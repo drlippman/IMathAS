@@ -4,23 +4,22 @@
 	//if needed
 
 use app\components\AppUtility;
-	
+
 	//load in filters as needed
 	$filterdir = rtrim(dirname(__FILE__), '/\\');
 	//include("$filterdir/simplelti/simplelti.php");
 	if ((isset($sessiondata['mathdisp']) && $sessiondata['mathdisp']==2 ) || isset($loadmathfilter)) { //use image fallback for math
 		include("$filterdir/math/ASCIIMath2TeX.php");
 		$AMT = new AMtoTeX;
-	} 
+	}
 	if ((isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==2) || isset($loadgraphfilter)) { //use image fallback for graphs
 		include("$filterdir/graph/asciisvgimg.php");
 		$AS = new AStoIMG;
 	}
 global $AS, $AMT, $imasroot;
 $imasroot = AppUtility::getHomeURL();
-include($filterdir."/graph/asciisvgimg.php");
-$AS = new AStoIMG;
-
+//include($filterdir."/graph/asciisvgimg.php");
+//$AS = new AStoIMG;
 //include($filterdir."/math/ASCIIMath2TeX.php");
 //$AMT = new AMtoTeX;
 	function mathfiltercallback($arr) {
@@ -183,21 +182,7 @@ $AS = new AStoIMG;
 			
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
-					/*if (!isset($GLOBALS['has_set_cdf_embed_script'])) {
-						$GLOBALS['has_set_cdf_embed_script'] = true;
-						$tag = '<script type="text/javascript" src="'.$urlmode.'www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script><script type="text/javascript">var cdf = new cdfplugin();';
-					} else {
-						$tag = '<script type="text/javascript">';
-					}
-					if (strpos($resval[3],'http')!==false) {
-						list ($junk,$w,$h,$url) = $resval;
-					} else {
-						list ($junk,$url,$w,$h) = $resval;
-					}
-						
-					$tag .= "cdf.embed('$url',$w,$h);</script>";
-					$str = str_replace($resval[0], $tag, $str);
-					*/
+
 					if (strpos($resval[3],'http')!==false) {
 						list ($junk,$w,$h,$url) = $resval;
 					} else {

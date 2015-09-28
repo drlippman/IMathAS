@@ -1292,7 +1292,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
-		$out .= "<script type=\"text/javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
 		
 		if (isset($answer)) {
 			if (!is_numeric($answer)) {
@@ -1398,7 +1398,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 			$out .= "<input type=button value=\"" . _('Preview') . "\" onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
-			$out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
+			$out .= "<script type=\"javascript\">matcalctoproc[$qn] = 1;</script>\n";
 			$tip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');
 			$tip .= '<br/>'.formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
 		}
@@ -1480,7 +1480,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$vlist = implode("|",$variables);
 		$flist = implode('|',$ofunc);
-		$out .= "<script type=\"text/javascript\">functoproc[$qn] = 1; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
+		$out .= "<script type=\"javascript\">functoproc[$qn] = 1; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
 		
 		for ($i = 0; $i < 20; $i++) {
@@ -1496,7 +1496,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$pts[$i] = implode("~",$tp);
 		}
 		$points = implode(",",$pts);
-		$out .= "<script type=\"text/javascript\">pts[$qn]=\"$points\";</script>\n";
+		$out .= "<script type=\"javascript\">pts[$qn]=\"$points\";</script>\n";
 		if ($answerformat=="equation") {
 			$out .= "<script type=\"text/javascript\">iseqn[$qn] = 1;</script>\n";
 			$tip = _('Enter your answer as an equation.  Example: y=3x^2+1, 2+x+y=3') . "\n<br/>" . _('Be sure your variables match those in the question');
@@ -1614,7 +1614,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"ntuplecalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">ntupletoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"javascript\">ntupletoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
 		//$tip .= "Enter DNE for Does Not Exist";
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
@@ -2018,7 +2018,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
-		$out .= "<script type=\"text/javascript\">intcalctoproc[$qn] = 1 ; calcformat[$qn] = '$answerformat';</script>\n";
+		$out .= "<script type=\"javascript\">intcalctoproc[$qn] = 1 ; calcformat[$qn] = '$answerformat';</script>\n";
 		
 		if (isset($answer)) {
 			if (in_array('inequality',$ansformats)) {
@@ -2292,7 +2292,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= getcolormark($colorbox);
 		if ($colorbox!='') { $out .= '</div>';}
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+		$out .= "<script type=\"javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 		
 		$la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);

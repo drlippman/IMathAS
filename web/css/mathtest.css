@@ -134,12 +134,13 @@ div.spacer {
 }
 
 div.navbar {
-	float: left;
-	width:120px;
-	padding:10px;
-	margin-top:0px;
-    min-height:200px;
-    color: #000000;
+    float: left;
+    width:120px;
+    padding:10px;
+    margin-top:0px;
+    background-color: #e0ffe0 !important;
+    border:1px solid #000;
+    color:#000;
 }
 
 div.navbar h4 {

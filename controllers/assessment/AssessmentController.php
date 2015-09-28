@@ -32,6 +32,8 @@ use app\models\Teacher;
 use app\models\User;
 use Yii;
 use app\components\AppConstant;
+
+include("../components/handled.php");
 class AssessmentController extends AppController
 {
     public function actionShowAssessment()
@@ -1160,12 +1162,14 @@ class AssessmentController extends AppController
     }
     public function actionShowTest(){
         $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $userid = $user['id'];
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $sessionId = $this->getSessionId();
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
-        $temp = '';
+        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings;
         $myrights = $user['rights'];
         $sessiondata = $this->getSessionData($sessionId);;
         if (!isset($CFG['TE']['navicons'])) {
@@ -1177,15 +1181,14 @@ class AssessmentController extends AppController
                 'correct'=>'te_green_check.png',
                 'wrong'=>'te_red_ex.png',
                 'partial'=>'te_yellow_check.png');
-
         }
         if (isset($guestid)) {
             $teacherid=$guestid;
         }
         if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-            $temp = _("You are not authorized to view this page.  If you are trying to reaccess a test you've already started, access it from the course page");
-            echo $temp;
-            exit;
+            $temp .= _("You are not authorized to view this page.  If you are trying to reaccess a test you've already started, access it from the course page");
+
+            return $temp;
         }
         $actas = false;
         $isreview = false;
@@ -1194,6 +1197,7 @@ class AssessmentController extends AppController
             unset($teacherid);
             $actas = true;
         }
+
         include("../components/displayQuestion.php");
         include("../components/testutil.php");
         include("../components/asidutil.php");
@@ -1219,16 +1223,15 @@ class AssessmentController extends AppController
 
             if (!$actas) {
                 if (isset($studentid)) {
-                    $temp['userid'] = $userid;
-                    $temp['courseid'] = $courseId;
-                    $temp['type'] = 'assess';
-                    $temp['typeid'] = $aid;
-                    $temp['viewtime'] = $now;
+                    $contentArray['userid'] = $userid;
+                    $contentArray['courseid'] = $courseId;
+                    $contentArray['type'] = 'assess';
+                    $contentArray['typeid'] = $aid;
+                    $contentArray['viewtime'] = $now;
                     $content = new ContentTrack();
-                    $content->createTrack($temp);
+                    $content->createTrack($contentArray);
                 }
                 $row = Exceptions::getStartDateEndDate($userid, $aid);
-
                 if ($row!=null) {
                     if ($now<$row['startdate'] || $row['enddate']<$now) { //outside exception dates
                         if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
@@ -1292,7 +1295,7 @@ class AssessmentController extends AppController
                         }
                     }
                 }
-                exit;
+                return $temp;
             }
             /*
              * check for password
@@ -1307,10 +1310,10 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($pwfail) {
-//                    if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-//                        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
-//                        $temp .= '&gt; ', _('Assessment'), '</div>';
-//                    }
+                    if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
+                        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
+                        $temp .= '&gt; '.'Assessment'. '</div>';
+                    }
                     $temp .= $out;
                     $temp .=  '<h2>'.$adata['name'].'</h2>';
                     $temp .= '<p>'. "Password required for access".'</p>';
@@ -1318,8 +1321,7 @@ class AssessmentController extends AppController
                     $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
                     $temp .= '<input type=submit value="'.'Submit'. '" />';
                     $temp .= "</form>";
-                    echo $temp;
-                    exit;
+                    return $temp;
                 }
             }
             /*
@@ -1341,20 +1343,15 @@ class AssessmentController extends AppController
                 /*
                  * starting test and get question set
                  */
-
                 if (trim($adata['itemorder'])=='') {
-                    echo 'No questions in assessment!';
-                    exit;
+                    $temp  .= 'No questions in assessment!';
+                    return $temp;
                 }
-
                 list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 
                 if ($qlist=='') {  //assessment has no questions!
-                    $temp .= '<html><body>';
                     $temp .= 'Assessment has no questions!';
-                    $temp .= '</body></html>';
-                    echo $temp;
-                    exit;
+                    return $temp;
                 }
 
                 $bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;  //bestscores;bestrawscores;firstscores
@@ -1373,12 +1370,9 @@ class AssessmentController extends AppController
                         $sessiondata['groupid'] = $stugroupid;
                     } else {
                         if ($adata['isgroup']==3) {
-                            $temp .= "<html><body>";
                             $temp .= "You are not yet a member of a group.  Contact your instructor to be added to a group.";
                             $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$_GET['cid']).">Back</a>";
-                            $temp .= "</body></html>";
-                            echo $temp;
-                            exit;
+                            return $temp;
                         }
                         $stuGrp = new Stugroups();
                         $stugroupid = $stuGrp->insertStuGrpData('Unnamed group', $adata['groupsetid']);
@@ -1535,8 +1529,8 @@ class AssessmentController extends AppController
         }
         //already started test
         if (!isset($sessiondata['sessiontestid'])) {
-            echo "<html><body>", _('Error.  Access test from course page'), "</body></html>\n";
-            exit;
+            $temp  .= 'Error.  Access test from course page';
+            return $temp;
         }
         $testid = addslashes($sessiondata['sessiontestid']);
         $asid = $testid;
@@ -1620,8 +1614,7 @@ class AssessmentController extends AppController
         $testsettings['timelimit'] = abs($testsettings['timelimit']);
         //do time limit mult
         $testsettings['timelimit'] *= $sessiondata['timelimitmult'];
-
-        list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
+        list($testtype,$showans) = explode('-',$testsettings['deffeedback']);
 
         //if submitting, verify it's the correct assessment
         if (isset($_POST['asidverify']) && $_POST['asidverify']!=$testid) {
@@ -1629,24 +1622,22 @@ class AssessmentController extends AppController
             $temp .= 'Only one open assessment can be handled at a time. Please reopen the assessment and try again. ';
             $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$testsettings['courseid']).">";
             $temp .= 'Return to course page'."</a>";
-            echo $temp;
-            exit;
+            return $temp;
         }
         //verify group is ok
         if ($testsettings['isgroup']>0 && !$isteacher &&  ($line['agroupid']==0 || ($sessiondata['groupid']>0 && $line['agroupid']!=$sessiondata['groupid']))) {
             $temp = 'Error.  Looks like your group has changed for this assessment. Please reopen the assessment and try again.';
             $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$testsettings['courseid']).">";
             $temp .= 'Return to course page'."</a>";
-            echo $temp;
-            exit;
+            return $temp;
         }
 
         $now = time();
         //check for dates - kick out student if after due date
         if ($testsettings['avail']==0 && !$isteacher) {
-            echo 'Assessment is closed';
+            $temp  .= 'Assessment is closed';
             $this->leavetestmsg($sessiondata);
-            exit;
+            return $temp;
         }
         if (!isset($sessiondata['actas'])) {
             $row = Exceptions::getStartDateEndDate($userid, $line['assessmentid']);
@@ -1656,9 +1647,9 @@ class AssessmentController extends AppController
                         $isreview = true;
                     } else {
                         if (!$isteacher) {
-                            echo 'Assessment is closed';
+                            $temp  .= 'Assessment is closed';
                             $this->leavetestmsg($sessiondata);
-                            exit;
+                            return $temp;
                         }
                     }
                 } else { //in exception
@@ -1673,9 +1664,9 @@ class AssessmentController extends AppController
                         $isreview = true;
                     } else {
                         if (!$isteacher) {
-                            echo 'Assessment is closed';
+                            $temp  .= 'Assessment is closed';
                             $this->leavetestmsg($sessiondata);
-                            exit;
+                            return $temp;
                         }
                     }
                 }
@@ -1689,14 +1680,14 @@ class AssessmentController extends AppController
         $superdone = false;
         if ($isreview) {
             if (isset($_POST['isreview']) && $_POST['isreview']==0) {
-                echo _('Due date has passed.  Submission rejected. ');
+                $temp  .= _('Due date has passed.  Submission rejected. ');
                 $this->leavetestmsg($sessiondata);
-                exit;
+                return $temp;
             }
-            $testsettings['testtype']="Practice";
+            $testtype="Practice";
             $testsettings['defattempts'] = 0;
             $testsettings['defpenalty'] = 0;
-            $testsettings['showans'] = '0';
+            $showans = '0';
 
             $seeds = explode(",",$line['reviewseeds']);
 
@@ -1729,9 +1720,9 @@ class AssessmentController extends AppController
             //check for past time limit, with some leniency for javascript timing.
             //want to reject if javascript was bypassed
             if ($timelimitremaining < -1*max(0.05*$testsettings['timelimit'],5)) {
-                echo 'Time limit has expired.  Submission rejected. ';
+                $temp  .= 'Time limit has expired.  Submission rejected. ';
                 $this->leavetestmsg($sessiondata);
-                exit;
+                return $temp;
             }
         }
 
@@ -1745,12 +1736,12 @@ class AssessmentController extends AppController
             }
         }
 
-        $allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
-        $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
-        $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
-        $showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
-        $noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
-        $reviewatend = ($testsettings['testtype']=="EndReview");
+        $allowregen = (!$superdone && ($testtype=="Practice" || $testtype=="Homework"));
+        $showeachscore = ($testtype=="Practice" || $testtype=="AsGo" || $testtype=="Homework");
+        $showansduring = (($testtype=="Practice" || $testtype=="Homework") && is_numeric($showans));
+        $showansafterlast = ($showans==='F' || $showans==='J');
+        $noindivscores = ($testtype=="EndScore" || $testtype=="NoScores");
+        $reviewatend = ($testtype=="EndReview");
         $showhints = ($testsettings['showhints']==1);
         $showtips = $testsettings['showtips'];
         $regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
@@ -1942,7 +1933,7 @@ class AssessmentController extends AppController
                         $reloadqi = true;
                     }
                 }
-            } else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
+            } else if ($_GET['regenall']=="fromscratch" && $testtype=="Practice" && !$isreview) {
                 filehandler::deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
                 AssessmentSession::deleteData($userid, $testsettings['id']);
                 return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/show-test?cid='.$testsettings['courseid'].'&id='.$testsettings['id']));
@@ -1950,7 +1941,7 @@ class AssessmentController extends AppController
             recordtestdata();
         }
 
-        if (isset($_GET['jumptoans']) && $testsettings['showans']==='J') {
+        if (isset($_GET['jumptoans']) && $showans==='J') {
             $tojump = $_GET['jumptoans'];
             $attempts[$tojump]=$qi[$questions[$tojump]]['attempts'];
             if ($scores[$tojump]<0){
@@ -1991,7 +1982,7 @@ class AssessmentController extends AppController
                 if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
                     $placeinhead = '';
                 }
-                $this->includeJS('mathquill_min.js','mathquill_min.js','AMtoMQ.js');
+                $this->includeJS('mathquill_min.js','AMtoMQ.js');
                 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
             }
@@ -2000,9 +1991,31 @@ class AssessmentController extends AppController
 
             //IP: eqntips
             if ($testsettings['showtips']==2) {
-                $this->includeJS('eqntips.js');
+//                $this->includeJS('eqntips.js');
             }
 
+            $placeinhead .= '<script type="text/javascript">
+	   function toggleintroshow(n) {
+	      var link = document.getElementById("introtoggle"+n);
+	      var content = document.getElementById("intropiece"+n);
+	      if (link.innerHTML.match("Hide")) {
+	      	   link.innerHTML = link.innerHTML.replace("Hide","Show");
+		   content.style.display = "none";
+	      } else {
+	      	   link.innerHTML = link.innerHTML.replace("Show","Hide");
+		   content.style.display = "block";
+	      }
+	     }
+	     function togglemainintroshow(el) {
+	     	if ($("#intro").hasClass("hidden")) {
+	     		$(el).html("'._("Hide Intro/Instructions").'");
+	     		$("#intro").removeClass("hidden").addClass("intro");
+	     	} else {
+	     		$("#intro").addClass("hidden");
+	     		$(el).html("'._("Show Intro/Instructions").'");
+	     	}
+	     }
+	     </script>';
             $cid = $testsettings['courseid'];
             if ($testsettings['displaymethod'] == "VideoCue") {
                 $this->includeJS('ytapi.js');
@@ -2010,22 +2023,21 @@ class AssessmentController extends AppController
             if ($sessiondata['intreereader']) {
                 $flexwidth = true;
             }
-            require("header.php");
             if ($testsettings['noprint'] == 1) {
                 $temp .= '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
             }
             if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
                 if (isset($sessiondata['actas'])) {
-//                    $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+                    $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
                     $temp .= "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">".'Gradebook Detail'. "</a> ";
                     $temp .= "&gt; ".'View as student'. "</div>";
                 } else {
                     $temp .= "<div class=breadcrumb>";
                     $temp .= "<span style=\"float:right;\">$userfullname</span>";
                     if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
-//                        $temp .= "$breadcrumbbase ", _('Assessment'), "</div>";
+                        $temp .= "$breadcrumbbase ".'Assessment'/ "</div>";
                     } else {
-//                        $temp .= "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+                        $temp .= "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
 
                         $temp .= "&gt; ".'Assessment'. "</div>";
                     }
@@ -2064,7 +2076,7 @@ class AssessmentController extends AppController
                 }
 
                 if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
-                    if ($testsettings['showans']!='N') {
+                    if ($showans!='N') {
                         $temp .= '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">'.'View your scored assessment'. '</a></p>';
                     }
                 }
@@ -2178,7 +2190,7 @@ class AssessmentController extends AppController
                         $temp .= 'and enter their password ';
                     }
                     $temp .= 'here.</p>';
-                    $temp .= '<form method="post" enctype="multipart/form-data" action="showtest.php?addgrpmem=true">';
+                    $temp .= '<form method="post" enctype="multipart/form-data" action="show-test?addgrpmem=true">';
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -2191,7 +2203,7 @@ class AssessmentController extends AppController
                     $temp .= '<p><input type=submit name="grpsubmit" value="'.'Record Group and Continue'. '"/></p>';
                     $temp .= '</form>';
 
-                    exit;
+                    return $temp;
                 }
             }
 
@@ -2205,7 +2217,7 @@ class AssessmentController extends AppController
                 $temp .= '<p>';
             }
 
-            if ($testsettings['testtype']=="Practice" && !$isreview) {
+            if ($testtype=="Practice" && !$isreview) {
                 $temp .= "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"show-test?regenall=fromscratch\">".'Create new version.'. "</a></div>";
             }
             if (!$isreview && !$superdone) {
@@ -2365,9 +2377,8 @@ class AssessmentController extends AppController
                 $temp .= "<div class=right>$duetimenote</div>\n";
             }
         } else {
-            require_once("../filter/filter.php");
-        }
 
+        }
         if (strpos($testsettings['intro'],'[Q')!==false) {
             $testsettings['intro'] = preg_replace('/((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?/','[Q $3]',$testsettings['intro']);
             if(preg_match_all('/\<p[^>]*>\s*\[Q\s+(\d+)(\-(\d+))?\s*\]\s*<\/p>/',$testsettings['intro'],$introdividers,PREG_SET_ORDER)) {
@@ -2489,7 +2500,8 @@ class AssessmentController extends AppController
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-                    basicshowq($toshow);
+
+                    basicshowq($toshow,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                     showqinfobar($toshow,true,true,2);
                     $temp .= '<input type="submit" class="btn" value="'.'Continue'. '" />';
                 } else { //are all done
@@ -2566,9 +2578,9 @@ class AssessmentController extends AppController
                         if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
                             $temp .= '<p>';
                             if ($reattemptsremain && !$immediatereattempt) {
-                                $temp .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">".'Reattempt last question'. "</a>, ";
+                                $temp .= "<a href=\"show-test?action=skip&amp;to=$qn&amp;reattempt=$qn\">".'Reattempt last question'. "</a>, ";
                             }
-                            $temp .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">".'Try another similar question'. "</a>";
+                            $temp .= "<a href=\"show-test?action=skip&amp;to=$qn&amp;regen=$qn\">".'Try another similar question'. "</a>";
                             if ($immediatereattempt) {
                                 $temp .= _(", reattempt last question below, or select another question.");
                             } else {
@@ -2576,7 +2588,7 @@ class AssessmentController extends AppController
                             }
                             $temp .= "</p>\n";
                         } else if ($reattemptsremain && !$immediatereattempt) {
-                            $temp .= "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">".'Reattempt last question'. "</a>";
+                            $temp .= "<p><a href=\"show-test?action=skip&amp;to=$qn&amp;reattempt=$qn\">".'Reattempt last question'. "</a>";
                             if ($lefttodo > 0) {
                                 $temp .=  _(", or select another question");
                             }
@@ -2585,14 +2597,14 @@ class AssessmentController extends AppController
                             $temp .= "<p>"._('Select another question').'</p>';
                         }
 
-                        if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
+                        if ($reattemptsremain == false && $showeachscore && $showans!='N') {
                             //TODO i18n
 
                             $temp .= "<p>This question, with your last answer";
                             if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
                                 $temp .= " and correct answer";
                                 $showcorrectnow = true;
-                            } else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+                            } else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $showans==$attempts[$qn]) {
                                 $temp .= " and correct answer";
                                 $showcorrectnow = true;
                             } else {
@@ -2636,22 +2648,22 @@ class AssessmentController extends AppController
                                     }
                                 }
                             }
-                            $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+                            $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
                             $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                             $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                             $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
                             $temp .= "<a name=\"beginquestions\"></a>\n";
-                            basicshowq($next);
+                            basicshowq($next,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                             showqinfobar($next,true,true);
                             $temp .= '<input type="submit" class="btn" value="'. _('Submit'). '" />';
-                            if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
-                                $temp .= ' <input type="button" class="btn" value="'.'Jump to Answer'. '" onclick="if (confirm(\''.'If you jump to the answer, you must generate a new version to earn credit'. '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+                            if (($showans=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+                                $temp .= ' <input type="button" class="btn" value="'.'Jump to Answer'. '" onclick="if (confirm(\''.'If you jump to the answer, you must generate a new version to earn credit'. '\')) {window.location = \'show-test?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
                             }
                             $temp .= "</form>\n";
 
                         }
 
-                        $temp .= "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+                        $temp .= "<br/><p>When you are done, <a href=\"show-test?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
 
                         $temp .= "</div>\n";
                     }
@@ -2676,16 +2688,16 @@ class AssessmentController extends AppController
                                 }
                             }
                         }
-                        $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+                        $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
                         $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                         $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                         $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
                         $temp .= "<a name=\"beginquestions\"></a>\n";
-                        basicshowq($next);
+                        basicshowq($next,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                         showqinfobar($next,true,true);
                         $temp .= '<input type="submit" class="btn" value="'. _('Submit'). '" />';
-                        if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
-                            $temp .= ' <input type="button" class="btn" value="'.'Jump to Answer'. '" onclick="if (confirm(\''.'If you jump to the answer, you must generate a new version to earn credit'. '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+                        if (($showans=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+                            $temp .= ' <input type="button" class="btn" value="'.'Jump to Answer'. '" onclick="if (confirm(\''.'If you jump to the answer, you must generate a new version to earn credit'. '\')) {window.location = \'show-test?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
                         }
                         $temp .= "</form>\n";
                         $temp .= "</div>\n";
@@ -2705,17 +2717,17 @@ class AssessmentController extends AppController
                         }
                         if (hasreattempts($next)) {
                             //if ($showeachscore) {
-                            $temp .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">".'Reattempt this question'. "</a></p>\n";
+                            $temp .= "<p><a href=\"show-test?action=skip&amp;to=$next&amp;reattempt=$next\">".'Reattempt this question'. "</a></p>\n";
                             //}
                             $reattemptsremain = true;
                         }
                         if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
-                            $temp .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">".'Try another similar question'. "</a></p>\n";
+                            $temp .= "<p><a href=\"show-test?action=skip&amp;to=$next&amp;regen=$next\">".'Try another similar question'. "</a></p>\n";
                         }
                         if ($lefttodo == 0) {
-                            $temp .= "<a href=\"showtest.php?action=skip&amp;done=true\">".'When you are done, click here to see a summary of your score'. "</a>\n";
+                            $temp .= "<a href=\"show-test?action=skip&amp;done=true\">".'When you are done, click here to see a summary of your score'. "</a>\n";
                         }
-                        if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
+                        if (!$reattemptsremain && $showans!='N') {// && $showeachscore) {
                             $temp .= "<p>".'Question with last attempt is displayed for your review only'. "</p>";
 
                             if (!$noraw && $showeachscore) {
@@ -2728,7 +2740,7 @@ class AssessmentController extends AppController
                             } else {
                                 $colors = array();
                             }
-                            $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+                            $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$showans));
                             if ($qshowans) {
                                 displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
                             } else {
@@ -2786,12 +2798,12 @@ class AssessmentController extends AppController
                         $temp .= "</p>";
 
                         if (hasreattempts($qn)) {
-                            $temp .= "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;reattempt=$qn\">".'Reattempt last question'. "</a></p>\n";
+                            $temp .= "<p><a href=\"show-test?action=seq&amp;to=$qn&amp;reattempt=$qn\">".'Reattempt last question'. "</a></p>\n";
                             $reattemptsremain = true;
                         }
                     }
                     if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-                        $temp .= "<p><a href=\"showtest.php?action=seq&amp;to=$qn&amp;regen=$qn\">".'Try another similar question'. "</a></p>\n";
+                        $temp .= "<p><a href=\"show-test?action=seq&amp;to=$qn&amp;regen=$qn\">".'Try another similar question'. "</a></p>\n";
                     }
                     unset($toshow);
                     if (canimprove($qn) && $showeachscore) {
@@ -2818,12 +2830,12 @@ class AssessmentController extends AppController
                         $done = true;
                     }
                     if (!$done) {
-                        $temp .= "<p>".'Question scored. <a href="#curq">Continue with assessment</a>, or when you are done click <a href="showtest.php?action=seq&amp;done=true">here</a> to see a summary of your score.'. "</p>\n";
+                        $temp .= "<p>".'Question scored. <a href="#curq">Continue with assessment</a>, or when you are done click <a href="show-test?action=seq&amp;done=true">here</a> to see a summary of your score.'. "</p>\n";
                         $temp .= "</div>\n";
                         $temp .= "<hr/>";
                     } else {
                         $temp .= "</div>\n";
-                        //$temp .= "<a href=\"showtest.php?action=skip&done=true\">Click here to finalize and score test</a>\n";
+                        //$temp .= "<a href=\"show-test?action=skip&done=true\">Click here to finalize and score test</a>\n";
                     }
 
 
@@ -2839,7 +2851,7 @@ class AssessmentController extends AppController
                 } else { //show more test
                     $temp .= filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
 
-                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=seq&amp;score=$toshow\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -2858,14 +2870,14 @@ class AssessmentController extends AppController
 
                         if ($i==$toshow) {
                             $temp .= '<div class="curquestion">';
-                            basicshowq($i,false);
+                            basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
                             $temp .= '</div>';
                         } else if ($qavail) {
                             $temp .= "<div class=todoquestion>";
-                            basicshowq($i,true);
+                            basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,true);
                             $temp .= "</div>";
                         } else {
-                            basicshowq($i,true);
+                            basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,true);
                         }
 
                         if ($i==$toshow) {
@@ -2985,13 +2997,13 @@ class AssessmentController extends AppController
 
                 }
                 if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
-                    $temp .= "<p><a href=\"showtest.php?regen=$qn&page=$page\">".'Try another similar question'. "</a></p>\n";
+                    $temp .= "<p><a href=\"show-test?regen=$qn&page=$page\">".'Try another similar question'. "</a></p>\n";
                 }
                 if (hasreattempts($qn)) {
                     if ($divopen) { $temp .= '</div>';}
 
                     ob_start();
-                    basicshowq($qn,false,$colors);
+                    basicshowq($qn,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false,$colors);
                     $quesout = ob_get_clean();
                     $quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="' . _('Submit') . '" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
                     $temp .= $quesout;
@@ -3005,7 +3017,7 @@ class AssessmentController extends AppController
                             if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
                                 $msg .= " and correct answer";
                                 $showcorrectnow = true;
-                            } else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+                            } else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $showans==$attempts[$qn]) {
                                 $msg .= " and correct answer";
                                 $showcorrectnow = true;
                             } else {
@@ -3023,7 +3035,7 @@ class AssessmentController extends AppController
 
                         } else {
                             $temp .= '</div>';
-                            if ($testsettings['showans']!='N') {
+                            if ($showans!='N') {
                                 displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
                             }
                         }
@@ -3048,7 +3060,7 @@ class AssessmentController extends AppController
                     $temp .= 'updateembednav();';
                 }
                 $temp .= '</script>';
-                exit;
+                return $temp;
 
             }
         } else { //starting test display
@@ -3115,7 +3127,7 @@ class AssessmentController extends AppController
                 $numdisplayed = 0;
                 for ($i = 0; $i < count($questions); $i++) {
                     if (unans($scores[$i]) || amreattempting($i)) {
-                        basicshowq($i);
+                        basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                         showqinfobar($i,true,false,1);
                         $numdisplayed++;
                     }
@@ -3125,7 +3137,7 @@ class AssessmentController extends AppController
                     $temp .= '<input type="submit" class="btn" name="saveforlater" value="'.'Save answers'. '" onclick="return confirm(\''.'This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'. '\');" />';
                     $temp .= "</form>\n";
                 } else {
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
                     $temp .= "</form>\n";
                     $this->leavetestmsg($sessiondata);
 
@@ -3137,17 +3149,17 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
                 } else {
                     $temp .= filter("<div class=intro>{$testsettings['intro']}</div>\n");
-                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-                    basicshowq($i);
+                    basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                     showqinfobar($i,true,true,2);
                     $temp .= '<input type="submit" class="btn" value="'.'Next'. '" />';
                     $temp .= "</form>\n";
@@ -3165,7 +3177,7 @@ class AssessmentController extends AppController
                     $temp .= "<div class=inset><br/>\n";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
 
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3180,16 +3192,16 @@ class AssessmentController extends AppController
                             }
                         }
                     }
-                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
-                    basicshowq($i);
+                    basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                     showqinfobar($i,true,true);
                     $temp .= '<input type="submit" class="btn" value="'.'Submit'. '" />';
-                    if (($testsettings['showans']=='J' && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='J') {
-                        $temp .= ' <input type="button" class="btn" value="'.'Jump to Answer'. '" onclick="if (confirm(\''.'If you jump to the answer, you must generate a new version to earn credit'. '\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
+                    if (($showans=='J' && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='J') {
+                        $temp .= ' <input type="button" class="btn" value="'.'Jump to Answer'. '" onclick="if (confirm(\''.'If you jump to the answer, you must generate a new version to earn credit'. '\')) {window.location = \'show-test?action=skip&amp;jumptoans='.$i.'&amp;to='.$i.'\'}"/>';
                     }
                     $temp .= "</form>\n";
                     $temp .= "</div>\n";
@@ -3202,14 +3214,14 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
+                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
                 } else {
                     $curq = $i;
                     $temp .= filter("<div class=intro>{$testsettings['intro']}</div>\n");
-                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+                    $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -3227,14 +3239,14 @@ class AssessmentController extends AppController
 
                         if ($i==$curq) {
                             $temp .= '<div class="curquestion">';
-                            basicshowq($i,false);
+                            basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
                             $temp .= '</div>';
                         } else if ($qavail) {
                             $temp .= "<div class=todoquestion>";
-                            basicshowq($i,true);
+                            basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,true);
                             $temp .= "</div>";
                         } else {
-                            basicshowq($i,true);
+                            basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,true);
                         }
                         if ($i==$curq) {
                             $temp .= "<div><input type=\"submit\" class=\"btn\" value=\"". sprintf('Submit Question %d'. ($i+1)). "\" /></div><p></p>\n";
@@ -3250,14 +3262,14 @@ class AssessmentController extends AppController
                 if ($testsettings['displaymethod'] == "VideoCue") {
                     $temp .= substr(trim($intro),0,-6);
                     if (!$sessiondata['istutorial']) {
-                        $temp .= "<p><a href=\"showtest.php?action=embeddone\">".'When you are done, click here to see a summary of your score'. "</a></p>\n";
+                        $temp .= "<p><a href=\"show-test?action=embeddone\">".'When you are done, click here to see a summary of your score'. "</a></p>\n";
                     }
                     $temp .= '</div>';
                     $intro = '';
                 }
                 $temp .= '<script type="text/javascript">var assesspostbackurl="' .  'show-test?embedpostback=true&action=scoreembed&page='.$_GET['page'].'";</script>';
                 //using the full test scoreall action for timelimit auto-submits
-                $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
+                $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=scoreall\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
                 if (strpos($intro,'[PAGE')===false && $testsettings['displaymethod'] != "VideoCue") {
                     $temp .= '<div class="formcontents" style="margin-left:20px;">';
                 }
@@ -3313,7 +3325,7 @@ class AssessmentController extends AppController
                     }
                     $dopage = true;
                     $dovidcontrol = false;
-                    showembednavbar($intropages,$_GET['page']);
+                    $this->showembednavbar($intropages,$_GET['page']);
                     $temp .= "<div class=inset>\n";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
                 } else if ($testsettings['displaymethod'] == "VideoCue") {
@@ -3325,7 +3337,7 @@ class AssessmentController extends AppController
 
 
                     //tag.src = "//www.youtube.com/iframe_api";
-                    showvideoembednavbar($viddata);
+                    $this->showvideoembednavbar($viddata);
                     $dovidcontrol = true;
                     $temp .= '<div class="inset" style="position: relative; margin-left: 225px; overflow: visible;">';
                     $temp .= "<a name=\"beginquestions\"></a>\n";
@@ -3346,7 +3358,7 @@ class AssessmentController extends AppController
                     $qmax = count($questions);
                     $dopage = false;
                     $dovidcontrol = false;
-                    showembedupdatescript();
+                    $this->showembedupdatescript();
                 }
 
                 for ($i = $qmin; $i < $qmax; $i++) {
@@ -3361,7 +3373,7 @@ class AssessmentController extends AppController
                     embedshowicon($i);
                     if (hasreattempts($i)) {
 
-                        basicshowq($i,false);
+                        basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
                         $quesout .= ob_get_clean();
                         $quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 
@@ -3370,7 +3382,7 @@ class AssessmentController extends AppController
                             $temp .= '<div class="prequestion">';
                             $temp .= "<p>".'No attempts remain on this problem.'. "</p>";
                             if ($allowregen && $qi[$questions[$i]]['allowregen']==1) {
-                                $temp .= "<p><a href=\"showtest.php?regen=$i\">".'Try another similar question'. "</a></p>\n";
+                                $temp .= "<p><a href=\"show-test?regen=$i\">".'Try another similar question'. "</a></p>\n";
                             }
                             if ($showeachscore) {
                                 //TODO i18n
@@ -3378,7 +3390,7 @@ class AssessmentController extends AppController
                                 if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
                                     $msg .= " and correct answer";
                                     $showcorrectnow = true;
-                                } else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
+                                } else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $showans==$attempts[$i]) {
                                     $msg .= " and correct answer";
                                     $showcorrectnow = true;
                                 } else {
@@ -3396,7 +3408,7 @@ class AssessmentController extends AppController
 
                             } else {
                                 $temp .= '</div>';
-                                if ($testsettings['showans']!='N') {
+                                if ($showans!='N') {
                                     displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
                                 }
                             }
@@ -3420,11 +3432,11 @@ class AssessmentController extends AppController
                 if ($dopage==true) {
                     $temp .= '<p>';
                     if ($_GET['page']>0) {
-                        $temp .= '<a href="showtest.php?page='.($_GET['page']-1).'">Previous Page</a> ';
+                        $temp .= '<a href="show-test?page='.($_GET['page']-1).'">Previous Page</a> ';
                     }
                     if ($_GET['page']<(count($intropages)-1)/2-1) {
                         if ($_GET['page']>0) { $temp .= '| ';}
-                        $temp .= '<a href="showtest.php?page='.($_GET['page']+1).'">Next Page</a>';
+                        $temp .= '<a href="show-test?page='.($_GET['page']+1).'">Next Page</a>';
                     }
                     $temp .= '</p>';
                 }
@@ -3435,30 +3447,31 @@ class AssessmentController extends AppController
 
                 $temp .= '</div>'; //ends either inset or formcontents div
                 if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
-                    $temp .= "<p><a href=\"showtest.php?action=embeddone\">".'When you are done, click here to see a summary of your score'. "</a></p>\n";
+                    $temp .= "<p><a href=\"show-test?action=embeddone\">".'When you are done, click here to see a summary of your score'. "</a></p>\n";
                 }
                 $temp .= '</form>';
-
-
-
             }
         }
-        return $this->renderWithData('showTest');
+
+        $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js']);
+        $this->includeCSS(['mathquill.css','mathtest.css']);
+        $renderData = array('displayQuestions' => $temp, 'sessiondata' =>  $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead);
+        return $this->renderWithData('showTest', $renderData);
     }
 
     function leavetestmsg($sessiondata) {
-        global $isdiag, $diagid, $isltilimited, $testsettings;
+        global $isdiag, $diagid, $isltilimited, $testsettings,$temp;
         if ($isdiag) {
-            echo "<a href=\"../diag/index.php?id=$diagid\">", _('Exit Assessment'), "</a></p>\n";
+            $temp .= "<a href=\"../diag/index.php?id=$diagid\">".'Exit Assessment'. "</a></p>\n";
         } else if ($isltilimited || $sessiondata['intreereader']) {
 
         } else {
-            echo "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">", _('Return to Course Page'), "</a></p>\n";
+            $temp .= "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">".'Return to Course Page'. "</a></p>\n";
         }
     }
 
     function showscores($questions,$attempts,$testsettings) {
-        global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend;
+        global $isdiag,$allowregen,$isreview,$noindivscores,$scores,$bestscores,$qi,$superdone,$timelimitkickout, $reviewatend,$temp;
 
         $total = 0;
         $lastattempttotal = 0;
@@ -3488,7 +3501,7 @@ class AssessmentController extends AppController
 
                 if (strpos($outmsg,'redirectto:')!==false) {
                     $redirecturl = trim(substr($outmsg,11));
-                    echo "<input type=\"button\" value=\"", _('Continue'), "\" onclick=\"window.location.href='$redirecturl'\"/>";
+                    $temp  .= "<input type=\"button\" value=\"".'Continue'. "\" onclick=\"window.location.href='$redirecturl'\"/>";
                     return false;
                 }
             }
@@ -3497,68 +3510,68 @@ class AssessmentController extends AppController
         if ($isdiag) {
             global $userid;
             $userinfo = User::getById($userid);
-            echo "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
-            echo substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));
-            echo "</h3>\n";
+            $temp  .= "<h3>{$userinfo['LastName']}, {$userinfo['FirstName']}: ";
+            $temp  .= substr($userinfo['SID'],0,strpos($userinfo['SID'],'~'));
+            $temp  .= "</h3>\n";
         }
 
-        echo "<h3>", _('Scores:'), "</h3>\n";
+        $temp  .= "<h3>".'Scores:'. "</h3>\n";
 
         if (!$noindivscores && !$reviewatend) {
-            echo "<table class=scores>";
+            $temp  .= "<table class=scores>";
             for ($i=0;$i < count($scores);$i++) {
-                echo "<tr><td>";
+                $temp  .= "<tr><td>";
                 if ($bestscores[$i] == -1) {
                     $bestscores[$i] = 0;
                 }
                 if ($scores[$i] == -1) {
                     $scores[$i] = 0;
-                    echo _('Question') . ' ' . ($i+1) . ': </td><td>';
-                    echo _('Last attempt: ');
+                    $temp  .= _('Question') . ' ' . ($i+1) . ': </td><td>';
+                    $temp  .= _('Last attempt: ');
 
-                    echo _('Not answered');
-                    echo "</td>";
-                    echo "<td>  ", _('Score in Gradebook: ');
-                    echo printscore($bestscores[$i],$i);
-                    echo "</td>";
+                    $temp  .= _('Not answered');
+                    $temp  .= "</td>";
+                    $temp  .= "<td>  ".'Score in Gradebook: ';
+                    $temp  .= printscore($bestscores[$i],$i);
+                    $temp  .= "</td>";
 
-                    echo "</tr>\n";
+                    $temp  .= "</tr>\n";
                 } else {
-                    echo _('Question') . ' ' . ($i+1) . ': </td><td>';
-                    echo _('Last attempt: ');
+                    $temp  .= _('Question') . ' ' . ($i+1) . ': </td><td>';
+                    $temp  .= _('Last attempt: ');
 
-                    echo printscore($scores[$i],$i);
-                    echo "</td>";
-                    echo "<td>  ", _('Score in Gradebook: ');
-                    echo printscore($bestscores[$i],$i);
-                    echo "</td>";
+                    $temp  .= printscore($scores[$i],$i);
+                    $temp  .= "</td>";
+                    $temp  .= "<td>  ".'Score in Gradebook: ';
+                    $temp  .= printscore($bestscores[$i],$i);
+                    $temp  .= "</td>";
 
-                    echo "</tr>\n";
+                    $temp  .= "</tr>\n";
                 }
             }
-            echo "</table>";
+            $temp  .= "</table>";
         }
         global $testid;
 
         recordtestdata();
 
-        if ($testsettings['testtype']!="NoScores") {
+        if ($testtype!="NoScores") {
 
-            echo "<p>", sprintf(_('Total Points on Last Attempts:  %d out of %d possible'), $lastattempttotal, $totpossible), "</p>\n";
+            $temp  .= "<p>". sprintf('Total Points on Last Attempts:  %d out of %d possible', $lastattempttotal, $totpossible). "</p>\n";
 
             //if ($total<$testsettings['minscore']) {
             if (($testsettings['minscore']<10000 && $total<$testsettings['minscore']) || ($testsettings['minscore']>10000 && $total<($testsettings['minscore']-10000)/100*$totpossible)) {
-                echo "<p><b>", sprintf(_('Total Points Earned:  %d out of %d possible: '), $total, $totpossible);
+                $temp  .= "<p><b>". sprintf(_('Total Points Earned:  %d out of %d possible: '), $total, $totpossible);
             } else {
-                echo "<p><b>", sprintf(_('Total Points in Gradebook: %d out of %d possible: '), $total, $totpossible);
+                $temp  .= "<p><b>". sprintf(_('Total Points in Gradebook: %d out of %d possible: '), $total, $totpossible);
             }
 
-            echo "$average % </b></p>\n";
+            $temp  .= "$average % </b></p>\n";
 
             if ($outmsg!='') {
-                echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
+                $temp  .= "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
                 if ($endmsg['commonmsg']!='' && $endmsg['commonmsg']!='<p></p>') {
-                    echo $endmsg['commonmsg'];
+                    $temp  .= $endmsg['commonmsg'];
                 }
             }
 
@@ -3569,45 +3582,45 @@ class AssessmentController extends AppController
                 } else {
                     $reqscore = ($testsettings['minscore']-10000).'%';
                 }
-                echo "<p><span style=\"color:red;\"><b>", sprintf(_('A score of %s is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";
+                $temp  .= "<p><span style=\"color:red;\"><b>". sprintf(_('A score of %s is required to receive credit for this assessment'), $reqscore). "<br/>".'Grade in Gradebook: No Credit (NC)'. "</span></p> ";
             }
         } else {
-            echo "<p><b>", _('Your scores have been recorded for this assessment.'), "</b></p>";
+            $temp  .= "<p><b>".'Your scores have been recorded for this assessment.'. "</b></p>";
         }
 
         //if timelimit is exceeded
         $now = time();
         if (!$timelimitkickout && ($testsettings['timelimit']>0) && (($now-$GLOBALS['starttime']) > $testsettings['timelimit'])) {
             $over = $now-$GLOBALS['starttime'] - $testsettings['timelimit'];
-            echo "<p>", _('Time limit exceeded by'), " ";
+            $temp  .= "<p>".'Time limit exceeded by'. " ";
             if ($over > 60) {
                 $overmin = floor($over/60);
-                echo "$overmin ", _('minutes'), ", ";
+                $temp  .= "$overmin ".'minutes'. ", ";
                 $over = $over - $overmin*60;
             }
-            echo "$over ", _('seconds'), ".<br/>\n";
-            echo _('Grade is subject to acceptance by the instructor'), "</p>\n";
+            $temp  .= "$over ".'seconds'. ".<br/>\n";
+            $temp  .= 'Grade is subject to acceptance by the instructor'. "</p>\n";
         }
 
 
         if (!$superdone) { // $total < $totpossible &&
             if ($noindivscores) {
-                echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)'), "</p>";
+                $temp  .= "<p>".'<a href="show-test?reattempt=all">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)'. "</p>";
             } else {
                 if (canimproveany()) {
-                    echo "<p>", _('<a href="showtest.php?reattempt=canimprove">Reattempt test</a> on questions that can be improved where allowed'), "</p>";
+                    $temp  .= "<p>".'<a href="show-test?reattempt=canimprove">Reattempt test</a> on questions that can be improved where allowed'. "</p>";
                 }
                 if (hasreattemptsany()) {
-                    echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on all questions where allowed'), "</p>";
+                    $temp  .= "<p>".'<a href="show-test?reattempt=all">Reattempt test</a> on all questions where allowed'. "</p>";
                 }
             }
 
             if ($allowregen) {
-                echo "<p>", _('<a href="showtest.php?regenall=missed">Try similar problems</a> for all questions with less than perfect scores where allowed.'), "</p>";
-                echo "<p>", _('<a href="showtest.php?regenall=all">Try similar problems</a> for all questions where allowed.'), "</p>";
+                $temp  .= "<p>".'<a href="show-test?regenall=missed">Try similar problems</a> for all questions with less than perfect scores where allowed.'. "</p>";
+                $temp  .= "<p>".'<a href="show-test?regenall=all">Try similar problems</a> for all questions where allowed.'. "</p>";
             }
         }
-        if ($testsettings['testtype']!="NoScores") {
+        if ($testtype!="NoScores") {
             $hascatset = false;
             foreach($qi as $qii) {
                 if ($qii['category']!='0') {
@@ -3625,7 +3638,7 @@ class AssessmentController extends AppController
             $showa=false;
 
             for ($i=0; $i<count($questions); $i++) {
-                echo '<div>';
+                $temp  .= '<div>';
                 if (!$noraw) {
                     if (strpos($rawscores[$i],'~')!==false) {
                         $col = explode('~',$rawscores[$i]);
@@ -3636,12 +3649,12 @@ class AssessmentController extends AppController
                     $col = scorestocolors($noraw?$scores[$i]:$rawscores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights'],$noraw);
                 }
                 displayq($i, $qi[$questions[$i]]['questionsetid'],$seeds[$i],$showa,false,$attempts[$i],false,false,false,$col);
-                echo "<div class=review>", _('Question')." ".($i+1).". ", _('Last Attempt:');
-                echo printscore($scores[$i], $i);
+                $temp  .= "<div class=review>".'Question'." ".($i+1).". ".'Last Attempt:';
+                $temp  .= printscore($scores[$i], $i);
 
-                echo '<br/>', _('Score in Gradebook: ');
-                echo printscore($bestscores[$i],$i);
-                echo '</div>';
+                $temp  .= '<br/>'.'Score in Gradebook: ';
+                $temp  .= printscore($bestscores[$i],$i);
+                $temp  .= '</div>';
             }
 
         }
@@ -3655,43 +3668,21 @@ class AssessmentController extends AppController
     }
 
     function shownavbar($questions,$scores,$current,$showcat) {
-        global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
+        global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG,$temp;
         $todo = 0;
         $earned = 0;
         $poss = 0;
-        echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
-        echo "<div class=navbar>";
-        echo "<h4>", _('Questions'), "</h4>\n";
-        echo "<ul class=qlist>\n";
+        $temp  .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"".'Skip Navigation'. "\" /></a>\n";
+        $temp  .= "<div class=navbar>";
+        $temp  .= "<h4>".'Questions'. "</h4>\n";
+        $temp  .= "<ul class=qlist>\n";
         for ($i = 0; $i < count($questions); $i++) {
-            echo "<li>";
-            if ($current == $i) { echo "<span class=current>";}
+            $temp  .= "<li>";
+            if ($current == $i) { $temp  .= "<span class=current>";}
             if (unans($scores[$i]) || amreattempting($i)) {
                 $todo++;
             }
-            /*
-            $icon = '';
-            if ($attempts[$i]==0) {
-                $icon = "full";
-            } else if (hasreattempts($i)) {
-                $icon = "half";
-            } else {
-                $icon = "empty";
-            }
-            echo "<img src=\"$imasroot/img/aicon/left$icon.gif\"/>";
-            $icon = '';
-            if (unans($bestscores[$i]) || getpts($bestscores[$i])==0) {
-                $icon .= "empty";
-            } else if (getpts($bestscores[$i]) == $qi[$questions[$i]]['points']) {
-                $icon .= "full";
-            } else {
-                $icon .= "half";
-            }
-            if (!canimprovebest($i) && !$allowregen && $icon!='full') {
-                $icon .= "ci";
-            }
-            echo "<img src=\"$imasroot/img/aicon/right$icon.gif\"/>";
-            */
+
             if ($isreview) {
                 $thisscore = getpts($scores[$i]);
             } else {
@@ -3699,57 +3690,57 @@ class AssessmentController extends AppController
             }
             if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
                 if (isset($CFG['TE']['navicons'])) {
-                    echo "<img alt=\"untried\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+                    $temp  .= "<img alt=\"untried\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
                 } else {
-                    echo "<img alt=\"untried\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
+                    $temp  .= "<img alt=\"untried\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
                 }
             } else if (canimprove($i) && !$noindivscores) {
                 if (isset($CFG['TE']['navicons'])) {
                     if ($thisscore==0 || $noindivscores) {
-                        echo "<img alt=\"incorrect - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+                        $temp  .= "<img alt=\"incorrect - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
                     } else {
-                        echo "<img alt=\"partially correct - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+                        $temp  .= "<img alt=\"partially correct - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
                     }
                 } else {
-                    echo "<img alt=\"can retry\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
+                    $temp  .= "<img alt=\"can retry\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
                 }
             } else {
                 if (isset($CFG['TE']['navicons'])) {
                     if (!$showeachscore) {
-                        echo "<img alt=\"cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+                        $temp  .= "<img alt=\"cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
                     } else {
                         if ($thisscore == $qi[$questions[$i]]['points']) {
-                            echo "<img alt=\"correct\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+                            $temp  .= "<img alt=\"correct\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
                         } else if ($thisscore==0) {
-                            echo "<img alt=\"incorrect - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+                            $temp  .= "<img alt=\"incorrect - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
                         } else {
-                            echo "<img alt=\"partially correct - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+                            $temp  .= "<img alt=\"partially correct - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
                         }
                     }
                 } else {
-                    echo "<img alt=\"cannot retry\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+                    $temp  .= "<img alt=\"cannot retry\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
                 }
             }
 
 
             if ($showcat>1 && $qi[$questions[$i]]['category']!='0') {
                 if ($qi[$questions[$i]]['withdrawn']==1) {
-                    echo "<a href=\"showtest.php?action=skip&amp;to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
+                    $temp  .= "<a href=\"show-test?action=skip&amp;to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
                 } else {
-                    echo "<a href=\"showtest.php?action=skip&amp;to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+                    $temp  .= "<a href=\"show-test?action=skip&amp;to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
                 }
             } else {
                 if ($qi[$questions[$i]]['withdrawn']==1) {
-                    echo "<a href=\"showtest.php?action=skip&amp;to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
+                    $temp  .= "<a href=\"show-test?action=skip&amp;to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
                 } else {
-                    echo "<a href=\"showtest.php?action=skip&amp;to=$i\">Q ". ($i+1) . "</a>";
+                    $temp  .= "<a href=\"show-test?action=skip&amp;to=$i\">Q ". ($i+1) . "</a>";
                 }
             }
             if ($showeachscore) {
                 if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
-                    echo ' (';
+                    $temp  .= ' (';
                 } else {
-                    echo ' [';
+                    $temp  .= ' [';
                 }
                 if ($isreview) {
                     $thisscore = getpts($scores[$i]);
@@ -3757,39 +3748,250 @@ class AssessmentController extends AppController
                     $thisscore = getpts($bestscores[$i]);
                 }
                 if ($thisscore<0) {
-                    echo '0';
+                    $temp  .= '0';
                 } else {
-                    echo $thisscore;
+                    $temp  .= $thisscore;
                     $earned += $thisscore;
                 }
-                echo '/'.$qi[$questions[$i]]['points'];
+                $temp  .= '/'.$qi[$questions[$i]]['points'];
                 $poss += $qi[$questions[$i]]['points'];
                 if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
-                    echo ')';
+                    $temp  .= ')';
                 } else {
-                    echo ']';
+                    $temp  .= ']';
                 }
             }
 
-            if ($current == $i) { echo "</span>";}
+            if ($current == $i) { $temp  .= "</span>";}
 
-            echo "</li>\n";
+            $temp  .= "</li>\n";
         }
-        echo "</ul>";
+        $temp  .= "</ul>";
         if ($showeachscore) {
             if ($isreview) {
-                echo "<p>", _('Review: ');
+                $temp  .= "<p>".'Review: ';
             } else {
-                echo "<p>", _('Grade: ');
+                $temp  .= "<p>".'Grade: ';
             }
-            echo "$earned/$poss</p>";
+            $temp  .= "$earned/$poss</p>";
         }
         if (!$isdiag && $testsettings['noprint']==0) {
-            echo "<p><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">", _('Print Version'), "</a></p> ";
+            $temp  .= "<p><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">".'Print Version'. "</a></p> ";
         }
 
-        echo "</div>\n";
+        $temp  .= "</div>\n";
         return $todo;
+    }
+
+    function showembedupdatescript() {
+        global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings,$temp;
+
+        $jsonbits = array();
+        $pgposs = 0;
+        for($j=0;$j<count($scores);$j++) {
+            $bit = "\"q$j\":[0,";
+            if (unans($scores[$j])) {
+                $cntunans++;
+                $bit .= "1,";
+            } else {
+                $bit .= "0,";
+            }
+            if (canimprove($j)) {
+                $cntcanimp++;
+                $bit .= "1,";
+            } else {
+                $bit .= "0,";
+            }
+            $curpts = getpts($bestscores[$j]);
+            if ($curpts<0) { $curpts = 0;}
+            $bit .= $curpts.']';
+            $pgposs += $qi[$questions[$j]]['points'];
+            $pgpts += $curpts;
+            $jsonbits[] = $bit;
+        }
+        $temp  .= '<script type="text/javascript">var embedattemptedtrack = {'.implode(',',$jsonbits).'}; </script>';
+        $temp  .= '<script type="text/javascript">function updateembednav() {
+			var unanscnt = 0;
+			var canimpcnt = 0;
+			var pts = 0;
+			var qcnt = 0;
+			for (var i in embedattemptedtrack) {
+				if (embedattemptedtrack[i][1]==1) {
+					unanscnt++;
+				}
+				if (embedattemptedtrack[i][2]==1) {
+					canimpcnt++;
+				}
+				pts += embedattemptedtrack[i][3];
+				qcnt++;
+			}
+			var status = 0;';
+        if ($showeachscore) {
+            $temp  .= 'if (pts == '.$pgposs.') {status=2;} else if (unanscnt<qcnt) {status=1;}';
+        } else {
+            $temp  .= 'if (unanscnt == 0) { status = 2;} else if (unanscnt<qcnt) {status=1;}';
+        }
+        $temp  .= 'if (top !== self) {
+				try {
+					top.updateTRunans("'.$testsettings['id'].'", status);
+				} catch (e) {}
+			}
+		      }</script>';
+    }
+
+    function showvideoembednavbar($viddata) {
+        global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings,$temp;
+        /*viddata[0] should be video id.  After that, should be [
+        0: title for previous video segment,
+        1: time to showQ / end of video segment, (in seconds)
+        2: qn,
+        3: time to jump to if right (and time for next link to start at) (in seconds)
+        4: provide a link to watch directly after Q (T/F),
+        5: title for the part immediately following the Q]
+        */
+        $temp  .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"".'Skip Navigation'. "\" /></a>\n";
+        $temp  .= '<div class="navbar" style="width:175px">';
+        $temp  .= '<ul class="qlist" style="margin-left:-10px">';
+        $timetoshow = 0;
+        for ($i=1; $i<count($viddata); $i++) {
+            $temp  .= '<li style="margin-bottom:7px;">';
+            $temp  .= '<a href="#" onclick="thumbSet.jumpToTime('.$timetoshow.',true);return false;">'.$viddata[$i][0].'</a>';
+            if (isset($viddata[$i][2])) {
+                $temp  .= '<br/>&nbsp;&nbsp;<a style="font-size:75%;" href="#" onclick="thumbSet.jumpToQ('.$viddata[$i][1].',false);return false;">'.'Jump to Question'. '</a>';
+                if (isset($viddata[$i][4]) && $viddata[$i][4]==true) {
+                    $temp  .= '<br/>&nbsp;&nbsp;<a style="font-size:75%;" href="#" onclick="thumbSet.jumpToTime('.$viddata[$i][1].',true);return false;">'.$viddata[$i][5].'</a>';
+                }
+            }
+            if (isset($viddata[$i][3])) {
+                $timetoshow = $viddata[$i][3];
+            } else if (isset($viddata[$i][1])) {
+                $timetoshow = $viddata[$i][1];
+            }
+            $temp  .= '</li>';
+        }
+        $temp  .= '</ul>';
+        $temp  .= '</div>';
+        $this->showembedupdatescript();
+    }
+
+    function showembednavbar($pginfo,$curpg) {
+        global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings, $temp;
+        $temp .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"".'Skip Navigation'. "\" /></a>\n";
+
+        $temp  .= '<div class="navbar fixedonscroll" style="width:125px">';
+        $temp  .= "<h4>".'Pages'. "</h4>\n";
+        $temp  .= '<ul class="qlist" style="margin-left:-10px">';
+        $jsonbits = array();
+        $max = (count($pginfo)-1)/2;
+        $totposs = 0;
+        for ($i = 0; $i < $max; $i++) {
+            $temp  .= '<li style="margin-bottom:7px;">';
+            if ($curpg == $i) { $temp  .= "<span class=current>";}
+            if (trim($pginfo[2*$i+1])=='') {
+                $pginfo[2*$i+1] =  $i+1;
+            }
+            $temp  .= '<a href="show-test?page='.$i.'">'.$pginfo[2*$i+1].'</a>';
+            if ($curpg == $i) { $temp  .= "</span>";}
+
+            preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$pginfo[2*$i+2],$matches,PREG_PATTERN_ORDER);
+            if (isset($matches[1]) && count($matches[1])>0) {
+                $qmin = min($matches[1])-1;
+                $qmax = max($matches[1]);
+
+                $cntunans = 0;
+                $cntcanimp = 0;
+                $pgposs = 0;
+                $pgpts = 0;
+                for($j=$qmin;$j<$qmax;$j++) {
+                    $bit = "\"q$j\":[$i,";
+                    if (unans($scores[$j])) {
+                        $cntunans++;
+                        $bit .= "1,";
+                    } else {
+                        $bit .= "0,";
+                    }
+                    if (canimprove($j)) {
+                        $cntcanimp++;
+                        $bit .= "1,";
+                    } else {
+                        $bit .= "0,";
+                    }
+                    $curpts = getpts($bestscores[$j]);
+                    if ($curpts<0) { $curpts = 0;}
+                    $bit .= $curpts.']';
+                    $pgposs += $qi[$questions[$j]]['points'];
+                    $pgpts += $curpts;
+                    $jsonbits[] = $bit;
+                }
+                $temp  .= '<br/>';
+
+                if ($showeachscore) {
+                    $temp  .= " <span id=\"embednavscore$i\" style=\"margin-left:8px\">".round($pgpts,1)." point".(($pgpts==1)?"":"s")."</span> out of $pgposs";
+                } else {
+                    $temp  .= " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
+                }
+                $totposs += $pgposs;
+            }
+            $temp  .= "</li>\n";
+        }
+        $temp  .= '</ul>';
+        $temp  .= '<script type="text/javascript">var embedattemptedtrack = {'.implode(',',$jsonbits).'}; </script>';
+        $temp  .= '<script type="text/javascript">function updateembednav() {
+			var unanscnt = [];
+			var unanstot = 0; var ptstot = 0;
+			var canimpcnt = [];
+			var pgpts = [];
+			var pgmax = -1;
+			var qcnt = 0;
+			for (var i in embedattemptedtrack) {
+				if (embedattemptedtrack[i][0] > pgmax) {
+					pgmax = embedattemptedtrack[i][0];
+				}
+				qcnt++;
+			}
+			for (var i=0; i<=pgmax; i++) {
+				unanscnt[i] = 0;
+				canimpcnt[i] = 0;
+				pgpts[i] = 0;
+
+			}
+			for (var i in embedattemptedtrack) {
+				if (embedattemptedtrack[i][1]==1) {
+					unanscnt[embedattemptedtrack[i][0]]++;
+					unanstot++;
+				}
+				if (embedattemptedtrack[i][2]==1) {
+					canimpcnt[embedattemptedtrack[i][0]]++;
+				}
+				pgpts[embedattemptedtrack[i][0]] += embedattemptedtrack[i][3];
+				ptstot += embedattemptedtrack[i][3];
+			}
+			for (var i=0; i<=pgmax; i++) { ';
+
+        if ($showeachscore) {
+            $temp  .= 'var el = document.getElementById("embednavscore"+i);';
+            $temp  .= 'if (el != null) {';
+            $temp  .= '	el.innerHTML = pgpts[i] + ((pgpts[i]==1) ? " point" : " points");';
+        } else {
+            $temp  .= 'var el = document.getElementById("embednavunans"+i);';
+            $temp  .= 'if (el != null) {';
+            $temp  .= '	el.innerHTML = unanscnt[i];';
+        }
+
+        $temp  .= '}}
+			var status = 0;';
+        if ($showeachscore) {
+            $temp  .= 'if (ptstot == '.$totposs.') {status=2} else if (unanstot<qcnt) {status=1;}';
+        } else {
+            $temp  .= 'if (unanstot == 0) { status = 2;} else if (unanstot<qcnt) {status=1;}';
+        }
+        $temp  .= 'if (top !== self) {
+				try {
+					top.updateTRunans("'.$testsettings['id'].'", status);
+				} catch (e) {}
+			}
+		}</script>';
+        $temp  .= '</div>';
     }
 }
 

@@ -87,7 +87,7 @@ function setMinHeightToContainer() {
             $(".master-wrap").css('min-height', heightMin+"px");
 }
 </script>
-<script type="text/javascript">
+<script type="javascript">
     noMathRender = false;
     var usingASCIIMath = true;
     var AMnoMathML = true;

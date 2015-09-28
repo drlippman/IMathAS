@@ -190,6 +190,7 @@ class AppController extends Controller
     }
 
     public function checkSession($params){
+        global $CFG;
         $session = Yii::$app->session;
         if (isset($sessionpath) && $sessionpath!='') {
             session_save_path($sessionpath);

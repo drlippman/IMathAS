@@ -157,7 +157,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function getStartDateEndDate($userId, $assessmentId)
     {
-        return Exceptions::find()->select('startdate,enddate')->where(['assessmentid' => $assessmentId, 'userid' => $userId]);
+        return Exceptions::find()->select('startdate,enddate')->where(['assessmentid' => $assessmentId, 'userid' => $userId])->one();
     }
 
 }

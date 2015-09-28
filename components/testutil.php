@@ -91,6 +91,7 @@ function getquestioninfo($qns,$testsettings) {
 //which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
 	global $seeds,$questions;
+
 	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
@@ -708,9 +709,8 @@ function canimproveany() {
 }
 
 //basic show question, for
-function basicshowq($qn,$seqinactive=false,$colors=array()) {
-	global $showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores;
-	$qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
+function basicshowq($qn,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,$seqinactive=false,$colors=array()) {
+    $qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
 	$qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J');
 	
 	if (canimprove($qn)) {
