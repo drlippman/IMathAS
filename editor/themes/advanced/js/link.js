@@ -27,6 +27,8 @@ var LinkDialog = {
 			selectByValue(f, 'link_list', f.href.value);
 			selectByValue(f, 'target_list', ed.dom.getAttrib(e, 'target'));
 			selectByValue(f, 'class_list', ed.dom.getAttrib(e, 'class'));
+		} else {
+			selectByValue(f, 'target_list', '_blank');
 		}
 	},
 

@@ -187,12 +187,17 @@ function showcalcontentsid(elid) {
 					
 					if (caleventsarr[elid].data[i].link=='') {
 						html += '<a onclick="recclick(\'linkedviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
+						if (caleventsarr[elid].data[i].target==1) { html += 'target="_blank" ';}
 						html += 'href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 					} else {
 						html += '<a onclick="recclick(\'linkedviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].link+'\');" ';
+						if (caleventsarr[elid].data[i].target==1) { html += 'target="_blank" ';}
 						html += 'href="'+caleventsarr[elid].data[i].link+'">';
 					}
-					html += caleventsarr[elid].data[i].name + '</a>';
+					html += caleventsarr[elid].data[i].name;
+					if (caleventsarr[elid].data[i].target==1) {html += ' <img src="'+imasroot+'/img/extlink.png"/>';}
+					html += '</a>';
+					
 				} else {
 					html += caleventsarr[elid].data[i].name;
 				}

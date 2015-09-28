@@ -250,9 +250,9 @@ while ($row = mysql_fetch_row($result)) {
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid' ORDER BY title";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid' ORDER BY title";
 } else {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_linkedtext WHERE ";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ";
 	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
 	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid' ORDER BY title";
 }
@@ -282,7 +282,7 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$tag = htmlentities($row[6], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$alink = htmlentities($alink, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	$json .= "name:\"$row[1]\", link:\"$alink\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$json .= "name:\"$row[1]\", link:\"$alink\", target:{$row[8]}, color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 	
 	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
 }
