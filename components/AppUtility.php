@@ -5,12 +5,17 @@ namespace app\components;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Exceptions;
+use app\models\Forums;
+use app\models\InlineText;
+use app\models\Items;
+use app\models\LinkedText;
 use app\models\QImages;
 use app\models\Questions;
 use app\models\Course;
 use app\models\QuestionSet;
 use app\models\Sessions;
 use app\models\User;
+use app\models\Wiki;
 use Yii;
 use yii\base\Component;
 use app\models\Links;
@@ -2907,5 +2912,427 @@ class AppUtility extends Component
             }
         }
         return $parent;
+    }
+
+    public function quickview($items,$countCourseDetails,$parent,$showdates=false,$showlinks=true)
+    {
+        global $courseId,$openblocks,$previewShift,$CFG;
+        if (!is_array($openblocks))
+        {
+            $openblocks = array();
+        }
+        $itemtypes = array();
+        $iteminfo = array();
+        /**
+         * Item data
+         */
+        $itemData = Items::getDataByCourseId($courseId);
+        foreach($itemData as $key => $row)
+        {
+            $itemtypes[$row['id']] = array($row['itemtype'],$row['typeid']);
+        }
+        /**
+         * Assessment data
+         */
+        $assessmentData = Assessments::getDataByCourseId($courseId);
+        foreach($assessmentData as $key => $row)
+        {
+            $id = array_shift($row);
+            $iteminfo['Assessment'][$id] = $row;
+
+        }
+        /**
+         * Inline text
+         */
+        $inlineTextData = InlineText::getDataByCourseId($courseId);
+        foreach($inlineTextData as $key => $row)
+        {
+            $id = array_shift($row);
+            $iteminfo['InlineText'][$id] = $row;
+
+        }
+        /**
+         * Link text
+         */
+        $linkTextData = LinkedText::getDataByCourseId($courseId);
+        foreach($linkTextData as $key => $row){
+            $id = array_shift($row);
+            $iteminfo['LinkedText'][$id] = $row;
+        }
+        /**
+         * Forum
+         */
+        $formData = Forums::getDataByCourseId($courseId);
+        foreach($formData as $key => $row){
+            $id = array_shift($row);
+            $iteminfo['Forum'][$id] = $row;
+        }
+
+        $wikiData = Wiki::getDataByCourseId($courseId);
+        foreach($wikiData as $key => $row)
+        {
+            $id = array_shift($row);
+            $iteminfo['Wiki'][$id] = $row;
+        }
+
+        $now = time() + $previewShift;
+        for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++) {
+
+            if (is_array($items[$i]))
+            {
+                /**
+                 * is a block
+                 * */
+                $items[$i]['name'] = ($items[$i]['name']);
+
+                if ($items[$i]['startdate'] == 0) {
+                    $startdate = _('Always');
+                } else {
+                    $startdate = AppUtility::formatdate($items[$i]['startdate']);
+                }
+                if ($items[$i]['enddate'] == 2000000000) {
+                    $enddate = _('Always');
+                } else {
+                    $enddate = AppUtility::formatdate($items[$i]['enddate']);
+                }
+                $bnum = $i + 1;
+                if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
+
+                    $availbeh = _('Expanded');
+                } else if ($items[$i]['SH'][1]=='F') {
+                    $availbeh = _('as Folder');
+                } else {
+                    $availbeh = _('Collapsed');
+                }
+                if ($items[$i]['avail']==2) {
+                    $show = sprintf(('Showing %s Always'), $availbeh);
+                } else if ($items[$i]['avail']==0) {
+                    $show = _('Hidden');
+                } else {
+                    $show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startdate, $enddate);
+                }
+                if ($items[$i]['avail']==2) {
+                    $color = '#0f0';
+                } else if ($items[$i]['avail']==0) {
+                    $color = '#ccc';
+                } else {
+                    $color = '#ccc';
+                }
+                if (in_array($items[$i]['id'],$openblocks))
+                {
+                    $isopen=true;
+                } else {
+                    $isopen=false;
+                }
+                if ($isopen || count($items[$i]['items'])==0) {
+                    $liclass = 'blockli';
+                    $qviewstyle = '';
+                } else {
+                    $liclass = 'blockli nCollapse';
+                    $qviewstyle = 'style="display:none;"';
+                }
+
+                if (!isset($CFG['CPS']['miniicons']['folder'])) {
+                    $icon  = '<span class=icon style="background-color:'.$color.'">B</span>';
+                } else {
+                    $icon = '<img alt="folder" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['folder'].'" class="mida icon" /> ';
+                }
+
+                echo '<li class="'.$liclass.'" id="'."$parent-$bnum".'" obn="'.$items[$i]['id'].'">'.$icon;
+                if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now))
+                {
+                    echo '<b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b>";
+                } else {
+                    echo '<i><b><span id="B'.$parent.'-'.$bnum.'" onclick="editinplace(this)">'.$items[$i]['name']. "</span></b></i>";
+                }
+
+                if ($showdates)
+                {
+                    echo " $show";
+                }
+                if ($showlinks) {
+                    echo '<span class="links">';
+                    echo "  <a class='modify' href='#'>", _('Modify'),"</a>| <a href='#'>", _('Delete'), "</a>";
+                    echo " | <a href=\"#\">", _('Copy'), "</a>";
+                    echo " | <a href=\"#\">", _('NewFlag'), "</a>";
+                    echo '</span>';
+                }
+                if (count($items[$i]['items']) > 0)
+                {
+                    echo '<ul class=qview '.$qviewstyle.'>';
+                    $this->quickview($items[$i]['items'],$countCourseDetails,$parent.'-'.$bnum,$showdats,$showlinks);
+                    echo '</ul>';
+                }
+                echo '</li>';
+            } else if ($itemtypes[$items[$i]][0] == 'Calendar')
+            {
+                /**
+                 * Calendar
+                 */
+                if (!isset($CFG['CPS']['miniicons']['calendar'])) {
+                    $icon  = '<span class=icon style="background-color:#0f0;">C</span>';
+                } else {
+                    $icon = '<img alt="calendar" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['calendar'].'" class="mida icon" /> ';
+                }
+                echo '<li id="'.$items[$i].'">'.$icon.'Calendar</li>';
+
+            } else if ($itemtypes[$items[$i]][0] == 'Assessment')
+            {
+                /**
+                 * Assessment
+                 */
+                $typeid = $itemtypes[$items[$i]][1];
+                $line['name'] = $iteminfo['Assessment'][$typeid]['name'];
+                $line['startdate'] = $iteminfo['Assessment'][$typeid]['startdate'];
+                $line['enddate'] = $iteminfo['Assessment'][$typeid]['enddate'];
+                $line['reviewdate'] = $iteminfo['Assessment'][$typeid]['reviewdate'];
+                $line['avail'] = $iteminfo['Assessment'][$typeid]['avail'];
+                if ($line['startdate']==0) {
+                    $startdate = _('Always');
+                } else {
+                    $startdate = AppUtility::formatdate($line['startdate']);
+                }
+                if ($line['enddate']==2000000000) {
+                    $enddate = _('Always');
+                } else {
+                    $enddate = AppUtility::formatdate($line['enddate']);
+                }
+                if ($line['reviewdate']==2000000000) {
+                    $reviewdate = _('Always');
+                } else {
+                    $reviewdate = AppUtility::formatdate($line['reviewdate']);
+                }
+                if (!isset($CFG['CPS']['miniicons']['assess'])) {
+                    $icon  = '<span class=icon style="background-color:'.$color.'">?</span>';
+                } else {
+                    $icon = '<img alt="assessment" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
+                }
+                echo '<li id="'.$items[$i].'">'.$icon;
+                if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+                    $show = sprintf(_('Available until %s'), $enddate);
+                    echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+                } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
+                    $show = sprintf(_('Review until %s'), $reviewdate);
+                    echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+                } else {
+                    $show = sprintf(_('Available %1$s to %2$s'), $startdate, $enddate);
+                    if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
+                        $show .= sprintf(_(', review until %s'), $reviewdate);
+                    }
+                    echo '<i><b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+                }
+                if ($showdates) {
+                    echo $show;
+                }
+                if ($showlinks) {
+                    echo '<span class="links">';
+                    echo " <a href=\"#\">", _('Questions'), "</a> | <a href=\"#\">", _('Settings'), "</a> | \n";
+                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
+                    echo " | <a href=\"#\">", _('Copy'), "</a>";
+                    echo " | <a href=\"#\">", _('Grades'), "</a>";
+                    echo '</span>';
+                }
+                echo "</li>";
+
+            } else if ($itemtypes[$items[$i]][0] == 'InlineText')
+            {
+                /**
+                 * Inline text
+                 */
+                $typeid = $itemtypes[$items[$i]][1];
+                $line['name'] = $iteminfo['InlineText'][$typeid]['title'];
+                $line['text'] = $iteminfo['InlineText'][$typeid]['text'];
+                $line['startdate'] = $iteminfo['InlineText'][$typeid]['startdate'];
+                $line['enddate'] = $iteminfo['InlineText'][$typeid]['enddate'];
+                $line['avail'] = $iteminfo['InlineText'][$typeid]['avail'];
+                if ($line['name'] == '##hidden##') {
+                    $line['name'] = strip_tags($line['text']);
+                }
+                if ($line['startdate'] == 0) {
+                    $startdate = _('Always');
+                } else {
+                    $startdate = AppUtility::formatdate($line['startdate']);
+
+                }
+                if ($line['enddate'] == 2000000000) {
+                    $enddate = _('Always');
+                } else {
+                    $enddate = AppUtility::formatdate($line['enddate']);
+                }
+                if ($items[$i]['avail']== 2) {
+                    $color = '#0f0';
+                } else if ($items[$i]['avail'] == 0) {
+                    $color = '#ccc';
+                }
+                if (!isset($CFG['CPS']['miniicons']['inline'])) {
+                    $icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
+                } else {
+                    $icon = '<img alt="text" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['inline'].'" class="mida icon" /> ';
+                }
+                echo '<li id="'.$items[$i].'">'.$icon;
+                if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+                    echo '<b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+                    if ($showdates) {
+                        printf(_(' showing until %s'), $enddate);
+                    }
+                } else {
+                    echo '<i><b><span id="I'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+                    if ($showdates) {
+                        printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
+                    }
+                }
+                if ($showlinks) {
+                    echo '<span class="links">';
+                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
+                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
+                    echo " | <a href=\"#\">", _('Copy'), "</a>";
+                    echo '</span>';
+                }
+                echo '</li>';
+            } else if ($itemtypes[$items[$i]][0] == 'LinkedText')
+            {
+                /**
+                 * Linked text
+                 */
+                $typeid = $itemtypes[$items[$i]][1];
+                    $line['name'] = $iteminfo['LinkedText'][$typeid]['title'];
+                    $line['startdate'] = $iteminfo['LinkedText'][$typeid]['startdate'];
+                    $line['enddate'] = $iteminfo['LinkedText'][$typeid]['enddate'];
+                    $line['avail'] = $iteminfo['LinkedText'][$typeid]['avail'];
+                if ($line['startdate'] == 0) {
+                    $startdate = _('Always');
+                } else {
+                    $startdate = AppUtility::formatdate($line['startdate']);
+                }
+                if ($line['enddate'] == 2000000000) {
+                    $enddate = _('Always');
+                } else {
+                    $enddate = AppUtility::formatdate($line['enddate']);
+                }
+                if ($items[$i]['avail']==2) {
+                    $color = '#0f0';
+                } else if ($items[$i]['avail']==0) {
+                    $color = '#ccc';
+                }
+                if (!isset($CFG['CPS']['miniicons']['linked'])) {
+                    $icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
+                } else {
+                    $icon = '<img alt="link" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['linked'].'" class="mida icon" /> ';
+                }
+                echo '<li id="'.$items[$i].'">'.$icon;
+                if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+                    echo '<b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+                    if ($showdates) {
+                        printf(_(' showing until %s'), $enddate);
+                    }
+                } else {
+                    echo '<i><b><span id="L'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+                    if ($showdates) {
+                        printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
+                    }
+                }
+                if ($showlinks) {
+                    echo '<span class="links">';
+                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
+                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
+                    echo " | <a href=\"#\">", _('Copy'), "</a>";
+                    echo '</span>';
+                }
+                echo '</li>';
+            } else if ($itemtypes[$items[$i]][0] == 'Forum')
+            {
+                /**
+                 * Forum
+                 */
+                $typeid = $itemtypes[$items[$i]][1];
+                $line['name'] = $iteminfo['Forum'][$typeid]['name'];
+                $line['startdate'] = $iteminfo['Forum'][$typeid]['startdate'];
+                $line['enddate'] = $iteminfo['Forum'][$typeid]['enddate'];
+                $line['avail'] = $iteminfo['Forum'][$typeid]['avail'];
+                if ($line['startdate']==0) {
+                    $startdate = _('Always');
+                } else {
+                    $startdate = AppUtility::formatdate($line['startdate']);
+                }
+                if ($line['enddate'] == 2000000000) {
+                    $enddate = _('Always');
+                } else {
+                    $enddate = AppUtility::formatdate($line['enddate']);
+                }
+
+                if (!isset($CFG['CPS']['miniicons']['forum'])) {
+                    $icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
+                } else {
+                    $icon = '<img alt="forum" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
+                }
+                echo '<li id="'.$items[$i].'">'.$icon;
+                if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+                    //echo '<b>'.$line['name']. "</b>";
+                    echo '<b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+                    if ($showdates) {
+                        printf(_(' showing until %s'), $enddate);
+                    }
+                } else {
+                    echo '<i><b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+                    if ($showdates) {
+                        printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
+                    }
+                }
+                if ($showlinks) {
+                    echo '<span class="links">';
+                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
+                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
+                    echo " | <a href=\"#\">", _('Copy'), "</a>";
+                    echo '</span>';
+                }
+                echo '</li>';
+            } else if ($itemtypes[$items[$i]][0] == 'Wiki')
+            {
+                /**
+                 * Wiki
+                 */
+                $typeid = $itemtypes[$items[$i]][1];
+                $line['name'] = $iteminfo['Wiki'][$typeid]['name'];
+                $line['startdate'] = $iteminfo['Wiki'][$typeid]['startdate'];
+                $line['enddate'] = $iteminfo['Wiki'][$typeid]['enddate'];
+                $line['avail'] = $iteminfo['Wiki'][$typeid]['avail'];
+                if ($line['startdate'] == 0) {
+                    $startdate = _('Always');
+                } else {
+                    $startdate = AppUtility::formatdate($line['startdate']);
+                }
+                if ($line['enddate']==2000000000) {
+                    $enddate = _('Always');
+                } else {
+                    $enddate = AppUtility::formatdate($line['enddate']);
+                }
+
+                if (!isset($CFG['CPS']['miniicons']['wiki'])) {
+                    $icon  = '<span class=icon style="background-color:'.$color.'">W</span>';
+                } else {
+                    $icon = '<img alt="wiki"  src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['wiki'].'" class="mida icon" /> ';
+                }
+                echo '<li id="'.$items[$i].'">'.$icon;
+                if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+                    echo '<b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+                    if ($showdates) {
+                        printf(_(' showing until %s'), $enddate);
+                    }
+                } else {
+                    echo '<i><b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+                    if ($showdates) {
+                        printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
+                    }
+                }
+                if ($showlinks) {
+                    echo '<span class="links">';
+                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
+                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
+                    echo " | <a href=\"#\">", _('Copy'), "</a>";
+                    echo '</span>';
+                }
+                echo '</li>';
+            }
+         }
     }
 }

@@ -545,5 +545,4 @@ class Course extends BaseImasCourses {
     public static function getLatePassHrs($courseId){
         return Course::find()->select('latepasshrs')->where(['id' => $courseId])->one();
     }
-
 }

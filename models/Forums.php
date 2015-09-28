@@ -287,4 +287,21 @@ class Forums extends BaseImasForums {
             $courseData->delete();
         }
     }
+    public static function getDataByCourseId($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','name','startdate','enddate','avail'])
+            ->from('imas_forums')
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function updateName($val, $typeId)
+    {
+        $form = Forums::findOne(['id' => $typeId]);
+        $form->name = $val;
+        $form->save();
+    }
 }

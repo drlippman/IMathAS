@@ -13,6 +13,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasItems;
 use Yii;
+use yii\db\Query;
 
 class Items extends BaseImasItems
 {
@@ -93,5 +94,16 @@ class Items extends BaseImasItems
         if($courseData){
             $courseData->delete();
         }
+    }
+
+    public static function getDataByCourseId($courseId)
+    {
+        $query = new Query();
+        $query	->select(['id','itemtype','typeid'])
+            ->from(['imas_items'])
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 }

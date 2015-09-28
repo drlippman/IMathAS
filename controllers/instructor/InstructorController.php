@@ -46,19 +46,43 @@ use yii\db\Exception;
 class InstructorController extends AppController
 {
 
-public $oa = array();
+    public $oa = array();
     public $cn = AppConstant::NUMERIC_ONE;
     public $key = AppConstant::NUMERIC_ZERO;
     public $enableCsrfValidation = false;
     public $shift;
+    public $cnt = AppConstant::NUMERIC_ZERO;
 
     public function actionIndex()
     {
+        global $courseId,$openblocks,$previewShift,$CFG;
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $isTeacher = $this->isTeacher($user['id'], $courseId);
         $isTutor = $this->isTutor($user['id'], $courseId);
+        $parent = AppConstant::NUMERIC_ZERO;
+        $quickview = $this->getParamVal('quickview');
+        $openblocks = 0;
+        $prevloadedblocks = 0;
+        $useviewbuttons = false;
+//        setcookie('openblocks-'.$courseId,$openblocks);
+//        setcookie('prevloadedblocks-'.$courseId,$prevloadedblocks);
+//        if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+//        {
+//            $openblocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+//            $firstload = false;
+//        } else {
+//            $firstload = true;
+//        }
+//
+//        if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
+//        {
+//            $prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
+//        }
+//        $plblist = $prevloadedblocks;
+//        $oblist = $openblocks;
+        $previewShift = -1;
         if ($isTeacher) {
             $canEdit = true;
             $viewAll = true;
@@ -307,13 +331,14 @@ public $oa = array();
             }
             $itemList = serialize($items);
             Course::setItemOrder($itemList,$courseId);
+
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
         $student = Student::getByCId($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js', 'mootools.js', 'nested1.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData,
-        'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll);
+        'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll, 'isTeacher' => $isTeacher, 'quickview' => $quickview, 'useviewbuttons' => $useviewbuttons);
         return $this->renderWithData('index', $returnData);
     }
     /**
@@ -1645,5 +1670,132 @@ public $oa = array();
                 $outcomesArr[$k] = $outcomes[$v];
             }
         }
+    }
+
+    public function actionSaveQuickRecorder()
+    {
+        global $items;
+        $params = $this->getRequestParams();
+        $courseId = $this->getParamVal('cid');
+        $order = $params['order'];
+
+        foreach ($params as $id => $val)
+        {
+
+            if ($id == "order")
+            {
+                continue;
+            }
+            $type = $id{0};
+            $typeId = substr($id,1);
+            if ($type=="I") {
+                $query = new InlineText();
+                $query->updateName($val, $typeId);
+            } else if ($type=="L") {
+                $query = new LinkedText();
+                $query->updateName($val,$typeId);
+            } else if ($type=="A") {
+                $query = new Assessments();
+                $query->updateName($val, $typeId);
+            } else if ($type=="F") {
+                $query = new Forums();
+                $query->updateName($val, $typeId);
+            } else if ($type=="W") {
+                $query = new Wiki();
+                $query->updateName($val, $typeId);
+            } else if ($type=="B") {
+                $query = Course::getItemOrder($courseId);
+                $itemsforblock = unserialize($query[0]['itemorder']);
+                $blocktree = explode('-',$typeId);
+                $existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
+                $sub =& $itemsforblock;
+                if (count($blocktree)>1) {
+                    for ($i=1;$i<count($blocktree);$i++) {
+                        $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                    }
+                }
+                $sub[$existingid]['name'] = stripslashes($val);
+                $itemOrder = addslashes(serialize($itemsforblock));
+                $query = new Course();
+                $query->setItemOrder($itemOrder, $courseId);
+            }
+        }
+        $query = Course::getItemOrder($courseId);
+        $items = unserialize($query[0]['itemorder']);
+
+        $newItems = array();
+
+        $newItems = $this->additems($order);
+        $itemList = addslashes(serialize($newItems));
+        $query = new Course();
+        $query->setItemOrder($itemList, $courseId);
+
+        $openblocks = Array(0);
+        $prevloadedblocks = array(0);
+        if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+        {
+            $openblocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+            $firstload=false;
+        } else {
+            $firstload=true;
+        }
+        if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
+        {
+            $prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
+        }
+        $plblist = implode(',',$prevloadedblocks);
+        $oblist = implode(',',$openblocks);
+
+        $quickView = new AppUtility();
+        $quickView->quickview($newItems,$courseDetail=false,0);
+    }
+
+   public function additems($list) {
+        global $items;
+        $outarr = array();
+        $list = substr($list,1,-1);
+        $i = 0; $nd = 0; $last = 0;
+        $listarr = array();
+        while ($i<strlen($list)) {
+            if ($list[$i]=='[') {
+                $nd++;
+            } else if($list[$i]==']') {
+                $nd--;
+            } else if ($list[$i]==',' && $nd==0) {
+                $listarr[] = substr($list,$last,$i-$last);
+                $last = $i+1;
+            }
+            $i++;
+        }
+        $listarr[] = substr($list,$last);
+        foreach ($listarr as $it) {
+            if (strpos($it,'-')!==false) { //is block
+                $pos = strpos($it,':');
+                if ($pos===false) {
+                    $pts[0] = $it;
+                } else {
+                    $pts[0] = substr($it,0,$pos);
+                    $pts[1] = substr($it,$pos+1);
+                }
+                $blocktree = explode('-',$pts[0]);
+                $sub = $items;
+                for ($i=1;$i<count($blocktree)-1;$i++) {
+                    $sub = $sub[$blocktree[$i]-1]['items'];
+                }
+                $block = $sub[$blocktree[count($blocktree)-1]-1];
+
+                if ($pos===false) {
+                    $block['items'] = array();
+                } else {
+                    $subarr = $this->additems($pts[1]);
+                    $block['items'] = $subarr;
+                }
+                $outarr[] = $block;
+            } else { //regular item
+                $outarr[] = $it;
+            }
+
+        }
+        return $outarr;
     }
 }

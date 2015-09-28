@@ -197,7 +197,6 @@ class CourseController extends AppController
 
                                 $exceptions[$line['typeid']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
                             }
-
                             if($previewshift > AppConstant::NUMERIC_ZERO)
                             {
                                if($assessment['enddate'] > ($now + $previewshift))

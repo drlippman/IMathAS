@@ -5,6 +5,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasWikis;
+use yii\db\Query;
 
 class Wiki extends BaseImasWikis
 {
@@ -144,5 +145,22 @@ class Wiki extends BaseImasWikis
         if ($wikiData) {
             $wikiData->delete();
         }
+    }
+
+    public static function getDataByCourseId($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','name','startdate','enddate','avail'])
+            ->from('imas_wikis')
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public function updateName($val, $typeId)
+    {
+        $form = Wiki::findOne(['id' => $typeId]);
+        $form->name = $val;
+        $form->save();
     }
 } 

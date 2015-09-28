@@ -187,4 +187,21 @@ class LinkedText extends BaseImasLinkedtext
     {
         return LinkedText::find()->select('text')->where(['id' => $id])->one();
     }
+
+    public static function getDataByCourseId($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','title','startdate','enddate','avail'])
+            ->from('imas_linkedtext')
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public function updateName($val, $typeId)
+    {
+        $linkText = LinkedText::findOne(['id' => $typeId]);
+        $linkText->title = $val;
+        $linkText->save();
+    }
 }

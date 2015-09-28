@@ -152,5 +152,26 @@ class InlineText extends BaseImasInlinetext
             $inlineData->delete();
         }
     }
+
+    public static function getDataByCourseId($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','title','text','startdate','enddate','avail'])
+            ->from('imas_inlinetext')
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function updateName($val, $inlineTextId)
+    {
+        $updateIdArray = InlineText::getById($inlineTextId);
+        if($updateIdArray)
+        {
+            $updateIdArray->title = $val;
+            $updateIdArray->save();
+        }
+    }
 }
 
