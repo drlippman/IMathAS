@@ -94,3 +94,6 @@ table td {
     margin-top: -8.6% !IMPORTANT;
     margin-right: -30px !IMPORTANT;
 }
+.default-end-timepicker .bootstrap-timepicker, .default-start-timepicker .bootstrap-timepicker {
+    width: 90%;
+}

@@ -16,8 +16,8 @@ if($commentType == "instr") {
 } ?>
 </div>
 <div class="title-container">
-    <div class="row">
-        <div class="pull-left page-heading">
+    <div class="row width-sixty-per">
+        <div class="pull-left page-heading width-hundread-per">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
     </div>
@@ -26,7 +26,6 @@ if($commentType == "instr") {
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 <div class="tab-content shadowBox upload-gradebook-comments-padding">
-<div class="inner-content-gradebook">
 
 <?php
 if($userCol == AppConstant::NUMERIC_NEGATIVE_ONE){
@@ -51,6 +50,15 @@ if (count($failures)>0) {
                 'labelOptions' => ['class' => 'col-sm-3  text-align-left'],
             ],
         ]); ?>
+    <div class="upload-comments-submit-btn">
+        <?php echo Html::submitButton(AppUtility::t('Submit', false), ['class' => 'btn btn-primary upload-comments-btn']) ?>
+        <?php if ($commentType == "instr"){ ?>
+            <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id.'&comtype=instr')  ?>"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Back')?></a>
+        <?php } else {?>
+            <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id)  ?>"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Back')?></a>
+        <?php }?>
+    </div>
+    <div class="col-md-12 padding-top-fifteen">
     <div class="col-md-12 padding-bottom-fifteen">
         <?php echo $form->field($model, 'file')->fileInput();?>
     </div>
@@ -67,7 +75,7 @@ if (count($failures)>0) {
         </span>
         <span class="col-md-9 padding-left-zero margin-left-minus-ten">
             <div class="col-md-12 padding-left-zero">
-                <div class="col-sm-4 padding-left-zero select-text-margin">
+                <div class="col-sm-5 padding-left-zero select-text-margin">
                     <input type="radio" name="userIdType" value="0" checked="1">&nbsp;<b>
                     <?php AppUtility::t('Username (login name) in column')?></b>
                 </div>
@@ -76,7 +84,7 @@ if (count($failures)>0) {
                 </div>
             </div>
             <div class="col-md-12 padding-left-zero padding-top-twenty">
-                <div class="col-sm-4 padding-left-zero select-text-margin">
+                <div class="col-sm-5 padding-left-zero select-text-margin">
                     <input type="radio" name="userIdType" value="1">
                     <span class="padding-left-five"><b><?php AppUtility::t('Lastname, Firstname in column')?></b></span>
                 </div>
@@ -86,17 +94,8 @@ if (count($failures)>0) {
             </div>
         </span>
     </div>
-    <div class="col-md-offset-3 col-md-9 padding-left-zero padding-top-thirty">
-            <?php echo Html::submitButton(AppUtility::t('Submit', false), ['class' => 'btn btn-primary upload-comments-btn']) ?>
-            <?php if ($commentType == "instr"){ ?>
-                <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id.'&comtype=instr')  ?>"><?php AppUtility::t('Back')?></a>
-            <?php } else {?>
-                <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
-            <?php }?>
-    </div>
-
+</div>
 </div>
 
 <?php ActiveForm::end(); ?>
-    </div>
 </div>

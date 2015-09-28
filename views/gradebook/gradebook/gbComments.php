@@ -21,19 +21,26 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 <div class="tab-content shadowBox"">
-<div class="inner-content-gradebook">
 <?php
 if($commentType == "instr"){
 ?>
-<div><pre><a href="gb-comments?cid=<?php echo $course->id?>"><?php AppUtility::t('View/Edit Student comments')?></a></pre></div>
-    <p><?php AppUtility::t('These notes will only display on this page and gradebook exports. They will not be visible to students.')?></p>
-    <p><a href="upload-comments?cid=<?php echo $course->id?>&comtype=instr"><?php AppUtility::t('Upload comments')?></a></p>
+<div>
+    <a href="gb-comments?cid=<?php echo $course->id?>"><?php AppUtility::t('View/Edit Student comments')?></a>
+</div>
+<p>
+    <?php AppUtility::t('These notes will only display on this page and gradebook exports. They will not be visible to students.')?>
+</p>
+<p>
+    <a href="upload-comments?cid=<?php echo $course->id?>&comtype=instr"><?php AppUtility::t('Upload comments')?></a>
+</p>
 <?php } else { ?>
-<div><pre><a href="gb-comments?cid=<?php echo $course->id?>&comtype=instr"><?php AppUtility::t('View/Edit Instructor notes')?></a></pre></div>
+<div>
+    <a href="gb-comments?cid=<?php echo $course->id?>&comtype=instr"><?php AppUtility::t('View/Edit Instructor notes')?></a>
+</div>
     <p><?php AppUtility::t('These comments will display at the top of the student\'s gradebook score list.')?></p>
     <p><a href="upload-comments?cid=<?php echo $course->id?>"><?php AppUtility::t('Upload comments')?></a></p>
 <?php } ?>
-    <br class="form">
+<div class="inner-content-gradebook padding-top-zero">
 <form id="mainform" method="post" action="#">
     <span class="col-sm-2 padding-zero"><?php AppUtility::t('Add/Replace to all') ?></span>
     <span class="col-sm-10 padding-zero">

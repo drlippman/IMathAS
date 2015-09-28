@@ -71,7 +71,11 @@ switch ($action) {
         if ($params['action'] == "modify") {
             echo "&id={$params['cid']}";
         }
-        echo "\"><input class='course-setting-submit-btn' type=submit value=Submit>";
+        echo "\">
+        <button class='course-setting-submit-btn' type='submit' value='Submit'>
+        <i class='fa fa-share'></i>
+            ".AppUtility::t('Submit',false)."
+        </button>";
         echo "<div class='col-md-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
                     <div class='col-md-12 margin-top-fifteen'>
                         <div class=col-md-3>Course ID</div>
@@ -98,7 +102,7 @@ switch ($action) {
         if (($avail & 1) == AppConstant::NUMERIC_ZERO) {
             echo 'checked="checked"';
         }
-        echo '/><span class="margin-left-five">' . AppUtility::t('Available to students', false) . '</span>
+        echo '/><span class="padding-left-ten">' . AppUtility::t('Available to students', false) . '</span>
                             </div>
 
                         <div class="col-md-12 margin-top-five">
@@ -106,7 +110,7 @@ switch ($action) {
         if (($avail & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_ZERO) {
             echo 'checked="checked"';
         }
-        echo '/><span class="margin-left-five">' . AppUtility::t('Show on instructors\' home page', false) . '</span>
+        echo '/><span class="padding-left-ten">' . AppUtility::t('Show on instructors\' home page', false) . '</span>
                         </div>
                     </div>
               </div>';
@@ -138,10 +142,10 @@ switch ($action) {
             <div class='col-md-12 margin-top-twenty'>
                     <div class='col-md-3 select-text-margin'>" . AppUtility::t('Default start/end time for new items', false) . "
                     </div>
-                    <div class=col-md-8>";
+                    <div class=col-md-9>";
             echo '<span class="floatleft non-bold select-text-margin">' . AppUtility::t('Start', false) . '</span>';
 
-            echo '<div class ="floatleft width-fourty-per margin-left-fifteen margin-right-minus-eleven-per margin-left-fifteen time-input">';
+            echo '<div class ="col-md-4 time-input default-start-timepicker margin-left-five margin-right-minus-twenty">';
             echo TimePicker::widget([
                 'name' => 'defstime',
                 'value' => $defstimedisp,
@@ -150,8 +154,8 @@ switch ($action) {
                 ]
             ]);
             echo '</div>';
-            echo '<label class="floatleft non-bold select-text-margin">End</label>';
-            echo '<div class="width-fourty-per margin-left-fifteen floatleft">';
+            echo '<label class="floatleft non-bold select-text-margin padding-right-five">End</label>';
+            echo '<div class="col-md-4 default-end-timepicker">';
             echo TimePicker::widget([
                 'name' => 'deftime',
                 'value' => $deftimedisp,
@@ -174,21 +178,21 @@ switch ($action) {
             if ($copyrights == AppConstant::NUMERIC_ZERO) {
                 echo "checked=1";
             }
-            echo '/><span class="margin-left-five">' . AppUtility::t('Require enrollment key from everyone', false) . '</span>
+            echo '/><span class="padding-left-ten">' . AppUtility::t('Require enrollment key from everyone', false) . '</span>
                         </div>
                         <div class="col-md-12 margin-top-five">
                         <input type=radio name="copyrights" value="1" ';
             if ($copyrights == AppConstant::NUMERIC_ONE) {
                 echo "checked=1";
             }
-            echo '/><span class="margin-left-five">' . AppUtility::t('No key required for group members, require key from others', false) . '</span>
+            echo '/><span class="padding-left-ten">' . AppUtility::t('No key required for group members, require key from others', false) . '</span>
                         </div>
                         <div class="col-md-12 margin-top-five">
                         <input type=radio name="copyrights" value="2" ';
             if ($copyrights == AppConstant::NUMERIC_TWO) {
                 echo "checked=1";
             }
-            echo '/><span class="margin-left-five">' . AppUtility::t('No key required from anyone', false) . '</span>
+            echo '/><span class="padding-left-ten">' . AppUtility::t('No key required from anyone', false) . '</span>
                         </div>
                     </div>
                     </div>';
@@ -205,7 +209,7 @@ switch ($action) {
             if ($msgset == AppConstant::NUMERIC_ZERO) {
                 echo "checked=1";
             }
-            echo '/><span class="margin-left-five">' . AppUtility::t('On for send and receive', false) . '</span>
+            echo '/><span class="padding-left-ten">' . AppUtility::t('On for send and receive', false) . '</span>
                     </div>
                     <div class="col-md-12 margin-top-five">
                     <input type=radio name="msgset" value="1" ';
@@ -256,14 +260,14 @@ switch ($action) {
             if (($toolset & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ZERO) {
                 echo 'checked="checked"';
             }
-            echo '><span class="margin-left-five">' . AppUtility::t('Calendar', false) . '</span>
+            echo '><span class="padding-left-ten">' . AppUtility::t('Calendar', false) . '</span>
                 </div>';
             echo '<div class="col-md-12 margin-top-five">
                 <input type="checkbox" name="toolset-forum" value="2" ';
             if (($toolset & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_ZERO) {
                 echo 'checked="checked"';
             }
-            echo '><span class="margin-left-five">' . AppUtility::t('Forum List', false) . '</span>
+            echo '><span class="padding-left-ten">' . AppUtility::t('Forum List', false) . '</span>
                 </div>';
             echo '
                 </div>
@@ -312,32 +316,33 @@ switch ($action) {
             </div>';
         }
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
-            echo '<div class=col-md-3>' . AppUtility::t('Mark course as template?', false) . '</div>';
-            echo '<div class=col-md-10><input type=checkbox name="isgrptemplate" value="2" ';
+            echo '<div class="col-md-12 margin-top-twenty">
+            <div class=col-md-3>' . AppUtility::t('Mark course as template?', false) . '</div>';
+            echo '<div class=col-md-9><input type=checkbox name="isgrptemplate" value="2" ';
             if (($istemplate & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO) {
                 echo 'checked="checked"';
             };
-            echo ' />' . AppUtility::t('Mark as group template course', false);
+            echo ' /><span class="padding-left-ten">' . AppUtility::t('Mark as group template course', false);echo '</span>';
             if ($myRights == AppConstant::ADMIN_RIGHT) {
-                echo '<br/><input type=checkbox name="istemplate" value="1" ';
+                echo '<div class="margin-top-ten"><input type=checkbox name="istemplate" value="1" ';
                 if (($istemplate & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE) {
                     echo 'checked="checked"';
                 };
-                echo ' />' . AppUtility::t('Mark as global template course', false) . '<br/>';
-                echo '<input type=checkbox name="isselfenroll" value="4" ';
+                echo ' /><span class="padding-left-ten">' . AppUtility::t('Mark as global template course', false) . '</span></div>';
+                echo '<div class="margin-top-ten"><input type=checkbox name="isselfenroll" value="4" ';
                 if (($istemplate & AppConstant::NUMERIC_FOUR) == AppConstant::NUMERIC_FOUR) {
                     echo 'checked="checked"';
                 };
-                echo ' />' . AppUtility::t('Mark as self-enroll course', false);
+                echo ' /><span class="padding-left-ten">'. AppUtility::t('Mark as self-enroll course', false); echo '</span></div>';
                 if (isset($CFG['GEN']['guesttempaccts'])) {
-                    echo '<br/><input type=checkbox name="isguest" value="8" ';
+                    echo '<input type=checkbox name="isguest" value="8" ';
                     if (($istemplate & AppConstant::NUMERIC_EIGHT) == AppConstant::NUMERIC_EIGHT) {
                         echo 'checked="checked"';
                     };
-                    echo ' />' . AppUtility::t('Mark as guest-access course', false);
+                    echo ' />'. AppUtility::t('Mark as guest-access course', false);
                 }
             }
-            echo '</div><br class="form" /><br class="form" />';
+            echo '</div></div>';
         }
         ?>
         <input type="hidden" name="picicons" value="<?php echo AppConstant::PIC_ICONS_VALUE; ?>">
@@ -441,8 +446,7 @@ switch ($action) {
                 <div class="row">
                     <div class="">
                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit"
-                                value="Submit"><i
-                                class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
+                                value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
                     </div>
                 </div>
             </div>
@@ -501,8 +505,7 @@ switch ($action) {
                 <div class="row">
                     <div class="">
                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit"
-                                value="Submit"><i
-                                class="fa fa-share header-right-btn"></i><?php AppUtility::t('Delete') ?></button>
+                                value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Delete') ?></button>
                     </div>
                 </div>
             </div>

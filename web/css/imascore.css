@@ -686,7 +686,7 @@ div.multiselitem {
     text-align: left !important;
 }
 .width-hundread-per {
-    width: 100%;
+    width: 100% !important;
 }
 .margin-thirty {
     margin: 30px;
@@ -1108,4 +1108,10 @@ background-color: #f8f8f8;
 }
 .padding-top-thirty {
     padding-top: 30px;
+}
+.margin-right-minus-twenty {
+    margin-right: -20px;
+}
+.padding-right-five {
+    padding-right: 5px;
 }

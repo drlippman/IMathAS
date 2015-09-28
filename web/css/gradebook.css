@@ -238,3 +238,8 @@ tr#quickadd td {
 .upload-gradebook-comments-padding {
 padding: 15px 10px 30px 0px;
 }
+.upload-comments-submit-btn {
+float: right;
+margin-top: -12.4%;
+margin-right: -10px;
+}
