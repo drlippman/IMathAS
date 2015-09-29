@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use \app\components\interpretUtility;
 use app\models\Assessments;
 use \app\components\CategoryScoresUtility;
-global $isteacher, $istutor;
+global $isteacher, $istutor, $temp;
 $isteacher = $defaultValuesArray['isteacher'];
 $gbmode =  $defaultValuesArray['gbmode'];
 $istutor = $defaultValuesArray['istutor'];
@@ -551,6 +551,7 @@ if ($isteacher) {
         $choicesdata = array();
 
         $qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors);
+        echo $temp;
         echo '</div>';
         if ($scores[$i]==-1) { $scores[$i]="N/A";} else {$total+=getpts($scores[$i]);}
         echo "<div class=review>Question ".($i+1).": ";

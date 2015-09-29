@@ -36,7 +36,6 @@ function selectCheckBox() {
 }
 function selectCheckBox1() {
     $('#add-remove-ques-table input[id = "header-checked1"]').click(function(){
-        alert('click chek all');
         if($(this).prop("checked") == true){
             $('#question-information-table input:checkbox').each(function () {
                 $(this).prop('checked', true);

@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 use app\components\AppConstant;
 use app\components\displayq2;
-
+global $temp;
 $this->title = AppUtility::t('Add Question', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -159,6 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
             $colors = array();
         }
         displayq(0,$params['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
+        echo $temp;
         echo "<div class='col-md-12 margin-top-ten padding-left-zero margin-bottom-fifteen'>
                     <div class='floatleft padding-left-zero padding-right-thirteen padding-top-ten'><input class='margin-right-ten' type=submit value=\"Submit\">
                     <input type=submit name=\"regen\" value=\"Submit and Regen\"></div>";
@@ -169,6 +170,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         echo '<code id="qhtml" style="display:none">';
         $message = displayq(0,$params['qsetid'],$seed,false,false,0,true);
+        echo $temp;
         $message = printfilter(forcefiltergraph($message));
         $message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
         $message = str_replacE('`','\`',$message);

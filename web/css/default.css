@@ -210,13 +210,13 @@ div.todoquestion {
 /*all questions*/
 div.question {
 	background-color: #ddf; 
-	border: 1px solid #00f;
+	/*border: 1px solid #00f;*/
 }
 
 
 div.review { /*info bar*/
 	background-color: #e0ffe0;
-	border: 1px solid #00f;
+	/*border: 1px solid #00f;*/
 }
 div.intro {
 	border: 1px solid #00f; 

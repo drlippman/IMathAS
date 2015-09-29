@@ -198,3 +198,6 @@ text-align: left;
     min-width: 95% !important;
     margin-left: -10px;
 }
+.chosen-container .chosen-results {
+    max-height:100px !important;
+}

@@ -16,7 +16,7 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $imasroot, $myrights, $showtips, $urlmode, $CFG;
+    global $imasroot, $myrights, $showtips, $urlmode, $CFG, $temp;
 	$imasroot = AppUtility::getHomeURL();
     $path = AppUtility::getHomeURL()."Uploads";
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
@@ -319,7 +319,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt===2) {
 		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
-		return '<div class="question col-lg-12">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div class="question col-lg-12 show-test-questions">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	}
 	if (($qdata['solutionopts']&1)==0) {
 		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
@@ -341,12 +341,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
-		echo "<div class=inactive>";
-		echo filter($evaledqtext);
+		$temp = "<div class=inactive>";
+        $temp .= filter($evaledqtext);
 	} else {
-		echo "<div class=\"question\"><div>\n";
-		echo filter($evaledqtext);
-		echo "</div>\n";
+        $temp .= "<div class=\"show-test-questions question\"><div>\n";
+        $temp .= filter($evaledqtext);
+        $temp .= "</div>\n";
 	}
 	
 	if (strpos($toevalqtxt,'$answerbox')===false) {  
@@ -359,8 +359,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($returnqtxt) {
 					$returntxt .= "<p>$abox</p>";
 				} else {
-					echo filter("<div class=\"toppad\">$abox</div>\n");
-					echo "<div class=spacer>&nbsp;</div>\n";
+                    $temp .= filter("<div class=\"toppad\">$abox</div>\n");
+                    $temp .= "<div class=spacer>&nbsp;</div>\n";
 				}
 			}
 		} else {  //one question only
@@ -371,7 +371,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if ($returnqtxt) {
 				$returntxt .= "<p>$answerbox</p>";
 			} else {
-				echo filter("<div class=\"toppad\">$answerbox</div>\n");
+                $temp .= filter("<div class=\"toppad\">$answerbox</div>\n");
 			}
 		}	
 	} 
@@ -380,10 +380,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		return $returntxt;
 	}
 	if (isset($helptext) &&  $showhints) {
-		echo '<div><p class="tips">'.filter($helptext).'</p></div>';
+        $temp .= '<div><p class="tips">'.filter($helptext).'</p></div>';
 	}
 	if ($showhints && ($qdata['extref']!='' || (($qdata['solutionopts']&2)==2 && $qdata['solution']!=''))) {
-		echo '<div><p class="tips">', _('Get help: ');
+        $temp .= '<div><p class="tips">'.AppUtility::t('Get help',false);
 		if ($qdata['extref']!= '') {
 			$extref = explode('~~',$qdata['extref']);
 		
@@ -397,53 +397,56 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
 					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
 					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
-					echo formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
+                    $temp .= formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
-					echo formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
+                    $temp .= formpopup("Read",$extrefpt[1],730,500,"button",true,"text",$qref);
 				} else {
-					echo formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text",$qref);
+                    $temp .= formpopup($extrefpt[0],$extrefpt[1],730,500,"button",true,"text",$qref);
 				}
 			}
 		}
 		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
 			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
 			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
-			echo formpopup("Written Example",$addr,730,500,"button",true,"soln",$qref);	
+            $temp .= formpopup("Written Example",$addr,730,500,"button",true,"soln",$qref);
 		}
-		echo '</p></div>';
+		$temp .= '</p></div>';
 	}
-	
-	echo "<div>";
+
+    $temp .= "<div>";
 	
 	foreach($entryTips as $iidx=>$entryTip) {
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
-			echo "<p class=\"tips\" ";
+            $temp .= "<p class=\"tips\" ";
 			if ($showtips!=1) { echo 'style="display:none;" ';}
-			echo ">", _('Box'), " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($entryTip)."</span></p>";
+            $temp .= ">".AppUtility::t('Box',false). " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($entryTip)."</span></p>";
 		}
 		if ($doshowans && strpos($toevalqtxt,'$showanswerloc')===false && is_array($showanswerloc) && isset($showanswerloc[$iidx])) {
-			echo '<div>'.$showanswerloc[$iidx].'</div>';
+            $temp .= '<div>'.$showanswerloc[$iidx].'</div>';
 		}
 	}
-	echo "</div>\n";
+    $temp .= "</div>\n";
 	
 	if ($doshowans && isset($showanswer) && !is_array($showanswer) && strpos($toevalqtxt,'$showanswerloc')===false) {  //single showanswer defined
-		echo '<div>'.$showanswerloc.'</div>';
+        $temp .= '<div>'.$showanswerloc.'</div>';
 	}
 	if ($doshowans && ($qdata['solutionopts']&4)==4 && $qdata['solution']!='') {
 		if ($nosabutton) {
-			echo filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
+            $temp .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
 		} else {
-			echo "<div><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:$(\"#soln$qnidx\").removeClass(\"hidden\"); rendermathnode(document.getElementById(\"soln$qnidx\"));' />";
-			echo filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
+            $temp .= "<div><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:$(\"#soln$qnidx\").removeClass(\"hidden\"); rendermathnode(document.getElementById(\"soln$qnidx\"));' />";
+            $temp .= filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
 		}
 	}
-	echo "</div>\n";
+//    echo $temp;
+
+    $temp .= "</div>\n";
 	if ($qdata['qtype']=="multipart" ) {
 		return $anstypes;
 	} else {
 		return array($qdata['qtype']);
 	}
+
 }
 
 //inputs: Question number, Question id, rand seed, given answer

@@ -738,6 +738,7 @@ class CourseController extends AppController
                     if (is_array($itemOrder)) {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
+//                        AppUtility::dump($itemOrder);
                         $tempItemList = array();
                         if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
@@ -790,6 +791,7 @@ class CourseController extends AppController
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js', 'course/addItem.js', 'course/instructor.js']);
         $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData, 'user' => $user);
+//        AppUtility::dump($responseData);
         return $this->render('blockIsolate', $returnData);
     }
 

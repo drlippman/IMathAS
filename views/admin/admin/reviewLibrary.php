@@ -2,6 +2,7 @@
 use app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = 'Remove Library';
+global $temp;
 ?>
 <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home','Admin', 'Manage Libraries'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'admin/admin/index', AppUtility::getHomeURL().'admin/admin/manage-lib?cid=admin'], 'page_title' => $this->title]); ?>
@@ -112,6 +113,7 @@ $this->title = 'Remove Library';
             <?php
             unset($lastanswers);
             displayq(0,$qsetid,$seed,true,true,0);
+            echo $temp;
             ?>
             <BR class=form><div class="col-lg-12"><input type=submit value="Submit"></div>
         </form>

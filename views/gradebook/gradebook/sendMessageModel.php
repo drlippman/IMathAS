@@ -7,6 +7,7 @@ $firstname = $receiverInformation['FirstName'];
 $lastname = $receiverInformation['LastName'];
 $email = $receiverInformation['email'];
 $useeditor = "message";
+global $temp;
 if ($params['sendtype'] == 'msg') {
     $this->title = 'New Message';
     $saveButton = 'Send Message';
@@ -39,6 +40,7 @@ if (isset($_GET['quoteq'])) {
     require("../assessment/displayq2.php");
     $parts = explode('-', $_GET['quoteq']);
     $message = displayq($parts[0], $parts[1], $parts[2], false, false, 0, true);
+    echo $temp;
     $message = printfilter(forcefiltergraph($message));
     $message = preg_replace('/(`[^`]*`)/', "<span class=\"AM\">$1</span>", $message);
 

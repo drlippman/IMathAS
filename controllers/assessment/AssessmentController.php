@@ -1160,8 +1160,9 @@ class AssessmentController extends AppController
             return array($params, $from, $filter);
         }
     }
-    public function actionShowTest(){
+    public function actionShowTest() {
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $params = $this->getRequestParams();
         $userid = $user['id'];
         $courseId = $this->getParamVal('cid');
@@ -1169,7 +1170,7 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
-        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores;
+        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$isdiag;
         $myrights = $user['rights'];
         $sessiondata = $this->getSessionData($sessionId);;
         if (!isset($CFG['TE']['navicons'])) {
@@ -1311,7 +1312,7 @@ class AssessmentController extends AppController
                 }
                 if ($pwfail) {
                     if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-                        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
+                        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../instructor/instructor/index?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
                         $temp .= '&gt; '.'Assessment'. '</div>';
                     }
                     $temp .= $out;
@@ -2006,21 +2007,10 @@ class AssessmentController extends AppController
                 $temp .= '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
             }
             if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
-                if (isset($sessiondata['actas'])) {
-                    $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
-                    $temp .= "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">".'Gradebook Detail'. "</a> ";
-                    $temp .= "&gt; ".'View as student'. "</div>";
-                } else {
-                    $temp .= "<div class=breadcrumb>";
-                    $temp .= "<span style=\"float:right;\">$userfullname</span>";
-                    if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
-                        $temp .= "$breadcrumbbase ".'Assessment'/ "</div>";
-                    } else {
-                        $temp .= "$breadcrumbbase <a href=\"../course/course.php?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
+                 /*
+                  * To handle breadcrumb here
+                  */
 
-                        $temp .= "&gt; ".'Assessment'. "</div>";
-                    }
-                }
             } else if ($isltilimited) {
                 $temp .= "<span style=\"float:right;\">";
                 if ($testsettings['msgtoinstr']==1) {
@@ -2187,8 +2177,8 @@ class AssessmentController extends AppController
             }
 
             //if was added to existing group, need to reload $questions, etc
-            $temp .= '<div id="headershowtest" class="pagetitle">';
-            $temp .= "<h2>{$testsettings['name']}</h2></div>\n";
+//            $temp .= '<div id="headershowtest" class="pagetitle">';
+//            $temp .= "<h2>{$testsettings['name']}</h2></div>\n";
             if (isset($sessiondata['actas'])) {
                 $temp .= '<p style="color: red;">'.'Teacher Acting as ';
                 $row = User::getPwdUNameById($sessiondata['actas']);
@@ -3096,7 +3086,7 @@ class AssessmentController extends AppController
                 $perfectscore = true;
             }
             if ($testsettings['displaymethod'] == "AllAtOnce") {
-                $temp .= filter("<div class=intro>{$testsettings['intro']}</div>\n");
+                $temp .= filter("<div class='test-etting-intro'>{$testsettings['intro']}</div>\n");
                 $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=scoreall\" onsubmit=\"return doonsubmit(this,true)\">\n";
                 $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                 $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -3131,7 +3121,7 @@ class AssessmentController extends AppController
                     $this->leavetestmsg($sessiondata);
 
                 } else {
-                    $temp .= filter("<div class=intro>{$testsettings['intro']}</div>\n");
+                    $temp .= filter("<div class='test-etting-intro'>{$testsettings['intro']}</div>\n");
                     $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=shownext&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -3142,7 +3132,7 @@ class AssessmentController extends AppController
                     $temp .= "</form>\n";
                 }
             } else if ($testsettings['displaymethod'] == "SkipAround") {
-                $temp .= filter("<div class=intro>{$testsettings['intro']}</div>\n");
+                $temp .= filter("<div class='test-etting-intro'>{$testsettings['intro']}</div>\n");
 
                 for ($i = 0; $i<count($questions);$i++) {
                     if (unans($scores[$i]) || amreattempting($i)) {
@@ -3197,7 +3187,7 @@ class AssessmentController extends AppController
 
                 } else {
                     $curq = $i;
-                    $temp .= filter("<div class=intro>{$testsettings['intro']}</div>\n");
+                    $temp .= filter("<div class='test-etting-intro'>{$testsettings['intro']}</div>\n");
                     $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=seq&amp;score=$i\" onsubmit=\"return doonsubmit(this,false,true)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -3432,7 +3422,7 @@ class AssessmentController extends AppController
 
         $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js','assessment/showQuestion.js']);
         $this->includeCSS(['mathquill.css','mathtest.css']);
-        $renderData = array('displayQuestions' => $temp, 'sessiondata' =>  $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead);
+        $renderData = array('displayQuestions' => $temp, 'sessiondata' =>  $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead, 'testsettings' => $testsettings, 'sessiondata' => $sessiondata, 'userfullname' => $userfullname);
         return $this->renderWithData('showTest', $renderData);
     }
 

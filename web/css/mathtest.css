@@ -56,8 +56,8 @@ div.question {
 	/*position: relative;*/
 	font-family: "Times New Roman", Times, serif;
 	font-size: medium;
-	background-color: #ddf; 
-	border: 1px solid #00f; 
+	background-color: #ddf;
+    border: 1px solid #d3d3d3 !important;
 	/*margin-top: 60px;*/
 	margin-bottom: 5px;
 	padding-top: 10px;
@@ -98,7 +98,7 @@ div.todoquestion {
 
 div.review {
 	/*background-color: #e0ffe0;*/
-	border: 1px solid #00f;
+	border: none !important;
 	margin-top: -4px;
 	margin-bottom: 20px;
 	padding: 5px;
@@ -139,7 +139,7 @@ div.navbar {
     padding:10px;
     margin-top:0px;
     background-color: #e0ffe0 !important;
-    border:1px solid #000;
+    border: none !important;
     color:#000;
 }
 
@@ -761,4 +761,9 @@ span.inlinebtn:hover {
 }
 .altContentOff {
 	display:none;
+}
+.show-test-questions {
+    background-color: #f8f8f8 !important;
+    padding: 25px !important;
+    margin-bottom: 25px !important;
 }
