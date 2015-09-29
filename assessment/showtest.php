@@ -2636,6 +2636,11 @@ if (!isset($_POST['embedpostback'])) {
 				} catch (e) {}
 			}
 		}</script>';
+		
+		if (!$isdiag && $testsettings['noprint']==0) {
+			echo "<p style=\"margin-top:2.5em\"><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">", _('Print Version'), "</a></p> ";
+		}
+		
 		echo '</div>';	
 	}
 	

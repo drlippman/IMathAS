@@ -139,6 +139,7 @@
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	
 	$endtext = '';  $intropieces = array();
+	$testsettings['intro'] = preg_replace('/\[PAGE\s+(.*?)\]/', '<h3>$1</h3>', $testsettings['intro']);
 	if (strpos($testsettings['intro'], '[QUESTION')!==false) {
 		//embedded type	
 		$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$testsettings['intro']);
