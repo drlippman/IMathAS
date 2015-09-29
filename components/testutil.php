@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
-
+global $imasroot;
+$imasroot = AppUtility::getHomeURL();
 //Returns Question settings for a single or set of questions
 //qns:  array of or single question ids
 //testsettings: assoc array of assessment settings
@@ -382,7 +383,6 @@ function printscore($sc,$qn) {
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 
-		//$sc = str_replace('~',', ',$sc);
 		$scarr = explode('~',$sc);
 		if (strpos($thisraw,'-2')!==false) {
 			$rawarr = explode('~',$thisraw);
@@ -403,33 +403,14 @@ function printscore($sc,$qn) {
 			} else {
 				$pm = 'ychk';
 			}
-			/*if (!is_numeric($v) || $v==0) { 
-				$w = 1; 
-			} if ($ptposs[$k]==0) {
-				$w = 14;	
-			} else {
-				$w = round(14*$sc/$ptposs[$k]);
-			}
-			$bar = '<span class="miniscorebarholder">';
-			if ($w < 7) { 
-			     $color = "#f".dechex(floor(16*($w)/7))."0";
-			} else if ($w==7) {
-			     $color = '#ff0';
-			} else { 
-			     $color = "#". dechex(floor(16*(2-$w/7))) . "f0";
-			}
-			$wmt = 14-$w;
-			$bar .= '<span class="miniscorebarinner" style="background-color:'.$color.';margin-top:'.$wmt.'px;height:'.$w.'px;">&nbsp;</span></span> ';
-			//$scarr[$k] = $bar.$v;
-			*/
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" />";
+
+			$bar = "<img src=\"$imasroot"."img/$pm.gif\" />";
 			if ($v=='*') {
 				$bar = '';
 			}
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
 		$out =  "$pts out of $poss (parts: $sc)";
 	}	
 	if ($hasmanual) {
@@ -474,7 +455,6 @@ function printscore2($sc) {
 function scorequestion($qn, $rectime=true) { 
 	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt, $sessiondata;
-	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
 
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
@@ -738,52 +718,52 @@ function basicshowq($qn,$showansduring,$questions,$testsettings,$qi,$seeds,$show
 
 //shows basic points possible, attempts remaining bar
 function showqinfobar($qn,$inreview,$single,$showqnum=0) {
-	global $qi,$questions,$responseString,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
+	global $qi,$questions,$temp,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
-            $responseString .= '<div class="review clearfix">';
+            $temp .= '<div class="review clearfix">';
 		}
 		if ($sessiondata['isteacher']) {
-            $responseString .= '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];
-            $responseString .= '<br/><a class="licensePopup" href="#">'._('License').'</a></span>';
+            $temp .= '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];
+            $temp .= '<br/><a class="licensePopup" href="#">'._('License').'</a></span>';
 		} else {
-            $responseString .= '<span style="float:right;font-size:70%"><a class="licensePopup" href="#">'._('License').'</a></span>';
+            $temp .= '<span style="float:right;font-size:70%"><a class="licensePopup" href="#">'._('License').'</a></span>';
 		}
-        $responseString .= "<input type='hidden' class='question-id' value='".$questions[$qn]."'>";
+        $temp .= "<input type='hidden' class='question-id' value='".$questions[$qn]."'>";
 		if ($showqnum==1) {
-            $responseString .= _('Question').' '.($qn+1).'. ';
+            $temp .= _('Question').' '.($qn+1).'. ';
 		} else if ($showqnum==2) {
-            $responseString .= sprintf(_('Question %d of %d'), $qn+1, count($questions)+1).'<br/>';
+            $temp .= sprintf(_('Question %d of %d'), $qn+1, count($questions)+1).'<br/>';
 		}
 		if ($qi[$questions[$qn]]['withdrawn']==1) {
-            $responseString .= '<span class="red">Question Withdrawn</span> ';
+            $temp .= '<span class="red">Question Withdrawn</span> ';
 		}
 		if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
 			$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 			if ($pointsremaining == $qi[$questions[$qn]]['points']) {
-                $responseString .= 'Points possible: '.$qi[$questions[$qn]]['points'].'<br/>';
+                $temp .= 'Points possible: '.$qi[$questions[$qn]]['points'].'<br/>';
 			} else {
-                $responseString .= sprintf(_('Points available on this attempt: %1$g of original %2$g'), $pointsremaining, $qi[$questions[$qn]]['points']).'<br/>';
+                $temp .= sprintf(_('Points available on this attempt: %1$g of original %2$g'), $pointsremaining, $qi[$questions[$qn]]['points']).'<br/>';
 			}
 		}
 		
 		if ($qi[$questions[$qn]]['attempts']==0) {
-            $responseString .= _('Unlimited attempts.');
+            $temp .= _('Unlimited attempts.');
 		} else if ($attempts[$qn]>=$qi[$questions[$qn]]['attempts']) {
-            $responseString .= _('No attempts remain.');
+            $temp .= _('No attempts remain.');
 		} else {
 			//echo '<br/>'.($qi[$questions[$qn]]['attempts']-$attempts[$qn])." attempts of ".$qi[$questions[$qn]]['attempts']." remaining.";
-            $responseString .= sprintf(_('This is attempt %1$d of %2$d.'), ($attempts[$qn]+1), $qi[$questions[$qn]]['attempts']);
+            $temp .= sprintf(_('This is attempt %1$d of %2$d.'), ($attempts[$qn]+1), $qi[$questions[$qn]]['attempts']);
 		}
 		if ($testsettings['showcat']>0 && $qi[$questions[$qn]]['category']!='0') {
-            $responseString .= "Category:".$qi[$questions[$qn]]['category']."";
+            $temp .= "Category:".$qi[$questions[$qn]]['category']."";
 		}
 		if ($attempts[$qn]>0 && $showeachscore) {
 			if (strpos($scores[$qn],'~')===false) {
-                $responseString .= "<br/>Score on last attempt:".($scores[$qn]<0?'N/A':$scores[$qn]).". ". _('Score in gradebook:').($bestscores[$qn]<0?'N/A':$bestscores[$qn]);
+                $temp .= "<br/>Score on last attempt:".($scores[$qn]<0?'N/A':$scores[$qn]).". ". _('Score in gradebook:').($bestscores[$qn]<0?'N/A':$bestscores[$qn]);
 			} else {
-                $responseString .= "<br/>_('Score on last attempt:')". str_replace('~', ', ',$scores[$qn]) . '), ';
-                $responseString .= _('Score in gradebook:') . str_replace('~', ', ',$bestscores[$qn]) . '), ';
+                $temp .= "<br/>_('Score on last attempt:')". str_replace('~', ', ',$scores[$qn]) . '), ';
+                $temp .= _('Score in gradebook:') . str_replace('~', ', ',$bestscores[$qn]) . '), ';
 				$ptposs = $qi[$questions[$qn]]['answeights'];
 				for ($i=0; $i<count($ptposs)-1; $i++) {
 					$ptposs[$i] = round($ptposs[$i]*$qi[$questions[$qn]]['points'],2);
@@ -792,26 +772,22 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 				$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
 				$ptposs[count($ptposs)-1] += $diff;
 				$ptposs = implode(', ',$ptposs);
-                $responseString .= _('Out of:'). " ($ptposs)";
+                $temp .= _('Out of:'). " ($ptposs)";
 			}
 		}
-		
-		//if (!$noindivscores) {
-		//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
-		//}
 	}
 	if ($single) {
-        $responseString .= "<input type=hidden id=\"verattempts\" name=\"verattempts\" value=\"{$attempts[$qn]}\" />";
+        $temp .= "<input type=hidden id=\"verattempts\" name=\"verattempts\" value=\"{$attempts[$qn]}\" />";
 	} else {
-        $responseString .= "<input type=hidden id=\"verattempts$qn\" name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
+        $temp .= "<input type=hidden id=\"verattempts$qn\" name=\"verattempts[$qn]\" value=\"{$attempts[$qn]}\" />";
 	}
 	if (!$sessiondata['istutorial']) {
 		$contactlinks = showquestioncontactlinks($qn);
 		if ($contactlinks!='') {
-            $responseString .= '<br/>'.$contactlinks;
+            $temp .= '<br/>'.$contactlinks;
 		}
 		if ($inreview) {
-            $responseString .= '</div>';
+            $temp .= '</div>';
 		}
 	}
 }
@@ -847,19 +823,19 @@ function seqshowqinfobar($qn,$toshow) {
 		echo '<div class="seqqinfocur">';
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			if (isset($CFG['TE']['navicons'])) {
-				echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+				echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
-			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			echo "<img src=\"$imasroot"."img/q_fullbox.gif\"/> ";
 			}
 		} else {
 			if (isset($CFG['TE']['navicons'])) {
 				if ($thisscore==0 || $noindivscores) {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+					echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 				} else {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+					echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 				}
 			} else {
-			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			echo "<img src=\"$imasroot"."img/q_halfbox.gif\"/> ";
 		}
 		}
 		echo "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
@@ -868,9 +844,9 @@ function seqshowqinfobar($qn,$toshow) {
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			echo '<div class="seqqinfoavail">';
 			if (isset($CFG['TE']['navicons'])) {
-				echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+				echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
-			echo "<img src=\"$imasroot/img/q_fullbox.gif\"/> ";
+			echo "<img src=\"$imasroot"."img/q_fullbox.gif\"/> ";
 			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\" onclick=\"return confirm('", _('Are you sure you want to jump to this question, discarding any work you have not submitted?'), "');\">$qlinktxt</a>.  ";
 			$qavail = true;
@@ -878,12 +854,12 @@ function seqshowqinfobar($qn,$toshow) {
 			echo '<div class="seqqinfoavail">';
 			if (isset($CFG['TE']['navicons'])) {
 				if ($thisscore==0 || $noindivscores) {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+					echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 				} else {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+					echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 				}
 			} else {
-			echo "<img src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			echo "<img src=\"$imasroot"."img/q_halfbox.gif\"/> ";
 			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\" onclick=\"return confirm('", _('Are you sure you want to jump to this question, discarding any work you have not submitted?'), "');\">$qlinktxt</a>.  ";
 			$qavail = true;
@@ -891,36 +867,36 @@ function seqshowqinfobar($qn,$toshow) {
 			echo '<div class="seqqinfoinactive">';
 			if (isset($CFG['TE']['navicons'])) {
 				if (!$showeachscore) {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+					echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 				} else {
 					if ($thisscore == $qi[$questions[$qn]]['points']) {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+						echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
 					} else if ($thisscore==0) { 
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+						echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 					} else {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+						echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
 					}
 				}
 			} else {
-			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			echo "<img src=\"$imasroot"."img/q_emptybox.gif\"/> ";
 			}
 			echo "<a href=\"showtest.php?action=seq&to=$qn#curq\" onclick=\"return confirm('", _('Are you sure you want to jump to this question, discarding any work you have not submitted?'), "');\">$qlinktxt</a>.  ";
 		} else {
 			echo '<div class="seqqinfoinactive">';
 			if (isset($CFG['TE']['navicons'])) {
 				if (!$showeachscore) {
-					echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+					echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 				} else {
 					if ($thisscore == $qi[$questions[$qn]]['points']) {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+						echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
 					} else if ($thisscore==0) { 
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+						echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 					} else {
-						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+						echo "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
 					}
 				}
 			} else {
-			echo "<img src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			echo "<img src=\"$imasroot"."img/q_emptybox.gif\"/> ";
 			}
 			echo "$qlinktxt.  ";
 		}
@@ -997,51 +973,51 @@ function embedshowicon($qn) {
 	}
 	if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			if (isset($CFG['TE']['navicons'])) {
-				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
-				echo "<img class=\"embedicon\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
+				echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_fullbox.gif\"/> ";
 			}
 	} else if (canimprove($qn) && !$noindivscores) {
 		if (isset($CFG['TE']['navicons'])) {
 			if ($thisscore==0 || $noindivscores) {
-				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 			} else {
-				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 			}
 		} else {
-			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
+			echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_halfbox.gif\"/> ";
 		}
 	} else if ($reattemptsremain) {
 		if (isset($CFG['TE']['navicons'])) {
 			if (!$showeachscore) {
-				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 			} else {
 				if ($thisscore == $qi[$questions[$qn]]['points']) {
-					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
 				} else if ($thisscore==0) { 
-					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 				} else {
-					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
 				}
 			}
 		} else {
-			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
 		}
 	} else {
 		if (isset($CFG['TE']['navicons'])) {
 			if (!$showeachscore) {
-				echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 			} else {
 				if ($thisscore == $qi[$questions[$qn]]['points']) {
-					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
 				} else if ($thisscore==0) { 
-					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 				} else {
-					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
 				}
 			}
 		} else {
-			echo "<img class=\"embedicon\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+			echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
 		}
 	}
 }

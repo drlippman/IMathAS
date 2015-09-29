@@ -1,6 +1,4 @@
 <?php
-//include \app\components\AppUtility::getHomeURL();
-//use app\components\AppUtility;
 	$nologo = true;
 	$flexwidth = true;
     global $imasroot;
