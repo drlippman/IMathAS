@@ -619,6 +619,7 @@ public static function deleteallpostfiles($postid) {
 	}
 	return $delcnt;
 }
+
 public static function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {

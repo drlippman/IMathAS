@@ -222,6 +222,7 @@ class AdminController extends AppController
     public function actionAddNewUser()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $model = new AddNewUserForm();
         if ($model->load($this->isPostMethod())){
             $params = $this->getRequestParams();
@@ -257,6 +258,7 @@ class AdminController extends AppController
     public function actionChangeRights()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $id = $this->getParamVal('id');
         $model = new ChangeRightsForm();
         if ($model->load($this->isPostMethod())) {
