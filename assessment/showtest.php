@@ -2341,6 +2341,13 @@ if (!isset($_POST['embedpostback'])) {
 					$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 					
 				} else {
+					if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
+						$showcorrectnow = true;
+					} else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
+						$showcorrectnow = true;
+					} else {
+						$showcorrectnow = false;
+					}
 					if (!$sessiondata['istutorial']) {
 						echo '<div class="prequestion">';
 						echo "<p>", _('No attempts remain on this problem.'), "</p>";
@@ -2350,30 +2357,26 @@ if (!isset($_POST['embedpostback'])) {
 						if ($showeachscore) {
 							//TODO i18n
 							$msg =  "<p>This question, with your last answer";
-							if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
+							if ($showcorrectnow) {
 								$msg .= " and correct answer";
-								$showcorrectnow = true;
-							} else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
-								$msg .= " and correct answer";
-								$showcorrectnow = true;
-							} else {
-								$showcorrectnow = false;
 							}
 							if ($showcorrectnow) {
-								echo $msg . ', is displayed below</p>';
-								echo '</div>';
-								displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],2,false,$attempts[$i],false,false,true);
+								echo $msg . ', is displayed below</p>';	
 							} else {
 								echo $msg . ', is displayed below</p>';
-								echo '</div>';
-								displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
 							}
-							
+						} 
+						echo '</div>';
+					}
+					if ($showeachscore) {
+						if ($showcorrectnow) {
+							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],2,false,$attempts[$i],false,false,true);
 						} else {
-							echo '</div>';
-							if ($testsettings['showans']!='N') {
-								displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
-							}
+							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
+						}
+					} else {
+						if ($testsettings['showans']!='N') {
+							displayq($i,$qi[$questions[$i]]['questionsetid'],$seeds[$i],0,false,$attempts[$i],false,false,true);
 						}
 					}
 					
