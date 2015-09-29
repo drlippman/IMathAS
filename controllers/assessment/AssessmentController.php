@@ -1169,7 +1169,7 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
-        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings;
+        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores;
         $myrights = $user['rights'];
         $sessiondata = $this->getSessionData($sessionId);;
         if (!isset($CFG['TE']['navicons'])) {
@@ -1994,28 +1994,7 @@ class AssessmentController extends AppController
 //                $this->includeJS('eqntips.js');
             }
 
-            $placeinhead .= '<script type="text/javascript">
-	   function toggleintroshow(n) {
-	      var link = document.getElementById("introtoggle"+n);
-	      var content = document.getElementById("intropiece"+n);
-	      if (link.innerHTML.match("Hide")) {
-	      	   link.innerHTML = link.innerHTML.replace("Hide","Show");
-		   content.style.display = "none";
-	      } else {
-	      	   link.innerHTML = link.innerHTML.replace("Show","Hide");
-		   content.style.display = "block";
-	      }
-	     }
-	     function togglemainintroshow(el) {
-	     	if ($("#intro").hasClass("hidden")) {
-	     		$(el).html("'._("Hide Intro/Instructions").'");
-	     		$("#intro").removeClass("hidden").addClass("intro");
-	     	} else {
-	     		$("#intro").addClass("hidden");
-	     		$(el).html("'._("Show Intro/Instructions").'");
-	     	}
-	     }
-	     </script>';
+            $placeinhead .= '';
             $cid = $testsettings['courseid'];
             if ($testsettings['displaymethod'] == "VideoCue") {
                 $this->includeJS('ytapi.js');
@@ -2788,8 +2767,6 @@ class AssessmentController extends AppController
                             $temp .= printscore($rawscore,$qn);
                             $temp .= "</p>";
                         }
-                        //$temp .= "<p>";
-                        //$temp .= "Score on last attempt: ";
                         $temp .= "<p>".'Score on last attempt: ';
                         $temp .= printscore($scores[$qn],$qn);
                         $temp .= "</p>\n";
@@ -3091,7 +3068,7 @@ class AssessmentController extends AppController
                 $temp .= '});</script>';
             }
             if ($testsettings['displaymethod'] != "Embed") {
-                $testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+                $testsettings['intro'] .= "<p>" . 'Total Points Possible: ' . totalpointspossible($qi) . "</p>";
             }
             if ($testsettings['isgroup']>0) {
                 $testsettings['intro'] .= "<p><span style=\"color:red;\">" . _('This is a group assessment.  Any changes effect all group members.') . "</span><br/>";
@@ -3441,7 +3418,7 @@ class AssessmentController extends AppController
                     $temp .= '</p>';
                 }
                 if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
-                    $temp .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
+                    $temp .= "<p>" .'Total Points Possible: '. totalpointspossible($qi) . "</p>";
                 }
 
 
@@ -3453,7 +3430,7 @@ class AssessmentController extends AppController
             }
         }
 
-        $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js']);
+        $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js','assessment/showQuestion.js']);
         $this->includeCSS(['mathquill.css','mathtest.css']);
         $renderData = array('displayQuestions' => $temp, 'sessiondata' =>  $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead);
         return $this->renderWithData('showTest', $renderData);
@@ -3690,35 +3667,35 @@ class AssessmentController extends AppController
             }
             if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
                 if (isset($CFG['TE']['navicons'])) {
-                    $temp  .= "<img alt=\"untried\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+                    $temp  .= "<img alt=\"untried\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
                 } else {
-                    $temp  .= "<img alt=\"untried\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
+                    $temp  .= "<img alt=\"untried\" src=\"$imasroot"."img/q_fullbox.gif\"/> ";
                 }
             } else if (canimprove($i) && !$noindivscores) {
                 if (isset($CFG['TE']['navicons'])) {
                     if ($thisscore==0 || $noindivscores) {
-                        $temp  .= "<img alt=\"incorrect - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+                        $temp  .= "<img alt=\"incorrect - can retry\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
                     } else {
-                        $temp  .= "<img alt=\"partially correct - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+                        $temp  .= "<img alt=\"partially correct - can retry\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
                     }
                 } else {
-                    $temp  .= "<img alt=\"can retry\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
+                    $temp  .= "<img alt=\"can retry\" src=\"$imasroot"."img/q_halfbox.gif\"/> ";
                 }
             } else {
                 if (isset($CFG['TE']['navicons'])) {
                     if (!$showeachscore) {
-                        $temp  .= "<img alt=\"cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+                        $temp  .= "<img alt=\"cannot retry\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
                     } else {
                         if ($thisscore == $qi[$questions[$i]]['points']) {
-                            $temp  .= "<img alt=\"correct\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+                            $temp  .= "<img alt=\"correct\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
                         } else if ($thisscore==0) {
-                            $temp  .= "<img alt=\"incorrect - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+                            $temp  .= "<img alt=\"incorrect - cannot retry\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
                         } else {
-                            $temp  .= "<img alt=\"partially correct - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+                            $temp  .= "<img alt=\"partially correct - cannot retry\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
                         }
                     }
                 } else {
-                    $temp  .= "<img alt=\"cannot retry\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+                    $temp  .= "<img alt=\"cannot retry\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
                 }
             }
 
@@ -3776,7 +3753,7 @@ class AssessmentController extends AppController
             $temp  .= "$earned/$poss</p>";
         }
         if (!$isdiag && $testsettings['noprint']==0) {
-            $temp  .= "<p><a href=\"#\" onclick=\"window.open('$imasroot/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">".'Print Version'. "</a></p> ";
+            $temp  .= "<p><a href=\"#\" onclick=\"window.open('$imasroot'.'question/question/print-test','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">".'Print Version'. "</a></p> ";
         }
 
         $temp  .= "</div>\n";
