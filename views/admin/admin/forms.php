@@ -752,7 +752,7 @@ switch ($action) {
                         <?php AppUtility::t('Modify Groups') ?>
                     </h3>
                 </div>
-                <table class='margin-top-twenty table table-bordered table-striped table-hover data-table'>
+                <table class='admin-modify-groups-table margin-top-twenty table table-bordered table-striped table-hover data-table'>
                     <thead>
                     <tr>
                         <th><?php AppUtility::t('Group Name') ?></th>
@@ -763,7 +763,7 @@ switch ($action) {
                     <?php foreach ($groupsName as $row) {
                         echo "<tbody>
                     <tr>
-                        <td>{$row['name']}</td>"; ?>
+                        <td class='word-break-break-all'>{$row['name']}</td>"; ?>
                         <td>
                             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modgroup&id=' . $row['id']); ?>"><?php AppUtility::t('Modify') ?></a>
                         </td>
@@ -818,4 +818,10 @@ switch ($action) {
 ?>
 </div>
 
+<script>
+    $(document).ready(function()
+    {
+        $('.admin-modify-groups-table').DataTable();
+    });
 
+</script>

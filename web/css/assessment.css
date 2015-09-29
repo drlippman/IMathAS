@@ -89,11 +89,16 @@ table td {
 .modify-lti-domain-group-padding {
     padding: 5px 30px 30px 30px !important;
 }
-.update-group-btn, .add-lti-credentials-btn, .add-group-btn {
+.update-group-btn, .add-lti-credentials-btn {
     float: right !IMPORTANT;
     margin-top: -8.6% !IMPORTANT;
     margin-right: -30px !IMPORTANT;
 }
 .default-end-timepicker .bootstrap-timepicker, .default-start-timepicker .bootstrap-timepicker {
     width: 90%;
+}
+.add-group-btn {
+    float: right !IMPORTANT;
+    margin-top: -92px !IMPORTANT;
+    margin-right: -30px !IMPORTANT;
 }

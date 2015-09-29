@@ -243,3 +243,8 @@ float: right;
 margin-top: -12.4%;
 margin-right: -10px;
 }
+.modify-gradebook-comments-background {
+    background-color: #f8f8f8;
+    height: 60px;
+    padding-top: 21px;
+}

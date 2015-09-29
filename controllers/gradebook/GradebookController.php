@@ -2647,6 +2647,7 @@ class GradebookController extends AppController
         }
         $studentsInfo = Student::findStudentsCompleteInfo($course['id']);
         $this->includeJS(['gradebook/gbComments.js']);
+        $this->includeCSS(['gradebook.css']);
         $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo, 'commentType' => $commentType);
         return $this->renderWithData('gbComments', $responseData);
     }

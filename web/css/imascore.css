@@ -1059,7 +1059,7 @@ background-color: #f8f8f8;
     margin-left: -30px !important;
 }
 .padding-left-twenty-five {
-    padding-left: 25px;
+    padding-left: 25px !important;
 }
 .width-twenty-one-per {
     width: 21% !important;
@@ -1114,4 +1114,8 @@ background-color: #f8f8f8;
 }
 .padding-right-five {
     padding-right: 5px;
+}
+.word-break-break-all {
+    word-break: break-all !important;
+    width:50% !important;
 }

@@ -781,8 +781,8 @@ class AdminController extends AppController
             case "removediag":
                 break;
         }
-        $this->includeCSS(['assessment.css']);
-        $this->includeJS(['general.js?ver=012115','forms.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
+        $this->includeCSS(['assessment.css','dataTables.bootstrap.css']);
+        $this->includeJS(['general.js','forms.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'myRights' => $myRights,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
