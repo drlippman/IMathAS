@@ -30,6 +30,7 @@ use app\models\Items;
 use app\models\Libraries;
 use app\models\LibraryItems;
 use app\models\LinkedText;
+use app\models\Message;
 use app\models\Questions;
 use app\models\QImages;
 use app\models\QuestionSet;
@@ -669,6 +670,7 @@ class AdminController extends AppController
                 $name = $course['name'];
                 break;
             case "deladmin":
+
                  break;
             case "chgpwd":
                  break;
@@ -799,6 +801,13 @@ class AdminController extends AppController
         $responseData = array('name' => $name,'id' => $id);
         return $this->successResponse($responseData);
     }
+    public function actionDeleteUserAjax()
+    {
+        $params = $this->getRequestParams();
+        $id = $params['id'];
+        $responseData = array('id' => $id);
+        return $this->successResponse($responseData);
+    }
     public function actionActions()
     {
         $params = $this->getRequestParams();
@@ -806,6 +815,7 @@ class AdminController extends AppController
         $this->layout = 'master';
         $currentUser = $this->getAuthenticatedUser();
         $userId = $currentUser['id'];
+        $getId = $this->getParamVal('id');
         $action = $params['action'];
         $myRights = $currentUser['rights'];
         $groupid = AppConstant::NUMERIC_ZERO;
@@ -844,6 +854,23 @@ class AdminController extends AppController
                 User::updatePassword($md5pw,$id,$myRights,$currentUser->groupid);
                 break;
             case "deladmin":
+
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    User::deleteAdmin($groupid, $getId);
+                } else
+                {
+                    User::deleteUserById($getId);
+                }
+                Student::deleteByUserId($getId);
+                Teacher::deleteUser($getId);
+                AssessmentSession::deleteByUserId($getId);
+                Exceptions::deleteByUserId($getId);
+                Message::deleteByMsgTo($getId);
+                Message::setIsRead($getId);
+                Message::deleteByMsgFrom($getId);
+                Message::setMsgFrom($getId);
+                filehandler::deletealluserfiles($getId);
                 break;
             case "chgpwd":
                 break;

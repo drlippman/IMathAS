@@ -758,5 +758,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function deleteAdmin($groupId, $id)
+    {
+        $users = User::find()->where(['id' => $id])->andWhere(['groupid' => $groupId])->andWhere(['<', 'rights', 100])->all();
+        foreach ($users as $user) {
+            $user->delete();
+        }
+    }
 }
 

@@ -40,9 +40,9 @@ if (!isset($params['id']))
         echo "<li>", _('No diagnostics are available through this page at this time'), "</li>";
     }
     foreach($displayDiagnostics as $key => $row) {
-        echo "<li>
-        <a href=".AppUtility::getURLFromHome('site', 'diagnostics?id='.$row['id']).">".$row['name']."</a></li>";
-    }
+        echo "<li>" ?>
+        <a href=<?php echo AppUtility::getURLFromHome('site', 'diagnostics?id='.$row['id'])?>><?php echo $row['name']?></a>
+   <?php  echo "</li>"; }
     echo "</ul></div>";
 
 }?>

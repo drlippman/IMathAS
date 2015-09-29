@@ -100,4 +100,12 @@ class Teacher extends BaseImasTeachers
             $courseData->delete();
         }
     }
+
+    public static function deleteUser($userId)
+    {
+        $userId = Teacher::findOne(['userid', $userId]);
+        if ($userId) {
+            $userId->delete();
+        }
+    }
 }

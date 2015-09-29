@@ -91,7 +91,7 @@ $imasroot = AppUtility::getHomeURL();
 		}
 		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
 	}
-	
+
 	function filter($str) {
 		global $sessiondata,$userfullname,$urlmode,$imasroot;
 //        echo'<pre>';print_r($sessiondata);die;
@@ -119,14 +119,14 @@ $imasroot = AppUtility::getHomeURL();
 				$str = preg_replace_callback('/<\s*embed[^>]*?sscr=(.)(.+?)\1.*?>/s','svgfiltersscrcallback',$str);
 				$str = preg_replace_callback('/<\s*embed[^>]*?script=(.)(.+?)\1.*?>/s','svgfilterscriptcallback',$str);
 			}
-		} else { 
+		} else {
 			$str = str_replace("<embed type='image/svg+xml'","<embed type='image/svg+xml' wmode=\"transparent\" ",$str);
 			$str = str_replace("src=".AppUtility::getHomeURL()."js/d.svg","",$str);
 		}
-	
+
 		if (strpos($str,'[WA')!==false) {
 			$search = '/\[WA:\s*(.+?)\s*\]/';
-			
+
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
 					$tag = '<script type="text/javascript" id="WolframAlphaScript'.$resval[1].'" src="'.$urlmode.'//www.wolframalpha.com/widget/widget.jsp?id='.$resval[1].'"></script>';
@@ -134,10 +134,10 @@ $imasroot = AppUtility::getHomeURL();
 				}
 			}
 		}
-		
+
 		if (strpos($str,'[EMBED')!==false) {
 			$search = '/\[EMBED:\s*([^\]]+)\]/';
-			
+
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
 					$respt = explode(',',$resval[1]);
@@ -149,7 +149,7 @@ $imasroot = AppUtility::getHomeURL();
 					}
 					if (count($respt)==1) {
 						$url = $respt[0]; $w = 600; $h = 400;
-					} else if (count($respt)<3) { 
+					} else if (count($respt)<3) {
 						continue;
 					} else {
 						if (strpos($respt[2],'http')!==false) {
@@ -164,22 +164,22 @@ $imasroot = AppUtility::getHomeURL();
 						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
 						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".urlencode($url);
 						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
-					
+
 					} else {
 						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" ";
 						if ($nobord) {
 							$tag .= 'frameborder="0" ';
-						} 
+						}
 						$tag .= "></iframe>";
 					}
 					$str = str_replace($resval[0], $tag, $str);
 				}
 			}
 		}
-		
+
 		if (strpos($str,'[CDF')!==false) {
 			$search = '/\[CDF:\s*([^,]+),([^,]+),([^,\]]+)\]/';
-			
+
 			if (preg_match_all($search, $str, $res, PREG_SET_ORDER)){
 				foreach ($res as $resval) {
 

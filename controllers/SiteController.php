@@ -160,7 +160,7 @@ class SiteController extends AppController
                 setcookie(session_name(), '', time()-42000, '/');
             }
             session_destroy();
-//            return $this->redirect('site', 'diagnostics?id=' .$diagId);
+            return $this->redirect('site', 'diagnostics?id=' .$diagId);
         }
         if (isset($params['SID']))
         {

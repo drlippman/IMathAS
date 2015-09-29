@@ -156,7 +156,7 @@ class Message extends BaseImasMsgs
     }
     public static function sentUnsendMsg($msgId)
     {
-        $message =Message::getById($msgId);
+        $message = Message::getById($msgId);
             if($message){
                 $message->delete();
             }
@@ -323,6 +323,40 @@ class Message extends BaseImasMsgs
 
     public static function getMsgIds($userid, $courseId){
         return Message::find()->select('id')->where(['msgto' => $userid, 'courseid' => $courseId])->andWhere(['OR','isread = 0' , 'isread = 4'])->all();
+    }
+
+    public static function deleteByMsgTo($userId)
+    {
+        $deleteId = Message::find()->where(['msgto' => $userId])->andWhere(['>','isread',1])->all();
+        if($deleteId)
+        {
+            foreach($deleteId as $deleteSingleId){
+                $deleteSingleId->delete();
+            }
+        }
+    }
+
+    public static function setIsRead($userId)
+    {
+        $query = "UPDATE imas_msgs SET isread=isread+2 WHERE msgto='$userId' AND isread<2";
+        Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function deleteByMsgFrom($userId)
+    {
+        $deleteId = Message::find()->where(['msgfrom' => $userId])->andWhere(['>','isread',1])->all();
+        if($deleteId){
+            foreach($deleteId as $deleteSingleId){
+                $deleteSingleId->delete();
+            }
+        }
+
+    }
+
+    public static function setMsgFrom($userId)
+    {
+        $query = "UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom='$userId' AND isread<2";
+        Yii::$app->db->createCommand($query)->execute();
     }
 }
 

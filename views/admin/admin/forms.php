@@ -47,6 +47,14 @@ switch ($action) {
         echo "</div>";
         break;
     case "deladmin":
+        if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            echo "You don't have authority to delete user";
+        }
+        echo "<p>Are you sure you want to delete this user?</p>\n";
+        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=deladmin&id=$getId'\">\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+        break;
         break;
     case "chgpwd":
         break;

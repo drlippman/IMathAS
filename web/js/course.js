@@ -50,7 +50,6 @@ function ahahDone(url, target) {
 var loadedblocks = new Array();
 
 function toggleblock(bnum) {
-    alert('hhii');
       var node = document.getElementById('block'+bnum);
       //var butn = document.getElementById('but'+bnum);
       var img = document.getElementById('img'+bnum);

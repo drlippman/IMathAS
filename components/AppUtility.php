@@ -2543,7 +2543,7 @@ class AppUtility extends Component
         *$labelList is an array of strings that are displayed as the select list
         *$selectVal is optional, if passed the item in $valList that matches will be output as selected
         */
-        echo "<select class=form-control apply-scroll name=\"$name\" ";
+        echo "<select class=form-control apply-scroll name=\"$name\" id=\"$name\" ";
         echo (isset($actions)) ? $actions : "";
         echo ">\n";
         if (isset($defaultLabel) && isset($defaultVal)) {

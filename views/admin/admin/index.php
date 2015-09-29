@@ -118,7 +118,6 @@ $this->params['breadcrumbs'][] = $this->title;
         if ($showcourses > AppConstant::NUMERIC_ZERO) {
             echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='index?showcourses=0'\" />";
         }
-
         echo "<div class='col-lg-3'>";
         AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
     </div>
@@ -126,6 +125,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     ?>
 </div>
+
 <?php
 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteacherexport'])) {
     ?>
@@ -292,7 +292,8 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
                                 </a>
                             </li>
                             <li>
-                                <a href="#"><?php AppUtility::t('Delete'); ?></a>
+                                <?php $userId = $page_userDataId[$i];?>
+                                <a href='javascript:deleteAdmin(<?php echo $userId ?>)'><?php AppUtility::t('Delete')?></a>
                             </li>
                         </ul>
                     </li>
