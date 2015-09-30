@@ -218,7 +218,7 @@ function interpretline($str,$anstype,$countcnt) {
 				
 				$bits = array("if ($cond) { $todo ; }");	
 			}
-			
+
 			$forloc = -1;
 			$ifloc = -1;
 			$whereloc = -1;
