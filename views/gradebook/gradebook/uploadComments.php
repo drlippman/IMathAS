@@ -82,7 +82,7 @@ if (count($failures)>0) {
                     <input type="radio" name="userIdType" value="0" checked="1">&nbsp;<b>
                     <?php AppUtility::t('Username (login name) in column')?></b>
                 </div>
-                <div class="col-sm-7 padding-left-zero padding-bottom-ten">
+                <div class="col-sm-7 padding-left-zero padding-bottom-ten margin-left-minus-twenty">
                     <input class="form-control width-seventeen-per" type="text" size="4" name="userNameCol">
                 </div>
             </div>
@@ -91,7 +91,7 @@ if (count($failures)>0) {
                     <input type="radio" name="userIdType" value="1">
                     <span class="padding-left-five"><b><?php AppUtility::t('Lastname, Firstname in column')?></b></span>
                 </div>
-                <div class="col-sm-7 padding-left-zero">
+                <div class="col-sm-7 padding-left-zero margin-left-minus-twenty">
                     <input class="form-control width-seventeen-per" type="text" size="4" name="fullNameCol">
                 </div>
             </div>
