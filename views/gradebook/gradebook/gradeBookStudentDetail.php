@@ -20,7 +20,7 @@ if($defaultValuesArray['studentId'] > 0){
    //show student view
 $gradebook = $totalData['gradebook'];
 $hidenc = $defaultValuesArray['hidenc'];
-$cid = $defaultValuesArray['hidenc'];
+$cid = $course->id;
 $gbmode =  ' ';
 $availshow= $defaultValuesArray['availshow'];
 $catfilter = $defaultValuesArray['catfilter'];
@@ -274,10 +274,10 @@ if ($studentId>0) {
     </span>
 <?php } else if ($istutor) { ?>
     <?php
-echo '<div style="clear:both;display:inline-block" class="cpmid">';
-    echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-    echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
-  ?> </div><br/>
+echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
+     <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId.'&from=gb');?> "><?php AppUtility::t('Login Log');?></a> |
+     <a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$studentId.'&from=gb');?>"><?php AppUtility::t('Activity Log') ?></a>
+    </div><br/>
     </div>  </div> <?php
 }
 echo '<br><br><br>';
@@ -306,9 +306,10 @@ echo $lpmsg;
 }
 ?>
 <br>
- <form method=post action="grade-book-student-detail?cid='<?php echo $course->id?>'&studentId='<?php echo $studentId?>">
- <?php if ($isteacher && $studentId>0) {
-     echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
+ <form method=post id="qform" action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
+ <?php if ($isteacher && $studentId>0) {  ?>
+        <input type="hidden" name="stusection" value="<?php echo $stusection?>">
+     <?php echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
     echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
     } ?>
@@ -384,10 +385,10 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
                 (isset($gradebook[1][1][$i][10]) && $gradebook[1][1][$i][10]>0 && !in_array($gradebook[0][1][$i][7],$viewedassess)) ||  //started, and already figured it's ok
                 (!isset($gradebook[1][1][$i][10]) && $now<$gradebook[0][1][$i][11]) || //not started, before due date
                 (!isset($gradebook[1][1][$i][10]) && $gradebook[0][1][$i][12]>10 && $now-$gradebook[0][1][$i][11]<$latepasshrs*3600 && !in_array($gradebook[0][1][$i][7],$viewedassess)) //not started, within one latepass
-                )) {
-                echo ' <span class="small"><a href="redeemlatepass.php?cid='.$cid.'&aid='.$gradebook[0][1][$i][7].'">[';
-                        echo AppUtility::t('Use LatePass').']</a></span>';
-                if ($now>$gradebook[0][1][$i][11]) {
+                )) { ?>
+                 <span class="small"><a href="<?php echo AppUtility::getURLFromHome('assessment','assessment/late-pass?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]); ?>">
+                         [<?php  echo AppUtility::t('Use LatePass'); ?> ]</a></span>
+                <?php if ($now>$gradebook[0][1][$i][11]) {
                 $afterduelatepass = true;
                 }
 
@@ -416,39 +417,39 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
                 if ($isteacher || $istutor || $gradebook[1][1][$i][2]==1) { //show link
                 if ($gradebook[0][1][$i][6]==0) {//online
                 if ($studentId==-1) { //in averages
-                if (isset($gradebook[1][1][$i][0])) { //has score
-                echo "<a href=\"gb-itemanalysis.php?stu=$studentId&cid=$cid&aid={$gradebook[0][1][$i][7]}\">";
-                    $haslink = true;
+                if (isset($gradebook[1][1][$i][0])) { //has score ?>
+                 <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?stu='.$studentId.'&cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>">
+                    <?php $haslink = true;
                     }
                     } else {
                     if (isset($gradebook[1][1][$i][0])) { //has score
-                    echo "<a href=\"gradebook-view-assessment-details?stu=$studentId&cid=$cid&asid={$gradebook[1][1][$i][4]}&uid={$gradebook[1][4][0]}\"";
+                    echo "<a href=\"gradebook-view-assessment-details?stu={$gradebook[1][4][0]}&cid=$course->id&asid={$gradebook[1][1][$i][4]}&uid={$gradebook[1][4][0]}\"";
                              if ($afterduelatepass) {
                              echo ' onclick="return confirm(\''._('If you view this assignment, you will not be able to use a LatePass on it').'\');"';
                     }
                     echo ">";
                     $haslink = true;
                     } else if ($isteacher) {
-                    echo "<a href=\"gradebook-view-assessment-details?stu=$studentId&cid=$cid&asid=new&aid={$gradebook[0][1][$i][7]}&uid={$gradebook[1][4][0]}\">";
+                    echo "<a href=\"gradebook-view-assessment-details?stu=$studentId&cid=$course->id&asid=new&aid={$gradebook[0][1][$i][7]}&uid={$gradebook[1][4][0]}\">";
                         $haslink = true;
                         }
                         }
                         } else if ($gradebook[0][1][$i][6]==1) {//offline
                         if ($isteacher || ($istutor && $gradebook[0][1][$i][8]==1)) {
                         if ($studentId==-1) {
-                        if (isset($gradebook[1][1][$i][0])) { //has score
-                        echo "<a href=\"addgrades.php?stu=$studentId&cid=$cid&grades=all&gbitem={$gradebook[0][1][$i][7]}\">";
-                            $haslink = true;
+                        if (isset($gradebook[1][1][$i][0])) { //has score ?>
+                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$studentId.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?> ">
+                            <?php $haslink = true;
                             }
                             } else { ?>
-                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$studentId.'&cid='.$cid.'&grades='.$gradebook[1][4][0].'&gbitem='.$gradebook[0][1][$i][7])?> ">
+                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$studentId.'&cid='.$course->id.'&grades='.$gradebook[1][4][0].'&gbitem='.$gradebook[0][1][$i][7])?> ">
                             <?php    $haslink = true;
                                 }
                                 }
                                 } else if ($gradebook[0][1][$i][6]==2) {//discuss
-                                if ($studentId != -1) {
-                                echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$studentId&uid={$gradebook[1][4][0]}&fid={$gradebook[0][1][$i][7]}\">";
-                                    $haslink = true;
+                                if ($studentId != -1) { ?>
+                                 <a href=\"viewforumgrade.php?cid=$cid&stu=$studentId&uid={$gradebook[1][4][0]}&fid={$gradebook[0][1][$i][7]}\">
+                                    <?php $haslink = true;
                                     }
                                     } else if ($gradebook[0][1][$i][6]==3) {//exttool
                                     if ($isteacher || ($istutor && $gradebook[0][1][$i][8]==1)) {

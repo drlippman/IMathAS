@@ -26,6 +26,7 @@ use app\models\GbScheme;
 use app\models\Grades;
 use app\models\Items;
 use app\models\LinkedText;
+use app\models\Log;
 use app\models\LoginLog;
 use app\models\loginTime;
 use app\models\Message;
@@ -36,6 +37,8 @@ use app\models\Rubrics;
 use app\models\Questions;
 use app\models\Sessions;
 use app\models\Student;
+use app\models\StuGroupMembers;
+use app\models\Stugroups;
 use app\models\StuGroupSet;
 use app\models\Teacher;
 use app\models\Tutor;
@@ -45,7 +48,7 @@ use yii\web\UploadedFile;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use yii\rbac\Item;
-
+include ("../components/asidutil.php");
 class GradebookController extends AppController
 {
     public $a;
@@ -2876,6 +2879,13 @@ class GradebookController extends AppController
             array_push($allStudentsinformation, $tempArray);
         }
         if ($this->isPostMethod()) {
+            if ((isset($params['posted']) && $params['posted']=="Make Exception") || isset($params['massexception'])) {
+                $calledfrom='gb';
+                 $assesschk = $params['assesschk'];
+                $_SESSION['assesschk']= $assesschk;
+                $stusection = $params['stusection'];
+                return $this->redirect(AppUtility::getURLFromHome('roster','roster/make-exception?cid=' . $courseId.'&gradebook='.$calledfrom.'&studentId='.$params['studentId'].'&section-data='.$stusection));
+            }
             if (isset($params['user-comments']) && $userId > AppConstant::NUMERIC_ZERO) {
                 $commentType = 'null';
                 Student::updateGbComments($userId, $params['user-comments'], $courseId, $commentType);
@@ -2993,7 +3003,7 @@ class GradebookController extends AppController
             if ($score == null) {
                 $score = ' ';
             }
-            Grades::updateScoreTostudnt($score, $params['feedback'][$studentId], $studentId, $params['gbitem']);
+            Grades::updateGradeToStudent($score, $params['feedback'][$studentId], $studentId, $params['gbitem']);
         }
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js']);
@@ -3016,7 +3026,6 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $teacherid = Teacher::getByUserId($currentUser['id'], $courseId);
         $tutorid = Tutor::getByUserId($currentUser['id'], $courseId);
-
         if (isset($teacherid)) {
             $isteacher = true;
         }
@@ -3046,7 +3055,6 @@ class GradebookController extends AppController
             } else {
                 $from = 'gb';
             }
-
             //Gbmode : Links NC Dates
             $totonleft = floor($gbmode / 1000) % 10; //0 right, 1 left
             $links = ((floor($gbmode / 100) % 10) & 1); //0: view/edit, 1 q breakdown
@@ -3060,9 +3068,10 @@ class GradebookController extends AppController
         }
 
         $assessmentData = Assessments::getByCourseIdJoinWithSessionData($params['asid'], $currentUser['id'], $isteacher, $istutor);
+
         if (!$isteacher && !$istutor) {
             $rv = new ContentTrack;
-            $rv->insertFromGradebook($currentUser, $courseId, 'gbviewasid', $assessmentData['assessmentid'], time());
+            $rv->insertFromGradebook($currentUser->id, $courseId, 'gbviewasid', $assessmentData['assessmentid'], time());
         }
         $student = Student::getByCourseId($courseId, $params['uid']);
         $studentUserData = User::getById($student['userid']);
@@ -3076,30 +3085,65 @@ class GradebookController extends AppController
         } else {
             $canedit = 0;
         }
-        if ($canedit) {
-            $rubrics = Rubrics::rubricDataByAssessmentId($assessmentData['assessmentid']);
+        if ($asid=="new" && $isteacher)
+        {
+            //student could have started, so better check to make sure it still doesn't exist
+            $aid = $params['aid'];
+            $newAssessmentId = AssessmentSession::getIdByUserIdAndAid($params['uid'],$aid);
+            if ($newAssessmentId > 0)
+            {
+                $params['asid'] = $newAssessmentId;
+            } else {
+                $assessmentInformation = Assessments::getByAssessmentId($aid);
+                $stugroupmem = array();
+                $agroupid = 0;
+                if ($assessmentInformation['isgroup']>0) { //if is group assessment, and groups already exist, create asid for all in group
+                    $stuGroup = Stugroups::getStuGrpDataForGradebook($params['uid'],$assessmentInformation['groupsetid']);
+                    if ($stuGroup > 0) { //group exists
+                        $agroupid = $stuGroup['id'];
+                        $stuGroupMembers = StuGroupMembers::getUserId($agroupid,$params['uid']);
+                        foreach ($stuGroupMembers as $stuGroupMember ) {
+                            $stugroupmem[] = $stuGroupMember['userid'];
+                        }
+                    }
+                }
+                $stugroupmem[] = $params['uid'];
+                list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($assessmentInformation['itemorder'],$assessmentInformation['shuffle'],$aid);
+                foreach ($stugroupmem as $uid) {
+                    $insertInSession = new AssessmentSession();
+                    $asid = $insertInSession->createSessionForGradebook($uid,$agroupid,$aid,$qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist);
+
+                }
+                $params['asid'] = $asid;
+            }
+            $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
+        }
+
+        if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
+            if ($assessmentData['agroupid']>0)
+            {
+                $groupMembers = AssessmentSession::getUserForGradebook($aid,$assessmentData['agroupid']);
+            }
         }
         $exceptionData = Exceptions::getByAssessmentIdAndUserId($params['uid'], $assessmentData['assessmentid']);
         $questions = Questions::getByQuestionsIdAndAssessmentId($assessmentData['assessmentid']);
-        $questionsData = array();
-        foreach ($questions as $question) {
-            $tempArray = array(
-                '0' => $question['id'],
-                '1' => $question['points'],
-                '2' => $question['withdrawn'],
-                '3' => $question['qtype'],
-                '4' => $question['control'],
-                '5' => $question['rubric'],
-                '6' => $question['showhints'],
-                '7' => $question['extref'],
-                '8' => $question['ownerid'],
-            );
-            array_push($questionsData, $tempArray);
-        }
+            $questionsData = array();
+            foreach ($questions as $question) {
+                $tempArray = array(
+                    '0' => $question['id'],
+                    '1' => $question['points'],
+                    '2' => $question['withdrawn'],
+                    '3' => $question['qtype'],
+                    '4' => $question['control'],
+                    '5' => $question['rubric'],
+                    '6' => $question['showhints'],
+                    '7' => $question['extref'],
+                    '8' => $question['ownerid'],
+                );
+                array_push($questionsData, $tempArray);
+            }
         $questionIdArray = explode(',', $assessmentData['questions']);
         $librariesName = array();
-
-
         foreach ($questionIdArray as $questionId) {
             $libraryName = Questions::getByLibrariesIdAndcategory($questionId);
             $tempArray = array(
@@ -3119,6 +3163,18 @@ class GradebookController extends AppController
         } else {
             $pers = 'student';
             $studentNameWithAssessmentName = $this->getconfirmheader(false, $isteacher, $istutor, $currentUser, $params);
+        }
+        if (isset($_GET['starttime']) && $isteacher)
+        {
+            $agroupid = $assessmentSessionData['agroupid'];
+            $aid= $assessmentSessionData['assessmentid'];
+            if ($agroupid>0)
+            {
+                $qp = array('agroupid',$agroupid,$aid);
+            } else {
+                $qp = array('id',$asid,$aid);
+            }
+            AssessmentSession::updateStartTime($params['starttime'],$qp);
         }
         $sessionId = $this->getSessionId();
         global $sessionId, $sessionData, $testsettings;
@@ -3159,6 +3215,21 @@ class GradebookController extends AppController
                         return $this->redirect('gradebook?stu=' . $stu . '&cid=' . $params['cid'] . '&gbmode=' . $gbmode);
                     }
                 }
+            }
+        }
+        if (isset($params['breakfromgroup']) && isset($params['asid']) && $isteacher) {
+            if ($params['breakfromgroup'] == "confirmed")
+            {
+                 StuGroupMembers::removeGrpMember($assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
+                //update any assessment sessions using this group
+                AssessmentSession::updateAssSessionForGrpByGrpIdAndUid($assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
+                $now = time();
+                if (isset($GLOBALS['CFG']['log']))
+                {
+                    $log = new Log();
+                    $log->insertEntry($now,$assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
+                }
+                return $this->redirect('gradebook-view-assessment-deyails?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$courseId.'&uid='.$params['uid']);
             }
         }
         if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
@@ -3370,10 +3441,26 @@ class GradebookController extends AppController
                 unset($params['clearq']);
             }
         }
+        if ($canedit) {
+            $rubrics = Rubrics::rubricDataByAssessmentId($assessmentData['assessmentid']);
+        }
+
+        if($links == 1){
+            $currentData = User::getById($params['uid']);
+            $assessmentAndAssessmentSessionData = AssessmentSession::getAssessmentData($params['asid']);
+            if (!$isteacher && !$istutor) {
+                $contentTrack = new ContentTrack;
+                $contentTrack->insertFromGradebook($params['uid'],$course->id,'gbviewasid',$assessmentAndAssessmentSessionData['assessmentid'],time());
+                $questionIds = Questions::numberOfQuestionByIdAndCategory($assessmentAndAssessmentSessionData['assessmentid']);
+                $questionsInformation = Questions::retrieveQuestionDataForgradebook($assessmentAndAssessmentSessionData['questions']);
+            }
+        }
+
         $this->includeJS(['general.js','gradebook/rubric.js']);
-        $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion,  'librariesName' => $librariesName,
-            'questionsData' => $questionsData, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
-            'assessmentData' => $assessmentData,'canedit' => $canedit,'rubricsData' => $rubrics, 'defaultValuesArray' => $defaultValuesArray);
+        $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion, 'groupMembers' =>$groupMembers, 'librariesName' => $librariesName,
+            'questionsData' => $questionsData,'questionsInformation' => $questionsInformation, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
+            'assessmentData' => $assessmentData,';assessmentAndAssessmentSessionData' => $assessmentAndAssessmentSessionData,'canedit' => $canedit,'rubricsData' => $rubrics,
+            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds);
         return $this->renderWithData('gradebookViewAssessmentDetails', $resposeData);
     }
     public function getconfirmheader($group,$isteacher,$istutor,$user,$params) {
@@ -4256,4 +4343,201 @@ class GradebookController extends AppController
         $responseData = array('studentData' => $studentData,'currentUser' => $currentUser,'totalData' => $totalData,'gbmode' => $gbmode,'stu' => $stu,'params' => $params,'isteacher' => $isTeacher,'course' => $course);
         return $this->renderWithData('gradebookExport',$responseData);
     }
+
+    public function actionIsolateAssessmentGroup()
+    {
+        $params = $this->getRequestParams();
+        $currentUser = $this->getAuthenticatedUser();
+        $courseId = $params['cid'];
+        $aid = $params['aid'];
+        $course = Course::getById($courseId);
+        $teacherId = $this->isTeacher($currentUser['id'],$courseId);
+        $this->noValidRights($teacherId);
+        if (isset($params['gbmode']) && $params['gbmode']!='') {
+            $gbMode = $params['gbmode'];
+        } else
+        {
+            $gbScheme = GbScheme::getByCourseId($courseId);
+            $gbMode = $gbScheme['defgbmode'];
+        }
+        $assessment = Assessments::getByAssessmentId($aid);
+        $questions = Questions::getByAssessmentId($aid);
+        $AssessmentGroups = AssessmentSession::getAssessmentGroups($aid);
+        $stuGroups = Stugroups::getByGrpSetIdAndName($assessment['groupsetid']);
+        $groupNumbers = AppConstant::NUMERIC_ONE;
+        foreach ($stuGroups as $row)
+        {
+            if ($row['name'] == 'Unnamed group') {
+                $row['name'] .= " $groupNumbers";
+                $groupNumbers++;
+                $user = User::getUserNameUsingStuGroup($row['id']);
+                if (count($user) > AppConstant::NUMERIC_ZERO)
+                {
+                    $row['name'] .=  $user[0]['LastName'].','.$user[0]['FirstName'];
+                }
+            }
+            $groupNames[$row['id']] = $row['name'];
+        }
+        $this->includeJS(['tablesorter.js']);
+        $responseData = array('aid' => $aid,'gbmode' => $gbMode,'questions' => $questions,'groupnames' => $groupNames,'course' => $course,'AssessmentGroups' => $AssessmentGroups,'assessment' => $assessment);
+        return $this->renderWithData('isolateAssessmentGroup',$responseData);
+    }
+
+    public function actionEditToolScore()
+    {
+        $isTutor = false;
+        $isTeacher = false;
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $currentUser = $this->getAuthenticatedUser();
+        $isTutor = $this->isTutor($currentUser['id'],$courseId);
+        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+        $lid = intval($params['lid']);
+        $linkData = LinkedText::getLinkDataByIdAndCourseID($lid,$courseId);
+        if (!$linkData)
+        {
+            $this->setWarningFlash('invalid item');
+            return $this->goBack();
+        }
+        $name = $linkData['title'];
+        $text = $linkData['text'];
+        $points = $linkData['points'];
+        $toolParts = explode('~~',substr($text, AppConstant::NUMERIC_EIGHT));
+        if (isset($toolParts[3])) {
+            $gbCat = $toolParts[3];
+            $countInGb = $toolParts[4];
+            $tutorEdit = $toolParts[5];
+        } else
+        {
+            $this->setWarningFlash(AppConstant::INVALID_PARAMETERS);
+            return $this->goBack();
+        }
+        if ($isTutor) {
+            $isOk = ($tutorEdit == 1);
+            if (!$isOk)
+            {
+                $this->setWarningFlash(AppConstant::NO_AUTHORITY);
+                return $this->goBack();
+            }
+        } else if (!$isTeacher)
+        {
+            $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
+            return $this->goBack();
+        }
+
+        if (isset($params['clear']) && $isTeacher)
+        {
+            if (isset($params['confirm']))
+            {
+                   Grades::deleteByGradeTypeId($lid);
+                   $this->redirect('gradebook?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid']);
+            }
+        }
+        if (isset($params['newscore']))
+        {
+            $keys = array_keys($params['newscore']);
+            foreach ($keys as $k=>$v) {
+                if (trim($v)=='') {unset($keys[$k]);}
+            }
+            if (count($keys) > AppConstant::NUMERIC_ZERO)
+            {
+                $userIds = Grades::getExternalToolUserId($lid,$keys);
+                foreach($userIds as $userId)
+                {
+                    $params['score'][$userId['userid']] = $params['newscore'][$userId['userid']];
+                    unset($params['newscore'][$userId['userid']]);
+                }
+            }
+        }
+        ///regular submit
+        if (isset($params['score']))
+        {
+            foreach($params['score'] as $k=>$sc)
+            {
+                if (trim($k)=='') { continue;}
+                $sc = trim($sc);
+                if ($sc!='')
+                {
+                    Grades::updateScoreToStudent($sc,$params['feedback'][$k],$k,$lid);
+                } else
+                {
+                    Grades::updateScoreToStudent('NULL',$params['feedback'][$k],$k,$lid);
+                }
+            }
+        }
+        if (isset($params['newscore']))
+        {
+            foreach($params['newscore'] as $k=>$sc)
+            {
+                if (trim($k)=='') {continue;}
+                if ($sc!='')
+                {
+                    $grade = array
+                    (
+                        'gradetype' => 'exttool',
+                        'gradetypeid' => $lid,
+                        'userid' => $k,
+                        'score' => $sc,
+                        'feedback' => $params['feedback'][$k]
+                    );
+                    $insertGrade = new Grades();
+                    $insertGrade->createGradesByUserId($grade);
+                } else if (trim($params['feedback'][$k])!='')
+                {
+                    $grade = array
+                    (
+                        'gradetype' => 'exttool',
+                        'gradetypeid' => $lid,
+                        'userid' => $k,
+                        'score' => 'NULL',
+                        'feedback' => $params['feedback'][$k]
+                    );
+                    $insertGrade = new Grades();
+                    $insertGrade->createGradesByUserId($grade);
+                }
+            }
+        }
+        if (isset($params['score']) || isset($params['newscore']) || isset($params['name']))
+        {
+            $this->redirect('gradebook?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid']);
+        }
+        $query = Student::findByCid($courseId);
+        if ($query) {
+            $countSection = AppConstant::NUMERIC_ZERO;
+            foreach ($query as $singleData) {
+                if ($singleData->section != null || $singleData->section != "") {
+                    $countSection++;
+                }
+            }
+        }
+        if ($countSection > AppConstant::NUMERIC_ZERO) {
+            $hasSection = true;
+        } else {
+            $hasSection = false;
+        }
+        if ($hasSection) {
+            $gbScheme = GbScheme::getByCourseId($courseId);
+            if ($gbScheme['usersort'] == AppConstant::NUMERIC_ZERO)
+            {
+                $sortOrder = "sec";
+            } else {
+                $sortOrder = "name";
+            }
+        } else {
+            $sortOrder = "name";
+        }
+        $tutorData = Tutor::getByUserId($currentUser['id'],$courseId);
+        $tutorSection = trim($tutorData['section']);
+        $externalToolData = Grades::getExternalToolData($lid,$params['uid']);
+        $studentData = User::getDataForExternalTool($params['uid'],$courseId,$isTutor,$tutorSection,$hasSection,$sortOrder);
+        if ($hasSection)
+        {
+            $this->includeJS(['tablesorter.js']);
+        }
+        $this->includeJS(['gradebook/addgrades.js']);
+        $responseData = array('studentData' => $studentData,'course' => $course,'externalToolData' => $externalToolData,'linkData' => $linkData,'params' => $params,'hassection' => $hasSection);
+        return $this->renderWithData('editToolScore',$responseData);
+    }
+
 }

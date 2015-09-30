@@ -27,7 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox"">
 <?php if ($gradebook != AppConstant::NUMERIC_ONE){
     echo $this->render("_toolbarRoster", ['course' => $course]);
-}?>
+}
+?>
 <div class="inner-content">
     <?php if ($gradebook == AppConstant::NUMERIC_ONE){ ?>
     <form action="make-exception?cid=<?php echo $course->id ?>&gradebook=1" method="post" id="roster-form">
@@ -153,9 +154,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="col-md-12 padding-left-zero margin-left-minus-six">
                                 <ul class='assessment-list'>
                                 <?php foreach ($assessments as $assessment) { ?>
-                                    <?php
-                                    echo "<li class='margin-top-ten'><div class='checkbox override-hidden'><label><input type='checkbox' name='addExc[]' value='{$assessment->id}'><span class='cr'><i class='cr-icon fa fa-check'></i></span><span class='margin-left-five'>"  . ucfirst($assessment->name)."</span></label></div></li>";;
-                                    ?>
+
+                                     <li class='margin-top-ten'>
+                                         <div class='checkbox override-hidden'>
+                                             <label>
+                                                 <input type='checkbox' name='addExc[]' value="<?php echo $assessment->id ?>" <?php if ($assesschk && in_array($assessment->id,$assesschk)) { echo 'checked="checked" ';} ?> >
+                                                 <span class='cr'><i class='cr-icon fa fa-check'></i></span>
+                                                 <span class='margin-left-five'><?php echo ucfirst($assessment->name) ?></span>
+                                             </label>
+                                         </div>
+                                     </li>
+
                                 <?php } ?>
                                 </ul>
                             </div>

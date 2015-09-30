@@ -31,4 +31,10 @@ class Log extends BaseImasLog
         $this->time = $time;
         $this->save();
     }
+
+    public function insertEntry($now,$uid,$grpid)
+    {
+        $query = "INSERT INTO imas_log (time,log) VALUES ($now,'deleting $uid from $grpid')";
+        $command = \Yii::$app->db->createCommand($query)->execute();
+    }
 } 

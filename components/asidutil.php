@@ -1,5 +1,6 @@
 <?php
 use app\components\AppConstant;
+
 function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
 	$ioquestions = explode(",",$itemorder);
 	$questions = array();

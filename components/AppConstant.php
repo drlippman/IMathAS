@@ -259,4 +259,6 @@ class AppConstant
     const MIN_START_DATE = 9999999999;
     const NO_ASSESSEMENT_SELECTED = 'No assessments selected';
     const ADD_LINK = 'Add Link';
+    const NO_FORUM_ACCESS = 'No access to scores for this forum';
+    const INVALID_PARAMETERS = 'invalid parameters';
 }

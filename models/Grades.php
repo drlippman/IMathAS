@@ -25,7 +25,6 @@ class Grades extends BaseImasGrades
             $this->feedback = $grade['feedback'];
             $this->gradetype = $grade['gradetype'];
             $this->save();
-
     }
 
     public static function GetOtherGrades($gradetypeselects, $limuser){
@@ -91,6 +90,7 @@ class Grades extends BaseImasGrades
             $grade->save();
         }
     }
+
     public static function deleteByGradeTypeIdAndGradeType($gradeId,$gradeType){
         $grades = Grades::find()->where(['gradetype' => $gradeType])->andWhere(['gradetypeid' => $gradeId])->all();
         if($grades){
@@ -114,8 +114,10 @@ class Grades extends BaseImasGrades
         $data = $command->queryAll();
         return $data;
     }
-    public static function updateScoreTostudnt($score,$feedback,$studentId,$gbitem){
-        $grade = Grades::find()->where(['userid' => $studentId])->andWhere(['gradetype' => 'offline'])->andWhere(['gradetypeid' => $gbitem])->one();
+
+    public static function updateScoreToStudent($score,$feedback,$studentId,$gbitem)
+    {
+        $grade = Grades::find()->where(['userid' => $studentId])->andWhere(['gradetype' => 'exttool'])->andWhere(['gradetypeid' => $gbitem])->one();
         $grade->score = $score;
         $grade->feedback = $feedback;
         $grade->save();
@@ -138,10 +140,76 @@ class Grades extends BaseImasGrades
         $query = "DELETE FROM imas_grades WHERE gradetypeid={$id} AND gradetype='exttool'";
         Yii::$app->db->createCommand($query)->execute();
     }
+
     public static function deleteByGradeId($id)
     {
         $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid={$id}";
         Yii::$app->db->createCommand($query)->execute();
     }
-}
 
+    public static function getExternalToolUserId($gbItem,$users)
+    {
+        return Grades::find()->where(['gradetype' => 'exttool'])->andWhere(['gradetypeid' => $gbItem])->andWhere(['IN','userid',$users])->all();
+    }
+
+    public static function getExternalToolData($gbitemId,$grades)
+    {
+        $query = new Query();
+        $query	->select(['userid','score','feedback'])
+            ->from('imas_grades')
+            ->where(['gradetype' => 'exttool'])
+            ->andWhere(['gradetypeid' => $gbitemId]);
+        if($grades != 'all'){
+            $query->andWhere(['userid' => $grades]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getForumData($forumId,$userId,$key)
+    {
+        return Grades::find()->where(['gradetype' => 'forum'])->andWhere(['gradetypeid' => $forumId])->andWhere(['userid' => $userId])->andWhere(['IN','refid',$key])->all();
+    }
+
+    public static function updateForumData($score,$feedback,$forumId,$userId,$key)
+    {
+        $grades =  Grades::find()->where(['gradetype' => 'forum'])->andWhere(['gradetypeid' => $forumId])->andWhere(['userid' => $userId])->andWhere(['refid' => $key])->all();
+        if($grades)
+        {
+            foreach($grades as $grade)
+            {
+                $grade->score = $score;
+                $grade->feedback = $feedback;
+                $grade->save();
+            }
+        }
+    }
+
+    public static function deleteForumData($forumId,$userId,$key)
+    {
+        $grades =  Grades::find()->where(['gradetype' => 'forum'])->andWhere(['gradetypeid' => $forumId])->andWhere(['userid' => $userId])->andWhere(['refid' => $key])->all();
+        if($grades)
+        {
+            foreach($grades as $grade)
+            {
+                $grade->delete();
+            }
+        }
+    }
+    public function insertForumDataInToGrade($grade)
+    {
+        $this->gradetypeid = $grade['gradetypeid'];
+        $this->userid = $grade['userid'];
+        $this->refid = $grade['refid'];
+        $this->score = $grade['score'];
+        $this->feedback = $grade['feedback'];
+        $this->gradetype = $grade['gradetype'];
+        $this->save();
+    }
+    public static function getForumDataUsingUserId($userId,$forumId)
+    {
+        return Grades::find()->where(['gradetype' => 'forum'])->andWhere(['gradetypeid' => $forumId])->andWhere(['userid' => $userId])->all();
+    }
+
+}

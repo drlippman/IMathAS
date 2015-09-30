@@ -312,4 +312,19 @@ class Questions extends BaseImasQuestions
         $query = Questions::find()->select('id,category,points')->where(['IN','id' => $dataId])->all();
         return $query;
     }
+
+    public static function retrieveQuestionDataForgradebook($qids)
+    {
+        $query = new Query();
+        $query->select(['imas_questionset.description','imas_questions.id','imas_questions.points','imas_questions.withdrawn'])
+            ->from('imas_questions')
+            ->join('INNER JOIN',
+                'imas_questionset',
+                'imas_questionset.id=imas_questions.questionsetid'
+            )
+            ->where(['IN','imas_questions.id',explode(',',$qids)]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

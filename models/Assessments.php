@@ -478,7 +478,7 @@ class Assessments extends BaseImasAssessments
     }
 
     public static function getAssessmentIntro($id){
-        return Assessments::find()->select('intro')->where(['id' => $id])->all();
+        return Assessments::find()->select('intro')->where(['id' => $id])-> all();
     }
     public static function getDataByCourseId($cid)
     {

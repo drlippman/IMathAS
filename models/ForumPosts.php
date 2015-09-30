@@ -312,4 +312,10 @@ class ForumPosts extends BaseImasForumPosts
         $data = $command->queryone();
         return $data;
     }
+
+    public static function getbyForumIdAndUserID($forumid, $currentUserId)
+    {
+        $ForumPost = ForumPosts::findAll(['forumid' => $forumid, 'userid' => $currentUserId]);
+        return $ForumPost;
+    }
 }

@@ -16,12 +16,14 @@ use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\Forums;
 use app\models\GbCats;
+use app\models\Grades;
 use app\models\Items;
 use app\models\LinkedText;
 use app\models\Outcomes;
 use app\models\Rubrics;
 use app\models\StuGroupSet;
 use app\models\Thread;
+use app\models\Tutor;
 use app\models\User;
 use app\components\htmLawed;
 use yii\web\UploadedFile;
@@ -1781,5 +1783,107 @@ class ForumController extends AppController
             $parentArray[] = $parentData['parent'];
             $this->parentList($parentData['parent']);
         }
+    }
+
+    public function actionViewForumGrade()
+    {
+        $params = $this->getRequestParams();
+        $courseId = intval($params['cid']);
+        $course  = Course::getById($courseId);
+        $currentUser = $this->getAuthenticatedUser();
+        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+        $isTutor = $this->isTutor($currentUser['id'],$courseId);;
+        $studentId = intval($params['stu']);
+        if ($isTeacher || $isTutor)
+        {
+
+            $userId = intval($params['uid']);
+        } else
+        {
+            /*
+             *userid is not defined
+             */
+//            $userId = $userid;
+        }
+        $forumId = intval($params['fid']);
+
+        if (($isTeacher || $isTutor) && (isset($params['score']) || isset($params['newscore'])))
+        {
+            if ($isTutor)
+            {
+                $forumData = Forums::getById($forumId);
+                if ($forumData['tutoredit'] != AppConstant::NUMERIC_ONE)
+                {
+                    exit; //not auth for score change
+                }
+            }
+            //check for grades marked as newscore that aren't really new
+            //shouldn't happen, but could happen if two browser windows open
+            if (isset($params['newscore']))
+            {
+                $keys = array_keys($params['newscore']);
+                foreach ($keys as $k => $v)
+                {
+                    if (trim($v) == '') {unset($keys[$k]);}
+                }
+                if (count($keys) > AppConstant::NUMERIC_ZERO)
+                {
+                    $gradeData = Grades::getForumData($forumId,$userId,$keys);
+                    foreach($gradeData as $singleGrade)
+                    {
+                        $params['score'][$singleGrade['refid']] = $params['newscore'][$singleGrade['refid']];
+                        unset($params['newscore'][$singleGrade['refid']]);
+                    }
+                }
+            }
+            if (isset($params['score']))
+            {
+                foreach($params['score'] as $key => $score)
+                {
+                    if (trim($key) == '') {continue;}
+                    $score = trim($score);
+                    if ($score != '')
+                    {
+                        Grades::updateForumData($score,$params['feedback'][$key],$forumId,$userId,$key);
+                    } else
+                    {
+                        Grades::deleteForumData($forumId,$userId,$key);
+                    }
+                }
+            }
+            if (isset($params['newscore']))
+            {
+                foreach($params['newscore'] as $scoreKey => $score)
+                {
+                    if (trim($scoreKey) == '') {continue;}
+                    if ($score != '')
+                    {
+                        $grade = array
+                        (
+                            'gradetype' => 'forum',
+                            'gradetypeid' => $forumId,
+                            'refid' => $scoreKey,
+                            'userid' => $userId,
+                            'score' => $score,
+                            'feedback' => $params['feedback'][$scoreKey]
+                        );
+                        $insertGrade = new Grades();
+                        $insertGrade->insertForumDataInToGrade($grade);
+                    }
+                }
+            }
+             return $this->redirect('gradebook?stu='.$studentId.'&cid='.$courseId);
+        }
+        $user = User::userDataUsingForum($userId,$forumId);
+        $tutorEdit = $user['tutoredit'];
+        if ($isTutor && $tutorEdit == AppConstant::NUMERIC_TWO)
+        {
+            $this->setWarningFlash(AppConstant::NO_FORUM_ACCESS);
+            return $this->goBack();
+        }
+        $forumInformation = Grades::getForumDataUsingUserId($userId,$forumId);
+        $forumPostData = ForumPosts::getbyForumIdAndUserID($forumId, $userId);
+        $responseData = array('user' => $user,'forumPostData' => $forumPostData,'forumInformation' => $forumInformation,'course' => $course,'forumId' => $forumId,'studentId' => $studentId,'userId' => $userId);
+        return $this->renderWithData('viewForumGrade',$responseData);
     }
 }

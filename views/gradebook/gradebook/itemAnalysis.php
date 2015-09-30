@@ -1,7 +1,7 @@
 <?php
 use app\components\AppUtility;
+use app\components\CategoryScoresUtility;
 $this->title = 'Item Analysis';?>
-
 <div class="item-detail-header">
 
     <?php
@@ -10,17 +10,10 @@ $this->title = 'Item Analysis';?>
     }else if ($student==-1) {
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Gradebook','Averages'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?stu='.$student.'&cid='.$course->id], 'page_title' => $this->title]);
     } else if ($from=='isolate') {
-      echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,'#'], 'page_title' => $this->title]);
-/* pass same parameters when assign hyper link to isolateassessgrade page
- *  echo "&gt; <a href=\"isolateassessgrade.php?cid=$courseId&aid=$assessmentId\"></a> ";
- */
+      echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,AppUtility::getHomeURL().'gradebook/gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$assessmentId], 'page_title' => $this->title]);
     } else if ($from=='gisolate') {
-      echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Group Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,'#'], 'page_title' => $this->title]);
-/*pass same parameters when assign hyper link to isolateassessbygroup page
- *     echo "&gt; <a href=\"isolateassessbygroup.php?cid=$courseId&aid=$assessmentId\"></a> ";
- */
-    } ?>
-
+      echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Group Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,AppUtility::getHomeURL().'gradebook/gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$assessmentId], 'page_title' => $this->title]);
+     } ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -229,8 +222,7 @@ if (!$isTeacher) {
     echo 'All averages only include those who have started the assessment</p>';
 
     if ($numberOfQuestions > 0) {
-        include("../assessment/catscores.php");
-        catscores($qs, $avgscore, $defpoints, $defoutcome, $cid);
+        CategoryScoresUtility::catscores($qs, $avgscore, $defpoints, $defoutcome, $cid);
     }
     echo '<div class="cpmid">Experimental:<br/>'; ?>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-results?cid=' . $course->id . '&aid=' . $assessmentId); ?>">Summary

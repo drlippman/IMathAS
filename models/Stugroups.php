@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
 use Yii;
 use app\models\_base\BaseImasStugroups;
 use yii\db\Query;
@@ -143,5 +144,18 @@ class Stugroups extends BaseImasStugroups
         $data->bindValue('grpSetId', $grpSetId);
         $query = $data->queryAll();
         return $query;
+    }
+    public static function getStuGrpDataForGradebook($userId,$grpSetId)
+    {
+        $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid  WHERE i_sgm.userid='.$userId.' AND i_sg.groupsetid='.$grpSetId;
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('grpSetId', $grpSetId);
+        $data->bindValue('i_sgm.userid', $userId);
+        $query = $data->queryOne();
+        return $query;
+    }
+    public static function getByGrpSetIdAndName($groupsetId)
+    {
+        return Stugroups::find()->select(['id','name'])->where(['groupsetid' => $groupsetId])->orderBy('id')->all();
     }
 }

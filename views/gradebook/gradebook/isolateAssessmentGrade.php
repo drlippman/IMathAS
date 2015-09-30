@@ -16,115 +16,127 @@ $this->title = AppUtility::t('View Scores',false);?>
 </div>
 <?
 echo '<div class="tab-content shadowBox non-nav-tab-item">';
-
-if (!$isTeacher && !$isTutor) {
-    echo '<div class="text"><br>';
-    echo AppUtility::t('You need to log in as a teacher to access this page');
-    echo '</div><br>';
-}else {  ?>
+ ?>
     <div class="item-analysis">
     <br><div class="cpmid"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id .'&amp;aid='.$assessmentId );?> ">View Item Analysis</a></div>
     <div id="headerisolateassessgrade" class="pagetitle"><h2>
  <?php   echo "Grades for $name</h2></div>"; ?>
     <p><?php echo $totalpossible;echo ' '; AppUtility::t('points possible')?></p>
-     <table id=myTable class=table table-bordered table-striped table-hover data-table>
-         <thead><tr><th><?php AppUtility::t('Name')?></th>
-                    <?php
-    if ($hassection) { ?>
-         <th><?php AppUtility::t('Section')?></th>
-   <?php }  ?>
-     <th><?AppUtility::t('Grade')?></th><th>%</th><th><?php AppUtility::t('Last Change')?></th><th><?php AppUtility::t('Time Spent (In Questions)')?></th><th><?php AppUtility::t('Feedback')?></th></tr></thead><tbody>
+    <table id=myTable class=table table-bordered table-striped table-hover data-table>
+         <thead>
+         <tr>
+             <th><?php AppUtility::t('Name')?></th>
+             <?php if ($hassection)
+             { ?>
+             <th><?php AppUtility::t('Section')?></th>
+             <?php }  ?>
+             <th><?AppUtility::t('Grade')?></th>
+             <th>%</th>
+             <th><?php AppUtility::t('Last Change')?></th>
+             <th><?php AppUtility::t('Time Spent (In Questions)')?></th>
+             <th><?php AppUtility::t('Feedback')?></th>
+         </tr>
+         </thead>
+        <tbody>
          <?php
-    $now = time();
-    $lc = 1;
-    $n = 0;
-    $ntime = 0;
-    $tot = 0;
-    $tottime = 0;
-    $tottimeontask = 0;
-    foreach ($studentData as $line) {
-        if ($lc % 2 != 0) {
-            echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";
-        } else {
-            echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
-        }
-        $lc++;
-        if ($line['locked'] > 0) {
-            echo '<td><span style="text-decoration: line-through;">';
-            echo "{$line['LastName']}, {$line['FirstName']}</span></td>";
-        } else {
-            echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
-        }
-        if ($hassection) {
-            echo "<td>{$line['section']}</td>";
-        }
-        $total = 0;
-        $sp = explode(';', $line['bestscores']);
-        $scores = explode(",", $sp[0]);
-        if (in_array(-1, $scores)) {
-            $IP = 1;
-        } else {
-            $IP = 0;
-        }
-        for ($i = 0; $i < count($scores); $i++) {
-            $total += getpts($scores[$i]);
-        }
-        $timeused = $line['endtime'] - $line['starttime'];
-        $timeontask = round(array_sum(explode(',', str_replace('~', ',', $line['timeontask']))) / 60, 1);
-
-        if ($line['id'] == null) {
-            ?>
-             <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid=new&uid='.$line['userid'].'&from=isolate&aid='.$assessmentId); ?>  ">-</a></td><td>-</td><td></td><td></td><td></td>
-            <td><a href="#" >-</a></td><td>-</td><td></td><td></td><td></td>
-        <? } else {
-            if (isset($exceptions[$line['userid']])) {
-                $thisenddate = $exceptions[$line['userid']][0];
-            } else {
-                $thisenddate = $enddate;
-            } ?>
-             <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid='.$line['id'].'&uid='.$line['userid'].'&from=isolate&aid='.$assessmentId);?>  ">
-          <?php  echo "<td><a href='#'>";
-            if ($thisenddate > $now) {
-                echo '<i>' . $total;
-            } else {
-                echo $total;
-            }
-            //if ($total<$minscore) {
-            if (($minscore < 10000 && $total < $minscore) || ($minscore > 10000 && $total < ($minscore - 10000) / 100 * $totalpossible)) {
-                echo "&nbsp;(NC)";
-            } else if ($IP == 1 && $thisenddate > $now) {
-                echo "&nbsp;(IP)";
-            } else if (($timelimit > 0) && ($timeused > $timelimit * $line['timelimitmult'])) {
-                echo "&nbsp;(OT)";
-            } else if ($assessmenttype == "Practice") {
-                echo "&nbsp;(PT)";
-            } else {
-                $tot += $total;
-                $n++;
-            }
-            if ($thisenddate > $now) {
-                echo '</i>';
-            }
-            echo '</a>';
-            if (isset($exceptions[$line['userid']])) {
-                if ($exceptions[$line['userid']][1] > 0) {
-                    echo '<sup>LP</sup>';
+            $now = time();
+            $lc = 1;
+            $n = 0;
+            $ntime = 0;
+            $tot = 0;
+            $tottime = 0;
+            $tottimeontask = 0;
+            foreach ($studentData as $line) {
+                if ($lc % 2 != 0) {
+                    echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";
                 } else {
-                    echo '<sup>e</sup>';
+                    echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
                 }
-            }
-            echo '</td>';
-            if ($totalpossible > 0) {
+                $lc++;
+                if ($line['locked'] > 0) {
+                    echo '<td><span style="text-decoration: line-through;">';
+                    echo "{$line['LastName']}, {$line['FirstName']}</span></td>";
+                } else {
+                    echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+                }
+                if ($hassection) {
+                    echo "<td>{$line['section']}</td>";
+                }
+                $total = 0;
+                $sp = explode(';', $line['bestscores']);
+                $scores = explode(",", $sp[0]);
+                if (in_array(-1, $scores)) {
+                    $IP = 1;
+                } else {
+                    $IP = 0;
+                }
+                for ($i = 0; $i < count($scores); $i++) {
+                    $total += getpts($scores[$i]);
+                }
+                $timeused = $line['endtime'] - $line['starttime'];
+                $timeontask = round(array_sum(explode(',', str_replace('~', ',', $line['timeontask']))) / 60, 1);
+                if ($line['id'] == null) {
+            ?>
+             <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid=new&uid='.$line['userid'].'&from=isolate&aid='.$assessmentId); ?>  ">-</a></td>
+             <td>-</td>
+             <td></td>
+             <td></td>
+             <td></td>
+             <td><a href="#" >-</a></td>
+             <td>-</td>
+             <td></td>
+             <td></td>
+             <td></td>
+        <? } else
+         {
+                if (isset($exceptions[$line['userid']])) {
+                    $thisenddate = $exceptions[$line['userid']][0];
+                } else {
+                    $thisenddate = $enddate;
+                } ?>
+             <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid='.$line['id'].'&uid='.$line['userid'].'&from=isolate&aid='.$assessmentId);?>  ">
+                             <?php if ($thisenddate > $now) {
+                    echo '<i>' . $total;
+                } else {
+                    echo $total;
+                }
+                //if ($total<$minscore) {
+                if (($minscore < 10000 && $total < $minscore) || ($minscore > 10000 && $total < ($minscore - 10000) / 100 * $totalpossible)) {
+                    echo "&nbsp;(NC)";
+                } else if ($IP == 1 && $thisenddate > $now) {
+                    echo "&nbsp;(IP)";
+                } else if (($timelimit > 0) && ($timeused > $timelimit * $line['timelimitmult'])) {
+                    echo "&nbsp;(OT)";
+                } else if ($assessmenttype == "Practice") {
+                    echo "&nbsp;(PT)";
+                } else {
+                    $tot += $total;
+                    $n++;
+                }
+                if ($thisenddate > $now) {
+                    echo '</i>';
+                }
+                echo '</a>';
+                if (isset($exceptions[$line['userid']])) {
+                    if ($exceptions[$line['userid']][1] > 0) { ?>
+                         <sup><?php AppUtility::t('LP');?></sup>
+                    <?php } else { ?>
+                         <sup><?php AppUtility::t('e')?></sup>
+                    <?php }
+                } ?>
+             </td>
+            <?php if ($totalpossible > 0)
+            {
                 echo '<td>' . round(100 * ($total) / $totalpossible, 1) . '%</td>';
             } else {
                 echo '<td>&nbsp;</td>';
             }
             if ($line['endtime'] == 0) {
-                if ($line['starttime'] == 0) {
-                    echo '<td>Never started</td>';
-                } else {
-                    echo '<td>Never submitted</td>';
-                }
+                if ($line['starttime'] == 0) { ?>
+                     <td><?php AppUtility::t('Never started')?></td>
+             <?php    } else { ?>
+                     <td><?php AppUtility::t('Never submitted')?></td>
+                <?php }
             } else {
                 echo '<td>' . AppUtility::tzdate("n/j/y g:ia", $line['endtime']) . '</td>';
             }
@@ -143,9 +155,9 @@ if (!$isTeacher && !$isTutor) {
             echo "<td>{$line['feedback']}&nbsp;</td>";
         }
         echo "</tr>";
-    }
-    echo '<tr><td>Average</td>';
-    if ($hassection) {
+    } ?>
+     <tr><td><?php AppUtility::t('Average');?></td>
+    <?php if ($hassection) {
         echo '<td></td>';
     } ?>
      <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id.'&aid='.$assessmentId.'&from=isolate');?>">
@@ -170,17 +182,14 @@ if (!$isTeacher && !$isTutor) {
     echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
     echo "</tbody></table>";
     if ($hassection) {
-        echo "<script> initSortTable('myTable',Array('S','S','N'),true);</script>";
+        echo "<script type='javascript'> initSortTable('myTable',Array('S','S','N'),true);</script>";
     } else {
-        echo "<script> initSortTable('myTable',Array('S','N'),true);</script>";
-    }
-    echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
-    echo "<sup>e</sup> Has exception <sup>LP</sup> Used latepass  </p><br>";
-}
-echo '</div>';echo '</div>';
-
-
-
+        echo "<script type='javascript'> initSortTable('myTable',Array('S','N'),true);</script>";
+    } ?>
+     <p><?php AppUtility::t('Meanings')?>:  <i><?php AppUtility::t('italics')?></i>-<?php AppUtility::t('available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit')?><br/>
+     <sup><?php AppUtility::t('e')?></sup> <?php AppUtility::t('Has exception')?> <sup><?php AppUtility::t('LP')?></sup> <?php AppUtility::t('Used latepass')?>  </p><br>
+     </div> </div>
+<?php
 function getpts($sc) {
     if (strpos($sc,'~')===false) {
         if ($sc>0) {

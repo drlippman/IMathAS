@@ -11,6 +11,7 @@ $includeduedate = $defaultValuesArray['includeduedate'];
 $includelastchange = $defaultValuesArray['includelastchange'];
 $lastlogin = $defaultValuesArray['lastlogin'];
 $secfilter = $data['secFilter'];
+$stu = $data['defaultValuesArray']['studentId']
 ?>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
@@ -574,9 +575,9 @@ for ($i = 1; $i < count($gradebook); $i++) {
                 } else { //no score
                     if ($gradebook[$i][0][0] == 'Averages') {
                         echo '-';
-                    } else if ($data['isTeacher']) {
-                        echo "<a href=\"#\">-</a>";
-                    } else {
+                    } else if ($data['isTeacher']) { ?>
+                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid=new&aid='.$gradebook[0][1][$j][7].'&uid='.$gradebook[$i][4][0])?>">-</a>
+                    <?php } else {
                         echo '-';
                     }
                 }
@@ -593,19 +594,19 @@ for ($i = 1; $i < count($gradebook); $i++) {
                 }
             } else if ($gradebook[0][1][$j][6] == 1) { //offline
                 if ($data['isTeacher']) {
-                    if ($gradebook[$i][0][0] == 'Averages') {
-                        echo "<a href=\"#\" ";
-                        echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
-                        echo ">";
-                    } else {
-                        echo "<a href=\"#\">";
-                    }
+                    if ($gradebook[$i][0][0] == 'Averages') { ?>
+                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>" <?php
+                          echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
+							echo ">";
+                    } else { ?>
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
+                    <?php }
                 } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
-                    if ($gradebook[$i][0][0] == 'Averages') {
-                        echo "<a href=\"#\">";
-                    } else {
-                        echo "<a href=\"#\">";
-                    }
+                    if ($gradebook[$i][0][0] == 'Averages') { ?>
+                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>">
+                    <?php } else { ?>
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades??stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
+                    <?php }
                 }
                 if (isset($gradebook[$i][1][$j][0])) {
                     echo $gradebook[$i][1][$j][0];

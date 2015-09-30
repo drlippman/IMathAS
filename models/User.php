@@ -766,5 +766,42 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->delete();
         }
     }
+
+    public static function getUserNameUsingStuGroup($stuGroupId)
+    {
+        $query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
+        $query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$stuGroupId}' ORDER BY isgm.id LIMIT 1";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getDataForExternalTool($UserId,$courseId,$isTutor,$tutorSection,$hasSection,$sortOrder)
+    {
+        $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
+        if ($UserId != 'all')
+        {
+            $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$UserId}' AND imas_students.courseid='$courseId'";
+        } else {
+            $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$courseId'";
+        }
+        if ($isTutor && isset($tutorSection) && $tutorSection!='') {
+            $query .= " AND imas_students.section='$tutorSection' ";
+        }
+
+        if ($hasSection && $sortOrder == "sec") {
+            $query .= " ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
+        } else {
+            $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
+        }
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function userDataUsingForum($userId,$forumId)
+    {
+        $data = User::find()->select(['iu.LastName','iu.FirstName','i_f.name','i_f.points','i_f.tutoredit','i_f.enddate'])
+            ->from(['imas_users AS iu','imas_forums as i_f'])->where(['iu.id' => $userId])->andWhere(['i_f.id' => $forumId])->one();
+        return $data;
+    }
 }
 

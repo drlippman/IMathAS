@@ -534,6 +534,71 @@ class AssessmentSession extends BaseImasAssessmentSessions
             $query->save();
         }
     }
+
+    public function createSessionForGradebook($uid,$agroupid,$aid,$qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist)
+    {
+            $this->userid = $uid;
+            $this->agroupid = $agroupid;
+            $this->assessmentid = $aid;
+            $this->questions = $qlist;
+            $this->seeds = $seedlist;
+            $this->scores = $scorelist;$scorelist;
+            $this->attempts = $attemptslist;
+            $this->lastanswers = $lalist;
+            $this->starttime = AppConstant::NUMERIC_ZERO;
+            $this->bestscores = $scorelist;$scorelist;$scorelist;
+            $this->bestattempts = $attemptslist;
+            $this->bestseeds = $seedlist;
+            $this->bestlastanswers = $lalist;
+            $this->reviewscores = $scorelist;$scorelist;
+            $this->reviewattempts = $attemptslist;
+            $this->reviewseeds = $reviewseedlist;
+            $this->reviewlastanswers = $lalist;
+            $this->save();
+            return $this->id;
+    }
+
+    public static function getUserForGradebook($aid,$groupId)
+    {
+        $query = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
+        $query .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$groupId}' ORDER BY LastName,FirstName";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getAssessmentData($asid)
+    {
+        $query = new Query();
+        $query->select(['imas_assessments.name','imas_assessments.defpoints','imas_assessments.defoutcome','imas_assessment_sessions.* '])
+            ->from('imas_assessment_sessions')
+            ->join('INNER JOIN',
+                'imas_assessments',
+                'imas_assessments.id=imas_assessment_sessions.assessmentid'
+            )
+            ->where(['imas_assessment_sessions.id' => $asid]);
+        $command = $query->createCommand();
+        $items = $command->queryOne();
+        return $items;
+    }
+
+    public static function getAssessmentGroups($aid)
+    {
+        return AssessmentSession::find()->select(['ias.agroupid','ias.id','ias.userid','ias.bestscores','ias.starttime','ias.endtime','ias.feedback'])
+            ->where(['ias.assessmentid' => $aid])->groupBy('agroupid')->all();
+    }
+
+    public static function updateStartTime($startTime,$qp)
+    {
+        $queries = AssessmentSession::find()->where([$qp[0] => $qp[1]])->andWhere(['assessmentid' => $qp[2]])->all();
+        if($queries)
+        {
+            foreach($queries as $query)
+            {
+                $query->starttime = $startTime;
+                $query->save();
+            }
+        }
+    }
 }
 
 
