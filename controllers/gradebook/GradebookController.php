@@ -2441,6 +2441,7 @@ class GradebookController extends AppController
     public function actionUploadGrades()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $course = Course::getById($this->getParamVal('cid'));
         $nowTime = time();
         $model = new AddGradesForm();
@@ -2505,7 +2506,7 @@ class GradebookController extends AppController
                 }
             }
         }
-        $this->includeCSS(['site.css']);
+        $this->includeCSS(['site.css', 'gradebook.css']);
         $responseData = array('course' => $course, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
         return $this->renderWithData('uploadGrades', $responseData);
     }

@@ -26,48 +26,81 @@ if (count($failures)>0) {
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
-<div class="title-container">
-    <div class="row">
-        <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $this->title ?> </div>
-        </div>
-    </div>
-</div>
 
-    <div class="tab-content shadowBox col-md-12 padding-thirty">
+
 
             <?php $form = ActiveForm::begin([
                 'id' => 'login-form',
                 'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
                 'action' => '',
                 'fieldConfig' => [
-                    'template' => "{label}\n<div class=\"col-lg-2\">{input}</div>\n<div class=\"col-lg-5 clear-both col-lg-offset-3\">{error}</div>",
-                    'labelOptions' => ['class' => 'col-lg-3  text-align-left'],
+                    'template' => "{label}\n<div class=\"col-md-2\">{input}</div>\n<div class=\"col-md-5 clear-both col-md-offset-3\">{error}</div>",
+                    'labelOptions' => ['class' => 'col-md-3  text-align-left'],
                 ],
             ]); ?>
             <?php
             $model->gradesColumn = 2;
             $model->feedbackColumn =  0;
             ?>
-            <?php echo $form->field($model, 'file')->fileInput();?>
-            <?php echo $form->field($model, 'fileHeaderRow')->radioList([AppConstant::NUMERIC_ZERO => 'No header',AppConstant::NUMERIC_ONE => 'Has 1 row header',AppConstant::NUMERIC_TWO => 'Has 2 row header']);?>
-                <?= $form->field($model,'gradesColumn')->textInput(); ?>
-                <?= $form->field($model,'feedbackColumn')->textInput(); ?>
-            <div >
-                <span class="pull-left"><b>User is identified by</b></span>
-            <span class="user-identity ">
-                <div class="col-lg-7" style="padding-left: 0px"><input type="radio" name="userIdType" value="0" checked="1">&nbsp;<b>Username (login name) in column</b></div>
-                <div class="col-lg-2"><input class="form-control" type="text" size="4" value="1" name="userNameCol"><br></div>
-                <div class="col-lg-7" style="padding-left: 0px"><input type="radio" name="userIdType" value="1">&nbsp;<b>Lastname, Firstname in column</b></div>
-                <div class="col-lg-2"><input class="form-control" type="text" size="4" value="2" name="fullNameCol"></div>
-            </span>
-            </div>
-        <div class="form-group">
-            <div class="col-md-offset-3 col-md-9">
-                <?php echo Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
-                     <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id)  ?>">Back</a>
+
+    <div class="col-md-12 padding-left-zero padding-right-zero">
+    <div class="title-container col-md-8 padding-left-zero">
+            <div class="row">
+                <div class="pull-left page-heading">
+                    <div class="vertical-align title-page"><?php echo $this->title ?> </div>
+                </div>
             </div>
         </div>
+        <div class="col-md-4 padding-right-zero">
+            <div class="floatright">
+                <?php echo Html::submitButton('Submit', ['class' => 'btn btn-primary margin-right-ten upload-grade-submit-btn']) ?>
+                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id)  ?>">Back</a>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content shadowBox col-md-12 padding-thirty margin-top-fourty">
+
+        <div class="col-md-12 padding-left-zero">
+            <?php echo $form->field($model, 'file')->fileInput();?>
+        </div>
+        <div class="col-md-12 padding-left-zero padding-top-ten file-header">
+            <?php echo $form->field($model, 'fileHeaderRow')->radioList([AppConstant::NUMERIC_ZERO => 'No header',AppConstant::NUMERIC_ONE => 'Has 1 row header',AppConstant::NUMERIC_TWO => 'Has 2 row header']);?>
+        </div>
+        <div class="col-md-12 padding-left-zero padding-top-five grade-in-column">
+        <?= $form->field($model,'gradesColumn')->textInput(['class' => 'width-fourty-five-per form-control']); ?>
+        </div>
+        <div class="col-md-12 padding-left-zero padding-top-fifteen feedback-in-column">
+        <?= $form->field($model,'feedbackColumn')->textInput(['class' => 'width-fourty-five-per form-control']); ?>
+        </div>
+
+        <div class="col-md-12 padding-left-zero">
+            <span class="col-md-3 padding-left-zero"><b>User is identified by</b></span>
+            <span class="col-md-9 padding-left-five">
+                <div class="col-md-12 padding-left-zero">
+                    <div class="col-md-5 padding-left-zero select-text-margin">
+                            <input type="radio" name="userIdType" value="0" checked="1">
+                            <span class="padding-left-three">
+                                <b>Username (login name) in column</b>
+                            </span>
+                    </div>
+                    <div class="col-md-2 padding-left-zero margin-left-minus-twenty">
+                        <input class="form-control width-sixty-per" type="text" size="4" value="1" name="userNameCol">
+                    </div>
+                </div>
+                <div class="col-md-12 padding-left-zero padding-top-twenty-five">
+                    <div class="col-md-5 padding-left-zero select-text-margin">
+                        <input type="radio" name="userIdType" value="1">
+                        <span class="padding-left-three">
+                            <b>Lastname, Firstname in column</b>
+                        </span>
+                    </div>
+                    <div class="col-md-2 padding-left-zero margin-left-minus-twenty">
+                        <input class="form-control width-sixty-per" type="text" size="4" value="2" name="fullNameCol">
+                    </div>
+                </div>
+            </span>
+        </div>
+
     </div>
 
 <?php ActiveForm::end(); ?>

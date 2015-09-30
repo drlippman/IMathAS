@@ -124,7 +124,7 @@ tr#quickadd td {
     margin-left: 30px !important;
 }
 .padding-top-twenty-five {
-    padding-top: 25px;
+    padding-top: 25px !important;
 }
 
 .section
@@ -247,4 +247,14 @@ margin-right: -10px;
     background-color: #f8f8f8;
     height: 60px;
     padding-top: 21px;
+}
+.upload-grade-submit-btn {
+    width: 72px;
+    height: 35px;
+}
+.feedback-in-column  label, .grade-in-column label {
+    padding-top: 7px;
+}
+.file-header label {
+    padding-bottom: 5px;
 }
