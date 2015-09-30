@@ -1119,3 +1119,6 @@ background-color: #f8f8f8;
     word-break: break-all !important;
     width:50% !important;
 }
+.color-white {
+    color: white;
+}
