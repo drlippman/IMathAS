@@ -73,7 +73,7 @@ if (count($failures)>0) {
     </div>
 
     <div class="col-md-12">
-        <div class="col-md-3 padding-left-zero">
+        <div class="col-md-3 padding-left-zero select-text-margin">
             <b><?php AppUtility::t('User is identified by')?></b>
         </div>
         <div class="col-md-9 padding-left-zero">
