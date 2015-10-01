@@ -1,3 +1,9 @@
+$(document).ready(function()
+{
+    $('.admin-modify-groups-table').DataTable();
+    textValidation();
+});
+
 function deleteGroup(groupId)
 {
     var html ='<div><p>Are you SURE you want to remove this group?</p></div>';

@@ -603,7 +603,7 @@ switch ($action) {
                     <?php AppUtility::t('Domain') ?>
                 </span>
 
-                        <div class='col-md-4 padding-left-zero'>
+                        <div class='col-md-6 padding-left-zero'>
                             <input class='form-control' type=text name="ltidomain" size=20>
                         </div>
                     </div>
@@ -612,7 +612,7 @@ switch ($action) {
                     <?php AppUtility::t('Key') ?>
                 </span>
 
-                        <div class='col-md-4 padding-left-zero'>
+                        <div class='col-md-6 padding-left-zero'>
                             <input class='form-control' type=text name="ltikey" size=20>
                         </div>
                     </div>
@@ -621,7 +621,7 @@ switch ($action) {
                     <?php AppUtility::t('Secret') ?>
                 </span>
 
-                        <div class='col-md-4 padding-left-zero'>
+                        <div class='col-md-6 padding-left-zero'>
                             <input class='form-control' type=text name="ltisecret" size=20>
                         </div>
                     </div>
@@ -630,7 +630,7 @@ switch ($action) {
                     <?php AppUtility::t('Can create instructors') ?>
                 </span>
 
-                        <div class='col-md-4 padding-left-zero'>
+                        <div class='col-md-6 padding-left-zero'>
                             <select class='form-control' name="createinstr">
                                 <option value="11" selected="selected"><?php AppUtility::t('No') ?></option>
                                 <option value="76"><?php AppUtility::t('Yes, and creates');
@@ -642,13 +642,15 @@ switch ($action) {
                     <div class='margin-top-twenty col-md-12 padding-left-zero'>
                         <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Associate with group') ?></span>
 
-                        <div class='col-md-4 padding-left-zero'>
+                        <div class='col-md-6 padding-left-zero' >
                             <select class='form-control' name='groupid'>
                                 <option value='0'><?php AppUtility::t('Default') ?></option>
+                                <div style="max-width: 300px">
                                 <?php
                                 foreach ($groupsName as $group) {
-                                    echo '<option value="' . $group['id'] . '">' . $group['name'] . '</option>';
+                                    echo '<option value="' . $group['id'] . '" >' . $group['name'] . '</option>';
                                 }
+                                echo '</div>';
                                 echo "</select>"; ?>
                         </div>
                     </div>
@@ -779,8 +781,8 @@ switch ($action) {
                             echo "<td></td>";
                         } else {
                             ?>
-                            <td><a href="#"
-                                   onclick="deleteGroup(<?php echo $row['id'] ?>)"><?php AppUtility::t('Delete') ?></a>
+                            <td>
+                                <a href="javascript: deleteGroup(<?php echo $row['id'] ?>)">  <?php AppUtility::t('Delete') ?></a>
                             </td>
                         <?php
                         }
@@ -825,13 +827,3 @@ switch ($action) {
 }
 ?>
 </div>
-
-<script>
-    $(document).ready(function()
-    {
-        $('.admin-modify-groups-table').DataTable();
-    });
-
-
-
-</script>

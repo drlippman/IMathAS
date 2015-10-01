@@ -4,7 +4,6 @@ $(document).ready(function()
 {
     $('.dataTables_filter').prop('type', 'text');
     $("#flash-message").animate({opacity:0.5}, 5000).fadeOut();
-    //textValidation();
 });
 
 function jQuerySubmit(url, data, successCallBack) {
@@ -178,28 +177,3 @@ function alertPopUp(message, e){
     });
 }
 
-function textValidation()
-{
-    $("input").keypress(function(e){
-        var subject = $(".subject").val();
-        $(".subject").css('border-color', '');
-        $('#flash-message').hide();
-        if(subject.length > 60)
-        {
-            $('#flash-message').show();
-            $(".subject").css('border-color', 'red');
-            $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters!");
-            return false;
-        }else{
-            $(".subject").css('border-color', '');
-            $('#flash-message').hide();
-        }
-    });
-    $("input").keyup(function(e){
-        if(e.keyCode == 8 || e.keyCode == 46)
-        {
-            $(".subject").css('border-color', '');
-            $('#flash-message').hide();
-        }
-    });
-}

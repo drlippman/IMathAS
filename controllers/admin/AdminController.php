@@ -1197,8 +1197,8 @@ class AdminController extends AppController
                                     $ne++;
                                 }
                             }
-                            echo "<p>Extracted $ne files.  <a href='".AppUtility::getURLFromHome('admin','admin/index')."'>Continue</a></p>\n";
-                            exit;
+                            $this->setWarningFlash('Extracted '.$ne.' files.');
+                            return $this->redirect('index');
                         } else {
                             $this->setWarningFlash(AppConstant::EMPTY_FILE);
                             return $this->redirect('forms?action=importcoursefiles');
@@ -1251,7 +1251,8 @@ class AdminController extends AppController
                 }
                 $old = time() - AppConstant::SECONDS * AppConstant::SECONDS * AppConstant::HOURS * AppConstant::NUMERIC_THIRTY * $params['months'];
                 $who = $params['who'];
-                if ($who=="students") {
+                if ($who=="students")
+                {
                     $users = User::getByLastAccessAndRights($old);
                     foreach ($users as $row) {
                         $userId = $row['id'];
@@ -1269,7 +1270,8 @@ class AdminController extends AppController
                 }
                 break;
             case "addgroup":
-                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
                     $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
                     return $this->redirect('forms?action=listgroups');
                 }
@@ -1278,8 +1280,15 @@ class AdminController extends AppController
                     $this->setWarningFlash('Group name already exists.');
                     return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
                 }else{
-                    $newGroup = new Groups();
-                    $newGroup->insertNewGroup($params['gpname']);
+                    if($params['gpname'])
+                    {
+                        $newGroup = new Groups();
+                        $newGroup->insertNewGroup($params['gpname']);
+                    }else
+                    {
+                        $this->setWarningFlash('Group name should not blank.');
+                        return $this->redirect('forms?action=listgroups');
+                    }
                 }
                 break;
             case "modgroup":
@@ -1291,12 +1300,19 @@ class AdminController extends AppController
                 if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO) {
                     $this->setWarningFlash('Group name already exists.');
                     return $this->redirect('forms?action=modgroup&id='.$existingGroupData['id']);
-                }else{
-                    Groups::updateGroup($params);
+                }else
+                {
+                    if($params['gpname'])
+                    {
+                        Groups::updateGroup($params);
+                    }else
+                    {
+                        $this->setWarningFlash('Group name should not blank.');
+                        return $this->redirect('forms?action=modgroup&id='.$params['id']);
+                    }
                 }
                 break;
             case "delgroup":
-
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
                     $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
                     return $this->redirect('forms?action=listgroups');
@@ -1316,7 +1332,6 @@ class AdminController extends AppController
                 } else {
                     User::updateLTIDomainCredentials($params);
                 }
-
                 break;
             case "delltidomaincred":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
