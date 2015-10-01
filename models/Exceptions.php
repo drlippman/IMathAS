@@ -160,4 +160,13 @@ class Exceptions extends BaseImasExceptions
         return Exceptions::find()->select('startdate,enddate')->where(['assessmentid' => $assessmentId, 'userid' => $userId])->one();
     }
 
+    public static function updateException($userId, $exceptionId, $startdate, $enddate, $waivereqscore)
+    {
+        $exception = Exceptions::find()->where(['id' => $exceptionId])->one();
+        $exception->startdate = $startdate;
+        $exception->enddate = $enddate;
+        $exception->waivereqscore = $waivereqscore;
+        $exception->islatepass = AppConstant::NUMERIC_ZERO;
+        $exception->save();
+    }
 }

@@ -182,7 +182,8 @@ function teacherMakeException() {
         CommonPopUp(msg);
     }
 }
-function chgfilter(cat) {ata
+function chgfilter(cat)
+{
     var courseId = $("#course-id").val();
     window.location = "gradebook?cid="+courseId+"&stu=0&catfilter=" + cat;
 }

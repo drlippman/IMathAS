@@ -60,17 +60,35 @@ class GradebookController extends AppController
         $this->layout = "master";
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
-        $get = $params;
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId, $user);
         $msgList = $this->getNotificationDataMessage($courseId, $user);
         $this->setSessionData('messageCount', $msgList);
         $this->setSessionData('postCount', $countPost);
         $course = Course::getById($courseId);
+
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        if (isset($params['refreshdef']) && isset($sessionData[$courseId.'catcollapse'])) {
+            unset($sessionData[$courseId.'catcollapse']);
+            AppUtility::writesessiondata($sessionData,$sessionId);
+        }
+        if (isset($sessionData[$courseId.'catcollapse'])) {
+            $overridecollapse = $sessionData[$courseId.'catcollapse'];
+        } else {
+            $overridecollapse = array();
+        }
+        if (isset($params['catcollapse'])) {
+            $overridecollapse[$params['cat']] = $params['catcollapse'];
+            $sessionData[$courseId.'catcollapse'] = $overridecollapse;
+            AppUtility::writesessiondata($sessionData,$sessionId);
+        }
+        $get = $params;
         $gradebookData = $this->gbtable($user->id, $courseId);
+
         $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
         $this->includeJS(['general.js', 'gradebook/gradebook.js','gradebook/tablescroller2.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
+        $responseData = array('course' => $course,'overridecollapse' => $overridecollapse, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
         return $this->renderWithData('gradebook', $responseData);
     }
 
@@ -135,8 +153,6 @@ class GradebookController extends AppController
             } else {
                 $catfilter = -1;
             }
-            $overridecollapse = array();
-
             if (isset($params['catfilter'])) {
                 $catfilter = $params['catfilter'];
                 $sessionData[$courseId.'catfilter'] = $catfilter;
@@ -1942,9 +1958,10 @@ class GradebookController extends AppController
             'includelastchange' => $includelastchange,
             'studentId' => $stu,
         );
+
         $gbCatsData = GbCats::getByCourseIdAndOrderByName($courseId);
         $responseData = array('gradebook' => $gradebook, 'sectionQuery' => $sectionQuery, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
-            'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
+            'secFilter' => $secfilter,'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
             'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'defaultValuesArray' => $defaultValuesArray, 'colorize' => $colorize, 'gbCatsData' => $gbCatsData);
         return $responseData;
     }
@@ -4539,6 +4556,176 @@ class GradebookController extends AppController
         $this->includeJS(['gradebook/addgrades.js']);
         $responseData = array('studentData' => $studentData,'course' => $course,'externalToolData' => $externalToolData,'linkData' => $linkData,'params' => $params,'hassection' => $hasSection);
         return $this->renderWithData('editToolScore',$responseData);
+    }
+
+    public function actionException()
+    {
+        $overwriteBody = 0;
+        $body = "";
+        $pagetitle = "Make Exception";
+        $params = $this->getRequestParams();
+        $cid = $params['cid'];
+        $course = Course::getById($cid);
+        $currentUser = $this->getAuthenticatedUser();
+        $isTeacher = $this->isTeacher($currentUser['id'],$course['id']);
+        $assessmentId = $params['asid'];
+        $aid = $params['aid'];
+        $userId = $params['uid'];
+        if (isset($params['stu'])) {
+            $stu = $params['stu'];
+        } else {
+            $stu=0;
+        }
+        if (isset($params['from'])) {
+            $from = $params['from'];
+        } else {
+            $from = 'gb';
+        }
+        if (!$isTeacher)
+        { // loaded by a NON-teacher
+            $overwriteBody=1;
+            $body = "You need to log in as a teacher to access this page";
+        } elseif (!(isset($_GET['cid']))) {
+            $overwriteBody=1;
+            $body = "You need to access this page from the course page menu";
+        } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+            $cid =  $course->id;
+            $waivereqscore = (isset($params['waivereqscore']))?1:0;
+
+            if (isset($params['sdate']))
+            {
+                $startdate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
+                $enddate = AppUtility::parsedatetime($params['edate'],$params['etime']);
+
+                //check if exception already exists
+                $exception = Exceptions::getByAssessmentIdAndUserId($userId, $assessmentId);
+                $exceptionId = $exception['id'];
+                if ($exceptionId != null)
+                {
+                    Exceptions::updateException($userId, $exceptionId, $startdate, $enddate, $waivereqscore);
+                } else
+                {
+                    $param = array('userid' => $params['uid'], 'assessmentid' => $params['aid'], 'startdate' => $startdate, 'enddate' => $enddate, 'waivereqscore' => $waivereqscore);
+                    $exception = new Exceptions();
+                    $exception->create($param);
+                }
+                if (isset($params['eatlatepass']))
+                {
+                    $n = intval($params['latepassn']);
+                    Student::updateStudentDataFromException($n,$params['uid'],$course->id);
+                }
+                //force regen?
+                if (isset($params['forceregen']))
+                {
+                    //this is not group-safe
+                    $stu = $params['uid'];
+                    $aid = $params['aid'];
+                    $assessmentSessionData = AssessmentSession::getAssessmentSession($params['uid'], $params['aid']);
+                    if ($assessmentSessionData)
+                    {
+                        if (strpos($assessmentSessionData['questions'],';')===false)
+                        {
+                            $questions = explode(",",$assessmentSessionData['questions']);
+                            $bestquestions = $questions;
+                        } else {
+                            list($questions,$bestquestions) = explode(";",$assessmentSessionData['questions']);
+                            $questions = explode(",",$questions);
+                        }
+                        $lastanswers = explode('~',$assessmentSessionData['lastanswers']);
+                        $curscorelist = $assessmentSessionData['scores'];
+                        $scores = array(); $attempts = array(); $seeds = array(); $reattempting = array();
+                        for ($i=0; $i<count($questions); $i++) {
+                            $scores[$i] = -1;
+                            $attempts[$i] = 0;
+                            $seeds[$i] = rand(1,9999);
+                            $newla = array();
+                            $laarr = explode('##',$lastanswers[$i]);
+                            //may be some files not accounted for here...
+                            //need to fix
+                            foreach ($laarr as $lael) {
+                                if ($lael=="ReGen") {
+                                    $newla[] = "ReGen";
+                                }
+                            }
+                            $newla[] = "ReGen";
+                            $lastanswers[$i] = implode('##',$newla);
+                        }
+                        $scorelist = implode(',',$scores);
+                        if (strpos($curscorelist,';')!==false) {
+                            $scorelist = $scorelist.';'.$scorelist;
+                        }
+                        $attemptslist = implode(',',$attempts);
+                        $seedslist = implode(',',$seeds);
+                        $lastanswers = str_replace('~','',$lastanswers);
+                        $lalist = implode('~',$lastanswers);
+                        $lalist = addslashes(stripslashes($lalist));
+                        $reattemptinglist = implode(',',$reattempting);
+
+                        $session['id'] = $assessmentSessionData['id'];
+                        $session['scores'] = $scorelist;
+                        $session['attempts'] = $attemptslist;
+                        $session['seeds'] = $seedslist;
+                        $session['lastanswers'] = $lalist;
+                        $session['reattempting'] = $reattemptinglist;
+                        AssessmentSession::modifyExistingSession($session);
+                    }
+
+                }
+                return $this->redirect('gradebook-view-assessment-details?cid='.$cid.'&asid='.$assessmentSessionData['id'].'&uid='.$userId.'&stu='.$stu.'&from='.$from);
+            } else if (isset($params['clear']))
+            {
+                $assessmentSessionData = AssessmentSession::getAssessmentSession($params['uid'], $params['aid']);
+                Exceptions::deleteExceptionById($params['clear']);
+                return $this->redirect('gradebook-view-assessment-details?cid='.$course->id.'&asid='.$assessmentSessionData['id'].'&uid='.$userId.'&stu='.$stu.'&from='.$from);
+            } elseif (isset($params['aid']) && $params['aid']!='')
+            {
+                $userData = User::getById($userId);
+                $userInformation = array();
+                $userInformation['LastName'] = $userData['LastName'];
+                $userInformation['FirstName'] = $userData['FirstName'];
+                $stuname = implode(', ',$userInformation);
+                $assessmentData = Assessments::getByAssessmentId($params['aid']);
+                $sdate = AppUtility::tzdate("m/d/Y",$assessmentData['startdate']);
+                $edate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']);
+                $stime = AppUtility::tzdate("g:i a",$assessmentData['startdate']);
+                $etime = AppUtility::tzdate("g:i a",$assessmentData['enddate']);
+                //check if exception already exists
+                $exception = Exceptions::getByAssessmentIdAndUserId($userId, $assessmentId);
+                $page_isExceptionMsg = "";
+                $savetitle = _('Create Exception');
+                if ($exception)
+                {
+                    $savetitle = _('Save Changes');
+                    $page_isExceptionMsg = "<p>An exception already exists.
+            <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$course->id&aid={$params['aid']}&uid={$params['uid']}&clear={$exception['startdate']}&asid=$assessmentId&stu=$stu&from=$from'\">"._("Clear Exception").'</button> or modify below.</p>';
+                    $sdate = AppUtility::tzdate("m/d/Y",$exception['startdate']);
+                    $edate = AppUtility::tzdate("m/d/Y",$exception['enddate']);
+                    $stime = AppUtility::tzdate("g:i a",$exception['startdate']);
+                    $etime = AppUtility::tzdate("g:i a",$exception['enddate']);
+                }
+            }
+
+            //DEFAULT LOAD DATA MANIPULATION
+//            return $this->redirect('exception?cid='.$params['cid'].'&uid='.$params['uid'].'&asid='.$asid.'&stu='.$stu.'&from='.$from);
+            $addr = 'exception?cid='.$params['cid'].'&uid='.$params['uid'].'&asid='.$asid.'&stu='.$stu.'&from='.$from;
+
+            $allAssessment = Assessments::getByCourse($course->id);
+            $page_courseSelect = array();
+            $i=0;
+            foreach ($allAssessment as $assessment)
+            {
+                $page_courseSelect['val'][$i] = $assessment['id'];
+                $page_courseSelect['label'][$i] = $assessment['name'];
+                $i++;
+            }
+
+        }
+        $student = Student::getByCourseId($course->id,$userId);
+        $latepasses = $student['latepass'];
+
+        $responseData = array('body' => $body,'addr' => $addr,'latepasses' => $latepasses,'savetitle' => $savetitle,'etime' => $etime,'stime' => $sdate,'sdate' => $sdate,'edate' => $edate,'overwriteBody' => $overwriteBody,'pagetitle' => $pagetitle,'course' => $course,
+           'from' => $from, 'params' => $params,'stuname' => $stuname,'page_isExceptionMsg' => $page_isExceptionMsg,'page_courseSelect' => $page_courseSelect,'asid' => $assessmentId,'isTeacher' => $isTeacher);
+        return $this->renderWithData('exception',$responseData);
     }
 
 }

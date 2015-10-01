@@ -524,5 +524,11 @@ class Student extends BaseImasStudents
     {
         return Student::find()->select('latepass')->where(['courseid' => $courseId, 'userid' => $userId])->one();
     }
+
+    public static function updateStudentDataFromException($n,$userId,$courseId)
+    {
+        $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$userId}' AND courseid='$courseId'";
+        \Yii::$app->db->createCommand($query)->execute();
+    }
 }
 

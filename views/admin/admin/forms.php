@@ -787,9 +787,9 @@ switch ($action) {
                         echo "</tr>";
                     }?>
                 </table>
-                <?php  echo "<div class='col-md-12 margin-top-twenty padding-left-zero'>
+                <?php  echo "<div class='col-md-12 margin-top-twenty  padding-left-zero'>
                         <span class='floatleft select-text-margin'>" . AppUtility::t('Add new group', false) . "</span>
-                        <input class='width-thirty-per floatleft margin-left-thirty form-control' type=text name=gpname id=gpname size=50>
+                        <input class='width-thirty-per floatleft margin-bottom-thirty margin-left-thirty form-control subject' type=text name=gpname id=gpname size=50>
                         </div>";
                 ?>
                 </tbody>
@@ -810,7 +810,7 @@ switch ($action) {
                         <?php AppUtility::t('Rename Instructor Group') ?></h2>
                 </div>
                 <?php AppUtility::t('Group name:', false) ?> <input
-                    class="form-control width-thirty-three-per margin-top-thirty" type=text size=50 name=gpname
+                    class="form-control width-thirty-three-per margin-top-thirty subject" type=text size=50 name=gpname
                     id=gpname value="<?php echo $gpname ?>">
             </form>
         </div>
@@ -831,5 +831,7 @@ switch ($action) {
     {
         $('.admin-modify-groups-table').DataTable();
     });
+
+
 
 </script>

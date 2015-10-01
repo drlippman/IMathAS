@@ -20,7 +20,6 @@ if($defaultValuesArray['studentId'] > 0){
    //show student view
 $gradebook = $totalData['gradebook'];
 $hidenc = $defaultValuesArray['hidenc'];
-$cid = $course->id;
 $gbmode =  ' ';
 $availshow= $defaultValuesArray['availshow'];
 $catfilter = $defaultValuesArray['catfilter'];
@@ -448,29 +447,30 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
                                 }
                                 } else if ($gradebook[0][1][$i][6]==2) {//discuss
                                 if ($studentId != -1) { ?>
-                                 <a href=\"viewforumgrade.php?cid=$cid&stu=$studentId&uid={$gradebook[1][4][0]}&fid={$gradebook[0][1][$i][7]}\">
+                                 <a href="<?php echo AppUtility::getURLFromHome('forum','forum/view-forum-grade?cid='.$course->id.'&stu='.$studentId.'&uid='.$gradebook[1][4][0].'&fid='.$gradebook[0][1][$i][7]);?>">
                                     <?php $haslink = true;
                                     }
                                     } else if ($gradebook[0][1][$i][6]==3) {//exttool
-                                    if ($isteacher || ($istutor && $gradebook[0][1][$i][8]==1)) {
-                                    echo "<a href=\"edittoolscores.php?cid=$cid&stu=$studentId&uid={$gradebook[1][4][0]}&lid={$gradebook[0][1][$i][7]}\">";
-                                        $haslink = true;
+                                    if ($isteacher || ($istutor && $gradebook[0][1][$i][8]==1)) { ?>
+                                     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?cid='.$course->id.'&stu='.$studentId.'&uid='.$gradebook[1][4][0].'&lid='.$gradebook[0][1][$i][7]);?>">
+                                        <?php $haslink = true;
                                         }
                                         }
                                         }
-                                        if (isset($gradebook[1][1][$i][0])) {
+                                        if (isset($gradebook[1][1][$i][0]))
+                                        {
                                         if ($gradebook[1][1][$i][3]>9) {
                                         $gradebook[1][1][$i][3] -= 10;
                                         }
                                         echo $gradebook[1][1][$i][0];
                                         if ($gradebook[1][1][$i][3]==1) {
-                                        echo ' (NC)';
+                                        AppUtility::t('NC',false);
                                         } else if ($gradebook[1][1][$i][3]==2) {
-                                        echo ' (IP)';
+                                            AppUtility::t('IP',false);
                                         } else if ($gradebook[1][1][$i][3]==3) {
-                                        echo ' (OT)';
+                                            AppUtility::t('OT',false);
                                         } else if ($gradebook[1][1][$i][3]==4) {
-                                        echo ' (PT)';
+                                            AppUtility::t('PT',false);
                                         }
                                         } else {
                                         echo '-';

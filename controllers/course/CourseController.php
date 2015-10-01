@@ -738,7 +738,7 @@ class CourseController extends AppController
                     if (is_array($itemOrder)) {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
- 
+
                         $tempItemList = array();
                         if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
