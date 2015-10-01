@@ -91,4 +91,16 @@ class StuGroupMembers extends BaseImasStugroupmembers
         $data = Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function getStudAndUserData($groupId)
+    {
+        $query = new Query();
+        $query->select(['i_u.LastName','i_u.FirstName'])
+            ->from(['imas_stugroupmembers AS i_sg','imas_users AS i_u'])
+            ->where(['i_u.id=i_sg.userid']);
+        $query->andWhere(['i_sg.stugroupid' => $groupId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

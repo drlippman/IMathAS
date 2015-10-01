@@ -28,12 +28,6 @@ $imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reor
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
                class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting
             </a>
-            <div class="tile_div">
-                <a href="#">Instructor</a>
-                <a href="#">Student</a>
-                <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?>" class="last">Quick Rearrange</a>
-                <div class="clear"></div>
-            </div>
         </div>
     </div>
 </div>
@@ -92,6 +86,27 @@ $imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reor
                 </ul>
             </li>
         </ul>
+        <div class='btn-group settings'>
+            <a class='btn btn-primary setting-btn last'
+               href="#"><i class="fa fa-eye"></i>
+
+                <?php AppUtility::t('Instructor'); ?>
+            </a>
+            <a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'>
+                <span class='fa fa-caret-down'></span>
+            </a>
+            <ul class='dropdown-menu'>
+                <li>
+                    <a href="#">
+                       <?php AppUtility::t('Student'); ?>
+                </li>
+                <li>
+                    <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?>">
+                        <?php AppUtility::t('Quick Rearrange'); ?>
+                    </a>
+                </li>
+            </ul>
+        </div>
 </div>
     <div class="clear-both"></div>
     <div class="row add-item">

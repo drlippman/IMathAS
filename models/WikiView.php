@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\_base\BaseImasWikiViews;
+use yii\db\Query;
 
 class WikiView extends BaseImasWikiViews
 {
@@ -37,5 +38,33 @@ class WikiView extends BaseImasWikiViews
         if ($query) {
             $query->delete();
         }
+    }
+
+    public static function getByUserIdAndWikiId($userId, $id)
+    {
+        $query = new Query();
+        $query->select(['stugroupid','lastview'])
+            ->from('imas_wiki_views')
+            ->where(['userid' => $userId]);
+        $query->andWhere(['wikiid' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function updateLastView($userId, $id, $groupId,$now)
+    {
+        $lastView = WikiView::find()->where(['userid' => $userId])->andWhere(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->one();
+        if($lastView){
+            $lastView->lastview = $now;
+        }
+    }
+
+    public function addWikiView($userId, $wikiId, $stuGroupId, $lastView)
+    {
+        $this->userid = $userId;
+        $this->wikiid = $wikiId;
+        $this->stugroupid = $stuGroupId;
+        $this->lastview = $lastView;
+        $this->save();
     }
 } 

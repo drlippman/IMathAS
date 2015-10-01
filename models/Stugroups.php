@@ -158,4 +158,14 @@ class Stugroups extends BaseImasStugroups
     {
         return Stugroups::find()->select(['id','name'])->where(['groupsetid' => $groupsetId])->orderBy('id')->all();
     }
+
+    public static function getByGrpSetOrderByName($groupsetId)
+    {
+        return Stugroups::find()->select(['id','name'])->where(['groupsetid' => $groupsetId])->orderBy('name')->all();
+    }
+
+    public static function getByName($groupId)
+    {
+        return Stugroups::find()->select('name')->where(['id' => $groupId])->all();
+    }
 }

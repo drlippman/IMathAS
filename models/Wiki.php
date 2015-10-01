@@ -168,4 +168,15 @@ class Wiki extends BaseImasWikis
     {
         return Wiki::find()->select('name')->where(['id' => $typeId])->one();
     }
+
+    public static function getDataById($id)
+    {
+        $query = new Query();
+        $query->select(['name','startdate','enddate','editbydate','avail','groupsetid'])
+            ->from('imas_wikis')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 } 

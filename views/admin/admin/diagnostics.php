@@ -56,27 +56,28 @@ $this->params['breadcrumbs'][] = $this->title;
 foreach ($sel1 as $k => $s1) {
     ?>
     <div>
-        <p><b><?php echo $s1 ?></b>. <?php AppUtility::t('Deliver assessment')?>
-            <?php
+        <div class="col-lg-2 padding-top-five"><b><?php echo $s1 ?></b>. <?php AppUtility::t('Deliver assessment')?></div>
+        <div class="col-lg-4">    <?php
+
             AppUtility::writeHtmlSelect($page_selectName[$k], $page_selectValList[$k], $page_selectLabelList[$k], $page_selectedOption[$k]);
-            ?>
-            <br/>
-            <?php AppUtility::t('Force regen on reentry (if allowed)?')?> <input type=checkbox name="reg<?php echo $k; ?>" value="1" <?php
+            ?></div>
+            <BR class="form"><br>
+           <div class="col-lg-12"> <?php AppUtility::t('Force regen on reentry (if allowed)?')?> <input type=checkbox name="reg<?php echo $k; ?>" value="1" <?php
             if (($forceregen & (AppConstant::NUMERIC_ONE << $k)) > AppConstant::NUMERIC_ZERO) {
                 echo 'checked="checked"';
-            }?> />
-            <?php
+            }?> /></div><br>
+               <div class="col-lg-12">  <?php
             if ($k == AppConstant::NUMERIC_ZERO && count($sel1) > AppConstant::NUMERIC_ONE) {
                 echo '<br/>Use these second-level selectors for all first-level selectors?';
-                echo '<input type=checkbox name="useoneforall" value="1" onclick="toggleonefor(this)" />';
+                echo '<input type=checkbox class="padding-left-ten" name="useoneforall" value="1" onclick="toggleonefor(this)" /><br/>';
             }
             ?>
-        </p>
+        </div><br/>
 
-        <div class="sel2"><?php AppUtility::t('Add selector value')?>
+        <div class="col-lg-12 sel2"><br/><?php AppUtility::t('Add selector value')?>
             <input type=text id="in<?php echo $k ?>"
                    onkeypress="return onenter(event,'in<?php echo $k ?>','out<?php echo $k ?>')"/>
-            <input type="button" value="Add" onclick="additem('in<?php echo $k ?>','out<?php echo $k ?>')"/><br/>
+            <input type="button" value="Add" onclick="additem('in<?php echo $k ?>','out<?php echo $k ?>')"/>
 
             <table>
                 <tbody id="out<?php echo $k ?>">
@@ -105,7 +106,7 @@ foreach ($sel1 as $k => $s1) {
                 ?>
                 </tbody>
             </table>
-        </div>
+        </div> <br class="form"><br>
 
         <?php
         echo (isset($sel2[$s1]) && count($sel2[$s1]) > AppConstant::NUMERIC_ZERO) ? "<script> cnt['out$k'] = " . count($sel2[$s1]) . ";</script>\n" : "<script> cnt['out$k'] = 0;</script>\n";
@@ -115,7 +116,7 @@ foreach ($sel1 as $k => $s1) {
 <?php
 } ?>
 
-<div class="col-lg-2"> <?php echo '<input type=submit value="Continue"></div>';
+<div class="col-lg-2"> <?php echo '<input type=submit value="Continue"></div><br class="form"><br/>';
 echo '<form>';
 
 } elseif (isset($_GET['step']) && $_GET['step'] == AppConstant::NUMERIC_THREE) {

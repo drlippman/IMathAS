@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasWikiRevisions;
 
 class WikiRevision extends BaseImasWikiRevisions
@@ -82,6 +83,40 @@ class WikiRevision extends BaseImasWikiRevisions
         $instrFileData = WikiRevision::findOne(['wikiid' => $itemId]);
         if ($instrFileData) {
             $instrFileData->delete();
+        }
+    }
+
+    public static function getByIdWithMaxTime($id)
+    {
+        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$id' GROUP BY stugroupid";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function deleteAllRevision($id, $groupId)
+    {
+        $queryAll = WikiRevision::find()->where(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->all();
+        if($queryAll) {
+            foreach($queryAll as $key => $query)
+            {
+                $query->delete();
+            }
+        }
+    }
+
+    public static function getDataWithLimit($id,$groupId)
+    {
+        $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupId' ORDER BY id DESC LIMIT 1";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function deleteRevisionHistory($id, $groupId,$curid)
+    {
+        $queryAll = WikiRevision::find()->where(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->andWhere(['<','id', $curid])->all();
+        if($queryAll) {
+            foreach($queryAll as $key => $query)
+            {
+                $query->delete();
+            }
         }
     }
 }

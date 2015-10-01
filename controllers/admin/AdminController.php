@@ -348,18 +348,19 @@ class AdminController extends AppController
                 $forceregen = AppConstant::NUMERIC_ZERO;
             }
             foreach($sel1 as $k=>$s1) {
+
                 $page_selectValList[$k] = array();
                  $page_selectLabelList[$k] = array();
                 $page_selectName[$k] = "aid" . $k;
+
                 $i= AppConstant::NUMERIC_ZERO;
                 $courseId = $params['cid'];
                 $result = Assessments::getByCId($courseId);
-
                 foreach($result as $key => $row)
                 {
-                    $page_selectValList[$k][$i] = $row[0];
-                    $page_selectLabelList[$k][$i] = $row[1];
-                    if (isset($aids[$k]) && $row[0]==$aids[$k]) {
+                    $page_selectValList[$k][$i] = $row['id'];
+                    $page_selectLabelList[$k][$i] = $row['name'];
+                    if (isset($aids[$k]) && $row['id']==$aids[$k]) {
                         $page_selectedOption[$k] = $aids[$k];
                     }
                     $i++;
@@ -397,7 +398,7 @@ class AdminController extends AppController
                     if (isset($params['alpha'])) {
                         sort($sel2[$i]);
                     }
-                    $sel2[$i] = implode('~',$sel2[$i]);
+                    $sel2[$i] = ($sel2[$i]);
                 }
             }
             $sel2list = implode(';',$sel2);
@@ -405,13 +406,13 @@ class AdminController extends AppController
             if (isset($params['id']) && $params['id'] != 0) {
                 $query = new Diags();
                 $id = $query->updateDiagnostics($params);
-                $page_successMsg = "<p>Diagnostic Updated</p>\n";
+                $page_successMsg = "<br/><div class='col-lg-12'>Diagnostic Updated</div><br/>";
             } else {
                 $query = new Diags();
                 $id = $query->saveDiagnostic($params, $userId);
-                $page_successMsg = "<BR class=form><div class='col-lg-2'>Diagnostic Added</div><BR class=form><br>\n";
+                $page_successMsg = "<BR class=form><div class='col-lg-2'>Diagnostic Added</div><br class='form'>";
             }
-            $page_diagLink = "<div class=col-lg-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
+            $page_diagLink = "<BR/><div class=col-lg-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
             $page_publicLink = ($params['public']&2) ? "<div class=col-lg-10>Diagnostic is listed on the public listing at <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></div><BR class=form><br>\n" : ""  ;
 
         } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
