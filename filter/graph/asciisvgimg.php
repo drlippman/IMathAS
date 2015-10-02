@@ -626,24 +626,24 @@ function ASaxes($arg) {
 		if ($dox) {
 			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
 				if ($x>=$this->winxmin) {
-					imageline($this->img,$x,$this->height-$this->origin[1]-.7*$this->ticklength,$x,$this->height-$this->origin[1]+.7*$this->ticklength,$this->$ac);
+					imageline($this->img,$x,$this->height-$this->origin[1]-.5*$this->ticklength,$x,$this->height-$this->origin[1]+.5*$this->ticklength,$this->$ac);
 				}
 			}
 			for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
 				if ($x<=$this->winxmax) {
-					imageline($this->img,$x,$this->height-$this->origin[1]-.7*$this->ticklength,$x,$this->height-$this->origin[1]+.7*$this->ticklength,$this->$ac);
+					imageline($this->img,$x,$this->height-$this->origin[1]-.5*$this->ticklength,$x,$this->height-$this->origin[1]+.5*$this->ticklength,$this->$ac);
 				}
 			}
 		}
 		if ($doy) {
 			for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
 				if ($y>=$this->winymin) {
-					imageline($this->img,$this->origin[0]-.7*$this->ticklength,$y,$this->origin[0]+.7*$this->ticklength,$y,$this->$ac);
+					imageline($this->img,$this->origin[0]-.5*$this->ticklength,$y,$this->origin[0]+.5*$this->ticklength,$y,$this->$ac);
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
 				if ($y<=$this->winymax) {
-					imageline($this->img,$this->origin[0]-.7*$this->ticklength,$y,$this->origin[0]+.7*$this->ticklength,$y,$this->$ac);
+					imageline($this->img,$this->origin[0]-.5*$this->ticklength,$y,$this->origin[0]+.5*$this->ticklength,$y,$this->$ac);
 				}
 			}
 		}

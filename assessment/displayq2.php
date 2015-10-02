@@ -2202,7 +2202,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$settings[3] = 0;
 			if (strpos($settings[4],':')!==false) {
 				$settings[4] = explode(':',$settings[4]);
-				$sclinglbl = $settings[4][0];
+				if ($settings[4][0]{0}=='h') {
+					$sclinglbl = substr($settings[4][0],1).':0:1';
+				} else {
+					$sclinglbl = $settings[4][0];
+				}
 				$sclinggrid = $settings[4][1];
 			} else {
 				$sclinglbl = $settings[4];
