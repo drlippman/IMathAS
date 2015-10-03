@@ -80,7 +80,7 @@ class WikiUtility extends Component
                     $users = array();
                     $revisionhistory = array();
                 }
-                $text = diffstringsplit($text);
+                $text = diff::diffstringsplit($text);
                 foreach ($text as $k => $v) {
                     $text[$k] = filter($v);
                 }

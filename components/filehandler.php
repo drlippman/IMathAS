@@ -76,7 +76,7 @@ public static function relocatecoursefileifneeded($file, $key, $sec="public") {
 	}
 }
 
-function relocatefileifneeded($file, $key, $sec="public") {
+public static function relocatefileifneeded($file, $key, $sec="public") {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -682,7 +682,7 @@ function copyqimage($key,$dest) {
 	}
 }
 
-function getuserfileurl($key) {
+public static function getuserfileurl($key) {
 	global $urlmode,$imasroot;
 		return "localhost/math/web/Uploads/$key";
 }

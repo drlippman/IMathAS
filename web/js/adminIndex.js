@@ -116,7 +116,6 @@ function removeSuccess(response) {
 
 }
 function showgroupusers() {
-    alert('priyanka');
     var grpid = document.getElementById("selgrpid").value;
 
     window.location = 'index?showusers=' + grpid;

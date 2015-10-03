@@ -12,13 +12,13 @@ class WikiRevision extends BaseImasWikiRevisions
         return WikiRevision::findAll(['wikiid' => $wikiId]);
     }
 
-    public function saveRevision($params)
+    public function saveRevision($id,$groupId,$userId,$wikiContent,$now)
     {
-        $this->wikiid = isset($params['wikiId']) ? $params['wikiId'] : null;
-        $this->userid = AppConstant::NUMERIC_THREE;
-        $this->revision = isset($params['wikicontent']) ? $params['wikicontent'] : null;
-        $this->stugroupid = AppConstant::NUMERIC_ZERO;
-        $this->time = isset($params['time']) ? $params['time'] : null;
+        $this->wikiid = $id;
+        $this->stugroupid = $groupId;
+        $this->userid = $userId;
+        $this->revision = $wikiContent;
+        $this->time = $now;
         $this->save();
     }
 
@@ -118,5 +118,44 @@ class WikiRevision extends BaseImasWikiRevisions
                 $query->delete();
             }
         }
+    }
+
+    public static function getRevision($id, $groupId, $revision)
+    {
+        $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupId' ";
+        $query .= "AND id>=$revision ORDER BY id DESC";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function updateRevision($revision, $newBase)
+    {
+        $updateRevisions = WikiRevision::findAll(['id' => $revision]);
+        if($updateRevisions)
+        {
+            foreach($updateRevisions as $key => $updateRevision)
+            {
+                $updateRevision->revision = $newBase;
+            }
+        }
+
+    }
+
+    public static function deleteRevision($id, $groupId,$revision)
+    {
+        $queryAll = WikiRevision::find()->where(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->andWhere(['>','id', $revision])->all();
+        if($queryAll) {
+            foreach($queryAll as $key => $query)
+            {
+                $query->delete();
+            }
+        }
+    }
+
+    public static function getDataToCheckConflict($id, $groupId)
+    {
+        $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
+        $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
+        $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupId' ORDER BY id DESC LIMIT 1";
+        return \Yii::$app->db->createCommand($query)->queryOne();
     }
 }

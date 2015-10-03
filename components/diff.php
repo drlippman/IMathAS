@@ -1,6 +1,9 @@
 <?php
-
-function diff($old, $new){
+namespace app\components;
+use yii\base\Component;
+class diff extends Component
+{
+public static function diff($old, $new){
 	foreach($old as $oindex => $ovalue){
 		$nkeys = array_keys($new, $ovalue);
 		foreach($nkeys as $nindex){
@@ -15,16 +18,16 @@ function diff($old, $new){
 	}
 	if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
 	return array_merge(
-		diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
+	    diff::diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
 		array_slice($new, $nmax, $maxlen),
-		diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+		diff::diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
 }
 
 //Added by David Lippman to condense diff into sparse JSON string
 //need syntax with delete, add, replace
 //lets use:  0: delete, 1: add, 2: replace
-function diffsparsejson($old, $new) {
-	$diff = diff(diffstringsplit($old), diffstringsplit($new));
+public static function diffsparsejson($old, $new) {
+	$diff = diff::diff(diff::diffstringsplit($old), diff::diffstringsplit($new));
 	$adj = 0;
 	$out = array();
 	foreach($diff as $k=>$v) {
@@ -58,7 +61,7 @@ function diffsparsejson($old, $new) {
 	}
 }
 
-function diffapplydiff($base,$diff) {
+public static function diffapplydiff($base,$diff) {
 	if (function_exists('json_encode')) {
 		$diffs = json_decode($diff);
 	} else {
@@ -79,7 +82,7 @@ function diffapplydiff($base,$diff) {
 	return $base;
 }
 
-function diffstringsplit($str) {
+public static function diffstringsplit($str) {
 	if (isset($GLOBALS['wikiver'])) {
 		$wikiver = $GLOBALS['wikiver'];
 	} else {
@@ -101,6 +104,7 @@ function diffstringsplit($str) {
 		}
 	}
 	return $out;
+}
 }
 
 ?>

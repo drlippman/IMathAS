@@ -132,7 +132,7 @@ class Stugroups extends BaseImasStugroups
     }
 
     public static function getStuGrpId($userId, $groupSetId){
-        $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
+        $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
         $query .= "WHERE i_sgm.userid='$userId' AND i_sg.groupsetid= $groupSetId";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
