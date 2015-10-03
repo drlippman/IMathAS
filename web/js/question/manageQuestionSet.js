@@ -70,3 +70,23 @@ function chglibtoggle(rad) {
     }
     chgliblaststate = val;
 }
+$("#manage-question-chglib").click(function() {
+    $("input[name=manage_ques_some_name]").attr("name", "chglib");
+    document.forms["selform"].submit();
+});
+$("#manage-question-license").click(function() {
+    $("input[name=manage_ques_some_name]").attr("name", "license");
+    document.forms["selform"].submit();
+});
+$("#manage-question-chgrights").click(function() {
+    $("input[name=manage_ques_some_name]").attr("name", "chgrights");
+    document.forms["selform"].submit();
+});
+$("#manage-question-remove").click(function() {
+    $("input[name=manage_ques_some_name]").attr("name", "remove");
+    document.forms["selform"].submit();
+});
+$("#manage-question-transfer").click(function() {
+    $("input[name=manage_ques_some_name]").attr("name", "transfer");
+    document.forms["selform"].submit();
+});

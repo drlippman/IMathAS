@@ -22,7 +22,7 @@ use Yii;
 use app\components\AppConstant;
 
 require("../components/displayQuestion.php");
-
+require("../components/handled.php");
 class QuestionController extends AppController
 {
     public function actionAddQuestions()
@@ -64,17 +64,16 @@ class QuestionController extends AppController
                 $sessionData['groupopt' . $assessmentId] = $params['grp'];
                 $this->writesessiondata($sessionData, $sessionId);
             }
-
             if (isset($params['selfrom'])) {
                 $sessionData['selfrom' . $assessmentId] = $params['selfrom'];
                 $this->writesessiondata($sessionData, $sessionId);
             } else {
+
                 if (!isset($sessionData['selfrom' . $assessmentId])) {
                     $sessionData['selfrom' . $assessmentId] = 'lib';
                     $this->writesessiondata($sessionData, $sessionId);
                 }
             }
-
             if (($teacherId) && isset($params['addset'])) {
                 if (!isset($params['nchecked']) && !isset($params['qsetids'])) {
                     $this->setErrorFlash(AppConstant::NO_QUESTION_SELECTED);
@@ -399,6 +398,7 @@ class QuestionController extends AppController
                 unset($subs);
             }
             $jsArray .= ']';
+
             /*
              * Data manipulation for potential questions
              */
@@ -508,7 +508,6 @@ class QuestionController extends AppController
                     }
                 }
                 $lList = "'" . implode("','", explode(',', $searchLibs)) . "'";
-
                 if (!$beenTaken) {
                     /*
                      * Potential questions
@@ -1069,6 +1068,7 @@ class QuestionController extends AppController
         $itemArray = implode(',', $itemArray);
         $itemArray = str_replace('~', ',', $itemArray);
         $itemArray = explode(',', $itemArray);
+        $this->includeCSS(['question/question.css']);
         $this->includeJS(['question/categorize.js']);
         $responseArray = array('cid' => $courseId, 'aid' => $assessmentId, 'itemarr' => $itemArray, 'descriptions' => $descriptions, 'category' => $category,
             'outcomes' => $outcomes, 'outcomenames' => $outcomeNames, 'questionlibs' => $questionLibs, 'libnames' => $libNames,
@@ -2978,7 +2978,7 @@ class QuestionController extends AppController
                             $pageQuestionTable[$i]['extref'] .= "<img src=" . AppUtility::getHomeURL() . 'img/html_tiny.png' . ">";
                         }
                     }
-                    $pageQuestionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/>";
+                    $pageQuestionTable[$i]['preview'] = "<div onClick=\"previewq('selform',$ln,{$line['id']})\" style='width: 100%;' class='btn btn-primary'><img class = 'padding-right-five small-preview-icon' src='" . AppUtility::getAssetURL() . 'img/prvAssess.png' . "'>&nbsp;Preview</div>";
                     $pageQuestionTable[$i]['type'] = $line['qtype'];
                     if ($searchAll == AppConstant::NUMERIC_ONE) {
                         $pageQuestionTable[$i]['lib'] = "<a href=\"manage-question-set?cid=$cid&listlib={$line['libid']}\">List lib</a>";

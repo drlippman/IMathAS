@@ -27,9 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
     echo '<div class="tab-content shadowBox non-nav-tab-item">';
     echo "<form class='margin-thirty categorize-question-form' method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
 
-    echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
-    echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-    echo '<table class="width-hundread-per categorize-question-table"><thead><tr>
+    echo '<table class="margin-top-twenty width-hundread-per categorize-question-table"><thead><tr>
     <th class="text-align-left">
         <div class="checkbox override-hidden">
             <label>
@@ -55,8 +53,8 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
 
-        echo "<td>{$descriptions[$qid]}</td><td>";
-        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control width-fifty-per qsel\">";
+        echo "<td class='categorize-question-description'>{$descriptions[$qid]}</td><td class='width-fourty-per'>";
+        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control min-with-hundred-per qsel\">";
         echo "<option value=\"0\" ";
         if ($category[$qid] == 0) {
             echo "selected=1";
@@ -128,10 +126,10 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
     }
-    echo "<p>Select first listed library for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
-    echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
-    echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-    echo '<p><input type=submit value="Record Categorizations"> and return to the course page.</p>';
+    echo "<p>".AppUtility::t('Select first listed library for all uncategorized questions',false)."<input class='margin-left-ten' type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+    echo "<p>".AppUtility::t('Add new category to lists',false)."<input class='form-control display-inline-block width-fourty-per margin-left-ten' type=type id=\"newcat\" size=40> ";
+    echo "<input class='margin-left-ten' type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
+    echo '<p><input type=submit value="Record Categorizations"> <span class="margin-left-ten">'.AppUtility::t('and return to the course page.',false).'</span></p>';
     echo "</form>\n";
 echo"</div>";
 ?>
