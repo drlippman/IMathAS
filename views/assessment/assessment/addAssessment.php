@@ -24,11 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading col-md-8 padding-left-zero">
             <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
         </div>
-
         <div class="col-md-4 floatright padding-right-zero">
             <?php if (isset($assessmentData['id'])) {
             echo '<div class="floatleft">
-            <a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$params['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''.AppUtility::t('This will discard any changes you have made on this page',false).'\');">
+            <a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$assessmentData['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''.AppUtility::t('This will discard any changes you have made on this page',false).'\');">
                 <i class="fa fa-share header-right-btn"></i>'
                 .AppUtility::t('Add/Remove Questions',false).
             '</a></div>';

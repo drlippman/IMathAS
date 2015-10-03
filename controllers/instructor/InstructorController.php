@@ -734,6 +734,7 @@ class InstructorController extends AppController
                 $gradeBookCategory[$singleRecord['id']] = $singleRecord['id'];
             }
         }
+        global $outComes;
         $outComes = array();
         $outComesData = Outcomes::getByCourseId($courseId);
         if ($outComesData){
@@ -1492,7 +1493,7 @@ class InstructorController extends AppController
                              $blockCnt = $query['blockcnt'];
                              $itemOrder = Course::getItemOrder($params['ctc']);
                              $items = unserialize($itemOrder['itemorder']);
-                             global $newItems;
+                             global $newItems, $copyStickyPosts;
                              if (isset($params['copystickyposts']))
                              {
                                  $copyStickyPosts = true;

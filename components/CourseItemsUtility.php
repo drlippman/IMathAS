@@ -801,7 +801,7 @@ class CourseItemsUtility extends Component
                     ?>
                     <ul class="fileattachlist">
                         <li>
-                            <a href="/math/web/Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                            <a href="<?php echo AppUtility::getHomeUrl()?>Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
                         </li>
                     </ul>
                 <?php
@@ -815,7 +815,7 @@ class CourseItemsUtility extends Component
                     src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
             <ul class=" select1 dropdown-menu selected-options pull-right">
                 <li><a class="modify"
-                       href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id) ?>"><?php AppUtility::t('Modify'); ?></a>
+                       href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?cid=' . $course->id . '&id=' . $inline->id) ?>"><?php AppUtility::t('Modify'); ?></a>
                 </li>
                 <li><a id="delete"
                        href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -846,7 +846,7 @@ class CourseItemsUtility extends Component
                     ?>
                     <ul class="fileattachlist">
                         <li>
-                            <a href="/math/web/Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                            <a href="<?php echo AppUtility::getHomeUrl()?>Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
                         </li>
                     </ul>
                 <?php
@@ -868,7 +868,7 @@ class CourseItemsUtility extends Component
                                                    src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                 <ul class=" select1 dropdown-menu selected-options pull-right">
                     <li><a class="modify"
-                           href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id) ?>"><?php AppUtility::t('Modify'); ?></a>
+                           href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?cid=' . $course->id . '&id=' . $inline->id) ?>"><?php AppUtility::t('Modify'); ?></a>
                     </li>
                     <li><a id="delete"
                            href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>

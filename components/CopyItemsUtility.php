@@ -70,19 +70,15 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $fileorder = $row['fileorder'];
         array_pop($row);
         $inlineText = new InlineText();
-        $newtypeid = $inlineText->saveChanges($row);
+        $newtypeid = $inlineText->saveInlineText($row);
         $instrFiles = InstrFiles::getFileName($typeid);
         $addedfiles = array();
         foreach ($instrFiles as $singleData)
         {
             $curid = $singleData['id'];
-            array_pop($singleData);
+            unset($singleData['id']);
             $instrFile = new InstrFiles();
-            if($params)
-            {
-                $singleData['newfiledescr'] = $singleData['description'];
-            }
-            $newInstrFileId = $instrFile->saveFile($singleData, $newtypeid);
+            $newInstrFileId = $instrFile->insertFile($singleData, $newtypeid);
             $addedfiles[$curid] = $newInstrFileId;
         }
         if (count($addedfiles) > AppConstant::NUMERIC_ZERO)
@@ -90,7 +86,6 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             $addedfilelist = array();
             foreach ((explode(',', $fileorder)) as $fid)
             {
-
                 $addedfilelist[] = $addedfiles[$fid];
             }
             $addedfilelist = implode(',', $addedfilelist);
@@ -127,8 +122,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         if ($istool) {
             $exttooltrack[$newtypeid] = intval($tool[0]);
         }
-    } elseif ($itemtype == "Forum")
-    {
+    } elseif ($itemtype == "Forum") {
         $ForumData = Forums::getById($typeid);
         if ($sethidden) {
             $ForumData['avail'] = AppConstant::NUMERIC_ZERO;
@@ -139,6 +133,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             $ForumData['gbcategory'] = AppConstant::NUMERIC_ZERO;
         }
         $rubric = $ForumData['rubric'];
+        unset($ForumData['rubric']);
         $ForumData['name'] .= stripslashes($params['append']);
         if ($ForumData['outcomes'] != '') {
             $curoutcomes = explode(',', $ForumData['outcomes']);
@@ -148,7 +143,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                     $newoutcomes[] = $outcomes[$o];
                 }
             }
-            $row['outcomes'] = implode(',', $newoutcomes);
+            $ForumData['outcomes'] = implode(',', $newoutcomes);
         }
         $forum = new Forums();
         $newtypeid = $forum->addNewForum($ForumData);
@@ -196,7 +191,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $newtypeid = $wiki->addWiki($row);
     } elseif ($itemtype == "Assessment")
     {
-        $assessmentData = Assessments::getByAssessmentId($typeid);
+        $assessmentData = Assessments::getByAssessmentId(intval($typeid));
         if ($sethidden)
         {
             $assessmentData['avail'] = AppConstant::NUMERIC_ZERO;
@@ -234,7 +229,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         }
         $assessnewid[$typeid] = $newtypeid;
         $thiswithdrawn = array();
-        $query = Assessments::getByAssessmentId($typeid);
+        $query = Assessments::getItemOrderById($typeid);
         if (trim($query['itemorder']) != '')
         {
             $itemorder = explode(',', $query['itemorder']);
@@ -262,10 +257,14 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             }
             $idtoorder = array_flip($insorder);
             if (count($inss) > AppConstant::NUMERIC_ZERO) {
-                $question = new Questions();
+
                 $questionIdArray = array();
                 foreach ($inss as $in) {
-                    $firstnewid = $question->addQuestions($in);
+
+                    unset($in['id']);
+                    $in['assessmentid'] = ($newtypeid);
+                    $question = new Questions();
+                    $firstnewid = $question->copyQuestions($in);
                     array_push($questionIdArray, $firstnewid);
                 }
                 $aitems = $itemorder;
@@ -312,12 +311,13 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
     }
     elseif ($itemtype == "Calendar")
     {
-
+        $newtypeid = AppConstant::NUMERIC_ZERO;
     }
     $items = new Items();
     $newItemId = $items->saveItems($params['courseId'], $newtypeid, $itemtype);
     return $newItemId;
 }
+
 public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden = false,$params=null,$checked=null,$blockCnt=null)
 {
     global $newItems;

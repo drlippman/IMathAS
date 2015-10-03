@@ -94,7 +94,6 @@ $imasroot = AppUtility::getHomeURL();
 
 	function filter($str) {
 		global $sessiondata,$userfullname,$urlmode,$imasroot;
-//        echo'<pre>';print_r($sessiondata);die;
 		if ($urlmode == 'https://') {
 			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
 		}
@@ -161,7 +160,6 @@ $imasroot = AppUtility::getHomeURL();
 					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
 					if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
-						//$tag = '<script type="text/javascript" src="'.$url.'"></script>';
 						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".urlencode($url);
 						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 

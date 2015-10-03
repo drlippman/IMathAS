@@ -770,9 +770,9 @@ class AdminController extends AppController
             case "deloldusers":
                 break;
             case "listltidomaincred":
-                     $users = User::getByRights();
-                    $groupsName = Groups::getIdAndName();
-                    break;
+                $users = User::getByRights();
+                $groupsName = Groups::getIdAndName();
+                break;
             case "modltidomaincred":
                  $user = User::getById($params['id']);
                 $groupsName = Groups::getIdAndName();

@@ -327,4 +327,21 @@ class Questions extends BaseImasQuestions
         $data = $command->queryAll();
         return $data;
     }
+
+    public function copyQuestions($params)
+    {print_r($params);
+        $this->assessmentid = $params->assessmentid;
+        $this->questionsetid = $params->questionsetid;
+        $this->points = $params->points;
+        $this->attempts = $params->attempts;
+        $this->penalty = $params->penalty;
+        $this->category = $params->category.'';
+        $this->regen = $params->regen;
+        $this->showans = $params->showans;
+        $this->showhints = $params->showhints;
+        $this->save();
+        print_r($this->id);
+        print_r($this->getErrors());
+        return $this->id;
+    }
 }

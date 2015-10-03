@@ -25,7 +25,7 @@ var curTarget = null;
 var nocanvaswarning = false;
 var hasTouch = false;
 var didMultiTouch = false;
-var imasroot = $('.home-path').val();
+var imasroot = $('.home-path').val();alert(imasroot);
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com

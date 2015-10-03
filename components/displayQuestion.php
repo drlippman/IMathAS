@@ -2164,46 +2164,46 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<span onclick=\"clearcanvas($qn)\">" . _('Clear All') . "</span> " . _('Draw:') . " ";
 		if ($answerformat[0]=='inequality') {
             		if (in_array('both',$answerformat)) {
-               			$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
-            			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
-            			$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"settool(this,$qn,10.3)\"/>";
-                		$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"settool(this,$qn,10.4)\"/>";
+               			$out .= "<img src=\"$imasroot"."img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
+            			$out .= "<img src=\"$imasroot"."img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
+            			$out .= "<img src=\"$imasroot"."img/tpineqparab.gif\" onclick=\"settool(this,$qn,10.3)\"/>";
+                		$out .= "<img src=\"$imasroot"."img/tpineqparabdash.gif\" onclick=\"settool(this,$qn,10.4)\"/>";
                 		$def = 10;
             		}
 			else if (in_array('parab',$answerformat)) {
-               			$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"settool(this,$qn,10.3)\" class=\"sel\"/>";
-                		$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"settool(this,$qn,10.4)\"/>";
+               			$out .= "<img src=\"$imasroot"."img/tpineqparab.gif\" onclick=\"settool(this,$qn,10.3)\" class=\"sel\"/>";
+                		$out .= "<img src=\"$imasroot"."img/tpineqparabdash.gif\" onclick=\"settool(this,$qn,10.4)\"/>";
                 		$def = 10.3;
             		}  
 			else {
-				$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
+				$out .= "<img src=\"$imasroot"."img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
             			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
                 		$def = 10;
           		}
         	} else if ($answerformat[0]=='twopoint') {
 			if (count($answerformat)==1 || in_array('line',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpline.gif\" onclick=\"settool(this,$qn,5)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpline.gif\" onclick=\"settool(this,$qn,5)\" ";
 				if (count($answerformat)==1 || $answerformat[1]=='line') { $out .= 'class="sel" '; $def = 5;}
 				$out .= '/>';
 			}
 			//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
 			if (in_array('lineseg',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpline3.gif\" onclick=\"settool(this,$qn,5.3)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 5.3;}
 				$out .= "/>";
 			}
 			if (in_array('ray',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='ray') { $out .= 'class="sel" '; $def = 5.2;}
 				$out .= "/>";
 			}
 			if (count($answerformat)==1 || in_array('parab',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpparab.png\" onclick=\"settool(this,$qn,6)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpparab.png\" onclick=\"settool(this,$qn,6)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
 				$out .= '/>';
 			}
 			if (in_array('sqrt',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpsqrt.png\" onclick=\"settool(this,$qn,6.5)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpsqrt.png\" onclick=\"settool(this,$qn,6.5)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='sqrt') { $out .= 'class="sel" '; $def = 6.5;}
 				$out .= '/>';
 			}
@@ -2213,20 +2213,20 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '/>';
 			}
 			if (in_array('exp',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpexp.png\" onclick=\"settool(this,$qn,8.3)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpexp.png\" onclick=\"settool(this,$qn,8.3)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='exp') { $out .= 'class="sel" '; $def = 8.3;}
 				$out .= '/>';
 			}
 			if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
 				//only circles if equal spacing in x and y
 				if (count($answerformat)==1 || in_array('circle',$answerformat)) {
-					$out .= "<img src=\"$imasroot/img/tpcirc.png\" onclick=\"settool(this,$qn,7)\" ";
+					$out .= "<img src=\"$imasroot"."img/tpcirc.png\" onclick=\"settool(this,$qn,7)\" ";
 					if (count($answerformat)>1 && $answerformat[1]=='circle') { $out .= 'class="sel" '; $def = 7;}
 					$out .= '/>';
 				}
 			}
 			if (count($answerformat)==1 || in_array('dot',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"settool(this,$qn,1)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpdot.gif\" onclick=\"settool(this,$qn,1)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
 				$out .= '/>';
 			}
@@ -2236,13 +2236,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= '/>';
 			}
 			if (in_array('trig',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpcos.png\" onclick=\"settool(this,$qn,9)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpcos.png\" onclick=\"settool(this,$qn,9)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='trig') { $out .= 'class="sel" '; $def = 9;}
 				$out .= '/>';
-				$out .= "<img src=\"$imasroot/img/tpsin.png\" onclick=\"settool(this,$qn,9.1)\"/>";
+				$out .= "<img src=\"$imasroot"."img/tpsin.png\" onclick=\"settool(this,$qn,9.1)\"/>";
 			}
 			if (in_array('vector',$answerformat)) {
-				$out .= "<img src=\"$imasroot/img/tpvec.gif\" onclick=\"settool(this,$qn,5.4)\" ";
+				$out .= "<img src=\"$imasroot"."img/tpvec.gif\" onclick=\"settool(this,$qn,5.4)\" ";
 				if (count($answerformat)>1 && $answerformat[1]=='vector') { $out .= 'class="sel" '; $def = 5.4;}
 				$out .= '/>';
 			}

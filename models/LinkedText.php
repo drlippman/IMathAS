@@ -45,7 +45,6 @@ class LinkedText extends BaseImasLinkedtext
         $this->startdate = $params['startdate'];
         $this->enddate = $params['enddate'];
         $this->save();
-
         return $this->id;
     }
 
@@ -57,7 +56,6 @@ class LinkedText extends BaseImasLinkedtext
 
     public function updateLinkData($params)
     {
-
         $updaateLink = LinkedText::findOne(['id' => $params['id']]);
         $updaateLink->courseid = $params['courseid'];
         $updaateLink->title = $params['title'];
@@ -107,7 +105,6 @@ class LinkedText extends BaseImasLinkedtext
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
 
     public static function updateLinkForMassChanges($startdate, $enddate, $avail, $id)
@@ -125,17 +122,17 @@ class LinkedText extends BaseImasLinkedtext
         return $query;
     }
 
-
     public static function updateDataForCopyCourse($toupdate)
     {
         $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)")->queryAll();
-
     }
+
     public static function getByIdForCopy($toupdate)
     {
         $query  = \Yii::$app->db->createCommand("SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)");
         return $query;
     }
+
     public static function updateData($text,$id)
     {
         $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='" . addslashes($text) . "' WHERE id={$id}")->queryAll();
@@ -149,6 +146,7 @@ class LinkedText extends BaseImasLinkedtext
         $rowCount=$command->execute();
         return $rowCount;
     }
+
     public static function updateSummary($from,$to)
     {
         $query = "UPDATE imas_linkedtext SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
@@ -198,6 +196,7 @@ class LinkedText extends BaseImasLinkedtext
         $data = $command->queryAll();
         return $data;
     }
+
     public function updateName($val, $typeId)
     {
         $linkText = LinkedText::findOne(['id' => $typeId]);
@@ -215,6 +214,7 @@ class LinkedText extends BaseImasLinkedtext
         $data = $command->queryOne();
         return $data;
     }
+
     public static function getLinkDataByIdAndCourseID($id,$courseId)
     {
         return LinkedText::find()->where(['id' => $id])->andWhere(['courseid' => $courseId])->one();

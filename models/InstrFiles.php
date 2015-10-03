@@ -34,14 +34,7 @@ class InstrFiles extends BaseImasInstrFiles
 
     public static function getFileName($itemId)
     {
-        $query = new Query();
-        $query ->select(['id','description','filename'])
-               ->from('imas_instr_files')
-                ->where(['itemid' => $itemId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
-
+        return InstrFiles::find()->select('description,filename,id')->where(['itemid' => $itemId])->all();
     }
 
     public static function deleteByItemId($itemId)
@@ -80,6 +73,15 @@ class InstrFiles extends BaseImasInstrFiles
     public static function getIdName($safefn)
     {
         return InstrFiles::find()->select('id')->where(['filename' => $safefn])->all();
+    }
+
+    public function insertFile($params, $itemId)
+    {
+        $this->description = i$params['description'];
+        $this->filename = $params['filename'];
+        $this->itemid =  $itemId;
+        $this->save();
+        return $this->id;
     }
 
 }

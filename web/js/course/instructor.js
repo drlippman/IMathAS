@@ -85,11 +85,9 @@ function deleteItem(id,type,block,courseId) {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "confirm": function ()
+                "Confirm": function ()
                 {
-
                     jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId},'responseSuccess');
-
                     $(this).dialog('destroy').remove();
                     return true;
                 }
@@ -105,8 +103,9 @@ function deleteItem(id,type,block,courseId) {
         });
      }
 }
+
 function responseSuccess(response)
-{
+{console.log(response);
     window.location = homePath;
 }
 
@@ -122,10 +121,8 @@ function copyItem(id,type,block,courseId) {
                 $(this).dialog('destroy').remove();
                 return false;
             },
-            "confirm": function () {
-
+            "Confirm": function () {
                 jQuerySubmit('copy-items-ajax', {copyid: id, itemType: type, block: block, courseId: courseId},'copyResponseSuccess');
-
                 $(this).dialog('destroy').remove();
                 return true;
             }
@@ -140,6 +137,7 @@ function copyItem(id,type,block,courseId) {
         }
     });
 }
+
 function copyResponseSuccess(response)
 {
     window.location = homePath;
