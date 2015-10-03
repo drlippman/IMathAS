@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Import student', 'url' => ['/roste
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<input type="hidden" id="course-id" value="<?php echo $courseId ?>" xmlns="http://www.w3.org/1999/html">
+<input type="hidden" id="course-id" value="<?php echo $course->id?>" xmlns="http://www.w3.org/1999/html">
 <div class="import-student">
     <fieldset>
 
@@ -40,8 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
 
             if (isset($uniqueStudents)) {
-                foreach ($uniqueStudents as $singleRecord) {
-
+                foreach ($uniqueStudents as $singleRecord)
+                {
                     ?>
                     <tr>
                         <td><?php echo $singleRecord[0] ?></td>
@@ -126,9 +126,9 @@ $this->params['breadcrumbs'][] = $this->title;
     function saveStudentData() {
         var existingData = <?php echo json_encode($existingStudent ); ?>;
         var NewStudentData =  <?php echo json_encode($uniqueStudents ); ?>;
-      console.log(NewStudentData);
         var courseId = $("#course-id").val();
-        if(existingData){
+        if(existingData)
+        {
         var html = '<div><p>Existing students detail : </p></div><p>';
         html += '* Already existing in system' + '<br>';
         $.each(existingData, function (index, thread) {
@@ -166,12 +166,11 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     function saveCsvFileSuccess(response)
     {
-        console.log(response);
         var courseId = $("#course-id").val();
 
         if(status == 0)
         {
-//             window.location = "student-roster?cid="+courseId;
+             window.location = "student-roster?cid="+courseId;
         }
     }
 

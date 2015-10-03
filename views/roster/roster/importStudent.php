@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
+use app\components\AssessmentUtility;
 $this->title = AppUtility::t('Import Students from File', false);
 $this->params['breadcrumbs'][] = $this->title;
 $model->headerRow = AppConstant::ZERO_VALUE;
@@ -12,9 +13,13 @@ $model->codeNumber = AppConstant::ZERO_VALUE;
 $model->sectionValue = AppConstant::ZERO_VALUE;
 ?>
 <div class="item-detail-header">
+<?php if($courseId == 'admin'){ ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index']]); ?>
+<?php }else{?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, AppUtility::t('Roster', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'roster/roster/student-roster?cid=' . $course->id]]); ?>
+<?php } ?>
 </div>
-<div class="title-container">
+    <div class="title-container">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
@@ -49,6 +54,23 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
         <?php echo $form->field($model, 'setPassword')->radioList([AppConstant::NUMERIC_ZERO => 'First 4 characters of username',AppConstant::NUMERIC_ONE=>'Last 4 characters of username',AppConstant::NUMERIC_THREE=>'Use value in column: <input type="text" name="pwcol" size=4 value="1">',AppConstant::NUMERIC_TWO=>'Set to: <input type="text" name="defpw" value="password"   >']); ?>
         <?php echo $form->field($model, 'codeNumber')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes, use value in column: <input type="text" name="code" size=4 value="1">']); ?>
         <?php echo $form->field($model, 'sectionValue')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes, use: <input type="text" name="secval" size=6 value="">',AppConstant::NUMERIC_TWO => 'Yes, use value in column: <input type="text" name="seccol" size=4 value="4">']); ?>
+        <span class="col-sm-3 padding-left-zero"><b>Enroll students in</b></span>
+            <div class="col-sm-4 padding-left-ten">
+        <?php
+        if ($courseId == "admin")
+        { ?>
+            <select class="form-control" name="courseId">
+                <?php foreach($allCourses as $singleCourse)
+                {?>
+                <option value="<?php echo $singleCourse['id']?>"><?php echo $singleCourse['name']. "(".$singleCourse['LastName']. " ".$singleCourse['FirstName'].")" ;?></option>
+                <?php } ?>
+                </select>
+                <?php
+        } else
+        {
+            echo "This class";
+        } ?>
+        </div>
     </fieldset>
     <div class="form-group">
         <div class="col-sm-offset-3 roster-submit">

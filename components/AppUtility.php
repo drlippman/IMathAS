@@ -342,6 +342,7 @@ class AppUtility extends Component
 
     public static function tzdate($string, $time)
     {
+
         $tzoffset = Yii::$app->session->get('tzoffset');
         $tzname = Yii::$app->session->get('tzname');
         if ($tzname != '') {
@@ -411,8 +412,7 @@ class AppUtility extends Component
 //        Displays date and time
     public static function parsedatetime($date, $time)
     {
-        $tzoffset =
-            self::getTimezoneOffset();
+        $tzoffset = self::getTimezoneOffset();
         $tzname = self::getTimezoneName();
         preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $date, $dmatches);
         preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);

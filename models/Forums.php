@@ -5,6 +5,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
+use app\controllers\AppController;
 use app\models\_base\BaseImasForums;
 use yii\db\Query;
 use Yii;
@@ -106,13 +107,8 @@ class Forums extends BaseImasForums {
         }
     }
 
-    public function updateForum($params)
+    public function updateForum($params,$endDate,$startDate,$postDate,$replyByDate,$settingValue)
     {
-        $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
-        $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
-        $postDate = AppUtility::parsedatetime($params['postDate'],$params['postTime']);
-        $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
-        $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
         $updateForumData = Forums::findOne(['id' => $params['modifyFid']]);
         $updateForumData->name = trim($params['name']);
         if(empty($params['forum-description']))
@@ -172,7 +168,6 @@ class Forums extends BaseImasForums {
         $updateForumData->outcomes = $params['outcomes'];
         $updateForumData->save();
     }
-
     public static function updateGbCat($catList){
 
         foreach($catList as $category){

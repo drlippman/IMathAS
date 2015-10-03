@@ -1320,16 +1320,17 @@ class ForumController extends AppController
             $startDate = $forumData['startdate'];
             $endDate = $forumData['enddate'];
             if ($startDate != AppConstant::NUMERIC_ZERO) {
-                $sDate = AppUtility::tzdate("m/d/Y", $startDate);
-                $sTime = AppUtility::tzdate("g:i a", $startDate);
+                $sDate = AppController::tzdate("m/d/Y", $startDate);
+                $sTime = AppController::tzdate("g:i a", $startDate);
                 $startDate =AppConstant::NUMERIC_ONE;
             } else {
                 $sDate = date('m/d/Y');
                 $sTime = date('g:i a');
             }
+
             if ($endDate != AppConstant::ALWAYS_TIME) {
                 $eDate = AppUtility::tzdate("m/d/Y", $endDate);
-                $eTime = AppUtility::tzdate("g:i a", $endDate);
+                $eTime = AppController::tzdate("g:i a", $endDate);
                 $endDate = AppConstant::NUMERIC_ONE;
             } else {
                 $eDate = date("m/d/Y",strtotime("+1 week"));
@@ -1437,8 +1438,13 @@ class ForumController extends AppController
                  }else{
                      $params['outcomes'] = " ";
                  }
+                 $endDate =   AppController::parsedatetime($params['edate'],$params['etime']);
+                 $startDate = AppController::parsedatetime($params['sdate'],$params['stime']);
+                 $postDate = AppUtility::parsedatetime($params['postDate'],$params['postTime']);
+                 $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
+                 $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
                  $updateForum = new Forums();
-                 $updateForum->UpdateForum($params);
+                 $updateForum->UpdateForum($params,$endDate,$startDate,$postDate,$replyByDate,$settingValue);
                  if(isset($params['Get-email-notify-of-new-posts'])){
                  $subscriptionEntry = new ForumSubscriptions();
                  $subscriptionEntry->AddNewEntry($params['modifyFid'], $user['id']);

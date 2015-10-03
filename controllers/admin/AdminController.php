@@ -1276,10 +1276,12 @@ class AdminController extends AppController
                     return $this->redirect('forms?action=listgroups');
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
-                if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO) {
+                if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO)
+                {
                     $this->setWarningFlash('Group name already exists.');
                     return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
-                }else{
+                }else
+                {
                     if($params['gpname'])
                     {
                         $newGroup = new Groups();
@@ -1334,7 +1336,8 @@ class AdminController extends AppController
                 }
                 break;
             case "delltidomaincred":
-                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
                     $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
                     return $this->redirect('forms?action = listltidomaincred');
                 }
@@ -1423,7 +1426,7 @@ class AdminController extends AppController
             $diagByTime = DiagOneTime::getByDiag($diag);
             foreach($diagByTime as $key => $row)
              {
-                $row['time'] = AppUtility::tzdate("F j, Y",$row['time']);
+                $row['time'] =  $this->tzdate("F j, Y",$row['time']);
                 if ($row['goodfor'] == AppConstant::NUMERIC_ZERO) {
                     $row['goodfor'] = "One-time";
                 } else if ($row['goodfor'] > 1000000000) {

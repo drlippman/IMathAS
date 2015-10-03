@@ -39,6 +39,8 @@ use yii\db\Exception;
 
 class RosterController extends AppController
 {
+   public $newUser = array();
+    public $existUserRecords = array();
 /*
  * Controller method to display student information on student roster page.
  */
@@ -514,16 +516,24 @@ class RosterController extends AppController
 
     public function actionImportStudent()
     {
+        global $newUser,$existUserRecords;
         $this->guestUserHandler();
         $this->layout = "master";
         $model = new ImportStudentForm();
         $nowTime = time();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
+        $currentUser = $this->getAuthenticatedUser();
         $studentRecords = '';
         $this->includeCSS(['roster/roster.css']);
-        if ($model->load($this->isPostMethod())) {
+        if ($model->load($this->isPostMethod()))
+        {
             $params = $this->getRequestParams();
+            if($courseId == 'admin' )
+            {
+                $courseId = $params['courseId'];
+            }
+
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
                 $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
@@ -531,32 +541,51 @@ class RosterController extends AppController
 
             }
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
-            $newUserRecords = array();
-            $existUserRecords = array();
-            if ($studentRecords['allUsers'] || $studentRecords['existingUsers']) {
-                foreach ($studentRecords['allUsers'] as $users) {
-                    array_push($newUserRecords, $users);
-                }
-                    foreach ($studentRecords['existingUsers'] as $singleUser) {
+            $existingUser = array();
+            $newUser = array();
+
+            if ($studentRecords)
+            {
+            foreach($studentRecords['allUsers'] as $key=>$StudentDataArray)
+            {
+                $userData = User::getByName($StudentDataArray[0]);
+                if ($userData)
+                {
+
+                    $courseStudent = Student::getByCourseId($courseId, $userData['id']);
+                    if ($courseStudent)
+                    {
                         $tempArray = array(
-                            'userName' => $singleUser->SID,
-                            'firstName' => $singleUser->FirstName,
-                            'lastName' => $singleUser->LastName,
-                            'email' => $singleUser->email,
+                            'userName' => $userData->SID,
+                            'firstName' => $userData->FirstName,
+                            'lastName' => $userData->LastName,
+                            'email' => $userData->email,
                         );
-                        array_push($existUserRecords, $tempArray);
+                        array_push($existingUser, $tempArray);
+                    }else
+                    {
+                        array_push($newUser, $StudentDataArray);
                     }
-                if ($filename) {
-                    $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
+                } else
+                {
+                    array_push($newUser, $StudentDataArray);
+                }
+            }
+                if ($filename)
+                {
+                    $this->redirect(array('show-import-student', 'courseId' => $courseId,'newUser' => $newUser,'existingUser' => $existingUser));
                 }
             } else {
                 $this->setErrorFlash(AppConstant::ADD_AT_LEAST_ONE_RECORD);
-                $responseData = array('model' => $model, 'course' => $course);
-                return $this->render('importStudent', $responseData);
+                return $this->redirect('import-student?cid='.$course->id);
             }
         }
+        if ($courseId == 'admin' )
+        {
+            $allCourses = Course::getAllCourses();
+        }
         if (!$studentRecords) {
-            $responseData = array('model' => $model, 'course' => $course);
+            $responseData = array('allCourses' => $allCourses,'model' => $model,'currentUser' => $currentUser,'courseId' => $courseId,'course' => $course);
             return $this->render('importStudent', $responseData);
         }
     }
@@ -566,37 +595,23 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $course = Course::getById($courseId);
         $allUserArray = array();
-        $existingUser = array();
-        $newUser =array();
-        if ($course) {
+        if ($course)
+        {
             $handle = fopen($fileName, 'r');
-                if ($params['ImportStudentForm']['headerRow'] == AppConstant::NUMERIC_ONE) {
+            if ($params['ImportStudentForm']['headerRow'] == AppConstant::NUMERIC_ONE)
+            {
                 $data = fgetcsv($handle, 2096);
-                }
+            }
             while (($data = fgetcsv($handle, 2096)) !== false)
             {
-
-                if(count($data) == 1){
-                    $data = explode(';',$data[0]);
-                }
-
                 $StudentDataArray = $this->parsecsv($data, $params);
-
-                for ($i = 0; $i < count($StudentDataArray); $i++) {
+                for ($i = 0; $i < count($StudentDataArray); $i++)
+                {
                     $StudentDataArray[$i] = trim($StudentDataArray[$i]);
                 }
                 if (trim($StudentDataArray[0]) == '' || trim($StudentDataArray[0]) == '_') {
                     continue;
                 }
-                $userData = User::getByName($StudentDataArray[0]);
-                    if($userData) {
-                        $courseStudent = Student::getByCourseId($courseId, $userData['id']);
-                        if ($courseStudent) {
-                            array_push($existingUser, $userData);
-                        }else{
-                            array_push($newUser, $data['0']);
-                        }
-                    }
                 if (($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_ZERO || $params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_ONE) && strlen($StudentDataArray[0]) < 4) {
                     $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
                 } else {
@@ -618,9 +633,8 @@ class RosterController extends AppController
                 }
                 array_push($StudentDataArray, $password);
                 array_push($allUserArray, $StudentDataArray);
-
             }
-            return (['allUsers' => $allUserArray, 'existingUsers' => $existingUser,'newUser' => $newUser]);
+            return (['allUsers' => $allUserArray]);
         }
         return false;
     }
@@ -691,63 +705,64 @@ class RosterController extends AppController
 
     public function actionShowImportStudent()
     {
+        global $a;
         $this->guestUserHandler();
         $studentInformation = $this->getRequestParams();
         $isCodePresent = false;
         $isSectionPresent = false;
-        $courseId = $this->getParamVal('courseId');
-        $course = Course::getById($courseId);
         $newStudents = array();
         $existingStudent = array();
         $existingStudentUsernameArray = array();
-         if($studentInformation['existingUsers']){
-        foreach ($studentInformation['existingUsers'] as $singleExistingStudent) {
-            array_push($existingStudentUsernameArray, $singleExistingStudent['userName']);
-        }
-             $tempArrayForExistingStudent = array();
-             $uniqueStudentsForExistingStudent = array();
-             foreach ($studentInformation['existingUsers'] as $singleStudent) {
+        $courseId = $studentInformation['courseId'];
+        $existingUser = $studentInformation['existingUser'];
+        $newUser = $studentInformation['newUser'];
+        $course = Course::getById($courseId);
+        if ($existingUser) {
+            foreach ($existingUser as $singleExistingStudent) {
+                array_push($existingStudentUsernameArray, $singleExistingStudent['userName']);
+            }
 
-                 if (!in_array($singleStudent['userName'], $tempArrayForExistingStudent)) {
-                     array_push($uniqueStudentsForExistingStudent, $singleStudent);
-                     array_push($tempArrayForExistingStudent, $singleStudent['userName']);
-                 }
-             }
-         }
-        if ($studentInformation['newUsers']) {
-            foreach ($studentInformation['newUsers'] as $student) {
+            $tempArrayForExistingStudent = array();
+            $uniqueStudentsForExistingStudent = array();
+            foreach ($studentInformation['existingUser'] as $singleStudent) {
+                if (!in_array($singleStudent['userName'], $tempArrayForExistingStudent)) {
+                    array_push($uniqueStudentsForExistingStudent, $singleStudent);
+                    array_push($tempArrayForExistingStudent, $singleStudent['userName']);
+                }
+            }
+        }
+
+        if ($newUser) {
+            foreach ($newUser as $student) {
                 if (!empty($student['4'])) {
                     $isCodePresent = true;
                 }
                 if (!empty($student['5'])) {
                     $isSectionPresent = true;
                 }
-
-                if (in_array($student[0],  $existingStudentUsernameArray)) {
-                    array_push($existingStudent, $student);
+            }
+            $tempArrayForNewStudent = array();
+            $uniqueStudentsForNewStudent = array();
+            $duplicateStudentsForNewStudent = array();
+            foreach ($newUser as $singleStudent) {
+                if (!in_array($singleStudent[0], $tempArrayForNewStudent)) {
+                    array_push($uniqueStudentsForNewStudent, $singleStudent);
+                    array_push($tempArrayForNewStudent, $singleStudent[0]);
                 } else {
-                    array_push($newStudents, $student);
+                    array_push($duplicateStudentsForNewStudent, $singleStudent);
                 }
             }
-        }
-        $tempArrayForNewStudent = array();
-        $uniqueStudentsForNewStudent = array();
-        $duplicateStudentsForNewStudent = array();
-        foreach ($newStudents as $singleStudent) {
-            if (!in_array($singleStudent[0], $tempArrayForNewStudent)) {
-                array_push($uniqueStudentsForNewStudent, $singleStudent);
-                array_push($tempArrayForNewStudent, $singleStudent[0]);
-            } else {
-                array_push($duplicateStudentsForNewStudent, $singleStudent);
+            if (count($uniqueStudentsForNewStudent) == 0) {
+                $this->setErrorFlash(AppConstant::RECORD_EXISTS);
             }
+        }else{
+            $this->setSuccessFlash(AppConstant::STUDENT_EXISTS);
+            return $this->redirect('import-student?cid='.$courseId);
         }
-        if(count($uniqueStudentsForNewStudent) == 0)
-        {
-            $this->setErrorFlash(AppConstant::RECORD_EXISTS);
-        }
+ 
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/importstudent.js', 'general.js']);
-        $responseData = array('existingStudent' => $uniqueStudentsForExistingStudent, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent, 'courseId' => $courseId, 'uniqueStudents' => $uniqueStudentsForNewStudent, 'duplicateStudents' => $duplicateStudentsForNewStudent, 'course' => $course);
+        $responseData = array( 'uniqueStudents' => $uniqueStudentsForNewStudent,'existingStudent' => $uniqueStudentsForExistingStudent, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'duplicateStudents' => $duplicateStudentsForNewStudent,'course' => $course);
         return $this->render('showImportStudent', $responseData);
     }
 
@@ -1261,20 +1276,22 @@ class RosterController extends AppController
         $params = $this->getRequestParams();
         $studentData = $params['studentData'];
         $courseId = $params['courseId'];
-        if ($studentData) {
-            foreach ($studentData as $newEntry) {
+        if ($studentData)
+        {
+            foreach ($studentData as $newEntry)
+            {
                 $user = new User();
-                $student = new Student();
-                $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
+                $id = $user->addUser($newEntry[0], $newEntry[7], AppConstant::STUDENT_RIGHT, $newEntry[1], $newEntry[2], $newEntry[3], time());
                 $sectionAndCodeValue = array(
                     'section' => $newEntry['5'],
                     'code' => $newEntry['4'],
                 );
+                $student = new Student();
                 $student->createNewStudent($id,$courseId,$sectionAndCodeValue);
             }
             $this->setSuccessFlash(AppConstant::IMPORTED_SUCCESSFULLY);
-
-        } else {
+        }
+        else {
             $this->setSuccessFlash(AppConstant::STUDENT_EXISTS);
         }
         return $this->successResponse();

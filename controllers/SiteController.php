@@ -85,7 +85,8 @@ class SiteController extends AppController
         $params = $this->getRequestParams();
         $model = new LoginForm();
         if ($model->load($this->isPostMethod())) {
-            if ($model->login()) {
+            if ($model->login())
+            {
                 Yii::$app->session->set('tzoffset', $this->getParamVal('tzoffset'));
                 Yii::$app->session->set('tzname', $this->getParamVal('tzname'));
                 $this->checkSession($params);

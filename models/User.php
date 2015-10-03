@@ -33,8 +33,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public function createUserFromCsv($student, $right)
     {
-
-
         $this->SID = $student[0];
         $this->FirstName = $student[1];
         $this->LastName = $student[2];
@@ -703,6 +701,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->lastaccess = $now;
         $this->save();
         return $this->id;
+
     }
 
     public static function getByIdOrdered()

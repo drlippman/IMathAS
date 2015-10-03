@@ -138,6 +138,7 @@ function printlist($parent)
 <script type="text/javascript">
     var curlibs = '0';
     function libselect() {
-        window.open('../course/libtree.php?libtree=popup&cid=<?php echo $cid ?>&selectrights=1&select=parent&type=radio&libs=' + curlibs, 'libtree', 'width=400,height=' + (.7 * screen.height) + ',scrollbars=1,resizable=1,status=1,top=20,left=' + (screen.width - 420));
+        alert('tgbtgtgbtgbtgb lab tress');
+        window.open('<?php echo AppUtility::getHomeURL() ?>libTree.php?libtree=popup&cid=admin&selectrights=1&select=parent&type=radio&libs=' + curlibs, 'libtree', 'width=400,height=' + (.7 * screen.height) + ',scrollbars=1,resizable=1,status=1,top=20,left=' + (screen.width - 420));
     }
 </script>

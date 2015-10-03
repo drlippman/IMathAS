@@ -181,7 +181,7 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function getWrongLibFlag()
     {
-        $query = "SELECT iqs.uniqueid,il.uniqueid FROM imas_questionset AS iqs
+        $query = "SELECT iqs.uniqueid,il.uniqueid AS uniqId FROM imas_questionset AS iqs
                   JOIN imas_library_items AS ili ON iqs.id=ili.qsetid
                   JOIN imas_libraries AS il ON ili.libid=il.id
                   WHERE ili.junkflag>0";

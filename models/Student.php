@@ -47,6 +47,7 @@ class Student extends BaseImasStudents
             $this->latepass = $params['latepass'];
         }
         $this->save();
+        return Student::find()->max('id');
     }
 
     public static function findByCid($cId)

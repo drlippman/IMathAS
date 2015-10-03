@@ -153,7 +153,7 @@ if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteache
             <span class=column>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=listgroups') ?>"><?php AppUtility::t('Edit Groups'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=deloldusers') ?>"><?php AppUtility::t('Delete Old Users'); ?></a><br/>
-            <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>"><?php AppUtility::t('Import Students from File'); ?></a>
+            <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/import-student?cid=admin') ?>"><?php AppUtility::t('Import Students from File'); ?></a>
         </span>
             <span class="column">
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importmacros') ?>"><?php AppUtility::t('Install Macro File'); ?></a><br/>
