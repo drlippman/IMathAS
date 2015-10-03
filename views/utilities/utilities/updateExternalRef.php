@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
             if (!isset($info[$question['uniqueid']])) {continue;}
             if (trim($question['extRef'])!=trim($info[$question['uniqueid']][1]))
             {
-                if ($question['extRef']=='')
+                if ($question['extref']=='')
                 {
                     echo "Found new extref.  Adding...<br/>";
                 }
