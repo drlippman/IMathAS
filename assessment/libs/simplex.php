@@ -2,15 +2,27 @@
 // Simplex method functions
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
+// 
+// File Version : 15
 //
+// 2015-08-31 Delete extra <br/> in simplexdisplaylatex
+// 2015-08-27 Deleted simplexreadsolutionlatex created simplexsolutiontolatex
+// 2015-08-20 Updated simplexreadsolutionlatex documentation.
+// 2015-08-19 Added debuging info to simplexreadsolutionlatex and simplexreadsolution.  Trying to figure out why they 
+//            hang when called from WAMAP
 //
+// 2015-08-19 Created simplexreadsolutionlatex(), fixed bugs in simplexdisplaylatex()
 // 2015-04-13 Created simplexdisplaylatex() to output latex commands for a simplex matrix
 //
-// 2015-04-10 Updated simplexcreateinequalities to accept a blank object variable that will result in an output of just equations for for all inequalities strings.
+// 2015-04-10 Updated simplexcreateinequalities to accept a blank object variable that will result in an output of 
+//            just equations for for all inequalities strings.
+//
 // 2015-04-03 Fixed bug in simplex - an error occurred sometimes when transposing the duality minimization
 //            to the maximization problem.
+//
 // 2015-03-18 Fixed bub in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
 //            updated the slove to stop when no more multiple solutions are found.
+//
 // 2015-03-11 Fixed bug in simplex for the "min" option - was not transposing correctly.
 // 2015-03-06 Fixed simplexchecksolution to include type and HasObjective options
 // 2015-01-09 Added simplexnumberofsolutions and simplexchecksolution
@@ -21,7 +33,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexdisplaylatex", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
+array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexdisplaylatex", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolutiontolatex", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
 
 
 include_once("fractions.php");  // fraction routine
@@ -1137,21 +1149,19 @@ function simplexdisplaytable() {
   }
 
 
-//simplexdisplaytable(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"])]) 
-// Create a string that is a valid HTML table syntax for display.
+//simplexdisplaytable(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1)]) 
+// Create a string that is a valid latex syntax for display.
 // simplexmatrix: a valid simplex matrix.
 //
 // optional
 // simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
 //             are creating a simplex display
-// showfractions: either0 or 1
+// showfractions: either 0 or 1
 //                 0 convert simplex element to a decimal
-//         default 1 convert simplex element to a \display\frac{}{}
-// pivot: list or array that contains the row, column, border color, and text color.  This puts a  
-//         border around the cell at (row,col). Both row and column are ZERO based.
-//    default point none
-//    default border color = blue
-//    default text  color  = black
+//         default 1 convert simplex element to a \displaystyle\frac{}{}
+// pivot: list or array that contains the row, column.  This puts a circle around the cell at (row,col). 
+//        Both row and column are ZERO based.
+//        default point none
 function simplexdisplaylatex() {
     
     //  arguments lise --------------------------------------------------
@@ -1189,8 +1199,8 @@ function simplexdisplaylatex() {
   
   //pivot
   if((count($args)>3)&&(!is_null($args[3]))) {
-    if (!is_array($args[3])) { $args[3]=explode(',',$args[5]); }
-    $pivots = $args[3];    
+    if (!is_array($args[3])) { $args[3]=explode(',',$args[3]); } 
+    $pivots = $args[3];
     for ($r=0; $r<count($pivots); $r++) {
       $currentpoint = $pivots[$r];
       if((count($currentpoint)>0)&&(!is_null($currentpoint[0]))&&($currentpoint[0]>=0)) {
@@ -1205,24 +1215,11 @@ function simplexdisplaylatex() {
       else {
         $pcol = -1;
       }
-      
-      //pivotcolor
-      $pivotbordercolor = "blue";
-      if((count($currentpoint)>2)&&(!is_null($currentpoint[2]))&&($currentpoint[2]!="")) {
-        $pivotbordercolor = $currentpoint[2];
-      }
-      
-      //pivottextcolor
-      $pivottextcolor = "black";
-      if((count($currentpoint)>3)&&(!is_null($currentpoint[3]))&&($currentpoint[3]!="")) {
-        $pivottextcolor = $currentpoint[3];
-      }
-      
-      if(($prow >= 0)&&($prow >= 0)) { 
-        $pivotstylematrix[$prow][$pcol] = "style='border:1px solid $pivotbordercolor;color:$pivottextcolor'";
-      }
     }
-  }  
+  } else {
+  	$prow = -1;
+  	$pcol = -1;
+  }
   
     // Done processing arguments ---------------------------------------
     $lastrow = $rows-1;
@@ -1232,18 +1229,20 @@ function simplexdisplaylatex() {
 	} else {
 		$Tableau = "$simplexmatrixname = $\begin{bmatrix}[";
 	}
-    
+    $ExtraLine = "";
+    $UseExtraLine = false;
     for ($cloop=0; $cloop<$cols; $cloop++) {
     	if($cloop==$cols-1) {
 			$Tableau .= "|c";
 		} else {
 			$Tableau .= "c";
+			$ExtraLine .= "&"; 
 		}
         
     }
     $Tableau .= "]<br/>\r\n";
+    $ExtraLine .= "\\\\";
     for ($rloop=0; $rloop<$rows; $rloop++) {
-    	//$Tableau .= "\r\n";
     	for ($cloop=0;$cloop<$cols; $cloop++) {
     		if($cloop!=0) {
 				$amp = "&";
@@ -1254,7 +1253,8 @@ function simplexdisplaylatex() {
 			$bot = $sm[$rloop][$cloop][1];
 			if($showfractions==1) {
 				if($bot!=1){
-					$Element = "\display\frac\{".$top."\}\{".$bot."\}"; 
+					$Element = "\displaystyle\\frac{".$top."}{".$bot."}"; 
+					$UseExtraLine = true;
 				} else {
 					$Element = "$top"; 
 				}
@@ -1265,16 +1265,19 @@ function simplexdisplaylatex() {
         	
         	// is this a pivot point
         	if(($prow==$rloop)&&($pcol==$cloop)) {
-        		$Tableau.= $amp." \\numcircledtikz\{$".$Element."$\} ";
+        		$Tableau.= $amp." \\numcircledtikz{\$".$Element."\$} ";
 			} else {
 				$Tableau.= $amp." $Element ";
 			}
     	}
-        $Tableau.= "\\\\";
+        $Tableau.= "\\\\";        
         if ($rloop==($lastrow-1)) { $Tableau .= " \hline"; }
         $Tableau.= "<br/>\r\n";
+        if(($showfractions==1)&&($UseExtraLine)){
+			$Tableau.= $ExtraLine."<br/>\r\n";
+		}
     }
-    $Tableau.= "<br/>\end{bmatrix}$\r\n<br/>";
+    $Tableau.= "\\end{bmatrix}$";
 
     return $Tableau;
   }
@@ -1687,14 +1690,16 @@ function simplexreadtoanswerarray($sm, $startnumber=0, $ans=array()) {
 // where g contains the minimium value
 // IsOptimized contains either a Yes or a No (objective has been reached)
 //
-function simplexreadsolution($sm,$type,$showfractions=1) {
+function simplexreadsolution($sm,$type,$showfractions=1,$debug=0) {
     // as the end user will be suppling this it will be in fraction form
     // convert to an array()	
     $sma = simplextoarray($sm);
-    return simplexreadsolutionarray($sma,$type,$showfractions);
+    return simplexreadsolutionarray($sma,$type,$showfractions,$debug);
 }
 
-function simplexreadsolutionarray($sma,$type,$showfractions=1) {
+function simplexreadsolutionarray($sma,$type,$showfractions=1,$debug=0) {
+    
+    if($debug==1) { echo "starting simplexreadsolutionarray<br/>"; }
     
     // process arguments -----------------------------------------------
     $type = verifytype("simplexreadsolution",$type,"max");
@@ -1726,34 +1731,32 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
   
     if($type=="min") {
         for($c=0;$c<$var;$c++) {
-    	
-        $solution[$c] = 0;
-        $columnsolutionfound  = true;
-        $zerorow = -1;   // not found
-        if($sma[$lastrow][$c][0]==0) {
-            for($r=0;$r<$lastrow;$r++) {
-            if(($sma[$r][$c][0]!=0)&&($sma[$r][$c][0]!=1)) { 
-                $columnsolutionfound = false;
-                break; // This should break out of the for r loop
-            }
-            if($sma[$r][$c][0]==$sma[$r][$c][1]){
-            if($zerorow != -1) { 
-                $columnsolutionfound = false; 
-                break; // This should break out of the for r loop
-            }
-            else { $zerorow = $r; }
-        }
-      }
+    		$solution[$c] = 0;
+        	$columnsolutionfound  = true;
+        	$zerorow = -1;   // not found
+        	if($sma[$lastrow][$c][0]==0) {
+            	for($r=0;$r<$lastrow;$r++) {
+            		if(($sma[$r][$c][0]!=0)&&($sma[$r][$c][0]!=1)) { 
+                		$columnsolutionfound = false;                		
+                		break; // This should break out of the for r loop
+            		}
+            	if($sma[$r][$c][0]==$sma[$r][$c][1]){
+            		if($zerorow != -1) { 
+                		$columnsolutionfound = false; 
+                		break; // This should break out of the for r loop
+            		} else { $zerorow = $r; }
+        		}
+      		}
         
-            if($columnsolutionfound) {
-                if($showfractions==1) {
-                    $solution[$c] = fractionreduce($sma[$zerorow][$lastcol]);
-                }
-                else {
-                    $solution[$c] = fractiontodecimal($sma[$zerorow][$lastcol]);
+      			if($columnsolutionfound) {
+      				if($showfractions==1) {
+            			$solution[$c] = fractionreduce($sma[$zerorow][$lastcol]);
+          		  	} else {
+          		  		$solution[$c] = fractiontodecimal($sma[$zerorow][$lastcol]);
+      		      	}
+        		}
             }
-        }
-            }
+            if($debug==1) { echo "$c) ".$solution[$c]." <br/>";}
         }
         
         for($c=$var;$c<($dualplusobjective+1);$c++) {
@@ -1763,11 +1766,10 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
             else {
                 $solution[$c] = fractiontodecimal($sma[$lastrow][$c]);
             }
+            if($debug==1) { echo "$c) ".$solution[$c]." <br/>";}
         }
-    }
-    else {
-        for($c=0;$c<$lastcol-1;$c++) {
-        
+    } else { // max
+        for($c=0;$c<$lastcol-1;$c++) {        
             $solution[$c] = 0;
             $columnsolutionfound = true;
             $zerorow = -1;   // not found
@@ -1789,17 +1791,20 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
                         $solution[$c] = fractiontodecimal($sma[$zerorow][$lastcol]);
                     }
                 }
+                
             }
+        	if($debug==1) { echo "$c) ".$solution[$c]." <br/>";}
         }
     }
   
   
     if($showfractions==1) {
         $solution[$objectiveposition] = fractionreduce($sma[$lastrow][$lastcol]);
-    }
-    else {
+    }  else {
         $solution[$objectiveposition] = fractiontodecimal($sma[$lastrow][$lastcol]);
     }
+    
+    if($debug==1) {echo "$objectiveposition) ".$solution[$objectiveposition]." <br/>";}
     
     $solution[$lastcol] = "Yes";  // objective reached
     for($c=0;$c<count($sma[0]);$c++) {
@@ -1808,9 +1813,34 @@ function simplexreadsolutionarray($sma,$type,$showfractions=1) {
             break;
         }
     }
-    
+    if($debug==1) {echo "$lastcol) ".$solution[$lastcol]." <br/>";
+      echo "ending simplexreadsolutionarray<br/>"; 
+    }
     return $solution;
 }
+
+// simplexsolutiontolatex(solution)
+// 
+// This function converts all fractions in the solution into latex fractions
+// \displaystyle\frac{numerator}{denominator}
+//
+function simplexsolutiontolatex($solution)
+{  
+	for($i=0;$i<count($solution);$i++)
+	{
+		$Position = strpos($solution[$i],"/");
+		if($Position > 0) {
+			$Top = substr($solution[$i],0,$Position);
+			$Bot = substr($solution[$i],$Position+1);
+			$returnvalue[$i] = "\displaystyle\\frac{{$Top}}{{$Bot}}";
+		} else {
+			$returnvalue[$i] = $solution[$i];
+		}
+	}
+	
+	return $returnvalue;
+}
+
 
 //simplexsolve(simplexmatrix,type)
 //

@@ -3,12 +3,27 @@
 &nbsp;Simplex method functions
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2
+<BR>&nbsp;
+<BR>&nbsp;File Version : 15
 <BR>
-<BR>&nbsp;2015-04-10 Updated simplexcreateinequalities to accept a blank object variable that will result in an output of just equations for for all inequalities strings.
+<BR>&nbsp;2015-08-31 Delete extra <br/> in simplexdisplaylatex
+<BR>&nbsp;2015-08-27 Deleted simplexreadsolutionlatex created simplexsolutiontolatex
+<BR>&nbsp;2015-08-20 Updated simplexreadsolutionlatex documentation.
+<BR>&nbsp;2015-08-19 Added debuging info to simplexreadsolutionlatex and simplexreadsolution.  Trying to figure out why they 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hang when called from WAMAP
+<BR>
+<BR>&nbsp;2015-08-19 Created simplexreadsolutionlatex(), fixed bugs in simplexdisplaylatex()
+<BR>&nbsp;2015-04-13 Created simplexdisplaylatex() to output latex commands for a simplex matrix
+<BR>
+<BR>&nbsp;2015-04-10 Updated simplexcreateinequalities to accept a blank object variable that will result in an output of 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;just equations for for all inequalities strings.
+<BR>
 <BR>&nbsp;2015-04-03 Fixed bug in simplex - an error occurred sometimes when transposing the duality minimization
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to the maximization problem.
+<BR>
 <BR>&nbsp;2015-03-18 Fixed bub in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;updated the slove to stop when no more multiple solutions are found.
+<BR>
 <BR>&nbsp;2015-03-11 Fixed bug in simplex for the "min" option - was not transposing correctly.
 <BR>&nbsp;2015-03-06 Fixed simplexchecksolution to include type and HasObjective options
 <BR>&nbsp;2015-01-09 Added simplexnumberofsolutions and simplexchecksolution
@@ -26,6 +41,7 @@
 <li><a href="#simplexdebug">simplexdebug</a></li>
 <li><a href="#simplexdefaultheaders">simplexdefaultheaders</a></li>
 <li><a href="#simplexdisplaytable">simplexdisplaytable</a></li>
+<li><a href="#simplexdisplaylatex">simplexdisplaylatex</a></li>
 <li><a href="#simplexfindpivotpoint">simplexfindpivotpoint</a></li>
 <li><a href="#simplexgetentry">simplexgetentry</a></li>
 <li><a href="#simplexsetentry">simplexsetentry</a></li>
@@ -33,6 +49,7 @@
 <li><a href="#simplexpivot">simplexpivot</a></li>
 <li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
 <li><a href="#simplexreadsolution">simplexreadsolution</a></li>
+<li><a href="#simplexsolutiontolatex">simplexsolutiontolatex</a></li>
 <li><a href="#simplexsolve">simplexsolve</a></li>
 </ul>
 <h3><a name="simplex">simplex</a></h3>
@@ -189,6 +206,20 @@ simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemo
 <BR>&nbsp;&nbsp;&nbsp;default none
 <BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
+<BR><h3><a name="simplexdisplaylatex">simplexdisplaylatex</a></h3>
+simplexdisplaytable(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1)]) 
+<BR>&nbsp;Create a string that is a valid latex syntax for display.
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;optional
+<BR>&nbsp;simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are creating a simplex display
+<BR>&nbsp;showfractions: either 0 or 1
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 convert simplex element to a decimal
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 convert simplex element to a \displaystyle\frac{}{}
+<BR>&nbsp;pivot: list or array that contains the row, column.  This puts a circle around the cell at (row,col). 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Both row and column are ZERO based.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default point none
 <BR><h3><a name="simplexfindpivotpoint">simplexfindpivotpoint</a></h3>
 simplexfindpivotpoint(simplexmatrix)
 <BR>
@@ -282,6 +313,12 @@ simplexreadsolution(simplexmatrix,type,showfractions)
 <BR>&nbsp;x1,  x2, etc,  y1,  y2,  etc.,  g,  IsOptimized
 <BR>&nbsp;where g contains the minimium value
 <BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
+<BR>
+<BR><h3><a name="simplexsolutiontolatex">simplexsolutiontolatex</a></h3>
+&nbsp;simplexsolutiontolatex(solution)
+<BR>&nbsp;
+<BR>&nbsp;This function converts all fractions in the solution into latex fractions
+<BR>&nbsp;\displaystyle\frac{numerator}{denominator}
 <BR>
 <BR><h3><a name="simplexsolve">simplexsolve</a></h3>
 simplexsolve(simplexmatrix,type)

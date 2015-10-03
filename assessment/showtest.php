@@ -512,7 +512,7 @@
 		exit;
 	}
 	if (!isset($sessiondata['actas'])) { 
-		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
+		$query = "SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {
@@ -529,6 +529,7 @@
 			} else { //in exception
 				if ($testsettings['enddate']<$now) { //exception is for past-due-date
 					$inexception = true;	
+					$exceptiontype = $row[2];
 				}
 			}
 			$exceptionduedate = $row[1];
@@ -1168,18 +1169,32 @@ if (!isset($_POST['embedpostback'])) {
 		echo "<div class=right><span style=\"color:#f00\">Practice Assessment.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
 	if (!$isreview && !$superdone) {
+		$duetimenote = '';
 		if ($exceptionduedate > 0) {
 			$timebeforedue = $exceptionduedate - time();
+			if ($timebeforedue>0 && ($testsettings['enddate'] - time()) < 0) { //past original due date
+				$duetimenote .= _('This assignment is past the original due date of ').tzdate('D m/d/Y g:i a',$testsettings['enddate']).'. ';
+				if ($exceptiontype==1) {
+					$duetimenote .= _('You have used a LatePass');
+				} else {
+					$duetimenote .= _('You were granted an extension');
+				}
+				$duetimenote .= '.<br/>';
+				if ($testsettings['exceptionpenalty']>0) {
+					$duetimenote .= sprintf(_('Problems answered correctly after the original due date are subject to a %d%% penalty'), $testsettings['exceptionpenalty']);
+					$duetimenote .= '.<br/>';
+				} 
+			}
 		} else {
 			$timebeforedue = $testsettings['enddate'] - time();
 		}
 		if ($timebeforedue < 0) {
-			$duetimenote = _('Past due');
+			$duetimenote .= _('Past due');
 		} else if ($timebeforedue < 24*3600) { //due within 24 hours
 			if ($timebeforedue < 300) {
-				$duetimenote = '<span style="color:#f00;">' . _('Due in under ');
+				$duetimenote .= '<span style="color:#f00;">' . _('Due in under ');
 			} else {
-				$duetimenote = '<span>' . _('Due in ');
+				$duetimenote .= '<span>' . _('Due in ');
 			}
 			if ($timebeforedue>3599) {
 				$duetimenote .= floor($timebeforedue/3600). " " . _('hours') . ", ";
@@ -1193,11 +1208,11 @@ if (!isset($_POST['embedpostback'])) {
 			}
 		} else {
 			if ($testsettings['enddate']==2000000000) {
-				$duetimenote = '';
+				$duetimenote .= '';
 			} else if ($exceptionduedate > 0) {
-				$duetimenote = _('Due') . " " . tzdate('D m/d/Y g:i a',$exceptionduedate);
+				$duetimenote .= _('Due') . " " . tzdate('D m/d/Y g:i a',$exceptionduedate);
 			} else {
-				$duetimenote = _('Due') . " " . tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+				$duetimenote .= _('Due') . " " . tzdate('D m/d/Y g:i a',$testsettings['enddate']);
 			}
 		}
 	}
