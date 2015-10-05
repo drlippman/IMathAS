@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left header-btn">
                     <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Access Diagnostic' ?></button>
                 <a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics'); ?>"
-                   class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Diagnostics
+                   class="btn btn-primary pull-right page-settings padding-right-ten"><i class="fa fa-eye"></i>&nbsp;Diagnostics
                 </a>
             </div>
         </div>
