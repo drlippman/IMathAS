@@ -26,6 +26,17 @@ use app\controllers\AppController;
 class UtilitiesController extends AppController
 {
     public $a = array();
+
+    public function beforeAction($action)
+    {
+        $user = $this->getAuthenticatedUser();
+        if ($user['rights'] != AppConstant::ADMIN_RIGHT) {
+            $this->setWarningFlash(AppConstant::REQUIRED_ADMIN_ACCESS);
+            return $this->redirect($this->goHome());
+        }
+        return true;
+    }
+
     public function actionAdminUtilities()
     {
         $this->guestUserHandler();

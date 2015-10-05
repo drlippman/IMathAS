@@ -533,11 +533,13 @@ class ForumController extends AppController
             {
                 $j=0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
+
                 $badExtensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
                 while(isset($_FILES['file-'.$j]) && is_uploaded_file($_FILES['file-'.$j]['tmp_name']))
                 {
                     $uploadFile = $uploadDir . basename($_FILES['file-'.$j]['name']);
                     $userFileName = basename($_FILES['file-'.$j]['name']);
+
                     if(trim($params['description-'.$j]) == '')
                     {
                         $params['description-'.$j] = $userFileName;

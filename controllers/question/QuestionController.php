@@ -2915,7 +2915,7 @@ class QuestionController extends AppController
                     $lNamesArray[0] = AppConstant::UNASSIGNED;
                     $libSortOrder[0] = AppConstant::NUMERIC_ZERO;
                 }
-                $query = Libraries::getById($lList);
+                $query = Libraries::getLibrariesByIdList($lList);
                 foreach ($query as $row) {
                     $lNamesArray[$row['id']] = $row['name'];
                     $libSortOrder[$row['id']] = $row['sortorder'];

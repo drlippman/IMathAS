@@ -55,6 +55,16 @@ use yii\base\Exception;
 
 class AdminController extends AppController
 {
+    public function beforeAction($action)
+    {
+        $user = $this->getAuthenticatedUser();
+        if ($user['rights'] < AppConstant::TEACHER_RIGHT) {
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }
+        return true;
+    }
+
     public function actionIndex()
     {
         $this->guestUserHandler();
@@ -499,6 +509,7 @@ class AdminController extends AppController
         'page_selectLabelList' => $page_selectLabelList, 'page_selectedOption' => $page_selectedOption, 'sel2list' => $sel2list, 'aidlist' => $aidlist, 'overwriteBody' => $overwriteBody, 'page_cntScript' => $page_cntScript);
         return $this->renderWithData('diagnostics', $responseData);
     }
+
     public function actionDeleteDiagnosticsAjax()
     {
         $params = $this->getRequestParams();
@@ -506,7 +517,8 @@ class AdminController extends AppController
         $responseData = array('id' => $id);
         return $this->successResponse($responseData);
     }
-   public function actionExternalTool()
+
+    public function actionExternalTool()
    {
        $this->guestUserHandler();
        $user = $this->getAuthenticatedUser();

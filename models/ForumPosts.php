@@ -193,11 +193,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getForumPostByFile($itemId)
     {
-        $entry = ForumPosts::findOne(['forumid' => $itemId, 'files' => '']);
-        if ($entry) {
-            $postId = $entry['id'];
-            return $postId;
-        }
+        return ForumPosts::find()->select('id')->where(['forumid' => $itemId])->andWhere(['<>','files',''])->all();
     }
     public static function updateParentId($threadId,$parentId)
     {

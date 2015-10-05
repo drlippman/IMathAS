@@ -21,7 +21,7 @@ class Sessions extends BaseImasSessions {
         }
     }
 
-    public static function setSessionId($sessionId,$enc){
+    public static function  setSessionId($sessionId,$enc){
         $sessionData = Sessions::getById($sessionId);
         if($sessionData){
             $sessionData->sessiondata = $enc;

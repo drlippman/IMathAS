@@ -54,6 +54,17 @@ class InstructorController extends AppController
     public $shift;
     public $cnt = AppConstant::NUMERIC_ZERO;
 
+    public function beforeAction($action)
+    {
+        $courseId = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+            return $this->noValidRights($teacherId);
+        }
+        return true;
+    }
+
     public function actionIndex()
     {
         global $courseId,$openblocks,$previewShift,$CFG;
@@ -393,16 +404,6 @@ class InstructorController extends AppController
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
     }
-
-    public function actionShowLinkedText()
-    {
-        $courseId = $this->getParamVal('cid');
-        $id = Yii::$app->request->get('id');
-        $course = Course::getById($courseId);
-        $link = Links::getById($id);
-        $returnData = array('course' => $course, 'links' => $link);
-        return $this->renderWithData('showLinkedText', $returnData);
-    }
     /**
      * To handle event on calendar.
      */
@@ -493,8 +494,8 @@ class InstructorController extends AppController
         $courseId = $eventData['cid'];
         $teacherId = Teacher::getByUserId($user->id, $courseId);
         if (!($teacherId)) {
-            echo AppConstant::UNAUTHORIZED_ACCESS;
-            exit;
+//            echo AppConstant::UNAUTHORIZED_ACCESS;
+//            exit;
         }
         if (isset($eventData['from']) && $eventData['from']=='cal') {
             $from = 'cal';
@@ -545,7 +546,6 @@ class InstructorController extends AppController
         $course = Course::getById($courseId);
         $eventItems = CalItem::getByCourse($courseId);
         $returnData = array('course' => $course, 'eventItems'=> $eventItems, 'model' => $model);
-//        $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         return $this->renderWithData('manageEvent',$returnData);
     }
@@ -1232,6 +1232,8 @@ class InstructorController extends AppController
          $courseId = $this->getParamVal('cid');
          $course = Course::getById($courseId);
          $user = $this->getAuthenticatedUser();
+        global $userid;
+        $userid = $user['id'];
          $loadToOthers = $this->getParamVal('loadothers');
          if(!$this->isTeacher($user->id,$courseId))
          {

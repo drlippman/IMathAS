@@ -328,6 +328,7 @@ class Libraries extends BaseImasLibraries
     {
         return Libraries::find()->select('name')->where(['id'=> $id])->all();
     }
+
     public static function getByNameList($ids)
     {
         return Libraries::find()->select('name')->where(['IN', 'id', $ids])->all();
@@ -346,4 +347,8 @@ class Libraries extends BaseImasLibraries
         }
     }
 
+    public static function getLibrariesByIdList($ids)
+    {
+        return Libraries::find()->select('name,id,sortorder')->where(['IN', 'id', $ids])->all();
+    }
 }

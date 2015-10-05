@@ -31,10 +31,10 @@ class CopyItemsUtility extends Component
 
 public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
 {
-    global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+    global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copyStickyPosts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
     global $posttoforumtrack, $forumtrack;
-    if (!isset($copystickyposts)) {
-        $copystickyposts = false;
+    if (!isset($copyStickyPosts)) {
+        $copyStickyPosts = false;
     }
     if ($gbcats === false) {
         $gbcats = array();
@@ -154,7 +154,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         if ($rubric != AppConstant::NUMERIC_ZERO) {
             $frubrictrack[$newtypeid] = $rubric;
         }
-        if ($copystickyposts) {
+        if ($copyStickyPosts) {
             //copy instructor sticky posts
             $query = ForumPosts::getByForumId($typeid);
             foreach ($query as $row) {

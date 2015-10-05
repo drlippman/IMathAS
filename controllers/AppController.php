@@ -208,6 +208,7 @@ class AppController extends Controller
         }
         $session->open();
         $sessionId = $session->getId();
+        Yii::$app->session->set('sessionId',$sessionId);
         if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
             $urlMode = 'https://';
         } else {
@@ -246,7 +247,7 @@ class AppController extends Controller
             if (function_exists('session_regenerate_id')) {
                 $sessionId = $session->regenerateID();
             }
-            AppUtility::getURLFromHome('site','login');
+            return $this->redirect(AppUtility::getURLFromHome('site','login'));
         }
         $sessionData = array();
         $haveSession = Sessions::getById($sessionId);
@@ -416,12 +417,7 @@ class AppController extends Controller
                 } else {
                     User::updateUser($now,'',$userId);
                 }
-                if (isset($_SERVER['QUERY_STRING'])) {
-                    $queries = '?'.$_SERVER['QUERY_STRING'].(isset($addToQueryString)?'&'.$addToQueryString:'');
-                } else {
-                    $queries = (isset($addToQueryString)?'?'.$addToQueryString:'');
-                }
-                header('Location: ' . $urlMode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $queries);
+                return $this->redirect('dashboard');
             } else {
                 if (empty($_SESSION['challenge'])) {
                     $badSession = true;
@@ -429,7 +425,6 @@ class AppController extends Controller
                     $badSession = false;
                 }
             }
-
         }
         if ($hasUserName) {
             $userData = User::getById($userId);
@@ -615,16 +610,6 @@ class AppController extends Controller
             $verified = true;
         }
 
-        if (!$verified) {
-//            if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
-//                if (!isset($loginpage)) {
-//                    $loginpage = "loginpage.php";
-//                }
-//                require($loginpage);
-//                exit;
-//            }
-        }
-
         if (!isset($courseName)) {
             $courseName = "Course Page";
         }
@@ -802,4 +787,5 @@ function generaterandstring() {
         $date = new \DateTime($date, $newTZ);
         return $newTZ->getOffset($date);
     }
+
 }

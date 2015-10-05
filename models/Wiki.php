@@ -72,8 +72,7 @@ class Wiki extends BaseImasWikis
 
     public static function getAllDataWiki($wikiId)
     {
-        $query = \Yii::$app->db->createCommand("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$wikiId'")->queryOne();
-        return $query;
+        return Wiki::find()->select('name,startdate,enddate,editbydate,avail')->where(['id' => $wikiId])->one();
     }
 
     public function addWiki($wiki)

@@ -53,6 +53,21 @@ class GradebookController extends AppController
 {
     public $a;
 
+    public function beforeAction($action)
+    {
+        $courseId = $this->getParamVal('cid');
+        $actionPath = Yii::$app->controller->action->id;
+        $user = $this->getAuthenticatedUser();
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'grade-book-student-detail'){
+            return true;
+        }else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+            return $this->noValidRights($teacherId);
+        }else{
+            return true;
+        }
+    }
+
     public function actionGradebook()
     {
         global $get;

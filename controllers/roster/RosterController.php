@@ -39,8 +39,19 @@ use yii\db\Exception;
 
 class RosterController extends AppController
 {
-   public $newUser = array();
+    public $newUser = array();
     public $existUserRecords = array();
+
+    public function beforeAction($action)
+    {
+        $courseId = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+            return $this->noValidRights($teacherId);
+        }
+        return true;
+    }
 /*
  * Controller method to display student information on student roster page.
  */

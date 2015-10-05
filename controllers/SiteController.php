@@ -87,8 +87,8 @@ class SiteController extends AppController
         if ($model->load($this->isPostMethod())) {
             if ($model->login())
             {
-                Yii::$app->session->set('tzoffset', $this->getParamVal('tzoffset'));
-                Yii::$app->session->set('tzname', $this->getParamVal('tzname'));
+                Yii::$app->session->set('tzoffset', $params['tzoffset']);
+                Yii::$app->session->set('tzname', $params['tzname']);
                 $this->checkSession($params);
                 return $this->redirect('dashboard');
             } else {
