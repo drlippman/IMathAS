@@ -10,25 +10,25 @@ $isCourseHidden = false;
     <div class="blockitems">
         <ul class="nomark courselist">
             <?php
-            foreach ($students as $student) {
+            foreach ($studCourse as $student) {
                 if ($student) {
                     if(!$student->hidefromcourselist){
-                        if(($student->course['available'] & 1) == 0){
+                        if(($student['available'] & 1) == 0){
                         ?>
                             <li>
                                 <?php if($student->locked != 0)
                                 { ?>
-                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid) ?> " class="locked"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
+                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student['id']) ?> " class="locked"><?php echo isset($student['name']) ? ucfirst($student['name']) : ""; ?></a>
                                 <?php }
                                 else
                                 {?>
-                                    <span class="delx" onclick="return hidefromcourselist(<?php echo $student->courseid ?>,this);" title="Hide from course list">x</span>
-                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid) ?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
-                                    <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $student->courseid.'&newmsg=1') ?>" class="msg-notification">
+                                    <span class="delx" onclick="return hidefromcourselist(<?php echo $student['id'] ?>,this);" title="Hide from course list">x</span>
+                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student['id']) ?>"><?php echo isset($student['name']) ? ucfirst($student['name']) : ""; ?></a>
+                                    <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $student['id'].'&newmsg=1') ?>" class="msg-notification">
                                         <?php
                                         if($msgRecord){
                                             foreach($msgRecord as $record){
-                                                if($student->courseid == $record['courseid']){
+                                                if($student->id == $record['courseid']){
                                                     if($record['msgCount'] != 0){
                                                         echo "Messages (".$record['msgCount'].")" ;
                                                     }

@@ -26,15 +26,15 @@ use app\components\AppConstant;
             {
                 if ($user->rights > AppConstant::TEACHER_RIGHT)
                 {
-                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'myRights' => $user->rights]);
+                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'myRights' => $user->rights, 'teachCourse' => $teachCourse]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT)
                 {
-                    echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord]);
+                    echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'teachCourse' => $teachCourse]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT)
                 {
                     echo $this->render('_courseTutoring', ['tutors' => $tutors]);
                 }
-                echo $this->render('_courseTaking', ['students' => $students, 'msgRecord' => $msgRecord]);
+                echo $this->render('_courseTaking', ['students' => $students, 'msgRecord' => $msgRecord, 'studCourse' => $studCourse]);
             }else
             {
 

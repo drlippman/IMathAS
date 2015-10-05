@@ -554,8 +554,24 @@ class Course extends BaseImasCourses {
         $data = Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
-    public static function getByName($id)
+    public static function  getByName($id)
     {
-        return Course::find()->select('name')->where(['ownerid' => $id])->orderBy('name')->all();
+        return Course::find()->select('*')->where(['ownerid' => $id])->orderBy('name')->all();
+    }
+
+    public static function getCourseOfStudent($userId)
+    {
+        $query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
+        $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userId' ";
+        $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getCourseOfTeacher($userId)
+    {
+        $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
+        $query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userId' ";
+        $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 }

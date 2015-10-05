@@ -583,6 +583,8 @@ class SiteController extends AppController
             $tutors = Tutor::getByUser($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
             $courses = Course::getByName($user->id);
+            $studCourse = Course::getCourseOfStudent($user->id);
+            $teachCourse = Course::getCourseOfTeacher($user->id);
             if($students){
                 $users = $students;
             }else if($teachers){
@@ -610,7 +612,7 @@ class SiteController extends AppController
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
-                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray, 'tutors' => $tutors, 'courses' => $courses];
+                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray, 'tutors' => $tutors, 'courses' => $courses, 'studCourse' => $studCourse, 'teachCourse' => $teachCourse];
                 return $this->renderWithData('dashboard', $userData);
             }
         }
