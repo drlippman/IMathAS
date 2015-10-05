@@ -732,14 +732,19 @@ class CourseController extends AppController
         $course = Course::getById($courseId);
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
+
             if (count($itemOrders)) {
-                foreach ($itemOrders as $key => $itemOrder) {
+                foreach ($itemOrders as $key => $itemOrder)
+                {
+                    $id = $this->getParamVal('blockId');
+                if($itemOrder['id'] == $id)
+                {
                     $tempAray = array();
                     if (is_array($itemOrder)) {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
-
                         $tempItemList = array();
+
                         if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
                                 $tempItem = array();
@@ -748,7 +753,7 @@ class CourseController extends AppController
                                     case 'Assessment':
                                         $assessment = Assessments::getByAssessmentId($item->typeid);
                                         $tempItem[$item->itemtype] = $assessment;
-                                        array_push($calendarCount, $assessment);
+                                        $calendarCount[$item['id']]=  $assessment;
                                         break;
                                     case 'Calendar':
                                         $tempItem[$item->itemtype] = AppConstant::NUMERIC_ONE;
@@ -777,8 +782,10 @@ class CourseController extends AppController
                         array_push($responseData, $tempAray);
                     }
                 }
+                }
             }
         }
+
         $message = Message::getByCourseIdAndUserId($courseId, $user->id);
         $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
         $msgList = array();

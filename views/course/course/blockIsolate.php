@@ -43,14 +43,13 @@ $now = $currentTime;
                 if($user->rights == 10){
             switch(key($item)):
             case 'Block': ?>
-            <?php $block = $item[key($item)];?>
+            <?php $block = $item[key($item)]; ;?>
 
             <?php if ($block['avail'] != 0 && $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
 
             <?php if(count($item['itemList'])) {?>
                     <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                         <?php switch(key($item)):
-
             /*Assessment here*/
             case 'Assessment': ?>
             <div class="inactivewrapper " onmouseout="this.className='inactivewrapper'">
@@ -583,8 +582,7 @@ $now = $currentTime;
     <?php break; ?>
 
 <?php endswitch;} elseif($user->rights == 100 || $user->rights == 20){
-
-//                    echo AssessmentUtility::createItemOrder($key, $countCourseDetails, $parent, $blockList);
+                    CourseItemsUtility::AddItemsDropDown();
                     switch (key($item)):
                         case  'Block':
                         $block = $item[key($item)];
@@ -605,23 +603,23 @@ $now = $currentTime;
                                     case 'Assessment': ?>
                                         <div class="inactivewrapper "
                                              onmouseout="this.className='inactivewrapper'">
-                                            <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent.'-'.$cnt); ?>
+                                            <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent.'-'.$cnt,$canEdit, $viewAll, $hasStats); ?>
                                         </div>
                                         <?php break; ?>
 
                                         <!-- Forum here-->
                                     <?php case 'Forum': ?>
-                                        <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent.'-'.$cnt); ?>
+                                        <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent.'-'.$cnt, $hasStats); ?>
                                         <?php break; ?>
 
                                         <!-- ////////////////// Wiki here //////////////////-->
                                     <?php case 'Wiki': ?>
-                                        <?php CourseItemsUtility::AddWiki($item,$course,$parent.'-'.$cnt); ?>
+                                        <?php CourseItemsUtility::AddWiki($item,$course,$parent.'-'.$cnt, $currentTime, $hasStats); ?>
                                         <?php break; ?>
 
                                         <!-- ////////////////// Linked text here //////////////////-->
                                     <?php case 'LinkedText': ?>
-                                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent.'-'.$cnt,$course);?>
+                                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent.'-'.$cnt,$course, $hasStats);?>
                                         <?php break; ?>
 
                                         <!-- ////////////////// Inline text here //////////////////-->
@@ -642,8 +640,7 @@ $now = $currentTime;
                                     <?php endswitch; ?>
                             <?php } ?>
                             <?php } ?>
-        <?php CourseItemsUtility::AddItemsDropDown();?>
-        </div>
+
             <?php  }
                              break; ?>
                         <?php endswitch;
@@ -656,5 +653,7 @@ $now = $currentTime;
         <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $course->id) ?>">Back</a>
 <?php }?>
 </div>
- <?php }
+</div>
+
+<?php }
 }?>
