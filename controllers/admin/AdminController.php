@@ -667,6 +667,8 @@ class AdminController extends AppController
         $enablebasiclti = true;
         $groupId= $currentUser['groupid'];
         $action = $params['action'];
+        $getAction = $this->getParamVal('action');
+        $getId = $this->getParamVal('id');
         switch($action) {
             case "delete":
                 $course = Course::getById($params['id']);
@@ -679,6 +681,15 @@ class AdminController extends AppController
                  break;
             case "chgrights":
             case "newadmin":
+            if ($getAction == "newadmin") {
+                $oldGroup = 0;
+                $oldRights = 10;
+            } else {
+                $line = User::getDataById($getId);
+            }
+            if ($myRights == AppConstant::ADMIN_RIGHT) {
+                $resultGroup = Groups::getIdNameByName();
+            }
                 break;
             case "addnewcourse":
                 break;
@@ -792,7 +803,7 @@ class AdminController extends AppController
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
             'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
-            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser);
+            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser, 'getAction' => $getAction, 'getId' => $getId, 'line' => $line, 'resultGroup' => $resultGroup);
         return $this->renderWithData('forms',$responseData);
     }
     public function actionDeleteCourseAjax()
@@ -831,6 +842,25 @@ class AdminController extends AppController
                 Sessions::updateUId($be,$sessionId);
                 break;
             case "chgrights":
+                if ($myRights < 100 && $params['newrights'] > 75)
+                {
+                    echo "You don't have the authority for this action";
+                    break;
+                }
+                if ($myRights < 75)
+                {
+                    echo "You don't have the authority for this action";
+                    break;
+                }
+
+                $group = $params['group'];
+                $newRights = $params['newrights'];
+                User::updateUserRight($myRights, $newRights, $group, $getId, $groupid);
+
+                if ($myRights == AppConstant::GROUP_ADMIN_RIGHT) { //update library groupids
+                    $groupId = $params['group'];
+                    Libraries::updateGroupIdAdmin($getId, $groupId);
+                }
                 break;
             case "resetpwd":
                 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
@@ -878,6 +908,55 @@ class AdminController extends AppController
             case "chgpwd":
                 break;
             case "newadmin":
+                if ($myRights < 75)
+                {
+                    echo "You don't have the authority for this action";
+                    break;
+                }
+                if ($myRights < 100 && $params['newrights'] > 75)
+                {
+                    break;
+                }
+                $adminName = $params['adminname'];
+                $row = User::getBySIDForAdmin($adminName);
+                if ($row != null) {
+                    echo "<html><body>Username is already used.\n";
+                    echo "<a href=\"forms?action=newadmin\">Try Again</a> or ";
+                    echo "<a href=\"forms?action=chgrights&id={$row['id']}\">Change rights for existing user</a></body></html>\n";
+                    exit;
+                }
+                if (isset($CFG['GEN']['newpasswords'])) {
+                    $md5pw = password_hash($params['password'], PASSWORD_DEFAULT);
+                } else {
+                    $md5pw =md5($params['password']);
+                }
+                if ($myRights < 100) {
+                    $newGroup = $groupid;
+                } else if ($myRights == 100) {
+                    $newGroup = $params['group'];
+                }
+                if (isset($CFG['GEN']['homelayout'])) {
+                    $homelayout = $CFG['GEN']['homelayout'];
+                } else {
+                    $homelayout = '|0,1,2||0,1';
+                }
+                $firstName = $params['firstname'];
+                $lastName = $params['lastname'];
+                $rights = $params['newrights'];
+                $email = $params['email'];
+                $user = new User();
+                $newUserid = $user->addUserFromAdmin($adminName, $md5pw, $firstName, $lastName,$rights, $email, $newGroup,$homelayout);
+                if (isset($CFG['GEN']['enrollonnewinstructor'])) {
+                    $valbits = array();
+                    foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
+                        $valbits[] = "('$newUserid','$ncid')";
+                        $newUserId = $newUserid;
+                        $courseId = $ncid;
+
+                    }
+                    $query = new Student();
+                    $query->insertUIdCId($newUserId, $courseId);
+                }
                 break;
             case "logout":
                 break;

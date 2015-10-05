@@ -11,6 +11,7 @@ $this->params['breadcrumbs'][] = $this->title;
 //include_once('../components/filehandler.php');
 
 ?>
+<div class="tab-content shadowBox non-nav-tab-item">
 <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
     <div class="name-of-item">
         <div class="col-lg-2"><?php AppUtility::t('Name of Inline Text')?></div>
@@ -192,6 +193,7 @@ if (isset($inlineId)) {
 
     <div class=submit><button type=submit name="submitbtn" value="Submit"><?php echo $savetitle ?></button></div>
 </form>
+    </div>
 <script type="text/javascript">
     function movefile(from) {
         var to = document.getElementById('ms-'+from).value;

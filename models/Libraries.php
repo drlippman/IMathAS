@@ -333,5 +333,17 @@ class Libraries extends BaseImasLibraries
         return Libraries::find()->select('name')->where(['IN', 'id', $ids])->all();
     }
 
+    public static function updateGroupIdAdmin($id, $groupId)
+    {
+        $libraries = Libraries::find()->where(['ownerid' => $id])->all();
+        if($libraries)
+        {
+            foreach($libraries as $library)
+            {
+                $library -> groupid = $groupId;
+                $library -> save();
+            }
+        }
+    }
 
 }

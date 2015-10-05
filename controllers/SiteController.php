@@ -125,6 +125,7 @@ class SiteController extends AppController
         $line = Diags::getAllDataById($diagId);
         $pcid = $line['cid'];
         $diagid = $line['id'];
+
         if ($line['term'] == '*mo*') {
             $diagqtr = date("M y");
         } else if ($line['term'] == '*day*') {
@@ -141,19 +142,20 @@ class SiteController extends AppController
                 if ($ip=='*') {
                     $noproctor = true;
                     break;
-                } else if (strpos($ip,'*')!==FALSE) {
+                } else if (strpos($ip,'*') !== FALSE) {
                     $ip = substr($ip,0,strpos($ip,'*'));
                     if ($ip == substr($userip,0,strlen($ip))) {
                         $noproctor = true;
                         break;
                     }
-                } else if ($ip==$userip) {
+                } else if ($ip == $userip) {
                     $noproctor = true;
                     break;
                 }
             }
         }
-        $sessionIdData = Sessions::getBySessionId($sessionid);
+        $sessionIdDatas = Sessions::getBySessionId($sessionid);
+        $sessionIdData = $sessionIdDatas['sessionid'];
         if (count($sessionIdData) > AppConstant::NUMERIC_ZERO) {
             Sessions::deleteBySessionId($sessionid);
             $sessiondata = array();
@@ -170,7 +172,7 @@ class SiteController extends AppController
             if (trim($params['SID']) == '' || trim($params['firstname']) == '' || trim($params['lastname']) == '')
             {
                 echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
-//                exit;
+                exit;
             }
             $result = Diags::getByDiagId($diagId);
             $entryformat = $result[0]['entryformat'];
@@ -225,7 +227,7 @@ class SiteController extends AppController
             if ($params['course'] == -1)
             {
                 echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
-//                exit;
+                exit;
             }
             $pws = array();
             $pws = explode(';',$line['pws']);
@@ -288,7 +290,7 @@ class SiteController extends AppController
                         } else {
                             echo "<html><body>", _('Error, password incorrect or expired.'), "
                             <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
-//                            exit;
+                            exit;
                         }
                     }
                 }
@@ -309,13 +311,13 @@ class SiteController extends AppController
                     if (count($r2) > 0) {
                         if (!$allowreentry) {
                             echo _("You've already taken this diagnostic."), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
-//                            exit;
+                            exit;
                         } else {
                             $d = count($r2);
                             $now = time();
                             if ($now - $d[1] > 60*$line['reentrytime']) {
                                 echo _('Your window to complete this diagnostic has expired.'), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
-//                                exit;
+                                exit;
                             }
                         }
                     }
@@ -580,6 +582,7 @@ class SiteController extends AppController
             $students = Student::getByUserId($user->id);
             $tutors = Tutor::getByUser($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
+            $courses = Course::getByName($user->id);
             if($students){
                 $users = $students;
             }else if($teachers){
@@ -607,7 +610,7 @@ class SiteController extends AppController
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
-                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray, 'tutors' => $tutors];
+                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray, 'tutors' => $tutors, 'courses' => $courses];
                 return $this->renderWithData('dashboard', $userData);
             }
         }

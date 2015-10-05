@@ -4,6 +4,7 @@ use kartik\time\TimePicker;
 use app\components\AppConstant;
 
 $this->title = AppUtility::t('Form', false);
+$imasroot = AppUtility::getHomeURL();
 if (isset($params['cid'])) {
     ?>
     <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
@@ -60,9 +61,67 @@ switch ($action) {
         break;
 
     case "chgrights":
-        break;
     case "newadmin":
-        break;
+            echo "<form method=post action=\"actions?action=$getAction";
+            if ($getAction == "chgrights") { echo "&id=$getId"; }
+            echo "\"><br>";
+            if ($getAction == "newadmin") {
+                echo "<div class=col-lg-2>New User username</div>  <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
+                echo "<div class=col-lg-2>First Name</div> <input class='form form-control-1' type=text size=40 name=firstname><BR class=form>\n";
+                echo "<div class=col-lg-2>Last Name</div> <input class='form form-control-1' type=text size=40 name=lastname><BR class=form>\n";
+                echo "<div class=col-lg-2>Email</div> <input class='form form-control-1' type=text size=40 name=email><BR class=form>\n";
+                echo '<div class=col-lg-2>Password</div> <input class="form form-control-1" type="text" size="40" name="password"/><br class="form"/>';
+                $oldGroup = 0;
+                $oldRights = 10;
+            } else {
+                echo "<div class='col-lg-12'><h2>{$line['FirstName']} {$line['LastName']}</h2></div>\n";
+                $oldGroup = $line['groupid'];
+                $oldRights = $line['rights'];
+
+            }
+            ?>
+             <div class="col-lg-2"><img class="help-img margin-left-zero" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>Set User rights to:</div>
+
+            <?php  echo "<div class='col-lg-4 padding-left-zero'><input type=radio name=\"newrights\" value=\"5\" ";
+            if ($oldRights == 5) {echo "CHECKED";}
+            echo "> Guest User <BR>\n";
+            echo "<input type=radio name=\"newrights\" value=\"10\" ";
+            if ($oldRights == 10) {echo "CHECKED";}
+            echo "> Student <BR>\n";
+            echo "<input type=radio name=\"newrights\" value=\"20\" ";
+            if ($oldRights == 20) {echo "CHECKED";}
+            echo "> Teacher <BR>\n";
+            echo "<input type=radio name=\"newrights\" value=\"40\" ";
+            if ($oldRights == 40) {echo "CHECKED";}
+            echo "> Limited Course Creator <BR>\n";
+            echo "<input type=radio name=\"newrights\" value=\"60\" ";
+            if ($oldRights == 60) {echo "CHECKED";}
+            echo "> Diagnostic Creator <BR>\n";
+            echo "<input type=radio name=\"newrights\" value=\"75\" ";
+            if ($oldRights == 75) {echo "CHECKED";}
+            echo "> Group Admin <BR>\n";
+            if ($myRights==100) {
+                echo "<input type=radio name=\"newrights\" value=\"100\" ";
+                if ($oldRights == 100) {echo "CHECKED";}
+                echo "> Full Admin </div><BR class=form><BR/>\n";
+            }
+
+            if ($myRights == 100) {
+                echo "<div class=col-lg-2>Assign to group: </div>";
+                echo "<div class='col-lg-6 padding-left-zero'><select name=\"group\" class='form-control' id=\"group\">";
+                echo "<option value=0>Default</option>\n";
+
+                foreach($resultGroup as $key => $row) {
+                    echo "<option value=\"{$row['id']}\" ";
+                    if ($oldGroup==$row['id']) {
+                        echo "selected=1";
+                    }
+                    echo ">{$row['name']}</option>\n";
+                }
+                echo "</select></div><br class=form /><br/>";
+            }
+            echo "<br/><div class=submit><input type=submit value=Save></div></form><br/>";
+            break;
     case "modify":
     case "addcourse":
         if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {

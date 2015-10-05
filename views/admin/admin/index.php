@@ -109,7 +109,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             </tbody>
         </table>
-        <div class="lg-col-2 pull-left">
+        <div class="col-md-12 padding-left-zero">
+        <div class="col-md-2 pull-left padding-left-zero display-inline-block">
             <a class="btn btn-primary margin-left-twenty"
                href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=addcourse') ?>"><?php AppUtility::t('Add New Course'); ?> </a>
         </div>
@@ -118,9 +119,11 @@ $this->params['breadcrumbs'][] = $this->title;
         if ($showcourses > AppConstant::NUMERIC_ZERO) {
             echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='index?showcourses=0'\" />";
         }
-        echo "<div class='col-lg-3'>";
-        AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
+        echo "<div class='col-lg-2 display-inline-block padding-left-zero'>";
+        echo "Show courses of</div>" ;
+       echo "<div class='col-lg-5 padding-left-zero display-inline-block'>";AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
     </div>
+        </div>
     <?php
     }
     ?>
@@ -282,7 +285,7 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
                             <span class="caret right-aligned"></span></a>
                         <ul class="dropdown-menu selected-options user-settings">
                             <li>
-                                <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id=' . $page_userDataId[$i]) ?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=chgrights&id=' . $page_userDataId[$i]) ?>">
                                     <?php AppUtility::t('Change'); ?>
                                 </a>
                             </li>
@@ -306,10 +309,11 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
 
         </tbody>
     </table>
-    <a class="btn btn-primary margin-left-twenty"
-       href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">
-        <?php AppUtility::t('Add New User'); ?>
-    </a>
+<!--    <a class="btn btn-primary margin-left-twenty"-->
+<!--       href="--><?php //echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?><!--">-->
+<!--        --><?php //AppUtility::t('Add New User'); ?>
+<!--    </a>-->
+    <input type=button value="Add New User" onclick="window.location='forms?action=newadmin'">
     <?php
     }
     if ($myRights == AppConstant::ADMIN_RIGHT) {

@@ -802,5 +802,44 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->from(['imas_users AS iu','imas_forums as i_f'])->where(['iu.id' => $userId])->andWhere(['i_f.id' => $forumId])->one();
         return $data;
     }
+     public static function getDataById($id)
+     {
+         $query = new Query();
+         $query->select(['FirstName','LastName','rights','groupid'])
+             ->from(['imas_users'])
+             ->where(['id' => $id]);
+         $command = $query->createCommand();
+         $data = $command->queryOne();
+         return $data;
+     }
+
+    public static function getBySIDForAdmin($adminName)
+    {
+        return User::find()->select('id')->where(['SID' => $adminName])->one();
+    }
+    public function addUserFromAdmin($adminName, $passwd, $firstname, $lastname,$ten, $eclass, $groupId,$homelayout)
+    {
+        $this->SID = $adminName;
+        $this->password = $passwd;
+        $this->FirstName = $firstname;
+        $this->LastName = $lastname;
+        $this->rights = $ten;
+        $this->email = $eclass;
+        $this->groupid = $groupId;
+        $this->homelayout = $homelayout;
+        $this->save();
+        return $this->id;
+    }
+
+    public static function updateUserRight($myRights, $newRights, $group, $id, $groupId)
+    {
+        $query = "UPDATE imas_users SET rights='$newRights'";
+        if ($myRights == 100) {
+            $query .= ",groupid='$group'";
+        }
+        $query .= " WHERE id='$id'";
+        if ($myRights < 100) { $query .= " AND groupid='$groupId' AND rights<100"; }
+        return Yii::$app->db->createCommand($query)->execute();
+    }
 }
 

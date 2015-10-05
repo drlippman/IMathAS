@@ -546,13 +546,16 @@ class Course extends BaseImasCourses {
         return Course::find()->select('latepasshrs')->where(['id' => $courseId])->one();
     }
 
+
     public static function getAllCourses()
     {
         $query = "SELECT imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName FROM imas_courses,imas_users ";
         $query .= "WHERE imas_users.id=imas_courses.ownerid ";
         $data = Yii::$app->db->createCommand($query)->queryAll();
         return $data;
-
-
+    }
+    public static function getByName($id)
+    {
+        return Course::find()->select('name')->where(['ownerid' => $id])->orderBy('name')->all();
     }
 }

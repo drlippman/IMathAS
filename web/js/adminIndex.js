@@ -88,7 +88,7 @@ function removeSuccess(response) {
 
     if (response.status == 0) {
         var message = '';
-        message += 'Are you sure you want to delete the course<b>' + name + '</b>' + '<br>';
+        message += 'Are you sure you want to delete the course <b>' + name + '</b>' + '<br>';
         var html = '<div><p>' + message + '</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Remove Course', zIndex: 10000, autoOpen: true,

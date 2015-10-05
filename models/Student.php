@@ -531,5 +531,12 @@ class Student extends BaseImasStudents
         $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$userId}' AND courseid='$courseId'";
         \Yii::$app->db->createCommand($query)->execute();
     }
+
+    public function insertUIdCId($userId, $pcid)
+    {
+        $this->userid = $userId;
+        $this->courseid = $pcid;
+        $this->save();
+    }
 }
 

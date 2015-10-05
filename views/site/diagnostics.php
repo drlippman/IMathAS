@@ -4,6 +4,7 @@ use app\components\AppUtility;
 $this->title = 'Diagnostics';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<?php if($params['id']) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => ['Home'], 'link_url' => [AppUtility::getHomeURL() . 'site/index'], 'page_title' => $this->title]); ?>
     </div>
@@ -12,16 +13,17 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
-            <div class="pull-left header-btn">
-                <div id="submit" class="submit pull-right page-settings">
-                   <input type=submit value='<?php echo 'Access Diagnostic' ?>'>
-                </div>
-<!--                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit">-->
-<!--                    <i class="fa fa-share header-right-btn"></i>--><?php //echo $defaultValues['saveButtonTitle']; ?><!--</button>-->
-            </div>
 
+            <div class="pull-left header-btn">
+                    <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Access Diagnostic' ?></button>
+                <a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics'); ?>"
+                   class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Diagnostics
+                </a>
+            </div>
         </div>
     </div>
+<?php } ?>
+
 <?php
 
 if (!isset($params['id']))
@@ -44,10 +46,11 @@ if (!isset($params['id']))
         <a href=<?php echo AppUtility::getURLFromHome('site', 'diagnostics?id='.$row['id'])?>><?php echo $row['name']?></a>
    <?php  echo "</li>"; }
     echo "</ul></div>";
-
+    exit;
 }?>
 
-<?php if (!($line['public']&1)) {
+<?php
+if(!($line['public']&1)) {
 echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
     exit;
 } ?>
