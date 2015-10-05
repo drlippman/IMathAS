@@ -69,9 +69,9 @@ $pagetitle =$line['name'];
 <form method=post action="diagnostics?id=<?php echo $diagid; ?>">
     <div class=col-lg-2><?php echo $line['idprompt']; ?></div>
     <div class="col-lg-6"><input class="form form-control-1" type=text  size=12 name=SID></div><BR class=form>
-    <div class=col-lg-2><?php echo _('Enter First Name'); ?></div>
+    <div class="col-lg-2 select-text-margin"><?php echo _('Enter First Name'); ?></div>
     <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=firstname></div><BR class=form>
-    <div class=col-lg-2><?php echo _('Enter Last Name'); ?></div> <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=lastname></div><BR class=form>
+    <div class="col-lg-2 select-text-margin"><?php echo _('Enter Last Name'); ?></div> <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=lastname></div><BR class=form>
 
     <script type="text/javascript">
         var teach = new Array();
@@ -96,7 +96,7 @@ $pagetitle =$line['name'];
         }
     </script>
 
-    <div class=col-lg-2><?php printf(_('Select your %s'), $line['sel1name']); ?></div>
+    <div class="col-lg-2 select-text-margin"><?php printf(_('Select your %s'), $line['sel1name']); ?></div>
     <div class=col-lg-4>
     <select name="course" class="form-control" id="course" onchange="getteach()">
     <option value="-1"><?php printf(_('Select a %s'), $line['sel1name']); ?></option>
@@ -107,7 +107,7 @@ $pagetitle =$line['name'];
     ?>
 </select></div><br class=form><br class=form>
 
-    <div class=col-lg-2><?php printf(_('Select your %s'), $line['sel2name']); ?></div>
+    <div class="col-lg-2 select-text-margin"><?php printf(_('Select your %s'), $line['sel2name']); ?></div>
     <div class=col-lg-4>
         <select name="teachers" class="form-control" id="teachers">
             <option value="not selected"><?php printf(_('Select a %s first'), $line['sel1name']); ?></option>
@@ -117,7 +117,7 @@ $pagetitle =$line['name'];
     <?php
     if (!$noproctor) {
         echo "<b><div class='col-lg-12'>", _('This test can only be accessed from this location with an access password'), "</div></b></br>\n";
-        echo "<div class=col-lg-2>", _('Access password'), "</div>  <div class='col-lg-4'><input class='form form-control-1' type=password size=40 name=passwd></div><BR class=form>";
+        echo "<div class='col-lg-2 select-text-margin'>", _('Access password'), "</div>  <div class='col-lg-4'><input class='form form-control-1' type=password size=40 name=passwd></div><BR class=form>";
     }
     ?>
     <input type="hidden" id="tzoffset" name="tzoffset" value="">
