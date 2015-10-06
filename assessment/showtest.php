@@ -512,7 +512,7 @@
 		exit;
 	}
 	if (!isset($sessiondata['actas'])) { 
-		$query = "SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
+		$query = "SELECT startdate,enddate,islatepass,exceptionpenalty FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {
@@ -530,6 +530,9 @@
 				if ($testsettings['enddate']<$now) { //exception is for past-due-date
 					$inexception = true;	
 					$exceptiontype = $row[2];
+					if ($row[3]!==null) {
+						$testsettings['exceptionpenalty'] = $row[3];
+					}
 				}
 			}
 			$exceptionduedate = $row[1];

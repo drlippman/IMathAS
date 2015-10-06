@@ -57,6 +57,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
 	$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
+	$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):'NULL';
 	
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
@@ -67,11 +68,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result);
 		if ($row != null) {
-			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore WHERE id='{$row[0]}'";
+			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore,exceptionpenalty=$epenalty WHERE id='{$row[0]}'";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		} else {
-			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore) VALUES ";
-			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate,$waivereqscore)";
+			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty) VALUES ";
+			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate,$waivereqscore,$epenalty)";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
 		if (isset($_POST['eatlatepass'])) {
@@ -152,7 +153,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$etime = tzdate("g:i a",$row[1]);
 
 		//check if exception already exists
-		$query = "SELECT id,startdate,enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
+		$query = "SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$erow = mysql_fetch_row($result);
 		$page_isExceptionMsg = "";
@@ -164,6 +165,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$edate = tzdate("m/d/Y",$erow[2]);
 			$stime = tzdate("g:i a",$erow[1]);
 			$etime = tzdate("g:i a",$erow[2]);
+			$curwaive = $erow[3];
+			$curepenalty = $erow[4];
 		}	
 	} 
 	//DEFAULT LOAD DATA MANIPULATION
@@ -235,8 +238,10 @@ if ($overwriteBody==1) {
 		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
 		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  
 		   Student currently has <?php echo $latepasses;?> latepasses.</span><br class="form"/>
-		<span class="form"><input type="checkbox" name="waivereqscore"/></span>
+		<span class="form"><input type="checkbox" name="waivereqscore" <?php if ($curwaive==1) echo 'checked="checked"';?>/></span>
 		<span class="formright">Waive "show based on an another assessment" requirements, if applicable.</span><br class="form"/>
+		<span class="form"><input type="checkbox" name="overridepenalty" <?php if ($curepenalty!==null) echo 'checked="checked"';?>/></span>
+		<span class="formright">Override default exception/LatePass penalty.  Deduct <input type="input" name="newpenalty" size="2" value="<?php echo ($curepenalty===null)?0:$curepenalty?>"/>% for questions done while in exception.
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
 
