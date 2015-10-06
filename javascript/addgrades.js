@@ -516,13 +516,9 @@ function togglefeedback(btn) {
 }
 
 function doonblur(value) {
-	value = value.replace(/[^\d\.\+\-\*\/]/g,'');
-	if (value!='0') {
-		value = value.replace(/^0+/,'');
-	}
 	if (value=='') {return ('');}
 	try {
-		return (eval(value));
+		return (eval(mathjs(value)));
 	} catch (e) {
 		return '';
 	}
