@@ -102,6 +102,21 @@ table td {
     margin-top: -92px !IMPORTANT;
     margin-right: -30px !IMPORTANT;
 }
-.summary-html-lord iframe, .instructions-html-lord iframe {
-    max-width: 909px !important;
+/*.summary-html-lord iframe, .instructions-html-lord iframe {*/
+    /*max-width: 909px !important;*/
+/*}*/
+@media screen and (max-width: 1300px) {
+    .summary-html-lord iframe, .instructions-html-lord iframe {
+        max-width: 861px !important;
+    }
+}
+@media screen and (max-width: 979px) {
+    .summary-html-lord iframe, .instructions-html-lord iframe {
+        max-width: 750px !important;
+    }
+}
+@media screen and (max-width: 640px) {
+    .summary-html-lord iframe, .instructions-html-lord iframe {
+        max-width: 650px !important;
+    }
 }

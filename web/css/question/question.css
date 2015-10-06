@@ -133,7 +133,7 @@ margin-left: -15px;
 .form-control-for-question {
     display: block;
     height: 34px;
-    padding: 6px 12px;
+    padding-left: 2px;
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
@@ -210,8 +210,8 @@ text-align: left;
     padding-top: 20px;
 }
 .manage-question-set-description {
-    min-width: 300px !important;
-    max-width: 300px !important;
+    /*min-width: 300px !important;*/
+    max-width: 90px;
     word-wrap: break-word !important;
 }
 #manage-question-chglib:hover, #manage-question-license:hover, #manage-question-chgrights:hover, #manage-question-remove:hover, #manage-question-transfer:hover {
@@ -222,7 +222,7 @@ text-align: left;
     cursor: pointer;
 }
 .with-selected-dropdown {
-    min-width: 170px;
+    /*min-width: 170px;*/
     max-width: 170px;
 }
 .categorize-question-description {
@@ -241,4 +241,12 @@ text-align: left;
 .question-in-assessment-table {
 word-wrap: break-word;
 max-width: 250px;
+}
+.owner-width {
+    max-width: 70px;
+    word-wrap: break-word;
+}
+.manage-question-table td, .manage-question-table th {
+    margin: 0px;
+    padding: 7px 3px 7px 4px !important;
 }
