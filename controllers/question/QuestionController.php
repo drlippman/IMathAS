@@ -2945,7 +2945,7 @@ class QuestionController extends AppController
                         $pageLibQids[$line['libid']][] = $line['id'];
                     }
                     $i = $line['id'];
-                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-left-twelve' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-right-ten' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
                     if ($line['userights'] == AppConstant::NUMERIC_ZERO) {
                         $pageQuestionTable[$i]['desc'] = '<span class="red">' . filter($line['description']) . '</span>';
                     } else if ($line['replaceby'] > AppConstant::NUMERIC_ZERO || $line['junkflag'] > AppConstant::NUMERIC_ZERO) {

@@ -315,21 +315,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         <ul class="dropdown-menu with-selected">
                             <li>
                                 <a id="manage-question-chglib" name="chglib">
-                                    <i class="fa fa-fw"></i>
-                                    <?php AppUtility::t('Library Assignment'); ?>
+                                    <i class="fa fa-fw padding-right-five"></i>
+                                    <span><?php AppUtility::t('Library Assignment'); ?></span>
                                 </a>
 <!--                                <input type=submit name="chglib" value="Library Assignment" title="CFhange library assignments">-->
                             </li>
                             <li>
                                 <a id="manage-question-license" name="license">
                                     <i class="fa fa-credit-card"></i>
-                                    <?php AppUtility::t('License'); ?>
+                                    <span class="padding-left-three"><?php AppUtility::t('License'); ?></span>
                                 </a>
 <!--                                <input type=submit name="license" value="License" title="Change license or attribution">-->
                             </li>
                             <li>
                                 <a id="manage-question-chgrights" name="chgrights">
-                                    <i class="fa fa-fw"></i>
+                                    <i class="fa fa-hand-o-up padding-right-five"></i>
                                     <?php AppUtility::t('Change Rights'); ?>
                                 </a>
 
@@ -337,7 +337,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             </li>
                             <li>
                                 <a id="manage-question-remove" name="remove">
-                                    <i class="fa fa-trash-o fa-fw"></i>
+                                    <i class="fa fa-trash-o fa-fw padding-right-five"></i>
                                     <?php AppUtility::t('Delete'); ?>
                                 </a>
 <!--                                <input type=submit name="remove" value="Delete">-->
@@ -345,7 +345,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <li>
                                 <a id="manage-question-transfer" name="transfer">
                                     <i class="fa fa-exchange"></i>
-                                    <?php AppUtility::t('Transfer'); ?>
+                                    <span class="padding-left-five"><?php AppUtility::t('Transfer'); ?></span>
                                 </a>
 <!--                                <input type=submit name="transfer" value="Transfer" title="Transfer question ownership">-->
                             </li>
