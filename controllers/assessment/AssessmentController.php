@@ -639,7 +639,7 @@ class AssessmentController extends AppController
                 }
             }
         }
-        $this->includeCSS(['course/items.css', 'course/course.css','gradebook.css']);
+        $this->includeCSS(['course/items.css', 'course/course.css','gradebook.css','assessment.css']);
         $this->includeJS(["editor/tiny_mce.js","assessment/addAssessment.js", "general.js"]);
         return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body);
     }

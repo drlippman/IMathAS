@@ -80,13 +80,13 @@ if ($overwriteBody==1) {
         $rubtypeval = array(1,0,3,4,2);
         $rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only'); ?>
 
-            <?php echo '<div class="col-md-12"><div class="col-md-2 select-text-margin">Name</div><div class="col-md-4">  <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
+            <?php echo '<div class="col-sm-12"><div class="col-sm-2 select-text-margin">Name</div><div class="col-sm-4">  <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
 
-        echo '<div class="col-md-12 margin-top-fifteen"><div class="col-md-2 select-text-margin">Rubric Type</div> <div class="col-md-4">';
+        echo '<div class="col-sm-12 padding-top-fifteen"><div class="col-sm-2 select-text-margin">Rubric Type</div> <div class="col-sm-4">';
         AssessmentUtility::writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');
         echo '</div></div>';
 
-        echo '<div class="col-md-12 margin-top-fifteen"><div class="col-md-offset-2 col-md-4">Share with Group<input class="margin-left-ten" type="checkbox" name="rubisgroup" '.AssessmentUtility::getHtmlChecked($rubgrp,-1,1).' /></div>';
+        echo '<div class="col-sm-12 padding-top-fifteen padding-bottom-five"><div class="col-sm-offset-2 col-sm-4">Share with Group<input class="margin-left-ten" type="checkbox" name="rubisgroup" '.AssessmentUtility::getHtmlChecked($rubgrp,-1,1).' /></div>';
         echo '
         <div class="col-md-12">
         <table class="width-hundread-per margin-top-fifteen">

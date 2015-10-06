@@ -186,8 +186,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <label class="padding-left-zero">
                                     <input type="checkbox" name="forceReGen">
                                     <span class='cr'><i class='cr-icon fa fa-check'></i></span>
-                                    <span class='margin-left-five'><?php AppUtility::t('Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.')?></span>
                                 </label>
+
+                                <span class='margin-left-five'><?php AppUtility::t('Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.')?></span>
                             </div>
                             <div class='checkbox override-hidden col-md-12 margin-top-five padding-left-zero'>
                                 <label class="padding-left-zero">
@@ -231,7 +232,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
                     <?php if (sizeof((unserialize($studentDetails))) != 1) { ?>
-                        <div>
+                        <div class="col-md-12">
                             <span><p><h4><?php AppUtility::t('Students Selected')?></h4></span>
                             <ul>
                             <span class="col-md-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>

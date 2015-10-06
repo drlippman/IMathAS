@@ -35,11 +35,11 @@ $now = $currentTime;
 </div>
 <div class="tab-content shadowBox ">
     <br>
-     <div class="view-message-inner-contents">
+     <div class="view-message-inner-contents min-height-three-hundred-five view-message-margin">
          <div class="row">
 
                  <div class=" col-sm-6 message-title">
-                     <h4><b><?php echo $messages->title ?></b></h4>
+                     <h4 class="margin-top-zero"><b><?php echo $messages->title ?></b></h4>
                   </div>
                  <div class="pull right col-sm-6 message-title ">
                      <?php echo date('M d, o g:i a', $messages->senddate) ?>
@@ -59,14 +59,14 @@ $now = $currentTime;
              </div>
              <?php }?>
          </div>
-        <div class="col-md-12 message-body" style="min-height: 300px">
+        <div class="col-md-12 message-body word-break-all">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
              {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">['.AppUtility::t('Show trimmed content', false).']</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
                    } ?>
            <?php echo $messages->message ?>
          </div>
 
-         <div class="reply message-body">
+         <div class="reply message-body col-md-12 padding-left-zero">
              <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
                     <span class="message-reply">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
@@ -76,7 +76,7 @@ $now = $currentTime;
                      <span class="message-reply">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
                     </span>
-             <span class="pull-right col-sm-1 margin-right-ten btn-hover">
+             <span class="pull-right btn-hover">
                  <?php if(($messages['isread']) < AppConstant::NUMERIC_SEVEN){?>
                       <a href="#" onclick='changeImage(this,false,<?php echo $messages['id'];?>)' class="btn1 flag-button"><img class="small-icon" src="<?php echo AppUtility::getAssetURL()?>img/flagempty.gif">&nbsp;&nbsp;<?php echo AppUtility::t('Flag')?></a>
                  <?php }else{?>
@@ -84,7 +84,6 @@ $now = $currentTime;
                  <?php }?>
               </span>
          </div>
-
-</div>
+        </div>
     <br>
  </div>

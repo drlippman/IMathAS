@@ -22,7 +22,6 @@ use Yii;
 use app\components\AppConstant;
 
 require("../components/displayQuestion.php");
-require("../components/handled.php");
 class QuestionController extends AppController
 {
     public function actionAddQuestions()
@@ -151,10 +150,10 @@ class QuestionController extends AppController
                     $overwriteBody = AppConstant::NUMERIC_ONE;
                     $assessmentData = Assessments::getByAssessmentId($params['aid']);
                     $assessmentName = $assessmentData['name'];
-                    $body .= "<h3>$assessmentName</h3>";
+                    $body .= "<div class='col-md-12 padding-top-five padding-left-thirty'><h3>$assessmentName</h3>";
                     $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-                    $body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId . '&clearattempts=confirmed') . "'\">\n";
-                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId) . "';\"></p>\n";
+                    $body .= "<p class='padding-top-ten'><input type=button value=\"Yes, Clear\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId . '&clearattempts=confirmed') . "'\">\n";
+                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn margin-left-ten\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId) . "';\"></p></div>";
                 }
             }
 
@@ -532,7 +531,7 @@ class QuestionController extends AppController
                             $existingQList = implode(',', $existingQuestion);  //pulled from database, so no quotes needed
                             $result = QuestionSet::getByUserId($assessmentId, $userId, $existingQList);
                         }
-                        if ($result == AppConstant::NUMERIC_ZERO) {
+                        if (count($result) == AppConstant::NUMERIC_ZERO) {
                             $noSearchResults = true;
                         } else {
                             $alt = AppConstant::NUMERIC_ZERO;
@@ -1068,8 +1067,8 @@ class QuestionController extends AppController
         $itemArray = implode(',', $itemArray);
         $itemArray = str_replace('~', ',', $itemArray);
         $itemArray = explode(',', $itemArray);
-        $this->includeCSS(['question/question.css']);
-        $this->includeJS(['question/categorize.js']);
+        $this->includeCSS(['question/question.css','dataTables.bootstrap.css']);
+        $this->includeJS(['question/categorize.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
         $responseArray = array('cid' => $courseId, 'aid' => $assessmentId, 'itemarr' => $itemArray, 'descriptions' => $descriptions, 'category' => $category,
             'outcomes' => $outcomes, 'outcomenames' => $outcomeNames, 'questionlibs' => $questionLibs, 'libnames' => $libNames,
             'extracats' => $extraCats, 'course' => $course);
@@ -3041,8 +3040,8 @@ class QuestionController extends AppController
                 }
             }
         }
-        $this->includeCSS(['question/question.css', 'question/libtree.css']);
-        $this->includeJS(['general.js', 'tablesorter.js', 'question/junkflag.js', 'question/libtree2.js', 'question/manageQuestionSet.js']);
+        $this->includeCSS(['question/question.css', 'question/libtree.css', 'dataTables.bootstrap.css']);
+        $this->includeJS(['general.js', 'tablesorter.js', 'question/junkflag.js', 'question/libtree2.js', 'question/manageQuestionSet.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
         $renderData = array('params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchLibs, 'curBreadcrumb' => $curBreadcrumb,
             'pagetitle' => $pageTitle, 'helpicon' => $helpIcon, 'cid' => $cid, 'rlist' => $rList, 'tlist' => $tList, 'page_transferUserList' => $pageTransferUserList,
             'clist' => $cList, 'page_adminMsg' => $pageAdminMsg, 'lnames' => $lNames, 'search' => $search, 'searchall' => $searchAll, 'searchmine' => $searchMine,

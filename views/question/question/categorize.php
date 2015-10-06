@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         echo "<td class='categorize-question-description'>{$descriptions[$qid]}</td><td class='width-fourty-per'>";
-        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control min-with-hundred-per qsel\">";
+        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control min-width-hundred-per qsel\">";
         echo "<option value=\"0\" ";
         if ($category[$qid] == 0) {
             echo "selected=1";

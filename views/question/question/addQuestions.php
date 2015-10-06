@@ -15,10 +15,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="title-container">
     <div class="row">
         <div class="col-sm-12 padding-right-zero">
-            <div class=" col-sm-6" style="right: 30px;">
+            <div class=" col-sm-7" style="right: 30px;">
                 <div class="vertical-align title-page">Add/Remove Questions<a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=addingquestionstoanassessment' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
             </div>
-            <div class="col-sm-6 padding-right-zero" style="">
+            <div class="col-sm-5 padding-right-zero" style="">
                 <div class="floatright">
                     <div class="floatleft padding-right-fifteen"> <a style="" title="Preview this assessment" onclick="window.open('<?php echo AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&amp;id='.$assessmentId) ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="<?php echo AppUtility::getHomeURL().'img/prvAssess.png' ?>">&nbsp;&nbsp;Preview Assessment</a></div>
                     <div class="floatleft">
@@ -31,8 +31,11 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox margin-top-fourty">
     <?php if ($overwriteBody == AppConstant::NUMERIC_ONE) {
-           echo $body;
-          } else { ?>
+           echo $body; ?>
+    <script>
+                    var itemarray = <?php echo 0; ?>;
+    </script>
+          <?php } else { ?>
                 <script type="text/javascript">
                     var curcid = <?php echo $courseId ?>;
                     var curaid = <?php echo $assessmentId ?>;
@@ -43,20 +46,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12 padding-zero">
         <?php
             echo '<div class="col-md-12 padding-left-zero" style="background-color: #E0E0E0;min-height: 60px;">
-            <div class="padding-left-zero col-md-12 margin-top-twenty">
-            <div class="col-md-2">
+            <div class="padding-left-zero col-md-12 margin-top-twenty display-inline-block">
+            <div class="col-md-2 display-inline-block">
                 <a title="Modify assessment settings" href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId.'&id='.$assessmentId).'">'.AppUtility::t("Assessment Settings",false).'
                 </a>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 display-inline-block">
                 <a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'
                 </a>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 display-inline-block">
                 <a href="'.AppUtility::getURLFromHome('question','question/print-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'
                 </a>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 display-inline-block">
                 <a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('assessment','assessment/assessment-message?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'
                 </a>
             </div>';
@@ -79,9 +82,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'"></p>
             </div>
         <?php } ?>
-        <div class="col-md-8 padding-left-zero"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
+        <?php if ($itemorder == '') { ?>
+            <div class="col-md-8 padding-left-zero"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
         <?php
-            if ($itemorder == '') {
                 echo '<div class="col-md-12 margin-bottom-thirty">';
                 echo "<p>No Questions currently in assessment</p>\n";
                 echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
@@ -120,8 +123,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <form id="curqform" method="post" action="add-questions?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
                 <?php
                 if (!$beentaken) {?>
-                  <div style="float: left">  Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a></div>
-                    <div class="col-lg-2 pull-right" style="left: 15px; margin-top: 10px; margin-bottom: 10px;">
+                  <div class="col-md-12 padding-left-zero padding-top-twenty">  Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a></div>
+                    <div class="col-md-12 padding-left-right-zero">
+                        <div class="col-md-8 padding-left-zero display-inline-block">
+                            <h3 class="margin-top-seventeen">Questions in Assessment - <?php echo $pageAssessmentName ?>
+                            </h3>
+                    </div>
+                    <div class="col-md-2 pull-right display-inline-block width-two-hundred" style="left: 15px; margin-top: 10px; margin-bottom: 10px;">
                         <div class="with-selected ">
                             <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
                                 <li class="dropdown">
@@ -136,6 +144,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </li>
                             </ul>
                         </div>
+                    </div>
                     </div>
                 <?php } ?>
                     <span id="submitnotice" style="color:red;"></span>
@@ -159,18 +168,18 @@ $this->params['breadcrumbs'][] = $this->title;
         if (!$beentaken) { ?>
             <form method=post action="add-questions?aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
                 <div class="col-md-12 patential-ques-header">
-                    <div class="col-md-2"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
-                    <div class="col-md-2 left-twenty-eight"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
-                    <div class="col-md-3"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
+                    <div class="col-md-3 padding-left-zero display-inline-block"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
+                    <div class="col-md-2 display-inline-block padding-left-zero"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
+                    <div class="col-md-3 display-inline-block"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
                     <input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
 
                </div>
 
             <div class="col-md-12 question-search">
-                <div class="col-md-2">
-                    <input type="search" rel="search" id="search" class="form-control" placeholder="Search" type=text size=15 name=search value="<?php echo $search ?>">
+                <div class="col-md-2 width-one-ninety display-inline-block">
+                    <input type="text" rel="search" id="search" class="form-control" placeholder="Search" type=text size=15 name=search value="<?php echo $search ?>">
                 </div>
-                <div class="col-md-4 select-text-margin">
+                <div class="col-md-4 select-text-margin display-inline-block">
                         <span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
                         <input type=checkbox name="searchall" value="1" <?php AppUtility::writeHtmlChecked($searchall,1,0) ?> />
                         Search all libs</span>
@@ -190,7 +199,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
          </form>
             <div class="col-md-12">
-                <div class="col-md-6 right-fifteen"><h3 class="margin-top-seven">Potential Questions</h3></div>
 
                 <?php
                 if ($searchall==1 && trim($search)=='') {
@@ -200,36 +208,45 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo "<p>No Questions matched search</p>\n";
                     } else { ?>
                     <form id="selq" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>&addset=true">
-                        <div class="col-lg-2 right-float left-fifteen margin-bottom-fifteen">
-                            <input type="hidden" name="some_name">
-                            <div class="with-selected ">
-                                <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
-                                    <li class="dropdown">
-                                        <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('With selected'); ?>
-                                            <span class="caret right-aligned"></span>
-                                        </a>
-                                        <ul class="dropdown-menu with-selected potential-ques-dropdown">
-                                            <li type="submit">
-                                                <a id="add-question" style="  margin-left: -3px;" name="add">
-                                                    <i class="fa fa-plus"></i>&nbsp;
-                                                    <?php AppUtility::t('Add'); ?>
-                                                </a>
-                                            </li>
-                                            <li type="submit">
-                                                <a id="add-question-default" style="margin-left: -4px;" name="addquick">
-                                                    <i class="fa fa-cart-plus"></i>&nbsp;
-                                                    <?php AppUtility::t('Add (using defaults)'); ?>
-                                                </a>
-                                            </li>
-                                            <li type="submit">
-                                                <a class="potentialques" style="margin-left: -6px;" href="javascript: previewsel('selq')">
-                                                    <i class="fa fa-fw"></i>
-                                                    <?php AppUtility::t('Preview Selected'); ?>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                        <div class="col-md-12 display-inline-block">
+                            <div class="col-md-6 right-fifteen display-inline-block padding-left-zero"><h3 class="margin-top-seven">Potential Questions</h3></div>
+                            <div class="col-md-2 right-float left-fifteen margin-bottom-fifteen padding-right-zero width-two-hundred">
+                                <input type="hidden" name="some_name">
+                                <div class="with-selected">
+                                    <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+                                        <li class="dropdown">
+                                            <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('With selected'); ?>
+                                                <span class="caret right-aligned"></span>
+                                            </a>
+                                            <ul class="dropdown-menu with-selected potential-ques-dropdown">
+                                                <li type="submit">
+                                                    <a id="add-question" style=" name="add">
+                                                        <i class="fa fa-plus padding-left-four"></i>&nbsp;
+                                                        <span class="padding-left-five">
+                                                            <?php AppUtility::t('Add'); ?>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                                <li type="submit">
+                                                    <a id="add-question-default" name="addquick">
+                                                        <i class="fa fa-cart-plus padding-left-two"></i>&nbsp;
+                                                        <span class="padding-left-five">
+                                                            <?php AppUtility::t('Add (using defaults)'); ?>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                                <li type="submit">
+                                                    <a class="potentialques" href="javascript: previewsel('selq')">
+                                                        <i class="fa fa-fw"></i>
+                                                        <span class="padding-left-five">
+                                                            <?php AppUtility::t('Preview Selected'); ?>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
@@ -298,7 +315,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ?>
 
                                     <td><div class="question-checkbox"><?php echo $pageQuestionTable[$qid]['checkbox'] ?></div></td>
-                                    <td><?php echo $pageQuestionTable[$qid]['desc'] ?></td>
+                                    <td class="word-break-all"><?php echo $pageQuestionTable[$qid]['desc'] ?></td>
                                     <td class="nowrap">
                                        <div <?php if ($pageQuestionTable[$qid]['cap']) {echo 'class="ccvid"';}?>><?php echo $pageQuestionTable[$qid]['extref'] ?></div>
                                     </td>
@@ -332,9 +349,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                             echo "<td class=c><img class=\"pointer\" id=\"tag{$pageQuestionTable[$qid]['libitemid']}\" src=\"$imasroot/flagempty.gif\" onClick=\"toggleJunkFlag({$pageQuestionTable[$qid]['libitemid']});return false;\" /></td>";
                                         }
                                     } ?>
-                                    <td class=""><div> <a style="width: 80%" class='btn btn-primary disable-btn background-color-blue'>
-                                        <i class='fa fa-cog fa-fw'></i> Settings</a><a style="width: 20%" class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
-                                        <ul class='qmenu'>
+                                    <td class=""><div class="btn-group settings"> <a class='btn btn-primary disable-btn background-color-blue width-eighty-per'>
+                                        <i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle width-twenty-per' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
+                                        <ul class='dropdown-menu min-width-hundred-per'>
                                         <li class=><?php echo $pageQuestionTable[$qid]['src'] ?></i></a></li>
                                         <li class=><?php echo $pageQuestionTable[$qid]['templ'] ?></i></a></li>
                                         </ul></div></td>
@@ -370,7 +387,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             <form id="selq" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>&addset=true">
                 <h3 style="padding-top: 10px;">Potential Questions</h3>
-
                 <input type=button value="Select Assessments" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearassmt=1') ?>'">
                 or <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">
                 <br/>
@@ -439,7 +455,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
 
             <form id="sela" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>">
-                <div class="patential-ques-header">
+                <div class="patentialq-select-from-assessment-header">
                 Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
                 <input type=submit value="Use these Assessments" /> or
                 <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">

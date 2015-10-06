@@ -211,3 +211,8 @@ button.btn.btn-primary1.btn-color{
     color:white;
     text-decoration: none;
 }
+.view-message-margin {
+margin-top: 10px;
+margin-left: 30px;
+margin-right: 30px;
+}

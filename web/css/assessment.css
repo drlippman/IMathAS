@@ -102,3 +102,6 @@ table td {
     margin-top: -92px !IMPORTANT;
     margin-right: -30px !IMPORTANT;
 }
+.summary-html-lord iframe, .instructions-html-lord iframe {
+    max-width: 909px !important;
+}

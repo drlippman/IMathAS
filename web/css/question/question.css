@@ -229,3 +229,16 @@ text-align: left;
     word-wrap: break-word;
     max-width: 400px;
 }
+.patentialq-select-from-assessment-header {
+    min-height: 60px !important;
+    background-color: #E0E0E0;
+    margin-right: -15px;
+    margin-left: -15px;
+    padding-top: 20px;
+    padding-top: 13px;
+    padding-left: 15px;
+}
+.question-in-assessment-table {
+word-wrap: break-word;
+max-width: 250px;
+}

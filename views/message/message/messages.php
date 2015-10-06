@@ -47,34 +47,46 @@ $now = $currentTime;
     }?>
 </div>
 <div class="tab-content shadowBox">
-    <div class="second-level-message-navigation">
-            <span class="pull left col-sm-3 message-second-level">
+    <div class="second-level-message-navigation height-ninety">
+        <div class="col-md-12 display-inline-block">
+            <span class="col-sm-3 message-second-level display-inline-block padding-left-right-zero padding-top-twelve">
                  <a  id="limit-to-tag-link" href="index?cid=<?php echo $course->id; ?>&show=1">Limit to Tagged</a>
                  <a  id="show-all-link" href="index?cid=<?php echo $course->id; ?>">Show All</a>
-                 <a id="sent-message"  href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>">Sent Messages</a>
+                 <a class="padding-left-zero display-inline-block" id="sent-message"  href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>">Sent Messages</a>
             </span>
-<!--         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >-->
+    <!--         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >-->
+            <div class="col-md-3 display-inline-block padding-left-right-zero padding-top-five padding-left-ten">
             <span class="pull-left message-second-level" >With Selected :</span>
-            <span class="col-sm-2 with-selected-dropdown">
-                <select  class="form-control with-selected" >
-                    <option value="-1" id="Select">Select</option>
-                     <option value="0" id="mark-as-unread">Mark as Unread</option>
-                    <option value="1" id="mark-read">Mark as Read</option>
-                    <option value="2" id="mark-delete">Delete</option>
-                </select>
-            </span>
-            <span class=" pull-left message-second-level">Filter By Course :</span>
-            <span class=" col-sm-2" >
-                <select name="seluid" class="show-course form-control" id="course-id">
-                    <option value="0">All Courses</option>
-                </select>
-            </span>
-             <span class=" pull-left message-second-level" id="by-Sender">By Sender :</span>
-             <span class="col-sm-2">
-                 <select name="seluid" class="show-users form-control" id="user-id">
-                    <option value="0">All Users</option>
-                 </select>
-             </span>
+                <span class="with-selected-dropdown">
+                    <select  class="form-control with-selected display-inline-block width-fifty-five-per width-one-thirty">
+                        <option value="-1" id="Select">Select</option>
+                         <option value="0" id="mark-as-unread">Mark as Unread</option>
+                        <option value="1" id="mark-read">Mark as Read</option>
+                        <option value="2" id="mark-delete">Delete</option>
+                    </select>
+                </span>
+            </div>
+            <div class="col-md-3 display-inline-block padding-left-right-zero padding-top-five padding-left-twenty-five">
+                <div class="">
+                    <span class=" pull-left message-second-level">Filter By Course :</span>
+                    <span class="" >
+                        <select name="seluid" class="show-course form-control display-inline-block width-fifty-five-per width-one-thirty" id="course-id">
+                            <option value="0">All Courses</option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3 display-inline-block padding-right-zero padding-top-five">
+                <div class="floatright">
+                <span class="pull-left message-second-level floatleft" id="by-Sender">By Sender :</span>
+                 <span class="floatleft">
+                     <select name="seluid" class="show-users form-control width-one-thirty" id="user-id">
+                        <option value="0">All Users</option>
+                     </select>
+                 </span>
+                 </div>
+            </div>
+        </div>
    </div>
     <div class="message-div">
     </div>

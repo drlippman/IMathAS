@@ -1,6 +1,7 @@
 $(document).ready(function () {
     selectCheckBox();
     $('input[name = "categorize-question-header-checked"]:checked').prop('checked', false);
+    $('.categorize-question-table').DataTable();
 });
 function addcategory() {
     var name = document.getElementById("newcat").value;

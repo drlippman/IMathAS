@@ -3053,6 +3053,7 @@ class GradebookController extends AppController
 
     public function actionGradebookViewAssessmentDetails()
     {
+        $this->layout = 'master';
         $params = $this->getRequestParams();
         $currentUser = $this->getAuthenticatedUser();
         $courseId = $params['cid'];

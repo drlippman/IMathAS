@@ -74,9 +74,9 @@
     } else if ($sessiondata['mathdisp']==2) {
         echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
         echo "<script src=\"$imasroot"."js/ASCIIMathTeXImg_min.js?v=092314\" type=\"text/javascript\"></script>\n";
-        echo "<script type=\"text/javascript\">var usingASCIIMath = false;var MathJaxCompatible = false;function rendermathnode(el) {AMprocessNode(el);}</script>";
+        echo "<script type=\"javascript\">var usingASCIIMath = false;var MathJaxCompatible = false;function rendermathnode(el) {AMprocessNode(el);}</script>";
     } else if ($sessiondata['mathdisp']==0) {
-        echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; function rendermathnode(el) {}</script>';
+        echo '<script type="javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; function rendermathnode(el) {}</script>';
     }
 
     if ($sessiondata['graphdisp']==1) {
