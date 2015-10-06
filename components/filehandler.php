@@ -569,7 +569,7 @@ public static function deleteqimage($file) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages';
+		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/web/Uploads/qimages';
 		if (unlink($base."/$file")) {
 			return true;
 		} else {
