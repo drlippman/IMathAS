@@ -77,11 +77,10 @@ class InstrFiles extends BaseImasInstrFiles
 
     public function insertFile($params, $itemId)
     {
-        $this->description = i$params['description'];
+        $this->description = $params['description'];
         $this->filename = $params['filename'];
         $this->itemid =  $itemId;
         $this->save();
         return $this->id;
     }
-
 }

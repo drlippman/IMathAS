@@ -14,7 +14,7 @@ $this->title = AppUtility::t('View Scores',false);?>
         </div>
     </div>
 </div>
-<?
+<?php
 echo '<div class="tab-content shadowBox non-nav-tab-item">';
  ?>
     <div class="item-analysis">

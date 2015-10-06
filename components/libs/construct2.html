@@ -1,0 +1,24 @@
+<html><body>
+<h1>Macro Library construct2</h1>
+Construct2 integration functions, Version 0.1, Dec 18, 2013
+<BR><ul>
+<li><a href="#addConstruct2">addConstruct2</a></li>
+</ul>
+<h3><a name="addConstruct2">addConstruct2</a></h3>
+addConstruct2(url,[width,height,params,qn,part]) 
+<BR>place a Construct2 HTML5 applet, using the HTML file specified in URL 
+<BR>  the applet must have the imathas postMessage shim added to the scripts
+<BR>params should be key=>value array of values to send to Construct2 via the query string, like 
+<BR>  array('a'=>3,'name'=>'Fred')
+<BR>  these will be readable in Construct2 using Browser.QueryParam("name")
+<BR>if you want to read values from Construct2 provide  
+<BR>  question number(1-indexed - usually use $thisq) 
+<BR>  and if multipart, part number (0-indexed)
+<BR>  IMathAS doesn't request values - Construct2 has to send them.
+<BR>  Use Browser.QueryParam("imathasqn") to read the imathas question number, then
+<BR>  form a returnstring text variable like: 
+<BR>      imathasqn&"::"&myvar&","&anothervar
+<BR>  to send back, use Browser -> Execute Javascript like this:
+<BR>      "parent.postMessage('"&returnstring&"','*')"
+<BR>  see http://www.imathas.com/misc/basicimathasex.capx for an example
+<BR>

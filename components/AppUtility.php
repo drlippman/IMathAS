@@ -3333,4 +3333,8 @@ class AppUtility extends Component
             }
          }
     }
+
+    public static function  getDataFromSession($data){
+        return $_SESSION[$data];
+    }
 }

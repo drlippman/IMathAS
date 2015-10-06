@@ -1,0 +1,13 @@
+<html><body>
+<h1>Macro Library lineutil</h1>
+various line utility functions
+<BR><ul>
+<li><a href="#lineboundarycoord">lineboundarycoord</a></li>
+</ul>
+<h3><a name="lineboundarycoord">lineboundarycoord</a></h3>
+function lineboundarycoord(xmin,xmax,ymin,ymax,m,b,[order])
+<BR>looks for where the line crosses the graph boundary.  
+<BR>supply graph boundaries, and m and b of the line.
+<BR>order can be an array of "right", "top", "left", "bottom" indicating order of search
+<BR>returns array(x,y,loc), where loc is a best guess for where it would be good to put the label
+<BR>

@@ -30,13 +30,9 @@ class OutcomesController extends AppController
 
     public function beforeAction($action)
     {
-        $courseId = $this->getParamVal('cid');
         $user = $this->getAuthenticatedUser();
-        $teacherId = $this->isTeacher($user['id'], $courseId);
-        if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
-            return $this->noValidRights($teacherId);
-        }
-        return true;
+        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForTeacher($user,$courseId);
     }
 
     public function actionAddOutcomes()

@@ -30,11 +30,7 @@ class UtilitiesController extends AppController
     public function beforeAction($action)
     {
         $user = $this->getAuthenticatedUser();
-        if ($user['rights'] != AppConstant::ADMIN_RIGHT) {
-            $this->setWarningFlash(AppConstant::REQUIRED_ADMIN_ACCESS);
-            return $this->redirect($this->goHome());
-        }
-        return true;
+        return $this->accessForAdmin($user['rights']);
     }
 
     public function actionAdminUtilities()

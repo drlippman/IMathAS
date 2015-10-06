@@ -788,4 +788,38 @@ function generaterandstring() {
         return $newTZ->getOffset($date);
     }
 
+    public function accessForAdmin($rights){
+        if ($rights != AppConstant::ADMIN_RIGHT) {
+            $this->setWarningFlash(AppConstant::REQUIRED_ADMIN_ACCESS);
+            return $this->redirect($this->goHome());
+        }
+        return true;
+    }
+
+    public function accessForTeacher($user,$courseId){
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+            return $this->noValidRights($teacherId);
+        }
+        return true;
+    }
+
+    public function accessForTeacherAndStudent($user,$courseId,$actionPath){
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'grade-book-student-detail'){
+            return true;
+        }else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+            return $this->noValidRights($teacherId);
+        }else{
+            return true;
+        }
+    }
+
+    public function accessForRightsMoreThanStudent($rights){
+        if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }
+        return true;
+    }
 }

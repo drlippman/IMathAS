@@ -1,0 +1,15 @@
+<html><body>
+<h1>Macro Library functioneval</h1>
+A smattering of macros for evaluating complicated functions.  Version 1.0 Oct 4 2009
+<BR><ul>
+<li><a href="#fe_lpfnc">fe_lpfnc</a></li>
+</ul>
+<h3><a name="fe_lpfnc">fe_lpfnc</a></h3>
+fe_lpfnc(x,xarray,yarray,[periodic])
+<BR>evals a linear piecewise function (connect-the-dots) from the provided
+<BR>array of x and y values at the given x value.
+<BR>requires x array to be in increasing order
+<BR>If periodic=true, then xarray values define the domain of one period, 
+<BR>and if x is outside that domain, f(x) = f(x-p) will be used
+<BR>domain: starting x <= x < last x, so make sure last x = x[0]+p
+<BR>

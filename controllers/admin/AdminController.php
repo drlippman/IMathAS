@@ -58,11 +58,7 @@ class AdminController extends AppController
     public function beforeAction($action)
     {
         $user = $this->getAuthenticatedUser();
-        if ($user['rights'] < AppConstant::TEACHER_RIGHT) {
-            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
-        }
-        return true;
+        return $this->accessForRightsMoreThanStudent($user['rights']);
     }
 
     public function actionIndex()
