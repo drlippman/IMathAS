@@ -261,4 +261,5 @@ class AppConstant
     const ADD_LINK = 'Add Link';
     const NO_FORUM_ACCESS = 'No access to scores for this forum';
     const INVALID_PARAMETERS = 'invalid parameters';
+    const UPLOAD_DIRECTORY_PROFILE = 'Uploads';
 }

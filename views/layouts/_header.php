@@ -10,7 +10,7 @@ $basePath = '/site/';
 $imgPath = AppUtility::getAssetURL().'img/';
 NavBar::begin([
     'brandLabel' => 'OpenMath',
-    'brandUrl' => Yii::$app->homeUrl.'site/login',
+    'brandUrl' => Yii::$app->homeUrl,
     'options' => [
         'class' => 'navbar-inverse navbar-fixed-top',
     ],
@@ -29,7 +29,7 @@ echo Nav::widget([
             ['label' => '<img class="small-icon" src="'.AppUtility::getAssetURL().'img/user.png">&nbsp;'.(ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
                 'items' =>
                     [
-                        ['label' => 'Account Setting','url' => ['/site/change-user-info']],
+                        ['label' => 'Account Setting','url' => ['/site/form?action=chguserinfo']],
                         ['label' => 'Help', 'url' => '#'],
                         ['label' => 'Logout', 'url' => ['/site/logout'],'linkOptions' => ['data-method' => 'post'], 'class' => 'user-alignment'],
                      ],

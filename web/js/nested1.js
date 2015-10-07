@@ -3,6 +3,7 @@
 // Author: CrazyDave
 // Website: http://www.clanccc.co.uk/moo/nested.html
 var noblockcookie = false;
+var req = null;
 var Nested = new Class({
 	getOptions: function() {
 		return {
@@ -338,11 +339,18 @@ function submitChanges() {
   }
 
   if (typeof req != 'undefined') {
-	req.open("POST", url, true);
+      req.open("POST", url, true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+<<<<<<< Updated upstream
 	//req.setRequestHeader("Content-length", params.length);
 	//req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {NestedahahDone(url, target);};
+=======
+	req.setRequestHeader("Content-length", params.length);
+	req.setRequestHeader("Connection", "close");
+	req.onreadystatechange = function() {
+        NestedahahDone(url, target);};
+>>>>>>> Stashed changes
 	req.send(params);
   }
 
@@ -356,15 +364,26 @@ function quickviewcollapseAll() {
 }
 
 function NestedahahDone(url, target) {
+<<<<<<< Updated upstream
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
 	    if (req.responseText.substring(0,2)=='OK') { console.log(req.responseText.substring(0,2));
+=======
+
+    if (req.readyState == 4) { // only if req is "loaded"
+    if (req.status == 200) { // only if "OK"
+	    if (req.responseText.substring(0,2)=='OK') {
+>>>>>>> Stashed changes
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    window.onbeforeunload = null;
 		    setlinksdisp("");
 		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
+<<<<<<< Updated upstream
             sortIt.haschanged = false;
+=======
+		    sortIt.haschanged = false;
+>>>>>>> Stashed changes
 	    } else {
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }
@@ -376,7 +395,7 @@ function NestedahahDone(url, target) {
 
 function setlinksdisp(disp) {
 	var el = document.getElementsByTagName("span");
-	for (var i=0; i<el.length; i++) {
+    for (var i=0; i<el.length; i++) {
 		if (el[i].className=='links') {
 			el[i].style.display = disp;
 		}
@@ -387,12 +406,12 @@ function editinplace(el) {
 	var inputh = document.getElementById('input'+el.id);
 	if (inputh==null) {
 		var inputh = document.createElement("input");
-		inputh.id = 'input'+el.id;
-		inputh.type = "hidden";
+        inputh.id = 'input'+el.id;
+        inputh.type = "hidden";
 		el.parentNode.insertBefore(inputh,el);	
 		var inputt  = document.createElement("input");
 		inputt.id = 'inputt'+el.id;
-		inputt.type = "text";
+        inputt.type = "text";
 		inputt.size = 60;
 		inputt.onblur = editinplaceun;
 		el.parentNode.insertBefore(inputt,el);	
@@ -408,7 +427,7 @@ function editinplace(el) {
 function editinplaceun() {
 	var el = document.getElementById(this.id.substring(6));
 	var input =  document.getElementById('input'+this.id.substring(6));
-	if (el.innerHTML != this.value) {
+    if (el.innerHTML != this.value) {
 		el.innerHTML = this.value;
 		//input.parentNode.removeChild(input);
 		input.value = this.value;

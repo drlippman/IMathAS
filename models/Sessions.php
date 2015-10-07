@@ -70,4 +70,13 @@ class Sessions extends BaseImasSessions {
     {
        return Sessions::find()->where(['sessionid' => $sessionid])->all();
     }
+
+    public static function updatetzName($sessionId, $tzname)
+    {
+        $sessionData = Sessions::findOne(['sessionid' => $sessionId]);
+        if($sessionData)
+        {
+            $sessionData->tzname = $tzname;
+        }
+    }
 }

@@ -58,7 +58,8 @@ public  static function storecontenttofile($content,$key,$sec="private") {
 	}
 }
 
-public static function relocatecoursefileifneeded($file, $key, $sec="public") {
+public static function relocatecoursefileifneeded($file, $key, $sec="public")
+{
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -85,7 +86,7 @@ public static function relocatefileifneeded($file, $key, $sec="public") {
 		}
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		if ($s3->putObjectFile($file,$GLOBALS['AWSbucket'],$key,$sec)) {
-			return getuserfileurl($key);
+			return filehandler::getuserfileurl($key);
 		} else {
 			return false;
 		}
@@ -548,7 +549,7 @@ public static function deletecoursefile($file) {
 		}
 	} else {
 
-        $base = AppConstant::UPLOAD_DIRECTORY;
+        $base =AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY;
         if(file_exists($base)){
             if (unlink($base."$file")) {
                 return true;
@@ -684,7 +685,8 @@ function copyqimage($key,$dest) {
 
 public static function getuserfileurl($key) {
 	global $urlmode,$imasroot;
-		return "localhost/math/web/Uploads/$key";
+//		return "localhost/math/web/Uploads/$key";
+    return AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$key;
 }
 public static function getcoursefileurl($key) {
 		return "localhost/math/web/Uploads/$key";

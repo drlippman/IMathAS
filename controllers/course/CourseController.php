@@ -795,8 +795,8 @@ class CourseController extends AppController
                     array_push($msgList, $singleMessage);
             }
         }
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js', 'course/addItem.js', 'course/instructor.js']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
         $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData, 'user' => $user);
 
         return $this->render('blockIsolate', $returnData);

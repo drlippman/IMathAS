@@ -10,16 +10,26 @@ $this->title = ucfirst($courseDetail[0]['Block']['name']);
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
-<input type="hidden" class="home-path" value="<?php echo AppUtility::getURLFromHome('course', 'coursef/index?cid=' . $course->id) ?>">
+<input type="hidden" class="home-path" value="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' . $course->id) ?>">
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
+<input type="hidden" class="courseId" value="<?php echo $course->id?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
+
+
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
+        <?php if($user->rights == 100 || $user->rights == 20){ ?>
+        <div class="pull-left header-btn">
+            <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
+               class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting
+            </a>
+        </div>
+        <?php } ?>
     </div>
 </div>
 
@@ -43,7 +53,8 @@ $now = $currentTime;
                 if($user->rights == 10){
             switch(key($item)):
             case 'Block': ?>
-            <?php $block = $item[key($item)]; ;?>
+        <div class="padding-left-fifteen padding-top-fifteen">
+            <?php $block = $item[key($item)];?>
 
             <?php if ($block['avail'] != 0 && $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
 
@@ -287,6 +298,7 @@ $now = $currentTime;
 
                 <!-- Calender Here-->
             <?php case 'Calendar': ?>
+                                <div class="margin-right-fifteen">
                    <div class="col-lg-12 padding-alignment calendar-container item">
                        <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
                            <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
@@ -299,7 +311,7 @@ $now = $currentTime;
                            </div>
                            <div class="calendar-day-details"></div>
                        </div>
-                   </div>
+                   </div></div>
             <?php break; ?>
                             <?php endswitch; ?>
                     <?php }?>
@@ -558,6 +570,7 @@ $now = $currentTime;
 
                                 <!--         Calender Here-->
                        <?php case 'Calendar': ?>
+                                    <div class="margin-right-fifteen">
                             <div class="col-lg-12 padding-alignment calendar-container item">
                                 <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
                                     <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
@@ -570,7 +583,7 @@ $now = $currentTime;
                                     </div>
                                     <div class="calendar-day-details"></div>
                                 </div>
-                            </div>
+                            </div></div>
                                <?php break; ?>
                        <?php endswitch; ?>
                     <?php }?>
@@ -580,10 +593,71 @@ $now = $currentTime;
 
     <?php } ?> <!--Show always ends-->
     <?php break; ?>
+</div>
+<?php endswitch;} elseif($user->rights == 100 || $user->rights == 20){ ?>
+        <div class="row course-copy-export">
+            <div class="col-md-2 course-top-menu">
+                <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('Copy Items');?></a>
+            </div>
+            <div class="col-md-2 course-top-menu">
+                <a href="#"><?php AppUtility::t('Export');?></a>
+            </div>
 
-<?php endswitch;} elseif($user->rights == 100 || $user->rights == 20){
-                    CourseItemsUtility::AddItemsDropDown();
-                    switch (key($item)):
+            <ul class="nav roster-menu-bar-nav sub-menu col-md-2">
+                <li class="dropdown">
+                    <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>
+                        <span class="caret right-aligned"></span></a>
+                    <ul class="dropdown-menu selected-options mass-changes">
+                        <li>
+                            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/change-assessment?cid=' . $course->id)?>"><?php AppUtility::t('Assessments'); ?></a>
+                        </li>
+                        <li>
+                            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/change-forum?cid=' . $course->id)?>"><?php AppUtility::t('Forums'); ?></a>
+                        </li>
+                        <li>
+                            <a href="<?php echo AppUtility::getURLFromHome('block', 'block/change-block?cid=' . $course->id)?>"><?php AppUtility::t('Blocks'); ?></a>
+                        </li>
+                        <li>
+                            <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/mass-change-dates?cid=' . $course->id)?>"><?php AppUtility::t('Dates'); ?></a>
+                        </li>
+                        <li>
+                            <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/time-shift?cid=' . $course->id)?>"><?php AppUtility::t('Time Shifts'); ?></a>
+                        </li>
+
+                    </ul>
+                </li>
+            </ul>
+            <div class='btn-group settings'>
+                <a class='btn btn-primary setting-btn last'
+                   href="#"><i class="fa fa-eye"></i>
+
+                    <?php AppUtility::t('Instructor'); ?>
+                </a>
+                <a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'>
+                    <span class='fa fa-caret-down'></span>
+                </a>
+                <ul class='dropdown-menu'>
+                    <li>
+                        <a href="#">
+                            <?php AppUtility::t('Student'); ?>
+                    </li>
+                    <li>
+                        <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?>">
+                            <?php AppUtility::t('Quick Rearrange'); ?>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+                    <div class="row add-item">
+                        <div class="col-md-1 plus-icon">
+                            <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png">
+                        </div>
+                        <div class="col-md-2 add-item-text">
+                            <p><?php AppUtility::t('Add An Item...');?></p>
+                        </div>
+                    </div>
+                   <div class="padding-left-fifteen padding-top-fifteen"><?php switch (key($item)):
                         case  'Block':
                         $block = $item[key($item)];
                             if ($block['avail'] != 0 && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime || $block['avail'] == 2) {
@@ -592,61 +666,62 @@ $now = $currentTime;
                             $countCourseDetails = count($item['itemList']);
                             for ($i=0;$i<$countCourseDetails;$i++) {
                                 if ($item['itemList'][$i]['Block']) { //if is a block
-                                    $blockList[] = $i+1;
+                                    $blockList[] = $i+1;AppUtility::dump('ssdddddddd');
                                 }
                             }
                             ?>
-                            <?php foreach ($item['itemList'] as $itemlistKey => $item) {?>
-                                <?php echo AssessmentUtility::createItemOrder($itemlistKey, $countCourseDetails, $parent.'-'.$cnt, $blockList);?>
-                                <?php switch (key($item)):
-                                    /*Assessment here*/
+                            <?php foreach ($item['itemList'] as $itemlistKey => $item) {
+                                    switch (key($item)):
                                     case 'Assessment': ?>
-                                        <div class="inactivewrapper "
-                                             onmouseout="this.className='inactivewrapper'">
-                                            <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent.'-'.$cnt,$canEdit, $viewAll, $hasStats); ?>
-                                        </div>
-                                        <?php break; ?>
-
-                                        <!-- Forum here-->
+                                    <?php  $cnt++;
+                                    ?>
+                                    <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent,$canEdit,$viewAll,$hasStats);?>
+                                    <input type="hidden" class="assessment-link" value="<?php echo $assessment->id?>">
+                                    <?php break; ?>
+                                    <!-- ///////////////////////////// Forum here /////////////////////// -->,
                                     <?php case 'Forum': ?>
-                                        <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent.'-'.$cnt, $hasStats); ?>
-                                        <?php break; ?>
-
-                                        <!-- ////////////////// Wiki here //////////////////-->
-                                    <?php case 'Wiki': ?>
-                                        <?php CourseItemsUtility::AddWiki($item,$course,$parent.'-'.$cnt, $currentTime, $hasStats); ?>
-                                        <?php break; ?>
-
-                                        <!-- ////////////////// Linked text here //////////////////-->
-                                    <?php case 'LinkedText': ?>
-                                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent.'-'.$cnt,$course, $hasStats);?>
-                                        <?php break; ?>
-
-                                        <!-- ////////////////// Inline text here //////////////////-->
-                                    <?php case 'InlineText': ?>
-                                        <?php CourseItemsUtility::AddInlineText($item,$currentTime,$course,$parent.'-'.$cnt);?>
-                                        <?php break; ?>
-
-                                        <!-- Calender Here-->
-                                    <?php case 'Calendar': ?>
-                                        <?php CourseItemsUtility::AddCalendar($item,$parent.'-'.$cnt,$course);?>
-                                        <?php break; ?>
-                                    <?php case '':?>
-                                        <?php
-
-                                        //                        $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent,$cnt);
-                                        ?>
-                                        <?php break; ?>
-                                    <?php endswitch; ?>
+                    <?php  $cnt++; ?>
+                    <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent, $hasStats); ?>
+                    <?php break; ?>
+                    <!-- ////////////////// Wiki here //////////////////-->
+                <?php case 'Wiki': ?>
+                    <?php  $cnt++; ?>
+                    <?php CourseItemsUtility::AddWiki($item,$course,$parent, $currentTime,$hasStats); ?>
+                    <?php break; ?>
+                    <!-- ////////////////// Linked text here //////////////////-->
+                <?php
+                    case 'LinkedText': ?>
+                        <?php  $cnt++; ?>
+                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent,$course,$hasStats);?>
+                        <?php break; ?>
+                        <!-- ////////////////// Inline text here //////////////////-->
+                    <?php case 'InlineText': ?>
+                    <?php  $cnt++; ?>
+                    <?php CourseItemsUtility::AddInlineText($item,$currentTime,$course,$parent);?>
+                    <?php break; ?>
+                    <!-- Calender Here-->
+                <?php case 'Calendar': ?>
+                    <?php  $cnt++; ?>
+                    <?php CourseItemsUtility::AddCalendar($item,$parent,$course);?>
+                    <?php break; ?>
+                    <!--  Block here-->
+                <?php case  'Block': ?>
+                    <?php  $cnt++; ?>
+                    <?php $displayBlock = new CourseItemsUtility();
+                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit,$viewAll,$hasStats);
+                    ?>
+                    <?php break; ?>
+                <?php endswitch;
+                ?>
                             <?php } ?>
                             <?php } ?>
 
             <?php  }
                              break; ?>
                         <?php endswitch;
-                }?>
+                }?></div>
 
-<div class="col-lg-12 align-linked-text-right">
+<div class="col-lg-12 align-linked-text-right padding-bottom-fifteen padding-right-twenty">
 <?php if($user->rights == 100 || $user->rights == 20) {?>
         <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id) ?>">Back</a>
    <?php } elseif($user->rights == 10){ ?>

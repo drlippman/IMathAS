@@ -14,6 +14,8 @@ use app\models\forms\ForgotUsernameForm;
 use app\models\forms\LoginForm;
 use app\models\forms\RegistrationForm;
 use app\models\forms\ResetPasswordForm;
+use app\models\Groups;
+use app\models\Libraries;
 use app\models\Message;
 use app\models\Sessions;
 use app\models\Student;
@@ -29,6 +31,8 @@ use app\components\AppUtility;
 use app\models\forms\ChangePasswordForm;
 use yii\web\HttpException;
 use yii\web\UploadedFile;
+use app\components\filehandler;
+use app\components\UserPics;
 
 class SiteController extends AppController
 {
@@ -580,6 +584,7 @@ class SiteController extends AppController
 
     public function actionDashboard()
     {
+        $this->layout = 'master';
         if (!$this->isGuestUser()) {
             $user = $this->getAuthenticatedUser();
             $students = Student::getByUserId($user->id);
@@ -656,51 +661,29 @@ class SiteController extends AppController
     public function actionChangeUserInfo()
     {
         $this->guestUserHandler();
-        $this->layout = 'nonLoggedUser';
+        $this->layout = 'master';
         $tzname = AppUtility::getTimezoneName();
         $userid = $this->getUserId();
         $user = User::findByUserId($userid);
         $model = new ChangeUserInfoForm();
-        $params = $this->getRequestParams();
-        if ($this->isPostMethod())
-        {
-            if(!$params['ChangeUserInfoForm']['oldPassword'] && !$params['ChangeUserInfoForm']['password'] && !$params['ChangeUserInfoForm']['rePassword'])
-            {
-                $result = AppConstant::NUMERIC_TWO;
-            }
-            else
-            {
-                $result = $model->checkPassword($userid,$params);
-            }
-            if($result == AppConstant::NUMERIC_ONE)
-            {
-                $this->setErrorFlash('New password must match with confirm password');
-                return $this->redirect('change-user-info');
-            }
-            else if($result == AppConstant::NUMERIC_ZERO)
-            {
-                $this->setErrorFlash('Incorrect old Password');
-                return $this->redirect('Change-user-info');
-            }
-            else if($result == AppConstant::NUMERIC_TWO)
-            {
-                $params = $params['ChangeUserInfoForm'];
-                $model->file = UploadedFile::getInstance($model, 'file');
-                if ($model->file )
-                {
-                    $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-                    $model->remove= AppConstant::NUMERIC_ZERO;
-                    if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
+        if ($model->load($this->isPostMethod())) {
+            $params = $this->getRequestParams();
+            $params = $params['ChangeUserInfoForm'];
+
+            $model->file = UploadedFile::getInstance($model, 'file');
+            if ($model->file ) {
+                $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+                $model->remove=0;
+                if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
                     User::updateImgByUserId($userid);
-                }
-                if($model->remove == AppConstant::NUMERIC_ONE){
-                    User::deleteImgByUserId($userid);
-                    unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-                }
-                User::saveUserRecord($params,$user);
-                $this->setSuccessFlash('Changes updated successfully.');
-                return $this->redirect('dashboard');
             }
+            if($model->remove == 1){
+                User::deleteImgByUserId($userid);
+                unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+            }
+            User::saveUserRecord($params,$user);
+            $this->setSuccessFlash('Changes updated successfully.');
+            return $this->redirect('dashboard');
         }
         $this->includeCSS(['dashboard.css']);
         $this->includeJS(['changeUserInfo.js']);
@@ -768,5 +751,144 @@ class SiteController extends AppController
     {
         $this->includeCSS(['docs.css']);
         return $this->renderWithData('instructorDocument');
+    }
+
+    public function actionForm()
+    {
+        $this->guestUserHandler();
+//        $this->layout = 'master';
+        $tzname = AppUtility::getTimezoneName();
+        $userId = $this->getUserId();
+        $user = User::findByUserId($userId);
+        $myRights = $user['rights'];
+        $action = $this->getParamVal('action');
+        $groupId = AppConstant::NUMERIC_ZERO;
+        switch($action) {
+            case "newuser":
+            break;
+
+            case "chgpwd":
+                break;
+
+            case "chguserinfo":
+                $line = User::getById($userId);
+                if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
+                    $r = Groups::getName($groupId);
+                }
+
+                if ($myRights > AppConstant::TEACHER_RIGHT)
+                {
+                   $lName = Libraries::getByName($line['deflib']);
+                   $lName = $lName[0]['name'];
+                }
+                break;
+        }
+        $responseData = array('action' => $action, 'line' => $line, 'myRights' => $myRights, 'groupId' => $groupId, 'groupResult' => $r, 'lName' => $lName, 'tzname' => $tzname, 'userId' => $userId);
+        return $this->renderWithData('form',$responseData);
+    }
+
+    public function actionAction()
+    {
+        $this->guestUserHandler();
+//        $this->layout = 'master';
+        $tzname = AppUtility::getTimezoneName();
+        $userId = $this->getUserId();
+        $user = User::findByUserId($userId);
+        $myRights = $user['rights'];
+        $action = $this->getParamVal('action');
+        $groupId = AppConstant::NUMERIC_ZERO;
+        $params = $this->getRequestParams();
+        if($action == 'chguserinfo')
+        {
+            if (($params['msgnot'])) {
+                $msgNot = 1;
+            } else {
+                $msgNot = 0;
+            }
+
+            if (isset($params['qrd']) || $myRights < 20) {
+                $qrightsdef = 0;
+            } else {
+                $qrightsdef = 2;
+            }
+            if (isset($params['usedeflib'])) {
+                $usedeflib = 1;
+            } else {
+                $usedeflib = 0;
+            }
+            if ($myRights < 20) {
+                $deflib = 0;
+            } else {
+                $deflib = $params['libs'];
+            }
+
+            $homelayout[0] = array();
+            $homelayout[1] = array(0,1,2);
+            $homelayout[2] = array();
+
+            if (isset($params['homelayout10'])) {
+                $homelayout[2][] = 10;
+            }
+            if (isset($params['homelayout11'])) {
+                $homelayout[2][] = 11;
+            }
+            $homelayout[3] = array();
+            if (isset($params['homelayout3-0'])) {
+                $homelayout[3][] = 0;
+            }
+            if (isset($params['homelayout3-1'])) {
+                $homelayout[3][] = 1;
+            }
+            foreach ($homelayout as $k=>$v) {
+                $homelayout[$k] = implode(',',$v);
+            }
+            $perpage = intval($params['perpage']);
+            if (isset($CFG['GEN']['fixedhomelayout']) && $CFG['GEN']['homelayout']) {
+                $deflayout = explode('|',$CFG['GEN']['homelayout']);
+                foreach ($CFG['GEN']['fixedhomelayout'] as $k) {
+                    $homelayout[$k] = $deflayout[$k];
+                }
+            }
+            $layoutstr = implode('|',$homelayout);
+            if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
+                UserPics::processImage($_FILES['stupic'],$userId,200,200);
+                UserPics::processImage($_FILES['stupic'],'sm'.$userId,40,40);
+                $chguserimg = 1;
+            } else if (isset($_POST['removepic'])) {
+                filehandler::deletecoursefile($userId.'.jpg');
+                filehandler::deletecoursefile($userId.'.jpg');
+                $chguserimg = 0;
+            } else {
+                $chguserimg = 0;
+            }
+            $firstName = $params['firstname'];
+            $lastName = $params['lastname'];
+            $email = $params['email'];
+            User::updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qrightsdef, $deflib, $usedeflib, $layoutstr, $perpage,$chguserimg);
+            if ($params['dochgpw']) {
+
+                $line = User::getUserPassword($userId);
+                if ((md5($params['oldpw']) == $line['password'] || (password_verify($params['oldpw'],$line['password']))) && ($params['newpw1'] == $params['newpw2']) && $myRights > 5)
+                {
+                    if (isset($CFG['GEN']['newpasswords'])) {
+                        $md5pw = password_hash($params['newpw1'], PASSWORD_DEFAULT);
+                    } else {
+                        $md5pw =md5($params['newpw1']);
+                    }
+                    User::updateUserPassword($userId, $md5pw);
+                } else {
+                    echo "Password change failed.  <a href=\"form?action=chguserinfo\">Try Again</a>\n";
+                    exit;
+                }
+            }
+            if (isset($params['settimezone'])) {
+                if (date_default_timezone_set($params['settimezone'])) {
+                    $tzname = $params['settimezone'];
+                    $sessionId = session_id();
+                    Sessions::updatetzName($sessionId, $tzname);
+                }
+            }
+            return $this->redirect('dashboard');
+        }
     }
 }

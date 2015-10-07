@@ -9,18 +9,19 @@ use app\components\AppUtility;
 <?php
 use app\components\AppConstant;
 ?>
+<div class="tab-content shadowBox non-nav-tab-item">
 <div class=mainbody>
     <div class="headerwrapper"></div>
     <div class="midwrapper">
-        <?php
-        if ($user->rights > AppConstant::GUEST_RIGHT) {
-            echo $this->render('_fullMenu');
-        } else {
-            echo $this->render('_guestMenu');
-        } ?>
-        <div class="pagetitle" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?><span class="red"></span>
+<!--        --><?php
+//        if ($user->rights > AppConstant::GUEST_RIGHT) {
+//            echo $this->render('_fullMenu');
+//        } else {
+//            echo $this->render('_guestMenu');
+//        } ?>
+        <div class="pagetitle col-lg-12" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?><span class="red"></span>
         </div>
-        <div id="homefullwidth">
+        <div class="col-lg-12" id="homefullwidth">
             <?php
             if ($user->rights > AppConstant::GUEST_RIGHT)
             {
@@ -42,4 +43,5 @@ use app\components\AppConstant;
         </div>
         <div class="clear"></div>
     </div>
+</div>
 </div>

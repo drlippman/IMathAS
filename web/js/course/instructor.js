@@ -2,6 +2,7 @@
  * Item Ordering on assessment page
  */
 var homePath = $('.home-path').val();
+
 function moveitem(from,blk) {
     var to = document.getElementById(blk+'-'+from).value;
     if (to != from) {

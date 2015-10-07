@@ -842,5 +842,39 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         if ($myRights < 100) { $query .= " AND groupid='$groupId' AND rights<100"; }
         return Yii::$app->db->createCommand($query)->execute();
     }
+
+    public static function updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qrightsdef, $deflib, $usedeflib, $layoutstr, $perpage,$chguserimg)
+    {
+        $user = static::findOne(['id' => $userId]);
+        if($user)
+        {
+            $user->FirstName = $firstName;
+            $user->LastName = $lastName;
+            $user->email = $email;
+            $user->msgnotify = $msgNot;
+            $user->qrightsdef = $qrightsdef;
+            $user->deflib = $deflib;
+            $user->usedeflib = $usedeflib;
+            $user->homelayout = $layoutstr;
+            $user->listperpage = $perpage;
+            $user->hasuserimg = $chguserimg;
+            $user->save();
+        }
+    }
+
+    public static function getUserPassword($userId)
+    {
+        return User::find()->select('password')->where(['id' => $userId])->one();
+    }
+
+    public static function updateUserPassword($userId, $md5pw)
+    {
+        $user = static::findOne(['id' => $userId]);
+        if($user)
+        {
+            $user->password = $md5pw;
+            $user->save();
+        }
+    }
 }
 

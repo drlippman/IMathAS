@@ -137,6 +137,7 @@ class AssessmentUtility extends Component
         }
         $key = $key + AppConstant::NUMERIC_ONE;
         if ($parent != AppConstant::ZERO_VALUE) {
+
             $html = "<select class=\"mvsel inside-mvsel \" id=\"$parent-$key\" onchange=\"moveitem($key,'$parent')\">\n";
         } else {
             $html = "<select class=\"mvsel\" id=\"$parent-$key\" onchange=\"moveitem($key,'$parent')\">\n";
