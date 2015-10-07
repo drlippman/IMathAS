@@ -25,10 +25,11 @@ class LoginLog extends BaseImasLoginLog
         return $data;
     }
 
-    public function createLog($userid,$cid,$now){
+    public function createLog($userid,$cid,$now,$action){
         $this->courseid = $cid;
         $this->userid = $userid;
         $this->logintime = $now;
+        $this->lastaction = $action;
         $this->save();
         return $this->id;
     }

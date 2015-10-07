@@ -261,7 +261,7 @@ class AppController extends Controller
                 }
             }
             $sessionContent = $haveSession['sessiondata'];
-            if ($sessionContent!=AppConstant::NUMERIC_ZERO) {
+            if ($sessionContent != AppConstant::ZERO_VALUE) {
                 $sessionData = unserialize(base64_decode($sessionContent));
                 /*
                  * delete own session if old and not posting
@@ -269,7 +269,6 @@ class AppController extends Controller
                 if ((time()-$haveSession['time'])>AppConstant::MAX_SESSION_TIME && (!isset($params) || count($params)==AppConstant::NUMERIC_ZERO)) {
                     Sessions::deleteSession($userId);
                     unset($userId);
-                    $this->setErrorFlash('You need to login again');
                 }
             } else {
                 $sessionData['useragent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -485,8 +484,8 @@ class AppController extends Controller
                 } else if ($sessionData['ltiitemtype']==AppConstant::NUMERIC_ZERO && $sessionData['ltirole']=='learner') {
                     $urlParts = parse_url($_SERVER['PHP_SELF']);
                     if (!in_array(basename($urlParts['path']),array('show-assessment','print-test','messages','sent-message','view-message','view-conversation','work-in-progress','work-in-progress','work-in-progress'))) {
-                        $assessment = Assessments::getByAssessmentId($sessionData['ltiitemid']);
-                        $courseId = $assessment['id'];
+                        $assessment = Assessments::getCourseIdName($sessionData['ltiitemid']);
+                        $courseId = $assessment['courseid'];
                         AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId.'&id='.$sessionData['ltiitemid']);
                         exit;
                     }
@@ -504,28 +503,22 @@ class AppController extends Controller
                 } else {
                     $courseId = $sessionData['courseid'];
                 }
-
                 $studentData = Student::getByCourseId($courseId,$userId);
                 if ($studentData != null) {
                     $studentId = $studentData['id'];
                     $studentInfo['timelimitmult'] = $studentData['timelimitmult'];
                     $studentInfo['section'] = $studentData['section'];
-                    if ($studentData['locked']>AppConstant::NUMERIC_ZERO) {
-                        echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
-                        return AppUtility::getURLFromHome('site','dashboard');
-                    } else {
                         $now = time();
                         if (!isset($sessionData['lastaccess'.$courseId])) {
                             Student::setLastAccess($studentId,$now);
                             $sessionData['lastaccess'.$courseId] = $now;
                             $loginLog = new LoginLog();
-                            $logId = $loginLog->createLog($userId,$courseId,$now);
+                            $logId = $loginLog->createLog($userId,$courseId,$now,AppConstant::NUMERIC_ZERO);
                             $sessionData['loginlog'.$courseId] = $logId;
                             $this->writesessiondata($sessionData,$sessionId);
                         } else if (isset($CFG['GEN']['keeplastactionlog'])) {
                             LoginLog::setLastAction($sessionData['loginlog'.$courseId],$now);
                         }
-                    }
                 } else {
                     $teacherData = Teacher::getByUserId($userId,$courseId);
                     if ($teacherData != null) {

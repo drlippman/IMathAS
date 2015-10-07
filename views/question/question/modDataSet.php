@@ -108,10 +108,10 @@ $this->params['breadcrumbs'][] = $this->title;
         echo 'It is recommended you discontinue use of this question when possible</p>';
     }
 
-    if (isset($inusecnt) && $inusecnt>0) {
+    if (isset($inUseCount) && $inUseCount > 0) {
         echo '<p style="color:red;">This question is currently being used in ';
-        if ($inusecnt>1) {
-            echo $inusecnt.' assessments that are not yours.  ';
+        if ($inUseCount > 1) {
+            echo $inUseCount.' assessments that are not yours.  ';
         } else {
             echo 'one assessment that is not yours.  ';
         }
@@ -160,28 +160,29 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         if (!isset($line['ownerid']) || isset($params['template']) || $line['ownerid']==$userId || ($line['userights']==3 && $line['groupid']==$groupId) || $isAdmin || ($isGrpAdmin && $line['groupid']==$groupId)) {
             echo '<div class="col-md-2 select-text-margin">Use Rights:</div> <div class="col-md-10"><select class="width-sixty-per form-control" name="userights" id="userights">';
-            echo "<option value=\"0\" ";
-            if ($line['userights']==AppConstant::NUMERIC_ZERO) {echo "SELECTED";}
-            echo ">Private</option>\n";
             echo "<option value=\"2\" ";
-            if ($line['userights']==AppConstant::NUMERIC_TWO) {echo "SELECTED";}
+        if ($line['userights']==AppConstant::NUMERIC_TWO) {echo "SELECTED";}
             echo ">Allow use by all</option>\n";
-            echo "<option value=\"3\" ";
-            if ($line['userights']==AppConstant::NUMERIC_THREE) {echo "SELECTED";}
-            echo ">Allow use by all and modifications by group</option>\n";
             echo "<option value=\"4\" ";
-            if ($line['userights']==AppConstant::NUMERIC_FOUR) {echo "SELECTED";}
+        if ($line['userights']==AppConstant::NUMERIC_FOUR) {echo "SELECTED";}
             echo ">Allow use by all and modifications by all</option>\n";
+            echo "<option value=\"3\" ";
+        if ($line['userights']==AppConstant::NUMERIC_THREE) {echo "SELECTED";}
+            echo ">Allow use by all and modifications by group</option>\n";
+            echo "<option value=\"0\" ";
+        if ($line['userights']==AppConstant::NUMERIC_ZERO) {echo "SELECTED";}
+            echo ">Private</option>\n";
             echo '</select></div><br/>'; ?>
     </div>
     <div class="col-md-12 padding-top-twenty">
             <?php
             echo '<div class="col-md-2 select-text-margin">License:</div> <div class="col-md-10"><select class="width-sixty-per form-control" name="license" id="license" onchange="checklicense()">';
             echo '<option value="0" '.($line['license']==AppConstant::NUMERIC_ZERO?'selected':'').'>Copyrighted</option>';
-            echo '<option value="1" '.($line['license']==AppConstant::NUMERIC_ONE?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
-            echo '<option value="2" '.($line['license']==AppConstant::NUMERIC_TWO?'selected':'').'>Public Domain</option>';
             echo '<option value="3" '.($line['license']==AppConstant::NUMERIC_THREE?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
             echo '<option value="3" '.($line['license']==AppConstant::NUMERIC_FOUR?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
+            echo '<option value="1" '.($line['license']==AppConstant::NUMERIC_ONE?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
+            echo '<option value="2" '.($line['license']==AppConstant::NUMERIC_TWO?'selected':'').'>Public Domain</option>';
+
             echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span> </div>';
             ?>
     </div>
@@ -221,26 +222,26 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <div class="col-md-12 padding-top-twenty">
            <div class="col-md-2 select-text-margin"> Question type:</div> <div class="col-md-10"> <select class="width-sixty-per form-control" name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
-                <option value="number" <?php if ($line['qtype']=="number") {echo "SELECTED";} ?>>Number</option>
-                <option value="calculated" <?php if ($line['qtype']=="calculated") {echo "SELECTED";} ?>>Calculated Number</option>
-                <option value="choices" <?php if ($line['qtype']=="choices") {echo "SELECTED";} ?>>Multiple-Choice</option>
-                <option value="multans" <?php if ($line['qtype']=="multans") {echo "SELECTED";} ?>>Multiple-Answer</option>
-                <option value="matching" <?php if ($line['qtype']=="matching") {echo "SELECTED";} ?>>Matching</option>
-                <option value="numfunc" <?php if ($line['qtype']=="numfunc") {echo "SELECTED";} ?>>Function</option>
-                <option value="string" <?php if ($line['qtype']=="string") {echo "SELECTED";} ?>>String</option>
-                <option value="essay" <?php if ($line['qtype']=="essay") {echo "SELECTED";} ?>>Essay</option>
-                <option value="draw" <?php if ($line['qtype']=="draw") {echo "SELECTED";} ?>>Drawing</option>
-                <option value="ntuple" <?php if ($line['qtype']=="ntuple") {echo "SELECTED";} ?>>N-Tuple</option>
-                <option value="calcntuple" <?php if ($line['qtype']=="calcntuple") {echo "SELECTED";} ?>>Calculated N-Tuple</option>
-                <option value="matrix" <?php if ($line['qtype']=="matrix") {echo "SELECTED";} ?>>Numerical Matrix</option>
-                <option value="calcmatrix" <?php if ($line['qtype']=="calcmatrix") {echo "SELECTED";} ?>>Calculated Matrix</option>
-                <option value="interval" <?php if ($line['qtype']=="interval") {echo "SELECTED";} ?>>Interval</option>
-                <option value="calcinterval" <?php if ($line['qtype']=="calcinterval") {echo "SELECTED";} ?>>Calculated Interval</option>
-                <option value="complex" <?php if ($line['qtype']=="complex") {echo "SELECTED";} ?>>Complex</option>
                 <option value="calccomplex" <?php if ($line['qtype']=="calccomplex") {echo "SELECTED";} ?>>Calculated Complex</option>
-                <option value="file" <?php if ($line['qtype']=="file") {echo "SELECTED";} ?>>File Upload</option>
-                <option value="multipart" <?php if ($line['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
+                <option value="calcinterval" <?php if ($line['qtype']=="calcinterval") {echo "SELECTED";} ?>>Calculated Interval</option>
+                <option value="calcmatrix" <?php if ($line['qtype']=="calcmatrix") {echo "SELECTED";} ?>>Calculated Matrix</option>
+                <option value="calcntuple" <?php if ($line['qtype']=="calcntuple") {echo "SELECTED";} ?>>Calculated N-Tuple</option>
+                <option value="calculated" <?php if ($line['qtype']=="calculated") {echo "SELECTED";} ?>>Calculated Number</option>
+                <option value="complex" <?php if ($line['qtype']=="complex") {echo "SELECTED";} ?>>Complex</option>
                 <option value="conditional" <?php if ($line['qtype']=="conditional") {echo "SELECTED";} ?>>Conditional</option>
+                <option value="draw" <?php if ($line['qtype']=="draw") {echo "SELECTED";} ?>>Drawing</option>
+                <option value="essay" <?php if ($line['qtype']=="essay") {echo "SELECTED";} ?>>Essay</option>
+                <option value="file" <?php if ($line['qtype']=="file") {echo "SELECTED";} ?>>File Upload</option>
+                <option value="numfunc" <?php if ($line['qtype']=="numfunc") {echo "SELECTED";} ?>>Function</option>
+                <option value="interval" <?php if ($line['qtype']=="interval") {echo "SELECTED";} ?>>Interval</option>
+                <option value="matching" <?php if ($line['qtype']=="matching") {echo "SELECTED";} ?>>Matching</option>
+                <option value="multipart" <?php if ($line['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
+                <option value="multans" <?php if ($line['qtype']=="multans") {echo "SELECTED";} ?>>Multiple-Answer</option>
+                <option value="choices" <?php if ($line['qtype']=="choices") {echo "SELECTED";} ?>>Multiple-Choice</option>
+                <option value="ntuple" <?php if ($line['qtype']=="ntuple") {echo "SELECTED";} ?>>N-Tuple</option>
+                <option value="number" <?php if ($line['qtype']=="number") {echo "SELECTED";} ?>>Number</option>
+                <option value="matrix" <?php if ($line['qtype']=="matrix") {echo "SELECTED";} ?>>Numerical Matrix</option>
+                <option value="string" <?php if ($line['qtype']=="string") {echo "SELECTED";} ?>>String</option>
             </select></div>
         </div>
         <div class="col-md-12 padding-top-twenty">

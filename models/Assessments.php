@@ -502,4 +502,9 @@ class Assessments extends BaseImasAssessments
     {
         return Assessments::find()->select('name')->where(['id' => $typeId])->one();
     }
+
+    public static function getCourseIdName($typeId)
+    {
+        return Assessments::find()->select('courseid')->where(['id' => $typeId])->one();
+    }
 }

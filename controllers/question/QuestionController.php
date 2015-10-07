@@ -1652,7 +1652,7 @@ class QuestionController extends AppController
         $renderData = array('course' => $course, 'addMode' => $addMod, 'params' => $params, 'inusecnt' => $inUseCount, 'line' => $line, 'myq' => $myq,
             'frompot' => $fromPot, 'author' => $author, 'userId' => $userId, 'groupId' => $groupId, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin,
             'inlibs' => $inLibs, 'locklibs' => $lockLibs, 'lnames' => $lNames, 'twobx' => $twoBox, 'images' => $images, 'extref' => $extRef, 'courseId' => $courseId,
-            'myRights' => $myRights, 'sessionData' => $sessionData);
+            'myRights' => $myRights, 'sessionData' => $sessionData,'inUseCount'=> $inUseCount);
         return $this->renderWithData('modDataSet', $renderData);
     }
 
