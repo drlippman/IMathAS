@@ -47,7 +47,7 @@ div.title {
 	margin-left: 35px;
 }
 div.block, div.blockitems div.blockitems div.block {
-	padding: 5px;
+	padding: 15px;
 	margin-bottom: 10px;
 	border-radius: 4px 4px 0 0;
 }
@@ -1231,4 +1231,19 @@ background-color: #f8f8f8;
 }
 .padding-right-two {
     padding-right: 2px;
+}
+.width-twenty-four-per {
+    width: 24% !important;
+}
+.width-twenty-two-per {
+    width: 22% !important;
+}
+.padding-left-fourty {
+    padding-left: 40px;
+}
+.padding-left-right-twenty {
+    padding: 0px 20px 0px 20px;
+}
+.padding-left-thirty-three {
+    padding-left: 33px;
 }

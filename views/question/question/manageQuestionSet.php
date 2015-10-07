@@ -297,10 +297,10 @@ $this->params['breadcrumbs'][] = $this->title;
         if ($isadmin) {
             echo "<div class='floatleft margin-left-fifteen'><input type=checkbox name=\"hidepriv\" value=\"1\" ";
             if ($hidepriv==1) {echo "checked=1";}
-            echo "/><span class='margin-left-five'>Hide Private </span></div></div>";
+            echo "/><span class='margin-left-five'>Hide Private </span></div>";
         }
 
-        echo '<div class=" col-md-4 padding-right-zero display-inline-block"><div class="floatright"><div class="display-inline-block"><input type=submit value="Search" title="List or search selected libraries"></div>';
+        echo '</div><div class=" col-md-4 padding-right-zero display-inline-block"><div class="floatright"><div class="display-inline-block"><input type=submit value="Search" title="List or search selected libraries"></div>';
         echo "<div class='display-inline-block'><input class='margin-left-fourteen' type=button value=\"Add New Question\" onclick=\"window.location='mod-data-set?cid=$cid'\"></div></div>";
         echo "</div></div></form>";
 
@@ -357,7 +357,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php if (!$isadmin && !$isgrpadmin) {
             echo "<br/>(Delete and Transfer only applies to your questions)\n";
         } else if ($isgrpadmin) {
-            echo "<br/>(Delete and Transfer only apply to group's questions)\n";
+            echo "<div class='col-md-12 padding-left-zero padding-bottom-fifteen'>(Delete and Transfer only apply to group's questions)</div>";
         }
         echo "<table class='col-md-12 manage-question-table' id=myTable><thead>\n";
         echo "<tr>

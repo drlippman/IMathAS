@@ -130,9 +130,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class=col-sm-2 ><?php AppUtility::t('Available After')?></div>
                 <div class=col-sm-10>
                     <label class="pull-left non-bold"><input type=radio name="sdatetype" class="margin-left-two pull-left margin-top-two" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/><span class="padding-left"><?php AppUtility::t('Always until end date')?></span></label>
-                    <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="sdatetype"  value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/></label>
+                    <label class="pull-left non-bold padding-right-fifteen padding-left-fourty"><input class="margin-top-five" type=radio name="sdatetype"  value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/></label>
                     <?php
-                    echo '<div class = "margin-top-minus-five time-input pull-left col-sm-4 width-twenty-one-per">';
+                    echo '<div class = "margin-top-minus-five time-input pull-left width-twenty-four-per">';
                     echo DatePicker::widget([
                         'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -144,8 +144,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left non-bold margin-top-two"> at </label>';
-                     echo '<div class="margin-top-minus-five pull-left col-sm-4 width-twenty-seven-per">';
+                    echo '<label class="end pull-left non-bold margin-top-two padding-left-right-twenty"> at </label>';
+                     echo '<div class="margin-top-minus-five pull-left width-twenty-two-per available-after-time-picker">';
                         echo TimePicker::widget([
                         'name' => 'stime',
                         'value' => $sTime,
@@ -163,9 +163,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class=col-sm-2><?php AppUtility::t('Available Until')?></div>
                 <div class=col-sm-10>
                     <label class='pull-left non-bold'><input type=radio name="edatetype" class="margin-left-two pull-left margin-top-two" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",0); ?>/><span class="padding-left"></span><?php AppUtility::t('Always after start date')?></span></label>
-                    <label class='pull-left non-bold' style="padding-left: 33px"><input type=radio name="edatetype"  value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/></label>
+                    <label class='pull-left non-bold padding-right-fifteen padding-left-thirty-three'><input class="margin-top-five" type=radio name="edatetype"  value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/></label>
                     <?php
-                    echo '<div class = "margin-top-minus-five pull-left col-sm-4 time-input width-twenty-one-per">';
+                    echo '<div class = "margin-top-minus-five pull-left time-input width-twenty-four-per">';
                     echo DatePicker::widget([
                         'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -177,8 +177,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left non-bold margin-top-two"> at </label>';
-                    echo '<div class="margin-top-minus-five pull-left col-sm-4 width-twenty-seven-per">';
+                    echo '<label class="end pull-left non-bold margin-top-two padding-left-right-twenty"> at </label>';
+                    echo '<div class="margin-top-minus-five pull-left width-twenty-two-per available-until-time-picker">';
 
                     echo TimePicker::widget([
                         'name' => 'etime',
@@ -202,8 +202,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-sm-12 padding-left-zero margin-top-fifteen">
                     <label class='pull-left select-text-margin'><input type=radio name="doreview" class="margin-left-two pull-left " value="1" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>></label>
                     <?php
-                    echo '<label class="select-text-margin end pull-left non-bold padding-left"> Until</label>';
-                    echo '<div class = "pull-left col-sm-4 time-input width-twenty-one-per">';
+                    echo '<label class="select-text-margin end pull-left non-bold padding-left padding-right-twenty"> Until</label>';
+                    echo '<div class = "pull-left time-input width-twenty-five-per">';
                     echo DatePicker::widget([
                         'name' => 'rdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -215,8 +215,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left non-bold select-text-margin"> at </label>';
-                    echo '<div class=" col-sm-6 width-twenty-seven-per">';
+                    echo '<label class="end pull-left non-bold select-text-margin padding-left-right-twenty"> at </label>';
+                    echo '<div class="width-twenty-two-per available-until-time-picker floatleft">';
                     echo TimePicker::widget([
                         'name' => 'rtime',
                         'value' => $reviewTime,

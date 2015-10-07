@@ -74,11 +74,11 @@ class CourseItemsUtility extends Component
                        id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
                 </b><br>
 
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
-                    <ul class=" select1 dropdown-menu selected-options">
+                    <ul class="select1 dropdown-menu selected-options">
                         <li><a class="question" href="<?php echo AppUtility::getURLFromHome('question', 'question/add-questions?cid='.$course->id.'&aid='.$assessment->id); ?>"><?php AppUtility::t('Questions'); ?></a></li>
                         <li><a class="modify"
                                href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a>
@@ -135,7 +135,7 @@ class CourseItemsUtility extends Component
                     <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forumid=' . $forum->id) ?>">
                             <?php echo $forum->name ?></a></b>
 
-                    <div class="floatright">
+                    <div class="floatright common-setting">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                            href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                            src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -194,7 +194,7 @@ class CourseItemsUtility extends Component
                     <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forumid=' . $forum->id) ?>">
                             <?php echo $forum->name ?></a></b>
 
-                    <div class="floatright">
+                    <div class="floatright common-setting">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                            href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                            src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -235,7 +235,7 @@ class CourseItemsUtility extends Component
                     <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forumid=' . $forum->id) ?>">
                             <?php echo $forum->name ?></a></b>
 
-                    <div class="floatright">
+                    <div class="floatright common-setting">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                            href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                            src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -290,7 +290,7 @@ class CourseItemsUtility extends Component
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo ucfirst($wikis->name) ?></a></b>
 
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -331,7 +331,7 @@ class CourseItemsUtility extends Component
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo ucfirst($wikis->name) ?></a></b>
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -386,7 +386,7 @@ class CourseItemsUtility extends Component
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo ucfirst($wikis->name) ?></a></b>
 
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -447,7 +447,7 @@ class CourseItemsUtility extends Component
                 <?php } else { ?>
                     <b><a href="<?php echo $text ?>"><?php echo ucfirst($link->title); ?></a></b>
                 <?php } ?>
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -522,7 +522,7 @@ class CourseItemsUtility extends Component
                     $alink = AppUtility::getHomeURL() . 'Uploads/' . $filename;
                     echo '<a href="' . $alink . '">' . ucfirst($link->title) . '</a>';
                 } ?>
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -603,7 +603,7 @@ class CourseItemsUtility extends Component
                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid . '&id=' . $link->id) ?>">
                             <?php echo ucfirst($link->title) ?></a></b>
                 <?php } ?>
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -679,7 +679,7 @@ class CourseItemsUtility extends Component
                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid . '&id=' . $link->id) ?>">
                             <?php echo $link->title ?></a></b>
                 <?php } ?>
-                <div class="floatright">
+                <div class="floatright common-setting">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -756,7 +756,7 @@ class CourseItemsUtility extends Component
         <div class="item">
             <?php $InlineId = $inline->id;
             $endDate = AppUtility::formatDate($inline->enddate);?>
-            <div class="floatright">
+            <div class="floatright common-setting">
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                    href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                    src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -992,7 +992,7 @@ class CourseItemsUtility extends Component
                             $endDate = 'ALways';
                         } ?>
                         <br><?php echo $title ?>   <?php echo $StartDate ?> until <?php echo $endDate ?></span>
-                        <span class="instronly">
+                        <span class="instronly common-setting">
                                          <?php if ($block['SH'] == 'HT' || $block['SH'] == 'ST') { ?>
                                              <a class="dropdown-toggle grey-color-link select_button1 floatright"
                                                 data-toggle="dropdown" href="javascript:void(0);"><img alt="setting"
@@ -1040,7 +1040,7 @@ class CourseItemsUtility extends Component
                                     </span>
                     <?php } else { ?>
                         <br><?php echo $title ?> Always</span>
-                        <span class="instronly">
+                        <span class="instronly kkkk">
                                           <a class="dropdown-toggle grey-color-link select_button1 floatright"
                                              data-toggle="dropdown" href="javascript:void(0);"><img alt="setting"
                                                                                                     class="floatright course-setting-button"
@@ -1068,7 +1068,7 @@ class CourseItemsUtility extends Component
                     <input type="hidden" id="isHidden" value="1">
                     <span class="instrdates">
                             <br>Hidden</span>
-                    <span class="instronly">
+                    <span class="instronly mmm">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>

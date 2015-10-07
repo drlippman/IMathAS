@@ -6,6 +6,7 @@ use kartik\time\TimePicker;
 
 if ($overwriteBody==1) {
     echo $body;
+
 } else {
     ?>
     <script type="text/javascript">
@@ -18,7 +19,6 @@ if ($overwriteBody==1) {
     <div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 <div class="tab-content shadowBox">
     <div id="headerexception" class="pagetitle"><h2>Make Start/Due Date Exception</h2></div>
-
     <?php
         echo '<h3>'.$stuname.'</h3>';
     echo $page_isExceptionMsg;
@@ -124,7 +124,6 @@ if ($overwriteBody==1) {
             <span class="formright">Waive "show based on an another assessment" requirements, if applicable.</span><br class="form"/>
             <div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
         </form>
-
     <?php
     }
 echo '</div>';

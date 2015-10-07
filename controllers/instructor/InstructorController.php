@@ -343,9 +343,8 @@ class InstructorController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
         $student = Student::getByCId($courseId);
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css','instructor.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
-//        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js', 'mootools.js', 'nested1.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData,
         'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll, 'isTeacher' => $isTeacher, 'quickview' => $quickview, 'useviewbuttons' => $useviewbuttons, 'item' => $item, 'hasStats' => $hasStats);
         return $this->renderWithData('index', $returnData);

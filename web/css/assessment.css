@@ -105,18 +105,21 @@ table td {
 /*.summary-html-lord iframe, .instructions-html-lord iframe {*/
     /*max-width: 909px !important;*/
 /*}*/
-@media screen and (max-width: 1300px) {
+@media screen and (min-width: 1300px) {
     .summary-html-lord iframe, .instructions-html-lord iframe {
         max-width: 861px !important;
     }
 }
-@media screen and (max-width: 979px) {
+@media screen and (min-width: 979px) {
     .summary-html-lord iframe, .instructions-html-lord iframe {
         max-width: 750px !important;
     }
 }
-@media screen and (max-width: 640px) {
+@media screen and (min-width: 640px) {
     .summary-html-lord iframe, .instructions-html-lord iframe {
         max-width: 650px !important;
     }
+}
+.available-after-time-picker .bootstrap-timepicker, .available-until-time-picker .bootstrap-timepicker {
+    width: 100% !important;;
 }
