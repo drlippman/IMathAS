@@ -26,7 +26,7 @@ echo Nav::widget([
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
         Yii::$app->user->isGuest ?
             ['label' => ''] :
-            ['label' => '<img class="small-icon" src="../../img/user.png">&nbsp;'.(ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
+            ['label' => '<img class="small-icon" src="'.AppUtility::getAssetURL().'img/user.png">&nbsp;'.(ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
                 'items' =>
                     [
                         ['label' => 'Account Setting','url' => ['/site/change-user-info']],
@@ -49,7 +49,7 @@ echo Nav::widget([
         Yii::$app->user->isGuest ?
             ['label' => 'Notifications ', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
 ]]:
-            ($totalCount > AppConstant::NUMERIC_ZERO ?['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><div class="notification msg-count">'.$totalCount.'</div></div>',
+            ($totalCount > AppConstant::NUMERIC_ZERO ?['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><div class="notification msg-count">'.$totalCount.'</div></div>',
                 'items' =>
                 [
                     ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
@@ -58,7 +58,7 @@ echo Nav::widget([
                 ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] :
 
-                ['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications',
+                ['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/notifctn.png">&nbsp;Notifications',
                 'items' =>
                     [
                         ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
@@ -82,7 +82,7 @@ echo Nav::widget([
     'items' => [
         Yii::$app->user->isGuest ?
             ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
-            ['label' =>'<b class="my-Classes"  <img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;</b>',
+            ['label' =>'<b class="my-Classes"  <img class="small-icon" src="'.AppUtility::getAssetURL().'img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;</b>',
 
                 'items' => Course::getGetMyClasses($user->id),
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
@@ -101,7 +101,7 @@ elseif($user['rights'] == AppConstant::STUDENT_RIGHT)
         'items' => [
             Yii::$app->user->isGuest ?
                 ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
-                ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
+                ['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
                 'items' =>Student::getMyClassesForStudent($user->id),
                  'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
         ],
