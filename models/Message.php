@@ -358,5 +358,20 @@ class Message extends BaseImasMsgs
         $query = "UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom='$userId' AND isread<2";
         Yii::$app->db->createCommand($query)->execute();
     }
+
+    public static function getNewMessageData($userid)
+    {
+        $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
+        $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
+        $query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+        $query .= "ORDER BY senddate DESC ";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getUserById($userid)
+    {
+        $query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }
 

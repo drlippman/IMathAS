@@ -108,4 +108,10 @@ class Teacher extends BaseImasTeachers
             $userId->delete();
         }
     }
+
+    public static function getDataByUserId($userId)
+    {
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS it ON ic.id=it.courseid WHERE it.userid='$userId' ORDER BY ic.name";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

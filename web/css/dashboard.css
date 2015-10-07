@@ -46,7 +46,9 @@ div {
     line-height: 0;
 }
 .password_checkbox{
-    margin-left: 49.5%;
+    width: 36%;
+    margin-left: -19px;
+    text-align: right;
 }
 .notify_checkbox{
     width: 64%;
@@ -67,7 +69,11 @@ table.gb thead th{
     margin-top: 20px;
     padding-left: 1.4%;
 }
-
+.change-password-content{
+    display: block;
+    margin-left: 0px;
+    width: 100%;
+}
 .about-page
 {
     float: left;

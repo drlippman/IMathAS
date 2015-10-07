@@ -70,4 +70,10 @@ class Tutor extends BaseImasTutors
             $courseData->delete();
         }
     }
+
+    public static function getDataByUserId($userid)
+    {
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
 } 

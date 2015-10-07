@@ -876,5 +876,37 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->save();
         }
     }
+
+    public static function getUserHomeLayoutInfo($id)
+    {
+        $query = new Query();
+        $query->select(['homelayout','hideonpostswidget'])
+            ->from('imas_users')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
+
+    public static function getUserHideOnPostInfo($id)
+    {
+        $query = new Query();
+        $query->select(['hideonpostswidget'])
+            ->from('imas_users')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
+
+    public static function updateHideOnPost($userId, $hideList)
+    {
+        $user = static::findOne(['id' => $userId]);
+        if($user)
+        {
+            $user->hideonpostswidget = $hideList;
+            $user->save();
+        }
+    }
 }
 

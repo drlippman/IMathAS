@@ -6,6 +6,7 @@ use app\controllers\AppController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Exceptions;
+use app\models\ForumPosts;
 use app\models\Forums;
 use app\models\InlineText;
 use app\models\Items;
@@ -3346,5 +3347,106 @@ class AppUtility extends Component
 
     public static function  getDataFromSession($data){
         return $_SESSION[$data];
+    }
+
+    public static function printPostsGadget($page_newpostlist = null, $page_coursenames = null, $postthreads = null) {
+
+        echo '<div class="block">';
+        echo "<span class=\"floatright\"><a href=\"form?action=forumwidgetsettings\">"; ?>
+        <img style="vertical-align:top" src=<?php echo AppUtility::getAssetURL()?>img/gears.png>
+
+       <?php echo "</a></span><h3>", _('New forum posts'), '</h3></div>';
+        echo '<div class="blockitems">';
+        if (count($page_newpostlist)==0) {
+            echo '<p>', _('No new posts'), '</p>';
+            echo '</div>';
+            return;
+        }
+        $threadlist = implode(',',$postthreads);
+        $threaddata = array();
+        $result = ForumPosts::getPostData($threadlist);
+        foreach($result as $key => $tline) {
+            $threaddata[$tline['id']] = $tline;
+        }
+
+        echo '<table class="gb" id="newpostlist"><thead>
+        <tr>
+            <th style="text-align: left">', _('Thread'), '</th>
+            <th style="text-align: left">', _('Started By'), '</th>
+            <th style="text-align: left">', _('Course'), '</th>
+            <th style="text-align: left">', _('Last Post'), '</th>
+        </tr></thead>';
+        echo '<tbody>';
+        foreach ($page_newpostlist as $line) {
+            echo '<tr>';
+            $subject = $threaddata[$line['threadid']]['subject'];
+            if (trim($subject)=='') {
+                $subject = '['._('No Subject').']';
+            }
+            $n = 0;
+            while (strpos($subject,'Re: ')===0) {
+                $subject = substr($subject,4);
+                $n++;
+            }
+            if ($n==1) {
+                $subject = 'Re: '.$subject;
+            } else if ($n>1) {
+                $subject = "Re<sup>$n</sup>: ".$subject;
+            }
+            echo "<td><a href=\"forums/posts.php?page=-3&cid={$line['courseid']}&forum={$line['id']}&thread={$line['threadid']}\">";
+            echo $subject;
+            echo '</a></td>';
+            if ($threaddata[$line['threadid']]['isanon']==1) {
+                echo '<td>', _('Anonymous'), '</td>';
+            } else {
+                echo '<td>'.$threaddata[$line['threadid']]['LastName'].', '.$threaddata[$line['threadid']]['FirstName'].'</td>';
+            }
+            echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+            echo '<td>'.AppUtility::tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
+        echo '<script type="text/javascript">initSortTable("newpostlist",Array("S","S","S","D"),false);</script>';
+
+        echo '</div>';
+    }
+
+    public static function printMessagesGadget($page_newmessagelist = null, $page_coursenames = null) {
+        echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
+        echo '<div class="blockitems">';
+        if (count($page_newmessagelist)==0) {
+            echo '<p>', _('No new messages'), '</p>';
+            echo '</div>';
+            return;
+        }
+        echo '<table class="gb" id="newmsglist"><thead><tr><th>', _('Message'), '</th><th>', _('From'), '</th><th>', _('Course'), '</th><th>' ,_('Sent'), '</th></tr></thead>';
+        echo '<tbody>';
+        foreach ($page_newmessagelist as $line) {
+            echo '<tr>';
+            if (trim($line['title'])=='') {
+                $line['title'] = '['._('No Subject').']';
+            }
+            $n = 0;
+            while (strpos($line['title'],'Re: ')===0) {
+                $line['title'] = substr($line['title'],4);
+                $n++;
+            }
+            if ($n==1) {
+                $line['title'] = 'Re: '.$line['title'];
+            } else if ($n>1) {
+                $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+            }
+            echo "<td><a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";
+            echo $line['title'];
+            echo '</a></td>';
+            echo '<td>'.$line['LastName'].', '.$line['FirstName'].'</td>';
+            echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+            echo '<td>'.AppUtility::tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
+        echo '<script type="text/javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
+        echo '</div>';
+
     }
 }

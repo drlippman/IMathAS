@@ -314,4 +314,11 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost = ForumPosts::findAll(['forumid' => $forumid, 'userid' => $currentUserId]);
         return $ForumPost;
     }
+
+    public static function getPostData($threadlist)
+    {
+        $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
+        $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

@@ -736,7 +736,7 @@ class CourseController extends AppController
             if (count($itemOrders)) {
                 foreach ($itemOrders as $key => $itemOrder)
                 {
-                    $id = $this->getParamVal('blockId');
+                $id = $this->getParamVal('blockId');
                 if($itemOrder['id'] == $id)
                 {
                     $tempAray = array();

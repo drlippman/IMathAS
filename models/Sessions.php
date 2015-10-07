@@ -77,6 +77,7 @@ class Sessions extends BaseImasSessions {
         if($sessionData)
         {
             $sessionData->tzname = $tzname;
+            $sessionData->save();
         }
     }
 }

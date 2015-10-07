@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasForumThreads;
 use yii\db\Query;
 use app\controllers\AppController;
@@ -82,5 +83,33 @@ class ForumThread extends BaseImasForumThreads
         if ($entry) {
             $entry->delete();
         }
+    }
+
+    public static function getNewPostData($poststucidlist, $now, $userid)
+    {
+        $poststucidlist = implode(',',$poststucidlist);
+        $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
+        $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+        $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+        $query .= "AND imas_forums.courseid IN ($poststucidlist) ";
+        $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+        $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+        $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+        $query .= "ORDER BY imas_forum_threads.lastposttime DESC";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getPostThread($poststucidlist, $now, $userid)
+    {
+        $query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+        $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+        $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+        $query .= "AND imas_forums.courseid IN ($poststucidlist) ";
+        $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+        $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+        $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+        $query .= "GROUP BY imas_forums.courseid";
+
+        return \Yii::$app->db->createCommand($query)->queryAll();
     }
 }

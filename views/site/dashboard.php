@@ -27,7 +27,7 @@ use app\components\AppConstant;
             {
                 if ($user->rights > AppConstant::TEACHER_RIGHT)
                 {
-                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'myRights' => $user->rights, 'teachCourse' => $teachCourse]);
+                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'myRights' => $user->rights, 'teachCourse' => $teachCourse, 'hideonpostswidget' => $hideonpostswidget, 'homelayout' => $homelayout, 'pagelayout' => $pagelayout, 'page_newpostlist' => $page_newpostlist, 'page_coursenames' => $page_coursenames, 'postthreads' => $postthreads, 'page_newmessagelist' => $page_newmessagelist]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT)
                 {
                     echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'teachCourse' => $teachCourse]);
