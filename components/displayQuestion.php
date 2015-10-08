@@ -344,7 +344,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$temp = "<div class=inactive>";
         $temp .= filter($evaledqtext);
 	} else {
-        $temp .= "<div class=\"show-test-questions question\"><div>\n";
+        $temp .= "<div class=\"show-test-questions question col-md-12 padding-top-bottom-fifteen\"><div>\n";
         $temp .= filter($evaledqtext);
         $temp .= "</div>\n";
 	}

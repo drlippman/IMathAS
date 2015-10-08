@@ -71,6 +71,7 @@ function chglibtoggle(rad) {
     chgliblaststate = val;
 }
 $("#manage-question-chglib").click(function() {
+
     $("input[name=manage_ques_some_name]").attr("name", "chglib");
     document.forms["selform"].submit();
 });
@@ -83,10 +84,53 @@ $("#manage-question-chgrights").click(function() {
     document.forms["selform"].submit();
 });
 $("#manage-question-remove").click(function() {
+    var questionListArray = createQuestionsList();
+    var questionCount = questionListArray.length;
+if(!questionCount){
     $("input[name=manage_ques_some_name]").attr("name", "remove");
     document.forms["selform"].submit();
+}else{
+    event.preventDefault();
+    var html ='<div><p>Are you SURE you want to delete these questions from the Question Set.This will make them unavailable to all users.</p></div>';
+    html +='<div><p class="floatleft">If any are currently being used in an assessment, it will mess up that assessment.</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                $('.form-control-for-question').val("0");
+                return false;
+            },
+            "Confirm": function () {
+                $(this).dialog("close");
+                $("input[name=manage_ques_some_name]").attr("name", "remove");
+                document.forms["selform"].submit();
+            }
+        },
+        Close: function (event, ui) {
+            $(this).remove();
+            $('.form-control-for-question').val("0");
+            return false;
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
+        }
+    });
+}
 });
 $("#manage-question-transfer").click(function() {
     $("input[name=manage_ques_some_name]").attr("name", "transfer");
     document.forms["selform"].submit();
 });
+
+function createQuestionsList(){
+    var markArray = [];
+    $('.manage-question-set-table-class input[name = "nchecked[]"]:checked').each(function () {
+        markArray.push($(this).val());
+    });
+    return markArray;
+}

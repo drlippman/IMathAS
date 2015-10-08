@@ -25,10 +25,10 @@ class AppAsset extends AssetBundle
     ];
     public $css = [
         'css/imascore.css?ver=13',
-        'css/default.css?ver=13',
         'css/jquery-ui.min.css?ver=13',
         'css/jquery-ui.structure.min.css?ver=13',
         'css/site.css?ver=13',
+        'css/default.css?ver=13',
         'css/font-awesome.min.css?ver=13'
     ];
     public $jsOptions = array(

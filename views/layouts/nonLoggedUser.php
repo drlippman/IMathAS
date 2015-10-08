@@ -3,8 +3,7 @@
 use yii\helpers\Html;
 use app\assets\AppAsset;
 use app\components\AppUtility;
-use app\controllers\AppController;
-
+use app\components\AppConstant;
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -21,7 +20,7 @@ AppAsset::register($this);
     <?php $this->head() ?>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo time(); ?>' rel='stylesheet' type='text/css'>
+    <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo AppConstant::VERSION_NUMBER ?>' rel='stylesheet' type='text/css'>
 </head>
 <body>
 <?php $this->beginBody() ?>

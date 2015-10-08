@@ -64,6 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     buttons: {
                         "Cancel": function () {
                             $(this).dialog('destroy').remove();
+                            $('.form-control-for-question').val("0");
                             return false;
                         },
                         "confirm": function () {
@@ -75,6 +76,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     close: function (event, ui) {
                         $(this).remove();
+                        $('.form-control-for-question').val("0");
+                        return false;
                     },
                     open: function(){
                         jQuery('.ui-widget-overlay').bind('click',function(){
@@ -246,13 +249,14 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <div>Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
         to all users.  If any are currently being used in an assessment, it will mess up that assessment.</div>
-        <form method=post action="manage-question-set?cid=<?php echo $cid ?>&confirmed=true">
-            <input type=hidden name=remove value="<?php echo $rlist ?>">
-            <div class="margin-top-fifteen">
-                <input type=submit value="Really Delete">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-            </div>
-        </form>
+<!--        <form method=post action="manage-question-set?cid=--><?php //echo $cid ?><!--&confirmed=true">-->
+<!--            --><?php //AppUtility::dump($rlist);?>
+<!--            <input type=hidden name=remove value="--><?php //echo $rlist ?><!--">-->
+<!--            <div class="margin-top-fifteen">-->
+<!--                <input type=submit value="Really Delete">-->
+<!--                <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=--><?php //echo $cid ?><!--'">-->
+<!--            </div>-->
+<!--        </form>-->
     <?php
     } else if (isset($params['transfer'])) {
         ?>
@@ -310,7 +314,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="with-selected with-selected-dropdown">
                 <ul class="nav nav-tabs nav-justified manage-question-with-selected-dropdown sub-menu">
                     <li class="dropdown">
-                        <a class="manage-question-with-selected dropdown-toggle grey-color-link" data-toggle="dropdown" href="#">With selected                                        <span class="caret right-aligned"></span>
+                        <a class="manage-question-with-selected dropdown-toggle grey-color-link" data-toggle="dropdown" href="#">With selected
+                            <span class="caret right-aligned"></span>
                          </a>
                         <ul class="dropdown-menu with-selected">
                             <li>
@@ -376,7 +381,7 @@ $this->params['breadcrumbs'][] = $this->title;
             echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';
         }
         echo "</tr>\n";
-        echo "</thead><tbody id='manage-question-set-table'>\n";
+        echo "</thead><tbody id='manage-question-set-table' class='manage-question-set-table-class'>\n";
         $alt = 0;
         $ln = 1;
         for ($j=0; $j<count($page_libstouse); $j++) {
@@ -390,24 +395,24 @@ $this->params['breadcrumbs'][] = $this->title;
             for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
                 $qid =$page_libqids[$page_libstouse[$j]][$i];
                 if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-                    echo '<td class="text-align-center">'.$page_questionTable[$qid]['checkbox'].'</td>';
-                echo '<td class="manage-question-set-description">'.$page_questionTable[$qid]['desc'].'</td>';
-                echo '<td class="nowrap"><div';
+                    echo '<td class="text-align-center width-five-per">'.$page_questionTable[$qid]['checkbox'].'</td>';
+                echo '<td class="manage-question-set-description width-twenty-per">'.$page_questionTable[$qid]['desc'].'</td>';
+                echo '<td class="nowrap width-five-per text-align-center"><div';
                 if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
                 echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';
-                echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
-                echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
-                echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
-                echo '<td class="c">'.$page_questionTable[$qid]['times'].'</td>';
-                echo '<td>'.$page_questionTable[$qid]['lastmod'].'</td>';
-                echo '<td class="c owner-width">'.$page_questionTable[$qid]['mine'].'</td>';
+                echo '<td class="width-ten-per">'.$page_questionTable[$qid]['preview'].'</td>';
+                echo '<td class="width-ten-per">'.$page_questionTable[$qid]['action'].'</td>';
+                echo '<td class="width-eight-per">'.$page_questionTable[$qid]['type'].'</td>';
+                echo '<td class="c width-five-per">'.$page_questionTable[$qid]['times'].'</td>';
+                echo '<td class="width-eight-per">'.$page_questionTable[$qid]['lastmod'].'</td>';
+                echo '<td class="owner-width">'.$page_questionTable[$qid]['mine'].'</td>';
                 if ($searchall==1) {
                     echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
                 } else if ($searchall==0) {
                     if ($page_questionTable[$qid]['junkflag']==1) {
-                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+                        echo "<td class='c width-seven-per'><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
                     } else {
-                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+                        echo "<td class='c width-seven-per'><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
                     }
                 }
                 $ln++;

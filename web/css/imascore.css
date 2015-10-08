@@ -1247,3 +1247,23 @@ background-color: #f8f8f8;
 .padding-left-thirty-three {
     padding-left: 33px;
 }
+.width-seven-per {
+    width: 7%;
+}
+.width-eight-per {
+    width: 8%;
+}
+.width-fifteen-per {
+    width: 15%;
+}
+.margin-left-nine {
+    margin-left: 9px !important;
+}
+.padding-left-right-thirty {
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+}
+.padding-top-bottom-fifteen {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+}
