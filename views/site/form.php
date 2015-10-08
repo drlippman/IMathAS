@@ -1,10 +1,25 @@
 <?php
 use app\components\AppConstant;
 use app\components\AppUtility;
+if ($gb == '') {
+$this->title = 'Modify User Profile';
+}
 $imasroot = AppConstant::UPLOAD_DIRECTORY;
 $pics = AppConstant::UPLOAD_DIRECTORY . $userId . '.jpg';
-
-switch ($action) {
+$emailErr = "";
+?>
+<div class="item-detail-header">
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index'], 'page_title' => $this->title]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox non-nav-tab-item">
+<?php switch ($action) {
     case "newuser":
         break;
 
@@ -20,13 +35,11 @@ switch ($action) {
             document.getElementById("pwinfo").style.display="none";
             }
 		} </script>';
-        if ($gb == '') {
-            echo "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Modify User Profile</div>\n";
-        }
-        echo '<div id="headerforms" class="pagetitle"><h2>User Profile</h2></div>';
+
         echo "<form enctype=\"multipart/form-data\" method=post action=\"action?action=chguserinfo$gb\">\n";
         echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
-        echo "<div class='col-lg-2'><label for=\"firstname\">Enter First Name:</label></div><div class='col-lg-8'><input class=form type=text size=20 id=firstname name=firstname value=\"{$line['FirstName']}\" /></div><br class=\"form\" />";
+        echo "<div class='col-lg-2'><label for=\"firstname\">Enter First Name:</label></div>
+        <div class='col-lg-8'><input class='form form-control-1' type=text size=20 id=firstname name=firstname  value=\"{$line['FirstName']}\" /></div><br class=\"form\" />";
         echo "<div class=col-lg-2><label for=\"lastname\">Enter Last Name:</label></div> <div class='col-lg-6'><input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"></div><BR class=form>\n";
 
         if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
@@ -218,4 +231,5 @@ switch ($action) {
         echo '<input type="submit" value="Save Changes"/>';
         echo '</form>';
         break;
-}
+}?>
+</div>

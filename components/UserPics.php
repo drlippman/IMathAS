@@ -1,11 +1,6 @@
 <?php
 namespace app\components;
-//IMathAS:  User image upload function
-//(c) 20009 David Lippman
-
 use yii\base\Component;
-
-$curdir = rtrim(dirname(__FILE__), '/\\');
 
 // $image is $_FILES[ <image name> ]
 // $imageId is the id used in a database or wherever for this image
@@ -16,19 +11,26 @@ class UserPics extends Component
     public static function processImage( $image, $imageId, $thumbWidth, $thumbHeight )
     {
         $type = $image[ 'type' ];
-        $curdir = rtrim(dirname(__FILE__), '/\\');
-        $galleryPath = AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY;
+        $galleryPath = AppConstant::UPLOAD_DIRECTORY;
 
         if ( strpos( $type, 'image/' ) === FALSE )
-        { // not an image
+        {
+            /**
+             * not an image
+             */
             return FALSE;
         }
         $type = str_replace( 'image/', '', $type );
-        if ($type=='pjpeg') { //stupid IE6
+        if ($type=='pjpeg') {
+        /*
+         * stupid IE6
+         */
             $type = 'jpeg';
         }
         if ($type!='jpeg' && $type!='png' && $type!='gif') {
-            //invalid image type
+            /*
+             * invalid image type
+             */
             return FALSE;
         }
         $createFunc = 'imagecreatefrom' . $type;
@@ -41,13 +43,18 @@ class UserPics extends Component
         $w = $size[ 0 ];
         $h = $size[ 1 ];
 
-        // create thumbnail
+        /*
+         *  create thumbnail
+         */
         $tw = $thumbWidth;
         $th = $thumbHeight;
 
 
         if ( $w/$h > $tw/$th )
-        { // wider
+        {
+        /*
+         * wider
+         */
             $imT = imagecreatetruecolor( $tw, $th );
             $tmpw = $w*($th/$h);
             $temp = imagecreatetruecolor( $tmpw, $th );
@@ -56,22 +63,18 @@ class UserPics extends Component
             imagedestroy( $temp );
         }else
         {
-        // taller
-            /* crops
-        $imT = imagecreatetruecolor( $tw, $th );
-        $tmph = $h*($tw/$w );
-            $temp = imagecreatetruecolor( $tw, $tmph );
-            imagecopyresampled( $temp, $im, 0, 0, 0, 0, $tw, $tmph, $w, $h ); // resize to height
-            imagecopyresampled( $imT, $temp, 0, 0, 0, $tmph/2-$th/2, $tw, $th, $tw, $th ); // crop
-        imagedestroy( $temp );
-        */
-        //nocrop version
+        /**
+         * taller
+         * nocrop version
+         */
         $tmpw = $w*($th/$h);
         $imT = imagecreatetruecolor( $tmpw, $th );
         imagecopyresampled( $imT, $im, 0, 0, 0, 0, $tmpw, $th, $w, $h ); // resize to width
         }
 
-        // save the image
+        /**
+         * save the image
+         */
         imagejpeg( $imT, $galleryPath .$imageId . '.jpg', 100);
        filehandler::relocatecoursefileifneeded($galleryPath .$imageId . '.jpg',$imageId . '.jpg');
     }

@@ -31,6 +31,7 @@ use yii\filters\VerbFilter;
 use app\components\AppUtility;
 use app\models\forms\ChangePasswordForm;
 use yii\web\HttpException;
+use yii\web\Session;
 use yii\web\UploadedFile;
 use app\components\filehandler;
 use app\components\UserPics;
@@ -890,26 +891,21 @@ class SiteController extends AppController
     public function actionForm()
     {
         $this->guestUserHandler();
-//        $this->layout = 'master';
-        $tzname = AppUtility::getTimezoneName();
+        $this->layout = 'master';
+        $sessionId = $this->getSessionId();
+        $sessions =  Sessions::getById($sessionId);
+        $tzname =  $sessions['tzname'];
         $userId = $this->getUserId();
         $user = User::findByUserId($userId);
         $myRights = $user['rights'];
         $action = $this->getParamVal('action');
         $groupId = AppConstant::NUMERIC_ZERO;
         switch($action) {
-            case "newuser":
-            break;
-
-            case "chgpwd":
-                break;
-
             case "chguserinfo":
                 $line = User::getById($userId);
                 if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
                     $r = Groups::getName($groupId);
                 }
-
                 if ($myRights > AppConstant::TEACHER_RIGHT)
                 {
                    $lName = Libraries::getByName($line['deflib']);
@@ -932,8 +928,7 @@ class SiteController extends AppController
     public function actionAction()
     {
         $this->guestUserHandler();
-//        $this->layout = 'master';
-        $tzname = AppUtility::getTimezoneName();
+        $this->layout = 'master';
         $userId = $this->getUserId();
         $user = User::findByUserId($userId);
         $myRights = $user['rights'];
@@ -943,72 +938,81 @@ class SiteController extends AppController
         if($action == 'chguserinfo')
         {
             if (($params['msgnot'])) {
-                $msgNot = 1;
+                $msgNot = AppConstant::NUMERIC_ONE;
             } else {
-                $msgNot = 0;
+                $msgNot = AppConstant::NUMERIC_ZERO;
             }
 
-            if (isset($params['qrd']) || $myRights < 20) {
-                $qrightsdef = 0;
+            if (isset($params['qrd']) || $myRights < AppConstant::TEACHER_RIGHT) {
+                $qRightsDef = AppConstant::NUMERIC_ZERO;
             } else {
-                $qrightsdef = 2;
+                $qRightsDef = AppConstant::NUMERIC_TWO;
             }
             if (isset($params['usedeflib'])) {
-                $usedeflib = 1;
+                $useDefLib = AppConstant::NUMERIC_ONE;
             } else {
-                $usedeflib = 0;
+                $useDefLib = AppConstant::NUMERIC_ZERO;
             }
-            if ($myRights < 20) {
-                $deflib = 0;
+            if ($myRights < AppConstant::TEACHER_RIGHT) {
+                $defLib = AppConstant::NUMERIC_ZERO;
             } else {
-                $deflib = $params['libs'];
+                $defLib = $params['libs'];
             }
 
-            $homelayout[0] = array();
-            $homelayout[1] = array(0,1,2);
-            $homelayout[2] = array();
+            $homeLayout[0] = array();
+            $homeLayout[1] = array(0,1,2);
+            $homeLayout[2] = array();
 
             if (isset($params['homelayout10'])) {
-                $homelayout[2][] = 10;
+                $homeLayout[2][] = AppConstant::NUMERIC_TEN;
             }
             if (isset($params['homelayout11'])) {
-                $homelayout[2][] = 11;
+                $homeLayout[2][] = AppConstant::NUMERIC_ELEVEN;
             }
-            $homelayout[3] = array();
+            $homeLayout[3] = array();
             if (isset($params['homelayout3-0'])) {
-                $homelayout[3][] = 0;
+                $homeLayout[3][] = AppConstant::NUMERIC_ZERO;
             }
             if (isset($params['homelayout3-1'])) {
-                $homelayout[3][] = 1;
+                $homeLayout[3][] = AppConstant::NUMERIC_ONE;
             }
-            foreach ($homelayout as $k=>$v) {
-                $homelayout[$k] = implode(',',$v);
+            foreach ($homeLayout as $k=>$v) {
+                $homeLayout[$k] = implode(',',$v);
             }
             $perpage = intval($params['perpage']);
             if (isset($CFG['GEN']['fixedhomelayout']) && $CFG['GEN']['homelayout']) {
                 $deflayout = explode('|',$CFG['GEN']['homelayout']);
                 foreach ($CFG['GEN']['fixedhomelayout'] as $k) {
-                    $homelayout[$k] = $deflayout[$k];
+                    $homeLayout[$k] = $deflayout[$k];
                 }
             }
-            $layoutstr = implode('|',$homelayout);
+            $layoutStr = implode('|',$homeLayout);
             if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
                 UserPics::processImage($_FILES['stupic'],$userId,200,200);
                 UserPics::processImage($_FILES['stupic'],'sm'.$userId,40,40);
-                $chguserimg = 1;
-            } else if (isset($_POST['removepic'])) {
+                $chgUserImg = AppConstant::NUMERIC_ONE;
+            } else if (isset($params['removepic'])) {
                 filehandler::deletecoursefile($userId.'.jpg');
                 filehandler::deletecoursefile($userId.'.jpg');
-                $chguserimg = 0;
+                $chgUserImg = AppConstant::NUMERIC_ZERO;
             } else {
-                $chguserimg = 0;
+                $chgUserImg = $user['hasuserimg'];
             }
             $firstName = $params['firstname'];
             $lastName = $params['lastname'];
             $email = $params['email'];
-            User::updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qrightsdef, $deflib, $usedeflib, $layoutstr, $perpage,$chguserimg);
-            if ($params['dochgpw']) {
 
+            if (empty($params["email"])) {
+                $emailErr = "Email is required";
+            } else {
+                $email = ($params["email"]);
+                // check if e-mail address is well-formed
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $emailErr = "Invalid email format";
+                }
+            }
+            User::updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qRightsDef, $defLib, $useDefLib, $layoutStr, $perpage,$chgUserImg);
+            if ($params['dochgpw']) {
                 $line = User::getUserPassword($userId);
                 if ((md5($params['oldpw']) == $line['password'] || (password_verify($params['oldpw'],$line['password']))) && ($params['newpw1'] == $params['newpw2']) && $myRights > 5)
                 {
@@ -1025,9 +1029,9 @@ class SiteController extends AppController
             }
             if ($params['settimezone']) {
                 if (date_default_timezone_set($params['settimezone'])) {
-                    $tzname = $params['settimezone'];
+                    $tzName = $params['settimezone'];
                     $sessionId = session_id();
-                    Sessions::updatetzName($sessionId, $tzname);
+                    Sessions::updatetzName($sessionId, $tzName);
                 }
             }
             return $this->redirect('dashboard');
@@ -1037,8 +1041,8 @@ class SiteController extends AppController
             foreach ($all as $k=>$v) {
                 $all[$k] = intval($v);
             }
-            $tohide = array_diff($all,$checked);
-            $hideList = implode(',', $tohide);
+            $toHide = array_diff($all,$checked);
+            $hideList = implode(',', $toHide);
             User::updateHideOnPost($userId, $hideList);
             return $this->redirect('dashboard');
         }

@@ -122,7 +122,6 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "<div class='col-lg-2 display-inline-block padding-left-zero'>";
         echo "Show courses of</div>" ;
 //        echo $a = substr($page_teacherSelectVal,0,4);
-//        AppUtility::dump($a);
        echo "<div class='col-lg-5 padding-left-zero display-inline-block'>";AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
     </div>
         </div>

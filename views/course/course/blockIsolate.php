@@ -666,7 +666,7 @@ $now = $currentTime;
                             $countCourseDetails = count($item['itemList']);
                             for ($i=0;$i<$countCourseDetails;$i++) {
                                 if ($item['itemList'][$i]['Block']) { //if is a block
-                                    $blockList[] = $i+1;AppUtility::dump('ssdddddddd');
+                                    $blockList[] = $i+1;
                                 }
                             }
                             ?>
