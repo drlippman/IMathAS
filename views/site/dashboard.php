@@ -30,10 +30,10 @@ use app\components\AppConstant;
                     echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'myRights' => $user->rights, 'teachCourse' => $teachCourse, 'hideonpostswidget' => $hideonpostswidget, 'homelayout' => $homelayout, 'pagelayout' => $pagelayout, 'page_newpostlist' => $page_newpostlist, 'page_coursenames' => $page_coursenames, 'postthreads' => $postthreads, 'page_newmessagelist' => $page_newmessagelist]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT)
                 {
-                    echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'teachCourse' => $teachCourse]);
+                    echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'teachCourse' => $teachCourse,'hideonpostswidget' => $hideonpostswidget, 'homelayout' => $homelayout, 'pagelayout' => $pagelayout, 'page_newpostlist' => $page_newpostlist, 'page_coursenames' => $page_coursenames, 'postthreads' => $postthreads, 'page_newmessagelist' => $page_newmessagelist]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT)
                 {
-                    echo $this->render('_courseTutoring', ['tutors' => $tutors]);
+                    echo $this->render('_courseTutoring', ['tutors' => $tutors,'hideonpostswidget' => $hideonpostswidget, 'homelayout' => $homelayout, 'pagelayout' => $pagelayout, 'page_newpostlist' => $page_newpostlist, 'page_coursenames' => $page_coursenames, 'postthreads' => $postthreads, 'page_newmessagelist' => $page_newmessagelist]);
                 }
                 echo $this->render('_courseTaking', ['students' => $students, 'msgRecord' => $msgRecord, 'studCourse' => $studCourse]);
             }else

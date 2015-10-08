@@ -1,6 +1,32 @@
 <?php
 use app\components\AppUtility;
 
+$twoColumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
+for ($i=0; $i<3; $i++) {
+    if ($i==0) {
+        echo '<div id="homefullwidth">';
+    }
+    if ($twocolumn) {
+        if ($i==1) {
+            echo '<div id="leftcolumn">';
+        } else if ($i==2) {
+            echo '<div id="rightcolumn">';
+        }
+    }
+    for ($j=0; $j<count($pagelayout[$i]); $j++) {
+        switch ($pagelayout[$i][$j]) {
+            case 10:
+                AppUtility::printMessagesGadget($page_newmessagelist, $page_coursenames);
+                break;
+            case 11:
+                AppUtility::printPostsGadget($page_newpostlist, $page_coursenames, $postthreads);
+                break;
+        }
+    }
+    if ($i==2 || $twocolumn) {
+        echo '</div>';
+    }
+}
 ?>
 
 <div id="homefullwidth">

@@ -3349,6 +3349,12 @@ class AppUtility extends Component
         return $_SESSION[$data];
     }
 
+    /***
+     * @param null $page_newpostlist
+     * @param null $page_coursenames
+     * @param null $postthreads
+     * To display forum's post and thread on dashboard.
+     */
     public static function printPostsGadget($page_newpostlist = null, $page_coursenames = null, $postthreads = null) {
 
         echo '<div class="block">';
@@ -3411,6 +3417,11 @@ class AppUtility extends Component
         echo '</div>';
     }
 
+    /**
+     * @param null $page_newmessagelist
+     * @param null $page_coursenames
+     * To display message wight on dashboard.
+     */
     public static function printMessagesGadget($page_newmessagelist = null, $page_coursenames = null) {
         echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
         echo '<div class="blockitems">';

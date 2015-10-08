@@ -627,6 +627,32 @@ class SiteController extends AppController
                 }
             }
 
+            $page_studentCourseData = array();
+
+        /**
+         *
+         * check to see if the user is enrolled as a student
+         */
+
+            $stuhashiddencourses = false;
+            if ($studCourse == 0) {
+                $noclass = true;
+            } else {
+                foreach($studCourse as $key => $line)
+                {
+                    if ($line['hidefromcourselist'] == 1) {
+                        $stuhashiddencourses = true;
+                    } else {
+                        $noclass = false;
+                        $page_studentCourseData[] = $line;
+                        $page_coursenames[$line['id']] = $line['name'];
+                        if (!in_array($line['id'],explode(',',$hideonpostswidget))) {
+                            $postcheckstucids[] = $line['id'];
+                        }
+                    }
+                }
+            }
+
             $shownewmsgnote = in_array(0,explode(',',$pagelayout[3]));
             $shownewpostnote = in_array(1,explode(',',$pagelayout[3]));
 

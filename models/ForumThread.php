@@ -101,6 +101,7 @@ class ForumThread extends BaseImasForumThreads
 
     public static function getPostThread($poststucidlist, $now, $userid)
     {
+        $poststucidlist = implode(',',$poststucidlist);
         $query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
         $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
         $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
