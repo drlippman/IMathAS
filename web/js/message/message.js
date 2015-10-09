@@ -45,10 +45,8 @@ var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
 var courseInfo = [];
-function createTableHeader() {
-
-
-
+function createTableHeader()
+{
     var html = " <table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
     html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
     html += "    </tr></thead><tbody class='message-table-body'></tbody></table>";
@@ -71,14 +69,15 @@ function showMessage(messageData, status) {
                 html += "<tr class='unread-message message-row message-row-'" + msg.id + "> <td><div class='checkbox override-hidden'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
             if(msg.hasuserimg == 0 ){
-                html += "<td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
+                html += "<div><td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
             }else{
-                html += "<td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
+                html += "<div><td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
             }
-            if (msg.replied == 1) {
-                html += "&nbsp;<i class='fa fa-reply'></i></a><br>&nbsp;&nbsp;&nbsp;"+msg.title +"</b>";
+            if (msg.replied == 1)
+            {
+                html += "&nbsp;<i class='fa fa-reply'></i></a><br>&nbsp;&nbsp;&nbsp;"+msg.title.substring(0,30) +"</b></td></div>";
             }else{
-                html +="</a><br>&nbsp;&nbsp;&nbsp;"+msg.title +"</b></td>";
+                html +="</a><br>&nbsp;&nbsp;&nbsp;"+msg.title.substring(0,30) +"</b></td></div>";
             }
             html += "<td>" + msg.senddate + "</td>";
 
@@ -105,7 +104,10 @@ function showMessage(messageData, status) {
     $('.message-div div').remove();
     createTableHeader();
     $(".message-table-body").append(html);
-    $('.display-message-table').DataTable({"bPaginate": false});
+    $('.display-message-table').DataTable({
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [0] } ],
+        "bPaginate": false
+    });
     $(".images").hide();
 }
 

@@ -48,4 +48,9 @@ class LoginLog extends BaseImasLoginLog
             }
         }
     }
+
+    public static function getLoginData($courseId,$start,$end)
+    {
+        return LoginLog::find()->where(['courseid' => $courseId])->andWhere(['>=','logintime',$start])->andWhere(['<=','logintime',$end])->all();
+    }
 }

@@ -110,7 +110,6 @@ class ForumThread extends BaseImasForumThreads
         $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
         $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
         $query .= "GROUP BY imas_forums.courseid";
-
         return \Yii::$app->db->createCommand($query)->queryAll();
     }
 }

@@ -434,7 +434,7 @@ class AppUtility extends Component
             $timeMatches[2] = 0;
         }
         $timeMatches[1] = $timeMatches[1]%12;
-        if($timeMatches[3]=="PM") {$timeMatches[1]+=12; }
+        if($timeMatches[3]=="PM" || $timeMatches[3]=="pm") {$timeMatches[1]+=12; }
         if ($tzName == '') {
             $serverOffset = date('Z')/60 + $tzOffset;
             $timeMatches[2] += $serverOffset;

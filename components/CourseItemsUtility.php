@@ -995,9 +995,8 @@ class CourseItemsUtility extends Component
                         <span class="instronly common-setting">
                                          <?php if ($block['SH'] == 'HT' || $block['SH'] == 'ST') { ?>
                                              <a class="dropdown-toggle grey-color-link select_button1 floatright"
-                                                data-toggle="dropdown" href="javascript:void(0);"><img alt="setting"
-                                                                                                       class="floatright course-setting-button"
-                                                                                                       src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
+                                                data-toggle="dropdown" href="javascript:void(0);">
+                                                 <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                                              <ul class=" select1 dropdown-menu selected-options pull-right">
                                                  <li><a class="modify"
                                                         href="#"><?php AppUtility::t('Edit Content'); ?></a></li>

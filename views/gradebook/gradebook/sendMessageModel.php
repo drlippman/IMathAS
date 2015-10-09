@@ -22,14 +22,14 @@ if ($params['sendtype'] == 'msg') {
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
-<form method="post" action="send-message-model?cid=<?php echo $course->id; ?>">
+<form method="post" id="form-id" action="send-message-model?cid=<?php echo $course->id; ?>">
 <div class="title-container">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
         <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings" type="submit" id="addNewThread" value="Submit">
+            <button class="btn btn-primary pull-right page-settings" type="button" onclick="submitForm()" id="addNewThread" value="Submit">
                 <i class="fa fa-share header-right-btn"></i><?php echo $saveButton; ?></button>
         </div>
     </div>
@@ -93,36 +93,3 @@ if (isset($_GET['quoteq'])) {
       </div>
 </div>
     </form>
-
-
-<script>
-
-    $(document).ready(function () {
-        $("input").keypress(function(e){
-            var subject = $(".subject").val();
-            $(".subject").css('border-color', '');
-            $('#flash-message').hide();
-            if(subject.length > 60)
-            {
-                $('#flash-message').show();
-                $(".subject").css('border-color', 'red');
-                $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters!");
-                return false;
-            }else{
-                $(".subject").css('border-color', '');
-                $('#flash-message').hide();
-            }
-        });
-        $("input").keyup(function(e){
-            if(e.keyCode == 8 || e.keyCode == 46)
-            {
-                $(".subject").css('border-color', '');
-                $('#flash-message').hide();
-            }
-        });
-    });
-
-
-
-
-</script>
