@@ -752,6 +752,18 @@ class QuestionSet extends BaseImasQuestionset
             $data->qtext = $qText;
             $data->save();
         }
+    }
 
+    public static function setBrokenFlag($flag, $qsetid){
+        $data = QuestionSet::findOne(['id' => $qsetid]);
+        if($data){
+            $data->broken = $flag;
+            $data->save();
+        }
+        return count($data);
+    }
+
+    public static function getOwnerId($id){
+        return QuestionSet::find()->select('ownerid')->where(['id' => $id])->all();
     }
 }

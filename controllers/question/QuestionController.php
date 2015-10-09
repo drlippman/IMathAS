@@ -12,6 +12,8 @@ use app\models\Course;
 use app\models\Items;
 use app\models\Libraries;
 use app\models\LibraryItems;
+use app\models\Log;
+use app\models\Message;
 use app\models\Outcomes;
 use app\models\QImages;
 use app\models\Questions;
@@ -1966,7 +1968,7 @@ class QuestionController extends AppController
         }
         $this->includeCSS(['mathquill.css', 'question/question.css', 'course/course.css', 'roster/roster.css']);
         $this->includeJS(['eqntips.js', 'eqnhelper.js', 'mathquill_min.js', 'mathquilled.js', 'AMtoMQ.js', 'tablesorter.js',
-            'question/addquestions.js', 'general.js', 'question/junkflag.js', 'AMhelpers_min.js', 'confirmsubmit.js']);
+            'question/addquestions.js', 'general.js', 'question/junkflag.js', 'AMhelpers_min.js', 'confirmsubmit.js','editor/tiny_mce.js']);
         $responseArray = array('course' => $course, 'params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'showtips' => $showTips,
             'eqnhelper' => $eqnHelper, 'page_onlyChkMsg' => $pageOnlyChkMsg, 'chk' => $chk, 'formn' => $formN, 'onlychk' => $onlyCheck, 'page_scoreMsg' => $pageScoreMsg,
             'page_formAction' => $pageFormAction, 'seed' => $seed, 'attempt' => $attempt, 'rawscores' => $rawScores, 'line' => $line, 'lastmod' => $lastMod,
@@ -2538,7 +2540,7 @@ class QuestionController extends AppController
                                         $tempLibArray['libid'] = AppConstant::NUMERIC_ZERO;
                                         $tempLibArray['qsetid'] = $qSetId;
                                         $tempLibArray['userid'] = $userId;
-                                        $library = new LibraryItems();
+                                         $library = new LibraryItems();
                                         $library->createLibraryItems($tempLibArray);
                                     }
                                 }
@@ -2943,7 +2945,7 @@ class QuestionController extends AppController
                         $pageLibQids[$line['libid']][] = $line['id'];
                     }
                     $i = $line['id'];
-                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-left-nine natwar' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-right-ten natwar' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
                     if ($line['userights'] == AppConstant::NUMERIC_ZERO) {
                         $pageQuestionTable[$i]['desc'] = '<span class="red">' . filter($line['description']) . '</span>';
                     } else if ($line['replaceby'] > AppConstant::NUMERIC_ZERO || $line['junkflag'] > AppConstant::NUMERIC_ZERO) {
@@ -3601,5 +3603,45 @@ class QuestionController extends AppController
             array("'", "'", '"', '"', '-', '--', '...'),
             $text);
         return $text;
+    }
+
+    public function actionSaveBrokenQuestionFlag(){
+        $user = $this->getAuthenticatedUser();
+        $userfullname = $user['FirstName'].''.$user['LastName'];
+        if (!isset($_GET['qsetid']) || $user['rights']<20) {
+            exit;
+        }
+        $_GET['qsetid'] = intval($_GET['qsetid']);
+        $ischanged = false;
+
+        $rowAffected = QuestionSet::setBrokenFlag($_GET['flag'], $_GET['qsetid']);
+        if ($rowAffected > 0) {
+            $ischanged = true;
+            if ($_GET['flag']==1) {
+                $now = time();
+                $msg = addslashes('Question '.$_GET['qsetid'].' marked broken by '.$userfullname);
+                $log = new Log();
+                $log->createLog($now, $msg);
+                if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
+                    $questionData = QuestionSet::getOwnerId($_GET['qsetid']);
+                    $msgArray = array(
+                        'courseid' => $CFG['GEN']['sendquestionproblemsthroughcourse'],
+                        'title' => 'Question #'.$_GET["qsetid"].' marked as broken',
+                        'message' => 'This is an automated message'. $userfullname.' has marked question #'.$_GET["qsetid"].' as broken. Hopefully they follow up with you about what they think is wrong with it.',
+                        'msgto' => $questionData['ownerid'],
+                        'msgfrom' => $user['id'],
+                        'senddate' => $now,
+                    );
+                    $message = new Message();
+                    $message->insertNewMsg($msgArray);
+                }
+            }
+        }
+
+        if ($ischanged) {
+            echo "OK";
+        } else {
+            echo "Error";
+        }
     }
 }

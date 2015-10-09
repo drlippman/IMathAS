@@ -29,25 +29,15 @@ $this->params['breadcrumbs'][] = $this->title;
     $sessiondata['coursetheme'] = $coursetheme;
     $flexwidth = true; //tells header to use non _fw stylesheet
     $placeinhead = '';
-    if ($showtips==2) {
-//        $placeinhead .= "<script type=\"text/javascript\" src=\"$AppU/js/eqntips.js?v=012810\"></script>";
-    }
 
     if ($eqnhelper==1 || $eqnhelper==2) {
         $placeinhead .= '<script type="text/javascript">var eetype='.$eqnhelper.'</script>';
-//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/js/eqnhelper.js?v=030112\"></script>";
         $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-
     } else if ($eqnhelper==3 || $eqnhelper==4) {
-//        $placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=030212\" type=\"text/css\" />";
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
             $placeinhead .= '';
         }
-//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
-//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=030112\"></script>";
-//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
         $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-
     }
     $useeqnhelper = $eqnhelper;
 
@@ -56,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo $body;
     } else { //DISPLAY BLOCK HERE
         $useeditor = 1;
-        $brokenurl = AppUtility::getHomeURL(). "/save-brokenq-flag.?qsetid=".$params['qsetid'].'&flag=';
+        $brokenurl = AppUtility::getHomeURL(). "question/question/save-broken-question-flag?qsetid=".$params['qsetid'].'&flag=';
         ?>
         <script type="text/javascript">
             var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
@@ -144,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
         echo $page_scoreMsg;
-        echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div"); for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
+        echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div"); for (i=0;i<e.length;i++) { if (e[i].id=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
         echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
         echo "<input type=hidden name=seed value=\"$seed\">\n";
         echo "<input type=hidden name=attempt value=\"$attempt\">\n";
@@ -160,22 +150,24 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         displayq(0,$params['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
         echo $temp;
-        echo "<div class='col-md-12 margin-top-ten padding-left-zero margin-bottom-fifteen'>
+        echo "<div class='col-md-12 margin-top-ten padding-left-zero margin-bottom-fifteen display-inline-block'>
                     <div class='floatleft padding-left-zero padding-right-thirteen padding-top-ten'><input class='margin-right-ten' type=submit value=\"Submit\">
-                    <input type=submit name=\"regen\" value=\"Submit and Regen\"></div>";
-                    echo "<div class='floatleft padding-right-ten padding-top-ten'> <input class='margin-right-thirteen' type=button value=\"White Background\" onClick=\"whiteout()\"/>";
-                    echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/></div><div class='col-md-4 floatright'></div>";
-
-        echo "</div></form>\n";
-
+                        <input type=submit name=\"regen\" value=\"Submit and Regen\">
+                    </div>";
+                    echo "<div class='floatleft padding-right-ten padding-top-ten'>
+                        <input class='margin-right-thirteen' type=button value=\"White Background\" onClick=\"whiteout()\"/>";
+                    echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>
+                        </div>";
+        echo "</div></form>";
+        echo "<div class='col-sm-12 background-color-gery word-break-all'>";
         echo '<code id="qhtml" style="display:none">';
         $message = displayq(0,$params['qsetid'],$seed,false,false,0,true);
-        echo $temp;
         $message = printfilter(forcefiltergraph($message));
         $message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
         $message = str_replacE('`','\`',$message);
         echo htmlentities($message);
         echo '</code>';
+        echo "</div>";
         echo '<div class="col-md-12 background-gery clear-both preview-question-information">';
         if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
             echo "<div> <span>Question id</span>  <span class='margin-left-fourty-three'>{$params['qsetid']}</span> <span> <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$params['qsetid']}\" target=\"_blank\">Message owner</a> <span>to report problems</span></span></div>";
@@ -193,11 +185,11 @@ $this->params['breadcrumbs'][] = $this->title;
             echo '<p style="color:red;">This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
             echo 'by searching all libraries with the ID number as the search term</p>';
         }
-
-        echo '<p id="brokenmsgbad" style="color:red;display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
-        echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
-        echo '<p class="padding-zero margin-top-ten" id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><span><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a></span> <span class="margin-left-nineteen">if there appears to be an error with the question</span></p>';
-
+?>
+        <p id="brokenmsgbad" style="color:red;display:<?php echo(($line['broken']==1)?"block":"none")?>">This message has been marked as broken.  This indicates
+  <?php      echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';?>
+        <p class="padding-zero margin-top-ten" id="brokenmsgok" style="display:<?php echo(($line['broken']==0)?"block":"none")?>"><span><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a></span> <span class="margin-left-nineteen">if there appears to be an error with the question</span></p>
+  <?php
         echo '<p class="padding-zero margin-top-ten"> <span>'._('License').'</span>';
         $license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
         echo '<span class="margin-left-seven">'.$license[$line['license']].'</span>';

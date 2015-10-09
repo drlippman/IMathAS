@@ -319,7 +319,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt===2) {
 		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
-		return '<div class="question col-lg-12 show-test-questions">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div id="question" class="question col-lg-12 show-test-questions">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	}
 	if (($qdata['solutionopts']&1)==0) {
 		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
@@ -344,7 +344,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$temp = "<div class=inactive>";
         $temp .= filter($evaledqtext);
 	} else {
-        $temp .= "<div class=\"show-test-questions question col-md-12 padding-top-bottom-fifteen\"><div>\n";
+        $temp .= "<div id='question' class='question show-test-questions col-md-12 padding-top-bottom-fifteen'><div>\n";
         $temp .= filter($evaledqtext);
         $temp .= "</div>\n";
 	}
