@@ -1267,3 +1267,12 @@ background-color: #f8f8f8;
     padding-top: 15px !important;
     padding-bottom: 15px !important;
 }
+.padding-right-eight-per {
+    padding-right: 8% !important;
+}
+.padding-right-eighteen {
+    padding-right: 18px !important;
+}
+.padding-right-eighteen-pt-six-per {
+    padding-right: 18.6% !important;
+}

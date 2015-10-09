@@ -1,6 +1,9 @@
 $(document).ready(function () {
     manageQuestionSelectedCheckbox();
     $('input[name = "manage-question-header-checked"]:checked').prop('checked', false);
+    $('.manage-question-table').DataTable({ordering:false,
+        "bLengthChange": false
+    });
 });
 function manageQuestionSelectedCheckbox() {
     $('.manage-question-table input[name = "manage-question-header-checked"]').click(function(){
@@ -72,16 +75,13 @@ function chglibtoggle(rad) {
 }
 $("#manage-question-chglib").click(function() {
 
-    $("input[name=manage_ques_some_name]").attr("name", "chglib");
-    document.forms["selform"].submit();
+    $('#chglibButton').trigger('click');
 });
 $("#manage-question-license").click(function() {
-    $("input[name=manage_ques_some_name]").attr("name", "license");
-    document.forms["selform"].submit();
+    $('#licenseButton').trigger('click');
 });
 $("#manage-question-chgrights").click(function() {
-    $("input[name=manage_ques_some_name]").attr("name", "chgrights");
-    document.forms["selform"].submit();
+    $('#chgrightsButton').trigger('click');
 });
 $("#manage-question-remove").click(function() {
     var questionListArray = createQuestionsList();
@@ -105,6 +105,7 @@ if(!questionCount){
             },
             "Confirm": function () {
                 $(this).dialog("close");
+                $('#removeButton').trigger('click');
                 $("input[name=manage_ques_some_name]").attr("name", "remove");
                 document.forms["selform"].submit();
             }
@@ -123,8 +124,7 @@ if(!questionCount){
 }
 });
 $("#manage-question-transfer").click(function() {
-    $("input[name=manage_ques_some_name]").attr("name", "transfer");
-    document.forms["selform"].submit();
+    $('#transferButton').trigger('click');
 });
 
 function createQuestionsList(){

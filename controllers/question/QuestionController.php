@@ -3035,13 +3035,18 @@ class QuestionController extends AppController
                 }
                 if ($searchAll == AppConstant::NUMERIC_ONE) {
                     $pageLibsToUse = array_keys($pageLibQids);
+                    if(count($pageLibsToUse) < AppConstant::NUMERIC_ONE )
+                    {
+                        $this->setErrorFlash("Question Not found.");
+                    }
                 }
+
             }
         }
         $this->includeCSS(['question/question.css', 'question/libtree.css', 'dataTables.bootstrap.css']);
         $this->includeJS(['general.js', 'tablesorter.js', 'question/junkflag.js', 'question/libtree2.js', 'question/manageQuestionSet.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
         $renderData = array('params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchLibs, 'curBreadcrumb' => $curBreadcrumb,
-            'pagetitle' => $pageTitle, 'helpicon' => $helpIcon, 'cid' => $cid, 'rlist' => $rList, 'tlist' => $tList, 'page_transferUserList' => $pageTransferUserList,
+            'pagetitle' => $pageTitle, 'helpicon' => $helpIcon, 'cid' => $cid, 'tlist' => $tList, 'page_transferUserList' => $pageTransferUserList,
             'clist' => $cList, 'page_adminMsg' => $pageAdminMsg, 'lnames' => $lNames, 'search' => $search, 'searchall' => $searchAll, 'searchmine' => $searchMine,
             'isadmin' => $isAdmin, 'hidepriv' => $hidePrivate, 'isgrpadmin' => $isGrpAdmin, 'page_libstouse' => $pageLibsToUse, 'lnamesarr' => $lNamesArray,
             'page_libqids' => $pageLibQids, 'page_questionTable' => $pageQuestionTable, 'remove' => $remove, 'transfer' => $transfer);

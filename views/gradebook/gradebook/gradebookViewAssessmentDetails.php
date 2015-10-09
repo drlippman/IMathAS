@@ -155,10 +155,10 @@ echo "Detail</div>";
  * start shadow-box
  */
 echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
-echo '<div class="col-md-12 padding-left-right-zero tab-content shadowBox">';
+echo '<div class="col-sm-12 padding-left-right-zero tab-content shadowBox">';
 
-echo "<div class='col-md-12 padding-bottom-fifteen'>";
-echo "<h3 class='col-md-12'>{$studentData[1]}, {$studentData[0]}</h3>\n";
+echo "<div class='col-sm-12 padding-bottom-fifteen'>";
+echo "<h3 class='col-sm-12'>{$studentData[1]}, {$studentData[0]}</h3>\n";
 
 //do time limit mult
 $timelimitmult = $studntData[2];
@@ -185,7 +185,7 @@ if ($showans == 'N' && !$isteacher && !$istutor) {
     echo "You shouldn't be here";
     exit;
 }
-echo "<h4 class='col-md-12 margin-top-zero'>{$line['name']}</h4>\n";
+echo "<h4 class='col-sm-12 margin-top-zero'>{$line['name']}</h4>\n";
 $aid = $line['assessmentid'];
 
 if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
@@ -202,19 +202,19 @@ if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['re
 if ($line['starttime'] == 0) {
     echo '<p>Started: Not yet started<br/>';
 } else {
-    echo "<div class='col-md-12'>Started: " . AppUtility::tzdate("F j, Y, g:i a", $line['starttime']) . "</div>";
+    echo "<div class='col-sm-12'>Started: " . AppUtility::tzdate("F j, Y, g:i a", $line['starttime']) . "</div>";
 }
 if ($line['endtime'] == 0) {
     echo "Not Submitted</p>\n";
 } else {
-    echo "<div class='col-md-12 padding-top-five'>Last change: " . AppUtility::tzdate("F j, Y, g:i a", $line['endtime']) . "</div>";
+    echo "<div class='col-sm-12 padding-top-five'>Last change: " . AppUtility::tzdate("F j, Y, g:i a", $line['endtime']) . "</div>";
     $timespent = round(($line['endtime'] - $line['starttime']) / 60);
     if ($timespent < 250) {
         echo "Time spent: " . $timespent . " minutes<br/>\n";
     }
     $timeontask = array_sum(explode(',', str_replace('~', ',', $line['timeontask'])));
     if ($timeontask > 0) {
-        echo "<div class='col-md-12 padding-top-five'>Total time questions were on-screen: " . round($timeontask / 60, 1) . " minutes.</div>";
+        echo "<div class='col-sm-12 padding-top-five'>Total time questions were on-screen: " . round($timeontask / 60, 1) . " minutes.</div>";
     }
 }
 $saenddate = $line['enddate'];
@@ -232,7 +232,7 @@ if ($isteacher) {
         echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
         echo "<br/>Original Due Date: " . AppUtility::tzdate("F j, Y, g:i a", $line['enddate']);
     } else {
-        echo "<div class='col-md-12 padding-top-ten'>Due Date: " . AppUtility::tzdate("F j, Y, g:i a", $line['enddate']);
+        echo "<div class='col-sm-12 padding-top-ten'>Due Date: " . AppUtility::tzdate("F j, Y, g:i a", $line['enddate']);
         echo "  <button class='margin-left-fifteen' type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Make Exception</button>";
     }
     echo "</div>";
@@ -253,20 +253,20 @@ if ($isteacher) {
 
 <?php if ($isteacher) { ?>
 
-    <div class="col-md-12 padding-top-twenty gradebook-view-assessment-link">
-        <a class="col-md-2" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&clearattempt=true'); ?>"
+    <div class="col-sm-12 padding-top-twenty gradebook-view-assessment-link">
+        <a class="col-sm-2" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&clearattempt=true'); ?>"
            onmouseover="tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')"
            onmouseout="tipout()">Clear Attempt</a>
-        <a class="col-md-2" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&clearscores=true') ?>"
+        <a class="col-sm-2" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&clearscores=true') ?>"
            onmouseover="tipshow(this,'Clear scores and attempts, but keep same versions of questions')"
            onmouseout="tipout()">Clear Scores</a>
-        <a class="col-md-2" href="#" onclick="markallfullscore();$('#uppersubmit').show();return false;"
+        <a class="col-sm-2" href="#" onclick="markallfullscore();$('#uppersubmit').show();return false;"
            onmouseover="tipshow(this,'Change all scores to full credit')" onmouseout="tipout()">All Full Credit</a>
         <input style="display:none;" id="uppersubmit" type="submit" value="Record Changed Grades">
-        <a class="col-md-2" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid=' . $course->id . '&id=' . $line['assessmentid'] . '&actas=' . $params['uid']); ?> "
+        <a class="col-sm-2" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid=' . $course->id . '&id=' . $line['assessmentid'] . '&actas=' . $params['uid']); ?> "
            onmouseover="tipshow(this,'Take on role of this student, bypassing date restrictions, to submit answers')"
            onmouseout="tipout()">View as student</a>
-        <a class="col-md-2" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/print-test?cid=' . $course->id . '&asid=' . $params['asid']); ?>"
+        <a class="col-sm-2" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/print-test?cid=' . $course->id . '&asid=' . $params['asid']); ?>"
            target="_blank" onmouseover="tipshow(this,'Pull up a print version of this student\'s assessment')"
            onmouseout="tipout()">Print Version</a>
     </div>
@@ -313,16 +313,16 @@ if (isset($params['lastver'])) {
     }
     $attempts = explode(",", $line['attempts']);
     $lastanswers = explode("~", $line['lastanswers']); ?>
-<div class="gradebook-view-assessment-sub-link padding-top-twenty col-md-12">
-    <div class="col-md-3">
+<div class="gradebook-view-assessment-sub-link padding-top-twenty col-sm-12">
+    <div class="col-sm-3">
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid']) ?> ">Show
             Scored Attempts
         </a>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-3">
         <b>Showing Last Attempts</b>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-3">
             <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid'] . '&reviewver=1') ?> ">Show
                 Review Attempts
             </a>
@@ -338,18 +338,18 @@ if (isset($params['lastver'])) {
     }
     $attempts = explode(",", $line['reviewattempts']);
     $lastanswers = explode("~", $line['reviewlastanswers']); ?>
-<div class="gradebook-view-assessment-sub-link padding-top-twenty col-md-12">
-    <div class="col-md-3">
+<div class="gradebook-view-assessment-sub-link padding-top-twenty col-sm-12">
+    <div class="col-sm-3">
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid']) ?> ">Show
         Scored Attempts
         </a>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-3">
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid'] . '&lastver=1') ?> ">Show
         Last Graded Attempts
         </a>
     </div>
-    <div class="col-md-3">
+    <div class="col-sm-3">
         <b>Showing Review Attempts</b>
     </div>
 </div>
@@ -365,16 +365,16 @@ if (isset($params['lastver'])) {
     $attempts = explode(",", $line['bestattempts']);
     $lastanswers = explode("~", $line['bestlastanswers']);
     $questions = $bestquestions; ?>
-    <div class="gradebook-view-assessment-sub-link padding-top-twenty col-md-12">
-        <div class="col-md-3">
+    <div class="gradebook-view-assessment-sub-link padding-top-twenty col-sm-12">
+        <div class="col-sm-3">
             <b>Showing Scored Attempts</b>
         </div>
-        <div class="col-md-3">
+        <div class="col-sm-3">
             <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&asid=' . $params['asid'] . '&cid=' . $course->id . '&from=' . $from . '&uid=' . $params['uid'] . '&lastver=1'); ?>  ">
                 Show Last Attempts
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-sm-3">
             <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&asid=' . $params['asid'] . '&cid=' . $course->id . '&from=' . $from . '&uid=' . $params['uid'] . '&reviewver=1'); ?> ">Show
                 Review Attempts
             </a>
@@ -512,7 +512,7 @@ echo '<script type="text/javascript">
 			});
 			</script>';
 
-echo '<div class="col-md-12 padding-top-fifteen padding-bottom-fifteen padding-left-thirty"><button class="margin-top-five" type="button" id="hctoggle" onclick="hidecorrect()">' . _('Hide Correct Questions') . '</button>';
+echo '<div class="col-sm-12 padding-top-fifteen padding-bottom-fifteen padding-left-thirty"><button class="margin-top-five" type="button" id="hctoggle" onclick="hidecorrect()">' . _('Hide Correct Questions') . '</button>';
 echo ' <button class="margin-top-five margin-left-ten" type="button" id="hptoggle" onclick="hideperfect()">' . _('Hide Perfect Questions') . '</button>';
 echo ' <button class="margin-top-five margin-left-ten" type="button" id="hnatoggle" onclick="hideNA()">' . _('Hide Unanswered Questions') . '</button>';
 echo ' <button class="margin-top-five margin-left-ten margin-right-ten" type="button" id="showanstoggle" onclick="showallans()">' . _('Show All Answers') . '</button>';
@@ -526,9 +526,9 @@ for ($i = 0; $i < count($questions); $i++) {
     } else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i]) == $pts[$questions[$i]])) {
         echo 'class="iscorrect"';
     } else if ($scores[$i] == -1) {
-        echo 'class="notanswered col-md-12"';
+        echo 'class="notanswered col-sm-12"';
     } else {
-        echo 'class="iswrong question-form-control col-md-12 padding-left-right-thirty" ';
+        echo 'class="iswrong question-form-control col-sm-12 padding-left-right-thirty" ';
     }
     $totalpossible += $pts[$questions[$i]];
 
@@ -578,7 +578,7 @@ for ($i = 0; $i < count($questions); $i++) {
     } else {
         $total += getpts($scores[$i]);
     }
-    echo "<div class='col-md-12 padding-left-right-thirty'><div class='review question-form-control col-md-12 padding-top-bottom-fifteen padding-left-right-thirty'>Question " . ($i + 1) . ": ";
+    echo "<div class='col-sm-12 padding-left-right-thirty'><div class='review question-form-control col-sm-12 padding-top-bottom-fifteen padding-left-right-thirty'>Question " . ($i + 1) . ": ";
     if ($withdrawn[$questions[$i]] == 1) {
         echo "<span class=\"red\">Question Withdrawn</span> ";
     }
@@ -766,7 +766,7 @@ for ($i = 0; $i < count($questions); $i++) {
 
 }
 
-echo "<p></p><div class='col-md-12 padding-left-right-thirty'><div class='review question-form-control'>Total: $total/$totalpossible</div></div>";
+echo "<p></p><div class='col-sm-12 padding-left-right-thirty'><div class='review question-form-control'>Total: $total/$totalpossible</div></div>";
 if ($canedit && !isset($params['lastver']) && !isset($params['reviewver'])) {
     echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 id=\"feedback\" name=\"feedback\">{$line['feedback']}</textarea></p>";
     if ($line['agroupid'] > 0) {

@@ -128,7 +128,7 @@ margin-bottom: 15px;
 margin-left: -15px;
 }
 .manage-question-set-shadowbox {
-    padding:25px 30px 15px 30px;
+    padding:25px 0px 15px 0px;
 }
 .form-control-for-question {
     display: block;
@@ -249,4 +249,12 @@ max-width: 250px;
 .manage-question-table td, .manage-question-table th {
     margin: 0px;
     padding: 7px 3px 7px 4px !important;
+}
+.display-none {
+    display: none !important;
+    background-color: #ffffff !important;
+    border: none !important;
+}
+.manage-qset-cng-licen {
+    padding: 5px 30px 15px 30px !important;
 }
