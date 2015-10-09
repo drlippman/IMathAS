@@ -24,12 +24,12 @@ class AppAsset extends AssetBundle
         'yii\web\YiiAsset',
     ];
     public $css = [
-        'css/imascore.css?ver=13',
-        'css/jquery-ui.min.css?ver=13',
-        'css/jquery-ui.structure.min.css?ver=13',
-        'css/site.css?ver=13',
-        'css/default.css?ver=13',
-        'css/font-awesome.min.css?ver=13'
+        'css/imascore.css?ver=14',
+        'css/jquery-ui.min.css?ver=14',
+        'css/jquery-ui.structure.min.css?ver=14',
+        'css/site.css?ver=14',
+        'css/default.css?ver=14',
+        'css/font-awesome.min.css?ver=14'
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD
