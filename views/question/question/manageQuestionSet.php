@@ -101,8 +101,8 @@ $this->params['breadcrumbs'][] = $this->title;
     if (isset($transfer)) {
     ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>&transfer=<?php echo $transfer ?>">
-            <div class="col-md-12 padding-left-zero">
-                <span class="floatleft select-text-margin">Transfer to:</span>
+            <div class="col-md-12 padding-left-thirty padding-top-five"><div class="col-md-12 padding-left-zero">
+                <span class="floatleft select-text-margin">Transfer to</span>
 <div class="col-md-3 floatleft">
     <?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
 </div>
@@ -111,6 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <input type=submit value="Transfer">
                 <input type=button value="Nevermind" class="margin-left-fifteen secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
+                </div>
         </form>
 
     <?php
