@@ -210,7 +210,7 @@ function calendar() {
             else if(event.reviewMode == false)
             {
                 $(".calendar-day-details").empty();
-                var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-assessment?id="+event.assessmentId+"&cid="+event.courseId+" '>"+event.title+"</a>";
+                var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test'>"+event.title+"</a>";
                 var dateH = "Due " +event.startDat+" "+event.dueTime+"";
                 var assessmentLogo = "<p style='padding-right: 5px'><img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/></p>";
                 $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");

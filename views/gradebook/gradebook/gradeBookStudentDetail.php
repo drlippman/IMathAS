@@ -87,57 +87,79 @@ if($totalData['isTutor']){
 <div class="tab-content shadowBox">
 
 <?php if ($canviewall) {  ?>
-    <br><div class=col-lg-12>
-        <div class="">
-            <span class="pull-left select-text-margin">
-    <?php AppUtility::t('Category')?>
-                </span>
-    <div class="col-sm-3">
-        <select id="filtersel" class="form-control " onchange="chgfilter()">
-    <option value="-1"
-   <?php if ($catfilter==-1) {echo "selected=1";}
-    echo '>', _('All'), '</option>';
-    echo '<option value="0" ';
-    if ($catfilter==0) { echo "selected=1";}
-    echo '>',AppUtility::t('Default'), '</option>';
-     foreach($gbCatsData as $gbCats){
+    <br>
+    <div class="col-lg-12 display-inline-block">
+        <div class="display-inline-block width-twenty-five-per">
+               <div class="display-inline-block"><?php AppUtility::t('Category')?></div>&nbsp;
+               <div class="display-inline-block width-fifty-percentage">
+                    <select id="filtersel" class="form-control display-inline-block" onchange="chgfilter()">
+                        <option value="-1"
+                        <?php if ($catfilter==-1) {echo "selected=1";} ?> >All
+                        </option>
+                        <option value="0"
+                        <?php if ($catfilter==0) { echo "selected=1";} ?>>
+                            <?php AppUtility::t('Default') ?>
+                        </option>
+                        <?php foreach($gbCatsData as $gbCats)
+                        {
+                            echo '<option value="'.$gbCats['id'].'"';
+                            if ($catfilter==$gbCats['id']) {echo "selected=1";}
+                            echo '>'.$gbCats['name'].'</option>';
+                        } ?>
+                         <option value="-2"
+                        <?php if ($catfilter==-2) {echo "selected=1";} ?> >
+                                <?php AppUtility::t('Category Totals'); ?>
+                        </option>
+                  </select>
+               </div>
+        </div>
+        <div class="display-inline-block width-twenty-five-per">
+            <div class="display-inline-block"> <?php AppUtility::t('Not Counted');?></div>&nbsp;
+             <div class='display-inline-block width-fifty-percentage'>
+                 <select id="toggle2" class='form-control' onchange=chgtoggle()>
+                     <option value=0 <?php AssessmentUtility::writeHtmlSelected($hidenc,0);?> > <?php AppUtility::t('Show all')?> </option>
+                     <option value=1 <?php AssessmentUtility::writeHtmlSelected($hidenc,1); ?> > <?php AppUtility::t('Show stu view')?> </option>
+                     <option value=2 <?php AssessmentUtility::writeHtmlSelected($hidenc,2); ?> > <?php AppUtility::t('Hide all')?> </option>
+                 </select>
+             </div>
+        </div>
 
-        echo '<option value="'.$gbCats['id'].'"';
-        if ($catfilter==$gbCats['id']) {echo "selected=1";}
-        echo '>'.$gbCats['name'].'</option>';
-    }
-    echo '<option value="-2" ';
-    if ($catfilter==-2) {echo "selected=1";}
-    echo '>',AppUtility::t('Category Totals'), '</option>';
-    echo '</select>
-    </div></div>';
-   echo '<div class=" "><span class="pull-left select-text-margin">';
-    echo _('Not Counted:'), " </span><div class='col-sm-2 drop-down-width'><select id=\"toggle2\" class='form-control  ' onchange=\"totonleft()\">";
-    echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($hidenc,0); echo ">",AppUtility::t('Show all'), "</option>";
-    echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($hidenc,1); echo ">",AppUtility::t('Show stu view'), "</option>";
-    echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($hidenc,2); echo ">",AppUtility::t('Hide all'), "</option>";
-    echo "</select></div></div>";
+        <div class="display-inline-block width-twenty-five-per">
+            <div class="display-inline-block"> <?php AppUtility::t('Show');?></div>&nbsp;
+            <div class='display-inline-block width-fifty-percentage'>
+                <select class='form-control' id="toggle3" onchange="chgtoggle()">
+                 <option value=0 <?php AssessmentUtility::writeHtmlSelected($availshow,0); ?> > <?php AppUtility::t('Past due') ?></option>
+                 <option value=3 <?php AssessmentUtility::writeHtmlSelected($availshow,3); ?> > <?php AppUtility::t('Past &amp; Attempted')?> </option>
+                 <option value=4 <?php AssessmentUtility::writeHtmlSelected($availshow,4); ?> > <?php AppUtility::t('Available Only') ?> </option>
+                 <option value=1 <?php AssessmentUtility::writeHtmlSelected($availshow,1); ?> > <?php AppUtility::t('Past &amp; Available') ?></option>
+                 <option value=2 <?php AssessmentUtility::writeHtmlSelected($availshow,2); ?> > <?php AppUtility::t('All')?></option>
+                </select>
+            </div>
+        </div>
+        <div class="display-inline-block width-twenty-four-per">
+            <div class="display-inline-block"> <?php AppUtility::t('Links') ?></div>&nbsp;
+            <div class=' display-inline-block width-eight-four-per'>
+                <select class='form-control' id="toggle1" onchange="chgtoggle()">
+                 <option value=0 <?php AssessmentUtility::writeHtmlSelected($links,0); ?> > <?php AppUtility::t('View/Edit')?> </option>
+                 <option value=1 <?php AssessmentUtility::writeHtmlSelected($links,1); ?> > <?php AppUtility::t ('Scores')?> </option>
+                </select>
+                 <input type="hidden" id="toggle4" value="<?php $showpics ?> " />
+                 <input type="hidden" id="toggle5" value="<?php $hidelocked?>" />
+            </div>
+        </div>
+    </div>
+    <?php } ?>
+  <br><br>
+    <div class="inner-content-gradebook">
+       <div class="button-container col-lg-12 padding-zero">
+<?php
+//if ($gradebook[1][4][2]==1)
+//{ ?>
+  <div class="col-lg-9 margin-left-minus-fifteen">
+<?php //}else{ ?>
+<!--               <div class="col-lg-9">-->
+<?php //} ?>
 
-    echo '<div class=" "><span class="pull-left select-text-margin">', _('Show:'), " </span><div class='col-sm-2 drop-down-width'><select class='form-control  ' id=\"toggle3\" onchange=\"chgtoggle()\">";
-    echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($availshow,0); echo ">",AppUtility::t('Past due'), "</option>";
-    echo "<option value=3 "; AssessmentUtility::writeHtmlSelected($availshow,3); echo ">",AppUtility::t('Past &amp; Attempted'), "</option>";
-    echo "<option value=4 "; AssessmentUtility::writeHtmlSelected($availshow,4); echo ">",AppUtility::t('Available Only'), "</option>";
-    echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($availshow,1); echo ">",AppUtility::t('Past &amp; Available'), "</option>";
-    echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($availshow,2); echo ">",AppUtility::t('All'), "</option></select></div></div>";
-    echo '<div class=" "><span class="pull-left select-text-margin">', _('Links:'), " </span><div class='col-sm-2 '><select class='form-control link-drop-down ' id=\"toggle1\" onchange=\"chgtoggle()\">";
-    echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($links,0); echo ">",AppUtility::t('View/Edit'), "</option>";
-    echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($links,1); echo ">",AppUtility::t ('Scores'), "</option></select>";
-    echo '<input type="hidden" id="toggle4" value="'.$showpics.'" />';
-    echo '<input type="hidden" id="toggle5" value="'.$hidelocked.'" />';
-   ?>
-     </div></div></div>
-    <?php
-}
-?>
-  <br><br>           <div class="inner-content-gradebook">
-                <div class="button-container col-lg-12 padding-zero">
-
-<span class="col-lg-9">
 
         <?php
 if ($availshow==4) {
@@ -158,15 +180,24 @@ if ($studentId>0) {
     $usersort = 1;
     }
    echo '<div>';
-    if ($gradebook[1][4][2]==1) {
-    if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-    echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gradebook[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
+    if ($gradebook[1][4][2]==1)
+    {
+    if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true)
+    {
+    echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gradebook[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida margin-bottom-ten\"/> ";
     } else { ?>
- <img src=" <?php AppUtility::getAssetURL().AppConstant::UPLOAD_DIRECTORY.$gradebook[1][4][0].'jpg' ?>" style="float: left; padding-right:5px;" onclick="togglepic(this)" class="mida">
+ <img src=" <?php echo AppUtility::getAssetURL().AppConstant::UPLOAD_DIRECTORY.$gradebook[1][4][0].'.jpg' ?>" style="float: left;width: 40px;height: 35px; padding-right:5px;" onclick="togglepic(this)" class="mida margin-bottom-ten">
    <?php }
     } ?>
      </div>
-   <div class="col-lg-4"> <?php
+                   <div class="">
+                       <?php
+                       if ($gradebook[1][4][2]==1)
+                       { ?>
+                       <span class="col-lg-4">
+                           <?php }else{ ?>
+                           <span class="col-lg-4 margin-left-minus-fifteen">
+                               <?php }
     echo '<select id="userselect" class="form-control"   onchange="chgstu(this)">';
         $lastsec = '';
         foreach($allStudentsinformation as $studiinfo) {
@@ -185,7 +216,7 @@ if ($studentId>0) {
             if ($lastsec!='') {echo '</optgroup>';}
         echo '</select>';
        ?>
-       </div>
+       </span>
     <div class="section pull-left ">
        <?php
     echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif"/>';
@@ -213,7 +244,8 @@ if ($studentId>0) {
    <?php } ?>
     <span class="small">Last Login: <?php echo AppUtility::tzdate('D n/j/y g:ia', $lastaccess);?></span>
     </div></div>
-    </span>
+    </div>
+    </div>
 <?php if ($isteacher) { ?>
     <span class="inner-page-options col-lg-3 padding-zero pull-right">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
@@ -276,7 +308,10 @@ if ($studentId>0) {
 echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
      <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId.'&from=gb');?> "><?php AppUtility::t('Login Log');?></a> |
      <a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$studentId.'&from=gb');?>"><?php AppUtility::t('Activity Log') ?></a>
-    </div><br/>
+    </div>
+    </div>
+
+    <br/>
     </div>  </div> <?php
 }
 echo '<br><br><br>';
@@ -692,104 +727,7 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
     echo "</form>";
 
 echo "<script class='javascript'>initSortTable('myTable',Array($sarr),false);</script>\n";
-/*
-if ($hidepast) {
-echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
-} else if ($availshow==2) {
-echo "<script>initSortTable('myTable',Array($sarr),false,-3);</script>\n";
-} else {
-echo "<script>initSortTable('myTable',Array($sarr),false,-2);</script>\n";
-}
-*/
+
 echo "<p class='text-area-padding'>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
                             echo '</div>';?>
- <script type="text/javascript">
-    function showhidefb(el,n) {
-        el.style.display="none";
-        document.getElementById("feedbackholder"+n).style.display = "inline";
-        return false;
-    }
-    function showhideallfb(s) {
-        s.style.display="none";
-        var els = document.getElementsByTagName("a");
-        for (var i=0;i<els.length;i++) {
-            if (els[i].className.match("feedbacksh")) {
-                els[i].style.display="none";
-            }
-        }
-        var els = document.getElementsByTagName("span");
-        for (var i=0;i<els.length;i++) {
-            if (els[i].id.match("feedbackholder")) {
-                els[i].style.display="inline";
-            }
-        }
-    }
 
-    function chgfilter() {
-        var cat = document.getElementById("filtersel").value;
-        var studentId = $("#student-id").val();
-        var courseId = $("#course-id").val();
-        window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+studentId+"&catfilter=" + cat;
-    }
-
-     function chgtoggle() {
-
-         var totonleft = $("#totonleft").val();
-         var avgontop = $("#avgontop").val();
-         var studentId = $("#student-id").val();
-         var courseId = $("#course-id").val();
-         var includelastchange = $("#includelastchange").val();
-         var lastlogin = $("#lastlogin").val();
-         var includeduedate = $("#includeduedate").val();
-         var altgbmode = 10000 * document.getElementById("toggle4").value + 1000 * parseInt(totonleft) + parseInt(avgontop) + 100 * (document.getElementById("toggle1").value * 1 + document.getElementById("toggle5").value * 1) + 10 * document.getElementById("toggle2").value + 1 * document.getElementById("toggle3").value;
-         if (includelastchange) {
-             altgbmode += 40;
-         }
-         if (lastlogin) {
-             altgbmode += 4000;
-         }
-         if (includeduedate) {
-             altgbmode += 400;
-         }
-         window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+studentId+"&gbmode="+altgbmode;
-     }
-     function chgstu(el)
-     {
-//         $('#updatingicon').show();
-         var courseId = $("#course-id").val();
-         window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+el.value;
-     }
-    function makeofflineeditable(el) {
-        var anchors = document.getElementsByTagName("a");
-        for (var i=0;i<anchors.length;i++) {
-            if (bits=anchors[i].href.match(/add-grades.*gbitem=(\d+)/)) {
-                if (anchors[i].innerHTML.match("-")) {
-                    type = "newscore";
-                } else {
-                    type = "score";
-                }
-                anchors[i].style.display = "none";
-                var newinp = document.createElement("input");
-                newinp.size = 4;
-                if (type=="newscore") {
-                    newinp.name = "newscore["+bits[1]+"]";
-
-                } else {
-                    newinp.name = "score["+bits[1]+"]";
-                    newinp.value = anchors[i].innerHTML;
-
-                }
-                anchors[i].parentNode.appendChild(newinp);
-                var newtxta = document.createElement("textarea");
-                newtxta.name = "feedback["+bits[1]+"]";
-                newtxta.cols = 50;
-                var feedbtd = anchors[i].parentNode.nextSibling.nextSibling.nextSibling;
-                newtxta.value = feedbtd.innerHTML;
-                feedbtd.innerHTML = "";
-                feedbtd.appendChild(newtxta);
-            }
-        }
-        document.getElementById("savechgbtn").style.display = "";
-        el.onclick = null;
-    }
-  </script>

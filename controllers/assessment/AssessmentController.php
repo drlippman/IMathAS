@@ -2449,11 +2449,11 @@ class AssessmentController extends AppController
 
                         $temp .= "</p>\n";
                         if (hasreattempts($last)) {
-                            $temp .= "<p><a href=\"show-test.?action=shownext&to=$last&amp;reattempt=$last\">".'Reattempt last question'. "</a>.  ".'If you do not reattempt now, you will have another chance once you complete the test.'. "</p>\n";
+                            $temp .= "<p><a href='#'>".'Reattempt last question'. "</a>.  ".'If you do not reattempt now, you will have another chance once you complete the test.'. "</p>\n";
                         }
                     }
                     if ($allowregen && $qi[$questions[$last]]['allowregen']==1) {
-                        $temp .= "<p><a href=\"show-test?action=shownext&to=$last&amp;regen=$last\">".'Try another similar question'. "</a></p>\n";
+                        $temp .= "<p><a href='#'>".'Try another similar question'. "</a></p>\n";
                     }
                     //show next
                     unset($toshow);
@@ -2642,7 +2642,7 @@ class AssessmentController extends AppController
 
                         }
 
-                        $temp .= "<br/><p>When you are done, <a href=\"show-test?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+                        $temp .= "<br/><p>When you are done, <a href='#'>click here to see a summary of your scores</a>.</p>\n";
 
                         $temp .= "</div>\n";
                     }

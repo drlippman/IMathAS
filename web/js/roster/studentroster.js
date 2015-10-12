@@ -1,4 +1,5 @@
-$(document).ready(function () {
+$(document).ready(function ()
+{
     var course_id = $("#course-id").val();
     selectCheckBox();
     studentLock();
@@ -18,6 +19,7 @@ function studentRosterSuccess(response) {
 
 function showStudentInformation(students)
 {
+
     var courseId =  $( "#course-id" ).val();
     var isImagePresent =  $( "#image-id" ).val();
     var html = "";
@@ -60,7 +62,13 @@ function showStudentInformation(students)
         html += "</ul></div></td>";
     });
     $('#student-information-table').append(html);
-    createDataTable('student-data-table');
+    //createDataTable('student-data-table');
+    $('.student-data-table').DataTable({
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [6] } ],
+        "bPaginate": false
+    });
+
+    $('.remove-sorting').removeClass('sorting');
     bindEvent();
     $(".images").hide();
 }

@@ -665,11 +665,12 @@ class CourseController extends AppController
         $CalendarLinkItems = Links::getByCourseId($cid);
         $calendarInlineTextItems = InlineText::getByCourseId($cid);
         $assessmentArray = array();
-        foreach ($assessments as $assessment) {
+        foreach ($assessments as $assessment)
+        {
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
-                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
+                'dueTime' => AppUtility::tzdate("g:i a", $assessment['enddate']),
                 'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
                 'name' => ucfirst($assessment['name']),
                 'startDateString' => $assessment['startdate'],

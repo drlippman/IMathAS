@@ -1284,6 +1284,7 @@ background-color: #f8f8f8;
 .margin-right-twelve {
     margin-right: 12px !important;
 }
+
 .max-width-eighty-six-per {
   max-width: 86% !important;
 }
@@ -1318,4 +1319,14 @@ background-color: #f8f8f8;
 }
 .width-hundread-three-per {
     width: 103%;
+}
+.width-sixty-five-percentage{
+    width: 65% !important;
+}
+.margin-left-minus-fifteen
+{
+    margin-left: -15px;
+}
+.width-eight-four-per {
+    width: 84% !important;
 }

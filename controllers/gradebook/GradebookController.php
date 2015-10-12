@@ -7,6 +7,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\filehandler;
+use app\components\htmLawed;
 use app\components\interpretUtility;
 use app\components\LtiOutcomesUtility;
 use app\models\Assessments;
@@ -49,6 +50,7 @@ use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use yii\rbac\Item;
 include ("../components/asidutil.php");
+include ("../components/htmLawed.php");
 class GradebookController extends AppController
 {
     public function beforeAction($action)
@@ -91,7 +93,6 @@ class GradebookController extends AppController
         }
         $get = $params;
         $gradebookData = $this->gbtable($user->id, $courseId);
-
         $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
         $this->includeJS(['general.js', 'gradebook/gradebook.js','gradebook/tablescroller2.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course,'overridecollapse' => $overridecollapse, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
@@ -2933,13 +2934,18 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $receiverInformation = User::getById($userId);
         if ($this->isPostMethod()) {
-            /*
-             * Applied html lawed
-             * $htmlawedconfig = array('elements' => '*-script');
-             */
+            $htmlawedconfig = array('elements'=>'*-script');
+            $params['message'] =  htmLawed(stripslashes($params['message']),$htmlawedconfig);
+            $params['subject'] =  strip_tags(stripslashes($params['subject']));
             $error = '';
             if ($params['sendtype'] == 'msg')
             {
+
+                if(strlen($params['subject']) > 60)
+                {
+                    $this->setWarningFlash('The Subject field cannot contain more than 60 characters');
+                    return $this->redirect('send-message-model?sendto='.$userId.'&sendtype=msg&cid='.$courseId);
+                }
                 $newMessage = new Message();
                 $newMessage->saveNewMessage($params, $currentUser);
                 $this->setSuccessFlash('Message sent');
@@ -4324,7 +4330,8 @@ class GradebookController extends AppController
         }
         $gradebookData = $this->gbtable($currentUser->id, $courseId);
         $studentsDistinctSection = Student::findDistinctSection($courseId);
-        $this->includeCSS(['jquery.dataTables.css','gradebook.css']);
+
+        $this->includeCSS(['jquery.dataTables.css','gradebook.css','course/course.css' ]);
         $this->includeJS(['general.js','gradebook/gradebookstudentdetail.js','tablesorter.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
         $responseData = array('studentsDistinctSection' => $studentsDistinctSection,'lnfilter' => $lnfilter,'timefilter' => $timefilter,'gradebookData' => $gradebookData,'isTeacher' => $isTeacher,'isTutor' => $isTutor,'course' => $course);
         return $this->renderWithData('gradebookTesting',$responseData);
@@ -4363,6 +4370,7 @@ class GradebookController extends AppController
             $logincnt = $params['logincnt'];
             $lastloginfromexport = $params['lastlogin'];
             $totalData = $this->gbtable($currentUser['id'], $course['id'], $stu);
+
         }
         $this->includeCSS('imascore.css','modern.css');
         $responseData = array('studentData' => $studentData,'currentUser' => $currentUser,'totalData' => $totalData,'gbmode' => $gbmode,'stu' => $stu,'params' => $params,'isteacher' => $isTeacher,'course' => $course);

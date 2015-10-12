@@ -152,9 +152,9 @@ class AppUtility extends Component
         return false;
     }
 
-    public static function getFormattedDate($dateStr, $format = 'Y-m-d')
+    public static function getFormattedDate($dateStr, $format = 'm-d-Y')
     {
-        return date($format, $dateStr);
+             return date($format, $dateStr);
     }
 
     public static function getFormattedDateCalendar($dateStr, $format = 'm-d-yy')
@@ -166,6 +166,7 @@ class AppUtility extends Component
     public static function getFormattedTime($dateStr, $format = 'h:i A')
     {
         return date($format, $dateStr);
+
     }
 
     public static function getFullName($first, $last)
@@ -448,8 +449,12 @@ class AppUtility extends Component
      */
     public static function parsetime($time)
     {
-        $tzoffset = self::getTimezoneOffset();
-        $tzname = self::getTimezoneName();
+
+        $sessionId = Yii::$app->session->getId();
+        $sessionData = Sessions::getById($sessionId);
+        $tzoffset = $sessionData['tzoffset'];
+        $tzname = $sessionData['tzname'];
+
         preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
         if (count($tmatches) == AppConstant::NUMERIC_ZERO) {
             preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
@@ -457,14 +462,14 @@ class AppUtility extends Component
             $tmatches[2] = AppConstant::NUMERIC_ZERO;
         }
         $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_ELEVEN;
-        if ($tmatches[3] == "pm") {
+        if ($tmatches[3] == "pm" || $tmatches[3] == "PM") {
             $tmatches[1] += AppConstant::NUMERIC_ELEVEN;
         }
         if ($tzname == '') {
             $serveroffset = date('Z') / AppConstant::SECONDS + $tzoffset;
             $tmatches[2] += $serveroffset;
         }
-        return mktime($tmatches[1], $tmatches[2], AppConstant::NUMERIC_ZERO);
+        return  mktime($tmatches[1], $tmatches[2], AppConstant::NUMERIC_ZERO);
     }
 
     public static function myRight()

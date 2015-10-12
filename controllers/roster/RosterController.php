@@ -21,6 +21,7 @@ use app\models\LoginLog;
 use app\models\loginTime;
 use app\models\Message;
 use app\models\Questions;
+use app\models\Sessions;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
@@ -31,6 +32,7 @@ use app\components\AppUtility;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use app\models\forms\ImportStudentForm;
+use yii\web\Session;
 use yii\web\UploadedFile;
 use app\components\AppConstant;
 use app\models\forms\ChangeUserInfoForm;
@@ -83,69 +85,65 @@ class RosterController extends AppController
         $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $this->includeCSS(['jquery-ui.css', 'roster/roster.css', 'dataTables.bootstrap.css']);
-        $this->includeJS(['logingridview.js', 'general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        $responseData = array('course' => $course);
-        return $this->render('loginGridView', $responseData);
-    }
-
-/*
- * Controller ajax method to retrieve student data form Login grid table
- */
-    public function actionLoginGridViewAjax()
-    {
-        $this->guestUserHandler();
         $params = $this->getRequestParams();
-        $courseId = $params['cid'];
-        $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
-        $newEndDate = strtotime($params['newEndDate']. " ".date('g:i a'));
-        $loginLogs = LoginGrid::getById($courseId, $newStartDate, $newEndDate);
-        $headsArray = array();
-        $headsArray[] = 'Name';
-        for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
-            $day = date('m/d', $curDate);
-            $headsArray[] = $day;
-        }
-        $rowLogs = array();
-        $nameHash = array();
-        foreach ($loginLogs as $loginLog) {
-            $day = date('m/d', $loginLog['logintime']);
-            $user_id = $loginLog['userid'];
-            if (!isset($rowLogs[$user_id])) {
-                $rowLogs[$user_id] = array();
-            }
-            $userSpecificDaysArray = $rowLogs[$user_id];
-            if (!isset($userSpecificDaysArray[$day])) {
-                $userSpecificDaysArray[$day] = AppConstant::NUMERIC_ONE;
+        $currentUser = $this->getAuthenticatedUser();
+        $sessionId = Yii::$app->session->getId();
+        $sessionData = Sessions::getById($sessionId);
+        $tzoffset = $sessionData['tzoffset'];
+          { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+            $now = time();
+              if (isset($params['daterange']))
+              {
+                $start = AppUtility::parsedatetime($params['sdate'],'12:00am');
+                $end = AppUtility::parsedatetime($params['edate'],'11:59pm');
+                if (($end-$start)/86400>365) {
+                    $start = $end-365*24*60*60;
+                }
+            } else if (isset($params['start']) && $params['start']+7*24*60*60<=$now) {
+                $start = intval($params['start']);
+                $end = $start + 7*24*60*60;
             } else {
-                $userSpecificDaysArray[$day] = $userSpecificDaysArray[$day] + AppConstant::NUMERIC_ONE;
+                $end = $now;
+                $start = 86400*ceil(($now-$tzoffset*60)/86400)+$tzoffset*60-7*24*60*60;
             }
-            if (!isset($nameHash[$user_id])) {
-                $nameHash[$user_id] = $loginLog['LastName'] . ', ' . $loginLog['FirstName'];
-            }
-            $rowLogs[$user_id] = $userSpecificDaysArray;
-        }
-        foreach ($headsArray as $headElem) {
-            foreach ($rowLogs as $key => $field) {
-                if ($headElem == 'Name') {
-                    continue;
+            $starttime = AppUtility::tzdate("M j, Y, g:i a", $start);
+            $endtime = AppUtility::tzdate("M j, Y, g:i a", $end);
+            $sdate = AppUtility::tzdate("m/d/Y",$start);
+            $edate = AppUtility::tzdate("m/d/Y",$end);
+
+                if( $start > $end)
+                {
+                    $this->setWarningFlash('First date can not be greater then last date.');
+                    return $this->redirect('login-grid-view?cid='.$courseId);
                 }
-                if (!isset($field[$headElem])) {
-                    $field[$headElem] = '';
-                    $rowLogs[$key] = $field;
+
+            $logins = array();
+            $loginData = LoginLog::getLoginData($courseId,$start,$end);
+            foreach($loginData as $row)
+            {
+                if (!isset($logins[$row['userid']])) { $logins[$row['userid']] = array(); }
+                $day = floor(($row['logintime'] - $start)/86400);
+                if (!isset($logins[$row['userid']][$day])) {
+                    $logins[$row['userid']][$day] = 1;
+                } else {
+                    $logins[$row['userid']][$day]++;
                 }
             }
+            $dates = array();
+            for ($time=$start;$time<$end;$time+=86400) {
+                $dates[] = AppUtility::tzdate("n/d",$time);
+            }
+            $stus = array();
+            $students = User::getDataByCourseId($courseId);
+            foreach($students as $row )
+            {
+                $stus[] = array($row['LastName'].', '.$row['FirstName'], $row['id']);
+            }
         }
-        $stuLogs = array();
-        foreach ($rowLogs as $key => $field) {
-            $stuLogs[$key]['name'] = $nameHash[$key];
-            $stuLogs[$key]['row'] = $field;
-        }
-         
-        $retJSON = new \stdClass();
-        $retJSON->header = $headsArray;
-        $retJSON->rows = $stuLogs;
-        return $this->successResponse($retJSON);
+        $this->includeCSS(['jquery-ui.css', 'roster/roster.css', 'dataTables.bootstrap.css']);
+        $this->includeJS([ 'logingridview.js' ,'general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
+        $responseData = array('students' => $students,'stus' => $stus,'dates' => $dates,'end' => $end,'edate' => $edate,'sdate' => $sdate,'now' => $now,'start'=> $start,'endtime'=> $endtime,'starttime' => $starttime,'course' => $course,'logins' => $logins);
+        return $this->renderWithData('loginGridView', $responseData);
     }
 
     public function actionStudentRosterAjax()
