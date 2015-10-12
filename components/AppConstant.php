@@ -4,7 +4,7 @@ namespace app\components;
 
 class AppConstant
 {
-    const VERSION_NUMBER = 15;
+    const VERSION_NUMBER = 16;
     const REMEMBER_ME_TIME = 2592000; //Time in second
     const ZERO_VALUE = '0';
     const ONE_VALUE = '1';

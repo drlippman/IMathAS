@@ -1339,3 +1339,6 @@ background-color: #f8f8f8;
 .width-twenty-four-per {
     width: 24%;
 }
+.overflow-x-auto {
+    overflow-x: auto !important;
+}
