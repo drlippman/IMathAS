@@ -832,7 +832,7 @@ switch ($action) {
                     <?php foreach ($groupsName as $row) {
                         echo "<tbody>
                     <tr>
-                        <td class='word-break-break-all'>{$row['name']}</td>"; ?>
+                        <td class='word-break-all-width'>{$row['name']}</td>"; ?>
                         <td>
                             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modgroup&id=' . $row['id']); ?>"><?php AppUtility::t('Modify') ?></a>
                         </td>

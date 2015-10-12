@@ -59,7 +59,7 @@ $now = $currentTime;
              </div>
              <?php }?>
          </div>
-        <div class="col-md-12 message-body word-break-all">
+        <div class="col-md-12 message-body word-break-break-all">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
              {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">['.AppUtility::t('Show trimmed content', false).']</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
                    } ?>

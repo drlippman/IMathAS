@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
             if (todo == 'del'){
                 event.preventDefault();
                 var html ='<div><p>Are you SURE you want to delete this question from the Question Set? This will make it unavailable</p></div>';
-                html +='<div><p class="pull-left">to all users. If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
+                html +='<div><p>to all users. If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
                 $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                     modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                     width: 'auto', resizable: false,
@@ -273,28 +273,28 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     } else { //DEFAULT DISPLAY
 
-        echo "<div class='col-sm-12 padding-left-thirty'>".$page_adminMsg."</div>";?>
+        echo "<div class='col-sm-12 padding-left-right-thirty'>".$page_adminMsg."</div>";?>
 
-        <div class='col-sm-12'>
+        <div class='col-sm-12 padding-left-right-thirty'>
             <?php echo"<form method=post action=\"manage-question-set?cid=$cid\">\n";
                 echo "<div class='col-sm-12 margin-top-fifteen padding-right-zero padding-left-zero margin-bottom-twenty'>
-                        <div class='col-sm-10 select-text-margin'>
+                        <div class='col-sm-10 select-text-margin padding-left-right-zero'>
                             <span>In Libraries</span>
                             <span id=\"libnames\">$lnames</span>
                             <input type=hidden name=\"libs\" id=\"libs\"  value=\"$searchlibs\">
                         </div>";
-                        echo '<div class="col-sm-2">
+                        echo '<div class="col-sm-2 padding-right-zero">
                                     <input class="floatright" type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'library-tree?cid='.$cid.'&libtree=popup&libs=\'+curlibs,500,500)" />
                               </div></div>';
 
-            echo "<div class='col-sm-12'>
+            echo "<div class='col-sm-12 padding-left-right-zero'>
                         <div class='col-sm-3 floatleft display-inline-block padding-left-zero padding-bottom-fifteen'>Search
                             <input id='manage-question-set-search' class='margin-left-five form-control width-sixty-four-per display-inline-block' type=text size=15 name=search value=\"$search\">
                         </div>"; ?>
             <?php if ($isadmin){ ?>
-                        <div class='floatleft select-text-margin padding-right-eight-per padding-bottom-fifteen'>
+                        <div class='floatleft select-text-margin padding-right-seven-pt-six-per padding-bottom-fifteen'>
                             <?php } else {?>
-                <div class='floatleft select-text-margin padding-right-eighteen-pt-six-per padding-bottom-fifteen'>
+                <div class='floatleft select-text-margin padding-right-eighteen-pt-one-per padding-bottom-fifteen'>
                     <?php } ?>
                         <?php echo"<div class='floatleft'> <input type=checkbox name=\"searchall\" value=\"1\" ";
                         if ($searchall==1) {echo "checked=1";}
@@ -308,10 +308,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                         echo '</div>
 
-                            <div class="floatleft display-inline-block padding-right-eighteen padding-bottom-fifteen">
+                            <div class="floatleft display-inline-block padding-right-twenty-one padding-bottom-fifteen">
                                 <input type=submit value="Search" title="List or search selected libraries padding-bottom-fifteen">
                             </div>';
-                        echo "<div class='floatleft display-inline-block padding-right-eighteen padding-bottom-fifteen'>
+                        echo "<div class='floatleft display-inline-block padding-right-twenty-one padding-bottom-fifteen'>
                                 <input type=button value=\"Add New Question\" onclick=\"window.location='mod-data-set?cid=$cid'\">
                               </div>"; ?>
                         <div class="floatleft padding-bottom-fifteen margin-top-minus-five">
@@ -361,7 +361,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </form>
             </div>
 
-        <div class='col-sm-12'>
+        <div class='col-sm-12 manage-ques-set-table padding-left-right-thirty'>
         <?php  echo "<form id=\"selform\" method=post action=\"manage-question-set?cid=$cid\">\n";?>
             <input class="display-none" type="submit" name="chglib" id="chglibButton">
             <input class="display-none" type="submit" name="license" id="licenseButton">
@@ -369,18 +369,15 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type="hidden" name="manage_ques_some_name">
             <input class="display-none" type="submit" name="transfer" id="transferButton">
     <?php if (!$isadmin && !$isgrpadmin) {
-            echo "<br/>(Delete and Transfer only applies to your questions)\n";
+            echo "<div class='col-sm-12 padding-bottom-fifteen padding-left-right-zero'> (Delete and Transfer only applies to your questions)</div>";
         } else if ($isgrpadmin) {
-            echo "<div class='col-sm-12 padding-bottom-fifteen'>(Delete and Transfer only apply to group's questions)</div>";
+            echo "<div class='col-sm-12 padding-bottom-fifteen padding-left-right-zero'>(Delete and Transfer only apply to group's questions)</div>";
         }
-        echo "<table class='col-sm-12 manage-question-table' id=myTable><thead>\n";
+        echo "<table class='col-sm-12 manage-question-table table table-bordered table-striped data-table' id=myTable><thead>\n";
         echo "<tr>
-                   <th>
-                   <div class='checkbox override-hidden'>
-                        <label>
-                            <input class='margin-left-five' type='checkbox' name='manage-question-header-checked' value=''>
-                                <span class='cr'><i class='cr-icon fa fa-check'></i></span>
-                        </label>
+                   <th class='text-align-center'>
+                   <div class='checkbox override-hidden padding-left-twenty-five'>
+                            <input type='checkbox' name='manage-question-header-checked' value=''>
                    </div></th>
                    <th>Description</th><th>&nbsp;</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
         if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
@@ -404,24 +401,24 @@ $this->params['breadcrumbs'][] = $this->title;
             for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
                 $qid =$page_libqids[$page_libstouse[$j]][$i];
                 if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-                    echo '<td class="text-align-center">'.$page_questionTable[$qid]['checkbox'].'</td>';
-                echo '<td class="manage-question-set-description">'.$page_questionTable[$qid]['desc'].'</td>';
-                echo '<td class="nowrap"><div';
+                    echo '<td class="text-align-center width-five-per">'.$page_questionTable[$qid]['checkbox'].'</td>';
+                echo '<td class="word-break-break-all width-twenty-per">'.$page_questionTable[$qid]['desc'].'</td>';
+                echo '<td class="nowrap width-five-per"><div';
                 if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}
                 echo '>'.$page_questionTable[$qid]['extref'].'</div></td>';
-                echo '<td>'.$page_questionTable[$qid]['preview'].'</td>';
-                echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
-                echo '<td>'.$page_questionTable[$qid]['type'].'</td>';
-                echo '<td class="c">'.$page_questionTable[$qid]['times'].'</td>';
-                echo '<td>'.$page_questionTable[$qid]['lastmod'].'</td>';
-                echo '<td class="c owner-width">'.$page_questionTable[$qid]['mine'].'</td>';
+                echo '<td class="width-ten-per">'.$page_questionTable[$qid]['preview'].'</td>';
+                echo '<td class="width-twelve-per">'.$page_questionTable[$qid]['action'].'</td>';
+                echo '<td class="width-eight-per">'.$page_questionTable[$qid]['type'].'</td>';
+                echo '<td class="c width-five-per">'.$page_questionTable[$qid]['times'].'</td>';
+                echo '<td class="width-eight-per">'.$page_questionTable[$qid]['lastmod'].'</td>';
+                echo '<td class="word-break-break-all width-ten-per">'.$page_questionTable[$qid]['mine'].'</td>';
                 if ($searchall==1) {
-                    echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
+                    echo '<td class="c width-seven-per">'.$page_questionTable[$qid]['lib'].'</td>';
                 } else if ($searchall==0) {
                     if ($page_questionTable[$qid]['junkflag']==1) {
-                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+                        echo "<td class='c width-seven-per'><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
                     } else {
-                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+                        echo "<td class='c width-seven-per'><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot"."img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
                     }
                 }
                 $ln++;

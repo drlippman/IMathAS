@@ -1651,7 +1651,7 @@ class QuestionController extends AppController
         }
         $lNames = implode(", ", $lNames);
         $this->includeJS(['general.js', 'question/modDataSet.js', 'editor/tiny_mce.js', 'ASCIIMathTeXImg_min.js']);
-        $renderData = array('course' => $course, 'addMode' => $addMod, 'params' => $params, 'inusecnt' => $inUseCount, 'line' => $line, 'myq' => $myq,
+        $renderData = array('course' => $course, 'addMode' => $addMod, 'params' => $params, 'line' => $line, 'myq' => $myq,
             'frompot' => $fromPot, 'author' => $author, 'userId' => $userId, 'groupId' => $groupId, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin,
             'inlibs' => $inLibs, 'locklibs' => $lockLibs, 'lnames' => $lNames, 'twobx' => $twoBox, 'images' => $images, 'extref' => $extRef, 'courseId' => $courseId,
             'myRights' => $myRights, 'sessionData' => $sessionData,'inUseCount'=> $inUseCount);
@@ -2945,7 +2945,7 @@ class QuestionController extends AppController
                         $pageLibQids[$line['libid']][] = $line['id'];
                     }
                     $i = $line['id'];
-                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-right-ten natwar' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-right-two natwar' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
                     if ($line['userights'] == AppConstant::NUMERIC_ZERO) {
                         $pageQuestionTable[$i]['desc'] = '<span class="red">' . filter($line['description']) . '</span>';
                     } else if ($line['replaceby'] > AppConstant::NUMERIC_ZERO || $line['junkflag'] > AppConstant::NUMERIC_ZERO) {
@@ -3000,7 +3000,7 @@ class QuestionController extends AppController
                     } else {
                         $pageQuestionTable[$i]['mine'] = '';
                     }
-                    $pageQuestionTable[$i]['action'] = "<select class='form-control-for-question' onchange=\"doaction(this.value,{$line['id']})\"><option selected value=\"0\">Action..</option>";
+                    $pageQuestionTable[$i]['action'] = "<select class='form-control-for-question max-width-eighty-six-per' onchange=\"doaction(this.value,{$line['id']})\"><option selected value=\"0\">Action..</option>";
                     if ($isAdmin || ($isGrpAdmin && $line['groupid'] == $groupId) || $line['ownerid'] == $userId || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['userights'] > AppConstant::NUMERIC_THREE) {
                         $pageQuestionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
                     } else {
@@ -3605,7 +3605,7 @@ class QuestionController extends AppController
         return $text;
     }
 
-    public function actionSaveBrokenQuestionFlag(){
+    public function actionSaveBrokenQuestionFlag() {
         $user = $this->getAuthenticatedUser();
         $userfullname = $user['FirstName'].''.$user['LastName'];
         if (!isset($_GET['qsetid']) || $user['rights']<20) {
@@ -3643,5 +3643,24 @@ class QuestionController extends AppController
         } else {
             echo "Error";
         }
+    }
+
+    public function actionHelp()
+    {
+        $params = $this->getRequestParams();
+        $section = $params['section'];
+        $this->layout = 'master';
+        $responseData = (['section' => $section]);
+        $this->includeCSS(['question/question.css']);
+        return $this->renderWithData('help', $responseData);
+    }
+    public function actionMicroLibHelp()
+    {
+        $params = $this->getRequestParams();
+        $section = $params['section'];
+        $this->layout = 'master';
+        $responseData = (['section' => $section]);
+        $this->includeCSS(['question/question.css']);
+        return $this->renderWithData('libhelp.php', $responseData);
     }
 }

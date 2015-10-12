@@ -1130,7 +1130,7 @@ div.review {
     padding-top: 15px;
 }
 .padding-bottom-ten {
-    padding-bottom: 10px;
+    padding-bottom: 10px !important;
 }
 .margin-bottom-three {
     margin-bottom: 3px !important;

@@ -39,7 +39,7 @@ $this->title = 'Manage Offline Grades';
     <div class="offline-grade-header">
         <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>"><?php AppUtility::t('Upload multiple offline grades');?></a>
     </div>
-<div class="col-md-12 offline-grade-padding">
+<div class="col-sm-12 offline-grade-padding">
     <table class="grade-name-table width-fourty-per">
         <thead>
         <tr>
@@ -51,35 +51,35 @@ $this->title = 'Manage Offline Grades';
                     </label>
                 </div>
             </th>
-            <th class="col-md-8"><?php AppUtility::t('Grade Names')?></th>
+            <th class="col-sm-8"><?php AppUtility::t('Grade Names')?></th>
         </tr>
         </thead>
         <tbody class="grade-name-table-body">
             <?php foreach ($gradeNames as $singlegradeNames) { ?>
                 <tr>
                     <td>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                             <input type='checkbox' id='Checkbox' name='grade-name-check[<?php echo $singlegradeNames['id'] ?>]' value="<?php echo $singlegradeNames['id'] ?>">
                         </span>
                     </td>
                     <td>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                             <?php echo $singlegradeNames['name'] ?>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                     </td>
                 </tr>
             <?php } ?>
         <tbody>
     </table>
-    <div class="padding-left-zero col-md-12 margin-top-twenty">
+    <div class="padding-left-zero col-sm-12 margin-top-twenty">
         <span><?php AppUtility::t('With selected')?> ,</span>
         <input type="button" class="margin-left-ten btn btn-primary" id="mark-delete" value="Delete">
         <span class="margin-left-ten"><?php AppUtility::t('or make changes below')?></span>
     </div>
-    <div class="col-md-12 padding-left-zero margin-top-ten">
+    <div class="col-sm-12 padding-left-zero margin-top-ten">
         <h4><strong><?php AppUtility::t('Offline Grade Options')?></strong></h4>
     </div>
-    <table class="col-md-12 margin-top-ten grade-option-table">
+    <table class="col-sm-12 margin-top-ten grade-option-table table table-bordered table-striped data-table">
         <thead>
             <tr>
                 <th>
@@ -90,33 +90,33 @@ $this->title = 'Manage Offline Grades';
                         </label>
                     </div>
                 </th>
-                <th class="col-md-2"><?php AppUtility::t('Option')?></th>
-                <th class="col-md-8"><?php AppUtility::t('Settings')?></th>
+                <th class="col-sm-2 padding-left-twenty-five"><?php AppUtility::t('Option')?></th>
+                <th class="col-sm-8 padding-left-twenty"><?php AppUtility::t('Settings')?></th>
             </tr>
         </thead>
         <tbody class="grade-option-table-name">
                  <tr>
                     <td>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                             <input type='checkbox' id='Checkbox' value="1" name='Show-after-check'>
                         </span>
                     </td>
                     <td>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                         <?php AppUtility::t('Show after')?>
                         </span>
                     </td>
                     <td>
-                        <div class="col-md-12 padding-left-zero" id="always-replies-radio-list">
-                            <span class="col-md-12 padding-left-zero margin-left-ten">
+                        <div class="col-sm-12 padding-left-zero" id="always-replies-radio-list">
+                            <span class="col-sm-12 padding-left-zero margin-left-ten padding-bottom-ten padding-top-five">
                                 <input type="radio" name="Show-after" value="1">
                                 <span class="margin-left-five">
                                     <?php AppUtility::t('Always')?>
                                 </span>
                             </span>
-                            <span class="col-md-12 padding-left-zero margin-left-ten margin-top-twenty">
+                            <span class="col-sm-12 padding-left-zero margin-left-ten margin-top-twenty">
                                 <input type="radio" name="Show-after" class="end pull-left select-text-margin" checked id="always" value="2">
-                                <div class="col-md-3 padding-left-zero margin-left-ten" id="datepicker-id">
+                                <div class="floatleft width-thirty-eight-per padding-left-zero margin-left-ten show-after-date-picker padding-bottom-ten" id="datepicker-id">
                                    <?php
                                    echo DatePicker::widget([
                                        'name' => 'endDate',
@@ -127,8 +127,8 @@ $this->title = 'Manage Offline Grades';
                                            'format' => 'mm/dd/yyyy']
                                    ]);
                                    echo '</div>'; ?>
-                                    <label class="end pull-left  select-text-margin"><?php AppUtility::t('At')?></label>
-                                    <?php echo '<div class="pull-left col-lg-4">';
+                                    <label class="end pull-left  select-text-margin padding-left-fifteen"><?php AppUtility::t('At')?></label>
+                                    <?php echo '<div class="pull-left col-sm-4 show-after-time-picker">';
                                    echo TimePicker::widget([
                                        'name' => 'startTime',
                                        'options' => ['placeholder' => 'Select operating time ...'],
@@ -146,31 +146,31 @@ $this->title = 'Manage Offline Grades';
                  </tr>
                  <tr>
                      <td>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                          <input type='checkbox' id='Checkbox' value="1" name='count-check'>
 
                          </span>
                      </td>
                      <td>
-                         <span class="col-md-12">
+                         <span class="col-sm-12">
                             <?php AppUtility::t('Count')?>
                          </span>
                      </td>
                      <td>
-                         <div class="col-md-12 padding-left-zero" id="always-replies-radio-list">
-                             <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
+                         <div class="col-sm-12 padding-left-zero" id="always-replies-radio-list">
+                             <span class="col-sm-12 padding-left-zero margin-left-ten padding-top-ten">
                                  <input type="radio" name="count" checked value="1">
                                  <span class="margin-left-five"><?php AppUtility::t('Count in Gradebook')?></span>
                              </span>
-                             <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
+                             <span class="col-sm-12 padding-left-zero margin-left-ten margin-top-ten">
                                 <input type="radio" name="count" value="2">
                                  <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total and hide from students")?></span>
                              </span>
-                             <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
+                             <span class="col-sm-12 padding-left-zero margin-left-ten margin-top-ten">
                                 <input type="radio" name="count" value="3">
                                  <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total")?></span>
                              </span>
-                             <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
+                             <span class="col-sm-12 padding-left-zero margin-left-ten margin-top-ten padding-bottom-ten">
                                  <input type="radio" name="count" value="4">
                                  <span class="margin-left-five"><?php AppUtility::t('Count as Extra Credit')?></span>
                              </span>
@@ -179,18 +179,18 @@ $this->title = 'Manage Offline Grades';
                  </tr>
                  <tr>
                     <td>
-                         <span class="col-md-12">
+                         <span class="col-sm-12">
                                 <input type='checkbox' id='Checkbox' value="1" name='gradebook-category-check'>
                          </span>
                     </td>
                     <td>
-                        <span class="col-md-12">
+                        <span class="col-sm-12">
                                 <?php AppUtility::t('Gradebook category')?>
                          </span>
                     </td>
                     <td>
-                        <div class="col-md-12">
-                        <span class="col-md-6 padding-left-zero margin-left-minus-five">
+                        <div class="col-sm-12">
+                        <span class="col-sm-6 padding-left-zero margin-left-minus-five padding-top-bottom-twenty">
                             <?php AssessmentUtility::writeHtmlSelect("gbcat",$gbcatsId,$gbcatsLabel,AppConstant::NUMERIC_ZERO,"Default",0); ?>
                         </span>
                         </div>
@@ -198,20 +198,20 @@ $this->title = 'Manage Offline Grades';
                  </tr>
                  <tr>
                     <td>
-                         <span class="col-md-12">
+                         <span class="col-sm-12">
                             <input type='checkbox' value="1" id='Checkbox' name='tutor-access'>
                          </span>
                     </td>
                     <td>
-                         <span class="col-md-12">
+                         <span class="col-sm-12">
                             <?php AppUtility::t('Tutor Access')?>
                          </span>
                     </td>
                     <td>
-                        <div class="col-md-12">
+                        <div class="col-sm-12 padding-top-bottom-twenty">
                             <?php $page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
                             $page_tutorSelect['val'] = array(2,0,1); ?>
-                            <div class="col-md-6 padding-left-zero margin-left-minus-five">
+                            <div class="col-sm-6 padding-left-zero margin-left-minus-five">
                                 <?php AssessmentUtility::writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],AppConstant::NUMERIC_ONE); ?>
                             </div>
                         </div>

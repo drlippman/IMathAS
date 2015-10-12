@@ -315,7 +315,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ?>
 
                                     <td><div class="question-checkbox"><?php echo $pageQuestionTable[$qid]['checkbox'] ?></div></td>
-                                    <td class="word-break-all"><?php echo $pageQuestionTable[$qid]['desc'] ?></td>
+                                    <td class="word-break-break-all"><?php echo $pageQuestionTable[$qid]['desc'] ?></td>
                                     <td class="nowrap">
                                        <div <?php if ($pageQuestionTable[$qid]['cap']) {echo 'class="ccvid"';}?>><?php echo $pageQuestionTable[$qid]['extref'] ?></div>
                                     </td>

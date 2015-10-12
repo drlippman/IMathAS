@@ -1,9 +1,10 @@
 $(document).ready(function () {
+//    $.fn.dataTableExt.sErrMode = 'throw';
     manageQuestionSelectedCheckbox();
     $('input[name = "manage-question-header-checked"]:checked').prop('checked', false);
-    $('.manage-question-table').DataTable({ordering:false,
-        "bLengthChange": false
-    });
+//    $('.manage-question-table').DataTable({ordering:false,
+//        "bLengthChange": false
+//    });
 });
 function manageQuestionSelectedCheckbox() {
     $('.manage-question-table input[name = "manage-question-header-checked"]').click(function(){

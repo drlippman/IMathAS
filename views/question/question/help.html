@@ -143,8 +143,7 @@ dd {
 	<li><a href="#lti">BasicLTI</a></li>
 	</ul>
 	
-
-<li class="padding-left-fifteen"><a href="#writingquestions">Writing Questions</a></li>
+<li><a href="#writingquestions" class="writing-ques">Writing Questions</a></li>
 	<ul>
 	<li><a href="#questionparts">Question Parts</a></li>
 	<li><a href="#basiccontrolsyntax">Basic Control Syntax</a></li>
@@ -1479,14 +1478,14 @@ If you have a long command to type, you can put a &quot;&amp;&quot; at the end o
 $questions = array("this is choice 1",&amp;
 "this is choice 2")
 </pre>
-If defining a string for display, you can put a &quot;&amp;&amp;&quot; at the end of a line to specify it continues on the next line and insert
-an HTML line break.  Example:
+<div class="padding-bottom-five">If defining a string for display, you can put a &quot;&amp;&amp;&quot; at the end of a line to specify it continues on the next line and insert
+an HTML line break.  Example:</div>
 <pre>
 $showanswer = "Do this first. &amp;&amp;
 Then do this."
 </pre>
-will be interpreted as:
-<pre>
+<span class="padding-bottom-five">will be interpreted as:</span>
+<pre class="margin-top-five">
 $showanswer = "Do this first. &lt;br/&gt;Then do this."
 </pre>
 </p>
@@ -1545,7 +1544,7 @@ $a = rand(0,1)
 </pre>
 When &quot;if&quot; is used before a block of code, it can optionally be followed
 with &quot;elseif&quot; and/or an &quot;else&quot; statement, like this:
-<pre>
+<pre class="margin-top-five">
 $a = rand(0,5)
 if ($a==0) {
    $b = 1
@@ -2181,7 +2180,7 @@ or if the question type gives away critical info to the student.</dd>
 
 A student is asked to select the correct answer from those given.  The order
 of choices is automatically randomized.
-<p><b>Required Variables</b><BR>
+<p><b>Required Variables</b>
 <dl>
 <dt>$questions (or $choices) = an array of choices (In Common Control)</dt>
 	<dd>Defines the choices.  If you use $choices, don't define $questions</dd>

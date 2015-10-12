@@ -159,7 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>
                         </div>";
         echo "</div></form>";
-        echo "<div class='col-sm-12 background-color-gery word-break-all'>";
+        echo "<div class='col-sm-12 background-color-gery word-break-break-all'>";
         echo '<code id="qhtml" style="display:none">';
         $message = displayq(0,$params['qsetid'],$seed,false,false,0,true);
         $message = printfilter(forcefiltergraph($message));

@@ -245,8 +245,11 @@ $this->params['breadcrumbs'][] = $this->title;
             </select></div>
         </div>
         <div class="col-md-12 padding-top-twenty">
-           <div class="col-md-2"> <a href="#" onclick="window.open('<?php echo AppUtility::getAssetURL();?>docs/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a></div>
-           <div class="col-md-3"> <a href="#" onclick="window.open('<?php echo AppUtility::getAssetURL();?>libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
+            <div class="col-md-2">
+            <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL();?>question/question/help?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a>
+           </div>
+           <div class="col-md-3">
+               <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL();?>question/question/micro-lib-help','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
            </div>
         </div>
         <div class="col-md-12 padding-top-twenty">
@@ -260,8 +263,10 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <div class="col-md-12">
         <div id=ccbox class="col-md-12 padding-top-twenty">
-              <div class="floatleft select-text-margin"> Common Control <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span></div>
-              <div class="floatleft margin-left-thirty-eight">  <input type=submit value="Save">
+              <div class="floatleft select-text-margin"> Common Control
+                  <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
+              </div>
+              <div class="floatleft padding-left-fourty-one">  <input type=submit value="Save">
                      <input type=submit name=test value="Save and Test Question">
               </div>
         </div></br>
@@ -281,7 +286,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div id='qtbox' class="col-md-12 padding-top-twenty">
            <div class="col-md-12">
                <div class="floatleft select-text-margin">Question Text <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span></div>
-               <div class="floatleft margin-left-five-ptfour-per"><input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
+               <div class="floatleft margin-left-five-pt-six-per"><input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
                     <input type=submit value="Save">
                     <input type=submit name=test value="Save and Test Question">
                </div>
@@ -314,7 +319,7 @@ $this->params['breadcrumbs'][] = $this->title;
        <div class="floatleft select-text-margin"> Detailed Solution
          <span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span>
        </div>
-       <div class="floatleft margin-left-thirty-eight">
+       <div class="floatleft padding-left-fourty-one">
             <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
             <input type=submit value="Save">
             <input type=submit name=test value="Save and Test Question">
@@ -333,7 +338,7 @@ $this->params['breadcrumbs'][] = $this->title;
             Use this as a "written example" help button<br/>
             <input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
             Display with the "Show Answer"<br/>
-        <textarea class="form-control padding-top-twenty max-width-hundread-three-per" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['solution']);?></textarea>
+        <textarea class="form-control padding-top-twenty width-hundread-three-per max-width-hundread-three-per margin-top-ten" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['solution']);?></textarea>
         <?php echo '</div></div></div>' ?>
 
 <div id=imgbox class="col-md-12">
@@ -356,15 +361,30 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <?php
     if (isset($images['vars']) && count($images['vars'])>0) {
-        echo "Images:<br/>\n";
+        echo "<div class='col-md-12 padding-left-zero'>
+        <div class='col-md-2'>Images</div>";
         foreach ($images['vars'] as $id=>$var) {
             if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                 $urlimg = $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$images['files'][$id]}";
             } else {
                 $urlimg = AppUtility::getAssetURL()."Uploads/qimages/{$images['files'][$id]}";
             }
-            echo "Variable: <input type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/> <a href=\"$urlimg\" target=\"_blank\">View</a> ";
-            echo "Description: <input type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/> Delete? <input type=checkbox name=\"delimg-$id\"/><br/>";
+            echo "</div>";
+            echo "<div class='col-md-12 padding-left-zero padding-bottom-twenty'>
+                        <div class='col-md-2 display-inline-block select-text-margin'>Variable</div>
+                        <div class='col-md-10 display-inline'>
+                            <input class='form-control width-sixty-one-per display-inline-block' type=\"text\" name=\"imgvar-$id\" value=\"\$$var\" size=\"10\"/>
+                            <a class='padding-left-twenty-five' href=\"$urlimg\" target=\"_blank\">View</a>
+                        </div>
+                  </div> ";
+            echo "<div class='col-md-12 padding-left-zero'>
+                    <div class='col-md-2 display-inline-block floatleft select-text-margin'>Description</div>
+                    <div class='col-md-10 display-inline'>
+                        <input class='floatleft form-control width-sixty-one-per display-inline-block' type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/>
+                        <span class='select-text-margin padding-left-twenty-five floatleft'>Delete?</span>
+                        <input class='select-text-margin margin-left-ten' type=checkbox name=\"delimg-$id\"/>
+                    </div>
+                    </div>";
         }
     }
     ?>

@@ -1012,7 +1012,7 @@ margin-top: -6% !important;
     padding-bottom: 5px;
 }
 .padding-left-twenty {
-    padding-left: 20px;
+    padding-left: 20px !important;
 }
 .margin-top-minus-six-per {
     margin-top: -6% !important;
@@ -1115,7 +1115,7 @@ background-color: #f8f8f8;
 .padding-right-five {
     padding-right: 5px;
 }
-.word-break-break-all {
+.word-break-all-width {
     word-break: break-all !important;
     width:50% !important;
 }
@@ -1173,7 +1173,7 @@ background-color: #f8f8f8;
 .width-one-ninety {
     width: 190px;
 }
-.word-break-all {
+.word-break-break-all {
     word-break: break-all !important;
 }
 .height-thirty-four {
@@ -1274,8 +1274,8 @@ background-color: #f8f8f8;
 .padding-right-eighteen {
     padding-right: 18px !important;
 }
-.padding-right-eighteen-pt-six-per {
-    padding-right: 18.6% !important;
+.padding-right-eighteen-pt-one-per {
+    padding-right: 18.1% !important;
 }
 .padding-left-one {
     padding-left: 1px;
@@ -1283,4 +1283,39 @@ background-color: #f8f8f8;
 
 .margin-right-twelve {
     margin-right: 12px !important;
+}
+.max-width-eighty-six-per {
+  max-width: 86% !important;
+}
+.width-twelve-per {
+    width: 12%;
+}
+.padding-right-seven-pt-six-per {
+    padding-right: 7.6%;
+}
+.padding-right-twenty-one {
+    padding-right: 21px !important;
+}
+.padding-left-right-fifteen {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.width-thirty-eight-per {
+    width:38%;
+}
+.padding-top-bottom-twenty {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+}
+.padding-left-fourty-one {
+    padding-left: 41px;
+}
+.margin-left-five-pt-six-per {
+    margin-left: 5.65%;
+}
+.margin-left-twenty-five {
+    margin-left: 25px;
+}
+.width-hundread-three-per {
+    width: 103%;
 }
