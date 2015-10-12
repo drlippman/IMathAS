@@ -1644,8 +1644,7 @@ class QuestionController extends AppController
         if (substr($inLibs, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ONE) === AppConstant::ZERO_VALUE) {
             $lNames[] = AppConstant::UNASSIGNED;
         }
-        $inLibsSafe = "'" . implode("','", explode(',', $inLibs)) . "'";
-        $query = Libraries::getByIdList($inLibsSafe);
+        $query = Libraries::getByIdList(explode(',', $inLibs));
         foreach ($query as $row) {
             $lNames[] = $row['name'];
         }
