@@ -35,7 +35,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 </div>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" xmlns="http://www.w3.org/1999/html"/>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport">
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" id="forum-id" value="<?php echo $forumId ?>">
 <input type="hidden" id="tag-id" value="<?php echo $tagValue ?>">

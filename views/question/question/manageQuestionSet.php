@@ -55,8 +55,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             if (todo == 'del'){
                 event.preventDefault();
-                var html ='<div><p>Are you SURE you want to delete this question from the Question Set? This will make it unavailable</p></div>';
-                html +='<div><p>to all users. If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
+                var html ='<div><p>Are you SURE you want to delete this question from the Question Set?</p></div>';
+                html +='<div><p> This will make it unavailable to all users.</p></div>';
+                html +='<div><p>If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
                 $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                     modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                     width: 'auto', resizable: false,
@@ -64,6 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     buttons: {
                         "Cancel": function () {
                             $(this).dialog('destroy').remove();
+                            $('.form-control-for-question').val("0");
                             return false;
                         },
                         "confirm": function () {
@@ -118,6 +120,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=chglib value="true">
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
+            <div class="col-md-12 padding-left-thirty">
             <div class="col-sm-12 padding-left-zero">What do you want to do with these questions?</div>
             <div class="col-sm-12 padding-left-zero margin-top-ten"><input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/><span class="margin-left-five">Add to libraries, keeping any existing library assignments</span></div>
             <div class="col-sm-12 padding-left-zero margin-top-five"><input type=radio name="action" value="1" onclick="chglibtoggle(this)"/><span class="margin-left-five">Add to libraries, removing existing library assignments</span></div>
@@ -132,6 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-sm-12 padding-left-zero margin-top-ten margin-bottom-fifteen">
                 <input type=submit value="Make Changes">
                 <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+            </div>
             </div>
         </form>
     <?php
@@ -165,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
                 <div class="col-sm-12 manage-qset-cng-licen">
-                    <div class="padding-left-zero col-sm-12 margin-bottom-ten text-background-color background-text-padding">
+                    <div class="padding-twenty col-sm-12 margin-bottom-ten text-background-color background-text-padding">
                         <div class="col-sm-12 padding-left-zero">This will allow you to change the license or attribution on questions, if you have the rights to change them</div>
                         <div class="col-sm-12 padding-left-zero">Note:  Be cautious when changing licenses or attribution on questions.  Some important things to note
                             <ul>
@@ -186,12 +190,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         <span class="col-sm-2 padding-left-zero select-text-margin">License:</span>
                         <span class="display-inline-block col-sm-6 padding-left-zero">
                             <select class="form-control" name="sellicense">
-                                <option value="0">Copyrighted</option>
-                                <option value="3">Creative Commons Attribution-NonCommercial-ShareAlike</option>
-                                <option value="4">Creative Commons Attribution-ShareAlike</option>
                                 <option value="-1">Do not change license</option>
+                                <option value="0">Copyrighted</option>
                                 <option value="1">IMathAS / WAMAP / MyOpenMath Community License</option>
                                 <option value="2">Public Domain</option>
+                                <option value="3">Creative Commons Attribution-NonCommercial-ShareAlike</option>
+                                <option value="4">Creative Commons Attribution-ShareAlike</option>
                             </select>
                         </span>
                     </div>
@@ -211,7 +215,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input class="form-control display-inline-block" type="text" size="80" name="addattr" />
                         </span>
                     </div>
-                    <div class="col-sm-4 margin-top-fifteen padding-left-zero">
+                    <div class="col-sm-6 margin-top-fifteen padding-left-zero">
                         <input type=submit value="Change License / Attribution">
                         <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
                     </div>
@@ -222,7 +226,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name="chgrights" value="true">
-
+            <div class="col-md-12 padding-left-thirty">
             <div>
                 This will allow you to change the use rights of the selected questions, if you can change those rights.
             </div>
@@ -243,6 +247,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <input type=submit value="Change Rights">
                 <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
+            </div>
         </form>
     <?php
     } else if (isset($params['remove'])) {
@@ -261,14 +266,16 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=transfer value="<?php echo $tlist ?>">
+            <div class="col-md-12 padding-left-thirty">
             <div class="col-md-12 padding-left-zero select-text-margin"> <span class="floatleft">Transfer question ownership to</span>
 
-                <span class="display-inline-block width-twenty-per margin-left-fifteen col-md-4"><?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?></span>
+                <span class="display-inline-block width-twenty-four-per margin-left-fifteen col-md-4"><?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?></span>
             </div>
             <div class="col-md-12 padding-top-fifteen padding-left-zero">
                 <input type=submit value="Transfer">
                 <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
+                </div>
         </form>
     <?php
     } else { //DEFAULT DISPLAY

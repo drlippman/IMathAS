@@ -24,21 +24,21 @@ class AppAsset extends AssetBundle
         'yii\web\YiiAsset',
     ];
     public $css = [
-        'css/imascore.css?ver=14',
-        'css/jquery-ui.min.css?ver=14',
-        'css/jquery-ui.structure.min.css?ver=14',
-        'css/site.css?ver=14',
-        'css/default.css?ver=14',
-        'css/font-awesome.min.css?ver=14'
+        'css/imascore.css?ver=15',
+        'css/jquery-ui.min.css?ver=15',
+        'css/jquery-ui.structure.min.css?ver=15',
+        'css/site.css?ver=15',
+        'css/default.css?ver=15',
+        'css/font-awesome.min.css?ver=15'
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD
     );
     public $js = [
         'js/mathjax/MathJax.js?config=AM_HTMLorMML',
-        'js/ASCIIsvg_min.js?ver=13',
-        'js/mathgraphcheck.js?ver=13',
-        'js/jquery-ui.min.js?ver=13',
-        'js/common.js?ver=13',
+        'js/ASCIIsvg_min.js?ver=15',
+        'js/mathgraphcheck.js?ver=15',
+        'js/jquery-ui.min.js?ver=15',
+        'js/common.js?ver=15',
     ];
 }

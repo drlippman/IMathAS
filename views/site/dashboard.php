@@ -4,7 +4,7 @@ use app\components\AppUtility;
     <title>IMathAS</title>
     <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge"/>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport">
 
 <?php
 use app\components\AppConstant;

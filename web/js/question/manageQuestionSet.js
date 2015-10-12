@@ -92,7 +92,8 @@ if(!questionCount){
     document.forms["selform"].submit();
 }else{
     event.preventDefault();
-    var html ='<div><p>Are you SURE you want to delete these questions from the Question Set.This will make them unavailable to all users.</p></div>';
+    var html ='<div><p>Are you SURE you want to delete these questions from the Question Set.</p></div>';
+    html +='<div><p>This will make them unavailable to all users.</p></div>';
     html +='<div><p class="floatleft">If any are currently being used in an assessment, it will mess up that assessment.</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -130,7 +131,7 @@ $("#manage-question-transfer").click(function() {
 
 function createQuestionsList(){
     var markArray = [];
-    $('.manage-question-set-table-class input[name = "nchecked[]"]:checked').each(function () {
+    $('#manage-question-set-table input[name = "nchecked[]"]:checked').each(function () {
         markArray.push($(this).val());
     });
     return markArray;

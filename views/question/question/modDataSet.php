@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="item-detail-content">
+<div class="item-detail-content margin-top-fourty">
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
 <div class="tab-content shadowBox padding-bottom-thirty">
@@ -391,7 +391,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12 right-ten padding-top-twenty">
         <div class="col-md-2 right-five select-text-margin display-inline-block floatleft">Help button: </div>
         <div class="col-md-4 padding-left-zero display-inline-block floatleft">
-            <div class="col-md-2 select-text-margin display-inline-block">Type:</div>
+            <div class="col-md-2 select-text-margin display-inline-block padding-left-thirteen">Type:</div>
             <div class="col-md-10 display-inline-block"><select class="form-control" name="helptype">
                     <option value="video">Video</option>
                     <option value="read">Read</option>
@@ -402,18 +402,22 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <?php
     if (count($extref)>0) {
-        echo "Help buttons:<br/>";
+        echo "<div class='col-md-12 padding-left-zero padding-top-fifteen'>
+        <div class='col-md-2'>Help buttons</div>
+        <div class='col-md-10'>";
         for ($i=0;$i<count($extref);$i++) {
             $extrefpt = explode('!!',$extref[$i]);
-            echo 'Type: '.ucfirst($extrefpt[0]);
+            echo '<span>Type</span><span class="padding-left-five"> '.ucfirst($extrefpt[0]).'</span>';
             if ($extrefpt[0]=='video' && count($extrefpt)>2 && $extrefpt[2]==1) {
                 echo ' (cc)';
             }
-            echo ', URL: <a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>.  Delete? <input type=\"checkbox\" name=\"delhelp-$i\"/><br/>";
+            echo ', <span>URL<span> <span><a href="'.$extrefpt[1].'">'.$extrefpt[1]."</a>
+            <span class='padding-left-ten'>Delete?</span> <input class='margin-left-five' type=\"checkbox\" name=\"delhelp-$i\"/></span>";
         }
+        echo '</div></div>';
     }
     if ($myRights==100) {
-        echo '<div class="col-md-12 padding-top-twenty display-inline-block"><div class="floatleft select-text-margin display-inline-block">Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
+        echo '<div class="col-md-12 padding-top-fifteen display-inline-block"><div class="floatleft select-text-margin display-inline-block">Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
         if ($line['replaceby']!=0) {
             echo 'checked="checked"';
         }

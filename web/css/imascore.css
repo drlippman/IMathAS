@@ -906,7 +906,7 @@ margin-left: 23px;
     width: 63%;
 }
 .width-eighty-per {
-    width: 80%;
+    width: 80% !important;
 }
 .margin-left-fifty {
     margin-left: 50px !important;
@@ -1286,7 +1286,7 @@ background-color: #f8f8f8;
 }
 
 .max-width-eighty-six-per {
-  max-width: 86% !important;
+  max-width: 76% !important;
 }
 .width-twelve-per {
     width: 12%;
@@ -1329,4 +1329,13 @@ background-color: #f8f8f8;
 }
 .width-eight-four-per {
     width: 84% !important;
+}
+.padding-left-thirteen {
+    padding-left: 13px;
+}
+.padding-twenty {
+    padding: 20px;
+}
+.width-twenty-four-per {
+    width: 24%;
 }
