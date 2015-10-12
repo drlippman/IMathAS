@@ -107,7 +107,6 @@ $this->params['breadcrumbs'][] = $this->title;
         echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
         echo 'It is recommended you discontinue use of this question when possible</p>';
     }
-
     if (isset($inUseCount) && $inUseCount > 0) {
         echo '<p style="color:red;">This question is currently being used in ';
         if ($inUseCount > 1) {
@@ -216,7 +215,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-3 select-text-margin"><span id="libnames"><?php echo $lnames;?></span></div>
                 <input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
                 <div class="col-md-2">
-                    <input type=button value="Select Libraries" onClick="libselect()">
+                    <input type=button value="Select Libraries" onClick="#">
                </div>
            </div>
         </div>
@@ -267,7 +266,7 @@ $this->params['breadcrumbs'][] = $this->title;
                   <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
               </div>
               <div class="floatleft padding-left-fourty-one">  <input type=submit value="Save">
-                     <input type=submit name=test value="Save and Test Question">
+                     <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
               </div>
         </div></br>
         <div class="col-md-10 col-md-offset-2 padding-top-twenty">
@@ -278,7 +277,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12 margin-left-sixteen padding-top-twenty">
                    <div class="floatleft select-text-margin"> Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span></div>
                    <div class="floatleft margin-left-thirty-eight"> <input type=submit value="Save">
-                    <input type=submit name=test value="Save and Test Question">
+                    <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
                    </div>
                 </div>
             <div class="col-md-10 col-md-offset-2 padding-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qcontrol'];?></textarea> </div>
@@ -287,8 +286,8 @@ $this->params['breadcrumbs'][] = $this->title;
            <div class="col-md-12">
                <div class="floatleft select-text-margin">Question Text <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span></div>
                <div class="floatleft margin-left-five-pt-six-per"><input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
-                    <input type=submit value="Save">
-                    <input type=submit name=test value="Save and Test Question">
+                    <input class="margin-left-fifteen" type=submit value="Save">
+                    <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
                </div>
            </div>
         </div></br>
@@ -301,7 +300,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="floatleft select-text-margin"> Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span></div>
                 <div class="floatleft margin-left-eight-pt-five-per">
                     <input type=submit value="Save">
-                    <input type=submit name=test value="Save and Test Question">
+                    <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
                 </div>
             </div>
             <div class="col-md-10 col-md-offset-2 padding-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea></div>
@@ -321,8 +320,8 @@ $this->params['breadcrumbs'][] = $this->title;
        </div>
        <div class="floatleft padding-left-fourty-one">
             <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
-            <input type=submit value="Save">
-            <input type=submit name=test value="Save and Test Question">
+            <input class="margin-left-fifteen" type=submit value="Save">
+            <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
        </div>
     </div>
     <br>
@@ -381,7 +380,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class='col-md-2 display-inline-block floatleft select-text-margin'>Description</div>
                     <div class='col-md-10 display-inline'>
                         <input class='floatleft form-control width-sixty-one-per display-inline-block' type=\"text\" size=\"20\" name=\"imgalt-$id\" value=\"{$images['alttext'][$id]}\"/>
-                        <span class='select-text-margin padding-left-twenty-five floatleft'>Delete?</span>
+                        <span class='select-text-margin padding-left-twenty-eight floatleft'>Delete?</span>
                         <input class='select-text-margin margin-left-ten' type=checkbox name=\"delimg-$id\"/>
                     </div>
                     </div>";
@@ -434,7 +433,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="col-md-12 save-question margin-left-fifteen padding-top-twenty display-inline-block">
     <input type=submit value="Save">
-    <input type=submit name=test value="Save and Test Question">
+    <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
 </div>
     </form>
     </div>
