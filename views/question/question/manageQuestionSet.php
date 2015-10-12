@@ -315,10 +315,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                         echo '</div>
 
-                            <div class="floatleft display-inline-block padding-right-twenty-one padding-bottom-fifteen">
+                            <div class="floatleft display-inline-block padding-right-seventeen padding-bottom-fifteen">
                                 <input type=submit value="Search" title="List or search selected libraries padding-bottom-fifteen">
                             </div>';
-                        echo "<div class='floatleft display-inline-block padding-right-twenty-one padding-bottom-fifteen'>
+                        echo "<div class='floatleft display-inline-block padding-right-seventeen padding-bottom-fifteen'>
                                 <input type=button value=\"Add New Question\" onclick=\"window.location='mod-data-set?cid=$cid'\">
                               </div>"; ?>
                         <div class="floatleft padding-bottom-fifteen margin-top-minus-five">
