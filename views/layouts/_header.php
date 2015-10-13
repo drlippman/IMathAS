@@ -52,18 +52,18 @@ echo Nav::widget([
             ($totalCount > AppConstant::NUMERIC_ZERO ?['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><div class="notification msg-count">'.$totalCount.'</div></div>',
                 'items' =>
                 [
-                    ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
+                    ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
                     '<li class="divider"></li>',
-                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/new-post?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
+                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/new-post?cid='.$courseId] :['label' => 'Forum', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
                 ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] :
 
                 ['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/notifctn.png">&nbsp;Notifications',
                 'items' =>
                     [
-                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
+                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
                         '<li class="divider"></li>',
-                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
+                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
                     ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] ),
 

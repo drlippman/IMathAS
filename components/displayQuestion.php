@@ -7,7 +7,7 @@ use app\models\Libraries;
 //(c) 2006 David Lippman
 //quadratic inequalities contributed by Cam Joyce
 $GLOBALS['noformatfeedback'] = true;
-global $allowedmacros;
+global $allowedmacros, $courseId;
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
 //require_once("mathphp.php");
@@ -99,7 +99,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}
-
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
@@ -395,7 +394,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			for ($i=0;$i<count($extref);$i++) {
 				$extrefpt = explode('!!',$extref[$i]);
 				if ($extrefpt[0]=='video' || strpos($extrefpt[1],'youtube.com/watch')!==false) {
-					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($extrefpt[1]);
+					$extrefpt[1] = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot"."assessment/assessment/watch-video?url=".urlencode($extrefpt[1]);
 					if ($extrefpt[0]=='video') {$extrefpt[0]='Video';}
                     $temp .= formpopup($extrefpt[0],$extrefpt[1],660,530,"button",true,"video",$qref);
 				} else if ($extrefpt[0]=='read') {
@@ -405,9 +404,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				}
 			}
 		}
+
 		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
-			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
-			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
+			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot"."assessment/assessment/show-solution?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
+			$addr .= '&t='.($qdata['solutionopts']&1).'&cid=10';
             $temp .= formpopup("Written Example",$addr,730,500,"button",true,"soln",$qref);
 		}
 		$temp .= '</p></div>';

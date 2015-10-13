@@ -2153,6 +2153,7 @@ function formhoverover($label,$tip) {
 
 function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='null',$id='popup',$ref='') {
 	global $urlmode;
+    $imasroot = \app\components\AppUtility::getHomeURL();
 	if ($scroll != null) {
 		$scroll = ','.$scroll;
 	}
@@ -2173,7 +2174,6 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 		} else {
 			$rec = "recclick('extref',$ref,'".$contentadd.trim(htmlentities($content))."');";
 		}
-		
 	} else {
 		$rec = '';
 	}
@@ -2184,7 +2184,7 @@ function formpopup($label,$content,$width=600,$height=400,$type='link',$scroll='
 			return '<span class="link" onClick="'.$rec.'popupwindow(\''.$id.'\',\''.str_replace('\'','\\\'',htmlentities($content)).'\','.$width.','.$height.$scroll.')">'.$label.'</span>';
 		} else if ($type=='button') {
 			if (substr($content,0,31)=='http://www.youtube.com/watch?v=') {
-				$content = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot/assessment/watchvid.php?url=".urlencode($content);
+				$content = $urlmode . $_SERVER['HTTP_HOST'] . "$imasroot"."assessment/assessment/watch-video?url=".urlencode($content);
 				$width = 660;
 				$height = 525;
 			}

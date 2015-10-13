@@ -169,4 +169,8 @@ class ContentTrack extends BaseImasContentTrack
         $query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$courseId' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
         return \Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getId($coursId, $userId,$type, $tId){
+        return ContentTrack::find()->select('id')->where(['courseid' => $coursId, 'userid' => $userId, 'linkedlink' => $type, 'typeid' => $tId])->orderBy(['viewtime'=> SORT_DESC])->limit(1);
+    }
 }

@@ -1965,7 +1965,7 @@ class QuestionController extends AppController
             }
             $resultLibNames = Libraries::getUserAndLibrary($params['qsetid']);
         }
-        $this->includeCSS(['mathquill.css', 'question/question.css', 'course/course.css', 'roster/roster.css']);
+        $this->includeCSS(['mathquill.css', 'question/question.css', 'course/course.css', 'roster/roster.css','mathtest.css']);
         $this->includeJS(['eqntips.js', 'eqnhelper.js', 'mathquill_min.js', 'mathquilled.js', 'AMtoMQ.js', 'tablesorter.js',
             'question/addquestions.js', 'general.js', 'question/junkflag.js', 'AMhelpers_min.js', 'confirmsubmit.js','editor/tiny_mce.js']);
         $responseArray = array('course' => $course, 'params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'showtips' => $showTips,

@@ -53,7 +53,7 @@ use app\components\AppConstant;
     if ($isdiag) {
         echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot"."diag/print.css?ver=".AppConstant::VERSION_NUMBER." media=\"print\"/>\n";
     } else {
-        echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot"."css/print.css?ver=".AppConstant::VERSION_NUMBER." media=\"print\"/>\n";
+//        echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot"."css/print.css?ver=".AppConstant::VERSION_NUMBER." media=\"print\"/>\n";
     }
     if (!isset($sessiondata['mathdisp'])) {
         echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; function rendermathnode(el) {AMprocessNode(el);}</script>';

@@ -190,7 +190,7 @@ class AppController extends Controller
     }
 
     public function checkSession($params){
-        global $CFG;
+        global $CFG,$urlMode;
         $session = Yii::$app->session;
         if (isset($sessionpath) && $sessionpath!='') {
             session_save_path($sessionpath);
@@ -209,11 +209,7 @@ class AppController extends Controller
         $session->open();
         $sessionId = $session->getId();
         Yii::$app->session->set('sessionId',$sessionId);
-        if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
-            $urlMode = 'https://';
-        } else {
-            $urlMode = 'http://';
-        }
+        $urlMode = AppUtility::urlMode();
         $randomString = $this->generaterandstring();
         $check =$this->checkeditorok();
 

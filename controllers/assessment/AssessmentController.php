@@ -1170,7 +1170,7 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
-        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$isdiag;
+        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$isdiag, $courseId;
         $myrights = $user['rights'];
         $sessiondata = $this->getSessionData($sessionId);;
         if (!isset($CFG['TE']['navicons'])) {
@@ -3969,6 +3969,104 @@ class AssessmentController extends AppController
 			}
 		}</script>';
         $temp  .= '</div>';
+    }
+
+    public function actionShowSolution(){
+        $
+        $id = intval($this->getParamVal(['id']));
+        $sig = $this->getParamVal(['sig']);
+        $t = intval($this->getParamVal(['t']));
+        global $sessiondata;
+        $flexwidth = true;
+        $temp = '<p><b style="font-size:110%">'.AppUtility::t('Written Example').'</b> '._('of a similar problem').'</p>';
+        if ($sig != md5($id.$sessiondata['secsalt'])) {
+            $temp .= AppUtility::t("invalid signature - not authorized to view the solution for this problem");
+        }
+        require("../components/displayQuestion.php");
+        $txt = displayq(0,$id,0,false,false,0,2+$t);
+        $temp .= filter($txt);
+
+        $renderData =array('temp' => $temp);
+        return $this->renderWithData('showSolution',$renderData);
+    }
+
+    public function actionRecTrackAjax(){
+        return $this->redirect('site','work-in-progress ');
+    }
+
+    public function actionWatchVideo(){
+        $url = $this->getParamVal(['url']);
+        global $urlmode;
+        $doEmbed = false;
+        $urlmode = AppUtility::urlMode();
+        if (strpos($url,'youtube.com/watch')!==false) {
+            //youtube
+            $videoId = substr($url,strrpos($url,'v=')+2);
+            if (strpos($videoId,'&')!==false) {
+                $videoId = substr($videoId,0,strpos($videoId,'&'));
+            }
+            if (strpos($videoId,'#')!==false) {
+                $videoId = substr($videoId,0,strpos($videoId,'#'));
+            }
+            $videoId = str_replace(array(" ","\n","\r","\t"),'',$videoId);
+            $timeStart = '?rel=0';
+            if (strpos($url,'start=')!==false) {
+                preg_match('/start=(\d+)/',$url,$m);
+                $timeStart .= '&'.$m[0];
+            } else if (strpos($url,'t=')!==false) {
+                preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+                $timeStart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
+            }
+
+            if (strpos($url,'end=')!==false) {
+                preg_match('/end=(\d+)/',$url,$m);
+                $timeStart .= '&'.$m[0];
+            }
+            $doEmbed = true;
+            $out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$videoId.$timeStart.'" frameborder="0" allowfullscreen></iframe>';
+        }
+        if (strpos($url,'youtu.be/')!==false) {
+            //youtube
+            $videoId = substr($url,strpos($url,'.be/')+4);
+            if (strpos($videoId,'#')!==false) {
+                $videoId = substr($videoId,0,strpos($videoId,'#'));
+            }
+            if (strpos($videoId,'?')!==false) {
+                $videoId = substr($videoId,0,strpos($videoId,'?'));
+            }
+            $videoId = str_replace(array(" ","\n","\r","\t"),'',$videoId);
+            $timeStart = '?rel=0';
+            if (strpos($url,'start=')!==false) {
+                preg_match('/start=(\d+)/',$url,$m);
+                $timeStart .= '&'.$m[0];
+            } else if (strpos($url,'t=')!==false) {
+                preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+                $timeStart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));
+            }
+
+            if (strpos($url,'end=')!==false) {
+                preg_match('/end=(\d+)/',$url,$m);
+                $timeStart .= '&'.$m[0];
+            }
+            $doEmbed = true;
+            $out = '<iframe width="640" height="510" src="'.$urlmode.'www.youtube.com/embed/'.$videoId.$timeStart.'" frameborder="0" allowfullscreen></iframe>';
+        }
+        if (strpos($url,'vimeo.com/')!==false) {
+            //youtube
+            $videoId = substr($url,strpos($url,'.com/')+5);
+            $doEmbed = true;
+            $out = '<iframe width="640" height="510" src="http://player.vimeo.com/video/'.$videoId.'" frameborder="0" allowfullscreen></iframe>';
+        }
+        if ($doEmbed) {
+            echo '<html><head><title>Video</title>';
+            echo '<meta name="viewport" content="width=660, initial-scale=1">';
+            echo '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}</style>';
+            echo '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);</script>';
+            echo '</head>';
+            echo '<body>'.$out.'</body></html>';
+        } else {
+            header("Location: $url");
+        }
     }
 }
 
