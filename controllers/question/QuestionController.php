@@ -3022,7 +3022,7 @@ class QuestionController extends AppController
                     $allUsedQids = implode(',', array_keys($pageQuestionTable));
                     $query = Questions::getByQuestionSetId($allUsedQids);
                     foreach ($query as $row) {
-                        $pageQuestionTable[$row[0]]['times'] = $row[1];
+                        $pageQuestionTable[$row['questionsetid']]['times'] = $row['COUNT(id)'];
                     }
                 }
                 /*

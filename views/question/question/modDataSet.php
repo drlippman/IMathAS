@@ -104,11 +104,11 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     if ($line['deleted']== AppConstant::NUMERIC_ONE) {
-        echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
+        echo '<p class="color-red col-md-12 padding-left-twelve">This question has been marked for deletion.  This might indicate there is an error in the question. ';
         echo 'It is recommended you discontinue use of this question when possible</p>';
     }
-    if (isset($inUseCount) && $inUseCount > 0) {
-        echo '<p style="color:red;">This question is currently being used in ';
+    if (isset($inUseCount) && $inUseCount["count('imas_questions.id')"] > 0) {
+        echo '<p class="color-red col-md-12 padding-left-twelve">This question is currently being used in ';
         if ($inUseCount > 1) {
             echo $inUseCount.' assessments that are not yours.  ';
         } else {

@@ -248,9 +248,11 @@ class Questions extends BaseImasQuestions
     }
 
     public static function getQidCount($userId,$qSetId){
-        $query = Questions::find()->from(['imas_questions','imas_assessments','imas_courses'])->where(['imas_assessments.id' => 'imas_questions.assessmentid'])->
-        andWhere(['imas_assessments.courseid' => 'imas_courses.id'])->andWhere(['imas_questions.questionsetid' =>$qSetId])->andWhere(['<>','imas_courses.ownerid',$userId])->all();
-        return count($query);
+
+        $query = "SELECT count('imas_questions.id') FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
+        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid='{$qSetId}' AND imas_courses.ownerid<>'$userId'";
+        $queryResult = Yii::$app->db->createCommand($query)->queryAll();
+        return $queryResult;
     }
 
     public static function updateQuestionData($checkedlist)

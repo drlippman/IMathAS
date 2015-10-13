@@ -54,7 +54,6 @@ $this->params['breadcrumbs'][] = $this->title;
             }
 
             if (todo == 'del'){
-                event.preventDefault();
                 var html ='<div><p>Are you SURE you want to delete this question from the Question Set?</p></div>';
                 html +='<div><p> This will make it unavailable to all users.</p></div>';
                 html +='<div><p>If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
@@ -381,7 +380,7 @@ $this->params['breadcrumbs'][] = $this->title;
         } else if ($isgrpadmin) {
             echo "<div class='col-sm-12 padding-bottom-fifteen padding-left-right-zero'>(Delete and Transfer only apply to group's questions)</div>";
         }
-        echo "<div class='overflow-x-auto width-hundread-per'><table class='col-sm-12 manage-question-table table table-bordered table-striped data-table' id=myTable><thead>\n";
+        echo "<div class='overflow-x-auto width-hundread-per table-float-left'><table class='col-sm-12 manage-question-table table table-bordered table-striped data-table' id=myTable><thead>\n";
         echo "<tr>
                    <th class='text-align-center'>
                    <div class='checkbox override-hidden padding-left-twenty-five'>

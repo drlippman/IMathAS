@@ -279,3 +279,12 @@ h3 {
 .ui-dialog {
     width:60% !IMPORTANT;
 }
+
+@-moz-document url-prefix() {
+    .table-float-left {
+        float: left !important;
+    }
+}
+.padding-left-twelve {
+padding-left: 12px;
+}
