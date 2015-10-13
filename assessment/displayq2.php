@@ -2654,7 +2654,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 		} else {
+			$givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
+			$givenans = str_replace(',','99999999',$givenans); //force wrong ans on lingering commas
+			echo $givenans;
 			$gaarr = array(str_replace(array('$',',',' ','/','^','*'),'',$givenans));
+			
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
 				$anarr = array(str_replace(',','',$answer));
 			} else {
@@ -3346,10 +3350,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		$givenans = str_replace(array('∞','⁄ '), array('oo','/'), $givenans);
+		$givenans = normalizemathunicode($givenans);
 
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
-		$_POST["tc$qn"] = str_replace(array('∞','⁄ '), array('oo','/'),$_POST["tc$qn"]);
+		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 		if ($answer==='') {
 			if (trim($_POST["tc$qn"])==='') { return 1;} else { return 0;}
 		}

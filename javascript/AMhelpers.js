@@ -16,7 +16,7 @@ function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
   fullstr = normalizemathunicode(fullstr);
   fullstr = fullstr.replace(/=/,'');
-  fullstr = fullstr.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
+  
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
   } else {
@@ -25,7 +25,7 @@ function calculate(inputId,outputId,format) {
   }
   for (var sc=0;sc<strarr.length;sc++) {
 	  str = strarr[sc];
-	  //str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
+	  str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	  var err = "";
 	  if (str.match(/DNE/i)) {
 		  str = str.toUpperCase();
@@ -34,8 +34,7 @@ function calculate(inputId,outputId,format) {
 	  } else {
 		  err += singlevalsyntaxcheck(str,format);
 		  if (str.match(/,/)) {
-		  	  err += _("Invalid use of a comma - it will be ignored and this expression may not evaluate as intended.");
-		  	  str = str.replace(/,/g,'');
+		  	  err += _("Invalid use of a comma.");
 		  }
 		  if (format.indexOf('mixednumber')!=-1) {
 		  	  str = str.replace(/_/,' ');
@@ -48,6 +47,7 @@ function calculate(inputId,outputId,format) {
 		  err += syntaxcheckexpr(str,format);
 		  try {
 			  var evalstr = str;
+			  evalstr = evalstr.replace(',','*NaN*'); //force eval error on lingering commas
 			  if (format.indexOf('allowmixed')!=-1 || format.indexOf('mixednumber')!=-1) {
 				  evalstr = evalstr.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 			  }
@@ -896,7 +896,7 @@ function doonsubmit(form,type2,skipconfirm) {
 		str = document.getElementById("tc"+qn).value;
 		str = normalizemathunicode(str);
 		str = str.replace(/=/,'');
-		str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
+		
 		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
 		} else {
@@ -905,8 +905,9 @@ function doonsubmit(form,type2,skipconfirm) {
 		}
 		for (var sc=0;sc<strarr.length;sc++) {
 			str = strarr[sc];
-			
-			str = str.replace(/,/g,"");
+			str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+			str = str.replace(',','*NaN*'); //force eval error
+			//str = str.replace(/,/g,"");
 			if (calcformat[qn].indexOf('scinot')!=-1) {
 				str = str.replace(/(x|X|\u00D7)/,"*");
 			}

@@ -1913,7 +1913,7 @@ function definefunc($func,$varlist) {
 	return array($func,$varlist);
 }
 
-function getstuans($v,$q,$i) {
+function getstuans($v,$q,$i=0) {
 	if (is_array($v[$q])) {
 		return $v[$q][$i];
 	} else {
