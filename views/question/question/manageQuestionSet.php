@@ -315,14 +315,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                         echo '</div>
 
-                            <div class="floatleft display-inline-block padding-right-seventeen padding-bottom-fifteen">
+                            <div class="floatleft display-inline-block padding-right-nineteen padding-bottom-fifteen moz-btn-padding">
                                 <input type=submit value="Search" title="List or search selected libraries padding-bottom-fifteen">
                             </div>';
-                        echo "<div class='floatleft display-inline-block padding-right-seventeen padding-bottom-fifteen'>
+                        echo "<div class='floatleft display-inline-block padding-right-nineteen padding-bottom-fifteen moz-btn-padding'>
                                 <input type=button value=\"Add New Question\" onclick=\"window.location='mod-data-set?cid=$cid'\">
                               </div>"; ?>
                         <div class="floatleft padding-bottom-fifteen margin-top-minus-five">
-                            <div class="with-selected with-selected-dropdown">
+                            <div class="with-selected with-selected-dropdown moz-drop-down-width">
                                 <ul class="nav nav-tabs nav-justified manage-question-with-selected-dropdown sub-menu">
                                     <li class="dropdown">
                                         <a class="manage-question-with-selected dropdown-toggle grey-color-link" data-toggle="dropdown" href="#">With selected

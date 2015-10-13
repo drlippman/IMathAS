@@ -221,8 +221,7 @@ word-break: break-all !important;
     cursor: pointer;
 }
 .with-selected-dropdown {
-    /*min-width: 170px;*/
-    max-width: 170px;
+    max-width: 174px;
 }
 .categorize-question-description {
     word-wrap: break-word;
@@ -283,6 +282,12 @@ h3 {
 @-moz-document url-prefix() {
     .table-float-left {
         float: left !important;
+    }
+    .moz-btn-padding {
+        padding-right: 15px !important;
+    }
+    .moz-drop-down-width {
+        width: 174px !important;
     }
 }
 .padding-left-twelve {

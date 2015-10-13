@@ -1295,7 +1295,7 @@ background-color: #f8f8f8;
     padding-right: 7.6%;
 }
 .padding-right-twenty-one {
-    padding-right: 21px !important;
+    padding-right: 21px;
 }
 .padding-left-right-fifteen {
     padding-left: 15px;
@@ -1350,4 +1350,7 @@ background-color: #f8f8f8;
 }
 .color-red {
 color:red;
+}
+.padding-right-nineteen {
+    padding-right: 19px;
 }

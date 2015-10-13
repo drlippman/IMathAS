@@ -107,15 +107,14 @@ $this->params['breadcrumbs'][] = $this->title;
         echo '<p class="color-red col-md-12 padding-left-twelve">This question has been marked for deletion.  This might indicate there is an error in the question. ';
         echo 'It is recommended you discontinue use of this question when possible</p>';
     }
-    if (isset($inUseCount) && $inUseCount["count('imas_questions.id')"] > 0) {
+    if (isset($inUseCount) && $inUseCount['qidCount'] > 0) {
         echo '<p class="color-red col-md-12 padding-left-twelve">This question is currently being used in ';
-        if ($inUseCount > 1) {
-            echo $inUseCount.' assessments that are not yours.  ';
+        if ($inUseCount['qidCount'] > 1) {
+            echo $inUseCount['qidCount'].' assessments that are not yours.  ';
         } else {
             echo 'one assessment that is not yours.  ';
         }
         echo 'In consideration of the other users, if you want to make changes other than minor fixes to this question, consider creating a new version of this question instead.  </p>';
-
     }
 
     if (isset($params['qid'])) {

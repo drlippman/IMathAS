@@ -249,9 +249,9 @@ class Questions extends BaseImasQuestions
 
     public static function getQidCount($userId,$qSetId){
 
-        $query = "SELECT count('imas_questions.id') FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
-        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid='{$qSetId}' AND imas_courses.ownerid<>'$userId'";
-        $queryResult = Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT count('imas_questions.id') AS qidCount FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
+        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid= :qSetId AND imas_courses.ownerid<>'$userId'";
+        $queryResult = Yii::$app->db->createCommand($query)->bindValue('qSetId',$qSetId)->queryOne();
         return $queryResult;
     }
 
