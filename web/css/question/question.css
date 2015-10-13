@@ -189,11 +189,6 @@ text-align: left;
     -moz-transition: all 2s !important;
     transition: all 0.2s;
 }
-#search:focus, #manage-question-set-search:focus {
-    /* Picked a random icon from Google */
-    background-position: -20px center;
-    text-indent: 0;
-}
 .add-question-preview-btn {
     min-width: 95% !important;
     margin-left: -10px;
@@ -245,7 +240,7 @@ max-width: 250px;
 }
 .manage-question-table td, .manage-question-table th {
     margin: 0px;
-    padding: 7px 3px 7px 4px !important;
+    padding: 7px 5px 7px 5px !important;
 }
 .display-none {
     display: none !important;
