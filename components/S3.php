@@ -26,12 +26,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-* Amazon S3 PHP class
-*
-* @link http://undesigned.org.za/2007/10/22/amazon-s3-php-class
-* @version 0.3.4
-*/
+
 namespace app\components;
 
 use Yii;

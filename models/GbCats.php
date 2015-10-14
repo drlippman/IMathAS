@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 25/6/15
- * Time: 7:13 PM
- */
-
 namespace app\models;
 use app\components\AppConstant;
 use app\models\_base\BaseImasGbcats;

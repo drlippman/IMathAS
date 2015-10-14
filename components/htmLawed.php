@@ -1,16 +1,5 @@
 <?php
 
-/*
-htmLawed 1.0.8, 27 May 2008
-Copyright Santosh Patnaik
-GPL v3 license
-A PHP Labware internal utility - http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed
-
-See htmLawed_README.txt/.htm
-
-Stripslashes() GET/POST if magic_quotes is on
-*/
-
 require_once("filehandler.php");
 
 function convertdatauris($in) {

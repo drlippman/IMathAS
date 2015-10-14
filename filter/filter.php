@@ -1,8 +1,7 @@
 <?php
-	//IMathAS (c) 2006 David Lippman
-	//Filter file - converts ASCIIsvg and ASCIImath to image tags
-	//if needed
-
+	/*
+	 * Filter file - converts ASCIIsvg and ASCIImath to image tags
+	 */
 use app\components\AppUtility;
 
 	//load in filters as needed

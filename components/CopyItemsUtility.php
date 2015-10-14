@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 9/7/15
- * Time: 12:14 PM
- */
 namespace app\components;
 use app\models\Assessments;
 use app\models\ExternalTools;
@@ -260,9 +254,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
 
                 $questionIdArray = array();
                 foreach ($inss as $in) {
-
                     unset($in['id']);
-                    $in['assessmentid'] = ($newtypeid);
+                    $in['assessmentid'] = $newtypeid;
                     $question = new Questions();
                     $firstnewid = $question->copyQuestions($in);
                     array_push($questionIdArray, $firstnewid);

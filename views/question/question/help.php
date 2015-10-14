@@ -1,11 +1,9 @@
-
 <html
 <head>
 <?php
 use app\components\AppUtility;
 
-	$dbsetup = true; //prevents connection to database
-//	include("config.php");
+$dbsetup = true; //prevents connection to database
 $installname = 'OpenMath';
 ?>
 <title><?php echo $installname;?> Help</title>
@@ -39,8 +37,6 @@ h2,h3,h4 {
 }
 </style>
 <?php
-//IMathAS:  Reads sections of the help.html file
-//(c) 2006 David Lippman
 	if (!isset($_GET['section'])) {
 		echo "<style type=\"text/css\">\n";
 		echo "div.h2 {margin-left: 10px;} \n div.h3 {margin-left: 20px;} \n div.h3 {margin-left: 30px;} \n";

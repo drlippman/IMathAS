@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 27/5/15
- * Time: 12:32 PM
- */
 
 namespace app\models\forms;
 

@@ -9,7 +9,7 @@ $(document).ready(function ()
 
 var studentData;
 function studentRosterSuccess(response) {
-    response = JSON.parse(response);
+    response = JSON.parse(response);console.log(response);
     if (response.status == 0) {
         var students = response.data.query;
         showStudentInformation(students);

@@ -1170,7 +1170,7 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
-        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$isdiag, $courseId;
+        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$isdiag, $courseId, $attempts,$scores,$bestscores,$noindivscores,$showeachscore;
         $myrights = $user['rights'];
         $sessiondata = $this->getSessionData($sessionId);;
         if (!isset($CFG['TE']['navicons'])) {
@@ -2843,8 +2843,9 @@ class AssessmentController extends AppController
                                 }
                             }
                         }
-                        $qavail = seqshowqinfobar($i,$toshow);
-
+                        $seqShowQuestion = seqshowqinfobar($i,$toshow);
+                        $qavail = $seqShowQuestion[0];
+                        $temp .= $seqShowQuestion[1];
                         if ($i==$toshow) {
                             $temp .= '<div class="curquestion">';
                             basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
@@ -2858,7 +2859,7 @@ class AssessmentController extends AppController
                         }
 
                         if ($i==$toshow) {
-                            $temp .= "<div><input type=\"submit\" class=\"btn\" value=\"". sprintf('Submit Question %d'. ($i+1)). "\" /></div><p></p>\n";
+                            $temp .= "<div><input type=\"submit\" class=\"btn\" value=".sprintf('Submit Question %d', ($i+1))." /></div><p></p>\n";
                         }
                         $temp .= '<hr class="seq"/>';
                     }
@@ -3114,7 +3115,7 @@ class AssessmentController extends AppController
                     $temp .= '<input type="submit" class="btn" name="saveforlater" value="'.'Save answers'. '" onclick="return confirm(\''.'This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'. '\');" />';
                     $temp .= "</form>\n";
                 } else {
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
                     $temp .= "</form>\n";
                     $this->leavetestmsg($sessiondata);
 
@@ -3126,7 +3127,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3154,7 +3155,7 @@ class AssessmentController extends AppController
                     $temp .= "<div class=inset><br/>\n";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
 
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3191,7 +3192,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3212,8 +3213,10 @@ class AssessmentController extends AppController
                                 }
                             }
                         }
-                        $qavail = seqshowqinfobar($i,$curq);
-
+                        $seqShowQuestion = seqshowqinfobar($i,$curq);
+                        $qavail = $seqShowQuestion[0];
+                        $temp .= $seqShowQuestion[1];
+//                        AppUtility::dump($temp);
                         if ($i==$curq) {
                             $temp .= '<div class="curquestion">';
                             basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
@@ -3226,7 +3229,7 @@ class AssessmentController extends AppController
                             basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,true);
                         }
                         if ($i==$curq) {
-                            $temp .= "<div><input type=\"submit\" class=\"btn\" value=\"". sprintf('Submit Question %d'. ($i+1)). "\" /></div><p></p>\n";
+                            $temp .= "<div><input type=\"submit\" class=\"btn\" value=". sprintf('Submit Question %d', ($i+1))." /></div><p></p>\n";
                         }
 
                         $temp .= '<hr class="seq"/>';
@@ -3972,10 +3975,9 @@ class AssessmentController extends AppController
     }
 
     public function actionShowSolution(){
-        $
-        $id = intval($this->getParamVal(['id']));
-        $sig = $this->getParamVal(['sig']);
-        $t = intval($this->getParamVal(['t']));
+        $id = intval($this->getParamVal('id'));
+        $sig = $this->getParamVal('sig');
+        $t = intval($this->getParamVal('t'));
         global $sessiondata;
         $flexwidth = true;
         $temp = '<p><b style="font-size:110%">'.AppUtility::t('Written Example').'</b> '._('of a similar problem').'</p>';
@@ -3995,7 +3997,7 @@ class AssessmentController extends AppController
     }
 
     public function actionWatchVideo(){
-        $url = $this->getParamVal(['url']);
+        $url = $this->getParamVal('url');
         global $urlmode;
         $doEmbed = false;
         $urlmode = AppUtility::urlMode();

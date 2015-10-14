@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 30/5/15
- * Time: 12:59 PM
- */
 
 namespace app\models\forms;
 use app\components\AppConstant;

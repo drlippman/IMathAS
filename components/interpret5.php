@@ -1,9 +1,5 @@
 <?php
 use app\models\QuestionSet;
-//IMathAS:  IMathAS question interpreter.  Defines how the IMathAS question
-//language works.
-//(c) 2006 David Lippman
-
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 global $disallowedvar;
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");

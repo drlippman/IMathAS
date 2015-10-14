@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 11/5/15
- * Time: 12:50 PM
- */
 
 namespace app\models;
 
@@ -331,19 +325,17 @@ class Questions extends BaseImasQuestions
     }
 
     public function copyQuestions($params)
-    {print_r($params);
-        $this->assessmentid = $params->assessmentid;
-        $this->questionsetid = $params->questionsetid;
-        $this->points = $params->points;
-        $this->attempts = $params->attempts;
-        $this->penalty = $params->penalty;
-        $this->category = $params->category.'';
-        $this->regen = $params->regen;
-        $this->showans = $params->showans;
-        $this->showhints = $params->showhints;
-        $this->save();
-        print_r($this->id);
-        print_r($this->getErrors());
+    {
+        $this->assessmentid = intval($params['assessmentid']);
+        $this->questionsetid = intval($params['questionsetid']);
+        $this->points = intval($params['points']);
+        $this->attempts = intval($params['attempts']);
+        $this->penalty = strval($params['penalty']);
+        $this->category = strval($params['category']);
+        $this->regen = intval($params['regen']);
+        $this->showans = intval($params['showans']);
+        $this->showhints = intval($params['showhints']);
+        $this->save();printf($this->getErrors());
         return $this->id;
     }
 }

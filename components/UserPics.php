@@ -2,9 +2,10 @@
 namespace app\components;
 use yii\base\Component;
 
-// $image is $_FILES[ <image name> ]
-// $imageId is the id used in a database or wherever for this image
-// $thumbWidth and $thumbHeight are desired dimensions for the thumbnail
+/* $image is $_FILES[ <image name> ]
+ * $imageId is the id used in a database or wherever for this image
+ * $thumbWidth and $thumbHeight are desired dimensions for the thumbnail
+ */
 
 class UserPics extends Component
 {

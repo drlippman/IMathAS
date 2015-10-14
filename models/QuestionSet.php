@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 11/5/15
- * Time: 1:10 PM
- */
 
 namespace app\models;
 
@@ -765,5 +759,9 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getOwnerId($id){
         return QuestionSet::find()->select('ownerid')->where(['id' => $id])->all();
+    }
+
+    public static function getExtRef($id){
+        return QuestionSet::find()->select('extref')->where(['id' => $id])->one();
     }
 }

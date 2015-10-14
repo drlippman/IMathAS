@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 14/7/15
- * Time: 8:40 PM
- */
-
 namespace app\controllers\block;
 
 use app\components\AppConstant;

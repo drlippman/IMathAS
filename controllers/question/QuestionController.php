@@ -1206,9 +1206,9 @@ class QuestionController extends AppController
              */
             if (isset($params['id']) || isset($params['templateid'])) {
                 if (isset($params['id'])) {
-                    $query = QuestionSet::getQuestionDataById($params['id']);
+                    $query = QuestionSet::getExtRef($params['id']);
                 } else {
-                    $query = QuestionSet::getQuestionDataById($params['templateid']);
+                    $query = QuestionSet::getExtRef($params['templateid']);
                 }
                 $extRef = $query['extref'];
                 if ($extRef == '') {
@@ -1643,7 +1643,8 @@ class QuestionController extends AppController
         if (substr($inLibs, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ONE) === AppConstant::ZERO_VALUE) {
             $lNames[] = AppConstant::UNASSIGNED;
         }
-        $query = Libraries::getByIdList(explode(',', $inLibs));
+        $inLibsSafe = "'" . implode("','", explode(',', $inLibs)) . "'";
+        $query = Libraries::getByIdList($inLibsSafe);
         foreach ($query as $row) {
             $lNames[] = $row['name'];
         }
@@ -2113,11 +2114,6 @@ class QuestionController extends AppController
         } else {
             echo AppConstant::ERROR;
         }
-    }
-
-    public function actionShowTest()
-    {
-        return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress'));
     }
 
     public function actionPrintLayout()
@@ -2943,7 +2939,7 @@ class QuestionController extends AppController
                         $pageLibQids[$line['libid']][] = $line['id'];
                     }
                     $i = $line['id'];
-                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-right-two' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                    $pageQuestionTable[$i]['checkbox'] = "<input class='margin-right-two natwar' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
                     if ($line['userights'] == AppConstant::NUMERIC_ZERO) {
                         $pageQuestionTable[$i]['desc'] = '<span class="red">' . filter($line['description']) . '</span>';
                     } else if ($line['replaceby'] > AppConstant::NUMERIC_ZERO || $line['junkflag'] > AppConstant::NUMERIC_ZERO) {
@@ -2998,7 +2994,7 @@ class QuestionController extends AppController
                     } else {
                         $pageQuestionTable[$i]['mine'] = '';
                     }
-                    $pageQuestionTable[$i]['action'] = "<select class='form-control-for-question' onchange=\"doaction(this.value,{$line['id']})\"><option selected value=\"0\">Action..</option>";
+                    $pageQuestionTable[$i]['action'] = "<select class='form-control-for-question max-width-eighty-six-per' onchange=\"doaction(this.value,{$line['id']})\"><option selected value=\"0\">Action..</option>";
                     if ($isAdmin || ($isGrpAdmin && $line['groupid'] == $groupId) || $line['ownerid'] == $userId || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['userights'] > AppConstant::NUMERIC_THREE) {
                         $pageQuestionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
                     } else {

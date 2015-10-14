@@ -26,9 +26,9 @@
 		if (!file_exists($imgdir.$fn.'.png')) {
 			include("asciisvgimg.php");
 			$AS = new AStoIMG(300,300);
-//			$AS->processShortScript($_GET['sscr']);
-//			$AS->outputimage($imgdir.$fn.'.png');
+			$AS->processShortScript($_GET['sscr']);
+			$AS->outputimage($imgdir.$fn.'.png');
 		}
 	}
-//	header("Location: $urlmode$host$uri/$imgdir$fn.png");
-//?>
+	header("Location: $urlmode$host$uri/$imgdir$fn.png");
+?>

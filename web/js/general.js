@@ -399,15 +399,17 @@ addLoadEvent(setselectbycookie);
 
 var recordedunload = false;
 function recclick(type,typeid,info,txt) {
-	if (cid>0) {
+    var cid = 10;alert(txt);
+	if (cid > 0) {
 		var extradata = '',m;
 		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
 			extradata = '&unloadinglinked='+m[1];
 			recordedunload = true;
 		}
+        alert('imasroot');
 		jQuery.ajax({
 			type: "POST",
-			url: imasroot+'course/rectrack.php?cid='+cid,
+			url: imasroot+'assessment/assessment/rec-track-ajax?cid='+cid,
 			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
 		});
 	}			

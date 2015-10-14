@@ -5,8 +5,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\QuestionSet;
 use app\controllers\AppController;
-//IMathAS:  Modify a question's settings in an assessment: grid for multiple.  Included in addquestions.php
-//(c) 2006 David Lippman
+
 if (!(isset($teacherId))) {
     echo "This page cannot be accessed directly";
     exit;

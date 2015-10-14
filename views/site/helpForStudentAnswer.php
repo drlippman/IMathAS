@@ -3,8 +3,6 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 
 $this->title = 'Help for student entering answers';
-//$this->params['breadcrumbs'][] = ['label' => 'About Us', 'url' => ['/site/about']];
-//$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
     <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL()], 'page_title' => $this->title]); ?>

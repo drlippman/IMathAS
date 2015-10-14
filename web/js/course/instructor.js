@@ -140,6 +140,6 @@ function copyItem(id,type,block,courseId) {
 }
 
 function copyResponseSuccess(response)
-{
+{console.log(response);
     window.location = homePath;
 }

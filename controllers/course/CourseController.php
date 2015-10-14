@@ -44,8 +44,6 @@ use app\models\forms\DeleteCourseForm;
 use yii\db\Exception;
 use yii\helpers\Html;
 
-
-
 class CourseController extends AppController
 {
     public $filehandertypecfiles = 'local';

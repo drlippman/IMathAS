@@ -3,9 +3,7 @@ use app\models\QuestionSet;
 use app\models\QImages;
 use app\components\AppUtility;
 use app\models\Libraries;
-//IMathAS:  Core of the testing engine.  Displays and grades questions
-//(c) 2006 David Lippman
-//quadratic inequalities contributed by Cam Joyce
+
 $GLOBALS['noformatfeedback'] = true;
 global $allowedmacros, $courseId;
 $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
@@ -17,6 +15,7 @@ require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
     global $imasroot, $myrights, $showtips, $urlmode, $CFG, $temp;
+    $urlmode = AppUtility::urlMode();
 	$imasroot = AppUtility::getHomeURL();
     $path = AppUtility::getHomeURL()."Uploads";
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
