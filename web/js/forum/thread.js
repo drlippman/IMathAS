@@ -1,166 +1,80 @@
+
 $(document).ready(function ()
 {
-
-    var forumid= $('#forumid').val();
-    var isValue = -1;
-    var courseid = $("#courseid").val();
     $('.select_option').val(-1);
-    $("#show-all-link").hide();
-    var page = $('#page').val();
-    $('#result').hide();
-    $('.forumResult').hide();
-    if(page)
-    {
-        limitToNew();
-    }else
-    {
-        //jQuerySubmit('get-thread-ajax',{forumid: forumid,isValue:isValue },'threadSuccess');
-    }
-    limitToTagShow();
-        $('.select_option').click(function(){
-        selected = $('.select_option :selected').val();
-        page = $('#page').val();
-        var forumid= $('#forumid').val();
-        if(selected == 0)
-        {
-
-            window.location = "list-post-by-name?page="+page+"&cid="+courseid+"&forumid="+forumid;
-        }
-        else if(selected == 1)
-        {
-
-            $('.forum-table').DataTable().destroy();
-                window.location = "thread?page=-2&cid="+courseid+"&forum="+forumid;
-        }
-        else if(selected == 2)
-        {
-            $('.forum-table').DataTable().destroy();
-            window.location = "thread?page=-1&cid="+courseid+"&forum="+forumid;
-        }
-        else if(selected == 3)
-        {
-            console.log(forumid);
-            window.location = "thread?page=1&cid="+courseid+"&forum="+forumid;
-        }
-    });
-    $('#change-button111').click(function(){
-        var searchText = $('#search_text').val();
-        var courseid = $('#courseid').val();
-        if(searchText.length>0)
-        {
-            alert('not blank');
-            if(searchText.match(/^[a-z A-Z 0-9-]+$/))
-            {
-            $('#flash-message').hide();
-                if(document.getElementById('searchAll').checked)
-                {
-                    $('#searchpost').show();
-                    $('#flash-message').hide();
-                    $('#myform').submit();
-                    //jQuerySubmit('get-search-post-ajax',{search: searchText, courseid: courseid},'postSearchSuccess');
-                }
-                else
-                {
-                    $('#searchpost').show();
-                    $('#flash-message').hide();
-                    $('#myform').submit();
-                    //jQuerySubmit('get-only-post-ajax',{search: searchText, courseid: courseid,forumid:forumid},'postSearchUnchecked');
-                //
-                }
-            }
-            else
-            {
-                $('#flash-message').show();
-                $('#flash-message').html("<div class='alert alert-danger'>Search text can contain only alphanumeric values");
-                $('#search_text').val(null);
-            }
-        }else
-        {
-            alert('blank');
-            $('#flash-message').show();
-            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
-        }
-
-    });
-
+    page = $('#page').val();
+    forumid= $('#forumid').val();
+    courseid = $("#courseid").val();
+    change();
+    select();
  });
-var hideLink =0;
-function postSearchSuccess(response)
-{
-    response = JSON.parse(response);
+ function select()
+ {
+     $('.select_option').click(function(){
+         selected = $('.select_option :selected').val();
+          if(selected == 0)
+         {
 
-    if (response.status == 0)
-    {
-        $('#searchpost').empty();
-        $('#data').empty();
-        var courseid = $('#courseid').val();
-        var postData = response.data.data;
-        $.each(postData, function(index, Data)
-        {
-            var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
-            var html = "<div class='block'>";
-            html += "<b><label  class='subject'>"+Data.subject+"</label></b>";
-            html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumName+"</label>)";
-            html += "<br/>Posted by:&nbsp;&nbsp;<label class='postedby'>"+Data.name+"</label>";
-            html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
-            html += "</div><div class=blockitems>";
-            html += "<label id='message'>"+result+"</label>";
-            html += "<p><a href='post?courseid=" + courseid + "&threadid=" + Data.threadId +"&forumid="+ Data.forumIdData+"'</a>Show full thread</p>";
-            html += "</div>\n";
-            $('#searchpost').append(html);
-        });
-        $('.threadDetails').hide();
-        $('.forumResult').show();
-        $('#noThread').hide();
-    }
-    else
-    {
-        $('#searchpost').hide();
-        $('.forumResult').hide();
-        var msg ="No result found for your search";
-        CommonPopUp(msg);
-    }
-}
+             window.location = "list-post-by-name?page="+page+"&cid="+courseid+"&forumid="+forumid;
+         }
+         else if(selected == 1)
+         {
 
-function postSearchUnchecked(response)
-{
-    response = JSON.parse(response);
+             $('.forum-table').DataTable().destroy();
+             window.location = "thread?page=-2&cid="+courseid+"&forum="+forumid;
+         }
+         else if(selected == 2)
+         {
+             $('.forum-table').DataTable().destroy();
+             window.location = "thread?page=-1&cid="+courseid+"&forum="+forumid;
+         }
+         else if(selected == 3)
+         {
+             window.location = "thread?page=1&cid="+courseid+"&forum="+forumid;
+         }
+         else if(selected == 4)
+         {
+             window.location = "thread?cid="+courseid+"&forum="+forumid+"&markallread=true&page="+page;
+         }
+     });
+ }{}
+ function change()
+ {
+     $('#change-button').click(function(){
+         var searchText = $('#search_text').val();
 
-    if (response.status == 0)
-    {
-        $('#searchpost').empty();
-        $('#data').empty();
-        var courseid = $('#courseid').val();
-        var postData = response.data.data;
-        $.each(postData, function(index, Data)
-        {
-            var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
-            var html = "<div class='block'>";
-            html += "<b><label  class='subject'>"+Data.subject+"</label></b>";
-            html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumName+"</label>)";
-            html += "<br/>Posted by:&nbsp;&nbsp;<label class='postedby'>"+Data.name+"</label>";
-            html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
-            html += "</div><div class=blockitems>";
-            html += "<label id='message'>"+result+"</label>";
-            html += "<p><a href='post?courseid=" + courseid + "&threadid=" + Data.threadId +"&forumid="+ Data.forumIdData+"'</a>Show full thread</p>";
-            html += "</div>\n";
-            $('#searchpost').append(html);
-        });
-        $('.threadDetails').hide();
-        $('.forumResult').show();
-        $('#noThread').hide();
-    }
-    else
-    {
-        $('.forumResult').hide();
-        $('#searchpost').hide();
-        var msg ="No result found for your search";
-        CommonPopUp(msg);
-    }
-}
-var newCount=0;
-var count;
-var isValue;
+         if(searchText.length>0)
+         {
+             if(searchText.match(/^[a-z A-Z 0-9-]+$/))
+             {
+                 $('#flash-message').hide();
+                 if(document.getElementById('searchAll').checked)
+                 {
+                     $('#searchpost').show();
+                     $('#flash-message').hide();
+                     $('#myForm').submit();
+                 }
+                 else
+                 {
+                     $('#searchpost').show();
+                     $('#flash-message').hide();
+                     $('#myForm').submit();
+                 }
+             }
+             else
+             {
+                 $('#flash-message').show();
+                 $('#flash-message').html("<div class='alert alert-danger'>Search text can contain only alphanumeric values");
+                 $('#search_text').val(null);
+             }
+         }else
+         {
+             $('#flash-message').show();
+             $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
+         }
+
+     });
+ }
 function changeImage(element,checkFlagValue, rowId) {
 
     var userId = $("#user-id").val();
@@ -182,42 +96,8 @@ function markAsRemoveSuccess(response) {
     var result = JSON.parse(response);
     if(result.status == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }
-}
-function limitToTagShow() {
-
-    $("#show-all-link").click(function () {
-        $('.forum-table').DataTable().destroy();
-        $("#limit-to-tag-link").show();
-        $("#show-all-link").hide();
-        isValue = 0;
-        hideLink = 0;
-        var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , isValue: isValue,hideLink:hideLink};
-        //jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
-
-    });
-    $('#markRead').click(function(){
-        var isValue = 3;
-        var forumid= $('#forumid').val();
-        $('.forum-table').DataTable().destroy();
-        var thread = {forumid: forumid , isValue: isValue};
-        //jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
-    });
-
-
-}
-function limitToNew()
-{
-    $('.forum-table').DataTable().destroy();
-    $("#limit-to-tag-link").hide();
-    $('#limit-to-new-link').hide();
-    $("#show-all-link").show();
-    var isValue = 2;
-    var forumid= $('#forumid').val();
-    var thread = {forumid: forumid , isValue: isValue};
-    //jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 }
 
 $("a[name=tabs]").on("click", function (event) {
@@ -248,27 +128,12 @@ $("a[name=tabs]").on("click", function (event) {
     });
 });
 
+function chgtagfilter() {
+    var tagfilter = document.getElementById("tagfilter").value;
+    window.location = "thread?page=&cid="+courseid+"&forum=" + forumid+'&tagfilter='+tagfilter;
 
-function toggletagged(threadid) {
-    var trchg = document.getElementById("tr"+threadid);
-    if (trchg.className=="tagged") {
-        submitTagged(threadid,0);
-    } else {
-        submitTagged(threadid,1);
-    }
-    return false;
 }
-
-function submitTagged(thread,tagged) {
-    url = AHAHsaveurl + '&threadid='+thread+'&tagged='+tagged;
-    if (window.XMLHttpRequest) {
-        req = new XMLHttpRequest();
-    } else if (window.ActiveXObject) {
-        req = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    if (typeof req != 'undefined') {
-        req.onreadystatechange = function() {ahahDone(url, thread, tagged);};
-        req.open("GET", url, true);
-        req.send("");
-    }
+function chgfilter() {
+    var ffilter = document.getElementById("ffilter").value;
+    window.location = "thread?page=&cid="+courseid+"&forum=" + forumid+'&ffilter='+ffilter;
 }

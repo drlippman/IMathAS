@@ -226,7 +226,7 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                         <div class="item student-course-alignment">
                         <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                     <div class="title">
-                        <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
+                        <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forum='.$forum->id) ?>">
                                 <?php echo $forum->name ?></a></b>
 
                     </div>
@@ -688,7 +688,7 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                 <div class="item student-course-alignment">
                                                 <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                             <div class="title">
-                                                <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
+                                                <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forum='.$forum->id) ?>">
                                                         <?php echo $forum->name ?></a></b>
                                             </div>
                                             <div class="itemsum"><p>

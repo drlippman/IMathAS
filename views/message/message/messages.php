@@ -41,9 +41,9 @@ $now = $currentTime;
 </div>
 <div class="item-detail-content">
     <?php if($userRights->rights == 100 || $userRights->rights == 20) {
-        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]);
     } elseif($userRights->rights == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course]);
     }?>
 </div>
 <div class="tab-content shadowBox">

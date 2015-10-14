@@ -68,7 +68,7 @@ $now = $currentTime;
             </div>
             <div class="buttons-div">
                 <input type=submit class="btn btn-primary search-button align-btn" id="move-button" value="<?php echo AppUtility::t('Move')?>">
-                <a class="btn btn-primary search-button align-btn" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forumid='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
+                <a class="btn btn-primary search-button align-btn" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forum='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
             </div>
 
         </div>

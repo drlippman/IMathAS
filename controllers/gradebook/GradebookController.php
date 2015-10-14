@@ -4742,4 +4742,9 @@ class GradebookController extends AppController
         return $this->renderWithData('exception',$responseData);
     }
 
+    public  function actionGradeAllQuestion()
+    {
+
+    }
+
 }

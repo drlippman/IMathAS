@@ -623,12 +623,12 @@ class BlockController extends AppController
 				//TODO check availability.
 				 $line = Forums::getById($typeid);
 				 if ($openitem=='' && $foundfirstitem=='') {
-				 	 $foundfirstitem = 'forum/forums/thread?cid='.$courseId.'&id='.$typeid; $isopen = true;
+				 	 $foundfirstitem = 'forum/forums/thread?cid='.$courseId.'&forum='.$typeid; $isopen = true;
 				 }
 				 if ($itemtype.$typeid===$openitem) {
-				 	 $foundopenitem = 'forum/forums/thread.php?cid='.$courseId.'&id='.$typeid; $isopen = true;
+				 	 $foundopenitem = 'forum/forums/thread?cid='.$courseId.'&forum='.$typeid; $isopen = true;
 				 }
-				 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconForum.png"> <a href="'.AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&id='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+				 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconForum.png"> <a href="'.AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 			} else if ($line['itemtype']=="Calendar") {
                 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconCalendar.png">
                 <a href="'.AppUtility::getURLFromHome('course', 'course/calendar?cid='.$courseId.'"'). 'target="readerframe">Calendar</a></li>';

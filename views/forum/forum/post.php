@@ -11,9 +11,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 ?>
 <div class="item-detail-header">
     <?php if($currentUser->rights > AppConstant::STUDENT_RIGHT) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forumid=' . $forumId]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forum=' . $forumId]]);
     } else{
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forumid=' . $forumId]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forum=' . $forumId]]);
     }?>
 </div>
 <div class = "title-container">
@@ -27,9 +27,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <div class="item-detail-content">
     <?php
     if ($currentUser->rights > AppConstant::STUDENT_RIGHT) {
-        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
     } else {
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => '']);
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }
     ?>
 </div>
@@ -46,7 +46,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <div class="tab-content shadowBox padding-top-one">
     <?php if(!$atLeastOneThread && $postBeforeView && !$canViewAll ){?>
      <p><?php AppUtility::t('This post is blocked. In this forum, you must post your own thread before you can read those posted by others.')?></p>
-        <a class="pull-right" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid=' . $course->id . '&forumid=' . $forumId);?>"><?php AppUtility::t('Back to Forum Topics')?></a>
+        <a class="pull-right" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid=' . $course->id . '&forum=' . $forumId);?>"><?php AppUtility::t('Back to Forum Topics')?></a>
         <?php }else {?>
         <div id="postlabel" class="padding-post-label">
             <div id="post">
@@ -236,7 +236,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         <input type="hidden" id="postCount" value="<?php echo $postCount ?>">
         <?php } ?>
         <div class="pull-right margin-bottom-twentyfive">
-            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $course->id . '&forumid=' . $forumId) ?>"><?php AppUtility::t('Back to Forum Topics')?></a>
+            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $course->id . '&forum=' . $forumId) ?>"><?php AppUtility::t('Back to Forum Topics')?></a>
         </div>
     </div>
     <?php } ?>

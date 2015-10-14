@@ -132,7 +132,7 @@ class CourseItemsUtility extends Component
                      src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
 
                 <div class="title">
-                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forumid=' . $forum->id) ?>">
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forum=' . $forum->id) ?>">
                             <?php echo $forum->name ?></a></b>
 
                     <div class="floatright common-setting">
@@ -191,7 +191,7 @@ class CourseItemsUtility extends Component
                      src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
 
                 <div class="title">
-                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forumid=' . $forum->id) ?>">
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forum=' . $forum->id) ?>">
                             <?php echo $forum->name ?></a></b>
 
                     <div class="floatright common-setting">
@@ -232,7 +232,7 @@ class CourseItemsUtility extends Component
                      src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
 
                 <div class="title">
-                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forumid=' . $forum->id) ?>">
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid . '&forum=' . $forum->id) ?>">
                             <?php echo $forum->name ?></a></b>
 
                     <div class="floatright common-setting">

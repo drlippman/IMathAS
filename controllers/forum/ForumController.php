@@ -229,18 +229,10 @@ class ForumController extends AppController
         $this->layout = "master";
         $this->guestUserHandler();
         $params = $this->getRequestParams();
-
         $currentUser = $this->getAuthenticatedUser();
         $threadsperpage = $currentUser['listperpage'];
+        $forumId = $params['forum'];
         $courseId = $params['cid'];
-        if($params['forum']){
-            $forumId = $params['forum'];
-        }else if($params['forumid'])
-        {
-            $forumId = $params['forumid'];
-        }
-
-
         if (!isset($params['page']) || $params['page'] == '') {
             $page = 1;
         } else {
@@ -302,15 +294,14 @@ class ForumController extends AppController
                     }
                 }
             }
-
-            if (isset($params['save']) && $params['save'] == 'Save Grades and View Previous') {
+            if (isset($params['save']) && $params['save'] == 'Save Grades and View Previous')
+            {
                 return $this->redirect('post?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId . '&thread=' . $params['prevth']);
             } else if (isset($params['save']) && $params['save'] == 'Save Grades and View Next') {
                 return $this->redirect('post?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId . '&thread=' . $params['nextth']);
             } else {
                 return $this->redirect('thread?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId);
             }
-            exit;
         }
 
         $forumname = $forumData['name'];
@@ -410,7 +401,11 @@ class ForumController extends AppController
             $searchlikes2 = "(imas_forum_posts.subject LIKE '%" . implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms) . "%')";
             $searchlikes3 = "(imas_users.LastName LIKE '%" . implode("%' AND imas_users.LastName LIKE '%", $searchterms) . "%')";
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
-
+            if(!$searchedPost)
+            {
+                $this->setWarningFlash('No result found for your search');
+                return $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
+            }
         }
 
         if (isset($params['markallread'])) {
@@ -464,9 +459,12 @@ class ForumController extends AppController
             }
         }
         $newpostlist = implode(',', $newpost);
+
         if ($page == -1 && count($newpost) == 0) {
             $page = 1;
-        } else if ($page == -2 && count($flags) == 0) {
+        } else if ($page == -2 && count($flags) == 0)
+        {
+                $this->setWarningFlash('No result found for limit to flagged');
             $page = 1;
         }
         $prevnext = '';
@@ -553,10 +551,7 @@ class ForumController extends AppController
                         ForumPosts::updateMoveThread($forum_Id, $thread_Id);
                     }
                 }
-                $this->includeCSS(['forums.css']);
-                $this->includeJS(['forum/thread.js?ver=' . time() . '']);
-                $responseData = array('cid' => $courseId, 'users' => $user, 'forumid' => $forumId, 'course' => $course);
-                return $this->renderWithData('thread', $responseData);
+                return $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
             }
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/movethread.js']);
@@ -666,7 +661,7 @@ class ForumController extends AppController
                 {
                     $contentTrackRecord->insertForumData($currentUser->id,$courseId,$forumId,$threadId,$threadIdOfPost,$type=AppConstant::NUMERIC_TWO);
                 }
-                $this->redirect('thread?cid='.$courseId.'&forumid='.$forumId);
+                $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
             }
         }
         $this->setReferrer();
@@ -1070,7 +1065,7 @@ class ForumController extends AppController
             {
                 $contentTrackRecord->insertForumData($user->id,$params['cid'],$params['forumid'],$threadId,$threadIdOfPost=null,$type=AppConstant::NUMERIC_ZERO);
             }
-            return $this->redirect('thread?cid='.$params['cid'].'&forumid='.$params['forumid']);
+            return $this->redirect('thread?cid='.$params['cid'].'&forum='.$params['forumid']);
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
@@ -1991,5 +1986,34 @@ class ForumController extends AppController
         $forumPostData = ForumPosts::getbyForumIdAndUserID($forumId, $userId);
         $responseData = array('user' => $user,'forumPostData' => $forumPostData,'forumInformation' => $forumInformation,'course' => $course,'forumId' => $forumId,'studentId' => $studentId,'userId' => $userId);
         return $this->renderWithData('viewForumGrade',$responseData);
+    }
+
+    public function actionListViews()
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+
+        $teacherid = $this->isTeacher($currentUser['id'],$params['cid']);
+        if (!isset($teacherid))
+        {
+            echo "Not authorized to view this page";
+            exit;
+        }
+        if (!isset($params['thread'])) {
+            echo "No thread specified";
+            exit;
+        }
+        $thread = intval($params['thread']);
+        $forumId = Forums::getForumId($thread,$params['cid']);
+
+        if (count($forumId) == 0)
+        {
+            echo 'Invalid thread';
+            exit;
+        }
+        $users = User::lastViewsUser($thread);
+        echo '<h4>'._('Thread Views').'</h4>';
+        $responseData = array('users' => $users);
+        return $this->renderWithData('listViews',$responseData);
     }
 }

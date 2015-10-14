@@ -422,10 +422,8 @@ class AppUtility extends Component
 //        Displays date and time
     public static function parsedatetime($date, $time)
     {
-        $sessionId = Yii::$app->session->getId();
-        $sessionData = Sessions::getById($sessionId);
-        $tzOffset = $sessionData['tzoffset'];
-        $tzName = $sessionData['tzname'];
+        $tzOffset = AppUtility::getTimezoneOffset();
+        $tzName = AppUtility::getTimezoneName();
         preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dateMatches);
         preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$time,$timeMatches);
         if (count($timeMatches) == 0)
@@ -440,6 +438,7 @@ class AppUtility extends Component
             $serverOffset = date('Z')/60 + $tzOffset;
             $timeMatches[2] += $serverOffset;
         }
+
         $dateString = $dateMatches[3].'-'.$dateMatches[1].'-'.$dateMatches[2].' '.$timeMatches[1].':'.$timeMatches[2].':00';
         $dateObject = date_create_from_format("Y-m-d H:i:s",$dateString,timezone_open($tzName));
         return $dateObject->getTimestamp();
@@ -450,11 +449,8 @@ class AppUtility extends Component
     public static function parsetime($time)
     {
 
-        $sessionId = Yii::$app->session->getId();
-        $sessionData = Sessions::getById($sessionId);
-        $tzoffset = $sessionData['tzoffset'];
-        $tzname = $sessionData['tzname'];
-
+        $tzOffset = AppUtility::getTimezoneOffset();
+        $tzName = AppUtility::getTimezoneName();
         preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
         if (count($tmatches) == AppConstant::NUMERIC_ZERO) {
             preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);

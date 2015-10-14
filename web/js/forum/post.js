@@ -107,7 +107,7 @@ function markAsRemoveSuccess(response) {
     var threadId = $("#thread-id").val();
     if(result.data == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }else if(result.data != 0)
     {
         window.location = "post?courseid="+courseid+"&threadid="+threadId+"&forumid="+forumid;
@@ -135,7 +135,7 @@ function changeImageSuccess(response) {
     var result = JSON.parse(response);
     if(result.status == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }
 }
 function changeUnreadSuccess(response) {

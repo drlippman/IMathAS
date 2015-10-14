@@ -908,5 +908,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->save();
         }
     }
+
+    public static function lastViewsUser($thread)
+    {
+        $query = "SELECT iu.LastName,iu.FirstName,ifv.lastview FROM imas_users AS iu JOIN ";
+        $query .= "imas_forum_views AS ifv ON iu.id=ifv.userid WHERE ifv.threadid=$thread ORDER BY ifv.lastview";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }
 

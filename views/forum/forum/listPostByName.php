@@ -121,5 +121,5 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php }else{?>
        <input type="hidden" id="isData" value="0">
     <?php }?>
-    <div class="Align-link-post"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forumid='.$forumId);?>">Back to Thread List</a></div>
+    <div class="Align-link-post"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forum='.$forumId);?>">Back to Thread List</a></div>
 

@@ -304,4 +304,11 @@ class Forums extends BaseImasForums {
     {
         return Forums::find()->select('name')->where(['id' => $typeId])->one();
     }
+
+    public static function getForumId($thread,$courseId)
+    {
+        $query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_threads ON imas_forums.id=imas_forum_threads.forumid ";
+        $query .= " WHERE imas_forum_threads.id=$thread AND imas_forums.courseid='$courseId'";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

@@ -4,7 +4,7 @@ $(document).ready(function () {
         toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
     });
     $("input").keypress(function(e){
-        var subject = $(".subject").val();
+        var subject = $(".subjectt").val();
         $(".subject").css('border-color', '');
         $('#flash-message').hide();
         if(subject.length > 45)
