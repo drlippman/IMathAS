@@ -3918,9 +3918,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = explode(',',$answerformat);
+		
 		$givenans = normalizemathunicode($givenans);
 		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
-
+				
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
 			$givenans = str_replace('u', 'U', $givenans);
@@ -3981,7 +3982,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$correct = 0;
 		$ansar = explode(' or ',$answer);
 		$givenans = str_replace(' ','',$givenans);
-		
+					
 		foreach($ansar as $anans) {
 			$answer = str_replace(' ','',$anans);
 			
