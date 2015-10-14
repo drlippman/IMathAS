@@ -335,7 +335,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getByAssessmentUsingStudentJoin($courseId, $assessmentId, $secfilter)
     {
         $query = new Query();
-        $query->select(['imas_assessment_sessions.questions', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.bestattempts', 'imas_assessment_sessions.bestlastanswers', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask'])
+        $query->select(['imas_assessment_sessions.questions', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.bestattempts', 'imas_assessment_sessions.bestlastanswers', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask','imas_students.userid'])
             ->from('imas_assessment_sessions')
             ->join('INNER JOIN',
                 'imas_students',

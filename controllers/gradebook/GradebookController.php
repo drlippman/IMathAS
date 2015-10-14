@@ -2918,7 +2918,7 @@ class GradebookController extends AppController
             $this->redirect('grade-book-student-detail?cid=' . $courseId . '&studentId=' . $userId);
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css','gradebook.css']);
-        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js','dataTables.bootstrap.js', 'gradebook/gradebookstudentdetail.js']);
+        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js','dataTables.bootstrap.js','gradebook/manageofflinegrades.js', 'gradebook/gradebookstudentdetail.js']);
         $responseData = array('totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
     }
@@ -3519,14 +3519,13 @@ class GradebookController extends AppController
         if($teacher){
             $isTeacher = true;
         }
-
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
         if (isset($sessionData[$courseId.'gbmode'])) {
-            $gbmode =  $sessionData[$courseId.'gbmode'];
+            $gbMode =  $sessionData[$courseId.'gbmode'];
         } else {
             $gbModeData = GbScheme::getByCourseId($courseId);
-            $gbmode = $gbModeData['defgbmode'];
+            $gbMode = $gbModeData['defgbmode'];
         }
         if (isset($params['stu']) && $params['stu']!='') {
             $student = $params['stu'];
@@ -3554,93 +3553,88 @@ class GradebookController extends AppController
             }
         }
 //Gbmode : Links NC Dates
-        $totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
-        $links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
-        $hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
-        $availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
         $pagetitle = "Gradebook";
-        $qtotal = array();
-        $qcnt = array();
-        $tcnt = array();
-        $qincomplete = array();
-        $timetaken = array();
-        $timeontask = array();
+        $questionTotal = array();
+        $questionCount = array();
+        $totalCount = array();
+        $questionInComplete = array();
+        $timeTaken = array();
+        $timeOnTask = array();
         $attempts = array();
         $regens = array();
         $assessmentData = Assessments::getByAssessmentId($assessmentId);
-        $itemarr = array();
-        $itemnum = array();
-        $itemorder = $assessmentData['itemorder'];
-        foreach (explode(',',$itemorder) as $k=>$itel) {
+        $itemArray = array();
+        $itemNumber = array();
+        $itemOrder = $assessmentData['itemorder'];
+        foreach (explode(',',$itemOrder) as $k=>$itel) {
             if (strpos($itel,'~')!==false) {
                 $sub = explode('~',$itel);
                 if (strpos($sub[0],'|')!==false) {
                     array_shift($sub);
                 }
                 foreach ($sub as $j=>$itsub) {
-                    $itemarr[] = $itsub;
-                    $itemnum[$itsub] = ($k+1).'-'.($j+1);
+                    $itemArray[] = $itsub;
+                    $itemNumber[$itsub] = ($k+1).'-'.($j+1);
                 }
             } else {
-                $itemarr[] = $itel;
-                $itemnum[$itel] = ($k+1);
+                $itemArray[] = $itel;
+                $itemNumber[$itel] = ($k+1);
             }
         }
         $StudentCount = Student::getStudentCountUsingCourseIdAndLockedStudent($courseId,$secfilter);
-        $totstucnt = count($StudentCount);
+        $totalStudentcount = count($StudentCount);
         $assessmentSessionData = AssessmentSession::getByAssessmentUsingStudentJoin($courseId,$assessmentId,$secfilter);
         foreach($assessmentSessionData as $singleAssessmentSessionData){
             if (strpos( $singleAssessmentSessionData['questions'],';')===false) {
                 $questions = explode(",",$singleAssessmentSessionData['questions']);
             } else {
-                list($questions,$bestquestions) = explode(";",$singleAssessmentSessionData['questions']);
-                $questions = explode(",",$bestquestions);
+                list($questions,$bestQuestions) = explode(";",$singleAssessmentSessionData['questions']);
+                $questions = explode(",",$bestQuestions);
             }
             $sp = explode(';', $singleAssessmentSessionData['bestscores']);
             $scores = explode(',', $sp[0]);
             $attp = explode(',',$singleAssessmentSessionData['bestattempts']);
             $bla = explode('~',$singleAssessmentSessionData['bestlastanswers']);
             $timeot = explode(',',$singleAssessmentSessionData['timeontask']);
-            foreach ($questions as $k=>$ques) {
+            foreach ($questions as $k=>$ques)
+            {
                 if (trim($ques)=='') {continue;}
-
-                if (!isset($qincomplete[$ques])) { $qincomplete[$ques]=0;}
-                if (!isset($qtotal[$ques])) { $qtotal[$ques]=0;}
-                if (!isset($qcnt[$ques])) { $qcnt[$ques]=0;}
-                if (!isset($tcnt[$ques])) { $tcnt[$ques]=0;}
+                if (!isset($questionInComplete[$ques])) { $questionInComplete[$ques]=0;}
+                if (!isset($questionTotal[$ques])) { $questionTotal[$ques]=0;}
+                if (!isset($questionCount[$ques])) { $questionCount[$ques]=0;}
+                if (!isset($totalCount[$ques])) { $totalCount[$ques]=0;}
                 if (!isset($attempts[$ques])) { $attempts[$ques]=0;}
                 if (!isset($regens[$ques])) { $regens[$ques]=0;}
-                if (!isset($timeontask[$ques])) { $timeontask[$ques]=0;}
+                if (!isset($timeOnTask[$ques])) { $timeOnTask[$ques]=0;}
                 if (strpos($scores[$k],'-1')!==false) {
-                    $qincomplete[$ques] += 1;
+                    $questionInComplete[$ques] += 1;
                 }
-                $qtotal[$ques] += $this->getpts($scores[$k]);
+                $questionTotal[$ques] += $this->getpts($scores[$k]);
                 $attempts[$ques] += $attp[$k];
                 $regens[$ques] += substr_count($bla[$k],'ReGen');
-                $qcnt[$ques] += 1;
+                $questionCount[$ques] += 1;
                 $timeot[$k] = explode('~',$timeot[$k]);
-                $tcnt[$ques] += count($timeot[$k]);
-                $timeontask[$ques] += array_sum($timeot[$k]);
+                $totalCount[$ques] += count($timeot[$k]);
+                $timeOnTask[$ques] += array_sum($timeot[$k]);
             }
             if ($singleAssessmentSessionData['endtime'] >0 && $singleAssessmentSessionData['starttime'] > 0) {
-                $timetaken[] = $singleAssessmentSessionData['endtime']-$singleAssessmentSessionData['starttime'];
+                $timeTaken[] = $singleAssessmentSessionData['endtime']-$singleAssessmentSessionData['starttime'];
             } else {
-                $timetaken[] = 0;
+                $timeTaken[] = 0;
             }
         }
-
         $vidcnt = array();
-        if (count($qcnt)>0) {
-            $qlist = implode(',', array_keys($qcnt));
+        if (count($questionCount) > 0) {
+            $qlist = implode(',', array_keys($questionCount));
             $contentTrackData = ContentTrack::getCourseIdUsingStudentTableJoin($courseId,$qlist,$secfilter);
             foreach($contentTrackData as $row){
                 $vidcnt[$row['typeid']]= count($row['userid']);
             }
         }
         $numberOfQuestions = Questions::numberOfQuestionByIdAndCategory($assessmentId);
-        $notstarted = ($totstucnt - count($timetaken));
-        $nonstartedper = round(100*$notstarted/$totstucnt,1);
-        $qslist = implode(',',$itemarr);
+        $notstarted = ($totalStudentcount - count($timeTaken));
+        $nonstartedper = round(100*$notstarted/$totalStudentcount,1);
+        $qslist = implode(',',$itemArray);
         if($qslist) {
             $questionSet = QuestionSet::getByQuestionId($qslist);
             $questionData = array();
@@ -3659,9 +3653,10 @@ class GradebookController extends AppController
                 array_push($questionData, $tempArray);
             }
         }
-        $this->includeJS(["general.js"]);
-        $this->includeCSS(['gradebook.css', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('from' => $from,'course' => $course,'questionData' => $questionData,  'qtotal' => $qtotal,'itemarr' => $itemarr,'assessmentData' => $assessmentData,'nonstartedper' => $nonstartedper,'notstarted' => $notstarted,'numberOfQuestions' => $numberOfQuestions,'isTeacher' => $isTeacher,'courseId' => $courseId,'assessmentId' => $assessmentId,'student' => $student);
+        $this->includeCSS(['gradebook.css']);
+        $this->includeJS(["general.js",'DataTables-1.10.6/media/js/jquery.dataTables.js','question/addquestions.js','tablesorter.js']);
+        $responseData = array('regens' => $regens,'timeTaken' => $timeTaken,'attempts' =>$attempts,'timeOnTask' => $timeOnTask,'questionInComplete' => $questionInComplete,'questionCount' => $questionCount,'from' => $from,'course' => $course,'questionData' => $questionData,  'questionTotal' => $questionTotal,'itemArray' => $itemArray,'assessmentData' => $assessmentData,'nonStartAssessment' => $nonstartedper,'notStarted' => $notstarted,'numberOfQuestions' => $numberOfQuestions,
+            'itemNumber' => $itemNumber,'isTeacher' => $isTeacher,'totalCount' => $totalCount,'courseId' => $courseId,'assessmentId' => $assessmentId,'student' => $student);
         return $this->renderWithData('itemAnalysis',$responseData);
     }
 
@@ -3676,7 +3671,6 @@ class GradebookController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
-//        $this->layout = 'master';
         if($teacher){
             $isTeacher = true;
         }
@@ -3697,6 +3691,7 @@ class GradebookController extends AppController
                 $secfilter = -1;
             }
         }
+
         $students = array();
         if ($type=='notstart') {
             $StudentIds = Student::getByUserIdUsingAssessmentSessionJoin($courseId,$assessmentId,$secfilter);
@@ -3717,8 +3712,10 @@ class GradebookController extends AppController
             $stutimes = array();
             $sturegens = array();
             $stuatt = array();
+
             $assessmentSessionData = AssessmentSession::getByAssessmentUsingStudentJoin($courseId,$assessmentId,$secfilter);
             foreach($assessmentSessionData as $line){
+
                 if (strpos($line['questions'],';')===false) {
                     $questions = explode(",",$line['questions']);
                 } else {

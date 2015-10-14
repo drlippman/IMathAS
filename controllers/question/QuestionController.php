@@ -1624,9 +1624,8 @@ class QuestionController extends AppController
             $images = array();
             $extRef = array();
             $author = $myName;
-            $inLibsSafe = "'" . implode("','", explode(',', $inLibs)) . "'";
             if (!isset($params['id']) || isset($params['template'])) {
-                $query = Libraries::getByIdList($inLibsSafe);
+                $query = Libraries::getByIdList(explode(',', $inLibs));
                 foreach ($query as $row) {
                     if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid'] == $groupId && ($row['userights'] % AppConstant::NUMERIC_THREE == AppConstant::NUMERIC_TWO)) || $row['ownerid'] == $userId) {
                         $okLibs[] = $row['id'];

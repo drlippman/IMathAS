@@ -105,4 +105,14 @@ class Thread extends BaseImasForumThreads
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function getByStuGroupIdNonZero($groupid)
+    {
+        return Thread::find()->select('id')->where(['stugroupid' => $groupid])->all();
+    }
+
+    public static function getByStuGroupId($groupid)
+    {
+        return Thread::find()->select('id')->where(['stugroupid' => 0])->orWhere(['stugroupid' => $groupid])->all();
+    }
 } 

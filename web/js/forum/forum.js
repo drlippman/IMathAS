@@ -149,9 +149,9 @@ function forumsSuccess(response) {
             {
                 if(forum.countId == 0)
                 {
-                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
+                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forum="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
                 }else{
-                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'>Post("+forum.count+")</span></a>";
+                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forum="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'>Post("+forum.count+")</span></a>";
                 }
 
                 html += "<td><a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
@@ -163,9 +163,9 @@ function forumsSuccess(response) {
             {
                     if(forum.countId == 0)
                     {
-                        html += "<tr><td><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
+                        html += "<tr><td><a  href='thread?cid="+courseId+"&forum="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
                     }else{
-                        html += "<tr><td><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
+                        html += "<tr><td><a  href='thread?cid="+courseId+"&forum="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
                     }
 //                    html += "<td>&nbsp;&nbsp;<a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
                     html += "<td>" + forum.threads + "</td>";

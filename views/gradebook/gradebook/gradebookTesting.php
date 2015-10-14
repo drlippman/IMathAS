@@ -1,7 +1,9 @@
 <?php
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
+use app\components\AppConstant;
 $this->title = AppUtility::t('Diagnostic Grade Book', false); ?>
+
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
@@ -17,41 +19,38 @@ $this->title = AppUtility::t('Diagnostic Grade Book', false); ?>
 </div>
 
     <div class="tab-content shadowBox">
-        <div class="offline-grade-header">  <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id);?>">View regular gradebook</a> </div>
-        <div class="inner-content-gradebook">
-         <?php
-//DISPLAY
-         ?>        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
- <form method=post action="gradebook?cid=<?php echo $course->id?>">
-      <div class="col-md-12">
-        <div class="pull-left padding-left-zero select-text-margin col-md-3">
-          <span class="col-md-12">  <?php echo "Meanings:   NC-no credit"; ?> </span>
+        <div class="offline-grade-header">
+            <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id);?>">View regular gradebook</a>
         </div>
-        <div class="col-md-9 pull-right">
-            <span class="col-md-5">
-                   Students starting in:
-                                     <select id="timetoggle" class="form-control-gradebook" onchange="chgtimefilter()">
-                    <option value="1" <?php AssessmentUtility::writeHtmlSelected($timefilter,1); ?> >last 1 hour</option>
-             <option value="2"  <?php  AssessmentUtility::writeHtmlSelected($timefilter,2); ?> >last 2 hours</option>
-             <option value="4"  <?php AssessmentUtility::writeHtmlSelected($timefilter,4); ?>>last 4 hours</option>
-             <option value="24"  <?php AssessmentUtility::writeHtmlSelected($timefilter,24); ?>>last day</option>
-             <option value="168"  <?php AssessmentUtility::writeHtmlSelected($timefilter,168); ?>>last week</option>
-             <option value="720"  <?php AssessmentUtility::writeHtmlSelected($timefilter,720); ?>>last month</option>
-             <option value="8760" <?php  AssessmentUtility::writeHtmlSelected($timefilter,8760); ?>>last year</option>
-             </select>
-
-           </span>
+      <div class="inner-content-gradebook">
+         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+        <form method=post action="gradebook?cid=<?php echo $course->id?>">
+         <div class="col-md-12">
+            <div class="pull-left padding-left-zero select-text-margin col-md-3">
+             <span class="col-md-12">  <?php echo "Meanings:   NC-no credit"; ?> </span>
+            </div>
+          <div class="col-md-9 pull-right">
+            <span class="col-md-5"> Students starting in:
+                 <select id="timetoggle" class="form-control-gradebook" onchange="chgtimefilter()">
+                     <option value="1" <?php AssessmentUtility::writeHtmlSelected($timefilter,1); ?> >last 1 hour</option>
+                     <option value="2"  <?php  AssessmentUtility::writeHtmlSelected($timefilter,2); ?> >last 2 hours</option>
+                     <option value="4"  <?php AssessmentUtility::writeHtmlSelected($timefilter,4); ?>>last 4 hours</option>
+                     <option value="24"  <?php AssessmentUtility::writeHtmlSelected($timefilter,24); ?>>last day</option>
+                     <option value="168"  <?php AssessmentUtility::writeHtmlSelected($timefilter,168); ?>>last week</option>
+                     <option value="720"  <?php AssessmentUtility::writeHtmlSelected($timefilter,720); ?>>last month</option>
+                     <option value="8760" <?php  AssessmentUtility::writeHtmlSelected($timefilter,8760); ?>>last year</option>
+                 </select>
+            </span>
             <span class=" pull-right">
              Last name: <input type=text id="lnfilter" value="<?php echo $lnfilter ?>" />
              <input type=button value="Filter by name" onclick="chglnfilter()" />
-        </span>
-        </div>
-      </div> <br> <br>
-<?php $gbt = gbinstrdisp($gradebookData,$studentsDistinctSection,$course); ?>
-
- </form>
- </div>
- </div>
+            </span>
+          </div>
+         </div> <br> <br>
+            <?php $gbt = gbinstrdisp($gradebookData,$studentsDistinctSection,$course); ?>
+        </form>
+      </div>
+    </div>
 <?php
 function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
     $isteacher = $gradebookData['isTeacher'];
@@ -63,10 +62,11 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
     $stu = $gradebookData['defaultValuesArray']['studentId'];
     $hidenc = 1;
     $cid = $course->id;
-    $gbt = $gradebookData['gradebook'];
-    echo "<div id=\"tbl-container\">";
-    echo "<table class=myTable table table-bordered table-striped table-hover data-table id=myTable><thead><tr>";
-    $n=0;
+    $gbt = $gradebookData['gradebook']; ?>
+<div style="position: relative;">
+<div id="tbl-container" style="width: 100%;overflow-x: scroll">
+     <table class= table table-bordered table-striped table-hover data-table id= ><thead><tr>
+    <?php $n=0;
     for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
         if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
         echo '<th>'.$gbt[0][0][$i];
@@ -104,6 +104,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
         if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
             echo $gbt[0][1][$i][2].' (Not Counted)';
         } else {
+
             echo $gbt[0][1][$i][2].'&nbsp;pts';
             if ($gbt[0][1][$i][4]==2) {
                 echo ' (EC)';
@@ -115,13 +116,48 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
         //links
         if ($isteacher) {
             if ($gbt[0][1][$i][6]==0) { //online ?>
-                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gbt[0][1][$i][7].'&cid='.$cid.'&from=gb');?> ">[Settings]</a>
-                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$cid.'&aid='.$gbt[0][1][$i][7]);?> ">[Isolate]</a>
+                 <span class="instronly common-setting" style="position: absolute">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright"
+                   data-toggle="dropdown" href="javascript:void(0);">
+                    <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/>
+                </a>
+                <ul class=" select1 dropdown-menu selected-options  ">
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gbt[0][1][$i][7].'&cid='.$cid.'&from=gb');?> ">[Settings]</a>
+                    </li>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$cid.'&aid='.$gbt[0][1][$i][7]);?> ">[Isolate]</a>
+                    </li>
+                </ul>
+                    </span>
     <?php   } else if ($gbt[0][1][$i][6]==1) { //offline ?>
-                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$i][7]);?> ">[Settings]</a>
-                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$i][7].'&isolate=true');?> ">[Isolate]</a>
+                <span class="instronly common-setting" style="position: absolute">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright"
+                   data-toggle="dropdown" href="javascript:void(0);">
+                    <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/>
+                </a>
+                <ul class=" select1 dropdown-menu selected-options  ">
+                    <li>
+                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$i][7]);?> ">[Settings]</a>
+                    </li>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$i][7].'&isolate=true');?> ">[Isolate]</a>
+                    </li>
+                </ul>
+                    </span>
           <?php  } else if ($gbt[0][1][$i][6]==2) { //discussion ?>
-                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/addforum?id='.$gbt[0][1][$i][7].'&cid='.$cid.'&from=gb');?>">[Settings]</a>";
+                <span class="instronly common-setting" style="position: absolute">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright"
+                   data-toggle="dropdown" href="javascript:void(0);">
+                    <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/>
+                </a>
+                <ul class=" select1 dropdown-menu selected-options  ">
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/addforum?id='.$gbt[0][1][$i][7].'&cid='.$cid.'&from=gb');?>">[Settings]</a>
+                    </li>
+                </ul>
+                    </span>
+
            <?php  }
         }
         echo '</th>';
@@ -222,7 +258,11 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
         }
 
     }
-    echo "</tbody></table>";
+    ?></tbody></table>
+    </div>
+    </div>
+
+    <?php
     if ($n>0) {
         $sarr = array_fill(0,$n-1,"'N'");
     } else {
@@ -235,8 +275,8 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
         echo "<script type='javascript'>initSortTable('myTable',Array($sarr),true,false);</script>\n";
     }
 } ?>
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>
+<!--    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>-->
+<!--    <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>-->
     <script>
     $(document).ready(function () {
         var table = $('.myTable').DataTable( {
@@ -247,7 +287,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             "ordering":false,
             paging: false
         });
-        new $.fn.dataTable.FixedColumns(table);
+//        new $.fn.dataTable.FixedColumns(table);
     });
 
 </script>

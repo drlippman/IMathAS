@@ -201,5 +201,31 @@ class ForumView extends BaseImasForumViews
         $query .= "WHERE imas_forum_threads.forumid='{$forumId}'";
         Yii::$app->db->createCommand($query)->execute();
     }
+
+    public static function getId($threadId, $UserId)
+    {
+        return ForumView::find(['id'])->where(['threadid' => $threadId, 'userid' => $UserId])->all();
+
+    }
+
+    public static function setLastview($threadId)
+    {
+        $forum = ForumView::find()->where(['id' => $threadId])->one();
+        if($forum)
+        {
+            $forum->lastview = time();
+            $forum->save();
+        }
+
+    }
+
+    public static function getForumDataByUserId($userId,$dofilter,$limthreads)
+    {
+        $query = "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid='$userId'";
+        if ($dofilter) {
+            $query .= " AND threadid IN ($limthreads)";
+        }
+       return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }
 

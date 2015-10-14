@@ -1,13 +1,14 @@
 <?php
 use app\components\AppUtility;
 use app\components\CategoryScoresUtility;
+use app\components\AppConstant;
 $this->title = 'Item Analysis';?>
 <div class="item-detail-header">
 
     <?php
-    if($student == 0) {
+    if($student == AppConstant::NUMERIC_ZERO) {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id], 'page_title' => $this->title]);
-    }else if ($student==-1) {
+    }else if ($student== AppConstant::NUMERIC_NEGATIVE_ONE) {
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Gradebook','Averages'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?stu='.$student.'&cid='.$course->id], 'page_title' => $this->title]);
     } else if ($from=='isolate') {
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,AppUtility::getHomeURL().'gradebook/gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$assessmentId], 'page_title' => $this->title]);
@@ -29,6 +30,8 @@ if (!$isTeacher) {
     echo "This page not available to students";
         echo '</div>';
 }else {
+    $cid = $course->id;
+    $aid = $assessmentId;
     $imasroot = AppUtility::getHomeURL();
     $placeinhead = '<script type="text/javascript">';
     $placeinhead .= '$(function() {$("a[href*=\'gradeallq\']").attr("title","' . _('Grade this question for all students') . '");});';
@@ -44,212 +47,206 @@ if (!$isTeacher) {
     //echo "&gt; Item Analysis";
     ?>
     <br>
-
-    <div class="cpmid item-analysis"><a
-            href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/isolate-assessment-grade?cid=' . $courseId . '&amp;aid=' . $assessmentId) ?>">View
-            Score List</a></div>
-    <?php
-    echo '<div id="headergb-itemanalysis" class="pagetitle item-analysis"><h2>Item Analysis: ';
-    $defpoints = $assessmentData['defpoints'];
-    $aname = $assessmentData['name'];
-    $itemorder = $assessmentData['itemorder'];
-    $defoutcome = $assessmentData['defoutcome'];
-    $showhints = $assessmentData['showhints'];
-    echo $aname . '</h2></div>';
+    <div class="cpmid item-analysis">
+        <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/isolate-assessment-grade?cid=' . $courseId . '&amp;aid=' . $assessmentId) ?>"><?php AppUtility::t('View Score List');?></a>
+    </div>
+     <div id="headergb-itemanalysis" class="pagetitle item-analysis"><h2><?php AppUtility::t('Item Analysis')?>:
+    <?php $defaultPoints = $assessmentData['defpoints'];
+    $defaultOutcome = $assessmentData['defoutcome'];
+    $showHints = $assessmentData['showhints'];
+    echo $assessmentData['name'] . '</h2></div>';
     echo '<div class="item-analysis">';
-    $root = AppUtility::getHomeURL() . 'instructor/instructor/item-analysis-detail?cid=' . $courseId . '&aid=' . $assessmentId . '&qid=' . $qid . '&type=notstart';
-
-    if ($notstarted == 0) {
-        echo '<p>All students have started this assessment. ';
-    } else {
-        echo "<p><a href=\"#\" onclick=\"GB_show('Not Started',$root,500,300);return false;\">$notstarted student" . ($notstarted > 1 ? 's' : '') . "</a> ($nonstartedper%) " . ($notstarted > 1 ? 'have' : 'has') . " not started this assessment.  They are not included in the numbers below. ";
-    }
-    echo '</p>';
-    //echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
-
-    echo "<table class=gb id=myTable><thead>"; //<tr><td>Name</td>\n";
-    echo "<tr><th>#</th><th scope=\"col\">Question</th><th>Grade</th>";
-    //echo "<th scope=\"col\">Average Score<br/>All</th>";
-    echo "<th scope=\"col\" title=\"Average score for all students who attempted this question\">Average Score<br/>Attempted</th><th title=\"Average number of attempts and regens (new versions)\" scope=\"col\">Average Attempts<br/>(Regens)</th><th scope=\"col\" title=\"Percentage of students who have not started this question yet\">% Incomplete</th>";
-    echo "<th scope=\"col\" title=\"Average time a student worked on this question, and average time per attempt on this question\">Time per student<br/> (per attempt)</th>";
-    if ($showhints == 1) {
-        echo '<th scope="col" title="Percentage of students who clicked on help resources in the question, if available">Clicked on Help</th>';
-    }
-    echo "<th scope=\"col\">Preview</th></tr></thead>\n";
-    echo "<tbody>";
-
-    if (count($qtotal) > 0) {
-        $i = 1;
-        $descrips = array();
-        $points = array();
-        $withdrawn = array();
-        $qsetids = array();
-        $needmanualgrade = array();
-        $showextref = array();
-
-        foreach ($questionData as $row) {
-            $descrips[$row[1]] = $row[0];
-            $points[$row[1]] = $row[2];
-            $qsetids[$row[1]] = $row[3];
-            $withdrawn[$row[1]] = $row[4];
-            if ($row[5] == 'essay' || $row[5] == 'file') {
-                $needmanualgrade[$row[1]] = true;
-            } else if ($row[5] == 'multipart') {
-                if (preg_match('/anstypes.*?(".*?"|array\(.*?\))/', $row[6], $matches)) {
-                    if (strpos($matches[1], 'essay') !== false || strpos($matches[1], 'file') !== false) {
-                        $needmanualgrade[$row[1]] = true;
+    if ($notStarted == AppConstant::NUMERIC_ZERO) { ?>
+         <p> <?php AppUtility::t('All students have started this assessment.')?>
+    <?php } else { ?>
+         <p><a href="#" onclick="GB_show('Not Started','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid=' . $courseId . '&aid=' . $assessmentId . '&qid=' . $qid . '&type=notstart');?>',500,300);return false;"><?php echo $notStarted;?> <?php AppUtility::t('student')?> <?php ($notStarted > 1 ? 's' : '') ?> </a>  (<?php echo $nonStartAssessment?> %) <?php ($notStarted > 1 ? AppUtility::t('have not started this assessment.  They are not included in the numbers below.') : AppUtility::t('has not started this assessment.  They are not included in the numbers below.')) ?>
+    <?php } ?>
+     </p>
+     <div class="overflow-x-auto width-hundread-per">
+             <table class='table table-bordered table-striped table-hover data-table' id=myTable><thead>
+             <tr><th>#</th><th scope="col"><?php AppUtility::t('Question')?></th><th><?php AppUtility::t('Grade')?></th>
+             <th scope="col" title="<?php AppUtility::t('Average score for all students who attempted this question')?>"><?php AppUtility::t('Average Score')?><br/><?php AppUtility::t('Attempted')?></th>
+             <th title="<?php AppUtility::t('Average number of attempts and regens (new versions)')?>" scope="col"><?php AppUtility::t('Average Attempts')?><br/>(<?php AppUtility::t('Regens')?>)</th>
+             <th scope="col" title="<?php AppUtility::t('Percentage of students who have not started this question yet')?>">% <?php AppUtility::t('Incomplete')?></th>
+             <th scope="col" title="<?php AppUtility::t('Average time a student worked on this question, and average time per attempt on this question')?>"><?php AppUtility::t('Time per student')?><br/> (<?php AppUtility::t('per attempt')?>)</th>
+            <?php if ($showHints == 1)
+            { ?>
+                 <th scope="col" title="<?php AppUtility::t('Percentage of students who clicked on help resources in the question, if available')?>"><?php AppUtility::t('Clicked on Help')?></th>
+            <?php } ?>
+             <th scope="col"><?php AppUtility::t('Preview')?></th></tr></thead>
+             <tbody>
+        <?php
+            if (count($questionTotal) > AppConstant::NUMERIC_ZERO) {
+                $i = AppConstant::NUMERIC_ONE;
+                $description = array();
+                $points = array();
+                $withdrawn = array();
+                $questionSetIds = array();
+                $needManualGrade = array();
+                $showExtraRef = array();
+                foreach ($questionData as $row)
+                {
+                    $description[$row[1]] = $row[0];
+                    $points[$row[1]] = $row[2];
+                    $questionSetIds[$row[1]] = $row[3];
+                    $withdrawn[$row[1]] = $row[4];
+                    if ($row[5] == 'essay' || $row[5] == 'file') {
+                        $needManualGrade[$row[1]] = true;
+                    } else if ($row[5] == 'multipart') {
+                        if (preg_match('/anstypes.*?(".*?"|array\(.*?\))/', $row[6], $matches)) {
+                            if (strpos($matches[1], 'essay') !== false || strpos($matches[1], 'file') !== false) {
+                                $needManualGrade[$row[1]] = true;
+                            }
+                        }
                     }
-                }
-            }
-            if ($row[8] != '' && ($row[7] == 2 || ($row[7] == 0 && $showhints == 1))) {
-                $showextref[$row[1]] = true;
-            } else {
-                $showextref[$row[1]] = false;
-            }
-        }
-
-        $avgscore = array();
-        $qs = array();
-
-        foreach ($itemarr as $qid) {
-            if ($i % 2 != 0) {
-                echo "<tr class=even>";
-            } else {
-                echo "<tr class=odd>";
-            }
-            $pts = $points[$qid];
-            if ($pts == 9999) {
-                $pts = $defpoints;
-            }
-            if ($qcnt[$qid] > 0) {
-                $avg = round($qtotal[$qid] / $qcnt[$qid], 2);
-                if ($qcnt[$qid] - $qincomplete[$qid] > 0) {
-                    $avg2 = round($qtotal[$qid] / ($qcnt[$qid] - $qincomplete[$qid]), 2); //avg adjusted for not attempted
-                } else {
-                    $avg2 = 0;
-                }
-                $avgscore[$i - 1] = $avg;
-                $qs[$i - 1] = $qid;
-
-                if ($pts > 0) {
-                    $pc = round(100 * $avg / $pts);
-                    $pc2 = round(100 * $avg2 / $pts);
-                } else {
-                    $pc = 'N/A';
-                    $pc2 = 'N/A';
-                }
-                $pi = round(100 * $qincomplete[$qid] / $qcnt[$qid], 1);
-
-                if ($qcnt[$qid] - $qincomplete[$qid] > 0) {
-                    $avgatt = round($attempts[$qid] / ($qcnt[$qid] - $qincomplete[$qid]), 2);
-                    $avgreg = round($regens[$qid] / ($qcnt[$qid] - $qincomplete[$qid]), 2);
-                    $avgtot = round($timeontask[$qid] / ($qcnt[$qid] - $qincomplete[$qid]), 2);
-                    $avgtota = round($timeontask[$qid] / ($tcnt[$qid]), 2);
-                    if ($avgtot == 0) {
-                        $avgtot = 'N/A';
-                    } else if ($avgtot < 60) {
-                        $avgtot .= ' sec';
+                    if ($row[8] != '' && ($row[7] == AppConstant::NUMERIC_TWO || ($row[7] == AppConstant::NUMERIC_ZERO && $showHints == AppConstant::NUMERIC_ONE)))
+                    {
+                        $showExtraRef[$row[1]] = true;
                     } else {
-                        $avgtot = round($avgtot / 60, 2) . ' min';
+                        $showExtraRef[$row[1]] = false;
                     }
-                    if ($avgtota == 0) {
-                        $avgtot = 'N/A';
-                    } else if ($avgtota < 60) {
-                        $avgtota .= ' sec';
+                }
+                $averageScore = array();
+                $qs = array();
+                foreach ($itemArray as $qid)
+                {
+                    if ($i % 2 != AppConstant::NUMERIC_ZERO) {
+                        echo "<tr class=even>";
                     } else {
-                        $avgtota = round($avgtota / 60, 2) . ' min';
+                        echo "<tr class=odd>";
                     }
-                } else {
-                    $avgatt = 0;
-                    $avgreg = 0;
-                    $avgtot = 0;
-                }
-            } else {
-                $avg = "NA";
-                $avg2 = "NA";
-                $avgatt = "NA";
-                $avgreg = "NA";
-                $pc = 0;
-                $pc2 = 0;
-                $pi = "NA";
-            }
+                    $pts = $points[$qid];
+                    if ($pts == AppConstant::QUARTER_NINE)
+                    {
+                        $pts = $defaultPoints;
+                    }
+                    if ($questionCount[$qid] > AppConstant::NUMERIC_ZERO) {
+                        $avg = round($questionTotal[$qid] / $questionCount[$qid], AppConstant::NUMERIC_TWO);
+                        if ($questionCount[$qid] - $questionInComplete[$qid] > AppConstant::NUMERIC_ZERO)
+                        {
+                            $avg2 = round($questionTotal[$qid] / ($questionCount[$qid] - $questionInComplete[$qid]), AppConstant::NUMERIC_TWO); //avg adjusted for not attempted
+                        } else {
+                            $avg2 = AppConstant::NUMERIC_ZERO;
+                        }
+                        $averageScore[$i - 1] = $avg;
+                        $qs[$i - 1] = $qid;
+                        if ($pts > AppConstant::NUMERIC_ZERO)
+                        {
+                            $pc = round(AppConstant::NUMERIC_HUNDREAD * $avg / $pts);
+                            $pc2 = round(AppConstant::NUMERIC_HUNDREAD * $avg2 / $pts);
+                        } else {
+                            $pc = AppUtility::t('N/A',false);
+                            $pc2 = AppUtility::t('N/A',false);
+                        }
+                        $pi = round(AppConstant::NUMERIC_HUNDREAD * $questionInComplete[$qid] / $questionCount[$qid], AppConstant::NUMERIC_ONE);
 
-            echo "<td>{$itemnum[$qid]}</td><td>";
-            if ($withdrawn[$qid] == 1) {
-                echo '<span class="red">Withdrawn</span> ';
-            }
-            echo "{$descrips[$qid]}</td>";
-            echo "<td><a href=\"gradeallq.php?stu=$student&cid=$cid&asid=average&aid=$aid&qid=$qid\" ";
-            if (isset($needmanualgrade[$qid])) {
-                echo 'class="manualgrade" ';
-            }
-            echo ">Grade</a></td>";
-            //echo "<td>$avg/$pts ($pc%)</td>";
-            echo "<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>";
-            echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,500);return false;\">$avgatt ($avgreg)</td>";
-            echo "<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi%</td>";
-            echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,500);return false;\">$avgtot ($avgtota)</td>";
-            if ($showhints == 1) {
-                if ($showextref[$qid]) {
-                    echo "<td class=\"pointer c\" onclick=\"GB_show('Got Help','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=help',500,500);return false;\">" . round(100 * $vidcnt[$qid] / ($qcnt[$qid] - $qincomplete[$qid])) . '%</td>';
-                } else {
-                    echo '<td class="c">N/A</td>';
-                }
-            }
-            echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
+                        if ($questionCount[$qid] - $questionInComplete[$qid] > AppConstant::NUMERIC_ZERO) {
+                            $averageAttribute = round($attempts[$qid] / ($questionCount[$qid] - $questionInComplete[$qid]), AppConstant::NUMERIC_TWO);
+                            $avgreg = round($regens[$qid] / ($questionCount[$qid] - $questionInComplete[$qid]), AppConstant::NUMERIC_TWO);
+                            $averageTotal = round($timeOnTask[$qid] / ($questionCount[$qid] - $questionInComplete[$qid]), AppConstant::NUMERIC_TWO);
+                            $averageTotalAssessment = round($timeOnTask[$qid] / ($totalCount[$qid]), AppConstant::NUMERIC_TWO);
+                            if ($averageTotal == AppConstant::NUMERIC_ZERO) {
+                                $averageTotal = AppUtility::t('N/A',false);
+                            } else if ($averageTotal < AppConstant::SIXTY) {
+                                $averageTotal .= AppUtility::t(' sec',false);
+                            } else {
+                                $averageTotal = round($averageTotal / AppConstant::SIXTY, AppConstant::NUMERIC_TWO) . AppUtility::t(' min');
+                            }
+                            if ($averageTotalAssessment == AppConstant::NUMERIC_ZERO)
+                            {
+                                $averageTotal = AppUtility::t('N/A',false);
+                            } else if ($averageTotalAssessment < AppConstant::SIXTY) {
+                                $averageTotalAssessment .= AppUtility::t(' sec',false);
+                            } else {
+                                $averageTotalAssessment = round($averageTotalAssessment / AppConstant::SIXTY, AppConstant::NUMERIC_TWO) . ' min';
+                            }
+                        } else {
+                            $averageAttribute = AppConstant::NUMERIC_ZERO;
+                            $avgreg = AppConstant::NUMERIC_ZERO;
+                            $averageTotal = AppConstant::NUMERIC_ZERO;
+                        }
+                    } else {
+                        $avg = AppUtility::t('NA');
+                        $avg2 = AppUtility::t('NA');
+                        $averageAttribute = AppUtility::t('NA');
+                        $avgreg = AppUtility::t('NA');
+                        $pc = AppConstant::NUMERIC_ZERO;
+                        $pc2 = AppConstant::NUMERIC_ZERO;
+                        $pi = AppUtility::t('NA');
+                    }
+                    echo "<td>{$itemNumber[$qid]}</td><td>";
+                    if ($withdrawn[$qid] == AppConstant::NUMERIC_ONE)
+                    { ?>
+                         <span class="red"><?php AppUtility::t('Withdrawn')?></span>
+                    <?php }
+                    echo "{$description[$qid]}</td>"; ?>
+                     <td><a href="<?php echo AppUtility::getHomeURL('gradebook','gradebook/gradeallq?stu='.$student.'&cid='.$cid.'&asid=average&aid='.$aid.'&qid='.$qid);?>"
+                    <?php if (isset($needManualGrade[$qid])) {
+                        echo 'class="manualgrade" ';
+                    } ?> ><?php AppUtility::t('Grade')?></a></td>
+                     <td class="pointer c" onclick="GB_show('Low Scores','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=score')?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><b><?php echo $pc2.'%'; ?></b></td>
+                     <td class="pointer" onclick="GB_show('Most Attempts and Regens','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=att')?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><?php echo $averageAttribute .'('.$avgreg.')' ?></td>
+                     <td class="pointer c" onclick="GB_show('Incomplete','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=incomp'); ?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><?php echo $pi.'%';?></td>
+                     <td class="pointer" onclick="GB_show('Most Time','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=time'); ?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><?php echo $averageTotal .'('.$averageTotalAssessment.')';?></td>
+                    <?php if ($showHints == AppConstant::NUMERIC_ONE)
+                {
+                        if ($showExtraRef[$qid]) { ?>
+                             <td class="pointer c" onclick="GB_show('Got Help','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=help') ?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><?php echo round(AppConstant::NUMERIC_HUNDREAD * $vidcnt[$qid]   ($questionCount[$qid] - $questionInComplete[$qid])).'%'; ?></td>
+                        <?php } else { ?>
+                            <td class="c"><?php AppUtility::t('N/A')?></td>
+                        <?php }
+                    }
+                    echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
+                    echo "</tr>\n";
+                    $i++;
+                } ?>
+             </tbody></table>
+     </div>
 
-            echo "</tr>\n";
-            $i++;
-        }
-
-        echo "</tbody></table>\n";
-        echo "<script type=\"text/javascript\">\n";
-        echo "initSortTable('myTable',Array('N','S',false,'N','N','N','N','N',false),true);\n";
-        echo "</script>\n";
-        echo "<p>Average time taken on this assessment: ";
-        if (count($timetaken) > 0) {
-            echo round(array_sum($timetaken) / count($timetaken) / 60, 1);
+         <p><?php AppUtility::t('Average time taken on this assessment')?>:
+        <?php if (count($timeTaken) > AppConstant::NUMERIC_ZERO)
+        {
+            echo round(array_sum($timeTaken) / count($timeTaken) / AppConstant::SIXTY, AppConstant::NUMERIC_ONE);
         } else {
-            echo 0;
-        }
-        echo " minutes</p>\n";
-    } else {
+            echo AppConstant::NUMERIC_ZERO;
+        } ?>
+         <?php AppUtility::t('minutes')?></p>
+    <?php } else
+    {
         echo '</tbody></table>';
-    }
-
-    echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
-    echo "Note: Average Attempts, Regens, and Time only counts those who attempted the problem<br/>";
-    echo 'All averages only include those who have started the assessment</p>';
-
-    if ($numberOfQuestions > 0) {
-        CategoryScoresUtility::catscores($qs, $avgscore, $defpoints, $defoutcome, $cid);
-    }
-    echo '<div class="cpmid">Experimental:<br/>'; ?>
-    <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-results?cid=' . $course->id . '&aid=' . $assessmentId); ?>">Summary
-        of assessment results</a> (only meaningful for non-randomized questions)<br/>
-
-    <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/assessment-export?cid=' . $course->id . '&aid=' . $assessmentId); ?>">Export
-        student answer details</a></div>
+    } ?>
+     <p><?php AppUtility::t('Items with grade link')?> <span class="manualgrade"><?php AppUtility::t('highlighted')?></span> <?php AppUtility::t('require manual grading')?>.<br/>
+     <?php AppUtility::t('Note: Average Attempts, Regens, and Time only counts those who attempted the problem')?><br/>
+     <?php AppUtility::t('All averages only include those who have started the assessment')?></p>
+<?php
+    if ($numberOfQuestions > AppConstant::NUMERIC_ZERO)
+    {
+        CategoryScoresUtility::catscores($qs, $averageScore, $defaultPoints, $defaultOutcome, $cid);
+    } ?>
+     <div class="cpmid"><?php AppUtility::t('Experimental')?>:<br/>
+    <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-results?cid=' . $course->id . '&aid=' . $assessmentId); ?>">
+        <?php AppUtility::t('Summary of assessment results')?></a> (<?php AppUtility::t('only meaningful for non-randomized questions')?>)<br/>
+    <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/assessment-export?cid=' . $course->id . '&aid=' . $assessmentId); ?>">
+        <?php AppUtility::t('Export student answer details')?></a></div>
 <? echo '</div><br>';
 }
 echo '</div>';
-
 function getpts($sc) {
     if (strpos($sc,'~')===false) {
-        if ($sc>0) {
+        if ($sc > AppConstant::NUMERIC_ZERO) {
             return $sc;
         } else {
-            return 0;
+            return AppConstant::NUMERIC_ZERO;
         }
     } else {
         $sc = explode('~',$sc);
-        $tot = 0;
+        $tot = AppConstant::NUMERIC_ZERO;
         foreach ($sc as $s) {
-            if ($s>0) {
+            if ($s > AppConstant::NUMERIC_ZERO) {
                 $tot+=$s;
             }
         }
-        return round($tot,1);
+        return round($tot,AppConstant::NUMERIC_ONE);
     }
 }
 

@@ -262,4 +262,5 @@ class AppConstant
     const NO_FORUM_ACCESS = 'No access to scores for this forum';
     const INVALID_PARAMETERS = 'invalid parameters';
     const UPLOAD_DIRECTORY_PROFILE = 'Uploads';
+    const FIVE_HUNDRED = 500;
 }

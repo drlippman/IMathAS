@@ -14,41 +14,33 @@ $(document).ready(function ()
         limitToNew();
     }else
     {
-        jQuerySubmit('get-thread-ajax',{forumid: forumid,isValue:isValue },'threadSuccess');
+        //jQuerySubmit('get-thread-ajax',{forumid: forumid,isValue:isValue },'threadSuccess');
     }
     limitToTagShow();
-
-    $('.select_option').click(function(){
+        $('.select_option').click(function(){
         selected = $('.select_option :selected').val();
+        page = $('#page').val();
+        var forumid= $('#forumid').val();
         if(selected == 0)
         {
-            var forumid= $('#forumid').val();
-            window.location = "list-post-by-name?cid="+courseid+"&forumid="+forumid;
 
+            window.location = "list-post-by-name?page="+page+"&cid="+courseid+"&forumid="+forumid;
         }
         else if(selected == 1)
         {
 
             $('.forum-table').DataTable().destroy();
-            var isValue = 1;
-            var forumid= $('#forumid').val();
-            var thread = {forumid: forumid , isValue: isValue};
-            jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
-
+                window.location = "thread?page=-2&cid="+courseid+"&forum="+forumid;
         }
         else if(selected == 2)
         {
-
             $('.forum-table').DataTable().destroy();
-            var isValue = 2;
-            var forumid= $('#forumid').val();
-            var thread = {forumid: forumid , isValue: isValue};
-            jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
-
+            window.location = "thread?page=-1&cid="+courseid+"&forum="+forumid;
         }
         else if(selected == 3)
         {
-            window.location.reload();
+            console.log(forumid);
+            window.location = "thread?page=1&cid="+courseid+"&forum="+forumid;
         }
     });
     $('#change-button').click(function(){
@@ -64,14 +56,14 @@ $(document).ready(function ()
                     $('#searchpost').show();
                     $('#flash-message').hide();
 
-                    jQuerySubmit('get-search-post-ajax',{search: searchText, courseid: courseid},'postSearchSuccess');
+                    //jQuerySubmit('get-search-post-ajax',{search: searchText, courseid: courseid},'postSearchSuccess');
                 }
                 else
                 {
                     $('#searchpost').show();
                     $('#flash-message').hide();
-                    jQuerySubmit('get-only-post-ajax',{search: searchText, courseid: courseid,forumid:forumid},'postSearchUnchecked');
-
+                    //jQuerySubmit('get-only-post-ajax',{search: searchText, courseid: courseid,forumid:forumid},'postSearchUnchecked');
+                //
                 }
             }
             else
@@ -177,6 +169,7 @@ function threadSuccess(response)
     var isRemoveThread = ( settings & 4) == 4;
     if (response.status == 0) {
         var threads = response.data.threadArray;
+        console.log(threads);
         var uniquesDataArray = response.data.uniquesDataArray;
         var isValue = response.data.isValue;
         var checkFlagValue;
@@ -196,7 +189,7 @@ function threadSuccess(response)
                 {
                     if(thread.isanon == 0)
                     {
-                        if(((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId) || unRead == thread.threadId)
+                        if(((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId) )
                         {
 
                             html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br> "+ thread.name+"</td>";
@@ -349,33 +342,6 @@ function threadSuccess(response)
     }
 
 
-    $("a[name=tabs]").on("click", function (event) {
-        event.preventDefault();
-        var threadsid = $(this).attr("data-var");
-        var checkPostOrThread = 1;
-        var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Cancel": function () {
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "confirm": function () {
-                    $(this).dialog("close");
-                    var threadId = threadsid;
-
-                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
-                    return true;
-                }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
-        });
-    });
 
     $("a[name=view-tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
@@ -413,7 +379,7 @@ function changeImage(element,checkFlagValue, rowId) {
     var userId = $("#user-id").val();
 
     var row = {rowId: rowId,userId:userId};
-    jQuerySubmit('change-image-ajax', row,'flagResponse');
+    //jQuerySubmit('change-image-ajax', row,'flagResponse');
 
 }
 
@@ -442,7 +408,7 @@ function limitToTagShow() {
         hideLink = 0;
         var forumid= $('#forumid').val();
         var thread = {forumid: forumid , isValue: isValue,hideLink:hideLink};
-        jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+        //jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });
     $('#markRead').click(function(){
@@ -450,7 +416,7 @@ function limitToTagShow() {
         var forumid= $('#forumid').val();
         $('.forum-table').DataTable().destroy();
         var thread = {forumid: forumid , isValue: isValue};
-        jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+        //jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
     });
 
 
@@ -464,5 +430,33 @@ function limitToNew()
     var isValue = 2;
     var forumid= $('#forumid').val();
     var thread = {forumid: forumid , isValue: isValue};
-    jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+    //jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 }
+
+$("a[name=tabs]").on("click", function (event) {
+    event.preventDefault();
+    var threadsid = $(this).attr("data-var");
+    var checkPostOrThread = 1;
+    var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            },
+            "confirm": function () {
+                $(this).dialog("close");
+                var threadId = threadsid;
+
+                jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
+                return true;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+});

@@ -152,15 +152,7 @@ if($totalData['isTutor']){
   <br><br>
     <div class="inner-content-gradebook">
        <div class="button-container col-lg-12 padding-zero">
-<?php
-//if ($gradebook[1][4][2]==1)
-//{ ?>
-  <div class="col-lg-9 margin-left-minus-fifteen">
-<?php //}else{ ?>
-<!--               <div class="col-lg-9">-->
-<?php //} ?>
-
-
+   <div class="col-lg-9 margin-left-minus-fifteen">
         <?php
 if ($availshow==4) {
 $availshow=1;

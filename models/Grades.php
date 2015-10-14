@@ -212,4 +212,30 @@ class Grades extends BaseImasGrades
         return Grades::find()->where(['gradetype' => 'forum'])->andWhere(['gradetypeid' => $forumId])->andWhere(['userid' => $userId])->all();
     }
 
+    public static function getByGradeTypeIdAndGradeType($gradeType,$gradeTypeId)
+    {
+        return Grades::find()->where(['gradetype' => $gradeType])->andWhere(['gradetypeid' => $gradeTypeId])->all();
+    }
+    public static function updateById($score,$feedback,$id)
+    {
+        $grades =  Grades::find()->where(['id' => $id])->all();
+        if($grades)
+        {
+            foreach($grades as $grade)
+            {
+                $grade->score = $score;
+                $grade->feedback = $feedback;
+                $grade->save();
+            }
+        }
+    }
+
+    public static function deleteByOnlyId($id)
+    {
+        $grade = Grades::find()->where(['id' => $id])->one();
+        if($grade)
+        {
+            $grade->delete();
+        }
+    }
 }

@@ -241,12 +241,16 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
         return $this->id;
     }
-    public static function MarkAllRead($forumId)
+    public static function MarkAllRead($forumId,$dofilter = null,$limthreads = null)
     {
           $query = new Query();
           $query ->select(['DISTINCT(threadid)'])
                     ->from('imas_forum_posts ')
                     ->where('forumid= :forumid',[':forumid' => $forumId]);
+        if ($dofilter)
+        {
+            $query .= " AND threadid IN ($limthreads)";
+        }
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -321,4 +325,110 @@ class ForumPosts extends BaseImasForumPosts
         $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getByRefIds($refids)
+    {
+        $query = "SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getThreadId($limthreads,$dofilter,$tagfilter)
+    {
+        $query = "SELECT threadid FROM imas_forum_posts WHERE tag='".addslashes($tagfilter)."'";
+        if ($dofilter)
+{
+            $query .= " AND threadid IN ($limthreads)";
+        }
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getBySearchText($isTeacher,$now,$courseId,$searchlikes,$searchlikes2,$searchlikes3,$forumId,$limthreads,$dofilter,$params)
+    {
+
+        if (isset($params['allforums']))
+        {
+            $query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
+            $query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
+            if (!$isTeacher) {
+                $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate < $now AND imas_forums.enddate>$now)) ";
+            }
+            $query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid='$courseId' AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
+        } else {
+            $query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
+            $query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid='$forumId' AND imas_users.id=imas_forum_posts.userid AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
+        }
+        if ($dofilter) {
+            $query .= " AND imas_forum_posts.threadid IN ($limthreads)";
+        }
+        $query .= " ORDER BY imas_forum_posts.postdate DESC";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getMaxPostDate($dofilter,$limthreads,$forumId)
+    {
+        $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+        $query .= "WHERE forumid='$forumId' ";
+        if ($dofilter)
+        {
+            $query .= " AND threadid IN ($limthreads)";
+        }
+        $query .= "GROUP BY threadid";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getForumPostId($forumId,$limthreads,$dofilter)
+    {
+        $query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid='$forumId'";
+        if ($dofilter)
+        {
+        $query .= " AND threadid IN ($limthreads)";
+        }
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getPostIds($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist)
+    {
+        $query = "SELECT imas_forum_posts.id,count(imas_forum_views.userid) FROM imas_forum_views,imas_forum_posts ";
+        $query .= "WHERE imas_forum_views.threadid=imas_forum_posts.id AND imas_forum_posts.parent=0 AND ";
+        $query .= "imas_forum_posts.forumid='$forumId' ";
+        if ($dofilter)
+        {
+            $query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+        }
+        if ($page==-1)
+        {
+            $query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
+        } else if ($page==-2)
+        {
+            $query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
+        }
+        $query .= "GROUP BY imas_forum_posts.id";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getPostDataForThread($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist,$sortby,$threadsperpage)
+    {
+        $query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
+        $query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid='$forumId' ";
+
+        if ($dofilter) {
+            $query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+        }
+        if ($page==-1) {
+            $query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
+        } else if ($page==-2) {
+            $query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
+        }
+        if ($sortby==0) {
+            $query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
+        } else if ($sortby==1) {
+            $query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_threads.lastposttime DESC ";
+        }
+        $offset = ($page-1)*$threadsperpage;
+        if ($page>0) {
+            $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
+        }
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
 }

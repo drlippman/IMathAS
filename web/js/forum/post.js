@@ -145,7 +145,7 @@ function changeUnreadSuccess(response) {
     var result = JSON.parse(response);
     if(result.status == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid+"&unread="+threadId;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }
 }
 function markAsUnreadPost(){
