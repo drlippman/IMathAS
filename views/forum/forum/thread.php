@@ -51,7 +51,7 @@ $now = $currentTime;
 <input type="hidden" id="un-read" value="<?php echo $unRead; ?>">
 
 <div class="tab-content shadowBox ">
-    <div class="inner-content col-lg-12">
+    <div class="inner-content col-sm-12 padding-left-right-thirty">
         <div class="view-drop-down  pull-left">
         <span class=""><?php echo AppUtility::t('View Options',false)?></span>
             <select name="seluid" class="form-control-forum select_option" id="">
@@ -67,12 +67,12 @@ $now = $currentTime;
             </select>
         </div>
 
-        <div class="mark-as-read-link pull-left col-lg-4 pull-left">
+        <div class="mark-as-read-link pull-left col-sm-3 pull-left">
         <?php if (count($newpost)>0) {?>
             <a   href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?page='.$page.'&cid='.$course->id.'&forum='.$forumid.'&markallread=true')?>" id="markRead"><?php echo AppUtility::t('Mark All Read')?></a>
         <?php } ?>
         </div>
-        <form method=post action="thread">
+        <form method=post id="" action="thread">
         <div class="pull-right view-drop-down">
             <button class="btn btn-primary search-button" type="submit" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></button>
 
@@ -97,11 +97,12 @@ $now = $currentTime;
 
         </form>
 
-
+    </div>
         <?php
         if (isset($params['search']) && trim($params['search'])!='')
         {
-            echo "<h2>Forum Search Results</h2>";
+            echo "<h2 class='col-sm-12 padding-bottom-ten padding-left-twenty-eight'>Forum Search Results</h2>";
+        echo '<div class="col-sm-12 padding-left-right-thirty padding-bottom-ten">';
             foreach ($searchedPost as $row )
             {
             echo "<div class=block>";
@@ -123,10 +124,17 @@ $now = $currentTime;
                  <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?cid='.$cid.'&forum='.$row['imas_forums.id'].'&thread='.$row['imas_forum_posts.threadid']);?>">Show full thread</a></p>
                  </div>
             <?php }
-
+echo '</div>';
 
             }else
         {
+            if (count($postInformtion) == 0)
+            {
+
+                echo ' No posts have been made yet.  Click Add New Thread to start a new discussion ';
+
+            }else{
+
     if ($page > 0) {
         $numpages = ceil($countOfPostId['id'] / $threadsperpage);
         if ($numpages > 1) {
@@ -224,7 +232,7 @@ $now = $currentTime;
 
             ?>
 
-            <div id="data">
+            <div id="data" class="col-sm-12 padding-left-right-thirty padding-top-thirty padding-bottom-ten">
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
                     <th><?php echo AppUtility::t('Topic')?></th>
@@ -243,10 +251,7 @@ $now = $currentTime;
                     $uniqviews[$row['id']] = $row['count(imas_forum_views.userid)']-1;
                     }
 
-                    if (count($postInformtion) == 0)
-                    {
-                    echo '<tr><td colspan='.(($isteacher && $grpaid>0 && !$dofilter)?6:5).'>No posts have been made yet.  Click Add New Thread to start a new discussion</td></tr>';
-                    }
+
 
                     foreach ($postInformtion as $line )
                     {
@@ -293,17 +298,47 @@ $now = $currentTime;
                 if ($line['tag']!='') { //category tags
                     echo '<span class="forumcattag">'.$line['tag'].'</span> ';
                 }
-                if ($isteacher) { ?>
-                    <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;Move</a></li>
+                 echo "</span>\n"; ?>
+
+
+                  <div class="btn-group">
+<?php
+                      if ($line['posttype']==0) {
+
+                      if (isset($flags[$line['id']])) { ?>
+<!--                          <a class='btn btn-primary flag-btn' id="tag{--><?php //echo $line['id'] ?><!--}"  onClick="toggletagged(--><?php //echo $line['id'] ?><!--);return false;" > <i class='fa fa-flag'></i> Unflag</a>-->
+                          <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
+                         <?php
+//                      echo "<img class=\"pointer\" id="tag{$line['id']}" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+                      } else { ?>
+<!--                          <a class='btn btn-primary flag-btn' id="tag{--><?php //echo $line['id'] ?><!--}" onClick="toggletagged(--><?php //echo $line['id'] ?><!--);return false;" )'> <i class='fa fa-flag-o'></i> Flag</a>-->
+                          <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
+                        <?php
+//                      echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+                      }
+                      }else{
+                          echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
+                      } ?>
+
+
+                  <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
+                    <span class="fa fa-caret-down "></span>
+                  </a>
+                  <ul class="dropdown-menu thread-dropdown">
+
+                <?php if ($isteacher) { ?>
+                    <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
 
                 <?php }
                 if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
-                    <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>
+                    <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
                 <?php }
                 if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
-                    <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;Remove</a></li>
+                    <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
                 <?php }
-                echo "</span>\n"; ?>
+                 ?>
+                      </ul>
+                      </div>
                      </td>
                     </tr>
           <?php          }
@@ -312,6 +347,6 @@ $now = $currentTime;
                 </table>
             </div>
             <div id="searchpost"></div>
-   <?php } ?>
+   <?php } } ?>
 </div>
-</div>
+<div>

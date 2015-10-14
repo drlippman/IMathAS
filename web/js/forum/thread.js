@@ -43,11 +43,12 @@ $(document).ready(function ()
             window.location = "thread?page=1&cid="+courseid+"&forum="+forumid;
         }
     });
-    $('#change-button').click(function(){
+    $('#change-button111').click(function(){
         var searchText = $('#search_text').val();
         var courseid = $('#courseid').val();
         if(searchText.length>0)
         {
+            alert('not blank');
             if(searchText.match(/^[a-z A-Z 0-9-]+$/))
             {
             $('#flash-message').hide();
@@ -55,13 +56,14 @@ $(document).ready(function ()
                 {
                     $('#searchpost').show();
                     $('#flash-message').hide();
-
+                    $('#myform').submit();
                     //jQuerySubmit('get-search-post-ajax',{search: searchText, courseid: courseid},'postSearchSuccess');
                 }
                 else
                 {
                     $('#searchpost').show();
                     $('#flash-message').hide();
+                    $('#myform').submit();
                     //jQuerySubmit('get-only-post-ajax',{search: searchText, courseid: courseid,forumid:forumid},'postSearchUnchecked');
                 //
                 }
@@ -74,6 +76,7 @@ $(document).ready(function ()
             }
         }else
         {
+            alert('blank');
             $('#flash-message').show();
             $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
         }
@@ -157,229 +160,13 @@ function postSearchUnchecked(response)
 }
 var newCount=0;
 var count;
-
-function threadSuccess(response)
-{
-    response = JSON.parse(response);
-    var fid = $('#forumid').val();
-    var courseId = $('#courseid').val();
-    var settings = $('#settings').val();
-    var unRead = $('#un-read').val();
-    var isModifyThread = ( settings & 2) == 2;
-    var isRemoveThread = ( settings & 4) == 4;
-    if (response.status == 0) {
-        var threads = response.data.threadArray;
-        console.log(threads);
-        var uniquesDataArray = response.data.uniquesDataArray;
-        var isValue = response.data.isValue;
-        var checkFlagValue;
-        var html = "";
-        $.each(threads, function (index, thread) {
-            if (fid == thread.forumiddata) {
-                count =0;
-                $.each(threads,function (index,data)
-                {
-                    if(thread.threadId == data.threadId)
-                    {
-                        count++;
-                    }
-                });
-                count--;
-                if(thread.parent == 0)
-                {
-                    if(thread.isanon == 0)
-                    {
-                        if(((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId) )
-                        {
-
-                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br> "+ thread.name+"</td>";
-                            newCount++;
-                        }else
-                        {
-                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br> </a>"+ thread.name+"</td>";
-                        }
-                    }
-                    else
-                    {
-                        if((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId)
-                        {
-                            html += "<tr><td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br>Anonymous</td>";
-                            newCount++;
-                        }else
-                        {
-                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br></a>Anonymous </td>";
-                        }
-                    }
-
-                    if(thread.groupSetId > 0 && thread.userright > 10){
-                        html += "<td>Non-group-specific</td>";
-                    }
-                    if(count >= 0){
-                    html += "<td>" + count + "</td>";}
-                    var uniqueView = thread.countArray;
-                    uniqueView--;
-                        if(uniqueView == -1){
-                            uniqueView = '';
-                        }
-                        if (thread.userright >= 20) {
-                            html += "<td><a href='#' name='view-tabs' data-var='" + thread.threadId + "' >" + thread.views + "(" + uniqueView + ")" + "</a></td>";
-                        } else {
-                            html += "<td>" + thread.views + "(" + uniqueView + ")" + "</td>";
-                        }
-                        html += "<td>" + thread .postdate + "</td>";
-                        if (thread.tagged != 1 && thread.posttype == 0 )
-                        {
-                                html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn' onclick='changeImage(this," + true + "," + thread.threadId+" )'>" +
-                                "<i class='fa fa-flag-o'></i> Flag</a><a class='btn btn-primary dropdown-toggle ' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
-                                "<ul class='dropdown-menu'>" ;
-                                 if(thread.userright > 10)
-                                 {
-                                    html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
-                                    "<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
-                                    "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                                }
-                                 else if(thread.currentUserId == thread.postUserId)
-                                 {
-                                     if(isModifyThread && thread.isReplies == 0 && isRemoveThread)
-                                     {
-                                         html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
-                                             "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                                     }else if(isModifyThread)
-                                     {
-                                         html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>";
-                                     }
-                                     else if(thread.isReplies == 0 && isRemoveThread)
-                                     {
-                                         html += "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                                     }
-                                     else {html += "<li><a href='#'><i class='fa fa-exclamation'></i></i></i>&nbsp;No Action Allowed</a></li>";}
-
-                                 }
-                                 else
-                                 {
-                                     html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
-                                 }
-                         }
-                         else if(thread.posttype == 0 )
-                        {
-
-                                html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn' onclick='changeImage(this," + true + "," + thread.threadId +" )' >"+
-                                "<i class='fa fa-flag'></i> Unflag</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
-                                "<ul class='dropdown-menu'>";
-                                if(thread.userright > 10) {
-                                    html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
-                                        "<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
-                                        "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                                }
-                                else if(thread.currentUserId == thread.postUserId)
-                                {
-                                    if(isModifyThread && thread.isReplies == 0 && isRemoveThread)
-                                    {
-                                        html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
-                                            "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                                    }else if(isModifyThread){
-                                        html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>";
-                                    }
-                                    else if(thread.isReplies == 0 && isRemoveThread){
-                                        html += "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                                    }
-                                    else {
-                                        html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
-                                    }
-
-                                }
-                                else {
-
-                                    html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
-                                }
-                        }
-                        else
-                        {
-                            html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn disable-btn-not-allowed'>"+
-                                " No Flag</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down '></span></a>" +
-                                "<ul class='dropdown-menu'>";
-                            if(thread.userright > 10) {
-                                html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
-                                    "<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
-                                    "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
-                            }else
-                            {
-                                html+="<li><a href='#' class='disable-btn-not-allowed'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
-
-                            }
-                        }
-                }
-            }
-        });
-        $('.forum-table-body').empty();
-        $(".forum-table-body").append(html);
-        $('.forum-table').DataTable({"ordering": false ,bPaginate: false});
-        if(isValue == 2)
-        {
-            $('#limit-to-new-link').hide();
-
-        }else{
-            if(newCount > 0)
-            {
-                $('#limit-to-new-link').show();
-                $('#markRead').show();
-            }
-            else{
-                $('#limit-to-new-link').hide();
-                $('#markRead').hide();
-            }
-        }
-
-    }
-    else if (response.status == -1)
-    {
-        $('#markRead').hide();
-    }
-    if(isValue == 3)
-    {
-        window.location.reload();
-
-    }
-
-
-
-    $("a[name=view-tabs]").on("click", function () {
-        var threadsid = $(this).attr("data-var");
-        var html = '<div><p>Thread Views : </p></div><p>';
-        html +=  '<span class="col-lg-11" >Name     LastView </span><br>';
-        $.each(uniquesDataArray, function (index, uniqueEntry) {
-
-            if(threadsid == uniqueEntry.threadId){
-                html += '<span class="col-lg-12 pull-left " >'+ uniqueEntry.name +''+uniqueEntry.lastView+'</span><br>';
-            }
-
-        });
-
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Cancel": function () {
-                    $(this).dialog('destroy').remove();
-                    return false;
-                }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
-        });
-
-    });
-}
-
 var isValue;
 function changeImage(element,checkFlagValue, rowId) {
 
     var userId = $("#user-id").val();
 
     var row = {rowId: rowId,userId:userId};
-    //jQuerySubmit('change-image-ajax', row,'flagResponse');
+    jQuerySubmit('change-image-ajax', row,'flagResponse');
 
 }
 
@@ -460,3 +247,28 @@ $("a[name=tabs]").on("click", function (event) {
         }
     });
 });
+
+
+function toggletagged(threadid) {
+    var trchg = document.getElementById("tr"+threadid);
+    if (trchg.className=="tagged") {
+        submitTagged(threadid,0);
+    } else {
+        submitTagged(threadid,1);
+    }
+    return false;
+}
+
+function submitTagged(thread,tagged) {
+    url = AHAHsaveurl + '&threadid='+thread+'&tagged='+tagged;
+    if (window.XMLHttpRequest) {
+        req = new XMLHttpRequest();
+    } else if (window.ActiveXObject) {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    if (typeof req != 'undefined') {
+        req.onreadystatechange = function() {ahahDone(url, thread, tagged);};
+        req.open("GET", url, true);
+        req.send("");
+    }
+}

@@ -491,3 +491,10 @@ margin: 20px;
 .hide-button:focus,.hide-button:hover {
     background-color: #e3e3ff !important;
 }
+.thread-dropdown {
+    width: 100%;
+    min-width: 98px !important;
+}
+.thread-dropdown > li > a {
+    padding: 3px 10px !important;
+}

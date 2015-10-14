@@ -233,7 +233,13 @@ class ForumController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $threadsperpage = $currentUser['listperpage'];
         $courseId = $params['cid'];
-        $forumId = $params['forum'];
+        if($params['forum']){
+            $forumId = $params['forum'];
+        }else if($params['forumid'])
+        {
+            $forumId = $params['forumid'];
+        }
+
 
         if (!isset($params['page']) || $params['page'] == '') {
             $page = 1;
@@ -404,6 +410,7 @@ class ForumController extends AppController
             $searchlikes2 = "(imas_forum_posts.subject LIKE '%" . implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms) . "%')";
             $searchlikes3 = "(imas_users.LastName LIKE '%" . implode("%' AND imas_users.LastName LIKE '%", $searchterms) . "%')";
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
+
         }
 
         if (isset($params['markallread'])) {
@@ -428,10 +435,8 @@ class ForumController extends AppController
             }
         }
 
-        $caller = 'thread';
-        if (isset($params['modify']) || isset($params['remove']) || isset($params['move'])) {
-            require("posthandler.php");
-        }
+
+
         $postData = ForumPosts::getMaxPostDate($dofilter, $limthreads, $forumId);
 
         $postcount = array();
@@ -492,7 +497,7 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
-        $responseData = array('params' => $params, 'lastview' => $lastview, 'newpost' => $newpost, 'postInformtion' => $postInformtion, 'postIds' => $postIds, 'groupnames' => $groupnames, 'curfilter' => $curfilter,
+        $responseData = array('params' => $params,'flags' => $flags, 'lastview' => $lastview, 'newpost' => $newpost, 'postInformtion' => $postInformtion, 'postIds' => $postIds, 'groupnames' => $groupnames, 'curfilter' => $curfilter,
             'dofilter' => $dofilter, 'groupsetid' => $groupsetid, 'isteacher' => $isteacher, 'countOfPostId' => $countOfPostId, 'cid' => $courseId, 'users' => $currentUser,
             'searchedPost' => $searchedPost, 'forumid' => $forumId, 'maxdate' => $maxdate, 'course' => $course, 'forumData' => $forumData, 'page' => $page, 'threadsperpage' => $threadsperpage, 'postcount' => $postcount);
         return $this->renderWithData('thread', $responseData);
