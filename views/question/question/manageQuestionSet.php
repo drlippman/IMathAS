@@ -203,9 +203,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <span class="col-sm-2 padding-left-zero select-text-margin">Other Attribution</span>
                         <span class="display-inline-block col-sm-6 padding-left-zero">
                             <select class="form-control" name="otherattribtype">
-                                <option value="1">Append to existing attribution</option>
                                 <option value="-1">Do not change attribution</option>
                                 <option value="0">Replace existing attribution</option>
+                                <option value="1">Append to existing attribution</option>
                             </select>
                         </span>
                     </div>
