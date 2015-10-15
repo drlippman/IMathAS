@@ -263,4 +263,7 @@ class AppConstant
     const INVALID_PARAMETERS = 'invalid parameters';
     const UPLOAD_DIRECTORY_PROFILE = 'Uploads';
     const FIVE_HUNDRED = 500;
+    const TEST_PAGE_NO_ACCESS = "You are not authorized to view this page.  If you are trying to reaccess a test you've already started, access it from the course page";
+    const NO_QUESTIONS = 'No questions in assessment';
+    const NOT_GROUP_MEMBER= "You are not yet a member of a group.  Contact your instructor to be added to a group.";
 }

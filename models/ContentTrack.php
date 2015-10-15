@@ -47,13 +47,16 @@ class ContentTrack extends BaseImasContentTrack
     public static function getDistinctUserIdUsingCourseIdAndQuestionId($courseId,$questionId,$secfilter)
     {
         $query = new Query();
-        $query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$courseId' AND ict.courseid='$courseId' AND ict.type='extref' AND ict.typeid='$questionId' AND ims.locked=0 ";
+        $query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid= :courseId AND ict.courseid= :courseId AND ict.type='extref' AND ict.typeid= :questionId AND ims.locked=0 ";
         if ($secfilter!=AppConstant::NUMERIC_NEGATIVE_ONE)
         {
         $query .= " AND ims.section='$secfilter' ";
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('secfilter',$secfilter);
+        $data->bindValue('courseId',$courseId);
+        $data->bindValue('questionId',$questionId);
+        return $data->queryAll();
     }
 
     public static function deleteByCourseId($courseId)
@@ -142,32 +145,46 @@ class ContentTrack extends BaseImasContentTrack
 
     public function getDataForLink($courseId,$typeId)
     {
-      $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid='$typeId'";
-      return \Yii::$app->db->createCommand($query)->queryAll();
+      $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid= :typeId";
+      $data = \Yii::$app->db->createCommand($query);
+      $data->bindValue('courseId',$courseId);
+      $data->bindValue('typeId', $typeId);
+      return $data->queryAll();
     }
 
     public function getDataForAssessment($courseId,$typeId)
     {
-        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('assessintro','assessum','assess') AND typeid='$typeId'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('assessintro','assessum','assess') AND typeid= :typeId";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('courseId',$courseId);
+        $data->bindValue('typeId', $typeId);
+        return $data->queryAll();
     }
 
     public function getDataForWiki($courseId,$typeId)
     {
-        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('wiki','wikiintext') AND typeid='$typeId'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('wiki','wikiintext') AND typeid= :typeId";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('courseId',$courseId);
+        $data->bindValue('typeId', $typeId);
+        return $data->queryAll();
     }
 
     public function getDataForForum($courseId,$typeId)
     {
-        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('forumpost','forumreply') AND info='$typeId'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('forumpost','forumreply') AND info= :typeId";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('courseId',$courseId);
+        $data->bindValue('typeId', $typeId);
+        return $data->queryAll();
     }
 
     public static function getStatsData($courseId)
     {
-        $query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$courseId' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid= :courseId AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('courseId',$courseId);
+        return $data->queryAll();
     }
 
     public static function getId($coursId, $userId,$type, $tId){

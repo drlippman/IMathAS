@@ -141,7 +141,7 @@ class StudentUnenrollUtility extends Component
         }
         if ($delforum && count($forums) > AppConstant::NUMERIC_ZERO) {
             ForumPosts::deleteForumRelatedToCurse($forums);
-            $query = ForumPosts::selectForumPosts($forumlist);
+            $query = ForumPosts::selectForumPosts($forums);
             foreach ($query as $post) {
                 filehandler::deleteallpostfiles($post['id']);
             }

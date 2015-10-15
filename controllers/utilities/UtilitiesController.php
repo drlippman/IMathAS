@@ -3,6 +3,7 @@ namespace app\controllers\utilities;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\components\StudentUnenrollUtility;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
@@ -319,7 +320,7 @@ class UtilitiesController extends AppController
 
                     foreach ($CFG['GEN']['enrollonnewinstructor'] as $rCId)
                     {
-                        unenrollstu($rCId, array(intval($_POST['id'])));
+                        StudentUnenrollUtility::unenrollstu($rCId, array(intval($_POST['id'])));
                     }
                 }
             }

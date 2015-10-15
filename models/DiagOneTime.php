@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\_base\BaseImasDiagOnetime;
+use yii\db\Query;
 
 class DiagOneTime extends BaseImasDiagOnetime
 {
@@ -14,14 +15,16 @@ class DiagOneTime extends BaseImasDiagOnetime
 
     public static function getByDiag($diag)
     {
-        $query = \Yii::$app->db->createCommand("SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag='$diag' ORDER BY time")->queryAll();
-        return $query;
+        $query = \Yii::$app->db->createCommand("SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag= :diag ORDER BY time");
+        $query->bindValue('diag',$diag);
+        return $query->queryAll();
     }
 
     public static function getByTime($now)
     {
-        $query = \Yii::$app->db->createCommand("SELECT code,goodfor FROM imas_diag_onetime WHERE time='$now'")->queryAll();
-        return $query;
+        $query = \Yii::$app->db->createCommand("SELECT code,goodfor FROM imas_diag_onetime WHERE time= :now");
+        $query->bindValue('now',$now);
+        return $query->queryAll();
     }
 
     public function generateDiagOneTime($diag, $now, $code, $goodfor)

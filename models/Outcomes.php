@@ -66,8 +66,14 @@ class Outcomes extends BaseImasOutcomes {
 
     public static function deleteUnusedOutcomes($unusedList)
     {
-        $query = "DELETE FROM imas_outcomes WHERE id IN ($unusedList)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $data = Outcomes::find()->where(['IN', 'id', $unusedList])->all();
+        if($data){
+            foreach($data as $singleData){
+                $singleData->delete();
+            }
+        }
+//        $query = "DELETE FROM imas_outcomes WHERE id IN ($unusedList)";
+//        $data = \Yii::$app->db->createCommand($query)->queryAll();
     }
 
     public static function getDataByJoins($ctc,$courseId)

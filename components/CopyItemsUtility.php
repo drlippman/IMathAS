@@ -620,7 +620,7 @@ public static function handleextoolcopy($sourcecid,$courseId)
         $oktocopycoursetools = true;
     }
     $toolidlist = implode(',', $exttooltrack);
-    $externalTool = ExternalTools::dataForCopy($toolidlist);
+    $externalTool = ExternalTools::dataForCopy($exttooltrack);
     foreach($externalTool as $row)
     {
         $doremap = false;

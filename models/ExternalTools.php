@@ -25,14 +25,14 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function dataForCopy($toolidlist)
     {
-        $query = \Yii::$app->db->createCommand("SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools WHERE id IN ($toolidlist)")->queryAll();
-        return $query;
+        return ExternalTools::find()->select(['id,courseid,groupid,name,url,ltikey,secret,custom,privacy'])->where(['IN', 'id', $toolidlist])->all();
     }
 
     public static function getId($courseId, $url)
     {
-        $query = \Yii::$app->db->createCommand("SELECT id FROM imas_external_tools WHERE url='" . addslashes($url) . "' AND courseid='$courseId'")->queryAll();
-        return $query;
+        $query = \Yii::$app->db->createCommand("SELECT id FROM imas_external_tools WHERE url='" . addslashes($url) . "' AND courseid= :courseId");
+        $query->bindValue('courseId', $courseId);
+        return $query->queryAll();
     }
 
     public function insertData($courseId, $groupid, $rowsub)
@@ -47,7 +47,6 @@ class ExternalTools extends BaseImasExternalTools
         $this->privacy = $rowsub['privacy'];
         $this->save();
         return $this->id;
-
     }
 
     public function saveExternalTool($courseId, $groupId, $params, $isTeacher, $isGroupAdmin, $isAdmin, $privacy)
@@ -88,7 +87,6 @@ class ExternalTools extends BaseImasExternalTools
                     $updateExtTool->groupid = $params['groupId'];
                 }
             }
-
         }
         $updateExtTool->save();
     }
@@ -187,10 +185,11 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function externalToolsDataForLink($courseId, $groupId)
     {
-        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= '$courseId' ";
-        $query .= "OR (courseid=0 AND (groupid='$groupId' OR groupid=0)) ORDER BY name";
-        $groupNames = \Yii::$app->db->createCommand($query)->queryAll();
-        return $groupNames;
+        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= :courseId ";
+        $query .= "OR (courseid=0 AND (groupid= :groupId OR groupid=0)) ORDER BY name";
+        $groupNames = \Yii::$app->db->createCommand($query);
+        $groupNames->bindValues(['courseId' => $courseId, 'qroupid' => $groupId]);
+        return $groupNames->queryAll();
     }
 
     public static function deleteByCourseId($courseId)

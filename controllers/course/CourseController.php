@@ -479,7 +479,7 @@ class CourseController extends AppController
             $exec = false;
             $row = Course::setOwner($params, $user);
             if ($user->rights == AppConstant::GROUP_ADMIN_RIGHT) {
-                $courseitem = Course::getByCourseAndGroupId($params, $user);
+                $courseitem = Course::getByCourseAndGroupId($params['cid'], $user['groupid']);
                 if ($courseitem > AppConstant::NUMERIC_ZERO) {
                     $row = Course::setOwner($params, $user);
                     $exec = true;

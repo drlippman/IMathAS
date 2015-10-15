@@ -5,6 +5,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasAssessmentSessions;
 use yii\db\Query;
+use Yii;
 
 class AssessmentSession extends BaseImasAssessmentSessions
 {
@@ -67,7 +68,6 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $param['starttime'] = time();
         $param['feedback'] = $deffeedbacktext;
         $param['lti_sourcedid'] = $ltisourcedid;
-
         $this->attributes = $param;
         $this->save();
         return self::getById($this->id);
@@ -285,15 +285,16 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getIdForGroups($stuList, $data, $fieldsToCopy)
     {
         $query = "SELECT id,$fieldsToCopy ";
-        $query .= "FROM imas_assessment_sessions WHERE userid IN ($stuList) AND assessmentid='{$data}'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "FROM imas_assessment_sessions WHERE userid IN ($stuList) AND assessmentid=' :data";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('data',$data);
+        $data->queryAll();
     }
 
     public static function dataForFileHandling($searchnot, $lookforstr)
     {
         $query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
-        return \Yii::$app->db->createCommand($query)->queryAll();
-
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 
     public static function getAGroupId($stuId, $data)
@@ -310,14 +311,16 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function updateAssessmentForStuGrp($id, $setsList)
     {
-        $query = "UPDATE imas_assessment_sessions SET $setsList WHERE id='{$id}'";
-        \Yii::$app->db->createCommand($query)->queryAll();
+        $query = Yii::$app->db->createCommand("UPDATE imas_assessment_sessions SET $setsList WHERE id= :id");
+        $query->bindValue('id', $id);
+        $query->queryAll();
     }
 
     public static function insertDataOfGroup($fieldsToCopy, $stuId, $insRow)
     {
         $query = "INSERT INTO imas_assessment_sessions (userid,$fieldsToCopy) ";
         $query .= "VALUES ('$stuId',$insRow)";
+        Yii::$app->db->createCommand($query)->query();
     }
 
     public static function updateAssSessionForGrpByGrpIdAndUid($uid, $grpId)
@@ -328,7 +331,6 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 $data->agroupid = AppConstant::NUMERIC_ZERO;
                 $data->save();
             }
-
         }
     }
 
@@ -385,9 +387,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getDataForUtilities($limitAid)
     {
         $query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
-        $query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitAid'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid= :limitAid";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('limitAid', $limitAid);
+        return $data->queryAll();
     }
 
     public static function getByIdAndStartTime($userid, $paid)
@@ -449,9 +452,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getFromUser($groupId){
         $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
-        $query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid=$groupId ORDER BY imas_users.LastName,imas_users.FirstName";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid= :groupId ORDER BY imas_users.LastName,imas_users.FirstName";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('groupId', $groupId);
+        return $data->queryAll();
     }
 
     public static function getAssessmentIDForClearScores($asid,$courseId)
@@ -515,8 +519,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getAssessmentIDAndAsidForClearScores($qp)
     {
-        return AssessmentSession::find()->select(['attempts','lastanswers','reattempting','scores','bestscores','bestattempts','bestlastanswers','lti_sourcedid'])
-            ->where([$qp[0] => $qp[1]])->andWhere(['assessmentid' => $qp[2]])->orderBy('id')->one();
+        return AssessmentSession::find()
+            ->select(['attempts','lastanswers','reattempting','scores','bestscores','bestattempts','bestlastanswers','lti_sourcedid'])
+            ->where([$qp[0] => $qp[1]])
+            ->andWhere(['assessmentid' => $qp[2]])
+            ->orderBy('id')->one();
     }
 
     public static function updateForClearScore($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$reattemptinglist,$bestlalist)
@@ -561,9 +568,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getUserForGradebook($aid,$groupId)
     {
         $query = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
-        $query .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$groupId}' ORDER BY LastName,FirstName";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid= :aid AND i_a_s.agroupid= :groupId ORDER BY LastName,FirstName";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('groupId', $groupId);
+        $data->bindValue('aid', $aid);
+        return $data->queryAll();
     }
 
     public static function getAssessmentData($asid)
@@ -598,6 +607,21 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 $query->save();
             }
         }
+    }
+
+    public static function insertAssessmentSessionData($userId, $fieldstocopy,$insrow){
+        $query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES ('$userId',$insrow)";
+        $data = Yii::$app->db->createCommand($query)->execute();
+        return $data;
+    }
+
+    public static function updateAssessmentSessionData($setslist, $id)
+    {
+        $query = "UPDATE imas_assessment_sessions SET $setslist WHERE id = :id";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('id',$id);
+        return $data->execute();
+
     }
 }
 

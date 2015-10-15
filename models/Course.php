@@ -165,7 +165,9 @@ class Course extends BaseImasCourses {
     }
     public static function getByCourseAndUser($cid)
     {
-        return Yii::$app->db->createCommand("SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons FROM imas_courses,imas_users WHERE imas_courses.id= $cid AND imas_users.id=imas_courses.ownerid")->queryAll();
+        $query = Yii::$app->db->createCommand("SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons FROM imas_courses,imas_users WHERE imas_courses.id= :cid AND imas_users.id=imas_courses.ownerid");
+        $query->bindValue('cid', $cid);
+        return $query->queryAll();
     }
     public static function UpdateItemOrder($finalBlockItems,$course,$blockCnt)
     {
@@ -178,16 +180,20 @@ class Course extends BaseImasCourses {
         }
     }
 
-    public static function getByCourseAndGroupId($params,$user)
+    public static function getByCourseAndGroupId($courseId,$userId)
     {
-        return Yii::$app->db->createCommand("SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id='{$params['cid']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='{$user['groupid']}'")->queryAll();
+        $data = Yii::$app->db->createCommand("SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id= :courseId AND imas_courses.ownerid=imas_users.id AND imas_users.groupid= :userId");
+        $data->bindValue('courseId', $courseId);
+        $data->bindValue('userId', $userId);
+        return $data->queryAll();
     }
 
     public static function getByAvailable($params){
         if(isset($params['cid'])){
             $courseId = intval($params['cid']);
-
-            return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4 AND id= $courseId")->queryAll();
+            $data = Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4 AND id= :courseId");
+            $data->bindValue('courseId', $courseId);
+            return $data->queryAll();
         }else{
             return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4")->queryAll();
         }
@@ -277,7 +283,6 @@ class Course extends BaseImasCourses {
 
     public static function updateCourseForCopyCourse($courseId,$sets)
     {
-
         $query = Yii::$app->db->createCommand("UPDATE imas_courses SET $sets WHERE id=:cid");
         $query->bindValue('cid',$courseId);
         $query->query();
@@ -344,21 +349,24 @@ class Course extends BaseImasCourses {
     public static function getDataByJoins($groupId,$userId)
     {
         $query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
-        $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupId' AND iu.id<>'$userId' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<> :groupId AND iu.id<> :userId AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+        $data= Yii::$app->db->createCommand($query);
+        $data->bindValues(['groupId' => $groupId,'userId' => $userId]);
+        return $data->queryAll();
     }
     public static function getFromJoinOnTeacher($userId,$courseId)
     {
-        $query  = Yii::$app->db->createCommand("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userId' and ic.id<>'$courseId' AND ic.available<4 ORDER BY ic.name")->queryAll();
-        return $query;
+        $query  = Yii::$app->db->createCommand("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid= :userId and ic.id<> :courseId AND ic.available<4 ORDER BY ic.name");
+        $query->bindValues(['userId' => $userId, 'courseId' =>$courseId]);
+        return $query->queryAll();
     }
     public static function getFromJoinsData($groupId,$userId)
     {
         $query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
-        $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupId' AND iu.id<>'$userId' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid= :groupId AND iu.id<> :userId AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValues(['groupId' => $groupId, 'userId' => $userId]);
+        return $data->queryAll();
     }
 
     public static function getTemplate()
@@ -370,28 +378,32 @@ class Course extends BaseImasCourses {
     public static function getGroupTemplate($groupId)
     {
         $query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
-        $query .= "iu.groupid='$groupId' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "iu.groupid= :groupId AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+        $data= Yii::$app->db->createCommand($query);
+        $data->bindValue('groupId',$groupId);
+        return $data->queryAll();
     }
 
     public static function queryForCourse($id)
     {
-        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$id;
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid= :id";
+        $data= Yii::$app->db->createCommand($query);
+        $data->bindValue('id',$id);
+        return $data->queryAll();
     }
     public static function queryFromCourseForTutor($id)
     {
-        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=".$id;
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid= :id";
+        $data= Yii::$app->db->createCommand($query);
+        $data->bindValue('id',$id);
+        return $data->queryAll();
     }
     public static function queryFromCourseForTeacher($id)
     {
-        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=".$id;
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid= :id";
+        $data= Yii::$app->db->createCommand($query);
+        $data->bindValue('id',$id);
+        return $data->queryAll();
     }
     public static function getItemOrderAndBlockCnt($ctc)
     {
@@ -405,8 +417,9 @@ class Course extends BaseImasCourses {
     }
     public static function getByUserId($userId)
     {
-        $query = Yii::$app->db->createCommand("SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid AND imas_teachers.userid='$userId' ORDER BY imas_courses.name")->queryAll();
-        return $query;
+        $query = Yii::$app->db->createCommand("SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid AND imas_teachers.userid= :userId ORDER BY imas_courses.name");
+        $query->bindValue('userId',$userId);
+        return  $query->queryAll();
     }
     public static function UpdateItemOrderAndBlockCnt($itemOrder,$blockCnt,$courseId,$num)
     {
@@ -492,9 +505,10 @@ class Course extends BaseImasCourses {
 
     public static function setOwnerIdByExecute($params)
     {
-        $query = "UPDATE imas_courses SET ownerid='{$params['newowner']}' WHERE id='{$params['id']}'";
-        $data = Yii::$app->db->createCommand($query)->execute();
-        return $data;
+        $query = "UPDATE imas_courses SET ownerid= :newOwner WHERE id= :id";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValues(['newOwner' => $params['newowner'], 'id' => $params['id']]);
+        return $data->execute();
 
     }
 
@@ -513,12 +527,14 @@ class Course extends BaseImasCourses {
     }
     public static function deleteByCourseId($params, $myRights, $userId)
     {
-        $query = "DELETE FROM imas_courses WHERE id='{$params['id']}'";
+        $query = "DELETE FROM imas_courses WHERE id= :id";
         if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
         {
-            $query .= " AND ownerid='$userId'";
+            $query .= " AND ownerid= :userId";
         }
-       return Yii::$app->db->createCommand($query)->execute();
+       $data = Yii::$app->db->createCommand($query);
+        $data->bindValues(['userId' => $userId, 'id' => $params['id']]);
+       return $data->execute();
     }
 
     public static function deleteById($params)
@@ -562,16 +578,20 @@ class Course extends BaseImasCourses {
     public static function getCourseOfStudent($userId)
     {
         $query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
-        $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userId' ";
+        $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid= :userId ";
         $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('userId',$userId);
+        return $data->queryAll();
     }
 
     public static function getCourseOfTeacher($userId)
     {
         $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
-        $query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userId' ";
+        $query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid= :userId ";
         $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('userId',$userId);
+        return $data->queryAll();
     }
 }

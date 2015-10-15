@@ -48,29 +48,25 @@ class OutcomesController extends AppController
             foreach($query as $singleOutcome)
             {
                $this->currOutcomesArray[$singleOutcome['id']] = $singleOutcome['name'];
-
             }
             $itemArray = $this->addItems($this->params['order']);
             $outcomeOrder = serialize($itemArray);
             $saveOutcome = new Course();
             $saveOutcome->SaveOutcomes($this->courseId,$outcomeOrder);
-            $unused = array_diff(array_keys($this->currOutcomesArray), $this->seenOutcomesArr);
+            $unused = array_diff(array_keys($this->currOutcomesArray), $this->seenOutcomesArr);AppUtility::dump($unused);
             if(count($unused) > AppConstant::NUMERIC_ZERO)
             {
                 $unusedList = implode(',',$unused);
-                Outcomes::deleteUnusedOutcomes($unusedList);
-                Assessments::updateOutcomes($this->courseId,$unusedList);
+                Outcomes::deleteUnusedOutcomes($unused);
+                Assessments::updateOutcomes($this->courseId,$unused);
             }
         }
         //load existing outcomes
         $courseOutcomeData = Course::getByCourseIdOutcomes($this->courseId);
+        $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
         if(($courseOutcomeData[0]['outcomes']) == '')
         {
             $outcomes = array();
-        }
-        else
-        {
-            $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
         }
         $outcomeData = Outcomes::getExistingOutcomes($this->courseId);
         foreach($outcomeData as $data)
@@ -209,13 +205,10 @@ class OutcomesController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
+        $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
         if(($courseOutcomeData[0]['outcomes']) == '')
         {
             $outcomes = array();
-        }
-        else
-        {
-            $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
         }
         $outcomeData = Outcomes::getByCourseId($courseId);
         $outcomeInfo = array();

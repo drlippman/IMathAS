@@ -525,8 +525,8 @@ class GroupsController extends AppController
             if(count($toDel) > AppConstant::NUMERIC_ZERO)
             {
                 $delList = implode(',',$toDel);
-                 ForumThread::deleteForumThread($delList);
-                ForumPosts::deleteForumPosts($delList);
+                 ForumThread::deleteForumThread($toDel);
+                ForumPosts::deleteForumPosts($toDel);
             }
         }
         else

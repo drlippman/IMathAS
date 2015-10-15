@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+
 use app\components\AppConstant;
 use app\models\_base\BaseImasGroups;
 use Yii;
@@ -10,11 +11,10 @@ use yii\db\Query;
 
 class Groups extends BaseImasGroups
 {
-
- public static function getIdAndName() {
-     $user = Groups::find()->orderBy('name')->all();
-     return $user;
- }
+    public static function getIdAndName() {
+        $user = Groups::find()->orderBy('name')->all();
+        return $user;
+    }
     public static function getByName($gpName)
     {
         $group = Groups::find()->where(['name' => $gpName])->one();
@@ -39,6 +39,7 @@ class Groups extends BaseImasGroups
         $group->name = $params['gpname'];
         $group->save();
     }
+
     public static function deleteById($id)
     {
         $group = Groups::find()->where(['id' => $id])->one();
@@ -70,9 +71,9 @@ class Groups extends BaseImasGroups
         $data = $command->queryAll();
         return $data;
     }
+
     public static function getName($id)
     {
         return Groups::find()->select('name')->where(['id' => $id])->one();
     }
 }
-

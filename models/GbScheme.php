@@ -36,6 +36,7 @@ class GbScheme extends BaseImasGbscheme
         $data = $command->queryAll();
         return $data;
     }
+
     public static function updateGbScheme($useWeights, $orderBy, $userSort, $defaultCat, $defGbMode, $stuGbMode, $colorize, $courseId)
     {
         $query = GbScheme::findOne(['courseid' => $courseId]);
@@ -50,6 +51,7 @@ class GbScheme extends BaseImasGbscheme
             $query->save();
         }
     }
+
     public static function getDataForCopyCourse($ctc)
     {
         $query = new Query();
@@ -60,6 +62,7 @@ class GbScheme extends BaseImasGbscheme
         $data = $command->queryone();
         return $data;
     }
+
     public static function updateDataForCopyCourse($query,$courseId)
     {
         $query = GbScheme::find()->where(['courseid' => $courseId])->one();

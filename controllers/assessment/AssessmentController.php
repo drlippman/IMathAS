@@ -61,7 +61,7 @@ class AssessmentController extends AppController
         $responseData = array('response' => $response, 'isQuestions' => $isQuestions, 'courseId' => $courseId, 'now' => time(), 'assessment' => $assessment, 'assessmentSession' => $assessmentSession, 'isShowExpiredTime' => $to, 'user' => $user, 'course' => $course);
         return $this->render('ShowAssessment', $responseData);
     }
-    /**
+    /*
      * Display password, when assessment need password.
      */
     public function actionPassword()
@@ -1187,9 +1187,8 @@ class AssessmentController extends AppController
             $teacherid=$guestid;
         }
         if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-            $temp .= _("You are not authorized to view this page.  If you are trying to reaccess a test you've already started, access it from the course page");
-
-            return $temp;
+            $this->setErrorFlash(AppConstant::TEST_PAGE_NO_ACCESS);
+            return $this->redirect($this->previousPage());
         }
         $actas = false;
         $isreview = false;
@@ -1312,10 +1311,6 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($pwfail) {
-                    if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-                        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../instructor/instructor/index?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
-                        $temp .= '&gt; '.'Assessment'. '</div>';
-                    }
                     $temp .= $out;
                     $temp .=  '<h2>'.$adata['name'].'</h2>';
                     $temp .= '<p>'. "Password required for access".'</p>';
@@ -1346,14 +1341,14 @@ class AssessmentController extends AppController
                  * starting test and get question set
                  */
                 if (trim($adata['itemorder'])=='') {
-                    $temp  .= 'No questions in assessment!';
-                    return $temp;
+                    $this->setErrorFlash(AppConstant::NO_QUESTIONS);
+                    return $this->redirect($this->previousPage());
                 }
                 list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 
                 if ($qlist=='') {  //assessment has no questions!
-                    $temp .= 'Assessment has no questions!';
-                    return $temp;
+                    $this->setErrorFlash(AppConstant::NO_QUESTIONS);
+                    return $this->redirect($this->previousPage());
                 }
 
                 $bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;  //bestscores;bestrawscores;firstscores
@@ -1372,7 +1367,7 @@ class AssessmentController extends AppController
                         $sessiondata['groupid'] = $stugroupid;
                     } else {
                         if ($adata['isgroup']==3) {
-                            $temp .= "You are not yet a member of a group.  Contact your instructor to be added to a group.";
+                            $temp .= AppConstant::NOT_GROUP_MEMBER;
                             $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$_GET['cid']).">Back</a>";
                             return $temp;
                         }
@@ -2007,22 +2002,7 @@ class AssessmentController extends AppController
             if ($testsettings['noprint'] == 1) {
                 $temp .= '<style type="text/css" media="print"> div.question, div.todoquestion, div.inactive { display: none;} </style>';
             }
-            if (!$isdiag && !$isltilimited && !$sessiondata['intreereader']) {
-                if (isset($sessiondata['actas'])) {
-                    $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../instructor/instructor/index?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
-                    $temp .= "&gt; <a href=\"../course/gb-viewasid.php?cid={$testsettings['courseid']}&amp;asid=$testid&amp;uid={$sessiondata['actas']}\">".'Gradebook Detail'. "</a> ";
-                    $temp .= "&gt; ".'View as student'. "</div>";
-                } else {
-//                    $temp .= "<div class=breadcrumb>";
-//                    $temp .= "<span style=\"float:right;\">$userfullname</span>";
-//                    if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0) {
-//                        $temp .= "$breadcrumbbase ".'Assessment'/ "</div>";
-//                    } else {
-//                        $temp .= "$breadcrumbbase <a href=\"../../instructor/instructor/index?cid={$testsettings['courseid']}\">{$sessiondata['coursename']}</a> ";
-//                        $temp .= "&gt; ".'Assessment'. "</div>";
-//                    }
-                }
-            } else if ($isltilimited) {
+            if ($isltilimited) {
                 $temp .= "<span style=\"float:right;\">";
                 if ($testsettings['msgtoinstr']==1) {
                     $query = Message::getMsgIds($userid, $courseId);
@@ -2105,7 +2085,8 @@ class AssessmentController extends AppController
                                         $sets[] = "$val='{$rowgrptest[$k]}'";
                                     }
                                     $setslist = implode(',',$sets);
-//                                    $query = "UPDATE imas_assessment_sessions SET $setslist WHERE id='{$row['id']}'";
+                                    AssessmentSession::updateAssessmentSessionData($setslist,$row['id']);
+
                                     $temp .= "<p>". sprintf('%s added to group, overwriting existing attempt.', $thisusername). "</p>";
                                     $loginfo .= "$thisusername switched to group. ";
                                 }
@@ -2113,8 +2094,9 @@ class AssessmentController extends AppController
                                 $stuGrpMember = new StuGroupMembers();
                                 $stuGrpMember->insertStuGrpMemberData($_POST['user'.$i], $sessiondata['groupid']);
 
-//                                $query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
-//                                $query .= "VALUES ('{$_POST['user'.$i]}',$insrow)";
+                                $assessmentSessionId = new AssessmentSession();
+                                $assessmentSessionId->insertAssessmentSessionData($_POST['user'.$i],$insrow,$fieldstocopy);
+
                                 $temp .= "<p>". sprintf('%s added to group.', $thisusername). "</p>";
                                 $loginfo .= "$thisusername added to group. ";
                             }

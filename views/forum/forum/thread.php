@@ -27,7 +27,7 @@ $now = $currentTime;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
         </div>
-        <?php if($users['rights']>AppConstant::NUMERIC_FIVE && time()<$forumData['postby'] || $isteacher ){ ?>
+        <?php if(($users['rights']>AppConstant::NUMERIC_FIVE && time()<$forumData['postby']) || $isteacher ){ ?>
         <div class="pull-left header-btn">
             <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid=' .$forumid.'&cid='.$course->id); ?>"
                class="btn btn-primary pull-right add-new-thread"><i class="fa fa-plus"></i>&nbsp;Add New Thread</a>

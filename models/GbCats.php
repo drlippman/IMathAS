@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+
 use app\components\AppConstant;
 use app\models\_base\BaseImasGbcats;
 use Yii;
@@ -39,8 +40,8 @@ class GbCats extends BaseImasGbcats
             $query->save();
         }
     }
-    public static function deleteGbCat($catList){
 
+    public static function deleteGbCat($catList){
         foreach($catList as $category){
             $query = GbCats::findOne(['id' => $category]);
             if($query){
@@ -48,6 +49,7 @@ class GbCats extends BaseImasGbcats
             }
         }
     }
+
     public static function createGbCat($courseId, $name, $scale, $scaleType, $chop, $weight, $hide, $calcType){
         $query = new GbCats();
         $query->courseid = $courseId;
@@ -60,6 +62,7 @@ class GbCats extends BaseImasGbcats
         $query->calctype = $calcType;
         $query->save();
     }
+
     public static function getByCourseIdAndOrderByName($courseId)
     {
         $query = new Query();
@@ -71,6 +74,7 @@ class GbCats extends BaseImasGbcats
         $data = $command->queryAll();
         return $data;
     }
+
     public static function getGbCatsForOutcomeMap($catList)
     {
         $query = new Query();
@@ -80,7 +84,6 @@ class GbCats extends BaseImasGbcats
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
 
     public static function getDataForCopyCourse($ctc)
@@ -120,6 +123,7 @@ class GbCats extends BaseImasGbcats
         $this->save();
         return $this->id;
     }
+
     public static function updateData($rpId,$data)
     {
         $query = GbCats::find()->where(['id' => $rpId])->one();
@@ -139,8 +143,7 @@ class GbCats extends BaseImasGbcats
     public static function getDataByJoins($ctc,$courseId)
     {
         $query = Yii::$app->db->createCommand("SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid= :ctc AND toc.courseid=:cid ");
-        $query->bindValue('ctc',$ctc);
-        $query->bindValue('cid',$courseId);
+        $query->bindValues(['ctc' => $ctc, 'cid' => $courseId]);
         $data = $query->queryAll();
         return $data;
     }
@@ -152,5 +155,4 @@ class GbCats extends BaseImasGbcats
             $courseData->delete();
         }
     }
-
 }

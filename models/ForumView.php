@@ -1,6 +1,5 @@
 <?php
 
-
 namespace app\models;
 
 use app\components\AppConstant;
@@ -23,15 +22,12 @@ class ForumView extends BaseImasForumViews
     {
         $thread = ForumView::findAll(['threadid' => $threadId, 'userid' => $userId]);
         return $thread;
-
     }
 
     public function updateFlagValue($threadId, $userId)
     {
         $thread = ForumView::find()->where(['threadid' => $threadId])->andWhere(['userid' => $userId])->one();
-
         if($thread){
-
             $thread->tagged = $thread['tagged'] ^ AppConstant::NUMERIC_ONE;
             $thread->save();
         }else{
@@ -41,7 +37,6 @@ class ForumView extends BaseImasForumViews
             $this->tagged = AppConstant::NUMERIC_ONE;
             $this->save();
         }
-
     }
 
     public static function uniqueCount($threadId)
@@ -128,10 +123,8 @@ class ForumView extends BaseImasForumViews
 
     public static function getLastViewOfPost($threadId, $CurrentUser)
     {
-
         $lastview = ForumView::find()->select(['lastview'])->where(['threadid' => $threadId, 'userid' => $CurrentUser])->all();
         return $lastview;
-
     }
 
     public function  updateDataForPostByName($threadId,$userId,$now)
@@ -149,7 +142,6 @@ class ForumView extends BaseImasForumViews
             $query  = ForumView::findOne(['id' =>$id ]);
                 $query->lastview = $now;
                 $query->save();
-
         }
         else
         {
@@ -176,6 +168,7 @@ class ForumView extends BaseImasForumViews
         $this->lastview = $forumViewArray['postdate'];
         $this->save();
     }
+
     public static function deleteViewRelatedToCourse($threads, $toUnEnroll)
     {
         $query = ForumView::find()->where(['IN', 'threadid', $threads])->andWhere(['IN', 'userid', $toUnEnroll])->all();
@@ -185,6 +178,7 @@ class ForumView extends BaseImasForumViews
             }
         }
     }
+
     public static function deleteByUserId($userId)
     {
         $views = ForumView::find()->where(['userid' => $userId])->all();
@@ -198,14 +192,15 @@ class ForumView extends BaseImasForumViews
     {
         $query = "DELETE imas_forum_views FROM imas_forum_views JOIN ";
         $query .= "imas_forum_threads ON imas_forum_views.threadid=imas_forum_threads.id ";
-        $query .= "WHERE imas_forum_threads.forumid='{$forumId}'";
-        Yii::$app->db->createCommand($query)->execute();
+        $query .= "WHERE imas_forum_threads.forumid= :forumId";
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('forumId', $forumId);
+        $data->execute();
     }
 
     public static function getId($threadId, $UserId)
     {
         return ForumView::find(['id'])->where(['threadid' => $threadId, 'userid' => $UserId])->all();
-
     }
 
     public static function setLastview($threadId)
@@ -216,16 +211,16 @@ class ForumView extends BaseImasForumViews
             $forum->lastview = time();
             $forum->save();
         }
-
     }
 
     public static function getForumDataByUserId($userId,$dofilter,$limthreads)
     {
-        $query = "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid='$userId'";
+        $query = "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid= :userId";
         if ($dofilter) {
             $query .= " AND threadid IN ($limthreads)";
         }
-       return Yii::$app->db->createCommand($query)->queryAll();
+        $data = Yii::$app->db->createCommand($query);
+        $data->bindValue('userId', $userId);
+        $data->queryAll();
     }
 }
-

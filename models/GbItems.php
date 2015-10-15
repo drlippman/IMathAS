@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+
 use app\components\AppConstant;
 use app\components\AssessmentUtility;
 use Yii;
@@ -25,8 +26,8 @@ class GbItems extends BaseImasGbitems
         $this->save();
         return $this->id;
     }
-    public static function findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now){
 
+    public static function findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now){
         $query = new Query();
         $query->select(['*'])
             ->from('imas_gbitems')
@@ -48,11 +49,13 @@ class GbItems extends BaseImasGbitems
         $data = $command->queryAll();
         return $data;
     }
+
     public static function getbyCourseId($courseId)
     {
         $gradeNames = GbItems::find()->where(['courseid' => $courseId])->all();
         return $gradeNames;
     }
+
     public static function deleteById($gradeId)
     {
         $grade = GbItems::find()->where(['id' => $gradeId])->one();
@@ -60,6 +63,7 @@ class GbItems extends BaseImasGbitems
             $grade->delete();
         }
     }
+
     public static function updateGrade($gradeId,$AssignValue,$temp)
     {
         $grade = GbItems::find()->where(['id' => $gradeId])->one();
@@ -74,7 +78,7 @@ class GbItems extends BaseImasGbitems
                $grade->gbcategory = $AssignValue;
            }
             $grade->save();
-            }
+        }
     }
 
     public static  function findOfflineGradeItemForOutcomes($courseId,$istutor,$catfilter, $now)
@@ -98,6 +102,7 @@ class GbItems extends BaseImasGbitems
         $data = $command->queryAll();
         return $data;
     }
+
     public static function updateGbCat($catList){
 
         foreach($catList as $category){
@@ -116,6 +121,7 @@ class GbItems extends BaseImasGbitems
             $rubricData->save();
         }
     }
+
     public static function deleteByCourseId($courseId)
     {
         $query = GbItems::find()->where(['courseid' => $courseId])->all();
@@ -125,6 +131,7 @@ class GbItems extends BaseImasGbitems
             }
         }
     }
+
     public static function getById($gbItem){
      return GbItems::find()->where(['id' => $gbItem])->one();
     }
@@ -139,8 +146,8 @@ class GbItems extends BaseImasGbitems
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
+
     public static function updateGbItemsByCourseId($gbItemId , $params)
     {
         $GbItems = GbItems::find()->where(['id' => $gbItemId])->one();

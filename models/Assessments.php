@@ -226,9 +226,10 @@ class Assessments extends BaseImasAssessments
 
     public static function selectItemOrder($todoaid)
     {
-        $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (" . implode(',', $todoaid) . ')';
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        return Assessments::find()->select(['id,itemorder'])->where(['IN','id',$todoaid])->all();
+//        $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (" . implode(',', $todoaid) . ')';
+//        $data = \Yii::$app->db->createCommand($query)->queryAll();
+//        return $data;
     }
 
     public static function UpdateItemOrder($newItemList, $id)
@@ -341,8 +342,13 @@ class Assessments extends BaseImasAssessments
 
     public static function  updateOutcomes($courseId, $unusedList)
     {
-        $query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$courseId' AND defoutcome IN ($unusedList)";
-        \Yii::$app->db->createCommand()->queryAll($query);
+        $assessmentData = Assessments::find()->where(['courseid' => $courseId])->andWhere(['IN', 'defoutcome', $unusedList])->all();
+        if($assessmentData){
+            foreach($assessmentData as $data){
+                $data->defoutcome = AppConstant::NUMERIC_ZERO;
+                $data->save();
+            }
+        }
     }
 
     public static function updateAssessmentForCopyCourse($assessNewId, $newId, $num)
@@ -356,7 +362,6 @@ class Assessments extends BaseImasAssessments
                 $query->reqscoreaid = AppConstant::NUMERIC_ZERO;
                 $query->save();
             }
-
         }
     }
 
@@ -371,13 +376,15 @@ class Assessments extends BaseImasAssessments
                 $query->posttoforum = AppConstant::NUMERIC_ZERO;
                 $query->save();
             }
-
         }
     }
 
     public static function getCourseAndUserId($courseId, $userId)
     {
-        return Yii::$app->db->createCommand("SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid WHERE ia.courseid='$courseId' AND ias.userid='$userId'")->queryAll();
+        $query = Yii::$app->db->createCommand("SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid WHERE ia.courseid= :courseId AND ias.userid= :userId");
+        $query->bindValues(['courseId' => $courseId, 'userId' => $userId]);
+        $data = $query->queryAll();
+        return $data;
     }
 
     public static function setEndMessage($id, $msgstr)
@@ -391,8 +398,7 @@ class Assessments extends BaseImasAssessments
 
     public static function getByCId($cid)
     {
-        $query = Yii::$app->db->createCommand("SELECT id,name FROM imas_assessments WHERE courseid='$cid'")->queryAll();
-        return $query;
+        return Assessments::find()->select(['id,name'])->where(['courseid' => $cid])->all();
     }
 
     public static function updateVideoId($from, $to)
