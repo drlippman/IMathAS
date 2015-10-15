@@ -24,21 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading col-sm-6 padding-left-zero">
             <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
         </div>
-        <div class="col-sm-6 floatright padding-right-zero">
-            <div class="floatright padding-top-five">
-                <?php if (isset($assessmentData['id'])) {
-                echo '<div class="floatleft padding-right-twenty">
-                <a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$assessmentData['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''.AppUtility::t('This will discard any changes you have made on this page',false).'\');">
-                    <i class="fa fa-share header-right-btn"></i>'
-                    .AppUtility::t('Add/Remove Questions',false).
-                '</a></div>';
-                } ?>
-
-                <div class="pull-right header-btn width-twenty-five-per">
-                    <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
@@ -678,5 +663,17 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             </div>
         </div>
+    <div class="col-sm-8 padding-left-thirty padding-top-thirty padding-bottom-thirty">
+            <?php if (isset($assessmentData['id'])) {
+                echo '<div class="floatleft padding-right-twenty">
+                <a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$assessmentData['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''.AppUtility::t('This will discard any changes you have made on this page',false).'\');">
+                    <i class="fa fa-share header-right-btn"></i>'
+                    .AppUtility::t('Add/Remove Questions',false).
+                    '</a></div>';
+            } ?>
 
+            <div class="header-btn floatleft">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
+            </div>
+    </div>
 </div></form>

@@ -20,13 +20,10 @@ $now = $currentTime;
     }?>
 </div>
 <form id="add-thread" enctype="multipart/form-data" action="<?php AppUtility::getURLFromHome('forum','forum/add-new-thread')?>" method="post">
-<div class = "title-container">
+<div class ="title-container">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
-        </div>
-        <div class="pull-left header-btn">
-            <a href="#"class="btn btn-primary pull-right add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
         </div>
     </div>
 </div>
@@ -43,15 +40,15 @@ $now = $currentTime;
 <input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
 <div class="tab-content shadowBox">
     <div style="padding-top: 30px;margin-left: 10px;margin-right: 69px">
-        <div class="col-lg-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
-        <div class="col-lg-10">
-            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=subject value="" class="subject">
+        <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
+        <div class="col-sm-10">
+            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=subject value="" class="subject form-control">
         </div>
     </div>
     <BR class=form>
     <div class="" style="padding-top: 20px;margin-left: 10px;margin-right: 69px">
-        <div class="col-lg-2 message-label"><?php echo AppUtility::t('Message')?></div>
-        <div class="col-lg-10 message-div">
+        <div class="col-sm-2 message-label"><?php echo AppUtility::t('Message')?></div>
+        <div class="col-sm-10 message-div">
             <div class=editor>
                 <textarea cols=5 rows=12 id=message name=message style="width: 100%">
                 </textarea>
@@ -100,7 +97,7 @@ $now = $currentTime;
                 <div class='radio student-enroll visibility pull-left override-hidden'><label class='checkbox-size label-visibility pull-left'><td>
                 <input type=radio name="always-replies" value="3" /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td></div>
                 <?php
-                echo '<div class = "col-lg-4 time-input" id="datepicker-id">';
+                echo '<div class = "col-sm-4 time-input" id="datepicker-id">';
                 echo DatePicker::widget([
                         'name' => 'endDate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -111,8 +108,8 @@ $now = $currentTime;
                     ]);
                 echo '</div>';?>
                 <?php
-                echo '<label class="end col-lg-1 select-text-margin margin-right-minus-thirtythree">At</label>';
-                echo '<div class="pull-left col-lg-4">';
+                echo '<label class="end col-sm-1 select-text-margin margin-right-minus-thirtythree">At</label>';
+                echo '<div class="pull-left col-sm-4">';
                 echo TimePicker::widget([
                         'name' => 'startTime',
                         'options' => ['placeholder' => 'Select operating time ...'],
@@ -133,6 +130,9 @@ $now = $currentTime;
             <div class="col-md-8"><input name="settings" id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
         </div>
     <?php } ?>
+    <div class="col-md-6 col-md-offset-2 padding-left-twelve padding-bottom-thirty padding-top-five">
+        <a href="#"class="btn btn-primary add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
+    </div>
 </div>
 </form>
 

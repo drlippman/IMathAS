@@ -3433,7 +3433,7 @@ class AssessmentController extends AppController
             }
         }
 
-        $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js','assessment/showQuestion.js']);
+        $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js','assessment/showQuestion.js','drawing.js']);
         $this->includeCSS(['mathquill.css','mathtest.css']);
         $renderData = array('displayQuestions' => $temp, 'sessiondata' =>  $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead, 'testsettings' => $testsettings, 'sessiondata' => $sessiondata, 'userfullname' => $userfullname, 'testid' => $testid, 'studentid' => $studentid, 'pwfail' => $pwfail, 'isdiag' => $isdiag);
         return $this->renderWithData('showTest', $renderData);

@@ -19,9 +19,6 @@ $now = $currentTime;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn">
-            <input class="btn btn-primary pull-right add-new-thread" type="submit" id="save-changes" value="Save changes">
-        </div>
     </div>
 </div>
 <div class="item-detail-content">
@@ -159,6 +156,8 @@ $now = $currentTime;
                 } ?> ></div>
         </div>
     <?php } ?>
+      <div class="col-sm-6 header-btn col-sm-offset-2 padding-left-fifteen padding-top-five padding-bottom-thirty">
+          <input class="btn btn-primary add-new-thread" type="submit" id="save-changes" value="Save changes">
+      </div>
 </div>
-
-
+</form>

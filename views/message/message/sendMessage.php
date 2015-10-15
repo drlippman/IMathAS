@@ -14,9 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Message:',false);?><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn hide-hover">
-            <a href="#"id="mess" class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
-        </div>
+
     </div>
 </div>
 <div class="item-detail-content">
@@ -40,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
     <div class="inner-reply-msg-content">
-        <div class="padding-top-one-thwenty">
+        <div class="">
             <div class="drop-down col-sm-12 padding-top">
                 <span class="col-sm-1"><?php echo AppUtility::t('To')?></span>
                 <?php if($newTo)
@@ -72,6 +70,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php echo "<span class='left col-sm-11'><div class= 'editor'>
             <textarea id='message' name='message' style='width: 70%;' rows='12' cols='15'>";
                 echo "</textarea></div></span><br>"; ?>
+            </div>
+            <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty">
+                <a href="#"id="mess" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
             </div>
         </div>
     </div>

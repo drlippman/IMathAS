@@ -18,9 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Forum:',false);?><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn hide-hover">
-            <a href="#" id="reply-btn" class="btn btn-primary1 pull-right  btn-color"><i class="fa fa-reply"></i>&nbsp;Post Reply</a>
-        </div>
     </div>
 </div>
     <div class="item-detail-content">
@@ -59,6 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <br><button class="add-more">Add More Files</button><br>
     <?php }?>
     </div>
+    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 padding-left-twenty-eight">
+        <a href="#" id="reply-btn" class="btn btn-primary1 btn-color"><i class="fa fa-reply"></i>&nbsp;Post Reply</a>
+    </div>
         <div  class="col-sm-12 replyTo padding-top">
             <div class=""><?php echo AppUtility::t('Replying To'); ?></div>
             <div class="block col-sm-12">
@@ -72,7 +72,5 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="blockitems col-sm-12" id="item1">
                 <h5><?php echo $reply[0]['message']?></h5></div>
         </div>
-
-
 </div>
     </form>

@@ -191,7 +191,9 @@ if (isset($inlineId)) {
         ?>
     </div>
 
-    <div class=submit><button type=submit name="submitbtn" value="Submit"><?php echo $savetitle ?></button></div>
+    <div class="col-md-6 padding-thirty">
+        <button type=submit name="submitbtn" value="Submit"><?php echo $savetitle ?></button>
+    </div>
 </form>
     </div>
 <script type="text/javascript">
