@@ -18,17 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
-
-            <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultValue['saveTitle'] ?></button>
-            </div>
         </div>
     </div>
 
     <div class="tab-content shadowBox non-nav-tab-item">
         <div class="name-of-item">
-            <div class="col-lg-2"><?php AppUtility::t('Name of Wiki')?></div>
-            <div class="col-lg-10">
+            <div class="col-sm-2"><?php AppUtility::t('Name of Wiki')?></div>
+            <div class="col-sm-10">
                 <?php $title = AppUtility::t('Enter title here', false);
                 if($defaultValue['name']){
                       $title = $defaultValue['name'];
@@ -39,8 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <BR class=form>
 
         <div class="editor-summary">
-            <div class="col-lg-2"><?php AppUtility::t('Description')?></div>
-            <div class="col-lg-10">
+            <div class="col-sm-2"><?php AppUtility::t('Description')?></div>
+            <div class="col-sm-10">
                 <div class=editor>
                     <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
                         <?php $text = "";
@@ -55,8 +51,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </div><BR class=form>
 
         <div class="visibility-item">
-            <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
-            <div class="col-lg-10">
+            <div class="col-sm-2"><?php AppUtility::t('Visibility')?></div>
+            <div class="col-sm-10">
 
                 <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($defaultValue['avail'], AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
                 <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],0);?>/><span class='padding-left'><?php AppUtility::t('Hide')?></span></label>
@@ -64,13 +60,13 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div>
                 <div id="datediv" style="display:<?php echo ($defaultValue['avail']==1)?"block":"none"; ?>"><BR class=form><br>
-                    <div class="col-lg-2"><?php AppUtility::t('Available After')?></div>
-                <div class=col-lg-10>
+                    <div class="col-sm-2"><?php AppUtility::t('Available After')?></div>
+                <div class=col-sm-10>
 
                     <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 0); ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
                     <label class="pull-left" style="padding-left: 41px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 1); ?>/></label>
                     <?php
-                    echo '<div class = "time-input pull-left col-lg-4">';
+                    echo '<div class = "time-input pull-left col-sm-4">';
                     echo DatePicker::widget([
                         'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -83,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '</div>';?>
                     <?php
                     echo '<label class="end pull-left non-bold">at</label>';
-                    echo '<div class="pull-left col-lg-4">';
+                    echo '<div class="pull-left col-sm-4">';
                     echo TimePicker::widget([
                         'name' => 'stime',
                         'value' => $defaultValue['sTime'],
@@ -95,12 +91,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '</div>';?>
                 </div><BR class=form><br>
 
-                 <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
-                <div class=col-lg-10>
+                 <div class=col-sm-2><?php AppUtility::t('Available Until')?></div>
+                <div class=col-sm-10>
                     <label class="pull-left non-bold"><input type=radio name="available-until" class="pull-left" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 0); ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
                     <label class="pull-left" style="padding-left: 34px"><input type=radio name="available-until" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 1); ?>/></label>
                     <?php
-                    echo '<div class = "time-input  col-lg-4">';
+                    echo '<div class = "time-input  col-sm-4">';
                     echo DatePicker::widget([
                         'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -113,7 +109,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '</div>';?>
                     <?php
                     echo '<label class="end pull-left non-bold"> at </label>';
-                    echo '<div class="pull-left col-lg-4">';
+                    echo '<div class="pull-left col-sm-4">';
 
                     echo TimePicker::widget([
                         'name' => 'etime',
@@ -129,8 +125,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <BR class=form>
         </div>
             <div class="group-wiki">
-        <div class="col-lg-2"><?php AppUtility::t('Group wiki?')?></div>
-        <div class="col-lg-4 dropdown">
+        <div class="col-sm-2"><?php AppUtility::t('Group wiki?')?></div>
+        <div class="col-sm-4 dropdown">
 <?php
 if ($started) {
     AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
@@ -143,13 +139,13 @@ if ($started) {
     </div>
   <br class="form"/><br class="form"/>
 
-        <div class=col-lg-2><?php AppUtility::t('Students can edit')?></div>
-		<div class=col-lg-10>
+        <div class=col-sm-2><?php AppUtility::t('Students can edit')?></div>
+		<div class=col-sm-10>
             <input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/><span class='padding-left'><?php AppUtility::t('Always')?></span><br>
             <input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/><span class="padding-left"><?php AppUtility::t('Never')?></span><br>
             <label class="pull-left non-bold"><input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/><span class='padding-left'><?php AppUtility::t('Before')?></span></label>
             <?php
-            echo '<div class = "col-lg-4 time-input">';
+            echo '<div class = "col-sm-4 time-input">';
             echo DatePicker::widget([
                 'name' => 'Calendar',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -161,8 +157,8 @@ if ($started) {
             ]);
             echo '</div>';?>
             <?php
-            echo '<label class="end col-lg-1 non-bold"> at </label>';
-            echo '<div class="pull-left col-lg-4">';
+            echo '<label class="end col-sm-1 non-bold"> at </label>';
+            echo '<div class="pull-left col-sm-4">';
 
             echo TimePicker::widget([
                 'name' => 'calendar_end_time',
@@ -173,6 +169,10 @@ if ($started) {
                 ]
             ]);
             echo '</div>';?>
-		</div><br class="form" />
-    </form><br>
+
+        </div>
+            <div class="header-btn col-sm-6 col-sm-offset-2 padding-top-thirty padding-bottom-thirty">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultValue['saveTitle'] ?></button>
+            </div>
+    </form>
 </div>

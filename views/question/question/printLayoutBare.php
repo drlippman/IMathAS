@@ -38,9 +38,6 @@ if (!isset($params['versions'])) {
     </div>
         <div class="col-md-12 padding-left-zero padding-bottom-five">
             <form method=post action="print-layout-bare?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>">
-                <div class="col-md-12 margin-top-fifteen padding-left-zero padding-right-zero">
-                    <input class="print-layout-bare-continue-btn" type=submit value="Continue">
-                </div>
             <h4>Copy-and-Paste Print Version</h4>
             <div class="col-md-12 margin-top-twenty padding-left-zero">
                 <span>This page will help you create a copy of this assessment that you should be able to cut and
@@ -113,6 +110,9 @@ if (!isset($params['versions'])) {
             <span class="col-md-9">
                 <input type=checkbox name=hidetxtboxes >
             </span>
+            </div>
+            <div class="col-md-12 padding-left-zero padding-top-thirty">
+                <input type=submit value="Continue">
             </div>
     </form>
     </div>

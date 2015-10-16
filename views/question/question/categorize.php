@@ -22,7 +22,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
  </div>
-   <div class="col-md-12"> <input type="button" class="reset-btn secondarybtn" value="Reset" onclick="resetcat()"/></div>
 <?php
     echo '<div class="tab-content shadowBox non-nav-tab-item">';
     echo "<form class='margin-thirty categorize-question-form' method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
@@ -126,10 +125,13 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
     }
-    echo "<p>".AppUtility::t('Select first listed library for all uncategorized questions',false)."<input class='margin-left-ten' type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
-    echo "<p>".AppUtility::t('Add new category to lists',false)."<input class='form-control display-inline-block width-fourty-per margin-left-ten' type=type id=\"newcat\" size=40> ";
+    echo "<p class='col-sm-12'>".AppUtility::t('Select first listed library for all uncategorized questions',false)."<input class='margin-left-ten' type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+    echo "<p class='col-sm-12'>".AppUtility::t('Add new category to lists',false)."<input class='form-control display-inline-block width-fourty-per margin-left-ten' type=type id=\"newcat\" size=40> ";
     echo "<input class='margin-left-ten' type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-    echo '<p><input type=submit value="Record Categorizations"> <span class="margin-left-ten">'.AppUtility::t('and return to the course page.',false).'</span></p>';
-    echo "</form>\n";
+    echo '<p class="col-sm-12"><input type=submit value="Record Categorizations"> <span class="margin-left-ten">'.AppUtility::t('and return to the course page.',false).'</span></p>'; ?>
+    <div class="col-md-4 padding-top-twenty-five padding-bottom-thirty">
+        <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/>
+    </div>
+<?php echo "</form>\n";
 echo"</div>";
 ?>

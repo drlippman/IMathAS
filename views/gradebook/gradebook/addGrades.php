@@ -19,10 +19,6 @@ if ($params['gbitem'] == 'new') {
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?> </div>
             </div>
-            <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i
-                        class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?></button>
-            </div>
         </div>
     </div>
     <div class="item-detail-content">
@@ -366,8 +362,13 @@ if ($params['gbitem'] == 'new') {
 
                               echo "</tbody>
                         </table>
-            </div>";
-            if ($hassection) {
+            </div>"; ?>
+            <div class="header-btn col-sm-12 padding-top-twenty padding-bottom-ten col-sm-offset-2">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit">
+                    <i class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?>
+                </button>
+            </div>
+            <?php if ($hassection) {
                 echo "<script type='javascript'> initSortTable('myTable',Array('S','S',false,false),false);</script>";
             }
             ?>

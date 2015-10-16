@@ -30,10 +30,6 @@ $this->title = $defaultValues['saveTitle'];
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit">
-                <i class="fa fa-share header-right-btn"></i><?php echo $defaultValues['saveButtonTitle']; ?></button>
-        </div>
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item add-link-padding">
@@ -410,6 +406,10 @@ $this->title = $defaultValues['saveTitle'];
             <sup>*</sup>
             <span>Avoid quotes in the filename</span>
         </div>
+    </div>
+    <div class="header-btn col-sm-offset-2 col-sm-6 padding-top-twenty-five padding-bottom-ten">
+        <button class="btn btn-primary page-settings" type="submit" value="Submit">
+            <i class="fa fa-share header-right-btn"></i><?php echo $defaultValues['saveButtonTitle']; ?></button>
     </div>
 </div>
 <?php

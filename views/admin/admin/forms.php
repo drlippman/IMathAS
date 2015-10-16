@@ -138,11 +138,7 @@ switch ($action) {
         if ($params['action'] == "modify") {
             echo "&id={$params['cid']}";
         }
-        echo "\">
-        <button class='course-setting-submit-btn' type='submit' value='Submit'>
-        <i class='fa fa-share'></i>
-            ".AppUtility::t('Submit',false)."
-        </button>";
+        echo "\">";
         echo "<div class='col-md-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
                     <div class='col-md-12 margin-top-fifteen'>
                         <div class=col-md-3>Course ID</div>
@@ -426,6 +422,13 @@ switch ($action) {
         <input type="hidden" name="deflatepass" value="0">
         <input type="hidden" name="avail" value="0">
         <input type="hidden" name="blockcnt" value="0">
+
+    <div class="col-sm-2 col-sm-offset-3 padding-top-twenty padding-left-twenty-three">
+        <button type='submit' value='Submit'>
+            <i class='fa fa-share'></i>
+            <?php AppUtility::t('Submit') ?>
+        </button>
+    </div>
         <?php echo "</div>";
         break;
     case "chgteachers":
@@ -435,11 +438,7 @@ switch ($action) {
         <form enctype="multipart/form-data" method=post action="actions?action=importmacros">
         <div class="title-container">
             <div class="row">
-                <div class="">
-                    <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit"
-                            value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?>
-                    </button>
-                </div>
+
             </div>
         </div>
         <div class='col-md-12 padding-twenty'>
@@ -465,21 +464,18 @@ switch ($action) {
                    <input name="userfile" type="file"/>
               </span>
                 </div>
+                <div class="col-sm-6 padding-left-zero padding-top-twenty">
+                    <button class="btn btn-primary page-settings" type="submit" value="Submit">
+                        <i class="fa fa-share header-right-btn"></i>
+                        <?php AppUtility::t('Submit') ?>
+                    </button>
+                </div>
             </div>
         </div></form><?php
         break;
     case "importqimages":
         ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importqimages">
-            <div class="title-container">
-                <div class="row">
-                    <div class="">
-                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit"
-                                value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?>
-                        </button>
-                    </div>
-                </div>
-            </div>
             <div class='col-md-12 padding-twenty'>
                 <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
                     <h3><?php AppUtility::t('Install Question Images') ?></h3>
@@ -493,15 +489,21 @@ switch ($action) {
 
                     <p class='margin-bottom-ten'>
                         <b></b>
-                        <span
-                            class='margin-left-ten'><?php AppUtility::t('Install will ignore files with the same filename as existing files') ?>
-                            .</span>
+                        <span>
+                            <?php AppUtility::t('Install will ignore files with the same filename as existing files.') ?>
+                        </span>
                     </p>
                     <input type="hidden" name="MAX_FILE_SIZE\" value="5000000"/>
                     <span class='floatleft'><?php AppUtility::t('Import file') ?> </span>
                 <span class='floatleft margin-left-ten'>
                     <input name="userfile" type="file"/>
                 </span>
+                <div class="col-sm-12 padding-left-zero padding-top-twenty">
+                    <button class="btn btn-primary page-settings" type="submit" value="Submit">
+                        <i class="fa fa-share header-right-btn"></i>
+                        <?php echo 'Submit' ?>
+                    </button>
+                </div>
                 </div>
             </div>
         </form>
@@ -509,14 +511,7 @@ switch ($action) {
     case "importcoursefiles":
         ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importcoursefiles">
-            <div class="title-container">
-                <div class="row">
-                    <div class="">
-                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit"
-                                value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
-                    </div>
-                </div>
-            </div>
+
             <div class='col-md-12 padding-twenty'>
                 <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
                     <h3><?php AppUtility::t('Install Course files') ?></h3>
@@ -539,6 +534,9 @@ switch ($action) {
                 <span class='floatleft margin-left-ten'>
                     <input name="userfile" type="file"/>
                 </span>
+                <div class="col-sm-12 padding-left-zero padding-top-twenty">
+                    <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
+                </div>
                 </div>
             </div>
         </form>  <?php
@@ -571,8 +569,6 @@ switch ($action) {
             <div class="title-container">
                 <div class="row">
                     <div class="">
-                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit"
-                                value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Delete') ?></button>
                     </div>
                 </div>
             </div>
@@ -600,6 +596,12 @@ switch ($action) {
                     </span>
                   </span>
                     </div>
+                    <div class="col-sm-6 padding-left-zero padding-top-twenty">
+                        <button class="btn btn-primary page-settings" type="submit" value="Submit">
+                            <i class="fa fa-share header-right-btn"></i>
+                            <?php AppUtility::t('Delete') ?>
+                        </button>
+                    </div>
                 </div>
             </div>
         </form> <?php
@@ -608,9 +610,6 @@ switch ($action) {
         ?>
         <div class="col-md-12 modify-lti-domain-credential">
             <form method=post action="actions?action=modltidomaincred&id=new">
-                <input class="add-lti-credentials-btn" type=submit
-                       value="<?php AppUtility::t('Add LTI Credentials') ?>">
-
                 <div id="headerforms" class="pagetitle">
                     <h3>
                         <?php AppUtility::t('Modify LTI Domain Credentials') ?>
@@ -714,6 +713,9 @@ switch ($action) {
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-2 padding-top-twenty padding-left-zero col-sm-offset-2">
+                    <input class="margin-left-minus-five" type=submit value="<?php AppUtility::t('Add LTI Credentials') ?>">
+                </div>
         </div>
         </form>
         <?php
@@ -725,8 +727,6 @@ switch ($action) {
         } ?>
         <div class="col-md-12 modify-lti-domain-group-padding">
             <form method=post action="actions?action=modltidomaincred&id=<?php echo $user['id'] ?>">
-                <input type=submit class="update-group-btn" value="<?php AppUtility::t('Update LTI Credentials') ?>">
-
                 <div id="headerforms" class="pagetitle">
                     <h3>
                         <?php AppUtility::t('Modify LTI Domain Credentials') ?>
@@ -804,6 +804,9 @@ switch ($action) {
                             ?>
                      </span>
                 </div>
+                <div class="col-sm-2 col-sm-offset-2 padding-top-thirty padding-left-zero">
+                    <input type=submit class="" value="<?php AppUtility::t('Update LTI Credentials') ?>">
+                </div>
             </form>
         </div>
         <?php break;
@@ -812,10 +815,7 @@ switch ($action) {
         <div class="col-md-12 modify-group-padding">
             <form method=post
                   action="<?php echo AppUtility::getURLFromHome('admin', 'admin/actions?action=addgroup'); ?>">
-                <button class="add-group-btn" type=submit value="<?php AppUtility::t('Add Group') ?>">
-                    <i class="fa fa-share header-right-btn"></i>
-                    <?php AppUtility::t('Add Group') ?>
-                </button>
+
                 <div id="headerforms" class="pagetitle">
                     <h3>
                         <?php AppUtility::t('Modify Groups') ?>
@@ -848,12 +848,18 @@ switch ($action) {
                         echo "</tr>";
                     }?>
                 </table>
-                <?php  echo "<div class='col-md-12 margin-top-twenty  padding-left-zero'>
-                        <span class='floatleft select-text-margin'>" . AppUtility::t('Add new group', false) . "</span>
-                        <input class='width-thirty-per floatleft margin-bottom-thirty margin-left-thirty form-control subject' type=text name=gpname id=gpname size=50>
+                <?php  echo "<div class='col-sm-12 padding-left-zero padding-top-ten'>
+                        <span class='floatleft select-text-margin col-sm-2 '>" . AppUtility::t('Add new group', false) . "</span>
+                        <input class='width-thirty-per floatleft form-control subject' type=text name=gpname id=gpname size=50>
                         </div>";
                 ?>
                 </tbody>
+            <div class="col-sm-4 padding-top-twenty padding-bottom-twenty">
+                <button type=submit value="<?php AppUtility::t('Add Group') ?>">
+                    <i class="fa fa-share header-right-btn"></i>
+                    <?php AppUtility::t('Add Group') ?>
+                </button>
+            </div>
             </form>
         </div>
         <?php break;
@@ -862,10 +868,6 @@ switch ($action) {
         <div class="col-md-12 rename-group-padding">
             <?php $gpname = $groupsName['name']; ?>
             <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id'] ?>>
-                <button class="update-group-btn" type=submit value="<?php AppUtility::t('Update Group') ?>">
-                    <i class="fa fa-share header-right-btn"></i>
-                    <?php AppUtility::t('Update Group') ?>
-                </button>
                 <div id="headerforms" class="pagetitle">
                     <h2>
                         <?php AppUtility::t('Rename Instructor Group') ?></h2>
@@ -873,6 +875,10 @@ switch ($action) {
                 <?php AppUtility::t('Group name:', false) ?> <input
                     class="form-control width-thirty-three-per margin-top-thirty subject" type=text size=50 name=gpname
                     id=gpname value="<?php echo $gpname ?>">
+                <button class="margin-top-twenty" type=submit value="<?php AppUtility::t('Update Group') ?>">
+                    <i class="fa fa-share header-right-btn"></i>
+                    <?php AppUtility::t('Update Group') ?>
+                </button>
             </form>
         </div>
         <?php break;

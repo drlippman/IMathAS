@@ -17,10 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading width-eighty-per">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
-            <div class="width-twenty-per floatright">
-                <button type="submit" class="btn btn-primary floatright" id="gbComments"><i
-                        class="fa fa-share header-right-btn"></i><?php AppUtility::t('Save Comments') ?></button>
-            </div>
         </div>
     </div>
     <div class="item-detail-content">
@@ -91,6 +87,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         }
         ?>
+        <div class="col-sm-4 col-sm-offset-2 padding-left-zero padding-top-thirty">
+            <button type="submit" class="btn btn-primary" id="gbComments">
+                <i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Save Comments') ?>
+            </button>
+        </div>
     </div>
     </div>
 </form>

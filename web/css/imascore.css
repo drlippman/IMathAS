@@ -1077,7 +1077,7 @@ background-color: #f8f8f8;
     width: 25% !important;
 }
 .margin-left-minus-five {
-    margin-left: -5px;
+    margin-left: -5px !important;
 }
 .padding-thirty {
     padding: 30px;
@@ -1356,4 +1356,13 @@ color:red;
 }
 .padding-right-thirty {
     padding-right: 30px;
+}
+.padding-top-twenty-five {
+    padding-top: 25px !important;
+}
+.padding-left-two {
+    padding-left: 2px;
+}
+.padding-left-twenty-three {
+    padding-left: 23px;
 }

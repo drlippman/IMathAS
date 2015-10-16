@@ -15,12 +15,6 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
             </div>
-            <?php if ($overWriteBody != AppConstant::NUMERIC_ONE) { ?>
-                <div class="pull-left header-btn">
-                    <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i
-                            class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?></button>
-                </div>
-            <?php } ?>
         </div>
     </div>
     <div class="tab-content shadowBox margin-top-fourty padding-top-fifteen padding-bottom-ten">
@@ -953,6 +947,13 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                 </tr>
                 </tbody>
             </table>
+        <?php if ($overWriteBody != AppConstant::NUMERIC_ONE) { ?>
+            <div class="header-btn col-sm-4 padding-left-zero padding-top-ten padding-bottom-twenty">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit">
+                    <i class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?>
+                </button>
+            </div>
+        <?php } ?>
         </div>
         <?php } ?>
     </div>

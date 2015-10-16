@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class=" col-sm-6" style="right: 30px;">
                 <div class="vertical-align title-page">Print Test</div>
             </div>
-            <div class="col-sm-6"">
+            <div class="col-sm-6">
                 <div class="col-sm-2 pull-right">
 <!--                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to course page" href="/openmath/web/instructor/instructor/index?cid=2" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>-->
                 </div>
@@ -40,7 +40,6 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     if (!isset($params['heights'])) {
     echo "<form method=post action=\"print-layout?cid=$courseId&aid=$assessmentId\">\n";
-        echo "<input class='continue-btn print-test-continue-btn' type=submit value=\"Continue\">\n";
         echo "<h4 class='margin-top-twenty-seven'>Header Setup</h4>\nPlease select the items you'd like in the test header";
         echo "<ul><li class='margin-top-ten'><input type=checkbox name=aname checked=1><span class='margin-left-ten'>Assessment Name</span></li>\n";
             echo "<li class='margin-top-ten'><input type=checkbox name=iname checked=1><span class='margin-left-ten'>Instructor Name</span></li>\n";
@@ -58,6 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "<div class='marrgin-left-twenty-three'><div class='margin-top-ten'><span>Left + Right</span>  <input class='form-control form-control-inline-textbox margin-left-twenty-six' type=text name=horiz size=5 value=\"1.0\"> <span class='margin-left-five'>inches</span></div><br/>\n";
         echo "<div><span>Top + Bottom </span> <input class='form-control form-control-inline-textbox margin-left-ten' type=text name=vert size=5 value=\"1.0\"><span class='margin-left-five'> inches</span></div><br/>\n";
         echo "<div><span class='floatleft'>Browser</span> <div class='margin-left-ten floatleft'><input type=radio name=browser value=0 checked=1><span class='margin-left-five'>Internet Explorer</span></div> <div> <input class='margin-left-ten' type=radio name=browser value=1><span class='margin-left-five'>FireFox</span><sup>*</sup></div></div></div>\n";
+        echo "<div class='col-sm-12 padding-left-zero padding-top-twenty-five padding-bottom-twenty'><input type=submit value=\"Continue\"></div>\n";
         echo "<h4 class='margin-top-twenty'>Print Layout</h4>\n";
         echo "<div class='marrgin-left-twenty-three'>On the next page, you will see alternating blue and green rectangles indicating the size of pages.  Use the resizing ";
             echo "buttons next to each question to increase or decrease the space after each question until the questions fall nicely onto ";

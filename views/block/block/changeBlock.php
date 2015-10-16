@@ -13,10 +13,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit">
-                <i class="fa fa-share header-right-btn"></i><?php echo _('Apply Changes'); ?></button>
-        </div>
     </div>
 </div>
 
@@ -90,6 +86,10 @@ $this->params['breadcrumbs'][] = $this->title;
     </tr>
     </tbody>
 </table>
+    <div class="header-btn col-sm-6 padding-top-ten padding-bottom-thirty">
+        <button class="btn btn-primary page-settings" type="submit" value="Submit">
+            <i class="fa fa-share header-right-btn"></i><?php echo _('Apply Changes'); ?></button>
+    </div>
 </form>
 </div>
 

@@ -13,9 +13,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Message:',false);?><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn hide-hover">
-            <a href="#" id="msg-btn" class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
-        </div>
     </div>
 </div>
 <div class="item-detail-content">
@@ -40,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
     $message = '';
 }?>
 <div class="tab-content shadowBox">
-    <div class="inner-reply-msg-content padding-top-thirty">
+    <div class="inner-reply-msg-content padding-top-thirty inner-reply-height">
         <div class="drop-down padding-top col-sm-12">
             <div class="col-sm-1"><?php echo AppUtility::t('To');?></div>
             <div class="col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;<a
@@ -65,5 +62,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php echo AppUtility::t('Mark original message unread');?>
             </label>
         </div>
+    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty-five padding-bottom-thirty">
+        <a href="#" id="msg-btn" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
+    </div>
     </div>
 </div>

@@ -19,12 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?> </div>
             </div>
-            <?php if (count($forumItems) != 0) { ?>
-                <div class="pull-left header-btn">
-                    <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i
-                            class="fa fa-share header-right-btn"></i><?php AppUtility::t('Apply Changes') ?></button>
-                </div>
-            <?php } ?>
         </div>
     </div>
     <div class="tab-content shadowBox non-nav-tab-item">
@@ -283,6 +277,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tbody>
             </table>
         </div>
+        <?php if (count($forumItems) != 0) { ?>
+            <div class="header-btn col-sm-4 padding-left-thirty padding-top-ten padding-bottom-thirty">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i
+                        class="fa fa-share header-right-btn"></i><?php AppUtility::t('Apply Changes') ?></button>
+            </div>
+        <?php } ?>
     </div>
     <?php } ?>
 </form>

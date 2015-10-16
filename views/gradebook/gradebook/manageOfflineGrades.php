@@ -19,14 +19,6 @@ $this->title = 'Manage Offline Grades';
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?> </div>
         </div>
-        <div class="pull-left header-btn">
-            <div class="pull-right">
-                <?= Html::submitButton('Save', ['class' => 'btn btn-primary offline-grade-save-btn']) ?>
-                <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid=' . $course->id) ?>">
-                    <i class="fa fa-share header-right-btn"></i> Back
-                </a>
-            </div>
-        </div>
     </div>
 </div>
     <div class="item-detail-content">
@@ -219,6 +211,12 @@ $this->title = 'Manage Offline Grades';
                  </tr>
         </tbody>
     </table>
+    <div class="header-btn col-sm-6 padding-left-right-zero padding-top-ten padding-bottom-five">
+            <?= Html::submitButton('Save', ['class' => 'btn btn-primary offline-grade-save-btn']) ?>
+            <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid=' . $course->id) ?>">
+                <i class="fa fa-share header-right-btn"></i> Back
+            </a>
+    </div>
 </div>
 </div>
   <?php  }else{ ?>

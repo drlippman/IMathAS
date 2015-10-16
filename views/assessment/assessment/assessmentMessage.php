@@ -20,9 +20,6 @@ $useeditor = "commonmsg"; ?>
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?> </div>
             </div>
-            <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save' ?></button>
-            </div>
         </div>
     </div>
 <div class="tab-content shadowBox non-nav-tab-item end-assesment-shadowbox">
@@ -54,13 +51,16 @@ $useeditor = "commonmsg"; ?>
                     echo '<p>After the score-specific message, display this text to everyone:</p>';
                     echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" style="width: 100%">';
                     echo htmlentities($endmsg['commonmsg']);
-                    echo '</textarea></div>';
-            echo '</form>';
-            ?>
-            <p>Order of entries is not important; the message with highest applicable score will be reported.
+                    echo '</textarea></div>';?>
+            <div class="header-btn col-sm-4 padding-left-zero padding-top-twenty padding-bottom-five">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save' ?></button>
+            </div>
+        </form>
+
+        <p class="col-sm-12 padding-left-zero">Order of entries is not important; the message with highest applicable score will be reported.
             The "otherwise, show" message will display if no other score messages are defined.  Use this instead
             of trying to create a 0 score entry</p>
-   </di22v>
+   </div>
 <?php    if (isset($params['checked'])) {
     echo '<input type="hidden" name="aidlist" value="'.$params['checked'].'" />';
     } else {

@@ -32,11 +32,6 @@ use app\components\AssessmentUtility;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
-            <?php    if (isset($params['id'])) {?>
-            <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $savetitle ?></button>
-            </div>
-            <?php } ?>
         </div>
     </div>
     <div class="item-detail-content">
@@ -111,8 +106,13 @@ if ($overwriteBody==1) {
             if (isset($rubric[$i]) && isset($rubric[$i][2])) { echo str_replace('"','&quot;',$rubric[$i][2]);} else {echo 0;}
             echo '"/></td></tr>';
         }
-        echo '</table></div>';
-        echo '</form>
+        echo '</table></div>'; ?>
+            <?php    if (isset($params['id'])) {?>
+                <div class="header-btn padding-left-twenty col-sm-4 padding-top-twenty">
+                    <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $savetitle ?></button>
+                </div>
+            <?php } ?>
+        <?php echo '</form>
         </div>
         </div>';
         }

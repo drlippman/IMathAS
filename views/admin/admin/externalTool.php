@@ -35,12 +35,7 @@ if (isset($params['id'])) {
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <?php if (isset($params['id'])) { ?>
-            <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="submit">
-                    <i class="fa fa-share header-right-btn"></i> <?php AppUtility::t('Save'); ?> </button>
-            </div>
-        <?php } ?>
+
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
@@ -105,6 +100,7 @@ if (isset($params['id'])) {
                    value="2" <?php if (($privacy & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO) echo 'checked="checked"'; ?> /><span
                 class="padding-left-five">Send email</span>
         </div>
+
         <br class="form"/><br/>
         <?php
         if ($isAdmin) {
@@ -114,10 +110,16 @@ if (isset($params['id'])) {
             echo '<input type="radio" name="scope" value="1" ' . (($grp > AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> Group';
             echo '</div>
             <br class="form" /><br/>';
-        }
-        echo '</form>';
+        } ?>
+        <?php if (isset($params['id'])) { ?>
+            <div class="header-btn col-sm-2 col-sm-offset-2 padding-bottom-thirty">
+                <button class="btn btn-primary page-settings" type="submit" value="submit">
+                    <i class="fa fa-share header-right-btn"></i> <?php AppUtility::t('Save'); ?> </button>
+            </div>
+        <?php } ?>
+        </form>
 
-    } else {
+    <?php } else {
         echo '<div class="col-md-12 padding-twenty">
             <div class="col-md-12 padding-top-twenty text-gray-background padding-left-thirty">';
         $str = "<p><b>";

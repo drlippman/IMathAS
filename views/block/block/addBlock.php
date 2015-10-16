@@ -18,9 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
             </div>
-            <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultBlockData['saveTitle'] ?></button>
-            </div>
         </div>
     </div>
     <div class="tab-content shadowBox non-nav-tab-item" style="padding-bottom: 10px">
@@ -137,7 +134,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class=col-lg-10>
             <input type=checkbox name=public value="1" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['public'],'1') ?> /></div>
 
-	    </div><br class=form />
+	    </div>
+        <div class="header-btn col-sm-6 padding-top-thirty padding-bottom-thirty">
+            <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultBlockData['saveTitle'] ?></button>
+        </div>
     </form>
     <p class="small col-lg-10" style="padding-left: 15px"><sup>*</sup><?php AppUtility::t('If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.')?><br/>
         <?php AppUtility::t('Items from publicly accessible blocks can viewed without logging in at ')?><?php echo "" ?>/public.php?cid=<?php echo ""?>. </p>

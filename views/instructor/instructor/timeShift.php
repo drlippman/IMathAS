@@ -15,9 +15,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?> </div>
         </div>
-        <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Change Dates' ?></button>
-        </div>
     </div>
 </div>
 <div class="item-detail-content">
@@ -89,11 +86,8 @@ if ($overWriteBody==1) {
     </div>
 
 <?php } ?>
-
+        <div class="col-sm-4 header-btn col-sm-offset-4 padding-top-ten padding-left-twenty">
+            <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Change Dates' ?></button>
+        </div>
 </div>
 </form>
-
-
-
-
-

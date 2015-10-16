@@ -13,13 +13,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
-
-            <div class="pull-left header-btn">
-                    <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Access Diagnostic' ?></button>
-                <a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics'); ?>"
-                   class="btn btn-primary pull-right page-settings padding-right-ten"><i class="fa fa-eye"></i>&nbsp;Diagnostics
-                </a>
-            </div>
         </div>
     </div>
 <?php } ?>
@@ -120,6 +113,12 @@ $pagetitle =$line['name'];
         echo "<div class='col-lg-2 select-text-margin'>", _('Access password'), "</div>  <div class='col-lg-4'><input class='form form-control-1' type=password size=40 name=passwd></div><BR class=form>";
     }
     ?>
+    <div class="header-btn col-sm-4 col-sm-offset-2 padding-top-fifteen padding-bottom-thirty">
+        <button class="btn btn-primary page-settings padding-right-ten" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Access Diagnostic' ?></button>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics'); ?>"
+           class="btn btn-primary page-settings padding-right-ten"><i class="fa fa-eye"></i>&nbsp;Diagnostics
+        </a>
+    </div>
     <input type="hidden" id="tzoffset" name="tzoffset" value="">
     <input type="hidden" id="tzname" name="tzname" value="">
     <script>

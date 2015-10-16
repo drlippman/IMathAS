@@ -47,14 +47,6 @@ if (count($failures)>0) {
             </div>
         </div>
     </div>
-    <div class="floatright margin-top-minus-thirty-nine">
-            <?php echo Html::submitButton(AppUtility::t('Submit', false), ['class' => 'btn btn-primary upload-comments-btn']) ?>
-            <?php if ($commentType == "instr"){ ?>
-                <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id.'&comtype=instr')  ?>"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Back')?></a>
-            <?php } else {?>
-                <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id)  ?>"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Back')?></a>
-            <?php }?>
-    </div>
     <div class="item-detail-content">
         <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
     </div>
@@ -97,8 +89,17 @@ if (count($failures)>0) {
             </div>
         </div>
     </div>
-</div>
-</div>
+        <div class="col-sm-6 col-sm-offset-3 padding-top-thirty padding-left-eight">
+            <?php echo Html::submitButton(AppUtility::t('Submit', false), ['class' => 'btn btn-primary upload-comments-btn']) ?>
+            <?php if ($commentType == "instr"){ ?>
+                <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id.'&comtype=instr')  ?>"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Back')?></a>
+            <?php } else {?>
+                <a class="btn btn-primary upload-comments-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id)  ?>"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Back')?></a>
+            <?php }?>
+        </div>
 
+
+  </div>
+</div>
 <?php ActiveForm::end(); ?>
 </div>
