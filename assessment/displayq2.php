@@ -159,7 +159,12 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($formatfeedbackon)) {
 		unset($GLOBALS['noformatfeedback']);
 	}
-	
+	if (isset($anstypes)) {
+		if (!is_array($anstypes)) {
+			$anstypes = explode(",",$anstypes);
+		}
+		$anstypes = array_map('trim', $anstypes);
+	}
 	//pack options
 	
 	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
@@ -188,9 +193,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$qcolors = array();
 	}
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
-		if (!is_array($anstypes)) {
-			$anstypes = explode(",",$anstypes);
-		}
 		if ($qdata['qtype']=="multipart") {
 			if (isset($answeights)) {
 				if (!is_array($answeights)) {
@@ -685,15 +687,32 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	if (isset($variable) && !isset($variables)) {
 		$variables =& $variable;
 	}
-	if (isset($reqdecimals) && !is_array($reqdecimals) && !isset($abstolerance) && !isset($reltolerance)) {
-		$abstolerance = 0.5/(pow(10,$reqdecimals));
-	} else if (isset($reqdecimals) && is_array($reqdecimals)) {
-		foreach ($reqdecimals as $kidx=>$vval) {
-			if (!isset($abstolerance[$kidx]) && !isset($reltolerance[$kidx])) {
-				$abstolerance[$kidx] = 0.5/(pow(10,$vval));
+	if (isset($anstypes)) {
+		if (!is_array($anstypes)) {
+			$anstypes = explode(",",$anstypes);
+		}
+		$anstypes = array_map('trim', $anstypes);
+	}
+	if (isset($reqdecimals)) {
+		if (is_array($reqdecimals)) {  
+			foreach ($reqdecimals as $kidx=>$vval) {
+				if (!isset($abstolerance[$kidx]) && !isset($reltolerance[$kidx])) {
+					$abstolerance[$kidx] = 0.5/(pow(10,$vval));
+				}
 			}
+		} else {
+			if (!isset($abstolerance) && !isset($reltolerance)) { //set global abstol
+				$abstolerance = 0.5/(pow(10,$reqdecimals));
+			} else if (isset($anstypes)) {
+				foreach ($anstypes as $kidx=>$vval) {
+					if (!isset($abstolerance[$kidx]) && !isset($reltolerance[$kidx])) {
+						$abstolerance[$kidx] = 0.5/(pow(10,$reqdecimals));
+					}
+				}
+			}			
 		}
 	}
+
 	srand($seed+2);
 	//pack options from eval
 	if (isset($answer)) {$options['answer'] = $answer;}
@@ -720,9 +739,6 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	
 	$score = 0;
 	if ($qdata['qtype']=="multipart") {
-		if (!is_array($anstypes)) {
-			$anstypes = explode(",",$anstypes);
-		}
 		if (in_array('essay',$anstypes) || in_array('file',$anstypes)) {
 			$GLOBALS['questionmanualgrade'] = true;
 		}
@@ -2656,7 +2672,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else {
 			$givenans = preg_replace('/(\d)\s*,\s*(?=\d{3}\b)/','$1',$givenans);
 			$givenans = str_replace(',','99999999',$givenans); //force wrong ans on lingering commas
-			echo $givenans;
+
 			$gaarr = array(str_replace(array('$',',',' ','/','^','*'),'',$givenans));
 			
 			if (strpos($answer,'[')===false && strpos($answer,'(')===false) {
