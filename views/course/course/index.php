@@ -26,13 +26,13 @@ $jsAddress1 = AppUtility::getURLFromHome('course', 'course/index?cid='.$course->
     </div>
 </div>
 <div>
-<div class="col-lg-12">
+<div class="col-md-12">
 <?php
 if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbuttons)) {
     if($previewshift > -1 && !$useviewbuttons) { ?>
-        <div class="col-lg-3">
+        <div class="col-md-3">
        <?php  echo _('Showing student view. Show view:') ?></div>
-        <div class="col-lg-3">
+        <div class="col-md-3">
         <?php echo ' <select id="pshift" class="form-control" onchange="changeshift()">';
         echo '<option value="0" ';
         if ($previewshift == 0) {echo "selected=1";}
@@ -50,7 +50,7 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
         if ($previewshift==604800) {echo "selected=1";}
         echo '>', _('1 week from now'), '</option>';
         echo '</select>';?> </div>
-        <div class="col-lg-2">
+        <div class="col-md-2">
         <?php echo " <a class=link-instructor href=".AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id).">", _('Back to instructor view'), "</a>";?>
         </div>
    <?php }
@@ -494,13 +494,13 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                 <!-- Calender Here-->
             <?php case 'Calendar':?>
                 <div class="student-course-alignment student-course-alignment-calendar">
-                <div class="col-lg-12 padding-alignment calendar-container item">
-                    <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                <div class="col-md-12 padding-alignment calendar-container item">
+                    <div class ='calendar padding-alignment calendar-alignment col-md-9 pull-left'>
                         <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                         <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                         <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
                     </div>
-                    <div class="calendar-day-details-right-side pull-left col-lg-3">
+                    <div class="calendar-day-details-right-side pull-left col-md-3">
                         <div class="day-detail-border">
                             <b style="font-size: 18px">Day Details:</b>
                         </div>
@@ -957,13 +957,13 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                         <!-- Calender Here-->
                                     <?php case 'Calendar': ?>
                                         <div class="student-course-alignment student-course-alignment-calendar">
-                                        <div class="col-lg-12 padding-alignment calendar-container item" style="margin-left: 20px">
-                                            <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                                        <div class="col-md-12 padding-alignment calendar-container item" style="margin-left: 20px">
+                                            <div class ='calendar padding-alignment calendar-alignment col-md-9 pull-left'>
                                                 <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                                                 <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                                                 <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
                                             </div>
-                                            <div class="calendar-day-details-right-side pull-left col-lg-3">
+                                            <div class="calendar-day-details-right-side pull-left col-md-3">
                                                 <div class="day-detail-border">
                                                     <b style="font-size: 18px">Day Details:</b>
                                                 </div>
@@ -1423,13 +1423,13 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                         <!-- Calender Here-->
                                     <?php case 'Calendar': ?>
                                         <div class="student-course-alignment student-course-alignment-calendar">
-                                        <div class="col-lg-12 padding-alignment calendar-container item">
-                                            <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                                        <div class="col-md-12 padding-alignment calendar-container item">
+                                            <div class ='calendar padding-alignment calendar-alignment col-md-9 pull-left'>
                                                 <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                                                 <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                                                 <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
                                             </div>
-                                            <div class="calendar-day-details-right-side pull-left col-lg-3">
+                                            <div class="calendar-day-details-right-side pull-left col-md-3">
                                                 <div class="day-detail-border">
                                                     <b style="font-size: 18px">Day Details:</b>
                                                 </div>

@@ -23,7 +23,7 @@ $useeditor = "commonmsg"; ?>
         </div>
     </div>
 <div class="tab-content shadowBox non-nav-tab-item end-assesment-shadowbox">
-    <div class="col-lg-12">
+    <div class="col-md-12">
             <?php
                 echo '<div class="col-md-12 margin-bottom-twenty-five"><div class="col-md-2 margin-left-minus-thirty">Base messages on: </div>';
                     echo '<div class="col-md-2"><input type="radio" name="type" value="0" ';

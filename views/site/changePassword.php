@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-lg-8 col-lg-offset-3\">{error}</div>",
+            'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-md-8 col-md-offset-3\">{error}</div>",
             'labelOptions' => ['class' => 'col-sm-3'],
         ],
     ]); ?>

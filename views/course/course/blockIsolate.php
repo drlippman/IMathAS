@@ -299,13 +299,13 @@ $now = $currentTime;
                 <!-- Calender Here-->
             <?php case 'Calendar': ?>
                                 <div class="margin-right-fifteen">
-                   <div class="col-lg-12 padding-alignment calendar-container item">
-                       <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                   <div class="col-md-12 padding-alignment calendar-container item">
+                       <div class ='calendar padding-alignment calendar-alignment col-md-9 pull-left'>
                            <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                            <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
                        </div>
-                       <div class="calendar-day-details-right-side pull-left col-lg-3">
+                       <div class="calendar-day-details-right-side pull-left col-md-3">
                            <div class="day-detail-border">
                                <b>Day Details:</b>
                            </div>
@@ -571,13 +571,13 @@ $now = $currentTime;
                                 <!--         Calender Here-->
                        <?php case 'Calendar': ?>
                                     <div class="margin-right-fifteen">
-                            <div class="col-lg-12 padding-alignment calendar-container item">
-                                <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                            <div class="col-md-12 padding-alignment calendar-container item">
+                                <div class ='calendar padding-alignment calendar-alignment col-md-9 pull-left'>
                                     <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                                     <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                                     <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
                                 </div>
-                                <div class="calendar-day-details-right-side pull-left col-lg-3">
+                                <div class="calendar-day-details-right-side pull-left col-md-3">
                                     <div class="day-detail-border">
                                         <b>Day Details:</b>
                                     </div>
@@ -721,7 +721,7 @@ $now = $currentTime;
                         <?php endswitch;
                 }?></div>
 
-<div class="col-lg-12 align-linked-text-right padding-bottom-fifteen padding-right-twenty">
+<div class="col-md-12 align-linked-text-right padding-bottom-fifteen padding-right-twenty">
 <?php if($user->rights == 100 || $user->rights == 20) {?>
         <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id) ?>">Back</a>
    <?php } elseif($user->rights == 10){ ?>

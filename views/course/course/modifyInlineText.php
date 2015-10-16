@@ -14,8 +14,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
 <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
     <div class="name-of-item">
-        <div class="col-lg-2"><?php AppUtility::t('Name of Inline Text')?></div>
-        <div class="col-lg-10">
+        <div class="col-md-2"><?php AppUtility::t('Name of Inline Text')?></div>
+        <div class="col-md-10">
             <?php $title = AppUtility::t('Enter title here', false);
             if($line['title']){
                 $title = $line['title'];
@@ -27,8 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <BR><br class=form />
 
     <div class="editor-summary">
-        <div class="col-lg-2"><?php AppUtility::t('Summary')?></div>
-        <div class="col-lg-10">
+        <div class="col-md-2"><?php AppUtility::t('Summary')?></div>
+        <div class="col-md-10">
             <div class=editor>
                 <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
                     <?php $text = AppUtility::t('Enter text here');
@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div><br class=form /><br class=form />
 
     <!--File Attachment -->
-    <div class=col-lg-2><?php AppUtility::t('Attached Files')?></div>
+    <div class=col-md-2><?php AppUtility::t('Attached Files')?></div>
 <?php
 if (isset($inlineId)) {
     foreach ($page_FileLinks as $k=>$arr) {
@@ -57,7 +57,7 @@ if (isset($inlineId)) {
     }
 }
 ?>
-        <div class=col-lg-10>
+        <div class=col-md-10>
             <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
             New file<sup>*</sup>: <input type="file" name="userfile" /><br />
             Description: <input type="text" name="newfiledescr"/><br/><br/>
@@ -66,8 +66,8 @@ if (isset($inlineId)) {
 
     <!--List of Youtube Videos-->
     <div class="youtube-video">
-        <div class="col-lg-2"><?php AppUtility::t('List of YouTube videos')?></div>
-        <div class="col-lg-10">
+        <div class="col-md-2"><?php AppUtility::t('List of YouTube videos')?></div>
+        <div class="col-md-10">
             <input type="checkbox" name="isplaylist" value="1" <?php AppUtility::writeHtmlChecked($line['isplaylist'],1);?>/>
             <span class="padding-left"><?php AppUtility::t('Show as embedded playlist')?></span>
         </div>
@@ -75,8 +75,8 @@ if (isset($inlineId)) {
 
     <div>
         <div class="visibility-item">
-            <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
-            <div class="col-lg-10">
+            <div class="col-md-2"><?php AppUtility::t('Visibility')?></div>
+            <div class="col-md-10">
             <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($line['avail'], AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/><span class="padding-left"><?php AppUtility::t('Show by Dates')?></span>
             <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/><span class="padding-left"><?php AppUtility::t('Hide')?></span></label>
             <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/><span class="padding-left"><?php AppUtility::t('Show Always')?></span></label>
@@ -85,13 +85,13 @@ if (isset($inlineId)) {
 
             <div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>"><br class="form"/>
 
-            <div class=col-lg-2><?php AppUtility::t('Available After')?></div>
-            <div class=col-lg-10>
+            <div class=col-md-2><?php AppUtility::t('Available After')?></div>
+            <div class=col-md-10>
                 <label class="pull-left non-bold"><input type=radio name="sdatetype" value="0" <?php AppUtility::writeHtmlChecked($startDate,'0',0) ?>/><span class='padding-left'><?php AppUtility::t(' Always until end date')?></span></label>
                 <label class="pull-left non-bold" style="padding-left: 36px"><input type=radio name="sdatetype" class="pull-left" value="sdate" <?php AppUtility::writeHtmlChecked($startDate,'0',1) ?>/></label>
 
                 <?php
-                echo '<div class = "time-input pull-left col-lg-4">';
+                echo '<div class = "time-input pull-left col-md-4">';
                 echo DatePicker::widget([
                     'name' => 'sdate',
                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -103,8 +103,8 @@ if (isset($inlineId)) {
                 ]);
                 echo '</div>';?>
                 <?php
-                echo '<label class="end pull-left non-bold col-lg-1"> at </label>';
-                echo '<div class="pull-left col-lg-4">';
+                echo '<label class="end pull-left non-bold col-md-1"> at </label>';
+                echo '<div class="pull-left col-md-4">';
 
                 echo TimePicker::widget([
                     'name' => 'stime',
@@ -117,12 +117,12 @@ if (isset($inlineId)) {
                 echo '</div>';?>
             </div><BR class=form><BR class=form>
 
-                <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
-                <div class=col-lg-10>
+                <div class=col-md-2><?php AppUtility::t('Available Until')?></div>
+                <div class=col-md-10>
                     <label class="pull-left non-bold"><input type=radio name="edatetype" value="2000000000" <?php AppUtility::writeHtmlChecked($endDate,'2000000000',0) ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
                     <label class="pull-left non-bold" style="padding-left: 34px"><input type=radio name="edatetype" class="pull-left" value="edate" <?php AppUtility::writeHtmlChecked($endDate,'2000000000',1) ?>/></label>
                     <?php
-                    echo '<div class = "time-input pull-left col-lg-4">';
+                    echo '<div class = "time-input pull-left col-md-4">';
                     echo DatePicker::widget([
                         'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -134,8 +134,8 @@ if (isset($inlineId)) {
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left non-bold col-lg-1"> at </label>';
-                    echo '<div class="pull-left col-lg-4">';
+                    echo '<label class="end pull-left non-bold col-md-1"> at </label>';
+                    echo '<div class="pull-left col-md-4">';
 
                     echo TimePicker::widget([
                         'name' => 'etime',
@@ -148,8 +148,8 @@ if (isset($inlineId)) {
                     echo '</div>';?>
                 </div><BR class=form><BR class=form>
 
-                <div class=col-lg-2><?php AppUtility::t('Place on Calendar?')?></div>
-                <div class=col-lg-10>
+                <div class=col-md-2><?php AppUtility::t('Place on Calendar?')?></div>
+                <div class=col-md-10>
                     <input type=radio name="oncal" value=0 <?php AppUtility::writeHtmlChecked($line['oncal'],0); ?> /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
                     <input type=radio name="oncal" value=1 <?php AppUtility::writeHtmlChecked($line['oncal'],1); ?> /><span class="padding-left"><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></span><br/>
                     <input type=radio name="oncal" value=2 <?php AppUtility::writeHtmlChecked($line['oncal'],2); ?> /><span class="padding-left"><?php AppUtility::t('Yes, on Available until date')?></span><br />
@@ -159,13 +159,13 @@ if (isset($inlineId)) {
 
 <!--            <div id="altcaldiv" style="display:--><?php //echo ($line['avail'] == 2)?"block":"none"; ?><!--"><BR class=form>-->
 
-<!--                <div class=col-lg-2>--><?php //AppUtility::t('Place on Calendar?')?><!--</div>-->
-<!--                <div class=col-lg-10>-->
+<!--                <div class=col-md-2>--><?php //AppUtility::t('Place on Calendar?')?><!--</div>-->
+<!--                <div class=col-md-10>-->
 <!--                    -->
 <!--                    <input type=radio name="altoncal" value="0" --><?php //AppUtility::writeHtmlChecked($altoncal,0); ?><!-- /><span class='padding-left'>--><?php //AppUtility::t('No')?><!--</span><br>-->
 <!--                    <input type=radio name="altoncal" class="pull-left" value="1" --><?php //AppUtility::writeHtmlChecked($altoncal,1); ?><!-- /><span class="pull-left padding-left">--><?php //AppUtility::t('Yes On')?><!--</span>-->
 <!--                    --><?php
-//                    echo '<div class = "col-lg-4 time-input">';
+//                    echo '<div class = "col-md-4 time-input">';
 //                    echo DatePicker::widget([
 //                        'name' => 'cdate',
 //                        'type' => DatePicker::TYPE_COMPONENT_APPEND,

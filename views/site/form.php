@@ -38,26 +38,26 @@ $emailErr = "";
 
         echo "<form enctype=\"multipart/form-data\" method=post action=\"action?action=chguserinfo$gb\">\n";
         echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
-        echo "<div class='col-lg-2'><label for=\"firstname\">Enter First Name:</label></div>
-        <div class='col-lg-8'><input class='form form-control-1' type=text size=20 id=firstname name=firstname  value=\"{$line['FirstName']}\" /></div><br class=\"form\" />";
-        echo "<div class=col-lg-2><label for=\"lastname\">Enter Last Name:</label></div> <div class='col-lg-6'><input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"></div><BR class=form>\n";
+        echo "<div class='col-md-2'><label for=\"firstname\">Enter First Name:</label></div>
+        <div class='col-md-8'><input class='form form-control-1' type=text size=20 id=firstname name=firstname  value=\"{$line['FirstName']}\" /></div><br class=\"form\" />";
+        echo "<div class=col-md-2><label for=\"lastname\">Enter Last Name:</label></div> <div class='col-md-6'><input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"></div><BR class=form>\n";
 
         if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
-            echo '<div class="col-lg-2">'._('Group').':</div><div class="col-lg-6">'.$groupResult['name'].'</div><br class="form"/>';
+            echo '<div class="col-md-2">'._('Group').':</div><div class="col-md-6">'.$groupResult['name'].'</div><br class="form"/>';
         }
-        echo '<div class="col-lg-2"><label for="dochgpw">Change Password?</label></div> <div class="col-lg-6"><input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" /></div><br class="form" />';
+        echo '<div class="col-md-2"><label for="dochgpw">Change Password?</label></div> <div class="col-md-6"><input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" /></div><br class="form" />';
         echo '<div style="display:none" id="pwinfo">';
-        echo "<div class='col-lg-2'><label for=\"oldpw\">Old password:</label></div> <div class='col-lg-6'><input class=form type=password id=oldpw name=oldpw size=40 /></div> <BR class=form>\n";
-        echo "<div class='col-lg-2'><label for=\"newpw1\">Change password:</label></div> <div class='col-lg-6'> <input class=form type=password id=newpw1 name=newpw1 size=40></div> <BR class=form>\n";
-        echo "<div class=col-lg-2><label for=\"newpw1\">Confirm password:</label></div> <div class='col-lg-6'> <input class=form type=password id=newpw2 name=newpw2 size=40></div> <BR class=form>\n";
+        echo "<div class='col-md-2'><label for=\"oldpw\">Old password:</label></div> <div class='col-md-6'><input class=form type=password id=oldpw name=oldpw size=40 /></div> <BR class=form>\n";
+        echo "<div class='col-md-2'><label for=\"newpw1\">Change password:</label></div> <div class='col-md-6'> <input class=form type=password id=newpw1 name=newpw1 size=40></div> <BR class=form>\n";
+        echo "<div class=col-md-2><label for=\"newpw1\">Confirm password:</label></div> <div class='col-md-6'> <input class=form type=password id=newpw2 name=newpw2 size=40></div> <BR class=form>\n";
         echo '</div>';
-        echo "<div class=col-lg-2><label for=\"email\">E-mail address:</label></div> <div class='col-lg-6'> <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"></div><BR class=form>\n";
-        echo "<div class=col-lg-2><label for=\"msgnot\">Notify me by email when I receive a new message:</label></div><div class=col-lg-6><input type=checkbox id=msgnot name=msgnot ";
+        echo "<div class=col-md-2><label for=\"email\">E-mail address:</label></div> <div class='col-md-6'> <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"></div><BR class=form>\n";
+        echo "<div class=col-md-2><label for=\"msgnot\">Notify me by email when I receive a new message:</label></div><div class=col-md-6><input type=checkbox id=msgnot name=msgnot ";
         if ($line['msgnotify']==1) {echo "checked=1";}
         echo " /></div><BR class=form>\n";
 
-        echo "<div class=col-lg-2><label for=\"stupic\">Picture:</label></div>";
-        echo "<div class=\"col-lg-6\">";
+        echo "<div class=col-md-2><label for=\"stupic\">Picture:</label></div>";
+        echo "<div class=\"col-md-6\">";
         if ($line['hasuserimg'] == 1) {
             if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                 echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
@@ -73,8 +73,8 @@ $emailErr = "";
             echo "No Pic ";
         }
         echo '<br/><input type="file" name="stupic"/></div><br class="form" />';
-        echo '<div class="col-lg-2"><label for="perpage">Messages/Posts per page:</label></div>';
-        echo '<div class="col-lg-6"><select name="perpage">';
+        echo '<div class="col-md-2"><label for="perpage">Messages/Posts per page:</label></div>';
+        echo '<div class="col-md-6"><select name="perpage">';
         for ($i=10;$i<=100;$i+=10) {
             echo '<option value="'.$i.'" ';
             if ($i==$line['listperpage']) {echo 'selected="selected"';}
@@ -111,14 +111,14 @@ $emailErr = "";
             $hpsets .= ' /> New posts notes on course list<br/>';
         }
         if ($hpsets != '') {
-            echo '<div class="col-lg-2">Show on home page:</div><div class="col-lg-6">';
+            echo '<div class="col-md-2">Show on home page:</div><div class="col-md-6">';
             echo $hpsets;
             echo '</div><br class="form" />';
 
         }
         if (isset($CFG['GEN']['translatewidgetID'])) {
-            echo '<div class="col-lg-2">Attempt to translate pages into another language:</div>';
-            echo '<div class="col-lg-6">';
+            echo '<div class="col-md-2">Attempt to translate pages into another language:</div>';
+            echo '<div class="col-md-6">';
             echo '<div id="google_translate_element"></div><script type="text/javascript">';
             echo ' function googleTranslateElementInit() {';
             echo '  new google.translate.TranslateElement({pageLanguage: "en", layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL}, "google_translate_element");';
@@ -130,7 +130,7 @@ $emailErr = "";
 
         if ($myRights > 19) {
             echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
-            echo "<div class=col-lg-2><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></div><div class=col-lg-6><input type=checkbox id=qrd name=qrd ";
+            echo "<div class=col-md-2><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></div><div class=col-md-6><input type=checkbox id=qrd name=qrd ";
             if ($line['qrightsdef'] == 0) {
                 echo "checked=1";
             }
@@ -154,15 +154,15 @@ $emailErr = "";
             echo "  document.getElementById(\"libnames\").innerHTML = libn;";
             echo "}";
             echo "</script>";
-            echo "<div class=col-lg-2>Default question library:</div><div class=col-lg-6> <span id=\"libnames\">$lName</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"{$line['deflib']}\">\n";
+            echo "<div class=col-md-2>Default question library:</div><div class=col-md-6> <span id=\"libnames\">$lName</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"{$line['deflib']}\">\n";
             echo " <input type=button value=\"Select Library\" onClick=\"libselect()\"></div><br class=form> ";
 
-            echo "<div class=col-lg-2>Use default question library for all templated questions?</div>";
-            echo "<div class=col-lg-6><input type=checkbox name=\"usedeflib\"";
+            echo "<div class=col-md-2>Use default question library for all templated questions?</div>";
+            echo "<div class=col-md-6><input type=checkbox name=\"usedeflib\"";
             if ($line['usedeflib']==1) {echo "checked=1";}
             echo "> ";
             echo "</div><br class=form>";
-            echo "<div class='col-lg-12'>Default question library is used for all local (assessment-only) copies of questions created when you ";
+            echo "<div class='col-md-12'>Default question library is used for all local (assessment-only) copies of questions created when you ";
             echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
             echo "be assigned to this library.</div>";
             echo '</fieldset>';
@@ -171,9 +171,9 @@ $emailErr = "";
         if ($tzname != '') {
 
             echo '<fieldset><legend>Timezone</legend>';
-            echo '<div class="col-lg-12">Due Dates and other times are being shown to you correct for the <b>'.$tzname.'</b> timezone.</div>';
-            echo '<div class="col-lg-12">You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.</div>';
-            echo '<div class="col-lg-12">Set timezone to: <select name="settimezone" id="settimezone">';
+            echo '<div class="col-md-12">Due Dates and other times are being shown to you correct for the <b>'.$tzname.'</b> timezone.</div>';
+            echo '<div class="col-md-12">You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.</div>';
+            echo '<div class="col-md-12">Set timezone to: <select name="settimezone" id="settimezone">';
             $timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
             foreach ($timezones as $tz) {
                 echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';

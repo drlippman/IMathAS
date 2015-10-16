@@ -24,8 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
     <br>
 
-    <div class="col-lg-12"><b><?php AppUtility::t('Hello'); ?><?php echo $userName ?></b></div>
-    <div class="col-lg-12 margin-left-five"><h3><?php AppUtility::t('Courses'); ?></h3></div>
+    <div class="col-md-12"><b><?php AppUtility::t('Hello'); ?><?php echo $userName ?></b></div>
+    <div class="col-md-12 margin-left-five"><h3><?php AppUtility::t('Courses'); ?></h3></div>
 
     <div class='item margin-padding-admin-table padding-bottom'>
 
@@ -119,10 +119,10 @@ $this->params['breadcrumbs'][] = $this->title;
         if ($showcourses > AppConstant::NUMERIC_ZERO) {
             echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='index?showcourses=0'\" />";
         }
-        echo "<div class='col-lg-2 display-inline-block padding-left-zero'>";
+        echo "<div class='col-md-2 display-inline-block padding-left-zero'>";
         echo "Show courses of</div>" ;
 //        echo $a = substr($page_teacherSelectVal,0,4);
-       echo "<div class='col-lg-5 padding-left-zero display-inline-block'>";AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
+       echo "<div class='col-md-5 padding-left-zero display-inline-block'>";AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
     </div>
         </div>
     <?php
@@ -178,7 +178,7 @@ if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteache
 }
 if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
     ?>
-    <div class="col-lg-12 margin-left-five"><h3><?php AppUtility::t('Diagnostics'); ?></h3></div>
+    <div class="col-md-12 margin-left-five"><h3><?php AppUtility::t('Diagnostics'); ?></h3></div>
 
     <div class='item margin-padding-admin-table padding-bottom'>
         <table class="display course-table table table-bordered table-striped table-hover data-table">
@@ -246,7 +246,7 @@ if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
 }
 if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
 ?>
-<div class="col-lg-12 margin-left-five"><h3><?php echo $page_userBlockTitle ?></h3></div>
+<div class="col-md-12 margin-left-five"><h3><?php echo $page_userBlockTitle ?></h3></div>
 
 <div class='item margin-padding-admin-table padding-bottom'>
     <table class="display course-table table table-bordered table-striped table-hover data-table">

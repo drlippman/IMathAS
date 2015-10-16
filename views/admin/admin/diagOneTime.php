@@ -19,12 +19,12 @@ $this->params['breadcrumbs'] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
     <br/>
     <?php
-    echo '<span class=col-lg-4><b>' . $nameOfDiag['name'] . '</b></span><br/><br/>';
+    echo '<span class=col-md-4><b>' . $nameOfDiag['name'] . '</b></span><br/><br/>';
     if (isset($params['generate'])) {
         if (isset($params['n'])) {
 
-            echo "<span class=col-lg-3>Newly generated passwords</b></span> <span class=col-lg-2><a href=" . AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&view=true') . ">View all</a></span><br><br/>";
-            echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
+            echo "<span class=col-md-3>Newly generated passwords</b></span> <span class=col-md-2><a href=" . AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&view=true') . ">View all</a></span><br><br/>";
+            echo '<div class="col-md-12"><table class="table table-bordered table-striped table-hover data-table">
                 <thead>
                     <tr>
                     <th style="text-align: center">' . AppUtility::t('Codes', false) . '</th>
@@ -38,17 +38,17 @@ $this->params['breadcrumbs'] = $this->title;
             echo '</tbody></table></div>';
         } else {
             echo "<form method='post' action='diag-one-time?id=$diag&generate=true'>";
-            echo '<div class="col-lg-6"><div class="col-lg-2 padding-top-five">' . AppUtility::t('Generate', false) . '</div><div class="col-lg-2 padding-left-zero"><input type="text" class="form-control" size="1" value="1" name="n" /></div><div class="col-lg-1 padding-left-zero padding-top-five">passwords </div><br/><br>';
-            echo '<div class="col-lg-12"><div class="col-lg-4 padding-left-zero padding-top-five">' . AppUtility::t('Allow multi-use within', false) . '</div><div class="col-lg-2 padding-left-zero"><input type="text" class="form-control" size="1" value="0" name="multi" /></div><div class="col-lg-6 padding-left-zero padding-top-five">' . AppUtility::t('minutes (0 for one-time-only use)', false) . '</div></div>';
-            echo '<br/><span class="col-lg-6"><input type="submit" value="Go" /></span>';
+            echo '<div class="col-md-6"><div class="col-md-2 padding-top-five">' . AppUtility::t('Generate', false) . '</div><div class="col-md-2 padding-left-zero"><input type="text" class="form-control" size="1" value="1" name="n" /></div><div class="col-md-1 padding-left-zero padding-top-five">passwords </div><br/><br>';
+            echo '<div class="col-md-12"><div class="col-md-4 padding-left-zero padding-top-five">' . AppUtility::t('Allow multi-use within', false) . '</div><div class="col-md-2 padding-left-zero"><input type="text" class="form-control" size="1" value="0" name="multi" /></div><div class="col-md-6 padding-left-zero padding-top-five">' . AppUtility::t('minutes (0 for one-time-only use)', false) . '</div></div>';
+            echo '<br/><span class="col-md-6"><input type="submit" value="Go" /></span>';
             echo '</form>';
         }
     } else if (isset($_GET['delete'])) {
     } else {
-        echo "<div class=col-lg-3><b>" . AppUtility::t('All one-time passwords', false) . "</b></div> <div class=col-lg-1><a href=" . AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&generate=true') . " ?>Generate</a></div>
-             <div class=col-lg-1><a href='#' onclick=deleteAll($diag)>Delete All</a></div><br/><br/>";
-//             <div class=col-lg-1><a href=" .AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&delete=check') ." onclick=deleteAll($diag)>Delete All</a></div><br/><br/>";
-        echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
+        echo "<div class=col-md-3><b>" . AppUtility::t('All one-time passwords', false) . "</b></div> <div class=col-md-1><a href=" . AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&generate=true') . " ?>Generate</a></div>
+             <div class=col-md-1><a href='#' onclick=deleteAll($diag)>Delete All</a></div><br/><br/>";
+//             <div class=col-md-1><a href=" .AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&delete=check') ." onclick=deleteAll($diag)>Delete All</a></div><br/><br/>";
+        echo '<div class="col-md-12"><table class="table table-bordered table-striped table-hover data-table">
                     <thead>
                         <tr>
                             <th style="text-align: center">' . AppUtility::t('Codes', false) . '</th>

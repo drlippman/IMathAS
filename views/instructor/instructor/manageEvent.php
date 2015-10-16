@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php }?>
             </tbody>
         </table>
-        <div class="col-lg-offset-1 event-submit">
+        <div class="col-md-offset-1 event-submit">
             <?= Html::submitButton('Save Changes', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit','value'=>'Save']) ?>
         </div>
         <h4>Add New Events</h4>
@@ -86,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td ><?= $form->field($model, 'newEventDetails')->textInput(); ?></td></tr>
             </tbody>
         </table>
-        <div class="col-lg-offset-1 event-submit">
+        <div class="col-md-offset-1 event-submit">
             <?= Html::submitButton('Save and Add another', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit','value'=>'AddSave']) ?>
             <?= Html::submitButton('Save Changes', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit','value'=>'Save',]) ?>
         </div>

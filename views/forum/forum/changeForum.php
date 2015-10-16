@@ -54,8 +54,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr">
                     <td><input type="checkbox" name="chg-avail" class="chgbox"/></td>
-                    <td class="col-lg-2"><?php AppUtility::t('Visibility')?></td>
-                    <td class="col-lg-10">
+                    <td class="col-md-2"><?php AppUtility::t('Visibility')?></td>
+                    <td class="col-md-10">
                         <input type=radio name="avail" value="1" checked="checked"/><span
                             class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
                         <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail"
@@ -68,8 +68,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-post-by" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Students can create new threads')?></td>
-                    <td class="col-lg-10">
+                    <td class=col-md-2><?php AppUtility::t('Students can create new threads')?></td>
+                    <td class="col-md-10">
                         <input type=radio name="post" value="Always" checked="checked"><span
                             class="padding-left"><?php AppUtility::t('Always')?></span><br>
                         <input type=radio name="post" value="Never"><span
@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <input type=radio name="post" class="pull-left " value="Date">
                         <?php
                         echo '<label class="end pull-left non-bold padding-left"> Before</label>';
-                        echo '<div class = "col-lg-4 time-input">';
+                        echo '<div class = "col-md-4 time-input">';
                         echo DatePicker::widget([
                             'name' => 'postDate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '</div>'; ?>
                         <?php
                         echo '<label class="end pull-left non-bold"> at </label>';
-                        echo '<div class=" col-lg-6">';
+                        echo '<div class=" col-md-6">';
                         echo TimePicker::widget([
                             'name' => 'postTime',
                             'pluginOptions' => [
@@ -102,15 +102,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-reply-by" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Students can reply to posts')?></td>
-                    <td class="col-lg-10">
+                    <td class=col-md-2><?php AppUtility::t('Students can reply to posts')?></td>
+                    <td class="col-md-10">
                         <input type=radio name="reply" value="Always" checked="checked"><span
                             class="padding-left"><?php AppUtility::t('Always')?></span><br>
                         <input type=radio name="reply" value="Never"><span
                             class="padding-left"><?php AppUtility::t('Never')?></span><br>
                         <input type=radio name="reply" class="pull-left " value="Date">
                          <label class="end pull-left non-bold padding-left"><?php AppUtility::t('Before')?></label>
-                        <?php echo '<div class = "col-lg-4 time-input">';
+                        <?php echo '<div class = "col-md-4 time-input">';
                         echo DatePicker::widget([
                             'name' => 'replyByDate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -123,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '</div>'; ?>
                         <?php
                         echo '<label class="end pull-left non-bold"> at </label>';
-                        echo '<div class=" col-lg-6">';
+                        echo '<div class=" col-md-6">';
                         echo TimePicker::widget([
                             'name' => 'replyByTime',
                             'pluginOptions' => [
@@ -137,8 +137,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-cal-tag" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Calendar icon')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Calendar icon')?></td>
+                    <td class=col-md-10>
                         <?php AppUtility::t('New Threads')?><span class="padding-left"><input type="text"
                                                                                               name="cal-tag-post"
                                                                                               value="FP"
@@ -151,40 +151,40 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-allow-anon" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Allow anonymous posts')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Allow anonymous posts')?></td>
+                    <td class=col-md-10>
                         <input type="checkbox" name="allow-anonymous-posts" value="1"><br>
                     </td>
                 </tr>
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-allow-mod" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Allow students to modify posts')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Allow students to modify posts')?></td>
+                    <td class=col-md-10>
                         <input type="checkbox" name="allow-students-to-modify-posts" value="1"><br>
                     </td>
                 </tr>
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-allow-del" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Allow students to delete own posts (if no replies)')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Allow students to delete own posts (if no replies)')?></td>
+                    <td class=col-md-10>
                         <input type="checkbox" name="allow-students-to-delete-own-posts" value="1"><br>
                     </td>
                 </tr>
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-allow-likes" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Turn on "liking" posts')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Turn on "liking" posts')?></td>
+                    <td class=col-md-10>
                         <input type="checkbox" name="like-post" value="1"><br>
                     </td>
                 </tr>
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-view-before-post" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Viewing before posting')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Viewing before posting')?></td>
+                    <td class=col-md-10>
                         <input type="checkbox" name="viewing-before-posting" value="1">
                         <label class="padding-left non-bold"><?php AppUtility::t('Prevent students from viewing posts until they have created a thread.
                             You will likely also want to disable modifying posts')?></label>
@@ -193,16 +193,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-subscribe" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Get email notify of new posts')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Get email notify of new posts')?></td>
+                    <td class=col-md-10>
                         <input type="checkbox" name="Get-email-notify-of-new-posts" value="1"><br>
                     </td>
                 </tr>
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-def-display" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Default display')?></td>
-                    <td class=col-lg-4>
+                    <td class=col-md-2><?php AppUtility::t('Default display')?></td>
+                    <td class=col-md-4>
                         <select name="default-display" class="form-control">
                             <option value="0"><?php AppUtility::t('Expanded');?></option>
                             <option value="1"><?php AppUtility::t('Collapsed');?></option>
@@ -213,8 +213,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-sort-by" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Sort threads by')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Sort threads by')?></td>
+                    <td class=col-md-10>
                         <input type=radio name="sort-thread" value="0" checked/><span
                             class="padding-left"><?php AppUtility::t('Thread start date')?></span><br>
                         <input type=radio name="sort-thread" value="1"/><span
@@ -224,8 +224,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-cnt-in-gb" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Count')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Count')?></td>
+                    <td class=col-md-10>
                         <input type=radio name="count-in-gradebook" value="0" checked/><span
                             class="padding-left"><?php AppUtility::t('No')?></span><br>
                         <input type=radio name="count-in-gradebook" value="1"/><span
@@ -240,16 +240,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-gb-cat" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Gradebook Category')?></td>
-                    <td class=col-lg-4>
+                    <td class=col-md-2><?php AppUtility::t('Gradebook Category')?></td>
+                    <td class=col-md-4>
                         <?php AssessmentUtility::writeHtmlSelect("gradebook-category", $gbCatsId, $gbCatsLabel, null, "Default", 0, " id=gbcat"); ?>
                     </td>
                 </tr>
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-forum-type" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Forum Type')?></td>
-                    <td class=col-lg-10>
+                    <td class=col-md-2><?php AppUtility::t('Forum Type')?></td>
+                    <td class=col-md-10>
                         <input type=radio name="forum-type" checked value="0"/><span
                             class="padding-left"><?php AppUtility::t('Regular forum')?></span><br>
                         <input type=radio name="forum-type" value="1"/><span
@@ -259,8 +259,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-tag-list" class="chgbox"/></td>
-                    <td class=col-lg-2><?php AppUtility::t('Categorize posts?')?></td>
-                    <td class=col-lg-6>
+                    <td class=col-md-2><?php AppUtility::t('Categorize posts?')?></td>
+                    <td class=col-md-6>
                         <input type=checkbox name="use-tags" value="1" <?php if ($defaultValue['tagList'] != '') {
                             echo "checked=1";
                         } ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/>

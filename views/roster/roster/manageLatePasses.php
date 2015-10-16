@@ -25,8 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
     'options' => ['class' => 'form-horizontal'],
     'action' => '',
     'fieldConfig' => [
-        'template' => "{label}\n<div class=\"col-lg-6\">{input}</div>\n<div class=\"col-lg-8 col-lg-offset-4\">{error}</div>",
-        'labelOptions' => ['class' => 'col-lg-4'],
+        'template' => "{label}\n<div class=\"col-md-6\">{input}</div>\n<div class=\"col-md-8 col-md-offset-4\">{error}</div>",
+        'labelOptions' => ['class' => 'col-md-4'],
     ],
 ]); ?>
     <p><?php AppUtility::t('Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.

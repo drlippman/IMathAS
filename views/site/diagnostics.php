@@ -60,11 +60,11 @@ $pagetitle =$line['name'];
 <div class="tab-content shadowBox non-nav-tab-item">
     <br>
 <form method=post action="diagnostics?id=<?php echo $diagid; ?>">
-    <div class=col-lg-2><?php echo $line['idprompt']; ?></div>
-    <div class="col-lg-6"><input class="form form-control-1" type=text  size=12 name=SID></div><BR class=form>
-    <div class="col-lg-2 select-text-margin"><?php echo _('Enter First Name'); ?></div>
-    <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=firstname></div><BR class=form>
-    <div class="col-lg-2 select-text-margin"><?php echo _('Enter Last Name'); ?></div> <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=lastname></div><BR class=form>
+    <div class=col-md-2><?php echo $line['idprompt']; ?></div>
+    <div class="col-md-6"><input class="form form-control-1" type=text  size=12 name=SID></div><BR class=form>
+    <div class="col-md-2 select-text-margin"><?php echo _('Enter First Name'); ?></div>
+    <div class="col-md-6"><input class="form form-control-1" type=text size=20 name=firstname></div><BR class=form>
+    <div class="col-md-2 select-text-margin"><?php echo _('Enter Last Name'); ?></div> <div class="col-md-6"><input class="form form-control-1" type=text size=20 name=lastname></div><BR class=form>
 
     <script type="text/javascript">
         var teach = new Array();
@@ -89,8 +89,8 @@ $pagetitle =$line['name'];
         }
     </script>
 
-    <div class="col-lg-2 select-text-margin"><?php printf(_('Select your %s'), $line['sel1name']); ?></div>
-    <div class=col-lg-4>
+    <div class="col-md-2 select-text-margin"><?php printf(_('Select your %s'), $line['sel1name']); ?></div>
+    <div class=col-md-4>
     <select name="course" class="form-control" id="course" onchange="getteach()">
     <option value="-1"><?php printf(_('Select a %s'), $line['sel1name']); ?></option>
     <?php
@@ -100,8 +100,8 @@ $pagetitle =$line['name'];
     ?>
 </select></div><br class=form><br class=form>
 
-    <div class="col-lg-2 select-text-margin"><?php printf(_('Select your %s'), $line['sel2name']); ?></div>
-    <div class=col-lg-4>
+    <div class="col-md-2 select-text-margin"><?php printf(_('Select your %s'), $line['sel2name']); ?></div>
+    <div class=col-md-4>
         <select name="teachers" class="form-control" id="teachers">
             <option value="not selected"><?php printf(_('Select a %s first'), $line['sel1name']); ?></option>
         </select>
@@ -109,8 +109,8 @@ $pagetitle =$line['name'];
 
     <?php
     if (!$noproctor) {
-        echo "<b><div class='col-lg-12'>", _('This test can only be accessed from this location with an access password'), "</div></b></br>\n";
-        echo "<div class='col-lg-2 select-text-margin'>", _('Access password'), "</div>  <div class='col-lg-4'><input class='form form-control-1' type=password size=40 name=passwd></div><BR class=form>";
+        echo "<b><div class='col-md-12'>", _('This test can only be accessed from this location with an access password'), "</div></b></br>\n";
+        echo "<div class='col-md-2 select-text-margin'>", _('Access password'), "</div>  <div class='col-md-4'><input class='form form-control-1' type=password size=40 name=passwd></div><BR class=form>";
     }
     ?>
     <div class="header-btn col-sm-4 col-sm-offset-2 padding-top-fifteen padding-bottom-thirty">
@@ -139,7 +139,7 @@ $pagetitle =$line['name'];
     }
     ?>
 </form>
-<div id="bsetup" class="col-lg-10">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div><br>
+<div id="bsetup" class="col-md-10">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div><br>
 </div>
 <script type="text/javascript">
     function determinesetup() {

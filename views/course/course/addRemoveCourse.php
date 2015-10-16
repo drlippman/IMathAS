@@ -17,11 +17,11 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
-<div class="col-lg-12"><h3>Current Teachers</h3></div>
+<div class="col-md-12"><h3>Current Teachers</h3></div>
 <input type="hidden" class="course-id" value="<?php echo $cid ?>">
 
 <div>
-    <div class="col-lg-10 pull-left select-text-margin">
+    <div class="col-md-10 pull-left select-text-margin">
         <strong>With Selected:</strong>&nbsp;&nbsp;
 
     <a class='btn btn-primary addRemoveTeacherButton addButton addTeacherButton-"+nonTeacher.id+" '
@@ -31,10 +31,10 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<div class="col-lg-12"><h3>Potential Teachers</h3></div>
+<div class="col-md-12"><h3>Potential Teachers</h3></div>
 
 <div>
-    <div class="col-lg-10 pull-left select-text-margin">
+    <div class="col-md-10 pull-left select-text-margin">
         <strong>With Selected:</strong> &nbsp;&nbsp;
         <table class="addRemoveTable non-teachers" id="nonTeach">
             <a class='btn btn-primary addRemoveTeacherButton removeButton removeTeacherButton-"+teacher.id+" '

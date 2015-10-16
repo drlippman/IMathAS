@@ -121,7 +121,7 @@ $now = $currentTime;
                             <input type=radio name="always-replies" value="3"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::NUMERIC_THREE);?> >
                             <span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td></div>
                 <?php
-                echo '<div class = "col-lg-4 time-input" id="datepicker-id">';
+                echo '<div class = "col-md-4 time-input" id="datepicker-id">';
                 echo DatePicker::widget([
                     'name' => 'startDate',
                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -132,8 +132,8 @@ $now = $currentTime;
                 ]);
                 echo '</div>';?>
                 <?php
-                echo '<label class="end col-lg-1 select-text-margin margin-right-minus-thirtythree">At</label>';
-                echo '<div class="pull-left col-lg-4">';
+                echo '<label class="end col-md-1 select-text-margin margin-right-minus-thirtythree">At</label>';
+                echo '<div class="pull-left col-md-4">';
                 echo TimePicker::widget([
                     'name' => 'startTime',
                     'options' => ['placeholder' => 'Select operating time ...'],

@@ -16,7 +16,7 @@ $this->title = $course->name;
 <div class="tab-content shadowBox non-nav-tab-item">
     <div class="padding-left padding-top-fifteen">
             <h3><b><?php echo $links->title ?></b></h3>
-            <div class="col-lg-3">
+            <div class="col-md-3">
                 <h5><?php echo $links->text?></h5>
             </div>
     </div>
@@ -31,7 +31,7 @@ $this->title = $course->name;
     <br>
     <br>
     <br>
-    <div class="col-lg-12 align-linked-text-right">
+    <div class="col-md-12 align-linked-text-right">
         <?php if($user->rights == 10){?>
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
                 <?php } elseif($user->rights == 100 || $user->rights == 20){?>

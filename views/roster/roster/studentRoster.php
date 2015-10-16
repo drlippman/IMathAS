@@ -21,10 +21,10 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
-<div class="roster-upper-content col-lg-12">
-    <div class="page-title col-lg-8 pull-left"><?php AppUtility::t('Student Roster'); ?>
+<div class="roster-upper-content col-md-12">
+    <div class="page-title col-md-8 pull-left"><?php AppUtility::t('Student Roster'); ?>
     </div>
-    <div class="with-selected col-lg-2 pull-left">
+    <div class="with-selected col-md-2 pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><i class="fa fa-user ic"></i>&nbsp;<?php AppUtility::t('Pictures'); ?>
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </li>
         </ul>
     </div>
-    <div class="with-selected col-lg-2 pull-left">
+    <div class="with-selected col-md-2 pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"

@@ -53,8 +53,8 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
 
                     <div class="datetime form-group">
                         <?php
-                        echo '<label class="start col-lg-2 pull-left padding-top"> Start Time </label>';
-                        echo '<div class = "pull-left col-lg-3 time-input">';
+                        echo '<label class="start col-md-2 pull-left padding-top"> Start Time </label>';
+                        echo '<div class = "pull-left col-md-3 time-input">';
                         echo TimePicker::widget([
                             'name' => 'start_time',
                             'value' => $dispTime['startTime'],
@@ -64,8 +64,8 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                         ]);
                         echo '</div>';?>
                         <?php
-                        echo '<label class="end pull-left col-lg-2 padding-top"> End Time </label>';
-                        echo '<div class="pull-left col-lg-3">';
+                        echo '<label class="end pull-left col-md-2 padding-top"> End Time </label>';
+                        echo '<div class="pull-left col-md-3">';
                         echo TimePicker::widget([
                             'name' => 'end_time',
                             'value' => $dispTime['endTime'],

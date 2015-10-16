@@ -28,8 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'options' => ['class' => 'form-horizontal'],
                 'fieldConfig' => [
-                    'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                    'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
+                    'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-7 col-md-offset-2\">{error}</div>",
+                    'labelOptions' => ['class' => 'col-md-2 select-text-margin'],
                 ],
             ]
         ) ?>
@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $form->field($model, 'section')->textInput(array('placeholder' => AppUtility::t('Section', false))); ?>
         <?php echo $form->field($model, 'code')->textInput(array('placeholder' => AppUtility::t('Code', false))); ?>
         <div class="form-group">
-            <div class="col-lg-offset-2 col-lg-3">
+            <div class="col-md-offset-2 col-md-3">
                 <?php echo Html::submitButton(AppUtility::t('Enroll', false), ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
             </div>
         </div>

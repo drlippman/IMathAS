@@ -413,14 +413,14 @@ class AdminController extends AppController
             if (isset($params['id']) && $params['id'] != 0) {
                 $query = new Diags();
                 $id = $query->updateDiagnostics($params);
-                $page_successMsg = "<br/><div class='col-lg-12'>Diagnostic Updated</div><br/>";
+                $page_successMsg = "<br/><div class='col-md-12'>Diagnostic Updated</div><br/>";
             } else {
                 $query = new Diags();
                 $id = $query->saveDiagnostic($params, $userId);
-                $page_successMsg = "<BR class=form><div class='col-lg-2'>Diagnostic Added</div><br class='form'>";
+                $page_successMsg = "<BR class=form><div class='col-md-2'>Diagnostic Added</div><br class='form'>";
             }
-            $page_diagLink = "<BR/><div class=col-lg-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
-            $page_publicLink = ($params['public']&2) ? "<div class=col-lg-10>Diagnostic is listed on the public listing at <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></div><BR class=form><br>\n" : ""  ;
+            $page_diagLink = "<BR/><div class=col-md-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
+            $page_publicLink = ($params['public']&2) ? "<div class=col-md-10>Diagnostic is listed on the public listing at <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></div><BR class=form><br>\n" : ""  ;
 
         } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
             if (isset($params['id'])) {

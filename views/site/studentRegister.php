@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'EnrollmentKey') ?>
 
         <div class="form-group">
-             <div class="col-lg-offset-2 col-lg-9">
+             <div class="col-md-offset-2 col-md-9">
                 <?= Html::submitButton('Sign Up', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 &nbsp; &nbsp;<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
             </div>

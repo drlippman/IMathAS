@@ -38,8 +38,8 @@ $now = $currentTime;
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-5\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-1 control-label'],
+                'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-5\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-1 control-label'],
             ],
         ]); ?>
           <div class="pull right second-level-div">

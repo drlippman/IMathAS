@@ -47,11 +47,11 @@ if ($overwriteBody == 1) {
     var filteraddr = \"$imasroot\";";
 
     echo "var orderaddr = \"$imasroot1\";</script>";  ?>
-<div class="col-lg-12">
-    <div class="col-lg-6">
-        <?php echo '<div class="col-lg-3">Order by</div>
-        <div class="col-lg-6">
-         <select id="orderby" class="form-control col-lg-4" onchange="chgorderby()">';
+<div class="col-md-12">
+    <div class="col-md-6">
+        <?php echo '<div class="col-md-3">Order by</div>
+        <div class="col-md-6">
+         <select id="orderby" class="form-control col-md-4" onchange="chgorderby()">';
         echo '<option value="0" ';
         if ($orderby == 0) {
             echo 'selected="selected"';
@@ -76,11 +76,11 @@ if ($overwriteBody == 1) {
         echo '</select> </div>';
         ?>
     </div>
-    <div class="col-lg-6">
+    <div class="col-md-6">
         <?php
-        echo '<div class="col-lg-3">Filter by type</div>
-        <div class="col-lg-6">
-        <select id="filter" class="form-control col-lg-4" onchange="filteritems()">';
+        echo '<div class="col-md-3">Filter by type</div>
+        <div class="col-md-6">
+        <select id="filter" class="form-control col-md-4" onchange="filteritems()">';
         echo '<option value="all" ';
         if ($filter=='all') {echo 'selected="selected"';}
         echo '>All</option>';
@@ -107,20 +107,20 @@ if ($overwriteBody == 1) {
 </div>
 
 <?php
-    echo "<p class='col-lg-12'><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
-    echo "<div class='col-lg-12'>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
+    echo "<p class='col-md-12'><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
+    echo "<div class='col-md-12'>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
     echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
     echo "If you click the checkboxes on the left, you can limit the update to those items. ";
     echo "Click the <img src=\"$imasroot2/img/swap.gif\"> icon in each cell to swap from ";
     echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</div>";
     echo "<form id=\"qform\">";
 
-    echo '<div class="col-lg-12">
-    <div class="col-lg-4">
-    <div class="col-lg-2">Check</div>
-    <a href="#" class="col-lg-1" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a>
-    <a href="#"  class="col-lg-1" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a></div> ';?>
-    <div class="col-lg-8">
+    echo '<div class="col-md-12">
+    <div class="col-md-4">
+    <div class="col-md-2">Check</div>
+    <a href="#" class="col-md-1" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a>
+    <a href="#"  class="col-md-1" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a></div> ';?>
+    <div class="col-md-8">
 <?php
     echo 'Change selected items
     <select id="swaptype" onchange="chgswaptype(this)">
@@ -140,20 +140,20 @@ if ($overwriteBody == 1) {
         echo '<table class=gb>
         <thead>
         <tr><th></th>
-            <th class="col-lg-1">Name</th>
-            <th class="col-lg-1">Show</th>
-            <th class="col-lg-3">Start Date</th>
-            <th class="col-lg-3">End Date</th>
-            <th class="col-lg-3">Review Date</th>
-            <th class="col-lg-2">Send Date Chg / Copy Down List</th>
+            <th class="col-md-1">Name</th>
+            <th class="col-md-1">Show</th>
+            <th class="col-md-3">Start Date</th>
+            <th class="col-md-3">End Date</th>
+            <th class="col-md-3">Review Date</th>
+            <th class="col-md-2">Send Date Chg / Copy Down List</th>
         </thead>
         <tbody>';
     } else {
         echo '<table class=gb>
         <thead>
         <tr><th></th>
-            <th class="col-lg-1">Name</th>
-            <th class="col-lg-1">Type</th>
+            <th class="col-md-1">Name</th>
+            <th class="col-md-1">Type</th>
             <th>Show</th>
             <th>Start Date</th>
             <th>End Date</th>
@@ -237,7 +237,7 @@ if ($overwriteBody == 1) {
         }
         echo "<input type=hidden size=10 onblur=\"ob(this)\"/>";
         echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
-                                        echo '<div class = "col-lg-10 time-input"">';
+                                        echo '<div class = "col-md-10 time-input"">';
                                         echo DatePicker::widget([
                                             'name' => 'sdate'.$cnt,
                                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -253,7 +253,7 @@ if ($overwriteBody == 1) {
 //        echo "<input type=hidden size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 
                                         echo '<label class="end pull-left non-bold"> at </label>';
-                                        echo '<div class="col-lg-12 padding-top">';
+                                        echo '<div class="col-md-12 padding-top">';
                                         echo TimePicker::widget([
                                             'name' => 'postTime',
                                             'id' => 'stime'.$cnt,
@@ -294,7 +294,7 @@ if ($overwriteBody == 1) {
         echo "<input type=hidden size=10  onblur=\"ob(this)\"/>";
         echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
         //echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-                echo '<div class = "col-lg-10 time-input">';
+                echo '<div class = "col-md-10 time-input">';
                 echo DatePicker::widget([
                     'name' => 'edate'.$cnt,
                     'id' => 'edate'.$cnt,
@@ -308,7 +308,7 @@ if ($overwriteBody == 1) {
                 echo '</div>';
 //        echo " <input type=hidden size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
                 echo '<label class="end pull-left non-bold"> at </label>';
-                echo '<div class=" col-lg-12 padding-top">';
+                echo '<div class=" col-md-12 padding-top">';
                 echo TimePicker::widget([
                     'name' => 'etime'.$cnt,
                     'value' => $etime,
@@ -360,7 +360,7 @@ if ($overwriteBody == 1) {
             echo "<input type=hidden onblur=\"ob(this)\"/>(";
             echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
 
-            echo '<div class = "col-lg-10 time-input">';
+            echo '<div class = "col-md-10 time-input">';
             echo DatePicker::widget([
                 'name' => 'rdate'.$cnt,
                 'id' => 'rdate'.$cnt,
@@ -373,7 +373,7 @@ if ($overwriteBody == 1) {
             ]);
             echo '</div>';
             echo '<label class="end pull-left non-bold"> at </label>';
-            echo '<div class=" col-lg-12">';
+            echo '<div class=" col-md-12">';
             echo TimePicker::widget([
                 'name' => 'rtime'.$cnt,
                 'id' => 'rtime'.$cnt,
@@ -388,7 +388,7 @@ if ($overwriteBody == 1) {
             echo "</span>";
         }
         echo '</td>';
-        echo "<td class='col-lg-3'>
+        echo "<td class='col-md-3'>
         <select id=\"sel$cnt\" class='form-control col-sm-10' onchange=\"senddownselect(this);\">
         <option value=\"0\" selected=\"selected\">Action...</option>";
         echo '<option value="1">Send down date &amp; time changes</option>';

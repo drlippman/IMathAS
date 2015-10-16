@@ -29,8 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
+                'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-7 col-md-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-2 select-text-margin'],
             ],
         ]
     ) ?>
@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </div>
     <div class="form-group">
-        <div class="col-lg-11">
+        <div class="col-md-11">
             <br>
             <?php echo Html::submitButton(AppUtility::t('Choose Students', false), ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back');?></a>

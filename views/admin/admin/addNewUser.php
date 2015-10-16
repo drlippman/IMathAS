@@ -24,11 +24,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal col-lg-12'],
+            'options' => ['class' => 'form-horizontal col-md-12'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
+                'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-7 col-md-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-2 select-text-margin'],
             ],
         ]); ?><br/>
 
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $form->field($model, 'email')->textInput() ?>
 
         <?php echo $form->field($model, 'password')->passwordInput() ?>
-        <div class="col-lg-0 pull-left select-text-margin padding-left-zero">
+        <div class="col-md-0 pull-left select-text-margin padding-left-zero">
             <a href="#"  onclick="window.open('help-of-rights','helpOfRights','top=0,width=400,height=500,scrollbars=1,left=150')"><img
                     src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" class="help-img padding-left-zero"></a></div>
         <div class="rights_alignment">
@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="clear-both"></div>
         <?php echo $form->field($model, 'AssignToGroup')->dropDownList(array(''), ['prompt' => 'Default']) ?>
         <div class="form-group">
-            <div class="col-lg-offset-2 col-lg-5">
+            <div class="col-md-offset-2 col-md-5">
                 <?php echo Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
             </div>
         </div><br/>

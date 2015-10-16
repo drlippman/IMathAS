@@ -13,8 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-5\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-2'],
+            'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-5\">{error}</div>",
+            'labelOptions' => ['class' => 'col-md-2'],
         ],
     ]); ?>
 
@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
 
     <div class="form-group">
-        <div class="col-lg-offset-1 col-lg-11">
+        <div class="col-md-offset-1 col-md-11">
             <?= Html::submitButton('Delete', ['class' => 'btn btn-primary', 'name' => 'delete-button']) ?>
             <?= Html::submitButton('Nevermind', ['class' => 'btn btn-primary', 'name' => 'Nevermind-button']) ?>
         </div>

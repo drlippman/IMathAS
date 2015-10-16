@@ -19,9 +19,9 @@ use app\components\AppConstant;
 //        } else {
 //            echo $this->render('_guestMenu');
 //        } ?>
-        <div class="pagetitle col-lg-12" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?><span class="red"></span>
+        <div class="pagetitle col-md-12" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?><span class="red"></span>
         </div>
-        <div class="col-lg-12" id="homefullwidth">
+        <div class="col-md-12" id="homefullwidth">
             <?php
             if ($user->rights > AppConstant::GUEST_RIGHT)
             {

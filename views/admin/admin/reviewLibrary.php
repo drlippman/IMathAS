@@ -80,20 +80,20 @@ global $temp;
         } else {
             $page_nextLink = "Next";
         } ?>
-        <BR class=form><div class="col-lg-12"><?php echo $page_lastLink . " | " . $page_nextLink; ?></div><BR class=form><BR class=form>
+        <BR class=form><div class="col-md-12"><?php echo $page_lastLink . " | " . $page_nextLink; ?></div><BR class=form><BR class=form>
 
       <?php  if ($myq || $myLib)
         { ?>
           <?php  if ($myq) { ?>
                 <input type=hidden name=delete value="Delete">
                 <input type="hidden" id="admin" value="<?php echo $cid ?>">
-                <div class="col-lg-1 padding-right-zero">
+                <div class="col-md-1 padding-right-zero">
                     <input type=submit name=delete value=Delete onclick=deleteLibQuestion(<?php echo $source;?>,<?php echo $offset;?>,<?php echo $lib;?>)></div>
           <?php  }
             if ($myLib) { ?>
                 <input type=hidden name=remove value="Remove from Library">
                 <input type="hidden" id="admin" value="<?php echo $cid ?>">
-                <div class="col-lg-1 padding-left-zero">
+                <div class="col-md-1 padding-left-zero">
                     <input type=submit name=remove value="remove" onclick=removeLibQuestion(<?php echo $source;?>,<?php echo $offset;?>,<?php echo $lib;?>)></div><BR class=form>
 
           <?php  }
@@ -102,10 +102,10 @@ global $temp;
 
         <p style="color: red;"><?php echo $page_updatedMsg; ?></p>
 
-        <div class="col-lg-12"><h4><?php echo $qsetid ?>: <?php echo $lineQSet['description'] ?></h4></div>
+        <div class="col-md-12"><h4><?php echo $qsetid ?>: <?php echo $lineQSet['description'] ?></h4></div>
 
-        <div class="col-lg-12"><?php echo  $page_deleteForm; ?></div>
-        <div class="col-lg-12"><?php echo  $page_lastScore; ?></div>
+        <div class="col-md-12"><?php echo  $page_deleteForm; ?></div>
+        <div class="col-md-12"><?php echo  $page_lastScore; ?></div>
 
         <form method=post action="review-library?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>" onsubmit="doonsubmit()">
             <input type=hidden name=seed value="<?php echo $seed ?>">
@@ -115,20 +115,20 @@ global $temp;
             displayq(0,$qsetid,$seed,true,true,0);
             echo $temp;
             ?>
-            <BR class=form><div class="col-lg-12"><input type=submit value="Submit"></div>
+            <BR class=form><div class="col-md-12"><input type=submit value="Submit"></div>
         </form>
         <?php
         if ($source == AppConstant::NUMERIC_ZERO) {
-            echo "	<BR class=form><BR class=form><div class='col-lg-12'><a href=\"review-library?cid=$cid&offset=$offset&lib=$lib&source=1\">View/Modify Question Code</a></div><BR class='form'><BR class='form'>\n";
+            echo "	<BR class=form><BR class=form><div class='col-md-12'><a href=\"review-library?cid=$cid&offset=$offset&lib=$lib&source=1\">View/Modify Question Code</a></div><BR class='form'><BR class='form'>\n";
         } else {
             ?>
-            <BR class="form"><BR class="form"><div class="col-lg-12">
+            <BR class="form"><BR class="form"><div class="col-md-12">
                 <a href="review-library?cid=<?php echo $cid ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>&source=0">
                     <?php AppUtility::t("Don't show Question Code")?>
                 </a>
             </div><BR class="form"><BR class="form">
             <form method=post action="review-library?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>">
-                <div class="col-lg-12"><?php echo $page_canModifyMsg; ?></div>
+                <div class="col-md-12"><?php echo $page_canModifyMsg; ?></div>
 
 
                 <script>
@@ -155,12 +155,12 @@ global $temp;
                     }
                 </script>
 
-               <div class="col-lg-12"> <input type=submit name="update" value="Update"></div> <BR class="form"><BR class="form">
+               <div class="col-md-12"> <input type=submit name="update" value="Update"></div> <BR class="form"><BR class="form">
 
-               <div class="col-lg-12"><?php AppUtility::t('Description')?></div> <BR>
-                <div class="col-lg-4"><textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['description'];?></textarea></div><BR class=form>
+               <div class="col-md-12"><?php AppUtility::t('Description')?></div> <BR>
+                <div class="col-md-4"><textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['description'];?></textarea></div><BR class=form>
 
-                <BR class="form"><div class="col-lg-12">
+                <BR class="form"><div class="col-md-12">
                     <?php AppUtility::t('Question type')?>
                     <select class="form-control-1" name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
                         <option value="number" <?php if ($lineQSet['qtype']=="number") {echo "SELECTED";} ?>>Number</option>
@@ -184,25 +184,25 @@ global $temp;
                         <option value="multipart" <?php if ($lineQSet['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
                     </select>
                 </div><BR class=form><BR class="form">
-                <div class="col-lg-12">
+                <div class="col-md-12">
                     <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL()?>help.php?section=writingquestions','Help','width=400,height=300,toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420))">Writing Questions Help</a>
                     <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL()?>/assessment/libs/libhelp.php','Help','width=400,height=300,toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420))">Macro Library Help</a><BR></div><BR class="form"><BR class="form">
-                <div class="col-lg-12">    <?php AppUtility::t('Switch to')?>
+                <div class="col-md-12">    <?php AppUtility::t('Switch to')?>
                     <input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($lineQSet['qcontrol']!='' || $lineQSet['answer']!='') echo "DISABLED"; ?>/><BR class="form">
                 </div><BR class="form"><BR class="form">
-                <div id=ccbox class="col-lg-12">
+                <div id=ccbox class="col-md-12">
                     <?php AppUtility::t('Common Control')?>
                     <span class=pointer onclick="incboxsize('control')">[+]</span>
                     <span class=pointer onclick="decboxsize('control')">[-]</span><BR>
                     <textarea cols=60 rows=<?php if ($twobx) {echo "20";} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['control'];?></textarea>
                 </div><BR class="form">
-                <div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?> class="col-lg-12">
+                <div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?> class="col-md-12">
                     <?php AppUtility::t('Question Control')?>
                     <span class=pointer onclick="incboxsize('qcontrol')">[+]</span>
                     <span class=pointer onclick="decboxsize('qcontrol')">[-]</span><BR>
                     <textarea cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['qcontrol'];?></textarea>
                 </div><BR class="form">
-                <div id=qtbox class="col-lg-12">
+                <div id=qtbox class="col-md-12">
                     <?php AppUtility::t('Question Text')?>
                     <span class=pointer onclick="incboxsize('qtext')">[+]</span>
                     <span class=pointer onclick="decboxsize('qtext')">[-]</span><BR>
@@ -214,7 +214,7 @@ global $temp;
                     <span class=pointer onclick="decboxsize('answer')">[-]</span><BR>
                     <textarea cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $lineQSet['answer'];?></textarea>
                 </div><BR class="form">
-                <div class="col-lg-12"><input type=submit name="update" value="Update"></div><BR class="form">
+                <div class="col-md-12"><input type=submit name="update" value="Update"></div><BR class="form">
             </form><BR class="form">
 
         <?php

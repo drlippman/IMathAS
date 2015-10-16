@@ -50,10 +50,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <form id="pform" method=post action="export-question-set?cid=<?php echo $cid ?>">
             <br/>
 
-            <div class="col-lg-12"><h3><?php AppUtility::t('Questions Marked for Export') ?></h3></div>
+            <div class="col-md-12"><h3><?php AppUtility::t('Questions Marked for Export') ?></h3></div>
             <?php
             if (count($checked) == AppConstant::NUMERIC_ZERO) {
-                echo "<div class='col-lg-12'>".AppUtility::t('No Questions currently marked for export',false)."</div>\n";
+                echo "<div class='col-md-12'>".AppUtility::t('No Questions currently marked for export',false)."</div>\n";
             } else {
                 ?>
                 <?php AppUtility::t('Check') ?>
@@ -99,15 +99,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
             if (isset($_POST['finalize'])) {
             ?>
-            <div class="col-lg-12"><h3><?php AppUtility::t('Export Settings') ?></h3></div>
-            <div class=col-lg-2><?php AppUtility::t('Library Description') ?></div>
-            <div class=col-lg-6>
+            <div class="col-md-12"><h3><?php AppUtility::t('Export Settings') ?></h3></div>
+            <div class=col-md-2><?php AppUtility::t('Library Description') ?></div>
+            <div class=col-md-6>
                 <textarea name="libdescription" rows=4 cols=60></textarea>
             </div>
             <br class=form><br/>
 
-            <div class=col-lg-2><?php AppUtility::t('Library Name') ?></div>
-            <div class=col-lg-6><input type=text name="libname" size="40"/></div>
+            <div class=col-md-2><?php AppUtility::t('Library Name') ?></div>
+            <div class=col-md-6><input type=text name="libname" size="40"/></div>
             <br class=form>
 
             <div class=submit><input name="export" type=submit value="Export"></div>
@@ -116,19 +116,19 @@ $this->params['breadcrumbs'][] = $this->title;
     } else {
     ?>
 
-        <div class="col-lg-12"><h3><?php AppUtility::t('Potential Questions') ?></h3></div>
-        <div class="col-lg-12"><?php AppUtility::t('In Libraries') ?><span id="libnames"
+        <div class="col-md-12"><h3><?php AppUtility::t('Potential Questions') ?></h3></div>
+        <div class="col-md-12"><?php AppUtility::t('In Libraries') ?><span id="libnames"
                                                                            class="padding-left-fifteen"><?php echo $lnames ?></span>
             <input type=hidden name="libs" id="libs" value="<?php echo $searchlibs ?>">
             <input type=button value="Select Libraries" onClick="libselect()"></div><br class=form><br class=form>
-        <div class="col-lg-12"><?php AppUtility::t('Search') ?>
+        <div class="col-md-12"><?php AppUtility::t('Search') ?>
             <span class="padding-left-fifteen">
                 <input type=text size=15 class="form-control-1" name=search value="<?php echo $search ?>"></span>
             <input type=submit value="Update and Search">
             <input type=submit name="finalize" value="Finalize"><BR></div>
     <?php
     if ($page_hasSearchResults == AppConstant::NUMERIC_ZERO) {
-        echo "<div class='col-lg-12'>".AppUtility::t('No Questions matched search',false)."</div>\n";
+        echo "<div class='col-md-12'>".AppUtility::t('No Questions matched search',false)."</div>\n";
     } else {
     ?>
     <?php AppUtility::t('Check') ?>
@@ -171,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </script>
     <?php
     }
-        echo "<div class='col-lg-12'>".AppUtility::t(' Note: Export of questions with static image files is not yet supported.')."</div>";
+        echo "<div class='col-md-12'>".AppUtility::t(' Note: Export of questions with static image files is not yet supported.')."</div>";
     }
         echo "</form>";
     }

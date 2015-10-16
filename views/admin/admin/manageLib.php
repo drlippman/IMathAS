@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
     echo $body;
 } else {
     ?>
-    <div class="col-lg-10">
+    <div class="col-md-10">
         <?php
         if (isset($_POST['remove'])) {
             ?>
@@ -58,13 +58,13 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             <form method=post action="manage-lib?cid=<?php echo $cid ?>">
                 <input type=hidden name=chgrights value="<?php echo $tlist ?>">
-                <div class="col-lg-10 padding-left-zero"><div class="col-lg-3 padding-left-zero"><?php AppUtility::t('Library use rights')?> </div>
-		<div class="col-lg-4 padding-left-zero">
+                <div class="col-md-10 padding-left-zero"><div class="col-md-3 padding-left-zero"><?php AppUtility::t('Library use rights')?> </div>
+		<div class="col-md-4 padding-left-zero">
 			<?php AppUtility::writeHtmlSelect ("newrights",$page_libRightsVal,$page_libRightsLabel,$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</div></div><br class=form><br/>
-                <div class="col-lg-10 padding-left-zero">
-                    <div class="col-lg-2 padding-left-zero"><input type=submit value="Change Rights"></div>
-                    <div class="col-lg-3 padding-left-zero"><input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'"></div>
+                <div class="col-md-10 padding-left-zero">
+                    <div class="col-md-2 padding-left-zero"><input type=submit value="Change Rights"></div>
+                    <div class="col-md-3 padding-left-zero"><input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'"></div>
                 </div>
             </form>
         <?php
@@ -72,8 +72,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             <form method=post action="managelibs.php?cid=<?php echo $cid ?>">
                 <input type=hidden name=setparent value="<?php echo $tlist ?>">
-                <div class="col-lg-10 padding-left-zero"><div class="col-lg-3 padding-left-zero"><?php AppUtility::t('New Parent Library')?></div>
-                    <div class="col-lg-3 padding-left-zero">
+                <div class="col-md-10 padding-left-zero"><div class="col-md-3 padding-left-zero"><?php AppUtility::t('New Parent Library')?></div>
+                    <div class="col-md-3 padding-left-zero">
                         <span id="libnames"></span>
                         <input type=hidden name="libs" id="libs"  value="<?php echo $parent ?>">
                         <input type=button value="Select Library" onClick="libselect()">
@@ -124,28 +124,28 @@ $this->params['breadcrumbs'][] = $this->title;
         } else if (isset($_GET['modify'])) {
     ?>
     <form method=post action="manage-lib?cid=<?php echo $cid ?>&modify=<?php echo $_GET['modify'] ?>">
-        <div class=col-lg-2><?php AppUtility::t('Library Name')?></div>
-        <div class=col-lg-10><input type=text class="form-control-1" name="name" maxlength="60" required="Please fill out this field." value="<?php echo $name ?>" size=20></div><br class=form><br>
-        <div class=col-lg-2><?php AppUtility::t('Rights')?> </div>
-		<div class=col-lg-4>
+        <div class=col-md-2><?php AppUtility::t('Library Name')?></div>
+        <div class=col-md-10><input type=text class="form-control-1" name="name" maxlength="60" required="Please fill out this field." value="<?php echo $name ?>" size=20></div><br class=form><br>
+        <div class=col-md-2><?php AppUtility::t('Rights')?> </div>
+		<div class=col-md-4>
 			<?php AppUtility::writeHtmlSelect ("rights",$page_libRightsVal,$page_libRightsLabel,$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</div><br class=form><br>
 
-        <div class=col-lg-2><?php AppUtility::t('Sort order')?></div>
-		<div class=col-lg-10>
+        <div class=col-md-2><?php AppUtility::t('Sort order')?></div>
+		<div class=col-md-10>
 			<input type="radio" name="sortorder" value="0" <?php AppUtility::writeHtmlChecked($sortorder,0); ?> /><span class="padding-left-five"><?php AppUtility::t('Creation date')?></span><br/>
 			<input type="radio" name="sortorder" value="1" <?php AppUtility::writeHtmlChecked($sortorder,1); ?> /><span class="padding-left-five"><?php AppUtility::t('Alphabetical')?></span>
 		</div><br class=form><br>
 
-        <div class=col-lg-2><?php AppUtility::t('Parent Library')?></div>
-		<div class=col-lg-10>
+        <div class=col-md-2><?php AppUtility::t('Parent Library')?></div>
+		<div class=col-md-10>
 			<span id="libnames"><?php echo $lnames ?></span>
 			<input type=hidden name="libs" id="libs"  value="<?php echo $parent ?>">
 			<input type=button value="Select Library" onClick="libselect()">
 		</div><br class=form><br>
-        <div class="submit col-lg-10">
-           <div class="col-lg-2 padding-left-zero"> <input type=submit value="Save Changes"></div>
-           <div class="col-lg-6"><input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'"></div>
+        <div class="submit col-md-10">
+           <div class="col-md-2 padding-left-zero"> <input type=submit value="Save Changes"></div>
+           <div class="col-md-6"><input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'"></div>
         </div><br/>
     </form><br/>
 
@@ -156,12 +156,12 @@ $this->params['breadcrumbs'][] = $this->title;
         echo $page_AdminModeMsg;
   ?></div><BR class=form><br>
 <form method=post action="manage-lib?cid=<?php echo $cid ?>">
-    <div class="col-lg-12"><input type=button value="Add New Library" onclick="window.location='manage-lib?modify=new&cid=<?php echo $cid ?>'"></div>
+    <div class="col-md-12"><input type=button value="Add New Library" onclick="window.location='manage-lib?modify=new&cid=<?php echo $cid ?>'"></div>
 </form>
 
 <form id="qform" method=post action="manage-lib?cid=<?php echo $cid ?>">
 		<div>
-<div class="col-lg-12"><?php AppUtility::t('Check')?> <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
+<div class="col-md-12"><?php AppUtility::t('Check')?> <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
 With Selected: <input type=submit name="transfer" value="Transfer" title="Transfer library ownership">
 <input type=submit name="remove" value="Delete" title="Delete library">
 <input type=submit name="setparent" value="Change Parent" title="Change the parent library">
@@ -170,7 +170,7 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
 
 </div>
             </div>
-<div class="col-lg-12">
+<div class="col-md-12">
     Root
 <ul class=base>
     <?php
@@ -182,7 +182,7 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
     ?>
 </ul>
 </div>
-<div class="col-lg-12">
+<div class="col-md-12">
     <b><?php AppUtility::t('Color Code')?></b><br/>
     <span class=r8><?php AppUtility::t('Open to all')?></span><br/>
     <span class=r4><?php AppUtility::t('Closed')?></span><br/>

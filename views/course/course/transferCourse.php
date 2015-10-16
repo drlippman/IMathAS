@@ -13,8 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class=mainbody>
     <div id="headeradmin" class="pagetitle"><h2>Transfer Course Owner</h2></div>
     <div class="form-group">
-        <label class="col-lg-3 label-text-margin pull-left">Transfer course ownership to</label>
-        <div class="col-lg-3 pull-left">
+        <label class="col-md-3 label-text-margin pull-left">Transfer course ownership to</label>
+        <div class="col-md-3 pull-left">
             <select name="seluid" class="dropdown form-control" id="seluid">
                 <option value="0">Select a user..</option>
                 <?php foreach ($users as $user) { ?>
@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <div class="clear-both"></div>
-    <div class="col-lg-offset-3 buttonAlignment">
+    <div class="col-md-offset-3 buttonAlignment">
         <a class="btn btn-primary transfer">Transfer</a>
         <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index'); ?>">Back</a>
     </div>

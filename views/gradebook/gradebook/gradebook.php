@@ -60,13 +60,13 @@ $stu = $data['defaultValuesArray']['studentId']
 <?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
 <div class="tab-content shadowBox"">
 <div class="inner-content-gradebook">
-<div class="button-container col-lg-12 padding-zero">
+<div class="button-container col-md-12 padding-zero">
 
-    <span class="col-lg-7 padding-zero pull-left">
+    <span class="col-md-7 padding-zero pull-left">
  Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit
     <sup>*</sup>Has feedback,<sub> d</sub>Dropped score,<sup> e</sup>Has exception,<sup> LP</sup>Used latepass
         </span>
-    <span class="inner-page-options col-lg-5 padding-zero pull-left">
+    <span class="inner-page-options col-md-5 padding-zero pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                  <?php echo '<select  class="form-control export-to-height" id="colorsel" onchange="updateColors(this)">';

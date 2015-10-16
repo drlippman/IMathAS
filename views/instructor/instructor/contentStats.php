@@ -19,7 +19,7 @@ if ($overWriteBody) {
     echo $body;
 }  else {
     echo '<div id="headermoddataset" class="pagetitle">';
-    echo "<div class='col-lg-12'><h2>Stats: $itemName</h2></div><BR class=form>\n";
+    echo "<div class='col-md-12'><h2>Stats: $itemName</h2></div><BR class=form>\n";
     echo '</div>';
 
     $idents = array_keys($descrips);
@@ -29,8 +29,8 @@ if ($overWriteBody) {
     }
 
     foreach ($idents as $ident) {
-        echo '<div class="col-lg-10"><h4>'.$descrips[$ident].'</h4></div>';
-        echo '<table class="gb col-lg-10"><thead>';
+        echo '<div class="col-md-10"><h4>'.$descrips[$ident].'</h4></div>';
+        echo '<table class="gb col-md-10"><thead>';
         echo '<tr><th colspan="2">Viewed</th><th>Not Viewed</th></tr>';
         echo '<tr><th>Name</th><th style="padding-right:1em">Views</th>';
         echo '<th>Name</th></tr></thead><tbody>';

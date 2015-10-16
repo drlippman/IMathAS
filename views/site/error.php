@@ -13,7 +13,7 @@ $this->title = $name;
 $errorCode = $exception->getCode();
 ?>
 <div class="site-error">
-    <div class="col-lg-offset-3 col-lg-6 center">
+    <div class="col-md-offset-3 col-md-6 center">
         <?php if($errorCode == 2){ ?>
                 <p>
                     Page not found!!!

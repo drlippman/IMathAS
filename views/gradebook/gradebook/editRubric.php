@@ -18,8 +18,8 @@ $this->title = 'Manage Rubrics';
         'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
         'action' => 'edit-rubric',
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-4\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-3 select-text-margin'],
+            'template' => "{label}\n<div class=\"col-md-4\">{input}</div>\n<div class=\"col-md-7 col-md-offset-2\">{error}</div>",
+            'labelOptions' => ['class' => 'col-md-3 select-text-margin'],
         ],
     ]); ?>
     Select a rubric to edit or <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid='.$course->id) ?>" >Add new rubric</a>

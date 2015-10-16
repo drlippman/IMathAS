@@ -17,8 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'options' => ['class' => 'form-horizontal'],
                 'action' => '',
                 'fieldConfig' => [
-                    'template' => "{label}\n<div class=\"col-lg-4\">{input}</div>\n<div class=\"col-lg-5 clear-both col-lg-offset-3\">{error}</div>",
-                    'labelOptions' => ['class' => 'col-lg-3  text-align-left'],
+                    'template' => "{label}\n<div class=\"col-md-4\">{input}</div>\n<div class=\"col-md-5 clear-both col-md-offset-3\">{error}</div>",
+                    'labelOptions' => ['class' => 'col-md-3  text-align-left'],
                 ],
             ]); ?>
 
@@ -29,8 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <div class="datetime form-group">
                     <?php
-                    echo '<label class="start col-lg-2 pull-left "> Start Time </label>';
-                    echo '<div class = "pull-left col-lg-4 time-input">';
+                    echo '<label class="start col-md-2 pull-left "> Start Time </label>';
+                    echo '<div class = "pull-left col-md-4 time-input">';
                     echo TimePicker::widget([
                         'name' => 'start_time',
                         'value' => '10:00 AM',
@@ -40,8 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left col-lg-1"> End Time </label>';
-                    echo '<div class="pull-left col-lg-4">';
+                    echo '<label class="end pull-left col-md-1"> End Time </label>';
+                    echo '<div class="pull-left col-md-4">';
                     echo TimePicker::widget([
                         'name' => 'end_time',
                         'value' => '10:00 PM',
@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </fieldset>
     </div>
     <div class="form-group">
-        <div class="col-lg-11 col-lg-offset-2 display_field">
+        <div class="col-md-11 col-md-offset-2 display_field">
             <?= Html::submitButton('Submit', ['id' => 'newCourse-btn', 'class' => 'btn btn-primary', 'name' => 'Submit']) ?>
         </div>
     </div>

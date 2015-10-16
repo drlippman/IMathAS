@@ -88,7 +88,7 @@ if($totalData['isTutor']){
 
 <?php if ($canviewall) {  ?>
     <br>
-    <div class="col-lg-12 display-inline-block">
+    <div class="col-md-12 display-inline-block">
         <div class="display-inline-block width-twenty-five-per">
                <div class="display-inline-block"><?php AppUtility::t('Category')?></div>&nbsp;
                <div class="display-inline-block width-fifty-percentage">
@@ -151,8 +151,8 @@ if($totalData['isTutor']){
     <?php } ?>
   <br><br>
     <div class="inner-content-gradebook">
-       <div class="button-container col-lg-12 padding-zero">
-   <div class="col-lg-9 margin-left-minus-fifteen">
+       <div class="button-container col-md-12 padding-zero">
+   <div class="col-md-9 margin-left-minus-fifteen">
         <?php
 if ($availshow==4) {
 $availshow=1;
@@ -186,9 +186,9 @@ if ($studentId>0) {
                        <?php
                        if ($gradebook[1][4][2]==1)
                        { ?>
-                       <span class="col-lg-4">
+                       <span class="col-md-4">
                            <?php }else{ ?>
-                           <span class="col-lg-4 margin-left-minus-fifteen">
+                           <span class="col-md-4 margin-left-minus-fifteen">
                                <?php }
     echo '<select id="userselect" class="form-control"   onchange="chgstu(this)">';
         $lastsec = '';
@@ -239,7 +239,7 @@ if ($studentId>0) {
     </div>
     </div>
 <?php if ($isteacher) { ?>
-    <span class="inner-page-options col-lg-3 padding-zero pull-right">
+    <span class="inner-page-options col-md-3 padding-zero pull-right">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
 
             <li class="dropdown">

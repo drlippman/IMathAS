@@ -20,8 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'form-horizontal'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-3 control-label'],
+                'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-8\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-3 control-label'],
             ],
         ]); ?>
 
@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <div class="form-group">
-        <div class="col-lg-offset-1 col-lg-11">
+        <div class="col-md-offset-1 col-md-11">
             <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
         </div>
     </div>

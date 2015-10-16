@@ -22,11 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-login">
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal col-lg-12'],
+            'options' => ['class' => 'form-horizontal col-md-12'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3 change-rights\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
+                'template' => "{label}\n<div class=\"col-md-3 change-rights\">{input}</div>\n<div class=\"col-md-8\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-2 select-text-margin'],
             ],
         ]); ?><br/>
         <?php echo
@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
             AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
         <?php echo $form->field($model, 'groupid')->dropDownList(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
         <div class="form-group">
-            <div class="col-lg-offset-2">
+            <div class="col-md-offset-2">
                 <?php echo Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
             </div>
         </div>
