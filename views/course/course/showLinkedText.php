@@ -20,22 +20,12 @@ $this->title = $course->name;
                 <h5><?php echo $links->text?></h5>
             </div>
     </div>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <div class="col-md-12 align-linked-text-right">
+
+    <div class="col-lg-12 align-linked-text-right">
         <?php if($user->rights == 10){?>
-            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
+            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
                 <?php } elseif($user->rights == 100 || $user->rights == 20){?>
-            <b><a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
+            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
         <?php } ?>
         <br><br>
     </div>

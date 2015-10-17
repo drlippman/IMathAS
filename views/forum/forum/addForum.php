@@ -6,13 +6,13 @@ use kartik\date\DatePicker;
 use app\components\AssessmentUtility;
 $this->title = $pageTitle;
 ?>
-<?php if ($modifyForumId){ ?>
-    <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>&modifyFid=<?php echo $modifyForumId;?>&block=<?php echo $block ?>">
-<?php }else{ ?>
-    <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>&block=<?php echo $block ?>">
-<?php } ?>
-    <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+
+    <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+    <?php if ($modifyForumId){ ?>
+        <input type="hidden" name="modifyFid" value="<?php echo $modifyForumId;?>">
+    <?php } ?>
+     <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
     <div class = "title-container">
         <div class="row">

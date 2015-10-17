@@ -3394,8 +3394,9 @@ class AppUtility extends Component
             } else if ($n>1) {
                 $subject = "Re<sup>$n</sup>: ".$subject;
             }
-            echo "<td><a href=\"forums/posts.php?page=-3&cid={$line['courseid']}&forum={$line['id']}&thread={$line['threadid']}\">";
-            echo $subject;
+      echo "<td> "; ?>
+            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='.$line['courseid'].'&forumid='.$line['id'].'&threadid='.$line['threadid'])?>">
+           <?php echo $subject;
             echo '</a></td>';
             if ($threaddata[$line['threadid']]['isanon']==1) {
                 echo '<td>', _('Anonymous'), '</td>';
@@ -3437,8 +3438,10 @@ class AppUtility extends Component
             } else if ($n>1) {
                 $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
             }
-            echo "<td><a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";
-            echo $line['title'];
+            echo "<td>" ?>
+            <a href="<?php echo AppUtility::getURLFromHome('message','message/view-message?message=0&id='.$line['id'].'&cid='.$line['courseid'])?>">
+<!--            <a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";-->
+            <?php echo $line['title'];
             echo '</a></td>';
             echo '<td>'.$line['LastName'].', '.$line['FirstName'].'</td>';
             echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
@@ -3449,5 +3452,188 @@ class AppUtility extends Component
         echo '<script type="text/javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
         echo '</div>';
 
+    }
+
+    public static function makeTopMenu($teacherId = null, $topBar = null, $msgSet = null, $previewShift = null, $courseId = null, $newMsgs = null, $quickView = null, $newPostsCnt = null, $courseNewFlag = null, $useViewButtons = null) {
+        if ($useViewButtons && (isset($teacherId) || $previewShift > -1)) {
+            echo '<div id="viewbuttoncont">View: ';
+            echo "<a href=\"course.php?cid=$courseId&quickview=off&teachview=1\" ";
+            if ($previewShift == -1 && $quickView != 'on') {
+                echo 'class="buttonactive buttoncurveleft"';
+            } else {
+                echo 'class="buttoninactive buttoncurveleft"';
+            }
+            echo '>', _('Instructor'), '</a>';
+            echo "<a href=\"course.php?cid=$courseId&quickview=off&stuview=0\" ";
+            if ($previewShift>-1 && $quickView != 'on') {
+                echo 'class="buttonactive"';
+            } else {
+                echo 'class="buttoninactive"';
+            }
+            echo '>', _('Student'), '</a>';
+            echo "<a href=\"course.php?cid=$courseId&quickview=on&teachview=1\" ";
+            if ($previewShift==-1 && $quickView == 'on') {
+                echo 'class="buttonactive buttoncurveright"';
+            } else {
+                echo 'class="buttoninactive buttoncurveright"';
+            }
+            echo '>', _('Quick Rearrange'), '</a>';
+            echo '</div>';
+            //echo '<br class="clear"/>';
+
+
+        } else {
+            $useViewButtons = false;
+        }
+
+        if (isset($teacherId) && $quickView == 'on') {
+            if ($useViewButtons) {
+                echo '<br class="clear"/>';
+            }
+            echo '<div class="cpmid">';
+            if (!$useViewButtons) {
+//            print_r('priyanka'); die;
+                echo _('Quick View.'), " <a href=\"course.php?cid=$courseId&quickview=off\">", _('Back to regular view'), "</a>. ";
+            }
+            if (isset($CFG['CPS']['miniicons'])) {
+                echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
+
+            } else {
+                echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
+            }
+            echo '<span id="submitnotice" style="color:red;"></span>';
+            echo '<div class="clear"></div>';
+            echo '</div>';
+
+        }
+        if (($courseNewFlag&1)==1) {
+            $gbnewflag = ' <span class="red">' . _('New') . '</span>';
+        } else {
+            $gbnewflag = '';
+        }
+        if (isset($teacherId) && count($topBar[1])>0 && $topBar[2] == 0) {
+
+            echo '<div class=breadcrumb>';
+            if (in_array(0,$topBar[1]) && $msgSet<4) { //messages
+                echo "<a href=\"$imasroot/msgs/msglist.php?cid=$courseId\">", _('Messages'), "</a>$newMsgs &nbsp; ";
+            }
+            if (in_array(6,$topBar[1])) { //Calendar
+                echo "<a href=\"$imasroot/forums/forums.php?cid=$courseId\">", _('Forums'), "</a>$newPostsCnt &nbsp; ";
+            }
+            if (in_array(1,$topBar[1])) {
+                //Stu view
+                echo "<a href=\"course.php?cid=$courseId&stuview=0\">", _('Student View'), "</a> &nbsp; ";
+            }
+            if (in_array(3,$topBar[1])) { //List stu
+                echo "<a href=\"listusers.php?cid=$courseId\">", _('Roster'), "</a> &nbsp; \n";
+            }
+            if (in_array(2,$topBar[1])) { //Gradebook
+                echo "<a href=\"gradebook.php?cid=$courseId\">", _('Gradebook'), "</a>$gbnewflag &nbsp; ";
+            }
+            if (in_array(7,$topBar[1])) { //List stu
+                echo "<a href=\"managestugrps.php?cid=$courseId\">", _('Groups'), "</a> &nbsp; \n";
+            }
+            if (in_array(4,$topBar[1])) { //Calendar
+                echo "<a href=\"showcalendar.php?cid=$courseId\">", _('Calendar'), "</a> &nbsp; \n";
+            }
+            if (in_array(5,$topBar[1])) { //Calendar
+
+                echo "<a href=\"course.php?cid=$courseId&quickview=on\">", _('Quick View'), "</a> &nbsp; \n";
+            }
+
+            if (in_array(9,$topBar[1])) { //Log out
+                echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
+            }
+            echo '<div class=clear></div></div>';
+        } else if (!isset($teacherId) && ((count($topBar[0])>0 && $topBar[2]==0) || ($previewShift>-1 && !$useViewButtons))) {
+            echo '<div class=breadcrumb>';
+            if ($topBar[2]==0) {
+                if (in_array(0,$topBar[0]) && $msgSet<4) { //messages
+                    echo "<a href=\"$imasroot/msgs/msglist.php?cid=$courseId\">", _('Messages'), "</a>$newMsgs &nbsp; ";
+                }
+                if (in_array(3,$topBar[0])) { //forums
+                    echo "<a href=\"$imasroot/forums/forums.php?cid=$courseId\">", _('Forums'), "</a>$newPostsCnt &nbsp; ";
+                }
+                if (in_array(1,$topBar[0])) { //Gradebook
+                    echo "<a href=\"gradebook.php?cid=$courseId\">", _('Show Gradebook'), "</a>$gbnewflag &nbsp; ";
+                }
+                if (in_array(2,$topBar[0])) { //Calendar
+                    echo "<a href=\"showcalendar.php?cid=$courseId\">", _('Calendar'), "</a> &nbsp; \n";
+                }
+                if (in_array(9,$topBar[0])) { //Log out
+                    echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
+                }
+                if ($previewShift>-1 && count($topBar[0])>0) { echo '<br />';}
+            }
+            if ($previewShift>-1 && !$useViewButtons) {
+                echo _('Showing student view. Show view:'), ' <select id="pshift" onchange="changeshift()">';
+                echo '<option value="0" ';
+                if ($previewShift==0) {echo "selected=1";}
+                echo '>', _('Now'), '</option>';
+                echo '<option value="3600" ';
+                if ($previewShift==3600) {echo "selected=1";}
+                echo '>', _('1 hour from now'), '</option>';
+                echo '<option value="14400" ';
+                if ($previewShift==14400) {echo "selected=1";}
+                echo '>', _('4 hours from now'), '</option>';
+                echo '<option value="86400" ';
+                if ($previewShift==86400) {echo "selected=1";}
+                echo '>', _('1 day from now'), '</option>';
+                echo '<option value="604800" ';
+                if ($previewShift==604800) {echo "selected=1";}
+                echo '>', _('1 week from now'), '</option>';
+                echo '</select>';
+                echo " <a href=\"course?cid=$courseId&teachview=1\">", _('Back to instructor view'), "</a>";
+            }
+            echo '<div class=clear></div></div>';
+        }
+    }
+
+    public static function printCourses($data,$title,$type=null, $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null) {
+        global $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses;
+        if (count($data) == 0 && $type == 'tutor') {
+            return;
+        }
+        global $myRights,$newMsgCnt,$newPostCnt;
+        echo '<div class="block"><h3>'.$title.'</h3></div>';
+        echo '<div class="blockitems"><ul class="nomark courselist">';
+        for ($i=0; $i<count($data); $i++) {
+            echo '<li>';
+            if ($type=='take') {
+                echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
+            } ?>
+            <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
+            <?php echo $data[$i]['name'].'</a>';
+            if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {
+                echo ' <span style="color:green;">', _('Hidden'), '</span>';
+            }
+            if (isset($data[$i]['lockaid']) && $data[$i]['lockaid'] > 0) {
+                echo ' <span style="color:green;">', _('Lockdown'), '</span>';
+            }
+            if ($showNewMsgNote && isset($newMsgCnt[$data[$i]['id']]) && $newMsgCnt[$data[$i]['id']]>0) {
+
+                echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$data[$i]['id']]), '</a>';
+            }
+            if ($showNewPostNote && isset($newPostCnt[$data[$i]['id']]) && $newPostCnt[$data[$i]['id']]>0) {
+                echo ' <a class="newnote" href="forums/newthreads.php?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newPostCnt[$data[$i]['id']]), '</a>';
+            }
+            echo '</li>';
+        }
+        if ($type == 'teach' && $myRights > 39 && count($data)==0) {
+            echo '<li>', _('To add a course, head to the Admin Page'), '</li>';
+        }
+        echo '</ul>';
+        if ($type == 'take') { ?>
+            <div class="center"><a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br>
+<!--            <a  id="unhidelink" class="course-taking small" href="--><?php //echo AppUtility::getURLFromHome('site', 'unhide-from-course-list') ?><!--">Unhide hidden courses</a>-->
+            <?php echo '<br><a id="unhidelink" '.($stuHasHiddenCourses?'':'style="display:none"').' class="small" href="site/unhide-from-course-list">Unhide hidden courses</a>';
+            echo '</div>';
+        } else if ($type=='teach' && $myRights > 39) { ?>
+            <div class="center">
+                <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index') ?>">Admin
+                    Page</a>
+            </div>
+      <?php  }
+        echo '</div>';
     }
 }

@@ -202,7 +202,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         }
         if ($assessmentData['ancestors'] == '')
         {
-            $assessmentData['ancestors'] = $typeid;
+            $assessmentData['ancestors'] = strval($typeid);
         } else {
             $assessmentData['ancestors'] = $typeid . ',' . $assessmentData['ancestors'];
         }

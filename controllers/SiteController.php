@@ -18,6 +18,7 @@ use app\models\ForumThread;
 use app\models\Groups;
 use app\models\Libraries;
 use app\models\Message;
+use app\models\QuestionSet;
 use app\models\Sessions;
 use app\models\Student;
 use app\models\forms\StudentEnrollCourseForm;
@@ -586,6 +587,8 @@ class SiteController extends AppController
 
     public function actionDashboard()
     {
+        global $homeLayout,  $hideOnPostsWidget, $newMsgCnt,  $brokenCnt,  $user, $myRights,  $twoColumn,  $pagelayout,  $page_newmessagelist, $page_coursenames,  $page_newpostlist,  $postThreads,
+         $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses,  $courses, $newPostCnt, $page_teacherCourseData, $page_tutorCourseData, $page_studentCourseData;
         $this->layout = 'master';
         if (!$this->isGuestUser()) {
             $user = $this->getAuthenticatedUser();
@@ -595,70 +598,15 @@ class SiteController extends AppController
             $teachers = Teacher::getTeacherByUserId($user->id);
             $courses = Course::getByName($user->id);
             $studCourse = Course::getCourseOfStudent($user->id);
-            $teachCourse = Course::getCourseOfTeacher($user->id);
             $userLayoutData = User::getUserHomeLayoutInfo($user->id);
-            $homelayout = $userLayoutData['homelayout'];
-            $hideonpostswidget = $userLayoutData['hideonpostswidget'];
-            $pagelayout = explode('|',$homelayout);
-
-            /**
-             * check for new posts in courses being taken
-             */
-            $page_teacherCourseData = array();
-            $newpostscnt = array();
-            $postcheckcids = array();
-            $postcheckstucids = array();
-            $page_coursenames = array();
-            $page_newpostlist = array();
-            $newmsgcnt = array();
-            if($teachCourse == 0)
-            {
-                $noclass = true;
-            }
-            else {
-                $noclass = false;
-                $tchcids = array();
-                foreach($teachCourse as $key => $line)
-                {
-                    $page_teacherCourseData[] = $line;
-                    $page_coursenames[$line['id']] = $line['name'];
-                    if (!in_array($line['id'],(explode(',',$hideonpostswidget)))) {
-                        $postcheckstucids[] = $line['id'];
-                    }
-                }
-            }
-
-            $page_studentCourseData = array();
-
-        /**
-         *
-         * check to see if the user is enrolled as a student
-         */
-
-            $stuhashiddencourses = false;
-            if ($studCourse == 0) {
-                $noclass = true;
+            $homeLayout = $userLayoutData['homelayout'];
+            $hideOnPostsWidget = $userLayoutData['hideonpostswidget'];
+            $pagelayout = explode('|',$homeLayout);
+            if ($hideOnPostsWidget != '') {
+                $hideOnPostsWidget = explode(',',$hideOnPostsWidget);
             } else {
-                foreach($studCourse as $key => $line)
-                {
-                    if ($line['hidefromcourselist'] == 1) {
-                        $stuhashiddencourses = true;
-                    } else {
-                        $noclass = false;
-                        $page_studentCourseData[] = $line;
-                        $page_coursenames[$line['id']] = $line['name'];
-                        if (!in_array($line['id'],explode(',',$hideonpostswidget))) {
-                            $postcheckstucids[] = $line['id'];
-                        }
-                    }
-                }
+                $hideOnPostsWidget = array();
             }
-
-            $shownewmsgnote = in_array(0,explode(',',$pagelayout[3]));
-            $shownewpostnote = in_array(1,explode(',',$pagelayout[3]));
-
-            $showmessagesgadget = (in_array(10,explode(',',$pagelayout[1])) || in_array(10,explode(',',$pagelayout[0])) || in_array(10,explode(',',$pagelayout[2])));
-            $showpostsgadget = (in_array(11,explode(',',$pagelayout[1])) || in_array(11,explode(',',$pagelayout[0])) || in_array(11,explode(',',$pagelayout[2])));
 
             foreach($pagelayout as $k=>$v) {
                 if ($v=='') {
@@ -667,54 +615,37 @@ class SiteController extends AppController
                     $pagelayout[$k] = explode(',',$v);
                 }
             }
+            $showNewMsgNote = in_array(0,$pagelayout[3]);
 
-            $shownewmsgnote = in_array(0,$pagelayout[3]);
-            $shownewpostnote = in_array(1,$pagelayout[3]);
+            $showNewPostNote = in_array(1,$pagelayout[3]);
 
-            $showmessagesgadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
-            $showpostsgadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
+            $showMessagesGadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
+            $showPostsGadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
 
-            $twocolumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
 
+            $twoColumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
             /**
              * check for new posts in courses being taken
              */
-            $poststucidlist = $postcheckstucids;
 
-            if ($showpostsgadget && count($postcheckstucids) > 0) {
-                $now = time();
+            $newpostscnt = array();
+            $postcheckcids = array();
+            $postcheckstucids = array();
+            $page_coursenames = array();
+            $page_newpostlist = array();
 
-                $result = ForumThread::getNewPostData($poststucidlist, $now, $user->id);
-                foreach($result as $key => $line) {
-                    if (!isset($newpostcnt[$line['courseid']])) {
-                        $newpostcnt[$line['courseid']] = 1;
-                    } else {
-                        $newpostcnt[$line['courseid']]++;
-                    }
-                    if ($newpostcnt[$line['courseid']]<10) {
-                        $page_newpostlist[] = $line;
-                        $postthreads[] = $line['threadid'];
-                    }
-                }
-            } else if (count($postcheckstucids)>0) {
-                $now = time();
-                $r2 = ForumThread::getPostThread($poststucidlist, $now, $user->id);
-                foreach($r2 as $key => $row) {
-                    $newpostcnt[$row['name']] = $row['id'];
-                }
-            }
             /**
              * check for new message in courses being taken
              */
-            $newmsgcnt = array();
-            if ($showmessagesgadget) {
+            $newMsgCnt = array();
+            if ($showMessagesGadget) {
                 $page_newmessagelist = array();
                 $result = Message::getNewMessageData($user->id);
                 foreach($result as $key => $line) {
-                    if (!isset($newmsgcnt[$line['courseid']])) {
-                        $newmsgcnt[$line['courseid']] = 1;
+                    if (!($newMsgCnt[$line['courseid']])) {
+                        $newMsgCnt[$line['courseid']] = 1;
                     } else {
-                        $newmsgcnt[$line['courseid']]++;
+                        $newMsgCnt[$line['courseid']]++;
                     }
                     $page_newmessagelist[] = $line;
                 }
@@ -725,38 +656,144 @@ class SiteController extends AppController
 
                 $result = Message::getUserById($user->id);
                 foreach($result as $key => $row){
-                    $newmsgcnt[$row['id']] = $row['title'];
+                    $newMsgCnt[$row['courseid']] = $row['COUNT(id)'];
                 }
             }
-            if($students){
-                $users = $students;
-            }else if($teachers){
-                $users = $teachers;
-            } elseif($tutors){
-                $user = $tutors;
-            }
-            $isreadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
-            $msgCountArray = array();
-            if($users){
-                foreach ($users as $singleUser) {
-                    $messageList = Message::getByCourseIdAndUserId($singleUser->courseid, $user->id);
-                    $count = AppConstant::NUMERIC_ZERO;
-                    if($messageList){
-                        foreach($messageList as $message){
-                            if(in_array($message->isread, $isreadArray))
-                                $count++;
+
+            $page_studentCourseData = array();
+
+            /**
+             *
+             * check to see if the user is enrolled as a student
+             */
+
+            $stuHasHiddenCourses = false;
+            if ($studCourse == 0) {
+                $noClass = true;
+            } else {
+                foreach($studCourse as $key => $line)
+                {
+                    if ($line['hidefromcourselist'] == 1) {
+                        $stuHasHiddenCourses = true;
+                    } else {
+                        $noClass = false;
+                        $page_studentCourseData[] = $line;
+                        $page_coursenames[$line['id']] = $line['name'];
+                        if (!in_array($line['id'],$hideOnPostsWidget)) {
+                            $postcheckstucids[] = $line['id'];
                         }
                     }
-                    $tempArray = array('courseid' => $singleUser->courseid, 'msgCount' => $count);
-                    array_push($msgCountArray,$tempArray);
+                }
+            }
+            /**
+             * Teacher
+             */
+            $page_teacherCourseData = array();
+            if($myRights > AppConstant::STUDENT_RIGHT)
+            {
+                $teachCourse = Course::getCourseOfTeacher($user->id);
+                if($teachCourse == AppConstant::NUMERIC_ZERO)
+                {
+                    $noClass = true;
+                } else {
+                $noClass = false;
+                $tchcids = array();
+                foreach($teachCourse as $key => $line)
+                {
+                    $page_teacherCourseData[] = $line;
+                    $page_coursenames[$line['id']] = $line['name'];
+                    if (!in_array($line['id'],($hideOnPostsWidget))) {
+                        $postcheckstucids[] = $line['id'];
+                    }
+                 }
+               }
+            }
+            /**
+             * Tutor
+             */
+            $page_tutorCourseData = array();
+            $resultTutor = Tutor::getTutorData($user->id);
+            if($resultTutor == AppConstant::NUMERIC_ZERO)
+            {
+                $noClass = true;
+            } else {
+                $noClass = false;
+                $tchcids = array();
+
+                foreach($resultTutor as $key => $line) {
+                    $page_tutorCourseData[] = $line;
+                    $page_coursenames[$line['id']] = $line['name'];
+                    if (!in_array($line['id'],$hideOnPostsWidget)) {
+                        $postcheckstucids[] = $line['id'];
+                    }
+                }
+            }
+            /**
+             * get new posts
+             * check for new posts in courses being taught.
+             */
+            $postcidlist = $postcheckcids;
+            $postThreads = array();
+
+            if ($showPostsGadget && count($postcheckcids) > AppConstant::NUMERIC_ZERO) {
+                $newPost = ForumThread::getNewPost($postcidlist, $user->id);
+                foreach($newPost as $key => $line) {
+                    if (!isset($newPostCnt[$line['courseid']])) {
+                        $newPostCnt[$line['courseid']] = 1;
+                    } else {
+                        $newPostCnt[$line['courseid']]++;
+                    }
+                    if ($newPostCnt[$line['courseid']]<10) {
+                        $page_newpostlist[] = $line;
+                        $postThreads[] = $line['threadid'];
+                    }
+                }
+            } else if (count($postcheckcids)>0) {
+                $result = ForumThread::getPostData($postcidlist, $user->id);
+                foreach($result as $key => $row)
+                {
+                    $newPostCnt[$row['courseid']] = $row['COUNT(imas_forum_threads.id)'];
+                }
+            }
+            /**
+             *
+             * check for new posts in courses being taken
+             */
+            $poststucidlist = $postcheckstucids;
+            $now = time();
+
+            if ($showPostsGadget && count($postcheckstucids) > AppConstant::NUMERIC_ZERO) {
+                $result = ForumThread::getNewPostData($poststucidlist, $now, $user->id);
+                foreach($result as $key => $line) {
+                    if (!isset($newPostCnt[$line['courseid']])) {
+                        $newPostCnt[$line['courseid']] = AppConstant::NUMERIC_ONE;
+                    } else {
+                        $newPostCnt[$line['courseid']]++;
+                    }
+                    if ($newPostCnt[$line['courseid']] < 10) {
+                        $page_newpostlist[] = $line;
+                        $postThreads[] = $line['threadid'];
+                    }
+                }
+            } else if (count($postcheckstucids) > 0) {
+                $r2 = ForumThread::getPostThread($poststucidlist, $now, $user->id);
+                foreach($r2 as $key => $row) {
+                    $newPostCnt[$row['courseid']] = $row['COUNT(imas_forum_threads.id)'];
+                }
+            }
+            if ($myRights == AppConstant::ADMIN_RIGHT) {
+                $result = QuestionSet::getBrokenData();
+                $brokenCnt = array();
+                foreach($result as $key => $row){
+                    $brokenCnt[$row['userights']] = $row['COUNT(id)'];
                 }
             }
             if ($user) {
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
-                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray, 'tutors' => $tutors, 'courses' => $courses, 'studCourse' => $studCourse, 'teachCourse' => $teachCourse, 'homelayout' => $homelayout, 'hideonpostswidget' => $hideonpostswidget, 'pagelayout' => $pagelayout, 'myRights' => $myRights, 'page_newpostlist' => $page_newpostlist, 'page_coursenames' => $page_coursenames, 'postthreads' => $postthreads, 'page_newmessagelist' => $page_newmessagelist];
-                return $this->renderWithData('dashboard', $userData);
+                $responseData = array('homeLayout' => $homeLayout, 'hideOnPostsWidget' => $hideOnPostsWidget, 'newMsgCnt' => $newMsgCnt, 'brokenCnt' => $brokenCnt, 'user' => $user, 'myRights' => $myRights, 'twoColumn' => $twoColumn, 'pagelayout' => $pagelayout, 'page_newmessagelist' => $page_newmessagelist, 'page_coursenames' => $page_coursenames, 'page_newpostlist' => $page_newpostlist, 'postThreads' => $postThreads, 'showNewMsgNote' => $showNewMsgNote, 'showNewPostNote' => $showNewPostNote, 'stuHasHiddenCourses' => $stuHasHiddenCourses, 'courses' => $courses, 'newPostCnt' => $newPostCnt, 'page_teacherCourseData' => $page_teacherCourseData, 'page_tutorCourseData' => $page_tutorCourseData, 'page_studentCourseData' => $page_studentCourseData);
+                return $this->renderWithData('dashboard', $responseData);
             }
         }
         $this->setErrorFlash(AppConstant::LOGIN_FIRST);

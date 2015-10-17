@@ -45,31 +45,36 @@ for ($i=0; $i<3; $i++) {
                         ?>
                         <li>
                             <?php
+
                             if($course->lockaid > 0)
                             {
                                 if(isset($course->name))
                                 {?>
-                                    <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course['id']) ?>"><?php echo ucfirst($course['name'])?></a><?php echo '<span style="color:green;">', _(' Lockdown'), '</span> '?>
+                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']) ?>"><?php echo ucfirst($course['name'])?></a><?php echo '<span style="color:green;">', _(' Lockdown'), '</span> '?>
                                 <?php }else{?>
-                                    <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course['id']) ?>"><?php echo " "?></a><?php echo '<span style="color:green;, Lockdown">'?>
+                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']) ?>"><?php echo " "?></a><?php echo '<span style="color:green;, Lockdown">'?>
                                 <?php }
                             }else{?>
-                            <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course['id']) ?>"><?php echo ucfirst($course['name']) ?>
+                            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']) ?>"><?php echo ucfirst($course['name']) ?>
                                 <?php }
+
                                 ?>
                                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $course['id']) ?>" class="msg-notification">
-                                    <?php
-                                    if($msgRecord){
-                                        foreach($msgRecord as $record){
-                                            if($course->id == $record['courseid']){
-                                                if($record['msgCount'] != 0){
-                                                    echo "Messages (".$record['msgCount'].")" ;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                </a>
+<!--                                    --><?php
+//                                    if($msgRecord){
+//                                        foreach($msgRecord as $record){
+//                                            if($course->id == $record['courseid']){
+//                                                if($record['msgCount'] != 0){
+//                                                    echo "Messages (".$record['msgCount'].")" ;
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                    ?>
+<!--                                </a>-->
+                              <?php  if ($showNewMsgNote && isset($newMsgCnt[$course['id']]) && $newMsgCnt[$course['id']] > 0) {
+                                echo ' <a class="newnote" href="msgs/msglist.php?cid='.$course['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$course['id']]), '</a>';
+                                } ?>
                         </li>
                     <?php
                     }

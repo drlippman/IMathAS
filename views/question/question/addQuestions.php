@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="floatright">
                     <div class="floatleft padding-right-fifteen"> <a style="" title="Preview this assessment" onclick="window.open('<?php echo AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&amp;id='.$assessmentId) ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="<?php echo AppUtility::getHomeURL().'img/prvAssess.png' ?>">&nbsp;&nbsp;Preview Assessment</a></div>
                     <div class="floatleft">
-                        <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id) ?>" class="btn btn-primary  page-settings"><img class="small-icon" src="<?php echo AppUtility::getHomeURL().'img/done.png' ?>">&nbsp;Done</a>
+                        <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id) ?>" class="btn btn-primary  page-settings"><img class="small-icon" src="<?php echo AppUtility::getHomeURL().'img/done.png' ?>">&nbsp;Done</a>
                     </div>
                 </div>
             </div>

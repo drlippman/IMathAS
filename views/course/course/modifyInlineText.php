@@ -11,8 +11,25 @@ $this->params['breadcrumbs'][] = $this->title;
 //include_once('../components/filehandler.php');
 
 ?>
+<?php if ($inlineId){ ?>
+<form enctype="multipart/form-data" method=post action="modify-inline-text?cid=<?php echo $course->id ?>&modifyFid=<?php echo $inlineId;?>&block=<?php echo $block ?>">
+<?php }else{ ?>
+<form enctype="multipart/form-data" method=post action="modify-inline-text?cid=<?php echo $course->id ?>&block=<?php echo $block ?>">
+<?php } ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+
 <div class="tab-content shadowBox non-nav-tab-item">
-<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+<form enctype="multipart/form-data" method=post action="modify-inline-text?block=0&cid=130&folder=&tb=t">
+    <input type="hidden" value="<?php echo $filter?>" name="tb">
     <div class="name-of-item">
         <div class="col-md-2"><?php AppUtility::t('Name of Inline Text')?></div>
         <div class="col-md-10">

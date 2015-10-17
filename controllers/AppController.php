@@ -184,7 +184,8 @@ class AppController extends Controller
     }
 
     public function checkSession($params){
-        global $CFG,$urlMode;
+        global $CFG,$teacherId;
+
         $session = Yii::$app->session;
         if (isset($sessionpath) && $sessionpath!='') {
             session_save_path($sessionpath);
@@ -705,6 +706,7 @@ function generaterandstring() {
     {
         if(!$teacherId)
         {
+            AppUtility::dump('hey Soo ja :p');
             $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
             return $this->redirect($this->goHome());
         }
@@ -744,5 +746,14 @@ function generaterandstring() {
             return $this->redirect($this->goHome());
         }
         return true;
+    }
+
+    public function isStudent($userId, $courseId){
+        $isStudent = false;
+        $student = Student::getByCourseId($courseId, $userId);
+        if($student){
+            $student = true;
+        }
+        return $student ;
     }
 }

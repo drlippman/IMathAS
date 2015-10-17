@@ -6,17 +6,24 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\filehandler;
+use app\components\ShowItemCourse;
 use app\models\_base\BaseImasGroups;
 use app\models\AppModel;
 use app\models\AssessmentSession;
 use app\models\Blocks;
 use app\models\CalItem;
+use app\models\ContentTrack;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\Exceptions;
 use app\models\forms\ChangeUserInfoForm;
 use app\models\forms\CourseSettingForm;
 use app\models\forms\ThreadForm;
+use app\models\ForumPosts;
+use app\models\ForumSubscriptions;
+use app\models\ForumThread;
+use app\models\ForumView;
+use app\models\Grades;
 use app\models\InstrFiles;
 use app\models\LinkedText;
 use app\models\Links;
@@ -30,12 +37,15 @@ use app\models\SetPassword;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\InlineText;
+use app\models\Thread;
 use app\models\Wiki;
 use app\models\User;
 use app\models\GbCats;
 use app\models\StuGroupSet;
 use app\models\Rubrics;
 use app\models\Outcomes;
+use app\models\WikiRevision;
+use app\models\WikiView;
 use yii\web\UploadedFile;
 use app\models\ExternalTools;
 use Yii;
@@ -43,6 +53,7 @@ use app\controllers\AppController;
 use app\models\forms\DeleteCourseForm;
 use yii\db\Exception;
 use yii\helpers\Html;
+use app\components\CopyItemsUtility;
 
 class CourseController extends AppController
 {
@@ -684,7 +695,7 @@ class CourseController extends AppController
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
+                'dueTime' => AppUtility::parsetime($calendarItem['date']),
                 'title' => ucfirst($calendarItem['title']),
                 'tag' => ucfirst($calendarItem['tag'])
             );
@@ -834,6 +845,7 @@ class CourseController extends AppController
         $cid = $params['cid'];
         $teacherId = $this->isTeacher($user['id'], $cid);
         $this->noValidRights($teacherId);
+        $block = $this->getParamVal('block');
         $inlineId = $params['id'];
         $course = Course::getById($cid);
         $inlineText = InlineText::getById($inlineId);
@@ -842,24 +854,22 @@ class CourseController extends AppController
         $tb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
         $moveFile = $this->getParamVal('movefile');
-        if (isset($tb)) {
-            $toTb = $tb;
+        if (isset($params['tb'])) {
+            $filter = $params['tb'];
         } else {
-            $toTb = 'b';
+            $filter = 'b';
         }
         if (!(isset($teacherId))) { // loaded by a NON-teacher
             $overWriteBody = AppConstant::NUMERIC_ONE;
             $body = "You need to log in as a teacher to access this page";
-        } elseif (!(isset($cid))) {
+        } elseif (!($cid)) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
             $body = "You need to access this page from the course page menu";
         }  else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-            $block = $block;
-            $page_formActionTag = "modify-inline-text?cid=" .$cid;
-            $page_formActionTag.="&block=".$block;
-            $page_formActionTag .= "&tb=$toTb";
-            $calTag = $params['caltag'];
+            $page_formActionTag = "modify-inline-text?block=$block&cid=$cid&folder=" . $params['folder'];
+            $page_formActionTag .= "&tb=$filter";
 
+            $calTag = $params['caltag'];
             if ($params['title'] != null || $params['text'] != null || $params['sdate'] != null)
             { //if the form has been submitted
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {
@@ -915,6 +925,7 @@ class CourseController extends AppController
                 $outcomes = implode(',', $outcomes);
 
                 $filestoremove = array();
+
                 if (isset($params['id'])) {  //already have id; update
                     $tempArray = array();
                     $tempArray['startdate'] = $startDate;
@@ -949,6 +960,8 @@ class CourseController extends AppController
                     }
                     $newtextid = $params['id'];
                 } else { //add new
+
+
                     $tempArray = array();
                     $tempArray['cid'] = $cid;
                     $tempArray['startdate'] = $startDate;
@@ -975,12 +988,13 @@ class CourseController extends AppController
                     {
                         $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
                     }
-                    if ($toTb == 'b') {
+
+                    if ($filter=='b') {
                         $sub[] = $itemid;
-                    } else if ($toTb == 't')
-                    {
-                        array_unshift($sub, $itemid);
+                    } else if ($filter=='t') {
+                        array_unshift($sub,$itemid);
                     }
+
                     $itemOrder = serialize($items);
                     $saveItemOrderIntoCourse = new Course();
                     $saveItemOrderIntoCourse->setItemOrder($itemOrder, $cid);
@@ -1010,7 +1024,6 @@ class CourseController extends AppController
                 }
             }
             if (isset($addedfile) || count($filestoremove) > 0 || isset($params['movefile'])) {
-
                 $fileorder = InlineText::getFileOrder($params['id']);
 
                 if ($fileorder['fileorder'] == '') {
@@ -1038,7 +1051,7 @@ class CourseController extends AppController
                  InlineText::setFileOrder($params['id'],$fileorder);
             }
             if ($params['submitbtn'] == 'Submit') {
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$cid));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$cid));
             }
 
             if (isset($params['id'])) {
@@ -1120,7 +1133,6 @@ class CourseController extends AppController
 
             $outcomenames = array();
            foreach($resultOutCome as $key => $row) {
-
                 $outcomenames[$row['id']] = $row['name'];
             }
             $result = Course::getOutComeByCourseId($cid);
@@ -1140,7 +1152,7 @@ class CourseController extends AppController
         }
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);
         $this->includeCSS(['course/items.css']);
-        $responseData = array('page_formActionTag' => $page_formActionTag, 'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes);
+        $responseData = array('page_formActionTag' => $page_formActionTag, 'filter' => $filter,'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes, 'block' => $block);
         return $this->renderWithData('modifyInlineText', $responseData);
     }
 
@@ -1160,6 +1172,11 @@ class CourseController extends AppController
         $query = Outcomes::getByCourse($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
+        if (isset($params['tb'])) {
+            $filter = $params['tb'];
+        } else {
+            $filter = 'b';
+        }
         if ($query) {
             foreach ($query as $singleData) {
                 $pageOutcomes[$singleData['id']] = $singleData['name'];
@@ -1198,6 +1215,7 @@ class CourseController extends AppController
         {
             $toolLabels[$key++] = $tool['name'];
         }
+
         if ($params['id']) {
             $linkData = LinkedText::getById($params['id']);
             if ($linkData['avail'] == AppConstant::NUMERIC_TWO && $linkData['startdate'] > AppConstant::NUMERIC_ZERO) {
@@ -1321,6 +1339,9 @@ class CourseController extends AppController
                 'caltag' => '!'
             );
         }
+        $page_formActionTag = "add-link?block=$block&cid=$courseId&folder=" . $params['folder'];
+        $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+        $page_formActionTag .= "&tb=$filter";
         if ($this->isPostMethod()) { //after modify done, save into database
             $outcomes = array();
             if (isset($params['outcomes'])) {
@@ -1442,18 +1463,22 @@ class CourseController extends AppController
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
                     $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                 }
-                array_unshift($sub, intval($lastItemId));
+                if ($filter=='b') {
+                    $sub[] = $lastItemId;
+                } else if ($filter=='t') {
+                    array_unshift($sub,$lastItemId);
+                }
                 $itemOrder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
             }
             $this->includeJS(["editor/tiny_mce.js", "general.js"]);
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id));
         }
         $this->includeCSS(["course/items.css"]);
         $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
         $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames,'pageOutcomesList' => $pageOutcomesList, 'linkData' => $linkData,
-            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolVals, 'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'toollabels' => $toolLabels, 'defaultValues' => $defaultValues,'block' => $block);
+            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolVals, 'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'toollabels' => $toolLabels, 'defaultValues' => $defaultValues,'block' => $block, 'page_formActionTag' => $page_formActionTag);
         return $this->renderWithData('addLink', $responseData);
     }
 
@@ -1511,5 +1536,800 @@ class CourseController extends AppController
                 $outcomes[] = array($v, 0);
             }
         }
+    }
+
+    public function actionCourse()
+    {
+        global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights,
+               $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
+               $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess,
+               $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useViewButtons,$previewshift, $useviewButtons;
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $myRights = $user['rights'];
+        $userId = $user['id'];
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $courseId = $this->getParamVal('cid');
+        $teacherId = $this->isTeacher($userId, $courseId);
+        $isStudent = $this->isStudent($userId, $courseId);
+        $stuView = $this->getParamVal('stuview');
+        $params = $this->getRequestParams();
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $teacherData = Teacher::getByUserId($userId,$courseId);
+        $type = $this->getParamVal('type');
+        if($myRights > AppConstant::STUDENT_RIGHT)
+        {
+            switch ($type) {
+                case 'assessment':
+                    return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
+                    break;
+                case 'inlinetext':
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
+                    break;
+                case 'linkedtext':
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId));
+                    break;
+                case 'forum':
+                    return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
+                    break;
+                case 'wiki':
+                    return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?courseId='.$courseId));
+                    break;
+                case 'block':
+                    return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&block=0&tb=t'));
+                    break;
+                case 'calendar':
+                    break;
+                case '':
+                    break;
+            }
+        }
+        if ($teacherData != null) {
+            if ($myRights>AppConstant::STUDENT_RIGHT) {
+                $teacherId = $teacherData['id'];
+                if (isset($params['stuview'])) {
+                    $sessionData['stuview'] = $params['stuview'];
+                    $this->writesessiondata($sessionData,$sessionId);
+                }
+                if (isset($params['teachview'])) {
+                    unset($sessionData['stuview']);
+                    $this->writesessiondata($sessionData,$sessionId);
+                }
+                if (isset($sessionData['stuview'])) {
+                    $previewShift = $sessionData['stuview'];
+                    unset($teacherId);
+
+                    $isStudent = $teacherData['id'];
+                }
+            } else {
+                $isTutor = $teacherData['id'];
+            }
+        }
+        $isTutor = $this->isTutor($userId, $courseId);
+        $body = "";
+        $from = $this->getParamVal('from');
+        $to = $this->getParamVal('to');
+        $toggleNewFlag = $this->getParamVal('togglenewflag');
+        $quickView = $this->getParamVal('quickview');
+        $folder = $this->getParamVal('folder');
+        $course = Course::getById($courseId);
+        $courseNewFlag = $course['newflag'];
+        $courseName = $course['name'];
+        $parent = AppConstant::NUMERIC_ZERO;
+        $previewShift = -1;
+        $previewshift = $this->getParamVal('stuview');
+        $useviewButtons = false;
+        $student = Student::getByCId($courseId);
+        $line  = Student::getStudentData($userId, $courseId);
+        if ($line != null) {
+            $studentId = $line['id'];
+            $studentInfo['timelimitmult'] = $line['timelimitmult'];
+            $studentInfo['section'] = $line['section'];
+        }
+        if (!isset($teacherId) && !isset($isTutor) && !isset($isStudent))
+        {
+
+            /*
+             * loaded by a NON-teacher
+             */
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = _("You are not enrolled in this course.  Please return to the <a href=\"#\">Home Page</a> and enroll\n");
+        } else {
+            /*
+             * PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+             */
+            if (($teacherId) && ($sessionData['sessiontestid']) && !($sessionData['actas']))
+            {
+                /*
+                 * clean up coming out of an assessment
+                 */
+                filehandler::deleteasidfilesbyquery2('id',$sessionData['sessiontestid'],null,1);
+                $sessionTestId = $sessionData['sessiontestid'];
+                AssessmentSession::deleteId($sessionTestId);
+            }
+
+            if (($teacherId) && ($from) && ($to)) {
+                $block = $this->getParamVal('block');
+                $result = $course->itemorder;
+                $items = unserialize($result);
+                $blockTree = explode('-',$block);
+                $sub =& $items;
+
+                for($i = 1; $i < count($blockTree)-1; $i++)
+                {
+                    /*
+                     * -1 to adjust for 1-indexing
+                     */
+                    $sub =& $sub[$blockTree[$i]-1]['items'];
+                }
+                if (count($blockTree) > 1)
+                {
+                    $curBlock =& $sub[$blockTree[$i]-1]['items'];
+                    $blockLoc = $blockTree[$i]-1;
+                } else {
+                    $curBlock =& $sub;
+                }
+
+                $blockLoc = $blockTree[count($blockTree)-1]-1;
+
+                if (strpos($to,'-')!==false)
+                {
+                    /*
+                     * in or out of block
+                     */
+                    if ($to[0]=='O')
+                    {
+                        /*
+                         * out of block
+                         * +3 to adjust for other block params
+                         */
+                        $itemToMove = $curBlock[$from-1];
+                        array_splice($curBlock, $from-1, 1);
+                        if (is_array($itemToMove)) {
+                            array_splice($sub,$blockLoc+1, 0, array($itemToMove));
+                        } else {
+                            array_splice($sub,$blockLoc+1, 0, $itemToMove);
+                        }
+                    } else {
+                        /*
+                         * in to block
+                         * -1 to adjust for 0 indexing vs 1 indexing
+                         */
+                        $itemToMove = $curBlock[$from-1];
+                        array_splice($curBlock,$from-1, 1);
+                        $to = substr($to, 2);
+                        if ($from<$to)
+                        {
+                            $adj = AppConstant::NUMERIC_ONE;
+                        } else {
+                            $adj = AppConstant::NUMERIC_ZERO;
+                        }
+                        array_push($curBlock[$to-1-$adj]['items'],$itemToMove);
+                    }
+                } else {
+                    /*
+                     * move inside block
+                     * -1 to adjust for 0 indexing vs 1 indexing
+                     */
+                    $itemToMove = $curBlock[$from-1];
+                    array_splice($curBlock, $from-1, 1);
+                    if (is_array($itemToMove)) {
+                        array_splice($curBlock, $to-1, 0, array($itemToMove));
+                    } else {
+                        array_splice($curBlock, $to-1, 0, $itemToMove);
+                    }
+                }
+                $itemList = serialize($items);
+                Course::setItemOrder($itemList, $courseId);
+                return $this->redirect('course?cid='.$courseId);
+            }
+
+            $line = Course::getCourseDataById($courseId);
+            if ($line == null) {
+                $overwriteBody = AppConstant::NUMERIC_ONE;
+                $body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
+            }
+
+            $allowUnEnroll = $line['allowunenroll'];
+            $hideIcons = $line['hideicons'];
+            $graphicalIcons = ($line['picicons']==1);
+            $pageTitle = $line['name'];
+            $items = unserialize($line['itemorder']);
+            $msgSet = $line['msgset']%5;
+            $toolSet = $line['toolset'];
+            $chatSet = $line['chatset'];
+            $latePassHrs = $line['latepasshrs'];
+            $useLeftBar = (($line['cploc']&1)==1);
+            $useLeftStuBar = (($line['cploc']&2)==2);
+            $useViewButtons = (($line['cploc']&4)==4);
+            $topBar = explode('|',$line['topbar']);
+            $topBar[0] = explode(',',$topBar[0]);
+            $topBar[1] = explode(',',$topBar[1]);
+            if (!($topBar[2]))
+            {
+                $topBar[2] = AppConstant::NUMERIC_ZERO;
+            }
+            if ($topBar[0][0] == null)
+            {
+                unset($topBar[0][0]);
+            }
+            if ($topBar[1][0] == null)
+            {
+                unset($topBar[1][0]);
+            }
+
+            if (($teacherId) && ($toggleNewFlag))
+            {
+                /*
+                 * handle toggle of NewFlag
+                 */
+                $sub =& $items;
+                $blockTree = explode('-',$toggleNewFlag);
+                if (count($blockTree) > 1) {
+                    for ($i = 1; $i < count($blockTree)-1; $i++)
+                    {
+                        /*
+                         * -1 to adjust for 1-indexing
+                         */
+                        $sub =& $sub[$blockTree[$i]-1]['items'];
+                    }
+                }
+                $sub =& $sub[$blockTree[$i]-1];
+                if (!($sub['newflag']) || $sub['newflag'] == 0)
+                {
+                    $sub['newflag'] = AppConstant::NUMERIC_ONE;
+                } else {
+                    $sub['newflag'] = AppConstant::NUMERIC_ZERO;
+                }
+                $itemList = addslashes(serialize($items));
+                Course::setItemOrder($itemList, $courseId);
+            }
+
+            /*
+             * enable teacher guest access
+             */
+
+            if ((!isset($folder) || $folder == '') && !isset($sessionData['folder'.$courseId])) {
+                $folder = '0';
+                $sessionData['folder'.$courseId] = '0';
+            } else if ((isset($folder) && $folder != '') && (!isset($sessionData['folder'.$courseId]) || $sessionData['folder'.$courseId] != $folder)) {
+                $sessionData['folder'.$courseId] = $folder;
+            } else if ((!isset($folder) || $folder == '') && isset($sessionData['folder'.$courseId])) {
+                $folder = $sessionData['folder'.$courseId];
+            }
+
+            if (!($quickView) && !($sessionData['quickview'.$courseId])) {
+                $quickView = false;
+            } else if ($quickView) {
+                $quickView = ($quickView);
+                $sessionData['quickview'.$courseId] = $quickView;
+            } else if (($sessionData['quickview'.$courseId])) {
+                $quickView = $sessionData['quickview'.$courseId];
+            }
+            if ($quickView == "on") {
+                $folder = '0';
+            }
+            if (($sessionData['ltiitemtype']) && $sessionData['ltiitemtype'] == 3)
+            {
+                if ($sessionData['lti_keytype'] != 'cc-of') {
+                    $useLeftBar = false;
+                    $useLeftStuBar = false;
+                }
+                $noCourseNav = true;
+                $usernameInHeader = false;
+            }
+            /*
+             * get exceptions
+             */
+            $now = time() + $previewShift;
+            $exceptions = array();
+            if (!($teacherId) && !($isTutor)) {
+                $result = Exceptions::getItemData($userId);
+
+                foreach($result as $key => $line){
+                    $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                }
+            }
+            /*
+             * update block start/end dates to show blocks containing items with exceptions
+             */
+//            if (count($exceptions) > 0) {
+//                upsendexceptions($items);
+//            }
+
+            if ($folder != '0')
+            {
+                $now = time() + $previewShift;
+                $blockTree = explode('-',$folder);
+                $backTrack = array();
+                for ($i = 1; $i < count($blockTree); $i++)
+                {
+                    $backTrack[] = array($items[$blockTree[$i]-1]['name'],implode('-',array_slice($blockTree, 0, $i+1)));
+                    if (!($teacherId) && !($isTutor) && $items[$blockTree[$i]-1]['avail'] < 2 && $items[$blockTree[$i]-1]['SH'][0]!='S' &&($now < $items[$blockTree[$i]-1]['startdate'] || $now > $items[$blockTree[$i]-1]['enddate'] || $items[$blockTree[$i]-1]['avail'] == '0'))
+                    {
+                        $folder = AppConstant::NUMERIC_ZERO;
+                        $items = unserialize($line['itemorder']);
+                        unset($backTrack);
+                        unset($blockTree);
+                        break;
+                    }
+                    if (($items[$blockTree[$i]-1]['grouplimit']) && count($items[$blockTree[$i]-1]['grouplimit']) > 0 && !($teacherId) && !($isTutor))
+                    {
+                        if (!in_array('s-'.$studentInfo['section'],$items[$blockTree[$i]-1]['grouplimit'])) {
+                            echo 'Not authorized';
+                            exit;
+                        }
+                    }
+                    /*
+                     * -1 to adjust for 1-indexing
+                     */
+                    $items = $items[$blockTree[$i]-1]['items'];
+                }
+            }
+            //DEFAULT DISPLAY PROCESSING
+            $jsAddress1 = AppUtility::getURLFromHome('course','course/course?cid=' .$courseId);
+            $jsAddress2 = AppUtility::getHomeURL();
+
+            $openBlocks = Array(0);
+            $prevLoadedbLocks = array(0);
+//            if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+//            {
+//                $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+//                $firstLoad = false;
+//            } else
+//            {
+//                $firstLoad = true;
+//            }
+            if (($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
+            {
+                $prevLoadedbLocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
+            }
+            $plbList = implode(',',$prevLoadedbLocks);
+            $obList = implode(',',$openBlocks);
+
+            $curBreadcrumb = $courseName;
+            if (($backTrack) && count($backTrack) > 0)
+            {
+                if (($sessionData['ltiitemtype']) && $sessionData['ltiitemtype'] == 3)
+                {
+                    $curBreadcrumb = '';
+                    $sendcrumb = '';
+                    $depth = substr_count($sessionData['ltiitemid'][1],'-');
+                    for ($i = $depth-1; $i < count($backTrack); $i++)
+                    {
+                        if ($i > $depth-1)
+                        {
+                            $curBreadcrumb .= " &gt; ";
+                            $sendcrumb .= " &gt; ";
+                        }
+                        if ($i != count($backTrack)-1)
+                        {
+                            $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\">";
+                        }
+                        $sendcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\">".stripslashes($backTrack[$i][0]).'</a>';
+                        $curBreadcrumb .= stripslashes($backTrack[$i][0]);
+                        if ($i != count($backTrack)-1)
+                        {
+                            $curBreadcrumb .= "</a>";
+                        }
+                    }
+                    $curName = $backTrack[count($backTrack)-1][0];
+
+                    if (count($backTrack) > $depth)
+                    {
+                        $backLink = "<span class=right><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+                    }
+                    $_SESSION['backtrack'] = array($sendcrumb,$backTrack[count($backTrack)-1][1]);
+                } else {
+                    $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder=0\">$courseName</a> ";
+                    for ($i = 0; $i < count($backTrack); $i++)
+                    {
+                        $curBreadcrumb .= " &gt; ";
+                        if ($i!=count($backTrack)-1)
+                        {
+                            $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\">";
+                        }
+                        $curBreadcrumb .= stripslashes($backTrack[$i][0]);
+                        if ($i != count($backTrack)-1)
+                        {
+                            $curBreadcrumb .= "</a>";
+                        }
+                    }
+                    $curName = $backTrack[count($backTrack)-1][0];
+                    if (count($backTrack) == 1)
+                    {
+                        $backLink =  "<span class=right><a href=\"course?cid=$courseId&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+                    } else {
+                        $backLink = "<span class=right><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+                    }
+                }
+//                print_r($curBreadcrumb); die;
+            } else {
+                $curBreadcrumb .= $courseName;
+                $curName = ucfirst($courseName);
+            }
+
+            if ($msgSet < 4)
+            {
+                $result = Message::getCountOfId($userId, $courseId);
+                $msgCnt = $result[0]['id'];
+                if ($msgCnt > 0)
+                {
+                    $newMsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$courseId\" style=\"color:red\">" . sprintf(_('New (%d)'), $msgCnt) . "</a>";
+                } else {
+                    $newMsgs = '';
+                }
+            }
+            $now = time();
+            $result = ForumThread::getDataByUserId($teacherId, $courseId, $userId, $now);
+            $newPostCnts = array();
+            foreach($result as $key => $row) {
+                $newPostCnts[$row['forumid']] = $row['COUNT(imas_forum_threads.id)'];
+            }
+            if (array_sum($newPostCnts) > 0)
+            {
+                $newPostsCnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$courseId\" style=\"color:red\">" . sprintf(_('New (%d)'), array_sum($newPostCnts)) . "</a>";
+            } else {
+                $newPostsCnt = '';
+            }
+
+            /**
+             *  get items with content views, for enabling stats link
+             */
+            if (($teacherId) || ($isTutor)) {
+                $hasStats = array();
+
+                $result = ContentTrack::getStatsData($courseId);
+                foreach($result as $key => $row)
+                {
+                    $hasStats[$row['typeid']] = true;
+                }
+            }
+
+            /*
+             * get latepasses
+             */
+            if (!($teacherId) && !($isTutor) && $previewShift == -1)
+            {
+                $result = Student::getLatePassById($userId, $courseId);
+                $latePasses = $result[0]['latepass'];
+            } else {
+                $latePasses = AppConstant::NUMERIC_ZERO;
+            }
+        }
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js','course/addItem.js']);
+        $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,
+        'items' => $items, 'folder' => $folder, 'parent' => $parent, 'firstLoad' => $firstLoad, 'jsAddress1' => $jsAddress1, 'jsAddress2' => $jsAddress2, 'curName' => $curName, 'curBreadcrumb' => $curBreadcrumb, 'isStudent' => $isStudent, 'students' => $student, 'newPostsCnt' => $newPostsCnt, 'backLink' => $backLink, 'type' => $type);
+        return $this->renderWithData('course', $responseData);
+    }
+
+    /**
+     * Get block items
+     */
+    public function actionGetBlockItems()
+    {
+        global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights,
+               $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
+               $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess;
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $courseId = $this->getParamVal('cid');
+        $teacherId = $this->isTeacher($userId, $courseId);
+        $isTutor = $this->isTutor($userId, $courseId);
+        $isStudent = $this->isStudent($userId, $courseId);
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $folder = $this->getParamVal('folder');
+        $previewShift = -1;
+
+        if (!($teacherId) && !($isTutor) && !($isStudent)) {
+            echo "You are not enrolled in this course.  Please return to the <a href=\"#\">Home Page</a> and enroll\n";
+            exit;
+        }
+
+        $line = Course::getCourseDataById($courseId);
+        if ($line == null) {
+            echo "Course does not exist.  <a href=\"#\">Return to main page</a></body></html>\n";
+            exit;
+        }
+
+        $allowUnEnroll = $line['allowunenroll'];
+        $hideIcons = $line['hideicons'];
+        $graphicalIcons = ($line['picicons']==1);
+        $pageTitle = $line['name'];
+        $items = unserialize($line['itemorder']);
+        $msgSet = $line['msgset']%5;
+        $latePassHrs = $line['latepasshrs'];
+        $useLeftBar = ($line['cploc']==1);
+        $topBar = explode('|',$line['topbar']);
+        $toolSet = $line['toolset'];
+        $topBar[0] = explode(',',$topBar[0]);
+        $topBar[1] = explode(',',$topBar[1]);
+        if ($topBar[0][0] == null) {unset($topBar[0][0]);}
+        if ($topBar[1][0] == null) {unset($topBar[1][0]);}
+
+        $now = time() + $previewShift;
+        $exceptions = array();
+
+        if (!($teacherId) && !($isTutor)) {
+            $result = Exceptions::getExceptionDataLatePass($userId);
+            foreach($result as $key => $line)
+            {
+               $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+            }
+        }
+            if (count($exceptions)>0) {
+//                upsendexceptions($items);
+            }
+
+            if (strpos($folder,'-') !== false)
+            {
+                $now = time() + $previewShift;
+                $blockTree = explode('-',$folder);
+                $backTrack = array();
+                for ($i = 1; $i < count($blockTree); $i++)
+                {
+                    $backTrack[] = array($items[$blockTree[$i]-1]['name'],implode('-',array_slice($blockTree,0,$i+1)));
+
+                    if (!($teacherId) && !($isTutor) && $items[$blockTree[$i]-1]['avail'] < 2 && $items[$blockTree[$i]-1]['SH'][0] != 'S' &&($now<$items[$blockTree[$i]-1]['startdate'] || $now>$items[$blockTree[$i]-1]['enddate'] || $items[$blockTree[$i]-1]['avail']=='0'))
+                    {
+                        $folder = 0;
+                        $items = unserialize($line['itemorder']);
+                        unset($backTrack);
+                        unset($blockTree);
+                        break;
+                    }
+                    $items = $items[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                }
+            }
+
+            $openBlocks = Array(0);
+//            if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+//            {
+//                $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);}
+//            if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
+//            {
+//                $prevLoadedBlocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
+//            } else {
+//                $prevLoadedBlocks = array();
+//            }
+//            if (in_array($folder,$prevLoadedBlocks))
+//            {
+//                $firstLoad = false;
+//            } else
+//            {
+//                $firstLoad = true;
+//            }
+
+            if (!($teacherId) && !($isTutor) && $previewShift == -1)
+            {
+                $result = Student::getLatePassById($userId, $courseId);
+                $latePasses = $result[0]['latepass'];
+            } else {
+                $latePasses = 0;
+            }
+            /*
+             * get new forum posts info
+             */
+            $result = ForumThread::getDataByUserId($teacherId, $courseId, $userId, $now);
+            $newPostCnts = array();
+            foreach($result as $key => $row) {
+                $newPostCnts[$row['forumid']] = $row['id'];
+            }
+            /*
+             * get items with content views, for enabling stats link
+             */
+            if (($teacherId) || ($$isTutor)) {
+                $hasStats = array();
+                $result = ContentTrack::getStatsData($courseId);
+                foreach($result as $key => $row) {
+                    $hasStats[$row['typeid']] = true;
+                }
+            }
+
+            if (count($items) > 0) {
+                /*
+                 * update block start/end dates to show blocks containing items with exceptions
+                 */
+                $showItems = new ShowItemCourse();
+                $showItems->showItems($items,$folder);
+            } else if ($teacherId) {
+                echo ShowItemCourse::generateAddItem($folder,'b');
+         }
+
+//            if ($firstLoad) {
+//                echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;</script>\n";
+//            }
+            if (($isTutor) && ($sessionData['ltiitemtype']) && $sessionData['ltiitemtype']==3)
+            {
+                echo '<script type="text/javascript">$(".instrdates").hide();</script>';
+            }
+
+            $this->includeJS(['course.js']);
+        }
+
+    /*
+     * Ajax method to copy course items
+     */
+    public function actionCopyItemsAjax()
+    {
+        $params = $this->getRequestParams();
+        $courseId = $params['courseId'];
+        $block = $params['block'];
+        $itemType = $params['itemType'];
+        $copyItemId = $params['copyid'];
+        if (isset($params['noappend'])) {
+            $params['append'] = "";
+        } else {
+            $params['append'] = AppConstant::COPY;
+        }
+        $params['ctc'] = $courseId;
+        $gradeBookCategory = array();
+        $gradeBookData =  GbCats::getByCourseId($courseId);
+        if ($gradeBookData){
+            foreach ($gradeBookData as $singleRecord){
+                $gradeBookCategory[$singleRecord['id']] = $singleRecord['id'];
+            }
+        }
+        global $outComes;
+        $outComes = array();
+        $outComesData = Outcomes::getByCourseId($courseId);
+        if ($outComesData){
+            foreach ($outComesData as $singleRecord){
+                $outComes[$singleRecord['id']] = $singleRecord['id'];
+            }
+        }
+        $courseData = Course::getById($courseId);
+        $blockCount = $courseData['blockcnt'];
+        $items = unserialize($courseData['itemorder']);
+        $connection = $this->getDatabase();
+        $transaction = $connection->beginTransaction();
+        try{
+            $notImportant = array();
+            $this->copyCourseItems($items, AppConstant::NUMERIC_ZERO, false, $notImportant, $copyItemId, $blockCount, $gradeBookCategory, $params);
+            CopyItemsUtility::copyrubrics();
+            $itemOrder = serialize($items);
+            Course::setBlockCount($itemOrder,$blockCount,$courseId);
+            $transaction->commit();
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return false;
+        }
+        return $this->successResponse();
+    }
+
+    public function copyCourseItems(&$items, $parent, $copyInside, &$addToArray, $copyItemId, $blockCount, $gradeBookCategory, $params) {
+        foreach ($items as $k => $item) {
+            if (is_array($item)) {
+                if (($parent.'-'.($k+AppConstant::NUMERIC_ONE)==$copyItemId) || $copyInside) { //copy block
+                    $newBlock = array();
+                    $newBlock['name'] = $item['name'].stripslashes($params['append']);
+                    $newBlock['id'] = $blockCount;
+                    $blockCount++;
+                    $newBlock['startdate'] = $item['startdate'];
+                    $newBlock['enddate'] = $item['enddate'];
+                    $newBlock['avail'] = $item['avail'];
+                    $newBlock['SH'] = $item['SH'];
+                    $newBlock['colors'] = $item['colors'];
+                    $newBlock['fixedheight'] = $item['fixedheight'];
+                    $newBlock['grouplimit'] = $item['grouplimit'];
+                    $newBlock['items'] = array();
+                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
+                        $this->copyCourseItems($items[$k]['items'], $parent.'-'.($k+AppConstant::NUMERIC_ONE), true, $newBlock['items'], $copyItemId, $blockCount, $gradeBookCategory, $params);
+                    }
+                    if (!$copyInside) {
+                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($newBlock));
+                        return AppConstant::NUMERIC_ZERO;
+                    } else {
+                        $addToArray[] = $newBlock;
+                    }
+                } else {
+                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
+                        $emptyArray = array();
+                        $this->copyCourseItems($items[$k]['items'],$parent.'-'.($k+AppConstant::NUMERIC_ONE),false,$emptyArray,$copyItemId,$blockCount,$gradeBookCategory,$params);
+                    }
+                }
+            } else {
+                if ($item==$copyItemId || $copyInside) {
+                    $newItem = CopyItemsUtility::copyitem($item,$gradeBookCategory,$params);
+                    if (!$copyInside) {
+                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,intval($newItem));
+                        return AppConstant::NUMERIC_ZERO;
+                    } else {
+                        $addToArray[] = intval($newItem);
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Ajax method to delete course items
+     */
+    public function actionDeleteItemsAjax()
+    {
+        $params = $this->getRequestParams();
+        $user = $this->getAuthenticatedUser();
+        $courseId = $params['courseId'];
+        $block = $params['block'];
+        $itemType = $params['itemType'];
+        $itemId = $params['id'];
+        $connection = $this->getDatabase();
+        $transaction = $connection->beginTransaction();
+        try{
+            switch($itemType){
+                case AppConstant::FORUM:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    Forums::deleteForum($itemId);
+                    ForumSubscriptions::deleteSubscriptionsEntry($itemId,$user['id']);
+                    $postId = ForumPosts::getForumPostByFile($itemId);
+                    $threadIdArray = ForumThread::findThreadCount($itemId);
+                    foreach($threadIdArray as $singleThread){
+                        ForumView::deleteByForumIdThreadId($singleThread['id']);
+                    }
+                    ForumPosts::deleteForumPost($itemId);
+                    Thread::deleteThreadByForumId($itemId);
+                    break;
+                case AppConstant::ASSESSMENT:
+                    AssessmentSession::deleteByAssessmentId($itemId);
+                    Questions::deleteByAssessmentId($itemId);
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    Assessments::deleteAssessmentById($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::CALENDAR:
+                    $itemDeletedId = Items::deletedCalendar($itemId,$itemType);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::INLINE_TEXT:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    InlineText::deleteInlineTextId($itemId);
+
+                    InstrFiles::deleteById($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::WIKI:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    Wiki::deleteById($itemId);
+                    WikiRevision::deleteByWikiId($itemId);
+                    WikiView::deleteByWikiId($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::LINK:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    $linkData = Links::getById($itemId);
+                    $points = $linkData['points'];
+                    if($points > AppConstant::NUMERIC_ZERO){
+                        Grades::deleteByGradeTypeId($itemId);
+                    }
+                    Links::deleteById($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::BLOCK:
+                    $course = Course::getById($courseId);
+                    $blockData = unserialize($course['itemorder']);
+                    $blockTree = explode('-',$itemId);
+                    $blockCnt='';
+                    $blockId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
+                    $sub =& $blockData;
+                    if (count($blockTree)>AppConstant::NUMERIC_ONE)
+                    {
+                        for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++)
+                        {
+                            $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+                        }
+                    }
+                    $itemList =(serialize($blockData));
+                    Course::setBlockCount($itemList,$blockCnt=null,$courseId);
+            }
+            $transaction->commit();
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return false;
+        }
+        return $this->successResponse();
     }
 }

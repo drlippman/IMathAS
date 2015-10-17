@@ -707,100 +707,100 @@ class InstructorController extends AppController
         }
         Items::deleteByTypeIdName($itemId,$ItemType['itemtype']);
     }
-    /*
-     * Ajax method to copy course items
-     */
-    public function actionCopyItemsAjax()
-    {
-        $params = $this->getRequestParams();
-        $courseId = $params['courseId'];
-        $block = $params['block'];
-        $itemType = $params['itemType'];
-        $copyItemId = $params['copyid'];
-        if (isset($params['noappend'])) {
-            $params['append'] = "";
-        } else {
-            $params['append'] = AppConstant::COPY;
-        }
-        $params['ctc'] = $courseId;
-        $gradeBookCategory = array();
-        $gradeBookData =  GbCats::getByCourseId($courseId);
-        if ($gradeBookData){
-            foreach ($gradeBookData as $singleRecord){
-                $gradeBookCategory[$singleRecord['id']] = $singleRecord['id'];
-            }
-        }
-        global $outComes;
-        $outComes = array();
-        $outComesData = Outcomes::getByCourseId($courseId);
-        if ($outComesData){
-            foreach ($outComesData as $singleRecord){
-                $outComes[$singleRecord['id']] = $singleRecord['id'];
-            }
-        }
-        $courseData = Course::getById($courseId);
-        $blockCount = $courseData['blockcnt'];
-        $items = unserialize($courseData['itemorder']);
-        $connection = $this->getDatabase();
-        $transaction = $connection->beginTransaction();
-        try{
-            $notImportant = array();
-            $this->copyCourseItems($items, AppConstant::NUMERIC_ZERO, false, $notImportant, $copyItemId, $blockCount, $gradeBookCategory, $params);
-            CopyItemsUtility::copyrubrics();
-            $itemOrder = serialize($items);
-            Course::setBlockCount($itemOrder,$blockCount,$courseId);
-            $transaction->commit();
-        }catch (Exception $e){
-            $transaction->rollBack();
-            return false;
-        }
-        return $this->successResponse();
-    }
-
-    public function copyCourseItems(&$items, $parent, $copyInside, &$addToArray, $copyItemId, $blockCount, $gradeBookCategory, $params) {
-        foreach ($items as $k => $item) {
-            if (is_array($item)) {
-                if (($parent.'-'.($k+AppConstant::NUMERIC_ONE)==$copyItemId) || $copyInside) { //copy block
-                    $newBlock = array();
-                    $newBlock['name'] = $item['name'].stripslashes($params['append']);
-                    $newBlock['id'] = $blockCount;
-                    $blockCount++;
-                    $newBlock['startdate'] = $item['startdate'];
-                    $newBlock['enddate'] = $item['enddate'];
-                    $newBlock['avail'] = $item['avail'];
-                    $newBlock['SH'] = $item['SH'];
-                    $newBlock['colors'] = $item['colors'];
-                    $newBlock['fixedheight'] = $item['fixedheight'];
-                    $newBlock['grouplimit'] = $item['grouplimit'];
-                    $newBlock['items'] = array();
-                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
-                        $this->copyCourseItems($items[$k]['items'], $parent.'-'.($k+AppConstant::NUMERIC_ONE), true, $newBlock['items'], $copyItemId, $blockCount, $gradeBookCategory, $params);
-                    }
-                    if (!$copyInside) {
-                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($newBlock));
-                        return AppConstant::NUMERIC_ZERO;
-                    } else {
-                        $addToArray[] = $newBlock;
-                    }
-                } else {
-                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
-                        $emptyArray = array();
-                        $this->copyCourseItems($items[$k]['items'],$parent.'-'.($k+AppConstant::NUMERIC_ONE),false,$emptyArray,$copyItemId,$blockCount,$gradeBookCategory,$params);
-                    }
-                }
-            } else {
-                if ($item==$copyItemId || $copyInside) {
-                    $newItem = CopyItemsUtility::copyitem($item,$gradeBookCategory,$params);
-                    if (!$copyInside) {
-                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,intval($newItem));
-                        return AppConstant::NUMERIC_ZERO;
-                    } else {
-                        $addToArray[] = intval($newItem);
-                    }
-                }
-            }
-        }
-    }
+//    /*
+//     * Ajax method to copy course items
+//     */
+//    public function actionCopyItemsAjax()
+//    {
+//        $params = $this->getRequestParams();
+//        $courseId = $params['courseId'];
+//        $block = $params['block'];
+//        $itemType = $params['itemType'];
+//        $copyItemId = $params['copyid'];
+//        if (isset($params['noappend'])) {
+//            $params['append'] = "";
+//        } else {
+//            $params['append'] = AppConstant::COPY;
+//        }
+//        $params['ctc'] = $courseId;
+//        $gradeBookCategory = array();
+//        $gradeBookData =  GbCats::getByCourseId($courseId);
+//        if ($gradeBookData){
+//            foreach ($gradeBookData as $singleRecord){
+//                $gradeBookCategory[$singleRecord['id']] = $singleRecord['id'];
+//            }
+//        }
+//        global $outComes;
+//        $outComes = array();
+//        $outComesData = Outcomes::getByCourseId($courseId);
+//        if ($outComesData){
+//            foreach ($outComesData as $singleRecord){
+//                $outComes[$singleRecord['id']] = $singleRecord['id'];
+//            }
+//        }
+//        $courseData = Course::getById($courseId);
+//        $blockCount = $courseData['blockcnt'];
+//        $items = unserialize($courseData['itemorder']);
+//        $connection = $this->getDatabase();
+//        $transaction = $connection->beginTransaction();
+//        try{
+//            $notImportant = array();
+//            $this->copyCourseItems($items, AppConstant::NUMERIC_ZERO, false, $notImportant, $copyItemId, $blockCount, $gradeBookCategory, $params);
+//            CopyItemsUtility::copyrubrics();
+//            $itemOrder = serialize($items);
+//            Course::setBlockCount($itemOrder,$blockCount,$courseId);
+//            $transaction->commit();
+//        }catch (Exception $e){
+//            $transaction->rollBack();
+//            return false;
+//        }
+//        return $this->successResponse();
+//    }
+//
+//    public function copyCourseItems(&$items, $parent, $copyInside, &$addToArray, $copyItemId, $blockCount, $gradeBookCategory, $params) {
+//        foreach ($items as $k => $item) {
+//            if (is_array($item)) {
+//                if (($parent.'-'.($k+AppConstant::NUMERIC_ONE)==$copyItemId) || $copyInside) { //copy block
+//                    $newBlock = array();
+//                    $newBlock['name'] = $item['name'].stripslashes($params['append']);
+//                    $newBlock['id'] = $blockCount;
+//                    $blockCount++;
+//                    $newBlock['startdate'] = $item['startdate'];
+//                    $newBlock['enddate'] = $item['enddate'];
+//                    $newBlock['avail'] = $item['avail'];
+//                    $newBlock['SH'] = $item['SH'];
+//                    $newBlock['colors'] = $item['colors'];
+//                    $newBlock['fixedheight'] = $item['fixedheight'];
+//                    $newBlock['grouplimit'] = $item['grouplimit'];
+//                    $newBlock['items'] = array();
+//                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
+//                        $this->copyCourseItems($items[$k]['items'], $parent.'-'.($k+AppConstant::NUMERIC_ONE), true, $newBlock['items'], $copyItemId, $blockCount, $gradeBookCategory, $params);
+//                    }
+//                    if (!$copyInside) {
+//                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($newBlock));
+//                        return AppConstant::NUMERIC_ZERO;
+//                    } else {
+//                        $addToArray[] = $newBlock;
+//                    }
+//                } else {
+//                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
+//                        $emptyArray = array();
+//                        $this->copyCourseItems($items[$k]['items'],$parent.'-'.($k+AppConstant::NUMERIC_ONE),false,$emptyArray,$copyItemId,$blockCount,$gradeBookCategory,$params);
+//                    }
+//                }
+//            } else {
+//                if ($item==$copyItemId || $copyInside) {
+//                    $newItem = CopyItemsUtility::copyitem($item,$gradeBookCategory,$params);
+//                    if (!$copyInside) {
+//                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,intval($newItem));
+//                        return AppConstant::NUMERIC_ZERO;
+//                    } else {
+//                        $addToArray[] = intval($newItem);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     public function actionTimeShift()
     {
@@ -1678,14 +1678,13 @@ class InstructorController extends AppController
 
     public function actionSaveQuickRecorder()
     {
-        global $items;
+        global $items,$courseId,$newItems,$courseDetail,$openblocks,$previewShift;
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $order = $params['order'];
-
+        $previewShift = -1;
         foreach ($params as $id => $val)
         {
-
             if ($id == "order")
             {
                 continue;

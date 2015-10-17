@@ -1022,7 +1022,7 @@ class QuestionController extends AppController
                     Questions::updateQuestionFields($params[$row['id']], $row['id']);
                 }
             }
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId));
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
         }
         $query = Outcomes::getByCourse($courseId);
         $outcomeNames = array();

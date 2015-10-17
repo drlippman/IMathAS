@@ -594,4 +594,15 @@ class Course extends BaseImasCourses {
         $data->bindValue('userId',$userId);
         return $data->queryAll();
     }
+
+    public static function getCourseDataById($courseId)
+    {
+        $query = new Query();
+        $query	->select(['name','itemorder','hideicons','picicons','allowunenroll','msgset','toolset','chatset','topbar','cploc','latepasshrs'])
+        ->from(['imas_courses'])
+        ->where(['id' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }

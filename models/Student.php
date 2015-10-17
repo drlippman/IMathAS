@@ -544,5 +544,17 @@ class Student extends BaseImasStudents
         $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
         return \Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getStudentData($userId, $courseId)
+    {
+        $query = new Query();
+        $query->select(['id','locked','timelimitmult', 'section'])
+            ->from('imas_students')
+            ->where(['userid' => $userId]);
+            $query->andWhere(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }
 

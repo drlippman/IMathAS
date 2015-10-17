@@ -185,10 +185,10 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function externalToolsDataForLink($courseId, $groupId)
     {
-        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= :courseId ";
-        $query .= "OR (courseid=0 AND (groupid= :groupId OR groupid=0)) ORDER BY name";
+        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= $courseId ";
+        $query .= "OR (courseid=0 AND (groupid= $groupId OR groupid=0)) ORDER BY name";
         $groupNames = \Yii::$app->db->createCommand($query);
-        $groupNames->bindValues(['courseId' => $courseId, 'qroupid' => $groupId]);
+//        $groupNames->bindValues(['courseId' => $courseId, 'qroupid' => $groupId]);
         return $groupNames->queryAll();
     }
 

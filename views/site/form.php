@@ -101,11 +101,9 @@ $emailErr = "";
             $hpsets .= ' /> New forum posts widget<br/>';
         }
         if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(3,$CFG['GEN']['fixedhomelayout'])) {
-
             $hpsets .= '<input type="checkbox" name="homelayout3-0" ';
             if (in_array(0,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
             $hpsets .= ' /> New messages notes on course list<br/>';
-
             $hpsets .= '<input type="checkbox" name="homelayout3-1" ';
             if (in_array(1,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
             $hpsets .= ' /> New posts notes on course list<br/>';

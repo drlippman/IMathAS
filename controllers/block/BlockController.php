@@ -33,15 +33,16 @@ class BlockController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
         $this->layout = 'master';
-        $courseId = $this->getParamVal('courseId');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $courseName = $course['name'];
         $blockData = unserialize($course['itemorder']);
         $toTb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
         $modify = $this->getParamVal('modify');
-        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $teacherId = $this->isTeacher($userId, $courseId);
         $this->noValidRights($teacherId);
         if(isset($toTb))
         {
@@ -131,6 +132,7 @@ class BlockController extends AppController
         $params = $this->getRequestParams();
         $course = Course::getById($params['courseId']);
         $blockCnt = $course['blockcnt'];
+        $toTb = $this->getParamVal('tb');
         $blockData = unserialize($course['itemorder']);
         if (isset($params['block']))
         {
@@ -218,7 +220,7 @@ class BlockController extends AppController
         }
         $finalBlockItems =(serialize($blockData));
         Course::UpdateItemOrder($finalBlockItems,$params['courseId'],$blockCnt);
-        $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$params['courseId']));
+        $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$params['courseId']));
     }
 
     public function actionNewFlag()
@@ -246,7 +248,7 @@ class BlockController extends AppController
         }
         $finalBlockItems =(serialize($blockData));
         Course::UpdateItemOrder($finalBlockItems,$courseId,$blockCnt=null);
-        $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
+        $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
     }
 
     public function actionEditContent()
@@ -272,7 +274,7 @@ class BlockController extends AppController
                 $blockData = $blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
             }
         }
-        $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
+        $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
     }
 
     /**
@@ -320,7 +322,7 @@ class BlockController extends AppController
             $itemorder = serialize($items);
             $saveItemOrderIntoCourse = new Course();
             $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id));
         }
         else
         {
@@ -479,9 +481,9 @@ class BlockController extends AppController
             $blockName = $backtrack[count($backtrack)-1][0];
 
             if (count($backtrack) == AppConstant::NUMERIC_ONE) {
-                $backlink =  "<span class=right><a href='".AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$courseId)."'>Back</a></span><br class=\"form\" />";
+                $backlink =  "<span class=right><a href='".AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId)."'>Back</a></span><br class=\"form\" />";
             } else {
-                $backlink = "<span class=right><a href=".AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$courseId. '&folder='.$backtrack[count($backtrack)-2][1]).">Back</a></span><br class=\"form\" />";
+                $backlink = "<span class=right><a href=".AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId. '&folder='.$backtrack[count($backtrack)-2][1]).">Back</a></span><br class=\"form\" />";
             }
         } else {
             $blockName = $course->name;

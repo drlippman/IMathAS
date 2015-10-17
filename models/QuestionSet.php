@@ -764,4 +764,9 @@ class QuestionSet extends BaseImasQuestionset
     public static function getExtRef($id){
         return QuestionSet::find()->select('extref')->where(['id' => $id])->one();
     }
+    public static function getBrokenData()
+    {
+        $query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

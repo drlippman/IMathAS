@@ -158,4 +158,17 @@ class WikiRevision extends BaseImasWikiRevisions
         $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupId' ORDER BY id DESC LIMIT 1";
         return \Yii::$app->db->createCommand($query)->queryOne();
     }
+
+    public static function getMaxTime($typeid, $groupSetId, $canEdit, $wikiGrpId)
+    {
+        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
+        if ($groupSetId >0 && !$canEdit) {
+            /*
+             * if group and not instructor limit to group
+             */
+            $query .= "AND stugroupid='$wikiGrpId' ";
+        }
+        $query .= "GROUP BY stugroupid";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

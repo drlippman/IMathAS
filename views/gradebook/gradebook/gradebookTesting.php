@@ -274,6 +274,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
     if (count($gbt)<500) {
         echo "<script type='javascript'>initSortTable('myTable',Array($sarr),true,false);</script>\n";
     }
+
 } ?>
 <!--    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>-->
 <!--    <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>-->

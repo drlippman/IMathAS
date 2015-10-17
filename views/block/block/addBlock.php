@@ -5,13 +5,13 @@ use kartik\date\DatePicker;
 use app\components\AppUtility;
 
 $this->title = $defaultBlockData['pageTitle'];
-$this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/instructor/instructor/index?cid='.$courseId]];
+$this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/course/course/course?cid='.$courseId]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <form method=post action="create-block?courseId=<?php echo $courseId; if(isset($block)){echo "&block=$block";} if(isset($toTb)){echo "&toTb=$toTb";} if(isset($id)){echo "&id=$id";}?>">
     <div class="item-detail-header">
-            <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$courseName], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId], 'page_title' => $this->title]); ?>
+            <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$courseName], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$courseId], 'page_title' => $this->title]); ?>
     </div>
     <div class = "title-container">
         <div class="row">

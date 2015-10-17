@@ -50,7 +50,7 @@ for ($i=0; $i<3; $i++) {
                                 else
                                 {?>
                                     <span class="delx" onclick="return hidefromcourselist(<?php echo $student['id'] ?>,this);" title="Hide from course list">x</span>
-                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student['id']) ?>"><?php echo isset($student['name']) ? ucfirst($student['name']) : ""; ?></a>
+                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $student['id']) ?>"><?php echo ucfirst($student['name']) ? ucfirst($student['name']) : ""; ?></a>
                                     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $student['id'].'&newmsg=1') ?>" class="msg-notification">
                                         <?php
                                         if($msgRecord){

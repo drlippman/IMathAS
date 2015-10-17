@@ -1290,6 +1290,11 @@ class ForumController extends AppController
             $groupNameLabel[$key] = AppConstant::USE_GROUP_SET . $group['name'];
             $key++;
         }
+        if (isset($params['tb'])) {
+            $filter = $params['tb'];
+        } else {
+            $filter = 'b';
+        }
         $key = AppConstant::NUMERIC_ZERO;
         $gbCatsData = GbCats::getByCourseId($courseId);
         foreach ($gbCatsData as $singleGbCatsData) {
@@ -1437,6 +1442,9 @@ class ForumController extends AppController
                 $outcomes = ' ';
             }
             list($postTag, $replyTag) = explode('--', $forumData['caltag']);
+            $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
+            $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+            $page_formActionTag .= "&tb=$filter";
             $defaultValue = array(
                 'allowAnonymous' => $allNon,
                 'allowModify' => $allMod,
@@ -1597,18 +1605,22 @@ class ForumController extends AppController
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
                     $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
                 }
-                array_unshift($sub, intval($lastItemId));
+                if ($filter=='b') {
+                    $sub[] = $lastItemId;
+                } else if ($filter=='t') {
+                    array_unshift($sub,$lastItemId);
+                }
                 $itemOrder = serialize($items);
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
             }
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id));
         }
         $this->includeJS(["editor/tiny_mce.js", "forum/addforum.js", "general.js"]);
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course, 'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
             'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue, 'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
-            'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'block' => $block);
+            'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'block' => $block,'page_formActionTag' => $page_formActionTag);
         return $this->renderWithData('addForum', $responseData);
     }
 

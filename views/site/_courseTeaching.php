@@ -41,7 +41,7 @@ for ($i=0; $i<3; $i++) {
                 if(($teacher->available & 2) == 0){
                 ?>
                     <li>
-                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid='. $teacher['id'].'&folder=0') ?>"><?php echo isset($teacher['name']) ? ucfirst($teacher['name']) : ""; ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid='. $teacher['id'].'&folder=0') ?>"><?php echo isset($teacher['name']) ? ucfirst($teacher['name']) : ""; ?></a>
                         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $teacher['id']) ?>" class="msg-notification">
                             <?php
                             if($msgRecord){

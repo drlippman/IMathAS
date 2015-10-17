@@ -513,4 +513,15 @@ class Assessments extends BaseImasAssessments
     {
         return Assessments::find()->select('courseid')->where(['id' => $typeId])->one();
     }
+
+    public static function getAssessmentDataById($typeId)
+    {
+        $query = new Query();
+        $query	->select(['name','summary','startdate','enddate','reviewdate','deffeedback','reqscore','reqscoreaid','avail','allowlate','timelimit'])
+            ->from(['imas_assessments'])
+            ->where(['id' => $typeId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }

@@ -621,7 +621,25 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $data = Yii::$app->db->createCommand($query);
         $data->bindValue('id',$id);
         return $data->execute();
+    }
+    public static function deleteId($data)
+    {
+        $data = AssessmentSession::find()->where(['id' => $data])->limit(1)->one();
+        if($data){
+            $data->delete();
+        }
+    }
 
+    public static function getBestScore($id, $userId)
+    {
+        $query = new Query();
+        $query	->select(['bestscores'])
+            ->from(['imas_assessment_sessions'])
+            ->where(['assessmentid' => $id]);
+        $query->andWhere(['userid' => $userId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
     }
 }
 

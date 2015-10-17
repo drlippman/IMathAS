@@ -421,7 +421,7 @@ class WikiController extends AppController
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $this->layout = "master";
-        $courseId = $this->getParamVal('courseId');
+        $courseId = $this->getParamVal('cid');
         $wikiId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $wiki = Wiki::getById($wikiId);
@@ -432,6 +432,11 @@ class WikiController extends AppController
         $saveTitle = '';
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $this->noValidRights($teacherId);
+        if (isset($params['tb'])) {
+            $filter = $params['tb'];
+        } else {
+            $filter = 'b';
+        }
         if ($params['id']) {
             $wiki = Wiki::getById($params['id']);
 
@@ -487,11 +492,14 @@ class WikiController extends AppController
                 'rdatetype' => date("m/d/Y",strtotime("+1 week")),
             );
         }
+        $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
+        $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
+        $page_formActionTag .= "&tb=$filter";
         if ($this->isPost()) {
             if ($wikiid) {
                 $link = new Wiki();
                 $link->updateChange($params);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id));
             } else{
                 if ($params['avail']== AppConstant::NUMERIC_ONE) {
                     if ($params['available-after'] == '0') {
@@ -517,13 +525,13 @@ class WikiController extends AppController
                     $startDate = AppConstant::NUMERIC_ZERO;
                     $endDate =  AppConstant::ALWAYS_TIME;
                 }
-                $finalArray['courseid'] = $params['courseId'];
+                $finalArray['courseid'] = $params['cid'];
                 $finalArray['title'] = $params['name'];
                 $finalArray['description'] = $params['description'];
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['startdate'] = $startDate;
                 $finalArray['enddate'] = $endDate;
-                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id.'&block='.$block);
+//                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id.'&block='.$block);
                 $saveChanges = new Wiki();
                 $lastWikiId = $saveChanges->createItem($finalArray);
                 $saveItems = new Items();
@@ -537,16 +545,20 @@ class WikiController extends AppController
                 for ($i=1;$i<count($blocktree);$i++) {
                     $sub =& $sub[$blocktree[$i]-1]['items'];
                 }
-                array_unshift($sub,intval($lastItemsId));
+                if ($filter=='b') {
+                    $sub[] = $lastItemsId;
+                } else if ($filter=='t') {
+                    array_unshift($sub,$lastItemsId);
+                }
                 $itemorder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id));
             }
         }
         $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
-        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag);
         return $this->render('addWiki', $returnData);
     }
 }

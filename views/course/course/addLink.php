@@ -13,12 +13,14 @@ $this->title = $defaultValues['saveTitle'];
         'options' => ['enctype' => 'multipart/form-data'],
         'action' => 'add-link?cid=' . $course['id'] . '&id='.$linkData['id'].'&block='.$block,
     ]);
-    ?>
+   if ($linkData['id']){ ?>
+        <input type="hidden" name="modifyFid" value="<?php echo $modifyForumId;?>">
+    <?php } ?>   ?>
 <?php } else { ?>
     <?php $form = ActiveForm::begin([
         'validateOnSubmit' => false,
         'options' => ['enctype' => 'multipart/form-data'],
-        'action' => 'add-link?cid='.$course['id'].'&block='.$block,
+        'action' => $page_formActionTag,
     ]);
     ?>
 <?php } ?>
