@@ -865,7 +865,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				}
 				strarr.push(fullstr.substring(lastpos));
 			  } else {
-				  var strarr = fullstr.split(/U/);
+				  var strarr = fullstr.split(/U/i);
 			  }
 			  for (k=0; k<strarr.length; k++) {
 				  str = strarr[k];

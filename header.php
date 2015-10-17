@@ -50,16 +50,10 @@ if (isset($CFG['locale'])) {
 	}
 }
 if (isset($coursetheme) && strpos($coursetheme,'_dark')!==false) {$mathdarkbg = true;} else {$mathdarkbg = false;}
-if (isset($ispublic) && $ispublic) {
-	//echo "<script src=\"$imasroot/javascript/ASCIIMathMLwFallback.js?ver=020514\" type=\"text/javascript\"></script>\n";
-	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'"; function rendermathnode(el) {AMprocessNode(el);} ';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=092514\" type=\"text/javascript\"></script>\n";
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?ver=012314\" type=\"text/javascript\"></script>\n";
-	echo "<script type=\"text/javascript\">var usingASCIIMath = true; var usingASCIISvg = true;</script>"; 
-	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
-	echo '</script>'; 
-	echo '<script type="text/javascript">var AScgiloc = "'.$imasroot.'/filter/graph/svgimg.php";</script>'; 
-} else {
+if (isset($ispublic) && $ispublic && !isset($sessiondata['mathdisp'])) {
+	$sessiondata['mathdisp'] = 1;
+	$sessiondata['graphdisp'] = 1;
+}
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
@@ -124,8 +118,6 @@ if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/mathjs.js?ver=012314\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false; var ASnoSVG=true;</script>";
 }
-}
-
 
 $start_time = microtime(true); 
 if (isset($placeinhead)) {
