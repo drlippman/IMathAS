@@ -706,7 +706,6 @@ function generaterandstring() {
     {
         if(!$teacherId)
         {
-            AppUtility::dump('hey Soo ja :p');
             $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
             return $this->redirect($this->goHome());
         }
