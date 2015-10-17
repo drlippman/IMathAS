@@ -174,13 +174,16 @@ function insertAction() {
 	}
 
 	// Remove element if there is no href
-	if (!document.forms[0].href.value || !document.forms[0].title.value) {
+	if (!document.forms[0].href.value) {
 		i = inst.selection.getBookmark();
 		inst.dom.remove(elm, 0);
 		inst.selection.moveToBookmark(i);
 		tinyMCEPopup.execCommand("mceEndUndoLevel");
 		tinyMCEPopup.close();
 		return;
+	}
+	if (!document.forms[0].title.value) {
+		document.forms[0].title.value = document.forms[0].href.value.substring(document.forms[0].href.value.lastIndexOf('/')+1);
 	}
 
 	// Create new anchor elements
