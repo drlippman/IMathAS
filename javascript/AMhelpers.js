@@ -19,6 +19,8 @@ function calculate(inputId,outputId,format) {
   
   if (format.indexOf('list')!=-1) {
 	  var strarr = fullstr.split(/,/);
+  } else if (format.indexOf('set')!=-1) {
+  	  var strarr = fullstr.replace(/[\{\}]/g,'').split(/,/);
   } else {
 	  var strarr = new Array();
 	  strarr[0] = fullstr;
@@ -72,6 +74,13 @@ function calculate(inputId,outputId,format) {
 	  strarr[sc] = str+" ";
   }
   fullstr = strarr.join(', ');
+  if (format.indexOf('set')!=-1) {
+  	  if (!document.getElementById(inputId).value.match(/^\s*{.*?}\s*$/)) {
+  	  	  fullstr += ("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}");
+  	  } else {
+  	  	  fullstr = '{'+fullstr+'}';
+  	  }
+  }
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
@@ -899,6 +908,12 @@ function doonsubmit(form,type2,skipconfirm) {
 		
 		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
+		} else if (calcformat[qn].indexOf('set')!=-1) {
+			if (!str.match(/^\s*{.*?}\s*$/)) {
+				continue;
+			} else {
+				strarr = str.replace(/^\s*{(.*?)}\s*$/,'$1').split(/,/);
+			}
 		} else {
 			var strarr = new Array();
 			strarr[0] = str;
