@@ -1,3 +1,4 @@
+var path = $('.home-path').val();
 function ahah(url, target) {
   document.getElementById(target).innerHTML = ' Fetching data... ';
   if (window.XMLHttpRequest) {
@@ -64,7 +65,7 @@ function toggleblock(bnum,folder) {
           node.className = 'hidden';
           //butn.value = 'Expand';
 	  if (img != null) {
-		  img.src = 'http://localhost/math/web/' +'/img/expand.gif';
+		  img.src =  path+'img/expand.gif';
 	  }
           if (loc>-1) {oblist.splice(loc,1);}
       } else {
@@ -77,7 +78,7 @@ function toggleblock(bnum,folder) {
           node.className = 'blockitems';
           //butn.value = 'Collapse';
 	  if (img != null) {
-		  img.src = 'http://localhost/math/web/'+'/img/collapse.gif';
+		  img.src = path+'img/collapse.gif';
 	  }
           if (loc==-1) {oblist.push(bnum);} 
       }

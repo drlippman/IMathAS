@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasInlinetext;
@@ -67,6 +66,7 @@ class InlineText extends BaseImasInlinetext
     {
         return InlineText::find()->select('title,text,startdate,enddate,avail,oncal,caltag,isplaylist,fileorder')->where(['id' => $id])->one();
     }
+
     public static function setStartDate($shift, $typeId)
     {
         $date = InlineText::find()->where(['id' => $typeId])->andWhere(['>', 'startdate', '0'])->one();
@@ -76,10 +76,8 @@ class InlineText extends BaseImasInlinetext
         }
     }
 
-
     public static function setEndDate($shift, $typeId)
     {
-
         $date = InlineText::find()->where(['id' => $typeId])->andWhere(['<', 'enddate', '2000000000'])->one();
         if($date) {
             $date->enddate = $date->enddate + $shift;
@@ -89,7 +87,6 @@ class InlineText extends BaseImasInlinetext
 
     public static function getInlineTextForOutcomeMap($courseId)
     {
-
         $query = new Query();
         $query->select(['id','title','outcomes'])
             ->from('imas_inlinetext')
@@ -123,6 +120,7 @@ class InlineText extends BaseImasInlinetext
         $rowCount=$command->execute();
         return $rowCount;
     }
+
     public static function getFileOrder($id)
     {
         $query = new Query();
@@ -173,4 +171,3 @@ class InlineText extends BaseImasInlinetext
         return InlineText::find()->select('name')->where(['id' => $typeId])->one();
     }
 }
-

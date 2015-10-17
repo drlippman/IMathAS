@@ -6,7 +6,7 @@ $this->title = ucfirst($course->name);
 $this->params['breadcrumbs'][] = $this->title; ?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
-<input type="hidden" class="home-path" value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
+<input type="hidden" class="home-path-course" value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
 <input type="hidden" class="web-path" value="<?php echo AppUtility::getHomeURL() ?>">
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 <?php if (($teacherId && (!$backLink))) {?>
@@ -210,7 +210,7 @@ if ($overwriteBody == 1) {
         if (($teacherId) && $quickView!='on') {
             if ($folder == '0') {
                 echo '<p><b>Welcome to your course!</b></p>';
-                echo '<p>To start by copying from another course, use the <a href="copyitems.php?cid='.$cid.'">Course Items: Copy</a> ';
+                echo '<p>To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
                 echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
             }
             echo ShowItemCourse::generateAddItem($folder,'t');

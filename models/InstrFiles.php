@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-
 use app\components\AppUtility;
 use app\models\_base\BaseImasInstrFiles;
 use yii\db\Query;
@@ -13,6 +12,7 @@ class InstrFiles extends BaseImasInstrFiles
     {
         return InstrFiles::findAll(['itemid' => $itemId]);
     }
+
     public function saveFile($params,$filename, $inlineText)
     {
         $this->description = isset($params['newfiledescr']) ? $params['newfiledescr'] : null;
@@ -65,6 +65,7 @@ class InstrFiles extends BaseImasInstrFiles
             return $inlineData->id;
         }
     }
+
     public static function getByName($itemid)
     {
         return InstrFiles::find()->select('filename')->where(['itemid' => $itemid])->all();

@@ -492,7 +492,7 @@ class QuestionController extends AppController
                     if (isset($CFG['AMS']['guesslib']) && count($existingQuestion) > AppConstant::NUMERIC_ZERO) {
                         $maj = count($existingQuestion) / AppConstant::NUMERIC_TWO;
                         $existingQList = implode(',', $existingQuestion);
-                        $query = LibraryItems::getByQuestionSetId($existingQList);
+                        $query = LibraryItems::getByQuestionSetId($existingQuestion);
                         $foundMaj = false;
                         foreach ($query as $row) {
                             if ($row[COUNT('qsetid')] >= $maj) {

@@ -1,7 +1,7 @@
 /*
  * Item Ordering on assessment page
  */
-var homePath = $('.home-path').val();
+var homePath = $('.home-path-course').val();
 var webPath = $('.web-path').val();
 function moveitem(from,blk) {
     var to = document.getElementById(blk+'-'+from).value;

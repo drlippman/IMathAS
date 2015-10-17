@@ -58,7 +58,7 @@ class AdminController extends AppController
     public function beforeAction($action)
     {
         $user = $this->getAuthenticatedUser();
-        return $this->accessForRightsMoreThanStudent($user['rights']);
+        return $this->accessForRightsMoreThanTeacher($user['rights']);
     }
 
     public function actionIndex()
@@ -1589,7 +1589,7 @@ class AdminController extends AppController
                 $qRights = $params['qrights'];
                 $toUse = '';
                 $lookup = implode("','",$unique);
-                $librariesData = Libraries::dataForImportLib($lookup);
+                $librariesData = Libraries::dataForImportLib($unique);
                 if($librariesData)
                 {
                     foreach($librariesData as $row)
@@ -2469,7 +2469,7 @@ class AdminController extends AppController
             }
             $now = time();
             if (isset($remove)) {
-                if (isset($params['confirmed'])) {
+                if (isset($params['confirmed'])) {AppUtility::dump('dddd');
                     $result = LibraryItems::getDistinctQSet($params['remove']);
                     foreach($result as $key => $row) {
                         $qidstocheck[] = $row[0];
@@ -2508,11 +2508,11 @@ class AdminController extends AppController
                     $pagetitle = ($libcnt > AppConstant::NUMERIC_ZERO) ? "Error" : "Remove Library";
                 }
             } elseif(isset($params['remove']))
-            {
+            {AppUtility::dump('ll');
                 if (isset($params['confirmed']))
                 {
                     if ($params['remove']!='') {
-
+                        $removeArray = explode(',',$params['remove']);
                         $remlist = "'".implode("','",explode(',',$params['remove']))."'";
 
                         $result = LibraryItems::getDistictqlibData($remlist);
@@ -2522,16 +2522,16 @@ class AdminController extends AppController
                         if ($isAdmin)
                         {
                             $deleteAdmin = new LibraryItems();
-                            $deleteAdmin->deleteLibraryAdmin($remlist);
+                            $deleteAdmin->deleteLibraryAdmin($removeArray);
                         } else if ($isGrpAdmin) {
-                            $result = Libraries::getByIdGroupAdmin($remlist, $groupId);
+                            $result = Libraries::getByIdGroupAdmin($removeArray, $groupId);
                             foreach($result as $key => $row)
                             {
                                 $deleteLibItem = new LibraryItems();
                                 $deleteLibItem->deleteLibraryGrpAdmin($row['id']);
                             }
                         } else {
-                            $result = Libraries::getByIdAdmin($remlist, $userId);
+                            $result = Libraries::getByIdAdmin($removeArray, $userId);
                             foreach($result as $key => $row)
                             {
                                 $deleteLibItem = new LibraryItems();

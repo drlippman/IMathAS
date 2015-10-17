@@ -9,8 +9,7 @@ use yii\db\Query;
 class LibraryItems extends BaseImasLibraryItems
 {
     public static function getByQuestionSetId($existingqlist){
-        $query = \Yii::$app->db->createCommand("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid")->queryAll();
-        return $query;
+        return LibraryItems::find()->select('libid,COUNT(qsetid')->where(['IN','qsetid',$existingqlist])->groupBy('libid')->all();
     }
 
     public static function getByGroupId($groupId, $qSetId,$userId,$isGrpAdmin,$isAdmin)
@@ -104,25 +103,20 @@ class LibraryItems extends BaseImasLibraryItems
         }
         return count($data);
     }
+
     public static function updateWrongLibFlag($val)
     {
         $query = "UPDATE imas_library_items AS ili
-	  JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
-	  JOIN imas_libraries AS il ON ili.libid=il.id
-	  SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN (".implode(',',$val).")";
+     	JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
+	    JOIN imas_libraries AS il ON ili.libid=il.id
+	    SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN (".implode(',',$val).")";
         $data = \Yii::$app->db->createCommand($query)->execute();
         return $data;
     }
 
     public static function getQueSetId($id)
     {
-        $query = new Query();
-        $query ->select(['qsetid'])
-            ->from('imas_library_items')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return LibraryItems::find()->select('qsetid')->where(['id' => $id])->all();
     }
 
     public function insertData($libId,$qId,$user)
@@ -189,14 +183,9 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataForImportQSet($qSetId)
     {
-        $query = new Query();
-        $query ->select(['libid','qsetid'])
-                ->from('imas_library_items')
-                ->where(['IN','qsetid',$qSetId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return LibraryItems::find()->select(['libid','qsetid'])->where(['IN','qsetid',$qSetId])->all();
     }
+
     public static function getDistictqlibData($remlist)
     {
         return LibraryItems::find()->select('qsetid')->distinct()->where(['IN', 'libid', $remlist])->all();
@@ -204,8 +193,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function deleteLibraryAdmin($remlist)
     {
-        $query = "DELETE FROM imas_library_items WHERE libid IN ($remlist)";
-        \Yii::$app->db->createCommand($query)->execute();
+        LibraryItems::deleteAll(['IN','libid',$remlist]);
     }
 
     public static function deleteLibraryGrpAdmin($libid)
@@ -216,10 +204,12 @@ class LibraryItems extends BaseImasLibraryItems
             $id->delete();
         }
     }
+
     public static function getByDistinctQid($qids)
     {
         return LibraryItems::find()->select('qsetid')->distinct()->where(['IN', 'qsetid', $qids])->all();
     }
+
     public static function getDistinctQSet($remlist)
     {
         return LibraryItems::find()->select('qsetid')->distinct()->where(['libid' => $remlist])->all();
@@ -231,6 +221,7 @@ class LibraryItems extends BaseImasLibraryItems
         $this->qsetid = $qId;
         $this->save();
     }
+
     public static function getDataByAdmin($safesearch, $llist, $checked, $clist)
     {
         $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
@@ -285,17 +276,20 @@ class LibraryItems extends BaseImasLibraryItems
     public static function getByLibItem($groupid, $qsetid, $lib)
     {
         $query = "SELECT imas_library_items FROM imas_library_items,imas_users WHERE ";
-        $query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ";
-        $query .= "imas_library_items.qsetid='$qsetid' AND imas_library_items.libid='$lib'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid= :groupid AND ";
+        $query .= "imas_library_items.qsetid= :qsetid AND imas_library_items.libid= :lib";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues([':groupid' => $groupid,'qsetid' => $qsetid, ':lib' => $lib]);
+        return $data->queryAll();
     }
+
     public static function deleteLib($qsetid,$lib,$isadmin,$userid)
     {
-        $query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$lib'";
         if (!$isadmin) {
-            $query .= " AND ownerid='$userid'";
+            LibraryItems::deleteAll(['qsetid'=> $qsetid, 'libid' => $lib,'ownerid' => $userid]);
+        }else{
+            LibraryItems::deleteAll(['qsetid'=> $qsetid, 'libid' => $lib]);
         }
-      return \Yii::$app->db->createCommand($query)->execute();
     }
 
     public static function getByQSetANDLibAndUId($lib,$qsetid)
@@ -304,12 +298,13 @@ class LibraryItems extends BaseImasLibraryItems
         $query ->select(['imas_library_items.ownerid', 'imas_users.groupid'])
             ->from('imas_library_items, imas_users')
             ->where('imas_library_items.ownerid=imas_users.id');
-        $query->andWhere(['imas_library_items.libid'=> $lib]);
-        $query->andWhere(['imas_library_items.qsetid' => $qsetid]);
-        $command = $query->createCommand();
+        $query->andWhere(['imas_library_items.libid'=> ':lib']);
+        $query->andWhere(['imas_library_items.qsetid' => ':qsetid']);
+        $command = $query->createCommand()->bindValues([':lib' => $lib, ':qsetid' => $qsetid]);
         $data = $command->queryOne();
         return $data;
     }
+
     public static function deleteByQsetIdAndLibId($libId,$qSetId)
     {
         $data = LibraryItems::find()->where(['libid' => $libId])->andWhere(['qsetid' => $qSetId])->all();
@@ -321,26 +316,27 @@ class LibraryItems extends BaseImasLibraryItems
             }
         }
     }
+
     public static function  getDataForModTutorial($groupId,$id)
     {
         $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-        $query .= "AND imas_users.groupid='$groupId' AND ili.qsetid='{$id}'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "AND imas_users.groupid= :groupId AND ili.qsetid=' :id";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues(['groupId' => $groupId, ':id' => $id]);
+        return $data->queryAll();
     }
 
     public static function getByQidIfNotAdmin($id,$isAdmin,$userId)
     {
-        $query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='{$id}'";
-        if (!$isAdmin)
-        {
-            $query .= " AND ownerid='$userId'";
+        if (!$isAdmin){
+            return LibraryItems::find()->select('libid')->distinct()->where(['qsetid' => $id, 'ownerid' => $userId])->all();
+        }else{
+            return LibraryItems::find()->select('libid')->distinct()->where(['qsetid' => $id])->all();
         }
-        return \Yii::$app->db->createCommand($query)->queryAll();
-    }
-    public static function getDataForModTutorialIfNoAdmin($userId,$id)
-    {
-        $query = "SELECT libid FROM imas_library_items WHERE qsetid='{$id}' AND imas_library_items.ownerid!='$userId'";
-        return \Yii::$app->db->createCommand($query)->queryAll();
     }
 
+    public static function getDataForModTutorialIfNoAdmin($userId,$id)
+    {
+        return LibraryItems::find()->select('libid')->where(['qsetid' => $id])->andWhere(['<>', 'ownerid', $userId])->all();
+    }
 }

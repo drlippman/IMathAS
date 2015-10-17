@@ -16,7 +16,7 @@ $msgTotal = array_sum($newMsgCnt);
     <div class="midwrapper">
         <div class="pagetitle col-lg-12" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?>
                <?php if ($myRights == AppConstant::ADMIN_RIGHT && count($brokenCnt) > 0) {
-                echo '<span class="red">'.array_sum($brokenCnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
+                echo '<span class="red">'.array_sum($brokenCnt).'</span> questions, '.(array_sum($brokenCnt)-$brokenCnt[0]).' public, reported broken systemwide';
                 } ?>
         </div>
 

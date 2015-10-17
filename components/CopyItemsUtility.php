@@ -657,8 +657,9 @@ public static function handleextoolcopy($sourcecid,$courseId)
         }
         if ($doremap)
         {
-            $toupdate = implode(",", array_keys($exttooltrack, $row['id']));
-            $query = LinkedText::getByIdForCopy($toupdate);
+            $tempArray = array_keys($exttooltrack, $row['id']);
+            $toupdate = implode(",", $tempArray);
+            $query = LinkedText::getByIdForCopy($tempArray);
             foreach($query as $data)
             {
                 $text = str_replace('exttool:' . $row['id'] . '~~', 'exttool:' . $toolmap[$row['id']] . '~~', $data['text']);

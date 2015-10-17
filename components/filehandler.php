@@ -689,7 +689,7 @@ public static function getuserfileurl($key) {
     return AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$key;
 }
 public static function getcoursefileurl($key) {
-		return "localhost/math/web/Uploads/$key";
+    return AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$key;
 	}
 public static function mkdir_recursive($pathname, $mode=0777)
 {

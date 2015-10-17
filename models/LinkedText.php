@@ -91,14 +91,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getLinkedTextForOutcomeMap($courseId)
     {
-        $query = new Query();
-        $query->select(['id','title','outcomes'])
-            ->from('imas_linkedtext')
-            ->where(['courseid' => $courseId])
-            ->andWhere(['<>','outcomes','']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return LinkedText::find()->select(['id','title','outcomes'])->where(['courseid' => $courseId])->andWhere(['<>','outcomes',''])->all();
     }
 
     public static function updateLinkForMassChanges($startdate, $enddate, $avail, $id)
@@ -123,8 +116,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getByIdForCopy($toupdate)
     {
-        $query  = \Yii::$app->db->createCommand("SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)");
-        return $query;
+        return LinkedText::find()->select('id,text')->where(['IN', 'id', $toupdate])->all();
     }
 
     public static function updateData($text,$id)

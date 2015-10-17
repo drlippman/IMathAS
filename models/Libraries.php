@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasLibraries;
@@ -19,9 +20,10 @@ class Libraries extends BaseImasLibraries
     public static function getByQSetId($qSetId){
         $query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
         $query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
-        $query .= "AND imas_library_items.qsetid='$qSetId'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "AND imas_library_items.qsetid= :qSetId";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('qSetId',$qSetId);
+        return $data->queryAll();
     }
 
     public static function getByIdList($ids)
@@ -30,10 +32,12 @@ class Libraries extends BaseImasLibraries
     }
 
     public static function getUserAndLibrary($questionId){
-        $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='$questionId'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid= :questionId";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('questionId', $questionId);
+        return $data->queryAll();
     }
+
     public static function updateGroupId($id)
     {
         $libraries = Libraries::find()->where(['groupid' => $id])->all();
@@ -54,6 +58,7 @@ class Libraries extends BaseImasLibraries
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
     public static function getById()
     {
         $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
@@ -65,9 +70,10 @@ class Libraries extends BaseImasLibraries
 
     public static function getByQuestionId($questionid){
         $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
-        $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id= :questionid";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('questionid',$questionid);
+        return $data->queryAll();
     }
 
     public static function getAllQSetId($qids){
@@ -79,10 +85,9 @@ class Libraries extends BaseImasLibraries
 
     public static function dataForImportLib($lookup)
     {
-        $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ('$lookup')";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        return Libraries::find()->select('id,uniqueid,adddate,lastmoddate')->where(['IN','uniqueid', $lookup])->all();
     }
+
     public static function updateLibData($isGrpAdmin, $isAdmin,$name,$now,$id,$user)
     {
         $query = "UPDATE imas_libraries SET name='{$name}',adddate=$now,lastmoddate=$now WHERE id={$id}";
@@ -110,7 +115,6 @@ class Libraries extends BaseImasLibraries
         $this->groupid = $user->groupid;
         $this->save();
         return $this->id;
-
     }
 
     public static function getByNameParents($name, $parents)
@@ -124,6 +128,7 @@ class Libraries extends BaseImasLibraries
         $data = $command->queryAll();
         return $data;
     }
+
     public function insertDataWithSort($uqid,$now, $now,$params,$userId,$groupId)
     {
         $this->uniqueid = $uqid;
@@ -141,14 +146,7 @@ class Libraries extends BaseImasLibraries
 
     public static function getByLibraryId($id)
     {
-        $query = new Query();
-        $query	->select(['name','userights','parent','sortorder'])
-            ->from('imas_libraries')
-            ->where(['id' => $id]);
-
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return Libraries::find()->select('name','userights','parent','sortorder')->where(['id' => $id])->all();
     }
 
     public static function getByModifyId($id, $isAdmin, $userId)
@@ -193,12 +191,10 @@ class Libraries extends BaseImasLibraries
             $query .= " AND ownerid='$userid'";
         }
         \Yii::$app->db->createCommand($query)->execute();
-
     }
 
     public static function getLibraryData($rootLibs,$nonPrivate)
     {
-
         $query = "SELECT id,name,parent,uniqueid,lastmoddate FROM imas_libraries WHERE id IN ($rootLibs)";
         if ($nonPrivate)
         {
@@ -208,6 +204,7 @@ class Libraries extends BaseImasLibraries
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
     public static function getDataByParent($lib,$nonPrivate)
     {
         $query = new Query();
@@ -223,6 +220,7 @@ class Libraries extends BaseImasLibraries
         $data = $command->queryAll();
         return $data;
     }
+
     public static function getDataForLibTree()
     {
         $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
@@ -250,27 +248,14 @@ class Libraries extends BaseImasLibraries
 
     public static function getByIdGroupAdmin($remlist, $groupid)
     {
-        $query = new Query();
-        $query ->select(['id'])
-            ->from('imas_libraries')
-            ->where(['IN','id',$remlist]);
-          $query->andWhere(['groupid' => $groupid]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return Libraries::find()->select('id')->where(['IN','id',$remlist])->andWhere(['groupid' => $groupid])->all();
     }
 
     public static function getByIdAdmin($remlist, $userid)
     {
-        $query = new Query();
-        $query ->select(['id'])
-            ->from('imas_libraries')
-            ->where(['IN','id',$remlist]);
-        $query->andWhere(['ownerid',$userid]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return Libraries::find()->select('id')->where(['IN','id',$remlist])->andWhere(['ownerid' => $userid])->all();
     }
+
     public static function deleteLibraryAdmin($remlist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
         $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
@@ -294,6 +279,7 @@ class Libraries extends BaseImasLibraries
         }
       return  \Yii::$app->db->createCommand($query)->execute();
     }
+
     public static function updateUserRightLastModeDate($rights,$now, $llist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
         $query = "UPDATE imas_libraries SET userights='$rights',lastmoddate=$now WHERE id IN ($llist)";

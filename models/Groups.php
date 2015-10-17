@@ -58,8 +58,7 @@ class Groups extends BaseImasGroups
 
     public static function getIdNameByName()
     {
-        $query = "SELECT id,name FROM imas_groups ORDER BY name";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return Groups::find()->select('id,name')->orderBy('name')->all();
     }
 
     public static function getAllIdName()

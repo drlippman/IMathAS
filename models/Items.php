@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasItems;
@@ -70,16 +69,15 @@ class Items extends BaseImasItems
 
     public static function getByAssessmentId($cid,$aid){
         $query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
-        $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid= :cid AND ia.id<> :aid";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues(['cid' => $cid, 'aid'=> $aid]);
+        return $data->queryAll();
     }
 
     public static function getByItem($item)
     {
-        $query = Yii::$app->db->createCommand("SELECT itemtype,typeid FROM imas_items WHERE id=:item");
-        $query->bindValue('item', $item);
-        return $query->queryOne();
+        return Items::find()->select('itemtype,typeid')->where(['id' => $item])->one();
     }
 
     public static function deleteByCourseId($courseId)

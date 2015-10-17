@@ -1720,7 +1720,7 @@ class CourseController extends AppController
                         array_splice($curBlock, $to-1, 0, $itemToMove);
                     }
                 }
-                $itemList = serialize($items);
+                $itemList = addslashes(serialize($items));
                 Course::setItemOrder($itemList, $courseId);
                 return $this->redirect('course?cid='.$courseId);
             }
@@ -1873,14 +1873,14 @@ class CourseController extends AppController
 
             $openBlocks = Array(0);
             $prevLoadedbLocks = array(0);
-//            if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
-//            {
-//                $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
-//                $firstLoad = false;
-//            } else
-//            {
-//                $firstLoad = true;
-//            }
+            if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+            {
+                $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+                $firstLoad = false;
+            } else
+            {
+                $firstLoad = true;
+            }
             if (($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
             {
                 $prevLoadedbLocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);

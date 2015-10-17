@@ -739,7 +739,7 @@ function generaterandstring() {
         }
     }
 
-    public function accessForRightsMoreThanStudent($rights){
+    public function accessForRightsMoreThanTeacher($rights){
         if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect($this->goHome());
@@ -751,8 +751,8 @@ function generaterandstring() {
         $isStudent = false;
         $student = Student::getByCourseId($courseId, $userId);
         if($student){
-            $student = true;
+            $isStudent = true;
         }
-        return $student ;
+        return $isStudent ;
     }
 }

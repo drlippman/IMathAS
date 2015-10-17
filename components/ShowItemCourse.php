@@ -17,8 +17,9 @@ use \yii\base\Component;
 class ShowItemCourse extends Component
 {
     public function showItems($items,$parent,$inpublic=false) {
-        global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights;
+        global $teacherId,$isTutor,$isStudent,$courseId,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights;
         global $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,$studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess;
+        $imasroot = AppUtility::getHomeURL();
         if (!($CFG['CPS']['itemicons'])) {
             $itemIcons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
                 'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
@@ -158,9 +159,9 @@ class ShowItemCourse extends Component
                                 echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             }
                             if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemIcons['folder']}\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['folder']}\"></a></span>";
                             } else {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/folder.gif\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder.gif\"></a></span>";
                             }
                             echo "<div class=title>";
                         }
@@ -230,9 +231,9 @@ class ShowItemCourse extends Component
                                 echo "<span class=left><a href=\"#\" border=0>";
                             }
                             if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemIcons['foldertree']}\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['foldertree']}\"></a></span>";
                             } else {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/folder_tree.png\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></a></span>";
                             }
                             echo "<div class=title>";
                         }
@@ -295,7 +296,7 @@ class ShowItemCourse extends Component
 
                         if (($hideIcons&16) == 0) {
                             echo "<span class=left>";
-                            echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+                            echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot"."img/";
                             if ($isopen)
                             {
                                 echo _('collapse');
@@ -416,9 +417,9 @@ class ShowItemCourse extends Component
                         if (($hideIcons&16) == 0) {
                             echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemIcons['folder']}\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['folder']}\"></a></span>";
                             } else {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/folder.gif\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder.gif\"></a></span>";
                             }
                             echo "<div class=title>";
                         }
@@ -478,9 +479,9 @@ class ShowItemCourse extends Component
                         if (($hideIcons&16) == 0) {
                             echo "<span class=left><a href=\"#\" border=0>";
                             if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/{$itemIcons['foldertree']}\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['foldertree']}\"></a></span>";
                             } else {
-                                echo "<img alt=\"folder\" src=\"$imasroot/img/folder_tree.png\"></a></span>";
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></a></span>";
                             }
                             echo "<div class=title>";
                         } ?>
@@ -541,7 +542,7 @@ class ShowItemCourse extends Component
                         echo ">";
                         if (($hideIcons&16)==0) {
                             echo "<span class=left>";
-                            echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
+                            echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot"."img/";
                             if ($isopen) {echo _('collapse');} else {echo _('expand');}
                             echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
                             echo "<div class=title>";
@@ -1687,7 +1688,7 @@ class ShowItemCourse extends Component
 
     public static function generateAddItem($blk,$tb)
     {
-        global $courseId, $CFG,$imasroot;
+        global $courseId, $CFG;
         if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
             if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
             if ($tb=='t' && $blk=='0') {
@@ -1699,44 +1700,44 @@ class ShowItemCourse extends Component
             }
             $html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['assess'])) {
-                $html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
+                $html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
             }
             $html .= _('Assessment') ."</a> | ";
 
             $html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['inline'])) {
 
-                $html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
+                $html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
             }
             $html .= _('Text') . "</a> | ";
 
             $html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['linked'])) {
-                $html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
+                $html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
             }
             $html .= _('Link') . "</a> | ";
 
             $html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['forum'])) {
-                $html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
+                $html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
             }
             $html .= _('Forum') . "</a> | ";
 
             $html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['wiki'])) {
-                $html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
+                $html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
             }
             $html .= _('Wiki') . "</a> | ";
 
             $html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['folder'])) {
-                $html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
+                $html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
             }
             $html .= _('Block') . "</a> | ";
 
             $html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$courseId\">";
             if (isset($CFG['CPS']['miniicons']['calendar'])) {
-                $html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
+                $html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
             }
             $html .= _('Calendar') . "</a>";
             $html .= '</span>';
