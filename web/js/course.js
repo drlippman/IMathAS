@@ -1,12 +1,15 @@
-function ahah(url, target) { 
+function ahah(url, target) {
   document.getElementById(target).innerHTML = ' Fetching data... ';
-  if (window.XMLHttpRequest) { 
-    req = new XMLHttpRequest(); 
-  } else if (window.ActiveXObject) { 
-    req = new ActiveXObject("Microsoft.XMLHTTP"); 
+  if (window.XMLHttpRequest) {
+      req = new XMLHttpRequest();
+  } else if (window.ActiveXObject) {
+      req = new ActiveXObject("Microsoft.XMLHTTP");
   } 
-  if (typeof req != 'undefined') { 
-    req.onreadystatechange = function() {ahahDone(url, target);}; 
+  if (typeof req != 'undefined') {
+      req.onreadystatechange = function()
+    {
+        ahahDone(url, target);
+    };
     req.open("GET", url, true); 
     req.send(""); 
   } 
@@ -16,12 +19,12 @@ function ahahDone(url, target) {
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
       document.getElementById(target).innerHTML = req.responseText; 
-      if (usingASCIIMath) {
-	      rendermathnode(document.getElementById(target));
-      }
-      if (usingASCIISvg) {
-	      setTimeout("drawPics()",100);
-      }
+//      if (usingASCIIMath) {
+//	      rendermathnode(document.getElementById(target));
+//      }
+//      if (usingASCIISvg) {
+//	      setTimeout("drawPics()",100);
+//      }
       $('#'+target+' a').each(setuptracklinks);
       $('#'+target+' a[href*="youtu"]').each(setupvideoembeds);
       $('#'+target+' a[href*="vimeo"]').each(setupvideoembeds);
@@ -37,8 +40,6 @@ function ahahDone(url, target) {
 		      eval(x[i].text);
 	      }
       }
-
-   
     } else { 
       document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText; 
     } 
@@ -49,13 +50,13 @@ function ahahDone(url, target) {
    
 var loadedblocks = new Array();
 
-function toggleblock(bnum) {
+function toggleblock(bnum,folder) {
       var node = document.getElementById('block'+bnum);
-      //var butn = document.getElementById('but'+bnum);
       var img = document.getElementById('img'+bnum);
       oblist = oblist.split(',');
       plblist = plblist.split(',');
-      var loc = arraysearch(bnum,oblist);
+
+    var loc = arraysearch(bnum,oblist);
       if (node.className == 'blockitems') {
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	loadedblocks.push(bnum);
@@ -63,10 +64,10 @@ function toggleblock(bnum) {
           node.className = 'hidden';
           //butn.value = 'Expand';
 	  if (img != null) {
-		  img.src = 'http://localhost/openmath/web/' +'/img/expand.gif';
+		  img.src = 'http://localhost/math/web/' +'/img/expand.gif';
 	  }
           if (loc>-1) {oblist.splice(loc,1);}
-      } else { 
+      } else {
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	ahah(getbiaddr+folder,'block'+bnum);
 		if (arraysearch(folder,plblist)==-1) {
@@ -76,7 +77,7 @@ function toggleblock(bnum) {
           node.className = 'blockitems';
           //butn.value = 'Collapse';
 	  if (img != null) {
-		  img.src = 'http://localhost/openmath/web/'+'/img/collapse.gif';
+		  img.src = 'http://localhost/math/web/'+'/img/collapse.gif';
 	  }
           if (loc==-1) {oblist.push(bnum);} 
       }

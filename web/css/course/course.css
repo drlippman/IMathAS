@@ -165,6 +165,7 @@ div.dialog-items{
     /*margin-top: 30px;*/
     z-index: 100;
     overflow: visible;
+    right: 40px!important;
 }
 .block-item{
     position: absolute;
