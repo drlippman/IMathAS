@@ -137,7 +137,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
         }
         echo '<td class="locked" scope="row">'; ?>
-         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$cid.'&stu='.$gbt[$i][4][0]);?> ">
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$cid.'&studentId='.$gbt[$i][4][0]);?> ">
         <?php echo $gbt[$i][0][0];
         echo '</a></td>';
         for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {

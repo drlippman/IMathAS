@@ -330,13 +330,13 @@ if ($data['catFilter'] > -2) {
             if ($data['isTeacher'])
             {  ?>
                  <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
-                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> \"><?php AppUtility::t('[Isolate]')?></a>
+                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
             <?php } else { ?>
-                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>> <?php AppUtility::t('[Scores]')?>
+                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
             <?php }
         } else if ($gradebook[0][1][$i][6] == 2 && $data['isTeacher'])
         { //discussion ?>
-             <br/><a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> ><?php AppUtility::t('[Settings]')?> </a>
+             <br><a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
         <?php } else if ($gradebook[0][1][$i][6] == 3 && $data['isTeacher'])
         { //exttool ?>
              <br/><a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?PHP AppUtility::t('[Settings]')?></a>
@@ -431,9 +431,9 @@ for ($i = 1; $i < count($gradebook); $i++) {
     if ($data['defaultValuesArray']['showpics'] == 1 && $gradebook[$i][0][0] !== 'Averages') { ?>
         <?php $fileName = AppUtility::getHomeURL().'Uploads/'.$gradebook[$i][4][0].'.jpg';
          if($gradebook[$i][4][2] == 1){ ?>
-             <td><?php echo $insdiv ?><div class="trld"><img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $gradebook[$i][4][0] ?>.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
+             <td><?php echo $insdiv ?><div class="trld"><img class='circular-image' src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $gradebook[$i][4][0] ?>.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
         <?php  }else{ ?>
-             <td><?php echo $insdiv ?><div class="trld"><img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
+             <td><?php echo $insdiv ?><div class="trld"><img  class='circular-image' src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
         <?php }
 
     }else {

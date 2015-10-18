@@ -127,19 +127,19 @@ class GradebookController extends AppController
         } else {
             $canviewall = false;
         }
-        if ($canviewall) {
-
+        if ($canviewall)
+        {
             $sessionData = $this->getSessionData($sessionId);
-
             if (isset($params['gbmode']) && $params['gbmode'] != '') {
                 $gbmode = $params['gbmode'];
-                $sessionData[$courseId.'gbmode'] = $gbmode;
-            } else if (isset($sessionData[$courseId.'gbmode']) && !isset($params['refreshdef'])) {
-                $gbmode = $sessionData[$courseId.'gbmode'];
+                setcookie($courseId.'gbmode',$gbmode);
+            } else if (isset($_COOKIE[$courseId.'gbmode']) && !isset($params['refreshdef'])) {
+                $gbmode = $_COOKIE[$courseId.'gbmode'];
             } else {
                 $defgbmode = GbScheme::findOne(['courseid' => $courseId]);
                 $gbmode = $defgbmode->defgbmode;
             }
+
             if (isset($_COOKIE["colorize-$courseId"]) && !isset($params['refreshdef'])) {
                 $colorize = $_COOKIE["colorize-$courseId"];
             } else {
