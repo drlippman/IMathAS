@@ -157,7 +157,6 @@ body {
 }
 
 .item-detail-content{
-    padding-top: 40px;
     /*box-shadow: 0 0 5px 5px #888;*/
 
 }
@@ -613,3 +612,8 @@ div.vidsegblock
     margin-right: 0;
 }
 
+.graphic-math-img1{
+    width: 136px;
+    height:120px;
+    float: left;
+}

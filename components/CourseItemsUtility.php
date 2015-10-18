@@ -200,7 +200,7 @@ class CourseItemsUtility extends Component
                                                            src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
                             <li><a class="modify"
-                                   href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $course->id.'&fromForum=1&id='.$forum->id); ?>"><?php AppUtility::t('Modify'); ?></a>
                             </li>
                             <li><a id="delete"
                                    href="javascript:deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -241,7 +241,7 @@ class CourseItemsUtility extends Component
                                                            src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
                             <li><a class="modify"
-                                   href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $course->id.'&fromForum=1&id='.$forum->id); ?>"><?php AppUtility::t('Modify'); ?></a>
                             </li>
                             <li><a id="delete"
                                    href="javascript:deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>

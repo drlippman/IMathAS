@@ -318,6 +318,7 @@ function submitChanges() {
   var params = 'order='+toSimpleJSON(sortIt.serialize());
   var url = AHAHsaveurl;
   var els = document.getElementsByTagName("input");
+
   for (var i=0; i<els.length; i++) {
 	  if (els[i].type=="hidden" && els[i].value!="") {
 	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
@@ -325,7 +326,6 @@ function submitChanges() {
 		  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
 	  }
   }
-
   var target = "submitnotice";
   //document.getElementById(target).innerHTML = url;
   //return;
@@ -336,14 +336,16 @@ function submitChanges() {
   } else if (window.ActiveXObject) {
     req = new ActiveXObject("Microsoft.XMLHTTP");
   }
+
   if (typeof req != 'undefined') {
 	req.open("POST", url, true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	req.setRequestHeader("Content-length", params.length);
-	req.setRequestHeader("Connection", "close");
+	//req.setRequestHeader("Content-length", params.length);
+	//req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {NestedahahDone(url, target);};
 	req.send(params);
   }
+
 }  
 
 function quickviewexpandAll() {
@@ -356,14 +358,13 @@ function quickviewcollapseAll() {
 function NestedahahDone(url, target) {
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
-	    if (req.responseText.substring(0,2)=='OK') {
+	    if (req.responseText.substring(0,2)=='OK') { console.log(req.responseText.substring(0,2));
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    window.onbeforeunload = null;
 		    setlinksdisp("");
 		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
-		    sortIt.haschanged = false;
-		      
+            sortIt.haschanged = false;
 	    } else {
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }

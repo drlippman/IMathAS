@@ -48,7 +48,7 @@ class RosterController extends AppController
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
         return $this->accessForTeacher($user,$courseId);
     }
-/*
+ /*
  * Controller method to display student information on student roster page.
  */
     public function actionStudentRoster()

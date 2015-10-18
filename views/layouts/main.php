@@ -1,11 +1,8 @@
-
 <?php
 use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\components\AppUtility;
+use app\controllers\AppController;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -21,66 +18,80 @@ AppAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo time(); ?>' rel='stylesheet' type='text/css'>
 </head>
+<?php $courseId = Yii::$app->session->get('courseId'); ?>
+<?php $messageCount = Yii::$app->session->get('messageCount');
+$postCount = Yii::$app->session->get('postCount');
+$totalCount = $messageCount + $postCount;
+$user = Yii::$app->session->get('user');
+?>
 <body>
-
 <?php $this->beginBody() ?>
-    <div class="wrap">
-        <?php
-        $basePath = '/site/';
-            NavBar::begin([
-                'brandLabel' => 'OpenMath',
-                'brandUrl' => Yii::$app->homeUrl.'site/login',
-                'options' => [
-                    'class' => 'navbar-inverse navbar-fixed-top',
-                ],
-            ]);
-            echo Nav::widget([
-                'options' => ['class' => 'navbar-nav navbar-right'],
-                'items' => [
-                    Yii::$app->user->isGuest ?
-                    ['label' => 'Home', 'url' => [$basePath.'login']]:
-                        ['label' => 'Home', 'url' => [$basePath.'dashboard']],
-                    Yii::$app->user->isGuest ?
-                    ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
-                    Yii::$app->user->isGuest ?
-                        ['label' => ''] :
-                        ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',
-                            'url' => ['/site/logout'],
-                            'linkOptions' => ['data-method' => 'post']],
-                ],
-            ]);
-            NavBar::end();
-        ?>
-
-        <div class="container">
-            <?= Breadcrumbs::widget([
-                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-            ]) ?>
-            <div id="flash-message">
-                <?php
-                $flashes = Yii::$app->session->getAllFlashes();
-                if (isset($flashes)) {
-                    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-                        echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
-                    }
-                }
-            ?>
+<div class="header-content">
+    <?php
+    echo $this->render('_header',['courseId' =>$courseId,'messageCount' => $messageCount,'totalCount' => $totalCount,'postCount' => $postCount,'user' => $user]); ?>
+</div>
+<div class="clear-both"></div>
+<div class="master-wrap">
+    <div class="master-container">
+        <div class="container-upper-blue" style="background-color:#ffffff">
+            <div class="graphic-math-img1">
             </div>
-
-            <?= $content ?>
+            <div class="clear-both"></div>
+        </div>
+        <div class="container-lower-white">
+            <div class="master-items-container">
+                <div class="page-content">
+                    <div id="flash-message">
+                        <?php
+                        $flashes = Yii::$app->session->getAllFlashes();
+                        if (isset($flashes)) {
+                            foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+                                echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
+                            }
+                        }
+                        ?>
+                    </div>
+                    <?php echo $content; ?>
+                </div>
+            </div>
         </div>
     </div>
-
-
-
+</div>
+<input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL();?>">
 <?php $this->endBody() ?>
+<div class="clear-both"></div>
 </body>
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; IMathAS <?= date('Y') ?></p>
-        <p class="pull-right">Powered by <a href="#">IMathAS</a> &copy; 2006-2015 | David Lippman</p>
-    </div>
-</footer>
+
 </html>
 <?php $this->endPage() ?>
+<script>
+    $(document).ready(function() {
+
+        setMinHeightToContainer();
+
+    });
+
+
+    function setMinHeightToContainer() {
+
+        var lowerContainer = $(".container-lower-white").height();
+
+        var windowLength = $(window).height();
+
+        var heightMin = lowerContainer < windowLength ? windowLength - 60 : lowerContainer + 120;
+//        $(".master-wrap").css('min-height', heightMin+"px");
+    }
+</script>
+<script type="javascript">
+    noMathRender = false;
+    var usingASCIIMath = true;
+    var AMnoMathML = true;
+    var MathJaxCompatible = true;
+    function rendermathnode(node) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+    }
+</script>

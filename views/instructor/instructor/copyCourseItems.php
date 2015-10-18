@@ -1,12 +1,17 @@
 <?php
 use app\components\AppUtility;
 use app\components\AppConstant;
-$this->title = AppUtility::t('Copy Course Items', false);
+
+    $this->title = AppUtility::t('Copy Course Items', false);
+
 $this->params['breadcrumbs'][] = $this->title;
-?>
+ ?>
+<?php if($isMaster == '')
+{ ?>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
+
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
@@ -14,9 +19,14 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
+<?php }else{ ?>
+
+<?php } ?>
 <div class="item-detail-content"></div>
-<input type="hidden" id="url" value="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id.'&loadothers=true')?>">
+<input type="hidden" id="url" value="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id.'&loadothers=true&isMaster=0')?>">
+<?php if($isMaster == '') {?>
 <div class="tab-content shadowBox">
+    <?php }?>
 <br>
 <div class="align-copy-course">
 <?php
@@ -185,7 +195,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo "				</ul>\n			</li>\n";
                             echo "			</ul>\n		</li>\n";
                             $lastTeacher = 0;
-                        }?>
+                        }
+                            ?>
                 <li class=lihdr>
                     <span class=dd>-</span>
 					<span class=hdr onClick="toggle('g<?php echo $line['groupid'] ?>')">
@@ -216,7 +227,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <a href="mailto:<?php echo $line['email'] ?>"><?php AppUtility::t('Email');?></a>
                             <ul class=hide id="<?php echo $line['userid'] ?>">
                                 <?php
-                                $lastteacher = $line['userid'];
+                            $lastTeacher = $line['userid'];
                                 }
                                 ?>
                                 <li>
@@ -227,14 +238,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if ($line['copyrights']<2) {
                                         echo "&copy;\n";
                                     } else {?>
-                                        <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$params['ctc'])?>" target="_blank"><?php AppUtility::t('Preview')?></a>
+                                        <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$line['id'])?>" target="_blank"><?php AppUtility::t('Preview')?></a>
                                     <?php }
                                     ?>
                                 </li>
                                 <?php
-                                }
+                          }
                                 ?>
-
                             </ul>
                         </li>
                     </ul>
@@ -446,7 +456,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php }?>
  <?php }?>
 </div>
+    <?php if($isMaster == '') {?>
 </div>
+        <?php }?>
+
 
 
 <script>

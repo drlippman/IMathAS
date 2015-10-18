@@ -51,8 +51,6 @@ use yii\rbac\Item;
 include ("../components/asidutil.php");
 class GradebookController extends AppController
 {
-    public $a;
-
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
@@ -61,7 +59,7 @@ class GradebookController extends AppController
         return $this->accessForTeacherAndStudent($user,$courseId,$actionPath);
     }
 
-    public function actionGradebook()
+     public function actionGradebook()
     {
         global $get;
         $this->guestUserHandler();
@@ -4574,6 +4572,7 @@ class GradebookController extends AppController
         $pagetitle = "Make Exception";
         $params = $this->getRequestParams();
         $cid = $params['cid'];
+        $this->layout = 'master';
         $course = Course::getById($cid);
         $currentUser = $this->getAuthenticatedUser();
         $isTeacher = $this->isTeacher($currentUser['id'],$course['id']);
@@ -4716,7 +4715,7 @@ class GradebookController extends AppController
 
             //DEFAULT LOAD DATA MANIPULATION
 //            return $this->redirect('exception?cid='.$params['cid'].'&uid='.$params['uid'].'&asid='.$asid.'&stu='.$stu.'&from='.$from);
-            $addr = 'exception?cid='.$params['cid'].'&uid='.$params['uid'].'&asid='.$asid.'&stu='.$stu.'&from='.$from;
+            $addr = 'exception?cid='.$params['cid'].'&uid='.$params['uid'].'&asid='.$params['asid'].'&stu='.$stu.'&from='.$from;
 
             $allAssessment = Assessments::getByCourse($course->id);
             $page_courseSelect = array();

@@ -76,6 +76,7 @@ class AdminController extends AppController
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
         $showUser = $this->getParamVal('showusers');
+        AppUtility::tzdate("g:i a",time());
         if ($myRights == AppConstant::NUMERIC_HUNDREAD) {
             if (isset($showUser))
             {

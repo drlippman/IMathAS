@@ -615,27 +615,6 @@ class AppController extends Controller
         }
     }
 
-
-function tzdate($string,$time)
-{
-    $sessioinId = $this->getSessionId();
-    $sessionData = Sessions::getById($sessioinId);
-    $tzoffset = $sessionData['tzoffset'];
-    $tzname = '';
-    if (isset($sessionData['tzname']) && $sessionData['tzname']!='') {
-        if (date_default_timezone_set($sessionData['tzname'])) {
-            $tzname = $sessionData['tzname'];
-        }
-    }
-
-    if ($tzname != '') {
-        return date($string, $time);
-    } else {
-        $serveroffset = date('Z') + $tzoffset*60;
-        return date($string, $time-$serveroffset);
-    }
-}
-
 function writesessiondata($sessionData,$sessionId) {
     $sessionContent = base64_encode(serialize($sessionData));
     Sessions::setSessionId($sessionId,$sessionContent);
@@ -747,45 +726,6 @@ function generaterandstring() {
             return $this->redirect($this->goHome());
         }
         return true;
-    }
-    function parsedatetime($date, $time)
-    {
-
-        $sessioinId = $this->getSessionId();
-        $sessionData = Sessions::getById($sessioinId);
-        $tzoffset = $sessionData['tzoffset'];
-        $tzname = $sessionData['tzname'];
-
-        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$time,$tmatches);
-
-
-        if (count($tmatches)==0) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/',$time,$tmatches);
-            $tmatches[3] = $tmatches[2];
-            $tmatches[2] = 0;
-        }
-        $tmatches[1] = $tmatches[1]%12;
-        if($tmatches[3]=="PM") {$tmatches[1]+=12; }
-        //$tmatches[2] += $tzoffset;
-        //return gmmktime($tmatches[1],$tmatches[2],0,$dmatches[1],$dmatches[2],$dmatches[3]);
-
-        if ($tzname=='') {
-            $serveroffset = date('Z')/60 + $tzoffset;
-            $tmatches[2] += $serveroffset;
-        }
-        $dateString = mktime($tmatches[1], $tmatches[2], 0, $dmatches[1], $dmatches[2], $dmatches[3]);
-         $tzOffset = self::getOffsetTime(date('Y-m-d H:i:s', $dateString), $tzname);
-        return  $dateString - $tzOffset;
-
-    }
-
-    static public function getOffsetTime($date, $timezone = "UTC")
-    {
-
-        $newTZ = new \DateTimeZone($timezone);
-        $date = new \DateTime($date, $newTZ);
-        return $newTZ->getOffset($date);
     }
 
     public function accessForAdmin($rights){

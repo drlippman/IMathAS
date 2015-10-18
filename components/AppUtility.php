@@ -2,6 +2,7 @@
 
 namespace app\components;
 
+use app\controllers\AppController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Exceptions;
@@ -342,14 +343,21 @@ class AppUtility extends Component
 
     public static function tzdate($string, $time)
     {
+        $sessionId = Yii::$app->session->getId();
+        $sessionData = Sessions::getById($sessionId);
+        $tzoffset = $sessionData['tzoffset'];
+        $tzname = '';
+        if (isset($sessionData['tzname']) && $sessionData['tzname']!='') {
+            if (date_default_timezone_set($sessionData['tzname'])) {
+                $tzname = $sessionData['tzname'];
+            }
+        }
 
-        $tzoffset = Yii::$app->session->get('tzoffset');
-        $tzname = Yii::$app->session->get('tzname');
         if ($tzname != '') {
             return date($string, $time);
         } else {
-            $serveroffset = date('Z') + $tzoffset * AppConstant::SECONDS;
-            return date($string, $time - $serveroffset);
+            $serveroffset = date('Z') + $tzoffset*60;
+            return date($string, $time-$serveroffset);
         }
     }
 
@@ -412,26 +420,28 @@ class AppUtility extends Component
 //        Displays date and time
     public static function parsedatetime($date, $time)
     {
-        $tzoffset = self::getTimezoneOffset();
-        $tzname = self::getTimezoneName();
-        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $date, $dmatches);
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
-        if (count($tmatches) == AppConstant::NUMERIC_ZERO) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
-            $tmatches[3] = $tmatches[2];
-            $tmatches[2] = AppConstant::NUMERIC_ZERO;
+        $sessionId = Yii::$app->session->getId();
+        $sessionData = Sessions::getById($sessionId);
+        $tzOffset = $sessionData['tzoffset'];
+        $tzName = $sessionData['tzname'];
+        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dateMatches);
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$time,$timeMatches);
+        if (count($timeMatches) == 0)
+        {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/',$time,$timeMatches);
+            $timeMatches[3] = $timeMatches[2];
+            $timeMatches[2] = 0;
         }
-        $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_ELEVEN;
-        if ($tmatches[3] == "pm") {
-            $tmatches[1] += AppConstant::NUMERIC_ELEVEN;
+        $timeMatches[1] = $timeMatches[1]%12;
+        if($timeMatches[3]=="PM") {$timeMatches[1]+=12; }
+        if ($tzName == '') {
+            $serverOffset = date('Z')/60 + $tzOffset;
+            $timeMatches[2] += $serverOffset;
         }
-        if ($tzname == '') {
-            $serveroffset = date('Z') / AppConstant::SECONDS + $tzoffset;
-            $tmatches[2] += $serveroffset;
-        }
-        return mktime($tmatches[1], $tmatches[2], AppConstant::NUMERIC_ZERO, $dmatches[1], $dmatches[2], $dmatches[3]);
+        $dateString = $dateMatches[3].'-'.$dateMatches[1].'-'.$dateMatches[2].' '.$timeMatches[1].':'.$timeMatches[2].':00';
+        $dateObject = date_create_from_format("Y-m-d H:i:s",$dateString,timezone_open($tzName));
+        return $dateObject->getTimestamp();
     }
-
     /*
      * Displays only time
      */

@@ -107,17 +107,6 @@ class Stugroups extends BaseImasStugroups
         return $this->id;
     }
 
-    public static function getAllIdName()
-    {
-
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_stugroups');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
-    }
-
     public static function getByGrpSetId($groupsetId)
     {
         return Stugroups::find()->select('id')->where(['groupsetid' => $groupsetId])->all();

@@ -12,9 +12,10 @@ $now = $currentTime;
 
 ?>
 <div class="item-detail-header">
-    <?php if($rights == 100 || $rights == 20) {
+    <?php if($rights == AppConstant::ADMIN_RIGHT || $rights == AppConstant::TEACHER_RIGHT) {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]);
-    } elseif($rights == 10){
+    } elseif($rights == AppConstant::STUDENT_RIGHT)
+    {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
     }?>
 </div>
@@ -30,9 +31,10 @@ $now = $currentTime;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php if($rights == 100 || $rights == 20) {
+    <?php if($rights == AppConstant::ADMIN_RIGHT || $rights == AppConstant::TEACHER_RIGHT) {
         echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
-    } elseif($rights == 10){
+    } elseif($rights == AppConstant::STUDENT_RIGHT)
+    {
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
@@ -57,14 +59,14 @@ $now = $currentTime;
         </div>
     </div>
     <div style="margin-left: 18%">
-    <?php if($forumData['forumtype'] == 1)
+    <?php if($forumData['forumtype'] == AppConstant::NUMERIC_ONE)
     { ?>
             <input name="file-0" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
             <br><button class="add-more">Add More Files</button><br>
 
 <?php }?>
     </div>
-    <?php if($rights > 10)
+    <?php if($rights > AppConstant::STUDENT_RIGHT)
     {?>
         <div style="padding-top: 30px;margin-left: 10px;margin-right: 69px">
             <span class="col-md-2 align-title"><?php echo AppUtility::t('Post Type')?></span>
@@ -124,7 +126,8 @@ $now = $currentTime;
                 echo '</div>';?>
             </span>
         </div>
-    <?php }elseif($rights == 10 && ($forumData['settings'] & 1 == 1)){?>
+    <?php }elseif($rights == AppConstant::STUDENT_RIGHT && ($forumData['settings'] & AppConstant::NUMERIC_ONE == AppConstant::NUMERIC_ONE))
+    {?>
         <div>
             <div class="col-md-2"><b><?php echo AppUtility::t('Post Anonymously')?></b></div>
             <div class="col-md-8"><input name="settings" id="post-anonymously" value="post-anonymously" type="checkbox" ></div>

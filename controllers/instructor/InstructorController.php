@@ -14,6 +14,7 @@ use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\GbItems;
 use app\models\Grades;
+use app\models\Groups;
 use app\models\InstrFiles;
 use app\models\LinkedText;
 use app\models\Message;
@@ -1224,14 +1225,18 @@ class InstructorController extends AppController
     public function actionCopyCourseItems()
     {
          $this->guestUserHandler();
-         $this->layout = 'master';
          $courseId = $this->getParamVal('cid');
          $course = Course::getById($courseId);
          $user = $this->getAuthenticatedUser();
         global $userid;
         $userid = $user['id'];
          $loadToOthers = $this->getParamVal('loadothers');
-         if(!$this->isTeacher($user->id,$courseId))
+         $isMaster = $this->getParamVal('isMaster');
+        if($isMaster == '')
+        {
+            $this->layout = 'master';
+        }
+        if(!$this->isTeacher($user->id,$courseId))
          {
              $overwriteBody = 1;
              $message = AppConstant::GROUP_MESSAGE;
@@ -1617,7 +1622,7 @@ class InstructorController extends AppController
                  }
                  else if (isset($loadToOthers))
                  {
-                     $query  = Stugroups::getAllIdName();
+                     $query  = Groups::getAllIdName();
                      if(count($query) > AppConstant::NUMERIC_ZERO)
                      {
                          $pageHasGroups=true;
@@ -1652,8 +1657,8 @@ class InstructorController extends AppController
          }
         $this->includeJS(['libtree.js']);
         $this->includeCSS(['question/libtree.css']);
-        $responseData = ['course'=> $course,'overwriteBody' => $overwriteBody,'message' => $message,'loadToOthers' => $loadToOthers,'action' => $action,'params' => $params,'calItems' => $calItems,'PicIcons' => $PicIcons,'ids' => $ids,'$types' => $types,'parents' => $parents,'names' => $names,'sums' => $sums,
-        'page_blockSelect' => $page_blockSelect,'courseGroupResults' => $courseGroupResults,'$grpNames' => $grpNames,'page_mineList' => $page_mineList,'courseTreeResult' => $courseTreeResult,'lastTeacher' => $lastTeacher,
+        $responseData = ['course'=> $course,'isMaster' => $isMaster,'pageHasGroups' => $pageHasGroups,'overwriteBody' => $overwriteBody,'message' => $message,'loadToOthers' => $loadToOthers,'action' => $action,'params' => $params,'calItems' => $calItems,'PicIcons' => $PicIcons,'ids' => $ids,'$types' => $types,'parents' => $parents,'names' => $names,'sums' => $sums,
+        'page_blockSelect' => $page_blockSelect,'courseGroupResults' => $courseGroupResults,'grpNames' => $grpNames,'page_mineList' => $page_mineList,'courseTreeResult' => $courseTreeResult,'lastTeacher' => $lastTeacher,
         'courseTemplateResults' => $courseTemplateResults,'groupTemplateResults' => $groupTemplateResults];
         return $this->render('copyCourseItems',$responseData);
     }

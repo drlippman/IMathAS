@@ -1374,13 +1374,15 @@ class CourseController extends AppController
             }
             $calTag = $params['tag'];
             if ($params['avail']== AppConstant::NUMERIC_ONE) {
-                if ($params['available-after']== AppConstant::NUMERIC_ZERO) {
+                if ($params['available-after']== AppConstant::NUMERIC_ZERO)
+                {
                     $startDate = AppConstant::NUMERIC_ZERO;
                 } else if ($params['available-after']=='now') {
                     $startDate = time();
                 } else {
                     $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                 }
+
                 if ($params['available-until']== AppConstant::ALWAYS_TIME) {
                     $endDate = AppConstant::ALWAYS_TIME;
                 } else {
