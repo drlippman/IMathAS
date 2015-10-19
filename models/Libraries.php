@@ -31,7 +31,8 @@ class Libraries extends BaseImasLibraries
         return Libraries::find()->where(['IN', 'id', $ids])->all();
     }
 
-    public static function getUserAndLibrary($questionId){
+    public static function getUserAndLibrary($questionId)
+    {
         $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid= :questionId";
         $data = \Yii::$app->db->createCommand($query);
         $data->bindValue('questionId', $questionId);
@@ -53,9 +54,9 @@ class Libraries extends BaseImasLibraries
 
     public static function getQidAndLibID($aid){
         $query = "SELECT imas_questions.id,imas_libraries.id AS libid,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
-        $query .= "WHERE imas_questions.assessmentid='$aid' AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
+        $query .= "WHERE imas_questions.assessmentid=':aid' AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
         $query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->bindValue(':aid',$aid)->queryAll();
         return $data;
     }
 
@@ -69,14 +70,14 @@ class Libraries extends BaseImasLibraries
     }
 
     public static function getByQuestionId($questionid){
-        $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
-        $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id= :questionid";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('questionid',$questionid);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name')->from('imas_questions')
+            ->join('INNER JOIN','imas_libraries','imas_questions.category=imas_libraries.id')->where('imas_questions.id= :questionid')
+            ->createCommand($query)->bindValue('questionid',$questionid)->queryAll();
     }
 
-    public static function getAllQSetId($qids){
+    public static function getAllQSetId($qids)
+    {
         $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
         $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
@@ -122,10 +123,10 @@ class Libraries extends BaseImasLibraries
         $query = new Query();
         $query	->select(['*'])
             ->from('imas_libraries')
-            ->where(['name' => $name]);
-        $query->andWhere(['parent' => $parents]);
+            ->where('name = :name');
+        $query->andWhere('parent = :parents' );
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':parents',$parents)->queryAll();
         return $data;
     }
 
@@ -154,13 +155,13 @@ class Libraries extends BaseImasLibraries
         $query = new Query();
         $query	->select(['name','userights','parent','sortorder'])
             ->from('imas_libraries')
-            ->where(['id' => $id]);
+            ->where('id = :id');
         if(!$isAdmin)
         {
             $query->andWhere(['ownerid' => $userId]);
         }
         $command = $query->createCommand();
-        $data = $command->queryOne();
+        $data = $command->bindValue(':id',$id)->queryOne();
         return $data;
     }
 
@@ -195,13 +196,17 @@ class Libraries extends BaseImasLibraries
 
     public static function getLibraryData($rootLibs,$nonPrivate)
     {
-        $query = "SELECT id,name,parent,uniqueid,lastmoddate FROM imas_libraries WHERE id IN ($rootLibs)";
-        if ($nonPrivate)
+        $query = new Query();
+        $query ->select('id,name,parent,uniqueid,lastmoddate')
+            ->from('imas_libraries')
+            ->where(['IN','rootLibs',$rootLibs]);
+        if($nonPrivate)
         {
-            $query .= " AND userights>0";
+            $query->andWhere(['>','userights','0']);
         }
-        $query .= " ORDER BY uniqueid";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query ->orderBy('uniqueid');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
         return $data;
     }
 

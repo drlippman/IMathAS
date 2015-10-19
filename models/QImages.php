@@ -65,13 +65,6 @@ class QImages extends BaseImasQimages {
     }
     public static function dataForExportLib($qSetId)
     {
-        $query = new Query();
-        $query ->select(['var','filename'])
-            ->from('imas_qimages')
-            ->where(['qsetid' => $qSetId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
-
+        return self::find()->select(['var','filename'])->where(['qsetid' => $qSetId])->all();
     }
 }

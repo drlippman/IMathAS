@@ -1024,7 +1024,7 @@ class QuestionController extends AppController
             }
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
         }
-        $query = Outcomes::getByCourse($courseId);
+        $query = Outcomes::getByCourseId($courseId);
         $outcomeNames = array();
         foreach ($query as $row) {
             $outcomeNames[$row['id']] = $row['name'];

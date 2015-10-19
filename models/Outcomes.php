@@ -21,29 +21,8 @@ class Outcomes extends BaseImasOutcomes {
     }
     public static function getByCourseId($courseId)
     {
-        $query = new Query();
-        $query -> select(['id','name'])
-               ->from('imas_outcomes')
-                ->where(['courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()-> select(['id','name'])->where(['courseid' => $courseId])->all();
     }
-
-    public static function getByCourse($courseId){
-        return Outcomes::find()->select('id,name')->where(['courseid' => $courseId])->all();
-    }
-
-    public static function getExistingOutcomes($courseId)
-    {
-        $query = new Query();
-        $query -> select(['id','name'])
-            ->from('imas_outcomes')
-            ->where('courseid= :courseid',[':courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
-     }
 
     public function insertOutcomes($courseId,$name)
     {
@@ -51,7 +30,6 @@ class Outcomes extends BaseImasOutcomes {
         $this->name = $name;
         $this->save();
         return $this->id;
-
     }
 
     public static function UpdateOutcomes($name,$Id,$courseId)
@@ -72,8 +50,6 @@ class Outcomes extends BaseImasOutcomes {
                 $singleData->delete();
             }
         }
-//        $query = "DELETE FROM imas_outcomes WHERE id IN ($unusedList)";
-//        $data = \Yii::$app->db->createCommand($query)->queryAll();
     }
 
     public static function getDataByJoins($ctc,$courseId)

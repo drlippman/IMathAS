@@ -56,10 +56,10 @@ class Tutor extends BaseImasTutors
             ->join('INNER JOIN',
                 'imas_users',
                 'imas_users.id = imas_tutors.userid')
-            ->where(['imas_tutors.courseid' => $courseId])
+            ->where('imas_tutors.courseid = :courseId')
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -73,8 +73,11 @@ class Tutor extends BaseImasTutors
 
     public static function getDataByUserId($userid)
     {
-        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = new Query();
+        $query->select('ic.id,ic.name')->from('imas_courses AS ic')->join('INNER JOIN','imas_tutors AS it','ic.id=it.courseid')
+            ->where('it.userid = :userid')->orderBy('ic.name');
+        $command = $query->createCommand();
+        return $command->bindValue(':userid',$userid)->queryAll();
     }
 
     public static function getTutorData($userId)

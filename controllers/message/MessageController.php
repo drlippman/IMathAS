@@ -63,7 +63,8 @@ class MessageController extends AppController
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('userid');
         $userName = User::getById($userId );
-        if ($this->getAuthenticatedUser()) {
+        if ($this->getAuthenticatedUser())
+        {
             $course = Course::getById($courseId);
             $teacher = Teacher::getTeachersById($courseId);
             $users = User::findTeachersToList($courseId);

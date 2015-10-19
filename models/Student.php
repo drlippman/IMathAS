@@ -171,7 +171,7 @@ class Student extends BaseImasStudents
     public static function findStudentByCourseId($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
     {
         $query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
-        $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=$courseId ";
+        $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid= :courseId ";
         if ($limuser>0) { $query .= "AND imas_users.id=$limuser ";}
         if ($secfilter!=-1 && $limuser<=0) {
             $query .= "AND imas_students.section='$secfilter' ";
@@ -193,7 +193,7 @@ class Student extends BaseImasStudents
         } else {
             $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->bindValue('courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -207,10 +207,10 @@ class Student extends BaseImasStudents
         $query = new Query();
         $query->select(['count(id)'])
             ->from('imas_students')
-            ->where(['courseid' => $courseId])
+            ->where('courseid = :courseId')
             ->andWhere(['NOT LIKE', 'section', 'NULL']);
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -264,10 +264,10 @@ class Student extends BaseImasStudents
                 'imas_students',
                 'imas_users.id = imas_students.userid'
             )
-            ->where(['imas_students.courseid' => $courseId])
+            ->where('imas_students.courseid = :courseId')
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -319,10 +319,10 @@ class Student extends BaseImasStudents
                 'imas_students',
                 'imas_users.id = imas_students.userid'
             )
-            ->where(['imas_students.courseid' => $courseId])
+            ->where('imas_students.courseid = :courseId')
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -409,7 +409,7 @@ class Student extends BaseImasStudents
                 'imas_students',
                 'imas_users.id = imas_students.userid'
             )
-            ->where(['imas_students.courseid' => $courseId]);
+            ->where('imas_students.courseid = :courseId');
         if ($hassection && $sortorder == "sec") {
             $query->orderBy('imas_students.section,imas_users.LastName,imas_users.FirstName');
 
@@ -417,7 +417,7 @@ class Student extends BaseImasStudents
             $query->orderBy('imas_users.LastName,imas_users.FirstName');
         }
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -470,9 +470,9 @@ class Student extends BaseImasStudents
     public static function getFNameAndLNameByJoin($date)
     {
         $query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_courses AS t ";
-        $query .= "ON s.courseid=t.id AND s.lastaccess>$date  JOIN imas_users as u  ";
+        $query .= "ON s.courseid=t.id AND s.lastaccess > :date  JOIN imas_users as u  ";
         $query .= "ON u.id=t.ownerid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id ORDER BY g.name";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return \Yii::$app->db->createCommand($query)->bindValue(':date',$date)->queryAll();
     }
 
     public static function getstuDetails($start, $now, $end)
@@ -541,8 +541,12 @@ class Student extends BaseImasStudents
 
     public static function getStudentByUserId($userid)
     {
-        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS it ON ic.id=it.courseid WHERE it.userid='$userid' ORDER BY ic.name";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = new Query();
+        $query->select('ic.id,ic.name')->from('imas_courses AS ic')->join('INNER JOIN','imas_students AS it','ic.id=it.courseid')->where('it.userid = :userId')
+            ->orderBy('ic.name');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':userId',$userid)->queryAll();
+        return $data;
     }
 
     public static function getStudentData($userId, $courseId)

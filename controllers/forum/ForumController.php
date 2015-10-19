@@ -299,10 +299,11 @@ class ForumController extends AppController
             }
             if (isset($params['save']) && $params['save'] == 'Save Grades and View Previous')
             {
-                return $this->redirect('post?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId . '&thread=' . $params['prevth']);
+                return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['prevth']);
             } else if (isset($params['save']) && $params['save'] == 'Save Grades and View Next') {
-                return $this->redirect('post?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId . '&thread=' . $params['nextth']);
-            } else {
+                return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['nextth']);
+            } else
+            {
                 return $this->redirect('thread?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId);
             }
         }
@@ -341,7 +342,8 @@ class ForumController extends AppController
                     $groupid = 0;
                 }
                 $dofilter = true;
-            } else {
+            } else
+            {
                 if (isset($sessionData['ffilter' . $forumId]) && $sessionData['ffilter' . $forumId] > -1) {
                     $groupid = $sessionData['ffilter' . $forumId];
                     $dofilter = true;
@@ -352,7 +354,8 @@ class ForumController extends AppController
             }
             if ($dofilter) {
                 $limthreads = array();
-                if ($isteacher || $groupid == 0) {
+                if ($isteacher || $groupid == 0)
+                {
                     $threadData = Thread::getByStuGroupIdNonZero($groupid);
                 } else {
                     $threadData = Thread::getByStuGroupId($groupid);
@@ -1311,7 +1314,7 @@ class ForumController extends AppController
             $rubricsLabel[$key] = $rubric['name'];
             $key++;
         }
-        $OutcomesData = Outcomes::getByCourse($courseId);
+        $OutcomesData = Outcomes::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
         if ($OutcomesData) {

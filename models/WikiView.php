@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasWikiViews;
 use yii\db\Query;
 

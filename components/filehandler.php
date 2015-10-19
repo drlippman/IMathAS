@@ -226,14 +226,14 @@ public static function storeuploadedqimage($id,$key,$sec="public-read") {
 		}
 	}
 }
-function getasidfileurl($file) {
-	global $imasroot;
+public  static function getasidfileurl($file) {
+
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3object = "adata/$file";
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],$s3object,7200);
 	} else {
-		return $imasroot.'/filestore/adata/'.$file;
+		return AppUtility::getHomeURL().'/filestore/adata/'.$file;
 	}
 }
 

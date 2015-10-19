@@ -11,17 +11,19 @@ use yii\db\Query;
 
 class LoginLog extends BaseImasLoginLog
 {
-    public static function getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy){
+    public static function getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy)
+    {
          return  LoginLog::find()->where(['courseid' => $courseId, 'userid' => $userId])->orderBy([$orderBy=>$sortBy])->all();
-   }
+    }
+
     public  static function findLoginCount($courseId){
         $query = new Query();
         $query->select(['userid', 'count(*) as count'])
             ->from('imas_login_log')
-            ->where(['courseid' => $courseId])
+            ->where('courseid = :courseId')
             ->groupBy('userid');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 

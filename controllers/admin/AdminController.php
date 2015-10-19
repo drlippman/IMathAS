@@ -1695,7 +1695,7 @@ class AdminController extends AppController
                                 if (count($includedQs)> AppConstant::NUMERIC_ZERO)
                                 {
                                     $includedList = implode(',',$includedQs);
-                                    $idAndUniqueId = QuestionSet::getUniqueId($includedList);
+                                    $idAndUniqueId = QuestionSet::getUniqueId($includedQs);
                                     if($idAndUniqueId)
                                     {
                                         foreach($idAndUniqueId as $row)
@@ -1704,8 +1704,7 @@ class AdminController extends AppController
                                         }
                                     }
                                 }
-                                $updateList = implode(',',$qIdsToUpdate);
-                                $data = QuestionSet::getDataToImportLib($updateList);
+                                $data = QuestionSet::getDataToImportLib($qIdsToUpdate);
                                 if($data)
                                 {
                                     foreach($data as $row)

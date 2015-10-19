@@ -45,27 +45,27 @@ class QuestionSet extends BaseImasQuestionset
 						FROM imas_questions AS a
 						JOIN imas_questions AS b ON a.assessmentid = b.assessmentid
 						JOIN imas_questions AS c ON b.questionsetid = c.questionsetid
-						AND c.assessmentid ='$aid'
+						AND c.assessmentid =':aid'
 						JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
-						AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
+						AND (imas_questionset.ownerid=':userid' OR imas_questionset.userights>0)
 						AND imas_questionset.deleted=0
 						AND imas_questionset.replaceby=0
 						WHERE a.questionsetid NOT IN ($existingqlist)
-						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100")->queryAll();
+						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100")->bindValues([':aid' => $aid,':userid' => $userid])->queryAll();
         return $query;
     }
 
     public static function getByGroupId($id,$groupId){
         $query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
-        $query .= "WHERE iq.id='$id' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupId' OR iq.userights>2)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "WHERE iq.id='$id' AND iq.ownerid=imas_users.id AND (imas_users.groupid=':groupId' OR iq.userights>2)";
+        $data = \Yii::$app->db->createCommand($query)->bindValue(':groupId',$groupId)->queryAll();
         return $data;
     }
 
     public static function getByUserIdGroupId($id,$userId,$groupId){
         $query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
-        $query .= "WHERE iq.id='$id' AND iq.ownerid=imas_users.id AND (iq.ownerid='$userId' OR (iq.userights=3 AND imas_users.groupid='$groupId') OR iq.userights>3)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "WHERE iq.id='$id' AND iq.ownerid=imas_users.id AND (iq.ownerid=':userId' OR (iq.userights=3 AND imas_users.groupid='$groupId') OR iq.userights>3)";
+        $data = \Yii::$app->db->createCommand($query)->bindValue(':userId',$userId)->queryAll();
         return $data;
     }
 
@@ -115,17 +115,22 @@ class QuestionSet extends BaseImasQuestionset
         return $this->id;
     }
 
-    public static function getByQSetIdJoin($id){
-        $query = "SELECT imas_questionset.*,imas_users.groupid FROM imas_questionset,imas_users WHERE ";
-        $query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$id'";
-        $data = \Yii::$app->db->createCommand($query)->queryOne();
+    public static function getByQSetIdJoin($id)
+    {
+        $query = new Query();
+        $query->select('imas_questionset.*,imas_users.groupid')->from('imas_questionset')->join('INNER JOIN','imas_users','imas_questionset.ownerid=imas_users.id')
+            ->where('imas_questionset.id= :id');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':id',$id)->queryOne();
         return $data;
     }
 
     public static function getUserAndQuestionSetJoin($id){
-        $query = "SELECT imas_users.email,imas_questionset.* ";
-        $query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='$id'";
-        $data = \Yii::$app->db->createCommand($query)->queryOne();
+        $query = new Query();
+        $query->select('imas_users.email,imas_questionset.* ')->from('imas_users')->join('INNER JOIN','imas_questionset','imas_users.id=imas_questionset.ownerid')
+            ->where('imas_questionset.id= :id');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':id',$id)->queryOne();
         return $data;
     }
 
@@ -134,13 +139,13 @@ class QuestionSet extends BaseImasQuestionset
         $query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
         $query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
         $query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
-        $query .= "imas_assessments.courseid='{$ctc}' AND imas_questionset.replaceby>0";
-        $data = \Yii::$app->db->createCommand($query)->queryOne();
+        $query .= "imas_assessments.courseid= :ctc AND imas_questionset.replaceby>0";
+        $data = \Yii::$app->db->createCommand($query)->bindValue(':ctc',$ctc)->queryOne();
         return $data;
     }
+
     public static function getByQuestionId($questionList)
     {
-        $query = new Query();
         $query  = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id AS qid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($questionList)";
@@ -148,10 +153,9 @@ class QuestionSet extends BaseImasQuestionset
         return $data;
     }
 
-    public  static function getQuestionSetData($ids){
-        $query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$ids)."')";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+    public  static function getQuestionSetData($ids)
+    {
+        return self::find()->select('id,description,extref,qtype,control')->where('IN','id',$ids)->all();
     }
 
     public static function updateVideoId($from,$to)
@@ -165,13 +169,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getExternalRef()
     {
-        $data = new Query();
-        $data ->select(['uniqueid','lastmoddate','extref'])
-               ->from(['imas_questionset'])
-            ->where(['<>','extref','']);
-        $command = $data->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['uniqueid','lastmoddate','extref'])->from(['imas_questionset'])->where(['<>','extref',''])->all();
     }
     public static function getWrongLibFlag()
     {
@@ -185,10 +183,7 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function getDataToUpdateExtRef()
     {
-        $query = "SELECT id,uniqueid,lastmoddate,extref FROM imas_questionset WHERE 1";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
-
+        return self::find()->select('id,uniqueid,lastmoddate,extref')->all();
     }
     public static function updateExternalRef($uniqueId,$rowId)
     {
@@ -202,10 +197,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getDataToUpdateQuestionUsageData()
     {
-        $query = "SELECT id,questionsetid FROM imas_questions WHERE 1";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
-
+        return self::find()->select('id,questionsetid')->all();
     }
 
     public static function updateAvgTime($avg,$qsid)
@@ -217,20 +209,14 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getIdAndAvgTime()
     {
-        $data = new Query();
-        $data->select(['avgtime', 'id'])
-            ->from(['imas_questionset']);
-        $command = $data->createCommand();
-        $data = $command->queryAll();
-        return $data;
-
+        return self::find()->select(['avgtime', 'id'])->all();
     }
     public static function getQuestionData($aid)
     {
-        $query = "SELECT iq.id,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
-        $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = new Query();
+        $query->select('iq.id,iq.category,iqs.description')->from('imas_questions AS iq')
+            ->join('INNER JOIN','imas_questionset as iqs','iq.questionsetid=iqs.id')->where('iq.assessmentid = :aid');
+        $query->createCommand()->bindValue(':aid',$aid)->queryAll();
     }
 
     public static function getQtext($id){
@@ -248,15 +234,11 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function getUniqueId($includedList)
     {
-        $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedList)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        return self::find()->select('id,uniqueid')->where('IN','uniqueid',$includedList)->all();
     }
     public static function getDataToImportLib($qIdsToCheck)
     {
-        $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qIdsToCheck)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        return self::find()->select('id,control,qtext')->where('IN','id',$qIdsToCheck)->all();
     }
     public static function updateQuestionSetToImportLib($control,$qText,$rowId)
     {
@@ -300,14 +282,9 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getLastModDateAndId($UId)
     {
-        $data = new Query();
-        $data->select(['id', 'adddate','lastmoddate'])
-            ->from(['imas_questionset'])
-            ->where(['uniqueid' => $UId]);
-        $command = $data->createCommand();
-        $data = $command->queryone();
-        return $data;
 
+        return self::find()->select(['id', 'adddate','lastmoddate'])
+            ->where(['uniqueid' => $UId])->one();
     }
 
     public static function getQSetAndUserData($qSetId,$groupId)
@@ -315,11 +292,11 @@ class QuestionSet extends BaseImasQuestionset
         $data = new Query();
         $data->select(['imas_questionset.id'])
             ->from(['imas_questionset','imas_users'])
-            ->where(['imas_questionset.id' => $qSetId])
+            ->where('imas_questionset.id = :qSetId')
             ->andWhere(['imas_questionset.ownerid=imas_users.id'])
-            ->andWhere(['imas_users.groupid' => $groupId]);
+            ->andWhere('imas_users.groupid = :groupId');
         $command = $data->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValues([':qSetId' => $qSetId,':groupId' => $groupId])->queryAll();
         return $data;
     }
 
@@ -588,13 +565,7 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function getUniqueIdToExportLib($includedGs)
     {
-        $query = new Query();
-        $query->select(['id', 'uniqueid'])
-            ->from('imas_questionset')
-            ->where(['IN', 'id', $includedGs]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'uniqueid'])->where(['IN', 'id', $includedGs])->all();
     }
     public static function getLicenseData($ids)
     {
@@ -602,13 +573,7 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function getDataForImportQSet($uniqueId)
     {
-        $query = new Query();
-        $query->select(['id','uniqueid','adddate','lastmoddate'])
-            ->from('imas_questionset')
-            ->where(['IN', 'uniqueid', $uniqueId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','uniqueid','adddate','lastmoddate'])->where(['IN', 'uniqueid', $uniqueId])->all();
     }
 
     public static function updateDataForImportQSet($qdata,$now,$qSetId,$hasImg)
@@ -658,8 +623,8 @@ class QuestionSet extends BaseImasQuestionset
     public static function getByOrUserId($qsetid,$groupid)
     {
         $query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
-        $query .= "WHERE iq.id='$qsetid' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>3)";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "WHERE iq.id=':qsetid' AND iq.ownerid=imas_users.id AND (imas_users.groupid=':groupid' OR iq.userights > 3)";
+        return \Yii::$app->db->createCommand($query)->bindValues([':qsetid' => $qsetid,':groupid' => $groupid])->queryAll();
     }
 
     public static function updateQSetId($params,$now,$qSetId){
@@ -689,21 +654,16 @@ class QuestionSet extends BaseImasQuestionset
         $query ->select(['imas_questionset.*', 'imas_users.groupid'])
             ->from('imas_questionset, imas_users')
             ->where('imas_questionset.ownerid=imas_users.id');
-        $query->andWhere(['imas_questionset.id' => $qsetid]);
+        $query->andWhere('imas_questionset.id = :qsetid');
         $command = $query->createCommand();
-        $data = $command->queryOne();
+        $data = $command->bindValue(':qsetid',$qsetid)->queryOne();
         return $data;
     }
 
     public static function getAncestor($templateId)
     {
-        $query = new Query();
-        $query ->select(['ancestors'])
-            ->from('imas_questionset')
-            ->where(['id' => $templateId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['ancestors'])->where(['id' => $templateId])->one();
+
     }
 
     public function insertDataForModTutorial($uQid,$now,$params,$user,$qType,$code,$qText,$ancestors)

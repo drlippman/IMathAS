@@ -350,10 +350,10 @@ class ForumPosts extends BaseImasForumPosts
             if (!$isTeacher) {
                 $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate < $now AND imas_forums.enddate>$now)) ";
             }
-            $query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid= :courseId AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
+            $query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid= ':courseId' AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
         } else {
             $query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
-            $query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid= :forumId AND imas_users.id=imas_forum_posts.userid AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
+            $query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid= ':forumId' AND imas_users.id=imas_forum_posts.userid AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
         }
         if ($dofilter) {
             $query .= " AND imas_forum_posts.threadid IN ($limthreads)";

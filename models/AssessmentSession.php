@@ -45,6 +45,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
         $bestscorelist = $scorelist . ';' . $scorelist . ';' . $scorelist;
         $scorelist = $scorelist . ';' . $scorelist;
+
         $bestattemptslist = $attemptslist;
         $bestseedslist = $seedlist;
         $bestlalist = $lalist;
@@ -147,7 +148,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function setGroupId($assessmentId)
     {
-        $assessment = AssessmentSession::findOne(['assessmentid' => $assessmentId]);
+        $assessment = self::findOne(['assessmentid' => $assessmentId]);
         $assessment->agroupid = AppConstant::NUMERIC_ZERO;
         $assessment->save();
     }
@@ -619,7 +620,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
     {
         $query = "UPDATE imas_assessment_sessions SET $setslist WHERE id = :id";
         $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('id',$id);
+        $data->bindValue('id', $id);
         return $data->execute();
     }
     public static function deleteId($data)
@@ -633,6 +634,51 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getBestScore($id, $userId)
     {
         return self::find()->select(['bestscores'])->where(['assessmentid' => $id])->andWhere(['userid' => $userId])->one();
+    }
+    public static function getDataForGrade($params,$page,$assessmentId)
+    {
+        $query = new Query();
+        $query->select('imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.*')
+            ->from('imas_users')
+            ->join(
+                'INNER JOIN',
+                'imas_assessment_sessions',
+            'imas_assessment_sessions.userid=imas_users.id'
+            )
+            ->where('imas_assessment_sessions.assessmentid = :assessmentId')
+             ->orderBy('imas_users.LastName')->orderBy('imas_users.FirstName');
+        if ($page != -1 && isset($params['userid']))
+        {
+            $query->andWhere('userid= :userid' );
+        }
+        $command = $query->createCommand();
+        $command->bindValue(':assessmentId',$assessmentId);
+        if ($page != -1 && isset($params['userid']))
+        {
+            $command->bindValue(':userid',$params['userid']);
+        }
+        $items =  $command->queryAll();
+        return $items;
+    }
+
+    public static function getDataWithUserData($assessmentId,$courseId)
+    {
+        $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
+        $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$courseId' AND imas_assessment_sessions.assessmentid='$assessmentId' ";
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getDataWithUserDataFilterByPage($aid,$cid,$page)
+    {
+        $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
+        $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+        if ($page != -1)
+        {
+            $query .= " LIMIT $page,1";
+        }
+        return \Yii::$app->db->createCommand($query)->queryAll();
     }
 }
 

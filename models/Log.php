@@ -28,7 +28,7 @@ class Log extends BaseImasLog
 
     public function insertEntry($now,$uid,$grpid)
     {
-        $query = "INSERT INTO imas_log (time,log) VALUES ($now,'deleting $uid from $grpid')";
-        $command = \Yii::$app->db->createCommand($query)->execute();
+        $query = "INSERT INTO imas_log (time,log) VALUES (:now,'deleting :uid from :grpid')";
+        $command = \Yii::$app->db->createCommand($query)->bindValues([':now' => $now,':uid' => $uid,':grpid' => $grpid])->execute();
     }
 } 

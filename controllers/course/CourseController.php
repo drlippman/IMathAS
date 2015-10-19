@@ -1169,7 +1169,7 @@ class CourseController extends AppController
         $model = new ThreadForm();
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $this->noValidRights($teacherId);
-        $query = Outcomes::getByCourse($courseId);
+        $query = Outcomes::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
         if (isset($params['tb'])) {

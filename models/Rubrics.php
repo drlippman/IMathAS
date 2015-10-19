@@ -45,20 +45,13 @@ class Rubrics extends BaseImasRubrics
 
     public static function getByUserIdAndGroupIdAndList($userId,$groupid,$list)
     {
-        $query = Yii::$app->db->createCommand("SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid='$userId' OR groupid='$groupid')")->queryAll();
+        $query = Yii::$app->db->createCommand("SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid= ':userId' OR groupid=':groupid')")->bindValues(['groupid' => $groupid,'userId' => $userId])->queryAll();
         return $query;
     }
 
     public static function getById($id)
     {
-        $query = new Query();
-        $query ->select(['name','rubrictype','rubric','groupid'])
-                ->from('imas_rubrics')
-                ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
-
+        return self::find()->select(['name','rubrictype','rubric','groupid'])->where(['id' => $id])->one();
     }
 
     public static function getByUserIdAndGroupIdAndRubric($rubric,$userid,$groupid){
@@ -100,9 +93,18 @@ class Rubrics extends BaseImasRubrics
 
     public static function rubricDataByAssessmentId($assessmentId)
     {
-
     $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
-    $query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$assessmentId} AND rubric>0)";
-    return Yii::$app->db->createCommand($query)->queryAll();
+    $query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid= :assessmentId AND rubric>0)";
+    return Yii::$app->db->createCommand($query)->bindValue(':assessmentId',$assessmentId)->queryAll();
+    }
+
+    public static function getRubricByQuestionId($questionId)
+    {
+        $query = new Query();
+        $query->select('imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric')->from('imas_rubrics')->
+        join('INNER JOIN','imas_questions','imas_rubrics.id=imas_questions.rubric')->where('imas_questions.id = :questionId');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':questionId',$questionId)->queryAll();
+        return $data;
     }
 }

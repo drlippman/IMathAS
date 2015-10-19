@@ -40,13 +40,7 @@ class Stugroups extends BaseImasStugroups
 
     public static function findByGrpSetIdToDlt($deleteGrpSet)
     {
-        $query = new Query();
-        $query->select(['id'])
-            ->from('imas_stugroups')
-            ->where('groupsetid= :groupsetid', [':groupsetid' => $deleteGrpSet]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return Stugroups::find()->select(['id'])->where(['groupsetid' => $deleteGrpSet])->all();
     }
 
     public static function deleteGrp($grpId)
@@ -62,32 +56,18 @@ class Stugroups extends BaseImasStugroups
 
     public static function findByGrpSetIdForCopy($copyGrpSet)
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_stugroups')
-            ->where('groupsetid= :groupsetid', [':groupsetid' => $copyGrpSet]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return Stugroups::find()->select(['id', 'name'])->where(['groupsetid' =>  $copyGrpSet])->all();
     }
 
     public static function findByGrpSetIdToManageSet($grpSetId)
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_stugroups')
-            ->where('groupsetid= :groupsetid', [':groupsetid' => $grpSetId]);
-        $query->orderBy('id');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
 
+        return Stugroups::find()->select(['id', 'name'])->where(['groupsetid' =>  $grpSetId])->orderBy('id')->all();
     }
 
     public static function getById($renameGrp)
     {
         return Stugroups::find()->where(['id' => $renameGrp])->one();
-
     }
 
     public static function renameGrpName($renameGrp, $grpName)
@@ -120,28 +100,32 @@ class Stugroups extends BaseImasStugroups
         }
     }
 
-    public static function getStuGrpId($userId, $groupSetId){
-        $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
-        $query .= "WHERE i_sgm.userid='$userId' AND i_sg.groupsetid= $groupSetId";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+    public static function getStuGrpId($userId, $groupSetId)
+    {
+        $query = new Query();
+        $query->select('i_sg.id,i_sg.name')->from('imas_stugroups as i_sg')->join('INNER JOIN','imas_stugroupmembers as i_sgm','i_sg.id=i_sgm.stugroupid')
+            ->where('i_sgm.userid = :userId')->andWhere('i_sg.groupsetid= :grpSetId');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':userId',$userId)->bindValue('grpSetId', $groupSetId)->queryAll();
         return $data;
     }
 
     public static function getUserIdStuGrpAndMembers($grpSetId)
     {
-        $data = Yii::$app->db->createCommand("SELECT i_sgm.userid FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid  WHERE i_sg.groupsetid= :grpSetId ");
-        $data->bindValue('grpSetId', $grpSetId);
-        $query = $data->queryAll();
-        return $query;
+        $query = new Query();
+         $query->select('i_sgm.userid')->from('imas_stugroups as i_sg')->join('INNER JOIN','imas_stugroupmembers as i_sgm','i_sg.id=i_sgm.stugroupid')
+            ->where('i_sg.groupsetid= :grpSetId');
+        $command = $query->createCommand();
+        $data = $command->bindValue('grpSetId', $grpSetId)->queryAll();
+        return $data;
     }
     public static function getStuGrpDataForGradebook($userId,$grpSetId)
     {
-        $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid  WHERE i_sgm.userid= :userId AND i_sg.groupsetid= :grpSetId';
-        $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('grpSetId', $grpSetId);
-        $data->bindValue('userId', $userId);
-        $query = $data->queryOne();
-        return $query;
+        $query = new Query();
+        $query->select('i_sg.id')->from('imas_stugroups as i_sg')->join('INNER JOIN','imas_stugroupmembers as i_sgm','i_sg.id=i_sgm.stugroupid')
+            ->where('i_sgm.userid = :userId')->andWhere('i_sg.groupsetid= :grpSetId');
+        $command = $query->createCommand();
+        return $command->bindValue('grpSetId', $grpSetId)->bindValue('userId', $userId)->queryAll();
     }
     public static function getByGrpSetIdAndName($groupsetId)
     {

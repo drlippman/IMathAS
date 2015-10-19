@@ -591,7 +591,7 @@ class AssessmentController extends AppController
                         $key++;
                     }
                 }
-                $query = Outcomes::getByCourse($courseId);
+                $query = Outcomes::getByCourseId($courseId);
                 $pageOutcomes = array();
                 if ($query) {
                     foreach ($query as $singleData) {

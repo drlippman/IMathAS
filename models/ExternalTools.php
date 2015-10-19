@@ -2,8 +2,10 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasExternalTools;
 use yii\db\Query;
+use Yii;
 
 class ExternalTools extends BaseImasExternalTools
 {
@@ -175,11 +177,11 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function externalToolsDataForLink($courseId, $groupId)
     {
-        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= $courseId ";
-        $query .= "OR (courseid=0 AND (groupid= $groupId OR groupid=0)) ORDER BY name";
-        $groupNames = \Yii::$app->db->createCommand($query);
-//        $groupNames->bindValues(['courseId' => $courseId, 'qroupid' => $groupId]);
-        return $groupNames->queryAll();
+        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= ':courseId'";
+        $query .= "OR (courseid=0 AND (groupid= ':groupId' OR groupid=0)) ORDER BY name";
+        $groupNames = Yii::$app->db->createCommand($query);
+        $data = $groupNames->bindValues(['courseId'=> $courseId, 'groupId' => $groupId])->queryAll();
+        return $data;
     }
 
     public static function deleteByCourseId($courseId)

@@ -50,31 +50,25 @@ class Teacher extends BaseImasTeachers
     public static function getUserIdByJoin($courseId)
     {
         $query = new Query();
-        $query->select('imas_users.id')->from(['imas_teachers', 'imas_users'])->where(['imas_teachers.courseid' => $courseId])
+        $query->select('imas_users.id')->from(['imas_teachers', 'imas_users'])->where('imas_teachers.courseid : :courseId')
             ->andWhere(['imas_teachers.userid=imas_users.id'])->all();
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
     public static function getDataForUtilities($courseId, $user)
     {
         $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
-        $query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$courseId' AND imas_teachers.userid=imas_users.id ";
-        $query .= "AND imas_users.id<>'$user->id'";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid=':courseId' AND imas_teachers.userid=imas_users.id ";
+        $query .= "AND imas_users.id<>':userId'";
+        return Yii::$app->db->createCommand($query)->bindValue(':userId',$user->id)->bindValue(':courseId',$courseId)->queryAll();
     }
 
     public static function getByCourseId($params)
     {
-        $query = new Query();
-        $query->select(['id'])
-            ->from('imas_teachers')
-            ->where(['courseid' => $params['id']]);
-        $query->andWhere(['userid' => $params['newowner']]);
-        $command = $query->createCommand();
-        $data = $command->queryone();
-        return $data;
+        return Teacher::find()->select('id')
+            ->where(['courseid' => $params['id']])->andWhere(['userid' => $params['newowner']])->one();
     }
 
     public function insertUidAndCid($params)
@@ -111,7 +105,10 @@ class Teacher extends BaseImasTeachers
 
     public static function getDataByUserId($userId)
     {
-        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS it ON ic.id=it.courseid WHERE it.userid='$userId' ORDER BY ic.name";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $query = new Query();
+        $query->select('ic.id,ic.name')->from('imas_courses AS ic')->join('INNER JOIN','imas_teachers AS it','ic.id=it.courseid')
+            ->where('it.userid = :userid')->orderBy('ic.name');
+        $command = $query->createCommand();
+        return $command->bindValue(':userid',$userId)->queryAll();
     }
 }

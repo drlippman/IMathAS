@@ -13,7 +13,9 @@ require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
+
 	//$starttime = microtime(true);
+
     global $imasroot, $myrights, $showtips, $urlmode, $CFG, $temp;
     $urlmode = AppUtility::urlMode();
 	$imasroot = AppUtility::getHomeURL();
@@ -182,6 +184,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}
 		$laparts = explode("&",$la);
+
 		foreach ($anstypes as $kidx=>$anstype) {
 			$qcol = ($qdata['qtype']=="multipart" && isset($qcolors[$kidx]))?(is_numeric($qcolors[$kidx])?rawscoretocolor($qcolors[$kidx],$answeights[$kidx]):$qcolors[$kidx]):'';
 			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
@@ -190,6 +193,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor($qcolors[0],1):$qcolors[0]):'';
 		list($answerbox,$entryTips[0],$shanspt[0],$previewloc) = makeanswerbox($qdata['qtype'],$qnidx,$la,$options,0,$qcol);
 	}
+
 	if ($qdata['qtype']=='conditional') {
 		$qcol = isset($qcolors[0])?(is_numeric($qcolors[0])?rawscoretocolor($qcolors[0],1):$qcolors[0]):'';
 		if ($qcol!='') {
@@ -278,6 +282,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 
 	if ($doshowans && isset($showanswer) && !is_array($showanswer)) {  //single showanswer defined
+
 		$showanswerloc = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 		if ($nosabutton) {
 			$showanswerloc .= filter(_('Answer:') . " $showanswer\n");
@@ -287,18 +292,22 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 		$showanswerloc .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
 	} else {
-		$showanswerloc = array();
+
+			$showanswerloc = array();
 		foreach($entryTips as $iidx=>$entryTip) {
-			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
+
+					$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
-				if ($nosabutton) {
+
+                if ($nosabutton) {
 					$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
 				} else {
 					$showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 					$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span>\n");
 				}
 			} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
-				if (isset($showanswer[$iidx])) {
+
+                if (isset($showanswer[$iidx])) {
 					if ($nosabutton) {
 						$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
 					} else {

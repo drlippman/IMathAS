@@ -136,7 +136,6 @@ class WikiController extends AppController
                     foreach($wikiViewResult as $key => $row){
                         $wikiLastViews[$row['stugroupid']] = $row['lastview'];
                     }
-
                     $wikiRevisionResult = WikiRevision::getByIdWithMaxTime($id);
                     foreach($wikiRevisionResult as $key => $row){
                         if (!isset($wikiLastViews[$row['stugroupid']]) || $wikiLastViews[$row['stugroupid']] < $row['time']) {
@@ -178,7 +177,6 @@ class WikiController extends AppController
                     }
                     $grpmem .= '</ul></p>';
                 }
-
                 $revisionResult = WikiRevision::getRevisionTotalData($id, $groupId);
                 $numRevisions = count($revisionResult);
                 if ($numRevisions == AppConstant::NUMERIC_ZERO) {

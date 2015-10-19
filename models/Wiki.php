@@ -124,7 +124,6 @@ class Wiki extends BaseImasWikis
             $wiki->avail = $avail;
             $wiki->save();
         }
-
     }
 
     public static function getWikiMassChanges($courseId)
@@ -150,6 +149,7 @@ class Wiki extends BaseImasWikis
     {
         return self::find()->select(['id','name','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
     }
+
     public function updateName($val, $typeId)
     {
         $form = Wiki::findOne(['id' => $typeId]);

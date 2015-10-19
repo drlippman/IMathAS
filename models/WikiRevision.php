@@ -4,6 +4,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasWikiRevisions;
+use yii\db\Query;
 
 class WikiRevision extends BaseImasWikiRevisions
 {
@@ -44,8 +45,16 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getRevisionTotalData($wikiId, $stugroupid)
     {
-        $query = \Yii::$app->db->createCommand("SELECT i_w_r.id as revision_id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id as user_id FROM imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid WHERE i_w_r.wikiid= '$wikiId' AND i_w_r.stugroupid= '$stugroupid' ORDER BY i_w_r.id DESC")->queryAll();
-        return $query;
+        $query = new Query();
+        $query	->select(['i_w_r.id as revision_id','i_w_r.revision','i_w_r.time','i_u.LastName','i_u.FirstName','i_u.id as user_id'])
+            ->from('imas_wiki_revisions as i_w_r')
+            ->join(	'INNER JOIN', 'imas_users as i_u', 'i_u.id=i_w_r.userid')
+            ->where('i_w_r.wikiid= :wikiId')
+        ->andWhere('i_w_r.stugroupid = :stugroupid')
+        ->orderBy(['i_w_r.id' => AppConstant::DESCENDING]);
+        $command = $query->createCommand();
+        $data = $command->bindValue(':stugroupid',$stugroupid)->bindValue(':wikiId',$wikiId)->queryAll();
+        return $data;
     }
 
     public static function deleteByWikiId($wikiId)
@@ -88,8 +97,8 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getByIdWithMaxTime($id)
     {
-        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$id' GROUP BY stugroupid";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=':id' GROUP BY stugroupid";
+        return \Yii::$app->db->createCommand($query)->bindValue(':id',$id)->queryAll();
     }
 
     public static function deleteAllRevision($id, $groupId)
@@ -105,8 +114,7 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getDataWithLimit($id,$groupId)
     {
-        $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupId' ORDER BY id DESC LIMIT 1";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+      return WikiRevision::find()->select('id')->where(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->orderBy(['id' => AppConstant::DESCENDING])->limit('1')->all();
     }
 
     public static function deleteRevisionHistory($id, $groupId,$curid)
@@ -122,9 +130,7 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getRevision($id, $groupId, $revision)
     {
-        $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupId' ";
-        $query .= "AND id>=$revision ORDER BY id DESC";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return WikiRevision::find()->select('revision')->where(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->andWhere(['>=','id',$revision])->orderBy(['id' => AppConstant::DESCENDING])->all();
     }
 
     public static function updateRevision($revision, $newBase)
@@ -153,12 +159,17 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getDataToCheckConflict($id, $groupId)
     {
-        $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
-        $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-        $query .= "WHERE i_w_r.wikiid=':id' AND i_w_r.stugroupid=':groupId' ORDER BY id DESC LIMIT 1";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['id' => $id, 'groupId' => $groupId]);
-        return $data->queryOne();
+        $query = new Query();
+        $query	->select(['i_w_r.id','i_w_r.revision','i_w_r.time','i_u.LastName','i_u.FirstName'])
+            ->from('imas_wiki_revisions as i_w_r')
+            ->join(	'INNER JOIN', 'imas_users as i_u', 'i_u.id=i_w_r.userid')
+            ->where('i_w_r.wikiid = :id')
+            ->andWhere('i_w_r.stugroupid = :stugroupid')
+            ->orderBy(['id' => AppConstant::DESCENDING])
+        ->limit('1');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':stugroupid',$groupId)->bindValue(':id',$id)->queryOne();
+        return $data;
     }
 
     public static function getMaxTime($typeid, $groupSetId, $canEdit, $wikiGrpId)

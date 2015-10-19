@@ -197,7 +197,7 @@ class GroupsController extends AppController
                     {
                         echo '<p>Some students joined a group already and were skipped:</p><p>';
                         $stuList = "'".implode("','",$alreadyGroupedStu)."'";
-                        $query = User::insertDataFroGroups($stuList);
+                        $query = User::insertDataFroGroups($alreadyGroupedStu);
                         if($query)
                         {
                             foreach($query as $data)
@@ -338,7 +338,6 @@ class GroupsController extends AppController
                      $page_Grp[$singleData['id']] = $singleData['name'];
                      $page_GrpMembers[$singleData['id']] = array();
                 }
-                $grpIds = implode(',',array_keys($page_Grp));
                 natsort($page_Grp);
                 $stuNames = array();
                 $hasUserImg = array();
@@ -351,7 +350,7 @@ class GroupsController extends AppController
                 $stuUserIdsInGroup = array();
                 if (count($page_Grp)>AppConstant::NUMERIC_ZERO)
                 {
-                    $query =StuGroupMembers::manageGrpSet($grpIds);
+                    $query =StuGroupMembers::manageGrpSet(array_keys($page_Grp));
                     foreach($query as $singleMember)
                     {
                         if (!isset($page_GrpMembers[$singleMember['stugroupid']]))

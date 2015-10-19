@@ -44,7 +44,7 @@ class OutcomesController extends AppController
             $this->layout = 'master';
         if(isset($this->params['order']))
         {
-            $query = Outcomes::getExistingOutcomes($this->courseId);
+            $query = Outcomes::getByCourseId($this->courseId);
             foreach($query as $singleOutcome)
             {
                $this->currOutcomesArray[$singleOutcome['id']] = $singleOutcome['name'];
@@ -53,7 +53,7 @@ class OutcomesController extends AppController
             $outcomeOrder = serialize($itemArray);
             $saveOutcome = new Course();
             $saveOutcome->SaveOutcomes($this->courseId,$outcomeOrder);
-            $unused = array_diff(array_keys($this->currOutcomesArray), $this->seenOutcomesArr);AppUtility::dump($unused);
+            $unused = array_diff(array_keys($this->currOutcomesArray), $this->seenOutcomesArr);
             if(count($unused) > AppConstant::NUMERIC_ZERO)
             {
                 $unusedList = implode(',',$unused);
@@ -68,7 +68,7 @@ class OutcomesController extends AppController
         {
             $outcomes = array();
         }
-        $outcomeData = Outcomes::getExistingOutcomes($this->courseId);
+        $outcomeData = Outcomes::getByCourseId($this->courseId);
         foreach($outcomeData as $data)
         {
             $outcomeInfo[$data['id']] = $data['name'];

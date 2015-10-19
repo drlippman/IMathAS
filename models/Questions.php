@@ -25,7 +25,6 @@ class Questions extends BaseImasQuestions
     {
         $query = Questions::find()->select('points,id,category')->where(['assessmentid' => $dataId])->all();
         return $query;
-
     }
 
     public static function setQuestionByAssessmentId($assessmentId)
@@ -129,8 +128,8 @@ class Questions extends BaseImasQuestions
     {
         $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,";
         $query .= "imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,";
-        $query .= "imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users WHERE imas_questions.id='$id' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
-        $data = \Yii::$app->db->createCommand($query)->queryOne();
+        $query .= "imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users WHERE imas_questions.id=':id' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
+        $data = \Yii::$app->db->createCommand($query)->bindValue(':id',$id)->queryOne();
         return $data;
     }
 
@@ -142,16 +141,17 @@ class Questions extends BaseImasQuestions
 
     public static function getByAssessmentIdJoin($aidq)
     {
-        $query = "SELECT imas_questions.id,imas_questionset.id AS qid,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
-        $query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query  = new Query();
+        $query->select('imas_questions.id,imas_questionset.id AS qid,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid')
+            ->from('imas_questionset,imas_questions,imas_users')->where('imas_questionset.id=imas_questions.questionsetid')->andWhere('imas_questionset.ownerid=imas_users.id')
+            ->where('imas_questions.assessmentid = :aidq');
+        $data = $query->createCommand()->bindValue(':aidq',$aidq)->queryAll();
         return $data;
     }
 
     public static function getQuestionCount($id)
     {
-        return $data = \Yii::$app->db->createCommand("SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$id}'")->queryAll();
-
+        return $data = \Yii::$app->db->createCommand("SELECT COUNT(id) FROM imas_questions WHERE questionsetid= ':id' ")->bindValue(':id',$id)->queryAll();
     }
 
     public static function getByQuestionsIdAndAssessmentId($assessmentId)
@@ -163,9 +163,9 @@ class Questions extends BaseImasQuestions
                 'imas_questions',
                 'imas_questions.questionsetid=imas_questionset.id'
             )
-            ->where(['imas_questions.assessmentid' => $assessmentId]);
+            ->where('imas_questions.assessmentid = :assessmentId');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':assessmentId',$assessmentId)->queryAll();
         return $data;
     }
 
@@ -179,11 +179,10 @@ class Questions extends BaseImasQuestions
                 'imas_libraries',
                 'imas_questions.category=imas_libraries.id'
             )
-            ->where(['imas_questions.id' => $questionId]);
+            ->where('imas_questions.id',':questionId');
         $command = $query->createCommand();
-        $data = $command->queryOne();
+        $data = $command->bindValue(':questionId',$questionId)->queryOne();
         return $data;
-
     }
 
     public static function updateQuestionSetId($aidarr)
@@ -226,11 +225,7 @@ class Questions extends BaseImasQuestions
     }
     public static function numberOfQuestionByIdAndCategory($assessmentid)
     {
-        $query = new Query();
-        $query -> select(['id'])->from('imas_questions')->where(['assessmentid' =>  $assessmentid])->andWhere(['<>','category','0']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return count($data);
+        return self::find()-> select(['id'])->where(['assessmentid' =>  $assessmentid])->andWhere(['<>','category','0'])->all();
     }
 
     public static function setQuestionSetIdById($qSetId, $id){
@@ -289,17 +284,26 @@ class Questions extends BaseImasQuestions
     }
     public static function getDataByJoin($aid)
     {
-        $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
-        $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+
+        $query = new Query();
+        $query->select('iq.id,iqs.description')
+            ->from('imas_questions AS iq')
+            ->join(
+                'INNER JOIN',
+                'imas_questionset as iqs',
+                'iq.questionsetid=iqs.id'
+            )
+            ->where('imas_questions.id',':questionId');
+        $command = $query->createCommand();
+        $data = $command->bindValue(':iq.assessmentid',$aid)->queryAll();
         return $data;
     }
 
     public static function getDataForModTutorial($userId,$id)
     {
         $query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
-        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid='{$id}' AND imas_courses.ownerid<>'$userId'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid= :id' AND imas_courses.ownerid<> :userId";
+        $data = \Yii::$app->db->createCommand($query)->bindValues([':id' => $id ,':userId' => $userId])->queryAll();
         return $data;
     }
 
@@ -337,5 +341,22 @@ class Questions extends BaseImasQuestions
         $this->showhints = intval($params['showhints']);
         $this->save();printf($this->getErrors());
         return $this->id;
+    }
+
+    public static function getQuestionsAndQuestionSetData($qid)
+    {
+        $query = new Query();
+        $query->select(['imas_questions.points','imas_questionset.control','imas_questions.rubric','imas_questionset.qtype'])
+            ->from('imas_questions')
+            ->join(
+                'INNER JOIN',
+                'imas_questionset',
+                'imas_questions.questionsetid = imas_questionset.id'
+            )
+            ->where('imas_questions.id = :qid');
+        $command = $query->createCommand()
+        ->bindValue('qid',$qid);
+        $data = $command->queryOne();
+        return $data;
     }
 }

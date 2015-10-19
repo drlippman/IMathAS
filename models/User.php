@@ -100,7 +100,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function findAllUsersArray($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->where(['rights' => 0])->asArray()->all();
-
     }
 
     public static function createStudentAccount($params)
@@ -196,12 +195,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         }
     }
 
-    public static function userAlreadyExist($StudentDataArray)
-    {
-        $message = "Username {$StudentDataArray} already existed in system";
-        return $message;
-    }
-
     public static function findTeachersToList($courseId)
     {
         $query = new Query();
@@ -211,10 +204,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                 'imas_teachers',
                 'imas_users.id = imas_teachers.userid'
             )
-            ->where(['imas_teachers.courseid' => $courseId])
+            ->where('imas_teachers.courseid = :courseId')
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue('courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -250,16 +243,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                 'imas_students',
                 'imas_users.id = imas_students.userid'
             )
-            ->where(['imas_students.courseid' => $courseId]);
-
+            ->where('imas_students.courseid = :courseId');
         if ($usersort == AppConstant::NUMERIC_ZERO) {
             $query->orderBy('imas_students.section', 'imas_users.LastName', 'imas_users.FirstName');
         } else {
             $query->orderBy('imas_users.LastName', 'imas_users.FirstName');
         }
-
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -274,14 +265,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query = new Query();
         $query
             ->from('imas_users')
-
             ->join('INNER JOIN',
                 'imas_students',
                 'imas_users.id = imas_students.userid'
             )
-            ->where(['imas_students.courseid' => $courseId]);
+            ->where('imas_students.courseid = :courseId');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
 
     }
@@ -296,17 +286,18 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                 'imas_students',
                 'imas_users.id = imas_students.userid'
             )
-            ->where(['imas_students.courseid' => $courseId]);
+            ->where('imas_students.courseid = :courseId');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
 
     }
 
     public static function insertDataFroGroups($stuList)
     {
-        $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id IN ($stuList) ORDER BY LastName, FirstName";
-        return Yii::$app->db->createCommand($query)->queryAll();
+//        $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id IN ($stuList) ORDER BY LastName, FirstName";
+//        return Yii::$app->db->createCommand($query)->queryAll();
+        return User::find()->select('FirstName,LastName,SID')->where(['IN','id',$stuList])->orderBy('LastName,FirstName')->all();
     }
 
     public static function userDataForGroups($remove)
@@ -314,9 +305,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query = new Query();
         $query->select(['FirstName', 'LastName'])
             ->from('imas_users')
-            ->where(['id' => $remove]);
+            ->where('id = :remove');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':remove',$remove)->queryAll();
         return $data;
     }
 
@@ -343,16 +334,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getNameByIdUsingINClause($ids)
     {
-        $query = "SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($ids)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        return User::find()->select('LastName,FirstName,id')->where(['IN','id',$ids])->all();
     }
 
     public static function findUserDataForIsolateAssessmentGrade($isTutor, $tutorsection, $aid, $cid, $hidelocked, $sortorder, $hassection)
     {
         $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
-        $query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
-        $query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid' WHERE istu.courseid='$cid' ";
+        $query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid= :courseId ";
+        $query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid= :assessmentId WHERE istu.courseid= :courseId ";
         if ($isTutor && isset($tutorsection) && $tutorsection != '') {
             $query .= " AND istu.section='$tutorsection' ";
         }
@@ -364,20 +353,18 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         } else {
             $query .= " ORDER BY iu.LastName,iu.FirstName";
         }
-        $data = Yii::$app->db->createCommand($query)->queryAll();
+        $data = Yii::$app->db->createCommand($query)->bindValues([':courseId' => $cid, 'assessmentId'=> $aid])->queryAll();
         return $data;
     }
 
     public static function getListOfTeacher($groupId)
     {
-        $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid='$groupId' ORDER BY LastName,FirstName";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return User::find()->select('id,LastName,FirstName,SID')->where(['>','rights',10])->andWhere(['groupid' => $groupId])->orderBy('LastName,FirstName')->all();
     }
 
     public static function getTeacherData()
     {
-        $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return User::find()->select('id,LastName,FirstName,SID')->where(['>','rights',10])->orderBy('LastName , FirstName')->all();
     }
 
     public static function getDataByJoin($data, $num)
@@ -392,7 +379,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         } elseif ($num == AppConstant::NUMERIC_ONE) {
             $query->where(['imas_users.SID' => $data]);
         }
-
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -427,14 +413,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getByLastAccessAndRights($old)
     {
-        $query = new Query();
-        $query->select(['id'])
-            ->from('imas_users')
-            ->where(['rights' => 10])
-            ->orWhere(['rights' => 0])->andWhere(['<', 'lastaccess', $old]);
-        $command = $query->createCommand();
-        $users = $command->queryAll();
-        return $users;
+        return User::find()->select('id')->where(['rights'=> 10])->orwhere(['rights'=> 0])->andWhere(['<','lastaccess',$old])->all();
     }
 
     public static function deleteByLastAccessAndRights($old)
@@ -460,9 +439,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', $date]);
+            ->andWhere(['>', 'imas_users.lastaccess',':date']);
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':date',$date)->queryAll();
         return count($data);
     }
 
@@ -472,12 +451,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query->select('imas_students.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', $date]);
+            ->andWhere(['>', 'imas_users.lastaccess',':date']);
         if (count($skipCid) > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['NOT IN', 'imas_students.courseid', $skipCidS]);
         }
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':date',$date)->queryAll();
         return count($data);
     }
 
@@ -488,14 +467,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', $date]);
+            ->andWhere(['>', 'imas_users.lastaccess', ':date']);
         if (count($skipCid) > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['NOT IN', 'imas_students.courseid', $skipCidS]);
         }
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':date',$date)->queryAll();
         return count($data);
-
     }
 
     public static function getCountByJoin($skipCid, $date, $skipCidS)
@@ -505,12 +483,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_teachers'])
             ->where('imas_users.id=imas_teachers.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', $date]);
+            ->andWhere(['>', 'imas_users.lastaccess', ':date']);
         if (count($skipCid) > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['NOT IN', 'imas_teachers.courseid', $skipCidS]);
         }
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':date',$date)->queryAll();
         return count($data);
     }
 
@@ -521,20 +499,15 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', $date]);
+            ->andWhere(['>', 'imas_users.lastaccess', ':date']);
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':date',$date)->queryAll();
         return count($data);
     }
 
     public static function getUserEmail($user)
     {
-        $query = new Query();
-        $query->select('email')
-            ->from('imas_users')
-            ->where(['>', 'rights', 20]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = User::find()->select('email')->where(['>', 'rights', 20])->all();
         return count($data);
     }
 
@@ -593,16 +566,11 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query .= "(SELECT courseid FROM imas_inlinetext WHERE text LIKE '%$srch%') OR imas_courses.id IN ";
         $query .= "(SELECT courseid FROM imas_linkedtext WHERE text LIKE '%$srch%' OR summary LIKE '%$srch%') ORDER BY imas_groups.name,imas_users.LastName";
         return Yii::$app->db->createCommand($query)->query();
-
     }
 
     public static function getFirstNameAndLastName($toList)
     {
-        $query = new Query();
-        $query->select(['FirstName', 'LastName', 'email', 'id'])->from('imas_users')->where(['IN', 'id', $toList]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return User::find()->select(['FirstName', 'LastName', 'email', 'id'])->where(['IN', 'id', $toList])->all();
     }
 
     public static function getByUserRight($myRight, $groupId)
@@ -612,10 +580,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->from('imas_users')
             ->where(['>', 'rights', '19']);
         if ($myRight < AppConstant::ADMIN_RIGHT) {
-            $query->andWhere(['groupid' => $groupId]);
+            $query->andWhere(['groupid = :groupId']);
         }
         $query->orderBy('LastName');
         $command = $query->createCommand();
+        if ($myRight < AppConstant::ADMIN_RIGHT) {
+            $command->bindValue(':groupId',$groupId);
+        }
         $data = $command->queryAll();
         return $data;
     }
@@ -631,27 +602,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getUserDataForUtilities($id)
     {
-        $query = new Query();
-        $query->select(['FirstName', 'SID', 'email'])->from('imas_users')->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
-
+        return User::find()->select(['FirstName', 'SID', 'email'])->where(['id' => $id])->one();
     }
 
     public static function findPendingUser($offset)
     {
-
-        $query = new Query();
-        $query->select(['id', 'SID', 'LastName', 'FirstName', 'email'])
-            ->from('imas_users')
-            ->where(['=', 'rights', '0'])
-            ->orWhere(['=', 'rights', '12'])
-            ->limit(AppConstant::NUMERIC_ONE)
-            ->offset($offset);
-        $command = $query->createCommand();
-        $data = $command->queryone();
-        return $data;
+        return User::find()->select(['id', 'SID', 'LastName', 'FirstName', 'email'])->where(['=', 'rights', '0'])
+            ->orWhere(['=', 'rights', '12'])->limit(AppConstant::NUMERIC_ONE)->offset($offset)->one();
     }
 
     public static function getUserGreaterThenTeacherRights()
@@ -702,7 +659,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->lastaccess = $now;
         $this->save();
         return $this->id;
-
     }
 
     public static function getByIdOrdered()
@@ -716,26 +672,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public static function userDataForTutorial($id)
     {
-        $query = new Query();
-        $query->select(['FirstName', 'LastName'])
-            ->from('imas_users')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return User::find()->select(['FirstName', 'LastName'])->where(['id' => $id])->one();
     }
 
     public static function getPwdUNameById($id)
     {
         return User::find()->select('password,LastName,FirstName')->where(['id' => $id])->all();
-    }
-
-    public static function getStudentData($curids,$id){
-        $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
-        $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$id' ";
-        $query .= "AND imas_users.id NOT IN ($curids) ORDER BY imas_users.LastName,imas_users.FirstName";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
     }
 
     public static function getPasswordFromLtiUser($sid)
@@ -752,9 +694,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                 'imas_students AS istu',
                 'iu.id = istu.userid'
             )
-            ->where(['istu.courseid' => $courseId]);
+            ->where('istu.courseid = :courseId');
         $query->orderBy('iu.LastName,iu.FirstName');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue(':courseId',$courseId);
         $data = $command->queryAll();
         return $data;
     }
@@ -769,9 +711,11 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getUserNameUsingStuGroup($stuGroupId)
     {
-        $query = "SELECT iu.FirstName,iu.LastName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
-        $query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$stuGroupId}' ORDER BY isgm.id LIMIT 1";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query = new query();
+        $query->select('iu.FirstName,iu.LastName')->from('imas_users')->join('INNER JOIN','imas_stugroupmembers AS isgm','iu.id=isgm.userid')
+            ->where('isgm.stugroupid = :stuGroupId')->orderBy('isgm.id')->limit('1');
+        $command = $query->createCommand()->bindValue(':stuGroupId',$stuGroupId);
+        $data = $command->queryAll();
         return $data;
     }
 
@@ -805,13 +749,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
      public static function getDataById($id)
      {
-         $query = new Query();
-         $query->select(['FirstName','LastName','rights','groupid'])
-             ->from(['imas_users'])
-             ->where(['id' => $id]);
-         $command = $query->createCommand();
-         $data = $command->queryOne();
-         return $data;
+         return User::find()->select(['FirstName','LastName','rights','groupid'])->where(['id' => $id])->one();
      }
 
     public static function getBySIDForAdmin($adminName)
@@ -879,24 +817,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getUserHomeLayoutInfo($id)
     {
-        $query = new Query();
-        $query->select(['homelayout','hideonpostswidget'])
-            ->from('imas_users')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return User::find()->select(['homelayout','hideonpostswidget'])->where(['id' => $id])->one();
     }
 
     public static function getUserHideOnPostInfo($id)
     {
-        $query = new Query();
-        $query->select(['hideonpostswidget'])
-            ->from('imas_users')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return User::find()->select('hideonpostswidget')->where(['id' => $id])->one();
     }
 
     public static function updateHideOnPost($userId, $hideList)
@@ -911,9 +837,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function lastViewsUser($thread)
     {
-        $query = "SELECT iu.LastName,iu.FirstName,ifv.lastview FROM imas_users AS iu JOIN ";
-        $query .= "imas_forum_views AS ifv ON iu.id=ifv.userid WHERE ifv.threadid=$thread ORDER BY ifv.lastview";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $query = new Query();
+        $query->select('iu.LastName,iu.FirstName,ifv.lastview')->from('imas_users AS iu')
+            ->join('INNER JOIN','imas_forum_views AS ifv','iu.id=ifv.userid')->where('ifv.threadid = :thread')
+            ->orderBy('ifv.lastview');
+        $command = $query->createCommand()->bindValue(':thread',$thread);
+        $data = $command->queryAll();
+        return $data;
     }
 }
 
