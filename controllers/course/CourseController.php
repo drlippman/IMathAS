@@ -63,422 +63,13 @@ class CourseController extends AppController
      */
     public $enableCsrfValidation = false;
 
-    public function actionIndex()
+    public function beforeAction($action)
     {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $courseId = $this->getParamVal('cid');
-        $this->setSessionData('courseId',$courseId);
-        $this->checkSession($params);
         $user = $this->getAuthenticatedUser();
-        $this->setSessionData('user',$user);
-        $msgList = $this->getNotificationDataMessage($courseId,$user);
-        $countPost = $this->getNotificationDataForum($courseId,$user);
-        $this->setSessionData('messageCount',$msgList);
-        $this->setSessionData('postCount',$countPost);
-        $this->layout = 'master';
-        $this->userAuthentication($user, $courseId);
-        $userId = $user->id;
-        $id = $this->getParamVal('id');
-        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
-        $exception = Exceptions::getTotalData($userId);
-        $responseData = array();
-        $now = time();
-        $calendarCount = array();
-        $exceptionDataCount = array();
-        $exceptions = array();
-        $latePassHrs = array();
-        $useviewbuttons = false;
-        $previewshift = $this->getParamVal('stuview');
-        $course = Course::getById($courseId);
-        $topbar = explode('|',$course['topbar']);
-        $topbar[0] = explode(',',$topbar[0]);
-        $topbar[1] = explode(',',$topbar[1]);
-        if (!isset($topbar[2])) {
-            $topbar[2] = 0;
-        }
-        if ($topbar[0][0] == null) {
-            unset($topbar[0][0]);
-        }
-        if ($topbar[1][0] == null) {
-            unset($topbar[1][0]);
-        }
-
-        if ($course && ($itemOrders = unserialize($course->itemorder))) {
-
-            foreach ($itemOrders as $key => $itemOrder) {
-                $tempAray = array();
-                if (is_array($itemOrder) || count($blockItems = $itemOrder['items'])) {
-                    $tempAray['Block'] = $itemOrder;
-                    $tempItemList = array();
-                    $blockItems = $itemOrder['items'];
-                    foreach ($blockItems as $blockKey => $blockItem) {
-                        $tempItem = array();
-                        $item = Items::getById($blockItem);
-                        switch ($item->itemtype) {
-                            case 'Assessment':
-
-                                $assessment = Assessments::getByAssessmentId($item->typeid);
-                                $exceptionData = Exceptions::getExceptionDataLatePass($userId);
-                                $result = Course::getByLatePasshrs($courseId);
-                                $hours = $result[0]['latepasshrs'];
-                                foreach($exceptionData as $key1 => $line) {
-                                    $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
-                                }
-
-                                if($previewshift > AppConstant::NUMERIC_ZERO){
-                                    if($assessment['enddate'] > ($now + $previewshift))
-                                    {
-                                    $tempItem[$item->itemtype] = $assessment;
-                                    array_push($calendarCount, $assessment);
-                                    array_push($exceptionDataCount, $exceptions);
-                                    array_push($latePassHrs, $hours);
-                                    }
-                                } else {
-                                    $tempItem[$item->itemtype] = $assessment;
-                                    array_push($calendarCount, $assessment);
-                                    array_push($exceptionDataCount, $exceptions);
-                                    array_push($latePassHrs, $hours);
-                                }
-                                break;
-                            case 'Calendar':
-                                $tempItem[$item->itemtype] = $itemOrder;
-                                break;
-                            case 'Forum':
-                                $form = Forums::getById($item->typeid);
-                                if($previewshift > AppConstant::NUMERIC_ZERO){
-                                    if($form['enddate'] > ($now + $previewshift))
-                                    {
-                                    $tempItem[$item->itemtype] = $form;
-                                    }
-                                } else{
-                                    $tempItem[$item->itemtype] = $form;
-                                }
-                                break;
-                            case 'Wiki':
-                                $wiki = Wiki::getById($item->typeid);
-                                if($previewshift > AppConstant::NUMERIC_ZERO){
-                                    if($wiki['enddate'] > ($now + $previewshift))
-                                    {
-                                    $tempItem[$item->itemtype] = $wiki;
-                                    }
-                                } else{
-                                    $tempItem[$item->itemtype] = $wiki;
-                                }
-                                break;
-                            case 'LinkedText':
-                                $linkedText = Links::getById($item->typeid);
-                                if($previewshift > AppConstant::NUMERIC_ZERO){
-                                    if($linkedText['enddate'] > ($now + $previewshift))
-                                    {
-                                    $tempItem[$item->itemtype] = $linkedText;
-                                    }
-                                } else{
-                                    $tempItem[$item->itemtype] = $linkedText;
-                                }
-                                break;
-                            case 'InlineText':
-                                $inlineText = InlineText::getById($item->typeid);
-                                if($previewshift > AppConstant::NUMERIC_ZERO){
-                                    if($inlineText['enddate'] > ($now + $previewshift))
-                                    {
-                                    $tempItem[$item->itemtype] = $inlineText;
-                                    }
-                                } else{
-                                    $tempItem[$item->itemtype] = $inlineText;
-                                }
-                                break;
-                        }
-
-                        array_push($tempItemList, $tempItem);
-                    }
-                    $tempAray['itemList'] = $tempItemList;
-                    array_push($responseData, $tempAray);
-                } else {
-                    $item = Items::getById($itemOrder);
-                    switch ($item->itemtype) {
-                        case 'Assessment':
-                            $assessment = Assessments::getByAssessmentId($item->typeid);
-                            $exceptionData = Exceptions::getExceptionDataLatePass($userId);
-                            $result = Course::getByLatePasshrs($courseId);
-                            $hours = $result[0]['latepasshrs'];
-                            foreach($exceptionData as $key1 => $line) {
-
-                                $exceptions[$line['typeid']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
-                            }
-                            if($previewshift > AppConstant::NUMERIC_ZERO)
-                            {
-                               if($assessment['enddate'] > ($now + $previewshift))
-                               {
-                                   $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
-                                   if($exception){
-                                       $assessment->startdate = $exception->startdate;
-                                       $assessment->enddate = $exception->enddate;
-                                   }
-                                   $tempAray[$item->itemtype] = $assessment;
-                                   array_push($responseData, $tempAray);
-                                   array_push($calendarCount, $assessment);
-                                   array_push($exceptionDataCount, $exceptions);
-                                   $latePassHrs[$assessment['id']] = $hours;
-                               }
-                            }else
-                            {
-                                $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
-                                if($exception){
-                                    $assessment->startdate = $exception->startdate;
-                                    $assessment->enddate = $exception->enddate;
-                                }
-                                $tempAray[$item->itemtype] = $assessment;
-                                array_push($responseData, $tempAray);
-                                array_push($calendarCount, $assessment);
-                                array_push($exceptionDataCount, $exceptions);
-                                $latePassHrs[$assessment['id']] = $hours;
-                            }
-                            break;
-                        case 'Calendar':
-                            $tempAray[$item->itemtype] = $itemOrder;
-                            array_push($responseData, $tempAray);
-                            break;
-                        case 'Forum':
-                            $form = Forums::getById($item->typeid);
-                            if($previewshift > AppConstant::NUMERIC_ZERO){
-                                if($form['enddate'] > ($now + $previewshift))
-                                {
-                                    $tempAray[$item->itemtype] = $form;
-                                    array_push($responseData, $tempAray);
-                                }
-                            } else
-                            {
-                                $tempAray[$item->itemtype] = $form;
-                                array_push($responseData, $tempAray);
-                            }
-                            break;
-                        case 'Wiki':
-                            $wiki = Wiki::getById($item->typeid);
-                            if($previewshift > AppConstant::NUMERIC_ZERO){
-                                if($wiki['enddate'] > ($now + $previewshift)){
-                                    $tempAray[$item->itemtype] = $wiki;
-                                    array_push($responseData, $tempAray);
-                                }
-                            }else{
-                                $tempAray[$item->itemtype] = $wiki;
-                                array_push($responseData, $tempAray);
-                            }
-                            break;
-                        case 'InlineText':
-                            $inlineText = InlineText::getById($item->typeid);
-                            if($previewshift > AppConstant::NUMERIC_ZERO){
-                                if($inlineText['enddate'] > ($now + $previewshift)){
-                                    $tempAray[$item->itemtype] = $inlineText;
-                                    array_push($responseData, $tempAray);
-                                }
-                            }else{
-                                $tempAray[$item->itemtype] = $inlineText;
-                                array_push($responseData, $tempAray);
-                            }
-                            break;
-                        case 'LinkedText':
-                            $linkedText = Links::getById($item->typeid);
-                            if($previewshift > AppConstant::NUMERIC_ZERO){
-                                if($linkedText['enddate'] > ($now + $previewshift)){
-                                    $tempAray[$item->itemtype] = $linkedText;
-                                    array_push($responseData, $tempAray);
-                                }
-                            }else{
-                                $tempAray[$item->itemtype] = $linkedText;
-                                array_push($responseData, $tempAray);
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-        $course = Course::getById($courseId);
-        $student = Student::getByCId($courseId);
-        $user = $this->getAuthenticatedUser();
-        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
-        $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
-        $msgList = array();
-        if ($message) {
-            foreach ($message as $singleMessage) {
-                if (in_array($singleMessage->isread, $isReadArray))
-                    array_push($msgList, $singleMessage);
-            }
-        }
-
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception, 'topbar1' => $topbar[0], 'topbar2' => $topbar[2], 'previewshift' => $previewshift, 'useviewbuttons' => $useviewbuttons, 'exceptionDataCount' => $exceptionDataCount, 'latePassHrs' => $latePassHrs);
-        return $this->render('index', $returnData);
+        $actionPath = Yii::$app->controller->action->id;
+        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForCourseController($user,$courseId, $actionPath);
     }
-    /**
-     * Display assessment details
-     */
-    public function actionShowAssessment()
-    {
-        $this->guestUserHandler();
-        $id = $this->getParamVal('id');
-        $courseId = $this->getParamVal('cid');
-        $assessment = Assessments::getByAssessmentId($id);
-        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
-        $questionRecords = Questions::getByAssessmentId($id);
-        $questionSet = QuestionSet::getByQuesSetId($id);
-        $course = Course::getById($courseId);
-        $this->saveAssessmentSession($assessment, $id);
-        $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css']);
-        $this->includeJS(['timer.js']);
-        $returnData = array('cid' => $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet, 'assessmentSession' => $assessmentSession, 'now' => time());
-        return $this->render('ShowAssessment', $returnData);
-    }
-    /**
-     * Show late passes of assessment.
-     */
-    public function actionLatePass()
-    {
-        $this->guestUserHandler();
-        $assessmentId = $this->getParamVal('id');
-        $courseId = $this->getParamVal('cid');
-        $studentId = $this->getUserId();
-        $exception = Exceptions::getByAssessmentId($assessmentId);
-        $assessment = Assessments::getByAssessmentId($assessmentId);
-        $student = Student::getByCourseId($courseId, $studentId);
-        $course = Course::getById($courseId);
-        $addTime = $course->latepasshrs * AppConstant::SECONDS * AppConstant::SECONDS;
-        $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
-        $usedLatepasses = round(($assessment->allowlate - $assessment->enddate) / ($course->latepasshrs * AppConstant::MINUTES));
-        $startDate = $assessment->startdate;
-        $endDate = $assessment->enddate + $addTime;
-        $wave = AppConstant::NUMERIC_ZERO;
-        $param['assessmentid'] = $assessmentId;
-        $param['userid'] = $studentId;
-        $param['startdate'] = $startDate;
-        $param['enddate'] = $endDate;
-        $param['waivereqscore'] = $wave;
-        $param['islatepass'] = AppConstant::NUMERIC_ONE;
-        if (count($exception)) {
-            if ((($assessment->allowlate % AppConstant::NUMERIC_TEN) == AppConstant::NUMERIC_ONE || ($assessment->allowlate % AppConstant::NUMERIC_TEN) - AppConstant::NUMERIC_ONE > $usedLatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > AppConstant::NUMERIC_TEN && ($currentTime - $exception->enddate) < $course->latepasshrs * AppConstant::MINUTES))) {
-                $latepass = $student->latepass;
-                $student->latepass = $latepass - AppConstant::NUMERIC_ONE;
-                $exception->enddate = $exception->enddate + $addTime;
-                $exception->islatepass = $exception->islatepass + AppConstant::NUMERIC_ONE;
-            }
-            $exception->attributes = $param;
-            $exception->save();
-            $student->save();
-        }
-        $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
-    }
-    /**
-     * Create new course at admin side
-     */
-    public function actionAddNewCourse()
-    {
-        $this->guestUserHandler();
-        
-        $model = new CourseSettingForm();
-
-        if ($model->load($this->isPostMethod())) {
-            $isSuccess = false;
-            $bodyParams = $this->getRequestParams();
-            $user = $this->getAuthenticatedUser();
-            $course = new Course();
-            $courseId = $course->create($user, $bodyParams, 1);
-            if ($courseId) {
-                $teacher = new Teacher();
-                $teacherId = $teacher->create($user->id, $courseId);
-                $gbScheme = new GbScheme();
-                $gbSchemeId = $gbScheme->create($courseId);
-                if ($teacherId && $gbSchemeId) {
-                    $this->setSuccessFlash('Course added successfully. Course id: ' . $courseId . ' and Enrollment key: ' . $bodyParams['CourseSettingForm']['enrollmentKey']);
-                    $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
-                    $model = new CourseSettingForm();
-                    $isSuccess = true;
-                }
-            }
-            if (!$isSuccess) {
-                $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
-            }
-        }
-        $this->includeCSS(["courseSetting.css"]);
-        $this->includeJS(["courseSetting.js"]);
-        $returnData = array('model' => $model);
-        return $this->renderWithData('addNewCourse', $returnData);
-    }
-    /**
-     * Setting in created course.
-     */
-    public function actionCourseSetting()
-    {
-        $this->guestUserHandler();
-        $this->layout = 'master';
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        if ($course) {
-            $model = new CourseSettingForm();
-            if ($model->load($this->isPostMethod())) {
-                $courseData = $this->getRequestParams();
-                $params = $courseData['CourseSettingForm'];
-                $courseSetting['name'] = $params['courseName'];
-                $courseSetting['enrollkey'] = $params['enrollmentKey'];
-                $available = $this->getSanitizedValue($params['available'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
-                $courseSetting['available'] = AppUtility::makeAvailable($available);
-                $courseSetting['copyrights'] = $params['copycourse'];
-                $courseSetting['msgset'] = $params['messageSystem'];
-                $toolSet = $this->getSanitizedValue($params['navigationLink'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
-                $courseSetting['toolset'] = AppUtility::makeToolset($toolSet);
-                $courseSetting['deflatepass'] = $params['latePasses'];
-                $courseSetting['theme'] = $params['theme'];
-                $courseSetting['deftime'] = AppUtility::calculateTimeDefference($courseData['start_time'], $courseData['end_time']);
-                $courseSetting['end_time'] = $courseData['end_time'];
-                $courseSetting = AppUtility::removeEmptyAttributes($courseSetting);
-                $course->attributes = $courseSetting;
-                $course->save();
-            } else {
-                $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
-                $this->includeCSS(["courseSetting.css"]);
-                $returnData = array('model' => $model, 'course' => $course, 'selectionList' => $selectionList);
-                return $this->renderWithData('courseSetting', $returnData);
-            }
-        }
-        return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
-    }
-    /**
-     * To delete existing course.
-     */
-    public function actionDeleteCourse()
-    {
-        $model = new DeleteCourseForm();
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        if ($course) {
-            $status = Course::deleteCourse($course->id);
-            if ($status) {
-                $this->setSuccessFlash(AppConstant::DELETED_SUCCESSFULLY);
-            } else {
-                $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
-            }
-        } else {
-            $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
-        }
-        $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
-    }
-    /**
-     * @return string
-     */
-    public function actionTransferCourse()
-    {
-        $this->guestUserHandler();
-        $courseId = $this->getParamVal('cid');
-        $sortBy = AppConstant::FIRST_NAME;
-        $order = AppConstant::ASCENDING;
-        $users = User::findAllUsers($sortBy, $order);
-        $course = Course::getById($courseId);
-        $this->includeCSS(['dashboard.css']);
-        $this->includeJS(['course/transferCourse.js']);
-        $returnData = array('users' => $users, 'course' => $course);
-        return $this->renderWithData('transferCourse', $returnData);
-    }
-
     public function actionUpdateOwner()
     {
         if ($this->isPostMethod()) {
@@ -512,6 +103,13 @@ class CourseController extends AppController
 
     public function actionAddRemoveCourse()
     {
+        /**
+         * Can access:
+         *  1. Full Admin
+         *  2. Group Admin
+         *  3. Diagnostics
+         *  4. Limited Course Creator.
+         */
         $this->guestUserHandler();
         $this->layout = 'master';
         $cid = $this->getParamVal('cid');
@@ -522,6 +120,9 @@ class CourseController extends AppController
 
     public function actionGetTeachers()
     {
+        /**
+         * Ajax
+         */
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
@@ -552,6 +153,9 @@ class CourseController extends AppController
 
     public function actionAddTeacherAjax()
     {
+        /**
+         * Ajax
+         */
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $teacher = new Teacher();
@@ -564,6 +168,9 @@ class CourseController extends AppController
 
     public function actionRemoveTeacherAjax()
     {
+        /**
+         * Ajax
+         */
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $teacher = new Teacher();
@@ -576,6 +183,9 @@ class CourseController extends AppController
 
     public function actionAddAllAsTeacherAjax()
     {
+        /**
+         * Ajax
+         */
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $courseId = $params['cid'];
@@ -590,6 +200,9 @@ class CourseController extends AppController
 
     public function actionRemoveAllAsTeacherAjax()
     {
+        /**
+         * Ajax
+         */
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $courseId = $params['cid'];
@@ -609,46 +222,13 @@ class CourseController extends AppController
     }
 
     /**
-     * @param $assessment
-     * @param $param
-     * @param $id
-     */
-    public function saveAssessmentSession($assessment, $id)
-    {
-        list($qList, $seedList, $reviewSeedList, $scoreList, $attemptsList, $laList) = AppUtility::generateAssessmentData($assessment->itemorder, $assessment->shuffle, $assessment->id);
-        $bestscorelist = $scoreList . ';' . $scoreList . ';' . $scoreList;
-        $scoreList = $scoreList . ';' . $scoreList;
-        $bestAttemptsList = $attemptsList;
-        $bestSeedsList = $seedList;
-        $bestLaList = $laList;
-        $startTime = time();
-        $defFeedbackText = $assessment->deffeedbacktext;
-        $ltiSourcedId = '';
-        $param['questions'] = $qList;
-        $param['seeds'] = $seedList;
-        $param['userid'] = $id;
-        $param['assessmentid'] = $id;
-        $param['attempts'] = $attemptsList;
-        $param['lastanswers'] = $laList;
-        $param['reviewscores'] = $scoreList;
-        $param['reviewseeds'] = $reviewSeedList;
-        $param['bestscores'] = $bestscorelist;
-        $param['scores'] = $scoreList;
-        $param['bestattempts'] = $bestAttemptsList;
-        $param['bestseeds'] = $bestSeedsList;
-        $param['bestlastanswers'] = $bestLaList;
-        $param['starttime'] = $startTime;
-        $param['feedback'] = $defFeedbackText;
-        $param['lti_sourcedid'] = $ltiSourcedId;
-        $assessmentSession = new AssessmentSession();
-        $assessmentSession->attributes = $param;
-        $assessmentSession->save();
-    }
-    /**
      * Display linked text on course page
      */
     public function actionShowLinkedText()
     {
+        /**
+         * Greater than guest user.
+         */
         $this->layout = 'master';
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
@@ -664,6 +244,9 @@ class CourseController extends AppController
      */
     public function actionGetAssessmentDataAjax()
     {
+        /**
+         * Ajax
+         */
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
@@ -731,87 +314,6 @@ class CourseController extends AppController
         return $this->successResponse($responseData);
     }
 
-    public function actionBlockIsolate()
-    {
-        $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
-        $this->layout = 'master';
-        $courseId = $this->getParamVal('cid');
-        $responseData = array();
-        $calendarCount = array();
-        $course = Course::getById($courseId);
-        if ($course) {
-            $itemOrders = unserialize($course->itemorder);
-
-            if (count($itemOrders)) {
-                foreach ($itemOrders as $key => $itemOrder)
-                {
-                $id = $this->getParamVal('blockId');
-                if($itemOrder['id'] == $id)
-                {
-                    $tempAray = array();
-                    if (is_array($itemOrder)) {
-                        $tempAray['Block'] = $itemOrder;
-                        $blockItems = $itemOrder['items'];
-                        $tempItemList = array();
-
-                        if (count($blockItems)) {
-                            foreach ($blockItems as $blockKey => $blockItem) {
-                                $tempItem = array();
-                                $item = Items::getById($blockItem);
-                                switch ($item->itemtype) {
-                                    case 'Assessment':
-                                        $assessment = Assessments::getByAssessmentId($item->typeid);
-                                        $tempItem[$item->itemtype] = $assessment;
-                                        $calendarCount[$item['id']]=  $assessment;
-                                        break;
-                                    case 'Calendar':
-                                        $tempItem[$item->itemtype] = AppConstant::NUMERIC_ONE;
-                                        break;
-                                    case 'Forum':
-                                        $form = Forums::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $form;
-                                        break;
-                                    case 'Wiki':
-                                        $wiki = Wiki::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $wiki;
-                                        break;
-                                    case 'LinkedText':
-                                        $linkedText = Links::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $linkedText;
-                                        break;
-                                    case 'InlineText':
-                                        $inlineText = InlineText::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $inlineText;
-                                        break;
-                                }
-                                array_push($tempItemList, $tempItem);
-                            }
-                        }
-                        $tempAray['itemList'] = $tempItemList;
-                        array_push($responseData, $tempAray);
-                    }
-                }
-                }
-            }
-        }
-
-        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
-        $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
-        $msgList = array();
-        if ($message) {
-            foreach ($message as $singleMessage) {
-                if (in_array($singleMessage->isread, $isReadArray))
-                    array_push($msgList, $singleMessage);
-            }
-        }
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
-        $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData, 'user' => $user);
-
-        return $this->render('blockIsolate', $returnData);
-    }
-
 /*
  *   Display calendar on click of menuBars
  */
@@ -836,6 +338,15 @@ class CourseController extends AppController
      */
     public function actionModifyInlineText()
     {
+
+        /**
+         * Can access: greater than student
+         *  1. Full Admin
+         *  2. Group Admin
+         *  3. Diagnostics
+         *  4. Limited Course Creator.
+         *  5. Teacher
+         */
         global $outcomes;
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
@@ -1158,6 +669,14 @@ class CourseController extends AppController
 
     public function actionAddLink()
     {
+        /**
+         * Can access: greater than student
+         *  1. Full Admin
+         *  2. Group Admin
+         *  3. Diagnostics
+         *  4. Limited Course Creator.
+         *  5. Teacher
+         */
         $params = $this->getRequestParams();
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
@@ -1482,6 +1001,9 @@ class CourseController extends AppController
         return $this->renderWithData('addLink', $responseData);
     }
 
+    /**
+     * recursive directory function.
+     */
     function mkdir_recursive($pathname, $mode = AppConstant::TRIPLE_SEVEN)
     {
         is_dir(dirname($pathname)) || $this->mkdir_recursive(dirname($pathname), $mode);
@@ -1540,6 +1062,16 @@ class CourseController extends AppController
 
     public function actionCourse()
     {
+        /**
+         * Can access: greater than student
+         *  1. Full Admin
+         *  2. Group Admin
+         *  3. Diagnostics
+         *  4. Limited Course Creator.
+         *  5. Teacher
+         *  6. Studnet
+         *  Greater than guest can access
+         */
         global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights,
                $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
                $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess,
@@ -2015,6 +1547,15 @@ class CourseController extends AppController
      */
     public function actionGetBlockItems()
     {
+        /**
+         * Can access: greater than equal student
+         *  1. Full Admin
+         *  2. Group Admin
+         *  3. Diagnostics
+         *  4. Limited Course Creator.
+         *  5. Teacher
+         *  6. Student
+         */
         global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights,
                $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
                $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess;
@@ -2206,6 +1747,9 @@ class CourseController extends AppController
     }
 
     public function copyCourseItems(&$items, $parent, $copyInside, &$addToArray, $copyItemId, $blockCount, $gradeBookCategory, $params) {
+        /**
+         * Ajax
+         */
         foreach ($items as $k => $item) {
             if (is_array($item)) {
                 if (($parent.'-'.($k+AppConstant::NUMERIC_ONE)==$copyItemId) || $copyInside) { //copy block

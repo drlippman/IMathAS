@@ -120,11 +120,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions',
                 'imas_assessments.id = imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessments.courseid:courseId']);
+            ->where(['imas_assessments.courseid', $courseId]);
         if ($limuser > AppConstant::NUMERIC_ZERO) {
-            $query->andWhere(['imas_assessment_sessions.userid:limuser']);
+            $query->andWhere(['imas_assessment_sessions.userid', $limuser]);
         }
-        $command = $query->createCommand()->bindValues(['courseId'=> $courseId, 'limuser' => $limuser]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
@@ -138,11 +138,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions',
                 'imas_assessments.id = imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessments.courseid:courseId']);
+            ->where(['imas_assessments.courseid', $courseId]);
         if ($limuser > AppConstant::NUMERIC_ZERO) {
-            $query->andWhere(['imas_assessment_sessions.userid:limuser']);
+            $query->andWhere(['imas_assessment_sessions.userid', $limuser]);
         }
-        $command = $query->createCommand()->bindValues(['courseId'=> $courseId, 'limuser' => $limuser]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
@@ -208,10 +208,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query = new Query();
         $query->select(['imas_assessment_sessions.id'])->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
-            ->where(['imas_assessment_sessions.assessmentid:assessmentId', 'imas_students.courseid:courseId'])
+            ->where('imas_assessment_sessions.assessmentid = :assessmentId')->andWhere('imas_students.courseid = :courseId')
             ->limit(AppConstant::NUMERIC_ONE);
-        $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
-        $items = $command->queryAll();
+        $command = $query->createCommand();
+        $items = $command->bindValues([':assessmentId' => $assessmentId, ':courseId' => $courseId])->queryAll();
         return $items;
     }
 

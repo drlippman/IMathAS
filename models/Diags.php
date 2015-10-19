@@ -20,12 +20,12 @@ class Diags extends BaseImasDiags
                 'imas_users.id=imas_diags.ownerid'
             );
         if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
-            $query->andWhere(['imas_diags.ownerid:userId']);
+            $query->andWhere(['imas_diags.ownerid' => $userId]);
         } else if ($myRights < AppConstant::NUMERIC_HUNDREAD) {
-            $query->andWhere(['imas_users.groupid:groupId']);
+            $query->andWhere(['imas_users.groupid' => $groupId]);
         }
         $query->orderBy('imas_diags.name');
-        $command = $query->createCommand()->bindValues(['userId' => $userId, 'groupId' => $groupId]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }

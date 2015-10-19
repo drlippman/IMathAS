@@ -165,7 +165,7 @@ class Course extends BaseImasCourses {
     }
     public static function getByCourseAndUser($cid)
     {
-        return self::find()->select('imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons')->where(['imas_courses.id' => $cid, 'imas_users.id=imas_courses.ownerid'])->all();
+        return self::find()->select('imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons')->join('INNER JOIN','imas_users','imas_users.id = imas_courses.ownerid')->where(['imas_courses.id' => $cid])->all();
     }
     public static function UpdateItemOrder($finalBlockItems,$course,$blockCnt)
     {
@@ -309,16 +309,16 @@ class Course extends BaseImasCourses {
             $query->andWhere(['imas_courses.available<4']);
         }
         if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==AppConstant::NUMERIC_ZERO){
-            $query->andWhere(['imas_courses.ownerid:userId']);
+            $query->andWhere(['imas_courses.ownerid'=> $userId]);
         }
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > AppConstant::NUMERIC_ZERO)
         {
-            $query->andWhere(['imas_courses.ownerid:showcourses']);
+            $query->andWhere(['imas_courses.ownerid' => $showcourses]);
             $query->orderBy('imas_users.LastName,imas_courses.name');
         } else{
             $query->orderBy('imas_courses.name');
         }
-        $command = $query->createCommand()->bindValues(['userId' => $userId, 'showcourses' => $showcourses]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }

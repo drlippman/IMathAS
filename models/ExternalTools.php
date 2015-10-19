@@ -146,7 +146,7 @@ class ExternalTools extends BaseImasExternalTools
                 'imas_groups',
                 'imas_external_tools.groupid=imas_groups.id'
             )
-            ->where(['imas_external_tools.courseid:courseId']);
+            ->where('imas_external_tools.courseid=:courseId');
         $query->orderBy('imas_external_tools.groupid,imas_external_tools.name');
         $command = $query->createCommand()->bindValue('courseId', $courseId);
         $data = $command->queryAll();

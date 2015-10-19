@@ -36,31 +36,6 @@ use app\components\AppConstant;
 include("../components/handled.php");
 class AssessmentController extends AppController
 {
-    public function actionShowAssessment()
-    {
-        $this->guestUserHandler();
-        $this->layout = 'master';
-        $user = $this->getAuthenticatedUser();
-        $params = $this->getRequestParams();
-        $assessmentId = isset($params['id']) ? trim($params['id']) : "";
-        $to = isset($params['to']) ? $params['to'] : AppConstant::NUMERIC_ZERO;
-        $courseId = isset($params['cid']) ? trim($params['cid']) : "";
-        $course = Course::getById($courseId);
-        $assessment = Assessments::getByAssessmentId($assessmentId);
-        $teacher = Teacher::getByUserId($user->getId(), $courseId);
-        $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
-        if (!$assessmentSession) {
-            $assessmentSessionObject = new AssessmentSession();
-            $assessmentSession = $assessmentSessionObject->saveAssessmentSession($assessment, $user->getId());
-        }
-//        $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
-        $isQuestions = Questions::getByAssessmentId($assessmentId);
-        $this->includeCSS(['showAssessment.css', 'mathtest.css']);
-        $this->getView()->registerJs('var imasroot="openmath/";');
-        $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        $responseData = array('response' => $response, 'isQuestions' => $isQuestions, 'courseId' => $courseId, 'now' => time(), 'assessment' => $assessment, 'assessmentSession' => $assessmentSession, 'isShowExpiredTime' => $to, 'user' => $user, 'course' => $course);
-        return $this->render('ShowAssessment', $responseData);
-    }
     /*
      * Display password, when assessment need password.
      */
@@ -409,17 +384,17 @@ class AssessmentController extends AppController
                     $itemAssessment = new Items();
                     $itemId = $itemAssessment->saveItems($courseId, $newAssessmentId, 'Assessment');
                     $courseItemOrder = Course::getItemOrder($courseId);
-                    $itemOrder = $courseItemOrder->itemorder;
-                    $items = unserialize($itemOrder);
+                    $itemOrder = $courseItemOrder['itemorder'];
+                    $items = unserialize($courseItemOrder['itemorder']);
                     $blockTree = explode('-', $block);
                     $sub =& $items;
                     for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
                         $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                     }
-                    if ($filter == 'b') {
+                    if ($filter=='b') {
                         $sub[] = intval($itemId);
-                    } else if ($filter == 't') {
-                        array_unshift($sub, intval($itemId));
+                    } else if ($filter=='t') {
+                        array_unshift($sub, ($itemId));
                     }
                     $itemList = serialize($items);
                     Course::setItemOrder($itemList, $courseId);

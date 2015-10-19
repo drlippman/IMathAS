@@ -30,7 +30,7 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
-            ->where(['courseid:courseId'])
+            ->where(['courseid', $courseId])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if (!$canviewall) {
             $query->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO]);
@@ -42,7 +42,7 @@ class Assessments extends BaseImasAssessments
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand()->bindValue('courseId', $courseId);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
@@ -57,7 +57,7 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'defoutcome'])
             ->from('imas_assessments')
-            ->where(['courseid:courseId'])
+            ->where(['courseid', $courseId])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO])
             ->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO])
             ->andWhere(['<', 'cntingb', AppConstant::NUMERIC_THREE]);
@@ -68,7 +68,7 @@ class Assessments extends BaseImasAssessments
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand()->bindValue('courseId', $courseId);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
@@ -174,16 +174,16 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
-            ->where(['courseid :courseId'])
+            ->where(['courseid', $courseId])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if ($istutor) {
             $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
         if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory:catfilter']);
+            $query->andWhere(['gbcategory', $catfilter]);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand()->bindValues(['courseId' => $courseId, 'catfilter' => $catfilter]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
@@ -249,7 +249,7 @@ class Assessments extends BaseImasAssessments
             ->andWhere(['>', 'ia.defoutcome', AppConstant::ZERO_VALUE])
             ->orWhere(['<>', 'iq.category', AppConstant::ZERO_VALUE]);
 
-        $command = $query->createCommand()->bindValue(':courseId' , $courseId);
+        $command = $query->createCommand()->bindValue('courseId' , $courseId);
         $data = $command->queryAll();
         return $data;
 
@@ -298,7 +298,7 @@ class Assessments extends BaseImasAssessments
         $query->select(['id'])
             ->from('imas_assessments')
             ->where('groupsetid = :grpSetId');
-        $command = $query->createCommand()->bindValue(':grpSetId',$grpSetId);
+        $command = $query->createCommand()->bindValue('grpSetId',$grpSetId);
         $data = $command->queryOne();
         return $data;
 

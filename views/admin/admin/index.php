@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 ?>
                 <td>
-                    <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $page_courseList[$i]['id']) ?>">
+                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $page_courseList[$i]['id']) ?>">
                         <?php
                         if (($page_courseList[$i]['available'] & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE) {
                             echo '<i>';
