@@ -219,3 +219,15 @@ margin-right: 30px;
 .inner-reply-height {
     height: 655px !important;
 }
+.reply-button{
+    background-color: #12856D;
+    color:whitesmoke;
+}
+.btn-bg-color {
+    background-color: #12856D;
+    color: white;
+}
+.text-deco-none a:hover {
+    text-decoration: none;
+    color: #ffffff;
+}

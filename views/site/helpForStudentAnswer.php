@@ -17,7 +17,7 @@ $this->title = 'Help for student entering answers';
 <div class="tab-content shadowBox non-nav-tab-item">
 <div class="site-about padding-right-left-top-thirty padding-bottom-thirty">
     <div style="background-color: #fafafa;" class="padding-bottom-twenty padding-right-left-top-thirty">
-    <img class="floatleft student-help-image" src="<?php echo AppUtility::getHomeURL() ?>img/typing.jpg" alt="Computer screens"/>
+    <img class="floatleft student-help-image help-student-mobile-hide" src="<?php echo AppUtility::getHomeURL() ?>img/typing.jpg" alt="Computer screens"/>
     <div class="content">
         <h4 class="margin-top-minus-two"><?php AppUtility::t('Answer Types');?></h4>
         <p class="ind">

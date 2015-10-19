@@ -24,14 +24,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
     <div style="margin: 30px;"><br>
             <div class="vcenter"><h3 style="border-bottom: 2px solid #a9a9a9; margin-top: 4px; margin-bottom: 30px; padding-bottom: 25px;">Instructor Account Request</h3></div>
-            <div class="registration col-md-9">
+            <div class="registration col-md-10 col-sm-12">
                 <?php $form = ActiveForm::begin([
                     'id' => 'login-form',
                     'options' => ['class' => 'form-horizontal'],
                     'action' => '',
                     'fieldConfig' => [
-                        'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-sm-6 clear-both col-sm-offset-3\">{error}</div>",
-                        'labelOptions' => ['class' => 'col-sm-3  text-align-left margin-top-eight'],
+                        'template' => "{label}\n<div class=\"col-md-4 col-sm-4\">{input}</div>\n<div class=\"col-md-6 col-sm-6 clear-both col-md-offset-2 col-sm-offset-3\">{error}</div>",
+                        'labelOptions' => ['class' => 'col-md-2 col-sm-3 text-align-left margin-top-eight'],
                     ],
                 ]); ?>
 
@@ -45,13 +45,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php echo $form->field($model, 'confirmPassword')->passwordInput() ?>
                 <?php echo $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms-label']]) ?>
                 <div class="form-group">
-                    <div class="col-sm-offset-3"><?php echo Html::submitButton('Request Account', ['class' => 'btn btn-primary instructor-save']) ?></div>
+                    <div class="col-md-offset-2 col-sm-offset-3"><?php echo Html::submitButton('Request Account', ['class' => 'btn btn-primary instructor-save']) ?></div>
                 </div>
 
                 <?php ActiveForm::end(); ?>
             </div><!-- registration -->
 
-            <div class="col-md-12">
+            <div class="col-md-12 col-sm-12">
                 <h4>Terms of Use</h4>
 
                 <p><em>This software is made available with <strong>no warranty</strong> and <strong>no guarantees</strong>. The
@@ -70,9 +70,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript">
     $(document).ready(function(){
 
-        $('.register-terms-label').closest('div').addClass('col-md-offset-3');
-        $('.register-terms-label').closest('div').removeClass('col-sm-4');
-        $('.register-terms-label').closest('div').addClass('col-sm-6');
+        $('.register-terms-label').closest('div').addClass('col-md-offset-3 col-sm-offset-3');
+        $('.register-terms-label').closest('div').removeClass('col-md-4 col-sm-4');
+        $('.register-terms-label').closest('div').addClass('col-md-6 col-sm-6');
     });
 
 </script>

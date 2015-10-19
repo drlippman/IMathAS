@@ -921,6 +921,7 @@ class SiteController extends AppController
     }
     public function actionInstructorDocument()
     {
+        $this->layout = 'master';
         $this->includeCSS(['docs.css']);
         return $this->renderWithData('instructorDocument');
     }
@@ -1084,6 +1085,5 @@ class SiteController extends AppController
             return $this->redirect('dashboard');
         }
     }
-
 
 }

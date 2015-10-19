@@ -2,14 +2,15 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 
-$this->title = AppUtility::t('yii', 'Instructor documents');
+$this->title = AppUtility::t('Instructor documents',false);
 $this->params['breadcrumbs'][] = ['label' => 'About Us', 'url' => ['/site/about']];
-$this->params['breadcrumbs'][] = $this->title;
+//$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 style="color: #ffffff"><?php echo $this->title; ?></h1>
 </div>
-<h2><?php AppUtility::t('Guides')?>></h2>
+<div class="tab-content shadowBox padding-left-thirty padding-top-twenty">
+<h2><?php AppUtility::t('Guides')?></h2>
 <h4><?php AppUtility::t('Use Guides')?></h4>
 <ul>
     <li><a href="<?php echo AppUtility::getHomeURL()?>docs/GettingStarted.pdf" target="_blank"><?php AppUtility::t('Getting Started in WAMAP
@@ -1861,4 +1862,5 @@ To upgrade your installation:
 
 </ul>
 </p>
+</div>
 </div>

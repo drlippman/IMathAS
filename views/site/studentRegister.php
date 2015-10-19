@@ -33,8 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'form-horizontal margin-left-fifteen'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-sm-3\">{input}</div>\n<div class=\"col-sm-6 clear-both col-sm-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-sm-2  text-align-left padding-top-seven'],
+                'template' => "{label}\n<div class=\"col-md-3 col-sm-6\">{input}</div>\n<div class=\"col-md-6 col-sm-6 clear-both col-md-offset-2 col-sm-offset-3\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-2 col-sm-3 text-align-left padding-top-seven'],
             ],
         ]); ?>
         <?= $form->field($model, 'username')->textInput(); ?>
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'email') ?>
         <?=
         $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',
-            ['template' => "<div class=\"col-md-offset-2 col-md-9\">{input}</div>\n<div class=\"col-md-8\">{error}</div>",
+            ['template' => "<div class=\"col-md-offset-2 col-md-9 col-sm-offset-3 col-sm-9\">{input}</div>\n<div class=\"col-md-8 col-md-8\">{error}</div>",
             ])->checkboxList(['1' => 'Notify Me By Email When I Receive A New Message.']) ?>
 
        <div class="form-group margin-left-zero"> <span><?php echo "If you already know your course ID, you can enter it now. Otherwise, leave this blank and you can enroll later." ?></span></div>
@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'EnrollmentKey') ?>
 
         <div class="form-group">
-             <div class="col-md-offset-2 col-md-9">
+             <div class="col-md-offset-2 col-md-9 col-md-offset-2 col-md-9">
                 <?= Html::submitButton('Sign Up', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 &nbsp; &nbsp;<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
             </div>

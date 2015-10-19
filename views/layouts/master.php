@@ -21,6 +21,7 @@ AppAsset::register($this);
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo AppConstant::VERSION_NUMBER ?>' rel='stylesheet' type='text/css'>
+    <link href='<?php echo AppUtility::getHomeURL(); ?>css/imascoreResponsive.css?<?php echo AppConstant::VERSION_NUMBER ?>' rel='stylesheet' type='text/css'>
 </head>
 <?php $courseId = Yii::$app->session->get('courseId'); ?>
 <?php $messageCount = Yii::$app->session->get('messageCount');

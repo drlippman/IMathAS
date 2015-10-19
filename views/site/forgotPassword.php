@@ -22,8 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-sm-3\">{input}</div>\n<div class=\"col-md-10 col-md-offset-1\">{error}</div>",
-                'labelOptions' => ['class' => 'col-md-1 control-label'],
+                'template' => "{label}\n<div class=\"margin-left-ten col-md-3 col-sm-4\">{input}</div>\n<div class=\"col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-2 padding-left-fifteen\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-1 col-sm-2 control-label'],
             ],
         ]); ?>
         <div style="padding: 30px">
@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $form->field($model, 'username') ?>
                 </div>
                 <div class="form-group">
-                    <div class="col-md-offset-1 col-md-11">
+                    <div class="padding-left-twenty-five col-md-offset-1 col-md-11 col-sm-offset-2 col-sm-10">
                         <?= Html::submitButton('Submit', ['id' => 'change-button','class' => 'btn btn-primary', 'name' => 'forgetpassword-button']) ?>
                          &nbsp; &nbsp;         <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
                     </div>
