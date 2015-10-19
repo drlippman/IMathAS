@@ -26,25 +26,20 @@ $this->title = 'Manage Offline Grades';
                     <i class="fa fa-share header-right-btn"></i> Back
                 </a>
             </div>
-
         </div>
     </div>
 </div>
     <div class="item-detail-content">
         <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
     </div>
-
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
     <?php
     if($gradeNames){    ?>
     <div class="tab-content shadowBox ">
     <div class="offline-grade-header">
-        <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">Upload multiple offline grades</a>
+        <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>"><?php AppUtility::t('Upload multiple offline grades');?></a>
     </div>
-
 <div class="col-md-12 offline-grade-padding">
-
-
     <table class="grade-name-table width-fourty-per">
         <thead>
         <tr>
@@ -56,7 +51,7 @@ $this->title = 'Manage Offline Grades';
                     </label>
                 </div>
             </th>
-            <th class="col-md-8">Grade Names</th>
+            <th class="col-md-8"><?php AppUtility::t('Grade Names')?></th>
         </tr>
         </thead>
         <tbody class="grade-name-table-body">
@@ -77,12 +72,12 @@ $this->title = 'Manage Offline Grades';
         <tbody>
     </table>
     <div class="padding-left-zero col-md-12 margin-top-twenty">
-        <span>With selected ,</span>
+        <span><?php AppUtility::t('With selected')?> ,</span>
         <input type="button" class="margin-left-ten btn btn-primary" id="mark-delete" value="Delete">
-        <span class="margin-left-ten">or make changes below</span>
+        <span class="margin-left-ten"><?php AppUtility::t('or make changes below')?></span>
     </div>
     <div class="col-md-12 padding-left-zero margin-top-ten">
-        <h4><strong>Offline Grade Options</strong></h4>
+        <h4><strong><?php AppUtility::t('Offline Grade Options')?></strong></h4>
     </div>
     <table class="col-md-12 margin-top-ten grade-option-table">
         <thead>
@@ -95,8 +90,8 @@ $this->title = 'Manage Offline Grades';
                         </label>
                     </div>
                 </th>
-                <th class="col-md-2">Option</th>
-                <th class="col-md-8">Settings</th>
+                <th class="col-md-2"><?php AppUtility::t('Option')?></th>
+                <th class="col-md-8"><?php AppUtility::t('Settings')?></th>
             </tr>
         </thead>
         <tbody class="grade-option-table-name">
@@ -108,7 +103,7 @@ $this->title = 'Manage Offline Grades';
                     </td>
                     <td>
                         <span class="col-md-12">
-                        Show after
+                        <?php AppUtility::t('Show after')?>
                         </span>
                     </td>
                     <td>
@@ -116,10 +111,9 @@ $this->title = 'Manage Offline Grades';
                             <span class="col-md-12 padding-left-zero margin-left-ten">
                                 <input type="radio" name="Show-after" value="1">
                                 <span class="margin-left-five">
-                                    Always
+                                    <?php AppUtility::t('Always')?>
                                 </span>
                             </span>
-
                             <span class="col-md-12 padding-left-zero margin-left-ten margin-top-twenty">
                                 <input type="radio" name="Show-after" class="end pull-left select-text-margin" checked id="always" value="2">
                                 <div class="col-md-3 padding-left-zero margin-left-ten" id="datepicker-id">
@@ -133,10 +127,8 @@ $this->title = 'Manage Offline Grades';
                                            'format' => 'mm/dd/yyyy']
                                    ]);
                                    echo '</div>'; ?>
-                                   <?php
-                                   echo '<label class="end pull-left  select-text-margin"> At</label>';
-                                   echo '<div class="pull-left col-lg-4">';
-
+                                    <label class="end pull-left  select-text-margin"><?php AppUtility::t('At')?></label>
+                                    <?php echo '<div class="pull-left col-lg-4">';
                                    echo TimePicker::widget([
                                        'name' => 'startTime',
                                        'options' => ['placeholder' => 'Select operating time ...'],
@@ -161,26 +153,26 @@ $this->title = 'Manage Offline Grades';
                      </td>
                      <td>
                          <span class="col-md-12">
-                            Count
+                            <?php AppUtility::t('Count')?>
                          </span>
                      </td>
                      <td>
                          <div class="col-md-12 padding-left-zero" id="always-replies-radio-list">
                              <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
                                  <input type="radio" name="count" checked value="1">
-                                 <span class="margin-left-five">Count in Gradebook</span>
+                                 <span class="margin-left-five"><?php AppUtility::t('Count in Gradebook')?></span>
                              </span>
                              <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
                                 <input type="radio" name="count" value="2">
-                                 <span class="margin-left-five">Don't count in grade total and hide from students</span>
+                                 <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total and hide from students")?></span>
                              </span>
                              <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
                                 <input type="radio" name="count" value="3">
-                                 <span class="margin-left-five">Don't count in grade total</span>
+                                 <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total")?></span>
                              </span>
                              <span class="col-md-12 padding-left-zero margin-left-ten margin-top-ten">
                                  <input type="radio" name="count" value="4">
-                                 <span class="margin-left-five">Count as Extra Credit</span>
+                                 <span class="margin-left-five"><?php AppUtility::t('Count as Extra Credit')?></span>
                              </span>
                          </div>
                      </td>
@@ -193,7 +185,7 @@ $this->title = 'Manage Offline Grades';
                     </td>
                     <td>
                         <span class="col-md-12">
-                                Gradebook category
+                                <?php AppUtility::t('Gradebook category')?>
                          </span>
                     </td>
                     <td>
@@ -212,7 +204,7 @@ $this->title = 'Manage Offline Grades';
                     </td>
                     <td>
                          <span class="col-md-12">
-                            Tutor Access
+                            <?php AppUtility::t('Tutor Access')?>
                          </span>
                     </td>
                     <td>
@@ -232,10 +224,10 @@ $this->title = 'Manage Offline Grades';
   <?php  }else{ ?>
     <div class="tab-content shadowBox ">
         <div class="offline-grade-header">
-           <div class="add-grade-name-left-margin"> No offline grades.
-            <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id.'&gbitem=new&grades=all'); ?>"> Add one </a> or
+           <div class="add-grade-name-left-margin"> <?php AppUtility::t('No offline grades')?>.
+            <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id.'&gbitem=new&grades=all'); ?>"> <?php AppUtility::t('Add one')?> </a> <?php AppUtility::t('or')?>
             <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">
-            Upload multiple offline grades
+            <?php AppUtility::t('Upload multiple offline grades')?>
             </a>
                </div>
         </div>

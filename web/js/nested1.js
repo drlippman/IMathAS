@@ -341,16 +341,9 @@ function submitChanges() {
   if (typeof req != 'undefined') {
       req.open("POST", url, true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-<<<<<<< Updated upstream
 	//req.setRequestHeader("Content-length", params.length);
 	//req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {NestedahahDone(url, target);};
-=======
-	req.setRequestHeader("Content-length", params.length);
-	req.setRequestHeader("Connection", "close");
-	req.onreadystatechange = function() {
-        NestedahahDone(url, target);};
->>>>>>> Stashed changes
 	req.send(params);
   }
 
@@ -363,28 +356,19 @@ function quickviewcollapseAll() {
 	jQuery("#qviewtree li.blockli:not(.nCollapse)").addClass("nCollapse").children("ul").hide();
 }
 
-function NestedahahDone(url, target) {
-<<<<<<< Updated upstream
-  if (req.readyState == 4) { // only if req is "loaded" 
-    if (req.status == 200) { // only if "OK" 
-	    if (req.responseText.substring(0,2)=='OK') { console.log(req.responseText.substring(0,2));
-=======
-
+function NestedahahDone(url, target)
+{
     if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK"
 	    if (req.responseText.substring(0,2)=='OK') {
->>>>>>> Stashed changes
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    window.onbeforeunload = null;
-		    setlinksdisp("");
+		    setlinksdisp("")
 		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
-<<<<<<< Updated upstream
             sortIt.haschanged = false;
-=======
-		    sortIt.haschanged = false;
->>>>>>> Stashed changes
-	    } else {
+	    } else
+        {
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }
     } else {

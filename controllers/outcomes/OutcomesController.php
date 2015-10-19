@@ -38,9 +38,10 @@ class OutcomesController extends AppController
     public function actionAddOutcomes()
     {
         $this->guestUserHandler();
-        $this->layout = 'master';
         $this->courseId = $this->getParamVal('cid');
+        $course = Course::getById($this->courseId);
         $this->params = $this->getRequestParams();
+            $this->layout = 'master';
         if(isset($this->params['order']))
         {
             $query = Outcomes::getExistingOutcomes($this->courseId);
@@ -76,9 +77,13 @@ class OutcomesController extends AppController
         {
             $outcomeInfo[$data['id']] = $data['name'];
         }
+        if(isset($this->params['save']))
+        {
+            exit;
+        }
         $this->includeCSS(['outcomes.css']);
         $this->includeJS(['mootools.js','nested1.js']);
-        return $this->render('addOutcomes',['courseId' => $this->courseId,'outcomes' => $outcomes,'outcomeInfo' => $outcomeInfo,'order' => $this->params['order']]);
+        return $this->render('addOutcomes',['courseId' => $this->courseId,'course' => $course,'outcomes' => $outcomes,'outcomeInfo' => $outcomeInfo,'order' => $this->params['order']]);
     }
 
     function addItems($list)

@@ -1454,8 +1454,8 @@ class ForumController extends AppController
                   ForumSubscriptions::deleteSubscriptionsEntry($params['modifyFid'],$user['id']);
                  }
             } else {
-                $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
-                $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+                $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
+                $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
                 $postDate = AppUtility::parsedatetime($params['postDate'],$params['postTime']);
                 $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
                 $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
@@ -1631,7 +1631,7 @@ class ForumController extends AppController
                   } else if ($params['reply'] == "Never") {
                       $replyBy = AppConstant::NUMERIC_ZERO;
                   } else {
-                      $replyBy = AssessmentUtility::parsedatetime($params['replyByDate'], $params['replyByTime']);
+                      $replyBy = AppUtility::parsedatetime($params['replyByDate'], $params['replyByTime']);
                   }
                   $sets[] = "replyby='$replyBy'";
               }
@@ -1642,7 +1642,7 @@ class ForumController extends AppController
                   } else if ($params['post'] == "Never") {
                       $postBy = AppConstant::NUMERIC_ZERO;
                   } else {
-                      $postBy = AssessmentUtility::parsedatetime($params['postDate'], $params['postTime']);
+                      $postBy = AppUtility::parsedatetime($params['postDate'], $params['postTime']);
                   }
                   $sets[] = "postby='$postBy'";
               }

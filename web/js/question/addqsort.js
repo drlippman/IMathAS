@@ -445,7 +445,7 @@ function ahahDone(url, target) {
 		    itemarray = olditemarray;
 	    }
     } else {
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 
+	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText;
 	    itemarray = olditemarray;
     } 
   }

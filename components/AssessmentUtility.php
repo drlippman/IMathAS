@@ -161,27 +161,6 @@ class AssessmentUtility extends Component
         echo $html;
     }
 
-    public static function parsedatetime($date, $time)
-    {
-        global $tzoffset, $tzname;
-        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $date, $dmatches);
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
-        if (count($tmatches) == AppConstant::NUMERIC_ZERO) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
-            $tmatches[3] = $tmatches[2];
-            $tmatches[2] = AppConstant::NUMERIC_ZERO;
-        }
-        $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_TWELVE;
-        if ($tmatches[3] == "pm") {
-            $tmatches[1] += AppConstant::NUMERIC_TWELVE;
-        }
-        if ($tzname == '') {
-            $serveroffset = date('Z') / AppConstant::MINUTE + $tzoffset;
-            $tmatches[2] += $serveroffset;
-        }
-        return mktime($tmatches[1], $tmatches[2], AppConstant::NUMERIC_ZERO, $dmatches[1], $dmatches[2], $dmatches[3]);
-    }
-
     public static function isNumericOne($notEqual)
     {
         return $notEqual == AppConstant::NUMERIC_ONE;

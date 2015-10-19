@@ -1,9 +1,16 @@
 <?php
 use app\components\AppUtility;
 $this->title = 'View Group Scores';
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-echo "&gt; <a href=\"gradebook.php?gbmode=$gbmode&cid=$cid\">Gradebook</a> &gt; View Group Scores</div>";
-
+?>
+<?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<?php
 $minscore = $assessment['minscore'];
 $timelimit = $assessment['timelimit'];
 $deffeedback = $assessment['deffeedback'];
@@ -42,6 +49,7 @@ foreach ($questions as $r) {
         }
     }
 }
+echo '<div class="tab-content shadowBox">';
 echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
 echo "Group grades for $name</h2></div>";
 echo "<p>$totalpossible points possible</p>";
@@ -49,14 +57,23 @@ $scoredata = array();
 foreach ($AssessmentGroups as $line) {
     $scoredata[$line['agroupid']] = $line;
 }
-echo "<table id=myTable class=gb><thead><tr><th>Group</th>";
-echo "<th>Grade</th><th>%</th><th>Feedback</th></tr></thead><tbody>";
+echo "<table id=myTable class='table table-bordered table-striped table-hover data-table'>
+  <thead>
+    <tr>
+      <th>Group</th>";
+echo "<th>Grade</th>
+      <th>%</th>
+      <th>Feedback</th>
+    </tr>
+  </thead>
+  <tbody>";
 $now = time();
 $lc = 1;
 $n = 0;
 $tot = 0;
-
-natsort($groupnames);
+if($groupnames)
+{
+    natsort($groupnames);
 
 foreach ($groupnames as $gid=>$gname) {
     if ($lc%2!=0) {
@@ -110,6 +127,7 @@ foreach ($groupnames as $gid=>$gname) {
     }
     echo "</tr>";
 }
+        }
 echo '<tr><td>Average</td>'; ?>
  <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id.'&aid='.$aid.'&from=gisolate');?>">
 <?php if ($n>0) {
@@ -124,6 +142,7 @@ if ($totalpossible > 0 ) {
 }
 echo "</a></td><td>$pct</td></tr>";
 echo "</tbody></table>";
+echo '</div>';
 echo "<script type='javascript'> initSortTable('myTable',Array('S','N','N'),true);</script>";
 
 

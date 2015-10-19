@@ -153,19 +153,19 @@ class AssessmentController extends AppController
                     if ($params['sdatetype'] == AppConstant::NUMERIC_ZERO) {
                         $startDate = AppConstant::NUMERIC_ZERO;
                     } else {
-                        $startDate = AssessmentUtility::parsedatetime($params['sdate'], $params['stime']);
+                        $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                     }
                     if ($params['edatetype'] == AppConstant::ALWAYS_TIME) {
                         $endDate = AppConstant::ALWAYS_TIME;
                     } else {
-                        $endDate = AssessmentUtility::parsedatetime($params['edate'], $params['etime']);
+                        $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                     }
                     if ($params['doreview'] == AppConstant::NUMERIC_ZERO) {
                         $reviewDate = AppConstant::NUMERIC_ZERO;
                     } else if ($params['doreview'] == AppConstant::ALWAYS_TIME) {
                         $reviewDate = AppConstant::ALWAYS_TIME;
                     } else {
-                        $reviewDate = AssessmentUtility::parsedatetime($params['rdate'], $params['rtime']);
+                        $reviewDate = AppUtility::parsedatetime($params['rdate'], $params['rtime']);
                     }
                 } else {
                     $startDate = AppConstant::NUMERIC_ZERO;

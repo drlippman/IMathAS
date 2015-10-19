@@ -2219,7 +2219,7 @@ class GradebookController extends AppController
             if ($params['available-after'] == '0') {
                 $params['showdate'] = 0;
             } else {
-                $params['showdate'] = AssessmentUtility::parsedatetime($params['sdate'], $params['stime']);
+                $params['showdate'] = AppUtility::parsedatetime($params['sdate'], $params['stime']);
             }
             $params['tutoredit'] = intval($params['tutoredit']);
             $params['rubric'] = intval($params['rubric']);
@@ -4375,6 +4375,7 @@ class GradebookController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $courseId = $params['cid'];
         $aid = $params['aid'];
+        $this->layout = 'master';
         $course = Course::getById($courseId);
         $teacherId = $this->isTeacher($currentUser['id'],$courseId);
         $this->noValidRights($teacherId);

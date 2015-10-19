@@ -7,6 +7,7 @@ $cnt = AppConstant::NUMERIC_ZERO;
 $this->title = AppUtility::t('Course Outcomes', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<div >
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
@@ -22,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <input type="hidden" id="course-id" value="<?php echo $courseId?>">
 <input type="hidden" id="outcome-url" value="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$courseId.'&save=save')?>">
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox clear1">
             <?php
             if (isset($order))
             {
@@ -40,7 +41,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php
                 echo '<div class="breadcrumb">Use colored boxes to drag-and-drop order and move outcomes inside groups
                 <input type="button" id="recchg" disabled="disabled" value="Save Changes" onclick="submitChanges()"/>
-                <span id="submitnotice" style="color:red;"></span></div>';
+                 </div>';
+                echo "<span id=\"submitnotice\" style=\"color:red;\"></span>";
                 echo '<ul id="qviewtree" class="qview">';
                 $print = new AppUtility();
                 $print->printOutcomesData($outcomes,$outcomeInfo,$cnt);
@@ -51,6 +53,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
     <?php }?>
 </div>
+</div>
+
 <script type="text/javascript">
 var AHAHsaveurl = $("#outcome-url").val();
 var j=jQuery.noConflict();

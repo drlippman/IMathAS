@@ -177,12 +177,12 @@ class BlockController extends AppController
             } else if ($params['available-after']==AppConstant::ONE_VALUE) {
                 $startDate = time()-AppConstant::NUMERIC_TWO;
             } else {
-                $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+                $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
             }
             if ($params['available-until']==AppConstant::AlWAYS_TIME_VALUE) {
                 $endDate = AppConstant::ALWAYS_TIME;
             } else {
-                $endDate = AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
+                $endDate = AppUtility::parsedatetime($params['edate'],$params['etime']);
             }
         }else
         {

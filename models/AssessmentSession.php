@@ -583,8 +583,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getAssessmentGroups($aid)
     {
-        return AssessmentSession::find()->select(['ias.agroupid','ias.id','ias.userid','ias.bestscores','ias.starttime','ias.endtime','ias.feedback'])
-            ->where(['ias.assessmentid' => $aid])->groupBy('agroupid')->all();
+        return AssessmentSession::find()->select(['agroupid','id','userid','bestscores','starttime','endtime','feedback'])
+            ->where(['assessmentid' => $aid])->groupBy('agroupid')->all();
     }
 
     public static function updateStartTime($startTime,$qp)
