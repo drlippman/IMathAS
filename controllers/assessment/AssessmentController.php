@@ -1162,11 +1162,9 @@ class AssessmentController extends AppController
         }
 
         if (isset($params['tb'])) {
-            print_r('hey');
             $filter = $params['tb'];
             return array($params, $from, $filter);
         } else {
-            print_r('hey11111111');
             $filter = 'b';
             return array($params, $from, $filter);
         }

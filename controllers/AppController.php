@@ -721,6 +721,9 @@ function generaterandstring() {
     }
 
     public function accessForTeacher($user,$courseId){
+        if($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT){
+            return true;
+        }
         $teacherId = $this->isTeacher($user['id'], $courseId);
         if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
             return $this->noValidRights($teacherId);
@@ -754,5 +757,40 @@ function generaterandstring() {
             $isStudent = true;
         }
         return $isStudent ;
+    }
+
+    public function accessForTeacherAndAdmin($user,$courseId,$actionPath){
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) && ($actionPath == 'manage-question-set' || $actionPath == 'add-questions-save' ||
+            $actionPath == 'mod-data-set' || $actionPath == 'mod-tutorial-question' || $actionPath == 'test-question' || $actionPath == 'help' || $actionPath == 'micro-lib-help'
+            ||$actionPath == 'save-broken-question-flag' || $actionPath == 'save-lib-assign-flag')){
+            return true;
+        }else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)|| ($user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && $courseId != 'admin')) {
+            if($courseId == 'admin'){
+                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                return $this->redirect($this->goHome());
+            }else{
+                return $this->noValidRights($teacherId);
+            }
+        }else{
+            return true;
+        }
+    }
+
+    public function accessForTeacherAndStudentForumController($user,$courseId,$actionPath){
+        if($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT){
+            return true;
+        }
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $studentId = $this->isStudent($user['id'],$courseId);
+        if (($user['rights'] < AppConstant::STUDENT_RIGHT) || (($user['rights'] == AppConstant::STUDENT_RIGHT) && ($actionPath == 'move-thread' || $actionPath == 'add-forum' || $actionPath == 'change-forum' || $actionPath == 'view-forum-grade'))){
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }else if(($user['rights'] == AppConstant::STUDENT_RIGHT && !$studentId) || ($user['rights'] > AppConstant::STUDENT_RIGHT && $user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && !$teacherId)){
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }else{
+            return true;
+        }
     }
 }

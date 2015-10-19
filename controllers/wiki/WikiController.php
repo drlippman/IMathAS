@@ -414,7 +414,7 @@ class WikiController extends AppController
         return $this->renderWithData('editPage', $responseData);
     }
 
-   public function actionAddWiki()
+   public function actionAddWiki()//only for teacher
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();

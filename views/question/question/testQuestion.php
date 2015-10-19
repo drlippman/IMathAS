@@ -67,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
             function submitBrokenFlagDone(tagged) {
                 if (req.readyState == 4) { // only if req is "loaded"
                     if (req.status == 200) { // only if "OK"
-                        if (req.responseText=='OK') {
+                        if (req.responseText.trim() =='OK') {
                             toggleBrokenFlagmsg(tagged);
                         } else {
                             alert(req.responseText);

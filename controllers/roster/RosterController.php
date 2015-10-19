@@ -46,7 +46,7 @@ class RosterController extends AppController
     public function beforeAction($action)
     {
         $user = $this->getAuthenticatedUser();
-        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
         return $this->accessForTeacher($user,$courseId);
     }
  /*

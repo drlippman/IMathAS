@@ -26,6 +26,14 @@ use app\components\AppConstant;
 require("../components/displayQuestion.php");
 class QuestionController extends AppController
 {
+    public function beforeAction($action)
+    {
+        $actionPath = Yii::$app->controller->action->id;
+        $user = $this->getAuthenticatedUser();
+        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForTeacherAndAdmin($user,$courseId,$actionPath);
+    }
+
     public function actionAddQuestions()
     {
         $user = $this->getAuthenticatedUser();
