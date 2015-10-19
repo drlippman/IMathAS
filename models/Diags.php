@@ -32,9 +32,7 @@ class Diags extends BaseImasDiags
 
     public static function getById($id)
     {
-        $query = \Yii::$app->db->createCommand("SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id= :id");
-        $query->bindValue('id',$id);
-        return $query->queryOne();
+        return self::find()->select('sel1list,sel2name,sel2list,aidlist,forceregen')->where(['id' => $id])->one();
     }
 
     public function saveDiagnostic($params, $userId)
@@ -57,9 +55,7 @@ class Diags extends BaseImasDiags
 
     public static function getByDiagnoId($id)
     {
-        $query = \Yii::$app->db->createCommand("SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id= :id");
-        $query->bindValue('id',$id);
-        return $query->queryOne();
+        return self::find()->select('name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid')->where(['id' => $id])->one();
     }
 
     public static function updateDiagnostics($params)
@@ -126,12 +122,6 @@ class Diags extends BaseImasDiags
 
     public static function getByDiagId($diagId)
     {
-        $query = new Query();
-        $query	->select(['entryformat','sel1list'])
-            ->from('imas_diags')
-            ->where(['id' => $diagId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['entryformat','sel1list'])->where(['id' => $diagId])->one();
     }
 }

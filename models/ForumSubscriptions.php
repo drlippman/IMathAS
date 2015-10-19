@@ -30,8 +30,9 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
     }
     public static function getByManyForumIdsANdUserId($checkedlist,$currentUserId)
     {
-        $query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$currentUserId'";
-        $data= Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid=':userId'";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('userId',$currentUserId);
+        return $data->queryAll();
     }
 }

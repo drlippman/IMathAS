@@ -90,12 +90,6 @@ class Items extends BaseImasItems
 
     public static function getDataByCourseId($courseId)
     {
-        $query = new Query();
-        $query	->select(['id','itemtype','typeid'])
-            ->from(['imas_items'])
-            ->where(['courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','itemtype','typeid'])->where(['courseid' => $courseId])->all();
     }
 }

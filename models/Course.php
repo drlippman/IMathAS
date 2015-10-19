@@ -182,10 +182,7 @@ class Course extends BaseImasCourses {
 
     public static function getByCourseAndGroupId($courseId,$userId)
     {
-        $data = Yii::$app->db->createCommand("SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id= :courseId AND imas_courses.ownerid=imas_users.id AND imas_users.groupid= :userId");
-        $data->bindValue('courseId', $courseId);
-        $data->bindValue('userId', $userId);
-        return $data->queryAll();
+        return self::find()->select(['imas_courses.id'])->where(['imas_courses.id'=> $courseId])->andWhere(['imas_courses.ownerid=imas_users.id'])->andWhere(['imas_users.groupid' => $userId])->all();
     }
 
     public static function getByAvailable($params){
@@ -597,12 +594,6 @@ class Course extends BaseImasCourses {
 
     public static function getCourseDataById($courseId)
     {
-        $query = new Query();
-        $query	->select(['name','itemorder','hideicons','picicons','allowunenroll','msgset','toolset','chatset','topbar','cploc','latepasshrs'])
-        ->from(['imas_courses'])
-        ->where(['id' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['name','itemorder','hideicons','picicons','allowunenroll','msgset','toolset','chatset','topbar','cploc','latepasshrs'])->where(['id' => $courseId])->one();
     }
 }

@@ -63,12 +63,7 @@ class Groups extends BaseImasGroups
 
     public static function getAllIdName()
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_groups');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return Groups::find()->select(['id', 'name'])->all();
     }
 
     public static function getName($id)

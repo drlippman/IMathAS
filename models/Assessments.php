@@ -227,9 +227,6 @@ class Assessments extends BaseImasAssessments
     public static function selectItemOrder($todoaid)
     {
         return Assessments::find()->select(['id,itemorder'])->where(['IN','id',$todoaid])->all();
-//        $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (" . implode(',', $todoaid) . ')';
-//        $data = \Yii::$app->db->createCommand($query)->queryAll();
-//        return $data;
     }
 
     public static function UpdateItemOrder($newItemList, $id)
@@ -248,11 +245,11 @@ class Assessments extends BaseImasAssessments
             ->from('imas_assessments AS ia')
             ->join('JOIN', 'imas_questions AS iq',
                 'ia.id=iq.assessmentid')
-            ->where(['ia.courseid' => $courseId])
+            ->where('ia.courseid = :courseId')
             ->andWhere(['>', 'ia.defoutcome', AppConstant::ZERO_VALUE])
             ->orWhere(['<>', 'iq.category', AppConstant::ZERO_VALUE]);
 
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue(':courseId' , $courseId);
         $data = $command->queryAll();
         return $data;
 
@@ -300,8 +297,8 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id'])
             ->from('imas_assessments')
-            ->where(['groupsetid' => $grpSetId]);
-        $command = $query->createCommand();
+            ->where('groupsetid = :grpSetId');
+        $command = $query->createCommand()->bindValue(':grpSetId',$grpSetId);
         $data = $command->queryOne();
         return $data;
 
@@ -427,14 +424,7 @@ class Assessments extends BaseImasAssessments
 
     public static function getByName($courseId)
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_assessments')
-            ->where(['courseid' => $courseId]);
-        $query->orderBy('name');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'name'])->where(['courseid' => $courseId])->orderBy('name')->all();
     }
 
     public static function getByAssId($courseId)
@@ -488,13 +478,7 @@ class Assessments extends BaseImasAssessments
     }
     public static function getDataByCourseId($cid)
     {
-        $query = new Query();
-        $query	->select(['id','name','startdate','enddate','reviewdate','avail'])
-            ->from(['imas_assessments'])
-            ->where(['courseid' => $cid]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','name','startdate','enddate','reviewdate','avail'])->where(['courseid' => $cid])->all();
     }
 
     public function updateName($val, $typeId)
@@ -516,12 +500,6 @@ class Assessments extends BaseImasAssessments
 
     public static function getAssessmentDataById($typeId)
     {
-        $query = new Query();
-        $query	->select(['name','summary','startdate','enddate','reviewdate','deffeedback','reqscore','reqscoreaid','avail','allowlate','timelimit'])
-            ->from(['imas_assessments'])
-            ->where(['id' => $typeId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['name','summary','startdate','enddate','reviewdate','deffeedback','reqscore','reqscoreaid','avail','allowlate','timelimit'])->where(['id' => $typeId])->one();
     }
 }

@@ -547,14 +547,7 @@ class Student extends BaseImasStudents
 
     public static function getStudentData($userId, $courseId)
     {
-        $query = new Query();
-        $query->select(['id','locked','timelimitmult', 'section'])
-            ->from('imas_students')
-            ->where(['userid' => $userId]);
-            $query->andWhere(['courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['id','locked','timelimitmult', 'section'])->where(['userid' => $userId, 'courseid' => $courseId])->one();
     }
 }
 

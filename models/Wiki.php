@@ -148,13 +148,7 @@ class Wiki extends BaseImasWikis
 
     public static function getDataByCourseId($courseId)
     {
-        $query = new Query();
-        $query->select(['id','name','startdate','enddate','avail'])
-            ->from('imas_wikis')
-            ->where(['courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','name','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
     }
     public function updateName($val, $typeId)
     {
@@ -170,12 +164,6 @@ class Wiki extends BaseImasWikis
 
     public static function getDataById($id)
     {
-        $query = new Query();
-        $query->select(['name','startdate','enddate','editbydate','avail','groupsetid'])
-            ->from('imas_wikis')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['name','startdate','enddate','editbydate','avail','groupsetid'])->where(['id' => $id])->one();
     }
 } 

@@ -43,7 +43,7 @@ class BlockController extends AppController
         $block = $this->getParamVal('block');
         $modify = $this->getParamVal('modify');
         $teacherId = $this->isTeacher($userId, $courseId);
-        $this->noValidRights($teacherId);
+//        $this->noValidRights($teacherId);
         if(isset($toTb))
         {
             $toTb = $toTb;

@@ -246,13 +246,7 @@ class Forums extends BaseImasForums {
 
     public static function getForumName($forumId)
     {
-        $query = new Query();
-        $query->select(['name'])
-            ->from('imas_forums')
-            ->where(['id' => $forumId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select('name')->where(['id' => $forumId])->one();
     }
 
     public static function updateForumMassChange($startdate, $enddate, $avail, $id)
@@ -284,13 +278,7 @@ class Forums extends BaseImasForums {
     }
     public static function getDataByCourseId($courseId)
     {
-        $query = new Query();
-        $query->select(['id','name','startdate','enddate','avail'])
-            ->from('imas_forums')
-            ->where(['courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','name','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
     }
 
     public function updateName($val, $typeId)
@@ -308,7 +296,9 @@ class Forums extends BaseImasForums {
     public static function getForumId($thread,$courseId)
     {
         $query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_threads ON imas_forums.id=imas_forum_threads.forumid ";
-        $query .= " WHERE imas_forum_threads.id=$thread AND imas_forums.courseid='$courseId'";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $query .= " WHERE imas_forum_threads.id=:thread AND imas_forums.courseid=':courseId'";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues(['thread' => $thread,'courseId'=> $courseId]);
+        return $data->queryAll();
     }
 }

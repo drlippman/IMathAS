@@ -155,20 +155,24 @@ class WikiRevision extends BaseImasWikiRevisions
     {
         $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM ";
         $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-        $query .= "WHERE i_w_r.wikiid='$id' AND i_w_r.stugroupid='$groupId' ORDER BY id DESC LIMIT 1";
-        return \Yii::$app->db->createCommand($query)->queryOne();
+        $query .= "WHERE i_w_r.wikiid=':id' AND i_w_r.stugroupid=':groupId' ORDER BY id DESC LIMIT 1";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues(['id' => $id, 'groupId' => $groupId]);
+        return $data->queryOne();
     }
 
     public static function getMaxTime($typeid, $groupSetId, $canEdit, $wikiGrpId)
     {
-        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
+        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=':typeid' ";
         if ($groupSetId >0 && !$canEdit) {
             /*
              * if group and not instructor limit to group
              */
-            $query .= "AND stugroupid='$wikiGrpId' ";
+            $query .= "AND stugroupid=':wikiGrpId' ";
         }
         $query .= "GROUP BY stugroupid";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues(['typeid' => $typeid, 'wikiGrpId' => $wikiGrpId]);
+        return $data->queryAll();
     }
 }

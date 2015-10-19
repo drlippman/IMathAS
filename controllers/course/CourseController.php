@@ -1999,7 +1999,7 @@ class CourseController extends AppController
             }
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js','course/addItem.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,
         'items' => $items, 'folder' => $folder, 'parent' => $parent, 'firstLoad' => $firstLoad, 'jsAddress1' => $jsAddress1, 'jsAddress2' => $jsAddress2, 'curName' => $curName, 'curBreadcrumb' => $curBreadcrumb, 'isStudent' => $isStudent, 'students' => $student, 'newPostsCnt' => $newPostsCnt, 'backLink' => $backLink, 'type' => $type);
         return $this->renderWithData('course', $responseData);

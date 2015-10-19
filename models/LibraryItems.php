@@ -322,7 +322,7 @@ class LibraryItems extends BaseImasLibraryItems
         $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
         $query .= "AND imas_users.groupid= :groupId AND ili.qsetid=' :id";
         $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['groupId' => $groupId, ':id' => $id]);
+        $data->bindValues(['groupId' => $groupId, 'id' => $id]);
         return $data->queryAll();
     }
 

@@ -632,14 +632,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getBestScore($id, $userId)
     {
-        $query = new Query();
-        $query	->select(['bestscores'])
-            ->from(['imas_assessment_sessions'])
-            ->where(['assessmentid' => $id]);
-        $query->andWhere(['userid' => $userId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['bestscores'])->where(['assessmentid' => $id])->andWhere(['userid' => $userId])->one();
     }
 }
 

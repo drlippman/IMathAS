@@ -153,20 +153,10 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function getByGroupId($courseId, $groupId)
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_external_tools')
-            ->where(['courseid' => $courseId])
-            ->andWhere(['groupid' => $groupId]);
-        $query->orderBy('name');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'name'])->where(['courseid' => $courseId, 'groupid' => $groupId])->orderBy('name')->all();
     }
-
     public static function getByCourseAndOrderByName($courseId)
     {
-
         $query = new Query();
         $query->select(['id', 'name AS nm'])
             ->from('imas_external_tools')
@@ -201,12 +191,6 @@ class ExternalTools extends BaseImasExternalTools
     }
     public static function getExternalToolName($id)
     {
-        $query = new Query();
-        $query->select(['name'])
-            ->from('imas_external_tools')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select('name')->where(['id' => $id])->one();
     }
 }

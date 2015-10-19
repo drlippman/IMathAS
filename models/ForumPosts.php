@@ -309,13 +309,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getFileDetails($modifyId)
     {
-        $query = new Query();
-        $query ->select(['files'])
-            ->from('imas_forum_posts ')
-            ->where(['id' => $modifyId]);
-        $command = $query->createCommand();
-        $data = $command->queryone();
-        return $data;
+        return self::find()->select(['files'])->where(['id' => $modifyId])->one();
     }
 
     public static function getbyForumIdAndUserID($forumid, $currentUserId)

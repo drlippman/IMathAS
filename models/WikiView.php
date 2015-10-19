@@ -42,14 +42,7 @@ class WikiView extends BaseImasWikiViews
 
     public static function getByUserIdAndWikiId($userId, $id)
     {
-        $query = new Query();
-        $query->select(['stugroupid','lastview'])
-            ->from('imas_wiki_views')
-            ->where(['userid' => $userId]);
-        $query->andWhere(['wikiid' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['stugroupid','lastview'])->where(['userid' => $userId,'wikiid' => $id])->all();
     }
     public static function updateLastView($userId, $id, $groupId,$now)
     {

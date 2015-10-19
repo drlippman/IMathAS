@@ -174,13 +174,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getDataByCourseId($courseId)
     {
-        $query = new Query();
-        $query->select(['id','title','startdate','enddate','avail'])
-            ->from('imas_linkedtext')
-            ->where(['courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','title','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
     }
 
     public function updateName($val, $typeId)
@@ -192,13 +186,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getByName($typeId)
     {
-        $query = new Query();
-        $query->select(['imas_linkedtext.title AS name'])
-            ->from('imas_linkedtext')
-            ->where(['imas_linkedtext.id' => $typeId]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select(['imas_linkedtext.title AS name'])->where(['imas_linkedtext.id' => $typeId])->one();
     }
 
     public static function getLinkDataByIdAndCourseID($id,$courseId)

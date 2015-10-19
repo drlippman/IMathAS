@@ -364,8 +364,10 @@ class Message extends BaseImasMsgs
 
     public static function getUserById($userid)
     {
-        $query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=':userid' AND (isread=0 OR isread=4) GROUP BY courseid";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValue('userid', $userid);
+        return $data->queryAll();
     }
     public function insertNewMsg($msgArray){
         $data = AppUtility::removeEmptyAttributes($msgArray);
@@ -376,9 +378,10 @@ class Message extends BaseImasMsgs
     }
     public static function getCountOfId($userid, $cid)
     {
-        $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
-        return Yii::$app->db->createCommand($query)->queryAll();
-
+        $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto=':userid' AND courseid=':cid' AND (isread=0 OR isread=4)";
+        $data = \Yii::$app->db->createCommand($query);
+        $data->bindValues(['userid'=> $userid, 'cid'=> $cid]);
+        return $data->queryAll();
     }
 }
 

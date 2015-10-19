@@ -47,14 +47,7 @@ class DiagOneTime extends BaseImasDiagOnetime
 
     public static function getByCode($password, $diagid)
     {
-        $query = new Query();
-        $query	->select(['id','goodfor'])
-            ->from('imas_diag_onetime')
-            ->where(['code' => $password]);
-        $query->andWhere(['diag' => $diagid]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','goodfor'])->where(['code' => $password])->andWhere(['diag' => $diagid])->all();
     }
 
     public static function deleteById($diagId)

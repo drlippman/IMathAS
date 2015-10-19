@@ -96,15 +96,7 @@ class ContentTrack extends BaseImasContentTrack
 
     public static function getByTypeId($courseId, $userId)
     {
-        $query = new Query();
-        $query->select(['typeid'])
-            ->from(['imas_content_track'])
-            ->where(['courseid' => $courseId]);
-        $query->andWhere(['userid' => $userId]);
-        $query->andWhere(['type' => 'gbviewasid']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['typeid'])->where(['courseid' => $courseId])->andWhere(['userid' => $userId])->andWhere(['type' => 'gbviewasid'])->all();
     }
 
     public function createTrack($params){
@@ -132,51 +124,35 @@ class ContentTrack extends BaseImasContentTrack
 
     public static function getDataByCourseId($courseId, $typeId)
     {
-        $query = new Query();
-        $query->select(['userid','type','info'])
-            ->from(['imas_content_track'])
-            ->where(['courseid' => $courseId]);
-        $query->andWhere(['type' => 'inlinetext']);
-        $query->andWhere(['typeid' => $typeId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['userid','type','info'])->where(['courseid' => $courseId])->andWhere(['type' => 'inlinetext'])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForLink($courseId,$typeId)
     {
-      $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid= :typeId";
-      $data = \Yii::$app->db->createCommand($query);
-      $data->bindValue('courseId',$courseId);
-      $data->bindValue('typeId', $typeId);
-      return $data->queryAll();
+        $temp = 'linkedsum,linkedlink,linkedintext,linkedvviacal';
+        $tempArray[] = explode(',',$temp);
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForAssessment($courseId,$typeId)
     {
-        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('assessintro','assessum','assess') AND typeid= :typeId";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('courseId',$courseId);
-        $data->bindValue('typeId', $typeId);
-        return $data->queryAll();
+        $temp = 'assessintro,assessum,assess';
+        $tempArray[] = explode(',',$temp);
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForWiki($courseId,$typeId)
     {
-        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('wiki','wikiintext') AND typeid= :typeId";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('courseId',$courseId);
-        $data->bindValue('typeId', $typeId);
-        return $data->queryAll();
+        $temp = 'wiki,wikiintext';
+        $tempArray[] = explode(',',$temp);
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForForum($courseId,$typeId)
     {
-        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid= :courseId AND type IN ('forumpost','forumreply') AND info= :typeId";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('courseId',$courseId);
-        $data->bindValue('typeId', $typeId);
-        return $data->queryAll();
+        $temp = 'forumpost,forumreply';
+        $tempArray[] = explode(',',$temp);
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['info' => $typeId])->all();
     }
 
     public static function getStatsData($courseId)

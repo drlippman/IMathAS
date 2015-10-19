@@ -47,13 +47,7 @@ class InstrFiles extends BaseImasInstrFiles
 
     public static function getByIdForFile($fileName)
     {
-        $query = new Query();
-        $query ->select(['id'])
-            ->from('imas_instr_files')
-            ->where(['filename' => $fileName]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return InstrFiles::find()->select('id')->where(['filename' => $fileName])->all();
     }
 
     public static function setFileDescription($id, $description)
