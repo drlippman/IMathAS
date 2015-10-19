@@ -1826,10 +1826,15 @@ class CourseController extends AppController
             $exceptions = array();
             if (!($teacherId) && !($isTutor)) {
                 $result = Exceptions::getItemData($userId);
+                if($result > 0)
+                {
+                    foreach($result as $key => $line){
+                        AppUtility::dump($line);
+                        $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                    }
 
-                foreach($result as $key => $line){
-                    $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
                 }
+
             }
             /*
              * update block start/end dates to show blocks containing items with exceptions

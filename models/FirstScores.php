@@ -10,15 +10,8 @@ class FirstScores extends BaseImasFirstscores
 
     public static function getDataForQuestionUsage($lastFirstUpdate)
     {
-        $query = new Query();
-        $query ->select(['qsetid','score','timespent'])
-            ->from('imas_firstscores')
-            ->where(['>','timespent','0'])
-            ->andwhere(['<','timespent','1200'])
-            ->andwhere(['>','id',$lastFirstUpdate])
-             ->orderBy('qsetid');
-        $command = $query->createCommand();
-        return $command->queryAll();
+        return self::find()->select(['qsetid','score','timespent'])->where(['>','timespent','0'])->andWhere(['<','timespent','1200'])
+            ->andWhere(['>','id',$lastFirstUpdate])->orderBy('qsetid')->all();
     }
 
     public static function getMaxId()

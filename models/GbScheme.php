@@ -28,13 +28,7 @@ class GbScheme extends BaseImasGbscheme
 
     public static  function findByCourseId($courseId)
     {
-        $query = new Query();
-        $query	->select(['useweights', 'orderby', 'defaultcat', 'defgbmode', 'usersort', 'stugbmode', 'colorize'])
-            ->from('imas_gbscheme')
-            ->where(['imas_gbscheme.courseid' => $courseId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['useweights', 'orderby', 'defaultcat', 'defgbmode', 'usersort', 'stugbmode', 'colorize'])->where(['imas_gbscheme.courseid' => $courseId])->all();
     }
 
     public static function updateGbScheme($useWeights, $orderBy, $userSort, $defaultCat, $defGbMode, $stuGbMode, $colorize, $courseId)
@@ -54,13 +48,7 @@ class GbScheme extends BaseImasGbscheme
 
     public static function getDataForCopyCourse($ctc)
     {
-        $query = new Query();
-        $query	->select(['useweights','orderby','defaultcat','defgbmode','stugbmode','colorize'])
-            ->from('imas_gbscheme')
-            ->where('courseid= :id',[':id' => $ctc]);
-        $command = $query->createCommand();
-        $data = $command->queryone();
-        return $data;
+        return self::find()->select(['useweights','orderby','defaultcat','defgbmode','stugbmode','colorize'])->where(['courseid' => $ctc])->one();
     }
 
     public static function updateDataForCopyCourse($query,$courseId)

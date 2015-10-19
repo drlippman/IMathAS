@@ -138,14 +138,7 @@ class GbItems extends BaseImasGbitems
 
     public static function getGbItemsForOutcomeMap($courseId)
     {
-        $query = new Query();
-        $query->select(['id','name','gbcategory','outcomes'])
-               ->from('imas_gbitems ')
-                ->where(['courseid' => $courseId])
-                ->andWhere(['<>','outcomes','']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','name','gbcategory','outcomes'])->where(['courseid'=>$courseId])->andWhere(['<>','outcomes',''])->all();
     }
 
     public static function updateGbItemsByCourseId($gbItemId , $params)
@@ -164,13 +157,7 @@ class GbItems extends BaseImasGbitems
 
     public static function getDataForCopyCourse($ctc)
     {
-        $query = new Query();
-        $query->select(['name','points','showdate','gbcategory','cntingb','tutoredit','rubric'])
-            ->from('imas_gbitems ')
-            ->where(['courseid' => $ctc]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['name','points','showdate','gbcategory','cntingb','tutoredit','rubric'])->where(['courseid'=>$ctc])->all();
     }
 
     public function insertData($courseId,$params,$rubric)

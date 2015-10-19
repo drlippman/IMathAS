@@ -297,14 +297,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getByForumPostId($forumId)
     {
-        $query = new Query();
-        $query ->select(['id'])
-            ->from('imas_forum_posts ')
-            ->where(['forumid' => $forumId]);
-        $query->andWhere(['<>', 'files', '" "']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return ForumPosts::find()->select('id')->where(['forumid' => $forumId])->andWhere(['<>', 'files', '" "'])->all();
     }
 
     public static function getFileDetails($modifyId)

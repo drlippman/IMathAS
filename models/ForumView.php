@@ -222,6 +222,5 @@ class ForumView extends BaseImasForumViews
         $data = Yii::$app->db->createCommand($query);
         $data->bindValue('userId', $userId);
         return $data->queryAll();
-
     }
 }

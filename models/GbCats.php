@@ -11,14 +11,7 @@ use yii\db\Query;
 class GbCats extends BaseImasGbcats
 {
     public static function findCategoryByCourseId($courseId){
-        $query = new Query();
-        $query->select(['id', 'name', 'scale', 'scaletype', 'chop', 'dropn', 'weight', 'hidden', 'calctype'])
-            ->from('imas_gbcats')
-            ->where(['courseid'=>$courseId])
-            ->orderBy('name');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'name', 'scale', 'scaletype', 'chop', 'dropn', 'weight', 'hidden', 'calctype'])->where(['courseid'=>$courseId])->orderBy('name')->all();
     }
 
     public static function getByCourseId($courseId)
@@ -65,14 +58,7 @@ class GbCats extends BaseImasGbcats
 
     public static function getByCourseIdAndOrderByName($courseId)
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
-            ->from('imas_gbcats')
-            ->where(['courseid'=>$courseId])
-            ->orderBy('name');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'name'])->where(['courseid'=>$courseId])->orderBy('name')->all();
     }
 
     public static function getGbCatsForOutcomeMap($catList)
@@ -88,25 +74,12 @@ class GbCats extends BaseImasGbcats
 
     public static function getDataForCopyCourse($ctc)
     {
-        $query = new Query();
-        $query->select(['id', 'name', 'scale', 'scaletype', 'chop', 'dropn', 'weight', 'hidden', 'calctype'])
-            ->from('imas_gbcats')
-            ->where('courseid= :courseid',[':courseid'=>$ctc]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'name', 'scale', 'scaletype', 'chop', 'dropn', 'weight', 'hidden', 'calctype'])->where(['courseid'=>$ctc])->all();
     }
 
     public static function getData($courseId,$name)
     {
-        $query = new Query();
-        $query->select(['id'])
-            ->from('imas_gbcats')
-            ->where('courseid= :courseid',[':courseid'=> $courseId])
-            ->andWhere('name= :name',[':name' => $name]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id'])->where(['courseid'=>$courseId, 'name' => $name])->all();
     }
 
     public function insertData($courseId,$data)
@@ -142,10 +115,18 @@ class GbCats extends BaseImasGbcats
 
     public static function getDataByJoins($ctc,$courseId)
     {
-        $query = Yii::$app->db->createCommand("SELECT tc.id,toc.id FROM imas_gbcats AS tc JOIN imas_gbcats AS toc ON tc.name=toc.name WHERE tc.courseid= :ctc AND toc.courseid=:cid ");
-        $query->bindValues(['ctc' => $ctc, 'cid' => $courseId]);
-        $data = $query->queryAll();
-        return $data;
+        $query = new Query();
+        $query->select('tc.id,toc.id')
+            ->from('imas_gbcats AS tc')
+            ->join('INNER JOIN',
+                'imas_gbcats AS toc',
+                'tc.name=toc.name'
+            )
+            ->where(['tc.courseid= :ctc']);
+        $query->andWhere(['toc.courseid=:cid']);
+        $command = $query->createCommand()->bindValues(['ctc' => $ctc, 'cid' => $courseId]);
+        $items = $command->queryAll();
+        return $items;
     }
 
     public static function deleteByCourseId($courseId)

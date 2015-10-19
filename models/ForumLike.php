@@ -24,19 +24,16 @@ class ForumLike extends BaseImasForumLikes
     public function findCOunt($threadId)
     {
         $likeCount = new Query();
-        $likeCount->select(['postid', 'type', 'COUNT(*) AS count'])->from('imas_forum_likes')->where(['threadid' => $threadId])->groupBy(['postid', 'type']);
-        $command = $likeCount->createCommand();
+        $likeCount->select(['postid', 'type', 'COUNT(*) AS count'])->from('imas_forum_likes')
+            ->where(['threadid:threadId'])->groupBy(['postid', 'type']);
+        $command = $likeCount->createCommand()->bindValue('threadId', $threadId);
         $data = $command->queryAll();
         return $data;
     }
 
     public function UserLikes($threadId, $currentUser)
     {
-        $myLikes = new Query();
-        $myLikes->select(['postid'])->from('imas_forum_likes')->where(['threadid' => $threadId, 'userid' => $currentUser['id']]);
-        $command = $myLikes->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['postid'])->where(['threadid' => $threadId, 'userid' => $currentUser['id']])->all();
     }
 
     public function DeleteLike($params, $userId)

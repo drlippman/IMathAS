@@ -15,16 +15,12 @@ class DiagOneTime extends BaseImasDiagOnetime
 
     public static function getByDiag($diag)
     {
-        $query = \Yii::$app->db->createCommand("SELECT time,code,goodfor FROM imas_diag_onetime WHERE diag= :diag ORDER BY time");
-        $query->bindValue('diag',$diag);
-        return $query->queryAll();
+        return self::find()->select('time,code,goodfor')->where(['diag' => $diag])->orderBy('time')->all();
     }
 
     public static function getByTime($now)
     {
-        $query = \Yii::$app->db->createCommand("SELECT code,goodfor FROM imas_diag_onetime WHERE time= :now");
-        $query->bindValue('now',$now);
-        return $query->queryAll();
+        return self::find()->select('code,goodfor')->where(['time' => $now])->all();
     }
 
     public function generateDiagOneTime($diag, $now, $code, $goodfor)

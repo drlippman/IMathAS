@@ -87,14 +87,7 @@ class InlineText extends BaseImasInlinetext
 
     public static function getInlineTextForOutcomeMap($courseId)
     {
-        $query = new Query();
-        $query->select(['id','title','outcomes'])
-            ->from('imas_inlinetext')
-            ->where(['courseid' => $courseId])
-            ->andWhere(['<>','outcomes','']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','title','outcomes'])->where(['courseid' => $courseId])->andWhere(['<>','outcomes',''])->all();
     }
 
     public static function updateInlineTextForMassChanges($startdate, $enddate, $avail, $id)

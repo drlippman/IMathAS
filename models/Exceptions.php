@@ -62,8 +62,8 @@ class Exceptions extends BaseImasExceptions
                 'imas_assessments',
                 'imas_exceptions.assessmentid = imas_assessments.id'
             )
-            ->where(['imas_assessments.courseid' => $courseId]);
-        $command = $query->createCommand();
+            ->where(['imas_assessments.courseid:courseId']);
+        $command = $query->createCommand()->bindValue('courseId', $courseId);
         $data = $command->queryAll();
         return $data;
     }
@@ -103,14 +103,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function getByUIdAndAssId($userId,$aid)
     {
-        $query = new Query();
-        $query	->select(['enddate', 'islatepass'])
-        ->from(['imas_exceptions'])
-        ->where(['userid' => $userId]);
-        $query->andWhere(['assessmentid' => $aid]);
-        $command = $query->createCommand();
-        $data = $command->queryone();
-        return $data;
+        return self::find()->select(['enddate', 'islatepass'])->where(['userid' => $userId, 'assessmentid' => $aid])->one();
     }
 
     public static function deleteByUserIdAndAssId($userId, $aid)
@@ -179,9 +172,8 @@ class Exceptions extends BaseImasExceptions
 
     public static function getItemData($userId)
     {
-        $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=':userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')");
-        $query->bindValue('userId', $userId);
-        $query->queryAll();
-        return $query;
+        $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')");
+        $data = $query->queryAll();
+        return $data;
     }
 }

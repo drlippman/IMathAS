@@ -210,14 +210,7 @@ class Forums extends BaseImasForums {
 
     public static function getForumsForOutcomeMap($courseId)
     {
-        $query = new Query();
-        $query->select(['id','cntingb','name','gbcategory','outcomes'])
-            ->from('imas_forums')
-            ->where('courseid = :courseId',[':courseId' => $courseId])
-            ->andWhere(['<>','outcomes','']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','cntingb','name','gbcategory','outcomes'])->where('courseId', $courseId)->andWhere(['<>','outcomes',''])->all();
     }
 
     public static function getByGroupSetId($deleteGrpSet)
@@ -295,10 +288,17 @@ class Forums extends BaseImasForums {
 
     public static function getForumId($thread,$courseId)
     {
-        $query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_threads ON imas_forums.id=imas_forum_threads.forumid ";
-        $query .= " WHERE imas_forum_threads.id=:thread AND imas_forums.courseid=':courseId'";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['thread' => $thread,'courseId'=> $courseId]);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('imas_forums.id')
+            ->from('imas_forums')
+            ->join('INNER JOIN',
+                'imas_forum_threads',
+                'imas_forums.id=imas_forum_threads.forumid'
+            )
+            ->where(['imas_forum_threads.id=:thread']);
+        $query->andWhere('imas_forums.courseid=:courseId');
+        $command = $query->createCommand()->bindValues(['thread' => $thread,'courseId'=> $courseId]);
+        $items = $command->queryAll();
+        return $items;
     }
 }

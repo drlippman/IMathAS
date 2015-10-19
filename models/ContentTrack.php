@@ -32,14 +32,14 @@ class ContentTrack extends BaseImasContentTrack
             )
             -> distinct('imas_content_track.userid')
             ->groupBy(['imas_content_track.typeid'])
-            -> where(['imas_students.courseid' => $courseId])
+            -> where(['imas_students.courseid:courseId'])
             -> andWhere(['imas_content_track.courseid' => $courseId])
             -> andWhere(['imas_content_track.type' => 'extref'])
-            -> andWhere(['IN','imas_content_track.typeid',$qlist]);
+            -> andWhere(['IN','imas_content_track.typeid:qlist']);
            if($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE){
-               $query->andWhere(['imas_students.section' => $secfilter]);
+               $query->andWhere(['imas_students.section:secfilter']);
            }
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValues(['courseId' => $courseId, 'qlist' => $qlist, 'secfilter' => $secfilter]);
         $data = $command->queryAll();
         return $data;
     }

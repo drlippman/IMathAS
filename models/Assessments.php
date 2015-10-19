@@ -30,7 +30,7 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
-            ->where(['courseid' => $courseId])
+            ->where(['courseid:courseId'])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if (!$canviewall) {
             $query->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO]);
@@ -42,7 +42,7 @@ class Assessments extends BaseImasAssessments
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue('courseId', $courseId);
         $data = $command->queryAll();
         return $data;
     }
@@ -57,7 +57,7 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'defoutcome'])
             ->from('imas_assessments')
-            ->where(['courseid' => $courseId])
+            ->where(['courseid:courseId'])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO])
             ->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO])
             ->andWhere(['<', 'cntingb', AppConstant::NUMERIC_THREE]);
@@ -68,7 +68,7 @@ class Assessments extends BaseImasAssessments
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue('courseId', $courseId);
         $data = $command->queryAll();
         return $data;
     }
@@ -174,16 +174,16 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
-            ->where(['courseid' => $courseId])
+            ->where(['courseid :courseId'])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if ($istutor) {
             $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
         if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory' => $catfilter]);
+            $query->andWhere(['gbcategory:catfilter']);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValues(['courseId' => $courseId, 'catfilter' => $catfilter]);
         $data = $command->queryAll();
         return $data;
     }
@@ -378,9 +378,13 @@ class Assessments extends BaseImasAssessments
 
     public static function getCourseAndUserId($courseId, $userId)
     {
-        $query = Yii::$app->db->createCommand("SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid WHERE ia.courseid= :courseId AND ias.userid= :userId");
-        $query->bindValues(['courseId' => $courseId, 'userId' => $userId]);
-        $data = $query->queryAll();
+        $query = new Query();
+        $query->select('ia.id,ias.bestscores')->from('imas_assessments AS ia');
+        $query->join('INNER JOIN','imas_assessment_sessions AS ias',
+                  'ia.id=ias.assessmentid');
+        $query->where(['ia.courseid= :courseId', 'ias.userid= :userId']);
+        $command = $query->createCommand()->bindValues(['courseId' => $courseId, 'userId' => $userId]);
+        $data = $command->queryAll();
         return $data;
     }
 
@@ -460,13 +464,7 @@ class Assessments extends BaseImasAssessments
 
     public static function getDateAndAllowById($aid)
     {
-        $query = new Query();
-        $query	->select(['allowlate','enddate','startdate'])
-            ->from(['imas_assessments'])
-            ->where(['id' => $aid]);
-        $command = $query->createCommand();
-        $data = $command->queryone();
-        return $data;
+        return self::find()->select(['allowlate','enddate','startdate'])->where(['id' => $aid])->one();
     }
 
     public static function getAssessmentData($id){

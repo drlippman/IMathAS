@@ -20,12 +20,12 @@ class Diags extends BaseImasDiags
                 'imas_users.id=imas_diags.ownerid'
             );
         if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
-            $query->andWhere(['imas_diags.ownerid' => $userId]);
+            $query->andWhere(['imas_diags.ownerid:userId']);
         } else if ($myRights < AppConstant::NUMERIC_HUNDREAD) {
-            $query->andWhere(['imas_users.groupid' => $groupId]);
+            $query->andWhere(['imas_users.groupid:groupId']);
         }
         $query->orderBy('imas_diags.name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValues(['userId' => $userId, 'groupId' => $groupId]);
         $data = $command->queryAll();
         return $data;
     }
@@ -82,13 +82,7 @@ class Diags extends BaseImasDiags
 
     public static function getNameById($id)
     {
-        $query = new Query();
-        $query->select(['name'])
-            ->from('imas_diags')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select('name')->where(['id' => $id])->one();
     }
 
     public static function deleteDiagno($params)
@@ -105,14 +99,7 @@ class Diags extends BaseImasDiags
     }
     public static function getByIdAndName()
     {
-        $query = new Query();
-        $query	->select(['id','name'])
-            ->from('imas_diags')
-            ->where(['public' => AppConstant::NUMERIC_THREE]);
-        $query->orWhere(['public' => AppConstant::NUMERIC_SEVEN]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id','name'])->where(['public' => AppConstant::NUMERIC_THREE])->orWhere(['public' => AppConstant::NUMERIC_SEVEN])->all();
     }
 
     public static function getAllDataById($diagid)

@@ -53,7 +53,7 @@ class AssessmentController extends AppController
             $assessmentSessionObject = new AssessmentSession();
             $assessmentSession = $assessmentSessionObject->saveAssessmentSession($assessment, $user->getId());
         }
-        $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
+//        $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
         $isQuestions = Questions::getByAssessmentId($assessmentId);
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');

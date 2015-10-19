@@ -128,11 +128,11 @@ class ExternalTools extends BaseImasExternalTools
             ->from('imas_external_tools')
             ->where(['id' => $id]);
         if ($isTeacher) {
-            $query->andWhere(['courseid' => $courseId]);
+            $query->andWhere(['courseid:courseId']);
         } else if ($isGrpAdmin) {
-            $query->andWhere(['groupid' => $groupId]);
+            $query->andWhere(['groupid:groupId']);
         }
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValues(['courseId' => $courseId, 'groupId' => $groupId]);
         $data = $command->queryOne();
         return $data;
     }
@@ -146,9 +146,9 @@ class ExternalTools extends BaseImasExternalTools
                 'imas_groups',
                 'imas_external_tools.groupid=imas_groups.id'
             )
-            ->where(['imas_external_tools.courseid' => $courseId]);
+            ->where(['imas_external_tools.courseid:courseId']);
         $query->orderBy('imas_external_tools.groupid,imas_external_tools.name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue('courseId', $courseId);
         $data = $command->queryAll();
         return $data;
     }
@@ -159,14 +159,7 @@ class ExternalTools extends BaseImasExternalTools
     }
     public static function getByCourseAndOrderByName($courseId)
     {
-        $query = new Query();
-        $query->select(['id', 'name AS nm'])
-            ->from('imas_external_tools')
-            ->where(['courseid' => $courseId]);
-        $query->orderBy('name');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id', 'name AS nm'])->where(['courseid' => $courseId])->orderBy('name')->all();
     }
 
     public static function getById($id)

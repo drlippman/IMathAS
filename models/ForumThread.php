@@ -49,13 +49,7 @@ class ForumThread extends BaseImasForumThreads
 
     public static function findByStuGrpId($grpId)
     {
-        $query = new Query();
-        $query ->select(['id'])
-               ->from('imas_forum_threads')
-               ->where('stugroupid= :stugroupid',[':stugroupid' => $grpId]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        return self::find()->select(['id'])->where(['stugroupid' => $grpId])->all();
     }
 
     public static function deleteForumThread($delList)
