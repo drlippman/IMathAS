@@ -267,4 +267,5 @@ class AppConstant
     const NO_QUESTIONS = 'No questions in assessment';
     const NOT_GROUP_MEMBER= "You are not yet a member of a group.  Contact your instructor to be added to a group.";
     const NO_DATA = "No data available";
+    const BLOCK_POST = 'This page is blocked. In this forum, you must post your own thread before you can read those posted by others.';
 }

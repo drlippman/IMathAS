@@ -51,7 +51,7 @@ class Rubrics extends BaseImasRubrics
 
     public static function getById($id)
     {
-        return self::find()->select(['name','rubrictype','rubric','groupid'])->where(['id' => $id])->one();
+        return self::find()->select(['name','rubrictype','rubric','groupid','id'])->where(['id' => $id])->one();
     }
 
     public static function getByUserIdAndGroupIdAndRubric($rubric,$userid,$groupid){

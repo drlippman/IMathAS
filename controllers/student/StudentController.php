@@ -16,13 +16,19 @@ class StudentController extends AppController
 {
     public function actionStudentEnrollCourse()
     {
+        $user = $this->getAuthenticatedUser();
+
+        if($user['rights'] == AppConstant::GUEST_RIGHT)
+        {
+            $this->setWarningFlash("Guest user can't access this page.");
+            return $this->redirect($this->goHome());
+        }
         $this->guestUserHandler();
         $this->layout = 'master';
         $model = new StudentEnrollCourseForm();
         if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollCourseForm'];
-            $user = $this->getAuthenticatedUser();
             $course = Course::getByIdAndEnrollmentKey($param['courseId'], $param['enrollmentKey']);
             if ($course) {
                 $teacher = Teacher::getByUserId($user->id, $param['courseId']);

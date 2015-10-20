@@ -67,9 +67,10 @@ class CourseController extends AppController
     {
         $user = $this->getAuthenticatedUser();
         $actionPath = Yii::$app->controller->action->id;
-        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
         return $this->accessForCourseController($user,$courseId, $actionPath);
     }
+
     public function actionUpdateOwner()
     {
         if ($this->isPostMethod()) {

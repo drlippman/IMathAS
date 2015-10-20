@@ -321,7 +321,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getByRefIds($refids)
     {
-        return ForumPosts::find()->select(['id,userid'])->where(['IN','id', $refids])->all();
+        return ForumPosts::find()->select(['id','userid'])->where(['IN','id', $refids])->all();
     }
 
     public static function getThreadId($limthreads,$dofilter,$tagfilter)
@@ -431,5 +431,17 @@ class ForumPosts extends BaseImasForumPosts
         $data = Yii::$app->db->createCommand($query);
         $data->bindValue('forumId', $forumId);
         return $data->queryAll();
+    }
+
+    public static function getPosts($userId,$forumId,$limthreads,$dofilter)
+    {
+        $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
+        $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userId') AS ifv ON ";
+        $query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumId' AND imas_forum_posts.isanon=0 ";
+        if ($dofilter) {
+            $query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+        }
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 }

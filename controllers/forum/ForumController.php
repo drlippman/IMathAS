@@ -273,8 +273,8 @@ class ForumController extends AppController
                 $existingscores[$grade['refid']] = $grade['id'];
             }
             $postuserids = array();
-            $refids = "'" . implode("','", array_keys($params['score'])) . "'";
-            $forumPosts = ForumPosts::getByRefIds($refids);
+
+            $forumPosts = ForumPosts::getByRefIds(array_keys($params['score']));
             foreach ($forumPosts as $forumPost) {
                 $postuserids[$forumPost['id']] = $forumPost['userid'];
             }
@@ -697,7 +697,7 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $allThreadIds = Thread::getAllThread($forumId);
         $prevNextValueArray = Thread::checkPreOrNextThreadByForunId($forumId);
-        $isNew = ForumView::getById($threadId, $currentUser);
+        $isNew = ForumView::getById($threadId, $currentUser['id']);
         $tagValue = $isNew[0]['tagged'];
         $isTeacher = $this->isTeacher($currentUser['id'], $courseId);
         $isTutor = $this->isTutor($currentUser['id'], $courseId);
@@ -1182,8 +1182,17 @@ class ForumController extends AppController
         $thread = ThreadForm::postByName($forumId, $sort, $orderBy);
         $page = $params['page'];
         $read = $params['read'];
+
+        $teacherid = $this->isTeacher($userId,$courseId);
+        if (isset($teacherid)) {
+            $isteacher = true;
+        } else {
+            $isteacher = false;
+        }
+
         if(isset($params['read']) && $read == 1)
         {
+
             $now = time();
             $readThreadId = ForumPosts::MarkAllRead($forumId);
             foreach ($readThreadId as $data) {
@@ -1191,6 +1200,95 @@ class ForumController extends AppController
                 $viewsData->updateDataForPostByName($data['threadid'], $userId, $now);
             }
         }
+        $forumData = Forums::getById($forumId);
+        $forumsettings = $forumData['settings'];
+        $replyby = $forumData['replyby'];
+        $defdisplay = $forumData['defdisplay'];
+        $forumname = $forumData['name'];
+        $pointspos = $forumData['points'];
+        $rubric = $forumData['rubric'];
+        $tutoredit = $forumData['tutoredit'];
+        $groupsetid = $forumData['groupsetid'];
+        $allowanon = (($forumsettings&1)==1);
+
+        $allowmod = ($isteacher || (($forumsettings&2)==2));
+        $allowdel = ($isteacher || (($forumsettings&4)==4));
+        $postbeforeview = (($forumsettings&16)==16);
+        $haspoints = ($pointspos>0);
+
+        $canviewall = (isset($teacherid) || isset($tutorid));
+        $caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
+        $canviewscore = (isset($teacherid) || (isset($tutorid) && $tutoredit<2));
+        $allowreply = ($canviewall || (time()<$replyby));
+
+        $caller = "byname";
+        $this->includeCSS(['forums.css']);
+
+        if ($haspoints && $caneditscore && $rubric != 0) {
+            $this->includeJS(['gradebook/rubric.js']);
+//            require("../includes/rubric.php");
+        }
+
+        if (!$canviewall && $postbeforeview)
+        {
+            $forumPost = ForumPosts::checkLeastOneThread($forumId,$userId);
+            if (count($forumPost) == 0)
+            {
+                $this->setWarningFlash(AppConstant::BLOCK_POST);
+                return $this->redirect($this->goHome());
+            }
+        }
+
+        if ($haspoints && $caneditscore && $rubric != 0)
+        {
+            $rubricData = Rubrics::getById($rubric);
+
+            if (count($rubricData) > 0)
+            {
+                $rubricDataRow = array(
+                    '0' => $rubricData['id'],
+                    '1' => $rubricData['rubrictype'],
+                    '2' => $rubricData['rubric'],
+                );
+            }
+        }
+
+        $scores = array();
+        $feedback = array();
+        if ($haspoints)
+        {
+            $grades = Grades::getByGradeTypeIdAndGradeType('forum',$forumId);
+            foreach($grades as $grade)
+            {
+                $scores[$grade['refid']] = $grade['score'];
+                $feedback[$grade['refid']] = $grade['feedback'];
+            }
+        }
+
+        $dofilter = false;
+        if (!$canviewall && $groupsetid>0)
+        {
+            $stuGroup = StuGroupMembers::getStudGroupAndStudGroupMemberData($userId,$groupsetid);
+            if (count($stuGroup) > 0)
+            {
+                $groupid = $stuGroup['id'];
+            } else {
+                $groupid=0;
+            }
+            $dofilter = true;
+            $threadIds = Thread::getByStuGroupId($groupid);
+            $limthreads = array();
+            foreach ($threadIds as $thread)
+            {
+                $limthreads[] = $thread['id'];
+            }
+            if (count($limthreads)==0) {
+                $limthreads = '0';
+            } else {
+                $limthreads = implode(',',$limthreads);
+            }
+        }
+        $posts = ForumPosts::getPosts($userId,$forumId,$limthreads,$dofilter);
         if ($thread) {
             $nameArray = array();
             $sortByName = array();
@@ -1233,14 +1331,16 @@ class ForumController extends AppController
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/listpostbyname.js']);
             $status = AppConstant::NUMERIC_ONE;
-            $responseData = array('threadArray' => $finalSortedArray,'page' => $page,'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status, 'userRights' => $userRights, 'currentUserId' => $userId);
-            return $this->renderWithData('listPostByName', $responseData);
+            $responseData = array('threadArray' => $finalSortedArray,'posts' => $posts,'pointspos' => $pointspos,'rubricData' => $rubricData,'forumname' => $forumname,'rubricDataRow' => $rubricDataRow,
+                'rubric' => $rubric,'scores' => $scores,'haspoints' => $haspoints,'caneditscore' => $caneditscore,'page' => $page,'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status,
+                'allowmod' => $allowmod,'allowdel' => $allowdel,'allowreply' => $allowreply,'userRights' => $userRights, 'canviewscore' => $canviewscore,'isteacher' => $isteacher,'currentUserId' => $userId);
+            return $this->renderWithData('listViews', $responseData);
         } else {
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/listpostbyname.js']);
             $status = AppConstant::NUMERIC_ZERO;
             $responseData = array('status' => $status, 'page' => $page,'forumId' => $forumId, 'course' => $course);
-            return $this->renderWithData('listPostByName', $responseData);
+            return $this->renderWithData('listViews', $responseData);
         }
     }
 
@@ -1971,6 +2071,24 @@ class ForumController extends AppController
         $users = User::lastViewsUser($thread);
         echo '<h4>'._('Thread Views').'</h4>';
         $responseData = array('users' => $users);
-        return $this->renderWithData('listViews',$responseData);
+        $flexwidth = true;
+        $nologo = true;
+        echo '<h4>'._('Thread Views').'</h4>';
+
+
+        if (count($users)==0) {
+            echo '<p>'._('No thread views').'</p>';
+        } else {
+            echo '<table><thead><tr><th>'._('Name').'</th><th>'._('Last Viewed').'</th></tr></thead>';
+            echo '<tbody>';
+            foreach ($users as $row ) {
+                echo '<tr><td>'.$row['LastName'].', '.$row['FirstName'].'</td>';
+                echo '<td>'.AppUtility::tzdate("F j, Y, g:i a", $row['lastview']).'</td></tr>';
+            }
+            echo '</tbody></table>';
+        }
+        echo '<p class="small">'._('Note: Only the most recent thread view per person is shown').'</p>';
+
+//        return $this->renderWithData('listViews',$responseData);
     }
 }

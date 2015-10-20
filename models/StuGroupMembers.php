@@ -117,4 +117,17 @@ class StuGroupMembers extends BaseImasStugroupmembers
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getStudGroupAndStudGroupMemberData($userId,$groupSetId)
+    {
+        $query = new Query();
+        $query->select('i_sg.id')
+            ->from('imas_stugroups AS i_sg')
+            ->join('INNER JOIN','imas_stugroupmembers as i_sgm','i_sgm.stugroupid=i_sg.id')
+            ->where(['i_sgm.userid' =>  $userId]);
+        $query->andWhere(['i_sg.groupsetid' => $groupSetId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

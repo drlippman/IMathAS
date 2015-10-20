@@ -25,7 +25,7 @@ class ForumLike extends BaseImasForumLikes
     {
         $likeCount = new Query();
         $likeCount->select(['postid', 'type', 'COUNT(*) AS count'])->from('imas_forum_likes')
-            ->where(['threadid=:threadId'])->groupBy(['postid', 'type']);
+            ->where('threadid = :threadId')->groupBy(['postid', 'type']);
         $command = $likeCount->createCommand()->bindValue('threadId', $threadId);
         $data = $command->queryAll();
         return $data;

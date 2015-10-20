@@ -21,6 +21,14 @@ class MessageController extends AppController
     public $totalMessages = array();
     public $children = array();
     public $enableCsrfValidation = false;
+
+    public function beforeAction($action)
+    {
+        $actionPath = Yii::$app->controller->action->id;
+        $user = $this->getAuthenticatedUser();
+        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForMessageController($user,$courseId,$actionPath);
+    }
     /*
      * Initial load of message index page.
      */
