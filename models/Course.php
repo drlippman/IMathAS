@@ -309,9 +309,11 @@ class Course extends BaseImasCourses {
         {
             $query->andWhere(['<','imas_courses.available','4']);
         }
+
         if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==AppConstant::NUMERIC_ZERO)
         {
             $query->andWhere(['imas_courses.ownerid'=> $userId]);
+
         }
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > AppConstant::NUMERIC_ZERO)
         {
@@ -624,5 +626,9 @@ class Course extends BaseImasCourses {
     public static function getCourseDataById($courseId)
     {
         return self::find()->select(['name','itemorder','hideicons','picicons','allowunenroll','msgset','toolset','chatset','topbar','cploc','latepasshrs'])->where(['id' => $courseId])->one();
+    }
+
+    public static function isOwner($userId,$courseId){
+        return self::find()->select('ownerid')->where(['id' => $courseId])->one();
     }
 }

@@ -688,7 +688,7 @@ class CourseController extends AppController
         $model = new ThreadForm();
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $this->noValidRights($teacherId);
-        $query = Outcomes::getByCourseId($courseId);
+        $query = Outcomes::getByCourse($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
         if (isset($params['tb'])) {
@@ -1100,7 +1100,7 @@ class CourseController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
                     break;
                 case 'inlinetext':
-                    return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?cid=' .$courseId));
                     break;
                 case 'linkedtext':
                     return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId));
@@ -1109,10 +1109,10 @@ class CourseController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
                     break;
                 case 'wiki':
-                    return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?courseId='.$courseId));
+                    return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?cid='.$courseId));
                     break;
                 case 'block':
-                    return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&block=0&tb=t'));
+                    return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&block=0&tb=t'));
                     break;
                 case 'calendar':
                     break;
@@ -1263,7 +1263,7 @@ class CourseController extends AppController
             $line = Course::getCourseDataById($courseId);
             if ($line == null) {
                 $overwriteBody = AppConstant::NUMERIC_ONE;
-                $body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
+                $body = _("Course does not exist.  <a href='#'>Return to main page</a>") . "</body></html>\n";
             }
 
             $allowUnEnroll = $line['allowunenroll'];
@@ -1361,14 +1361,15 @@ class CourseController extends AppController
             $exceptions = array();
             if (!($teacherId) && !($isTutor)) {
                 $result = Exceptions::getItemData($userId);
-                if($result > 0)
-                {
-                    foreach($result as $key => $line){
-                        $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                if($result > 0) {
+                    foreach ($result as $key => $line) {
+                        $exceptions[$line['id']] = array($line['startdate'], $line['enddate'], $line['islatepass'], $line['waivereqscore']);
                     }
-
                 }
 
+                foreach($result as $key => $line){
+                    $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                }
             }
             /*
              * update block start/end dates to show blocks containing items with exceptions
@@ -1537,7 +1538,7 @@ class CourseController extends AppController
             }
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js','course/addItem.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,
         'items' => $items, 'folder' => $folder, 'parent' => $parent, 'firstLoad' => $firstLoad, 'jsAddress1' => $jsAddress1, 'jsAddress2' => $jsAddress2, 'curName' => $curName, 'curBreadcrumb' => $curBreadcrumb, 'isStudent' => $isStudent, 'students' => $student, 'newPostsCnt' => $newPostsCnt, 'backLink' => $backLink, 'type' => $type);
         return $this->renderWithData('course', $responseData);

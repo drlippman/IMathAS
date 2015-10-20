@@ -41,6 +41,14 @@ class ForumController extends AppController
     public $children = array();
     public $threadLevel = AppConstant::NUMERIC_ONE;
 
+    public function beforeAction($action)
+    {
+        $actionPath = Yii::$app->controller->action->id;
+        $user = $this->getAuthenticatedUser();
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForTeacherAndStudentForumController($user,$courseId,$actionPath);
+    }
+
     /*
     * Controller Action To Redirect To Search Forum Page
     */
@@ -509,7 +517,7 @@ class ForumController extends AppController
     /*
      * controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
      */
-    public function actionMoveThread()
+    public function actionMoveThread()//only for teacher
     {
         $this->layout = 'master';
         $courseId = $this->getParamVal('courseId');
@@ -1638,7 +1646,7 @@ class ForumController extends AppController
         }
     }
 
-    public function actionChangeForum()
+    public function actionChangeForum()//only for teacher
     {
         $courseId = $this->getParamVal('cid');
         $currentUser = $this->getAuthenticatedUser();
@@ -1851,7 +1859,7 @@ class ForumController extends AppController
         }
     }
 
-    public function actionViewForumGrade()
+    public function actionViewForumGrade()//only for teacher
     {
         $params = $this->getRequestParams();
         $courseId = intval($params['cid']);

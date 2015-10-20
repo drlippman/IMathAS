@@ -638,12 +638,12 @@ class QuestionController extends AppController
                                 $pageQuestionTable[$i]['add'] = "<a style='background-color: #008E71;  width: 85%;' class='btn btn-primary add-btn-question' href=" . AppUtility::getURLFromHome('question', 'question/mod-question?qsetid=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId) . "><i class='fa fa-plus'></i>&nbsp; Add</a>";
 
                                 if ($line['userights'] > AppConstant::NUMERIC_THREE || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['ownerid'] == $userId) {
-                                    $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&frompot=1') . "><i class='fa fa-fw'></i>Edit</a>";
+                                    $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&frompot=1') . "><i class='fa fa-fw'></i> Edit</a>";
                                 } else {
-                                    $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/view-source?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId) . ">View</a>";
+                                    $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/view-source?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId) . "><i class='fa fa-fw'></i> View</a>";
                                 }
 
-                                $pageQuestionTable[$i]['templ'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&template=' . true) . "><i class='fa fa-archive'></i>Template</a>";
+                                $pageQuestionTable[$i]['templ'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&template=' . true) . "><i class='fa fa-archive'></i> Template</a>";
                                 $ln++;
 
                             }
@@ -3663,6 +3663,26 @@ class QuestionController extends AppController
         $this->layout = 'master';
         $responseData = (['section' => $section]);
         $this->includeCSS(['question/question.css']);
-        return $this->renderWithData('libhelp.php', $responseData);
+        return $this->renderWithData('libhelp', $responseData);
+    }
+
+    public function actionViewSource(){
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $myRights = $user['rights'];
+        $teacherid = $this->isTeacher($user['id'], $courseId);
+        $this->layout = 'master';
+        $pagetitle = "Question Source";
+        if (!(isset($teacherid)) && $myRights<100) {
+            echo "You need to log in as a teacher to access this page";
+            exit;
+        }
+        $isAdmin = false;
+        $qsetid = $params['id'];
+        $qSetData = QuestionSet::getByQuesSetId($qsetid);
+        $responseData = (['params' => $params, 'qSetData' => $qSetData, 'isAdmin' => $isAdmin, 'course' => $course]);
+        return $this->renderWithData('viewSource', $responseData);
     }
 }

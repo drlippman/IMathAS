@@ -720,6 +720,20 @@ function generaterandstring() {
         return true;
     }
 
+    public function accessForWikiController($user,$courseId,$actionPath){
+        if($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT){
+            return true;
+        }
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $studentId = $this->isStudent($user['id'],$courseId);
+        if (($user['rights'] < AppConstant::STUDENT_RIGHT) || ($user['rights'] == AppConstant::STUDENT_RIGHT && !$studentId) ||
+            ($user['rights'] > AppConstant::STUDENT_RIGHT && $user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && !$teacherId) ||
+            ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'add-wiki')) {
+            return $this->noValidRights($teacherId);
+        }
+        return true;
+    }
+
     public function accessForTeacher($user,$courseId){
         if($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT){
             return true;
@@ -779,6 +793,10 @@ function generaterandstring() {
     }
 
     public function accessForTeacherAndAdmin($user,$courseId,$actionPath){
+        $isOwner = Course::isOwner($user['id'],$courseId);
+        if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)){
+            return true;
+        }
         $teacherId = $this->isTeacher($user['id'], $courseId);
         if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) && ($actionPath == 'manage-question-set' || $actionPath == 'add-questions-save' ||
             $actionPath == 'mod-data-set' || $actionPath == 'mod-tutorial-question' || $actionPath == 'test-question' || $actionPath == 'help' || $actionPath == 'micro-lib-help'
@@ -797,7 +815,8 @@ function generaterandstring() {
     }
 
     public function accessForTeacherAndStudentForumController($user,$courseId,$actionPath){
-        if($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT){
+        $isOwner = Course::isOwner($user['id'],$courseId);
+        if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)){
             return true;
         }
         $teacherId = $this->isTeacher($user['id'], $courseId);

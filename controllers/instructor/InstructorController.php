@@ -100,7 +100,7 @@ class InstructorController extends AppController
         } else {
             $canEdit = false;
             $viewAll = false;
-            $this->noValidRights($isTeacher);
+//            $this->noValidRights($isTeacher);
         }
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $countPost = $this->getNotificationDataForum($courseId,$user);

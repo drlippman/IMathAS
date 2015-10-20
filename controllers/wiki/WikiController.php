@@ -13,9 +13,16 @@ use app\models\Wiki;
 use app\models\WikiRevision;
 use app\models\WikiView;
 use app\components\diff;
-use app\components\htmLawed;
+use Yii;
 class WikiController extends AppController
 {
+    public function beforeAction($action)
+    {
+        $actionPath = Yii::$app->controller->action->id;
+        $user = $this->getAuthenticatedUser();
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForWikiController($user,$courseId,$actionPath);
+    }
     /**
      * display detail of selected wiki
      */
