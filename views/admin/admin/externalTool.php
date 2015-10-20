@@ -124,12 +124,23 @@ if (isset($params['id'])) {
             echo '<p><b>Course Tools</b></p>';
         }
         $str .= '</b></p>';
-        echo '<ul class="nomark margin-left-zero">';
         if (count($resultFirst) == AppConstant::NUMERIC_ZERO) {
             echo '<span class="col-md-12 padding-left-zero">'.AppUtility::t('No tools',false).'</span>';
-        } else {
-            foreach ($resultFirst as $key => $row) {
-                echo '<li>' . $row['nm'];
+        } else { ?>
+        <table class="display course-table table table-bordered table-striped table-hover data-table">
+            <thead>
+            <tr>
+                <th ><?php AppUtility::t('Name'); ?></th>
+                <th ><?php AppUtility::t('Setting'); ?></th>
+                <th ><?php AppUtility::t('Delete'); ?></th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <?php foreach ($resultFirst as $key => $row) { ?>
+                <td>
+               <?php echo  $row['nm'];
                 if ($isAdmin) {
                     if ($row['name'] == null) {
                         echo ' (System-wide)';
@@ -138,17 +149,23 @@ if (isset($params['id'])) {
                     }
                 }
                 ?>
+                </td>
                 <input type="hidden" id="id" value="<?php echo $row['nm'] ?>">
+                <td>
                 <?php
                 echo ' <a href=' . AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $courseId . $ltfrom . '&amp;id=' . $row['id']) . '>Edit</a> ';
                 $ExternalToolId = $row['id'];
                 $cid = $courseId . $ltfrom;?>
+                </td>
+                <td>
                 <input type="hidden" id="admin" value="<?php echo $cid ?>">
-                | <a onclick=deleteExternalTool(<?php echo $ExternalToolId ?>) href='#'> <?php AppUtility::t('Delete');?> </a>
-                <?php echo '</li>';
-            }
-        }
-        echo '</ul>';
+                 <a onclick=deleteExternalTool(<?php echo $ExternalToolId ?>) href='#'> <?php AppUtility::t('Delete');?> </a>
+                    </td></tr>
+            <?php }
+        }?>
+            </tbody>
+            </table>
+        <?php
         echo '<p class="col-md-12 padding-left-zero"><a href="' . AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $courseId . '&amp;id=new') . '">'.AppUtility::t('Add a Tool',false).'</a></p>';
         echo '</div></div>';
     } ?>
