@@ -870,4 +870,16 @@ function generaterandstring() {
             return true;
         }
     }
+    public function accessForSiteController($user,$courseId,$actionPath)
+    {
+        $isStudent = $this->isStudent($user['id'], $courseId);
+        if(($user['rights'] > AppConstant::STUDENT_RIGHT) && ($actionPath == 'login' || $actionPath == 'diagnostics' || $actionPath == 'registration' || $actionPath == 'student-register' || $actionPath == 'forgot-password' || $actionPath == 'forgot-username' || $actionPath == 'check-browser' || $actionPath == 'reset-password' || $actionPath == 'logout' || $actionPath == 'dashboard' || $actionPath == 'change-password' || $actionPath == 'change-user-info')) {
+            return true;
+        } else if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'student-enroll-course' || $actionPath == 'hide-from-course-list' || $actionPath == 'unhide-from-course-list' || $actionPath == 'form' || $actionPath == 'action') && $isStudent) {
+            return true;
+        }  else {
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }
+    }
 }

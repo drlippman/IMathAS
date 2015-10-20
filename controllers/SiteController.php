@@ -77,6 +77,16 @@ class SiteController extends AppController
 
     public function actionIndex()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         if (!$this->isGuestUser()) {
             return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         } else {
@@ -87,6 +97,16 @@ class SiteController extends AppController
 
     public function actionLogin()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->unauthorizedAccessHandler();
         $this->layout = 'nonLoggedUser';
         $params = $this->getRequestParams();
@@ -118,6 +138,16 @@ class SiteController extends AppController
      */
     public function actionDiagnostics()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
@@ -181,7 +211,7 @@ class SiteController extends AppController
 
             if (trim($params['SID']) == '' || trim($params['firstname']) == '' || trim($params['lastname']) == '')
             {
-                echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+                echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"#\">", _('Try Again'), "</a>\n";
                 exit;
             }
             $result = Diags::getByDiagId($diagId);
@@ -394,6 +424,16 @@ class SiteController extends AppController
      */
     public function actionRegistration()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->layout = 'nonLoggedUser';
         $model = new RegistrationForm();
         if ($this->isPostMethod()) {
@@ -429,6 +469,16 @@ class SiteController extends AppController
 
     public function actionStudentRegister()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $flashMsg ='';
         $this->layout = 'nonLoggedUser';
         $model = new StudentRegisterForm();
@@ -465,15 +515,18 @@ class SiteController extends AppController
         return $this->renderWithData('progress');
     }
 
-    public function actionDiagnostic()
-    {
-        $model = new DiagnosticForm();
-        $responseData = array('model' => $model,);
-        return $this->renderWithData('diagnostic', $responseData);
-    }
-
     public function actionForgotPassword()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->layout = 'nonLoggedUser';
         $model = new ForgotPasswordForm();
         if ($model->load($this->isPostMethod())) {
@@ -512,6 +565,16 @@ class SiteController extends AppController
 
     public function actionForgotUsername()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->layout = 'nonLoggedUser';
         $model = new ForgotUsernameForm();
         if ($model->load($this->isPostMethod())) {
@@ -540,12 +603,32 @@ class SiteController extends AppController
 
     public function actionCheckBrowser()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->layout = 'nonLoggedUser';
         return $this->renderWithData('checkBrowser');
     }
 
     public function actionResetPassword()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $id = $this->getParamVal('id');
         $code = $this->getParamVal('code');
         $model = new ResetPasswordForm();
@@ -577,6 +660,16 @@ class SiteController extends AppController
 
     public function actionLogout()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         if ($this->getAuthenticatedUser()) {
             $sessionId = Yii::$app->session->getId();
             Sessions::deleteBySessionId($sessionId);
@@ -587,6 +680,16 @@ class SiteController extends AppController
 
     public function actionDashboard()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         global $homeLayout,  $hideOnPostsWidget, $newMsgCnt,  $brokenCnt,  $user, $myRights,  $twoColumn,  $pagelayout,  $page_newmessagelist, $page_coursenames,  $page_newpostlist,  $postThreads,
          $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses,  $courses, $newPostCnt, $page_teacherCourseData, $page_tutorCourseData, $page_studentCourseData;
         $this->layout = 'master';
@@ -802,6 +905,16 @@ class SiteController extends AppController
 
     public function actionChangePassword()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $this->layout = 'nonLoggedUser';
         $model = new ChangePasswordForm();
@@ -832,6 +945,16 @@ class SiteController extends AppController
 
     public function actionChangeUserInfo()
     {
+        /**
+         * Can access: greater than equal to guest.
+         *  Guest
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $this->layout = 'master';
         $tzname = AppUtility::getTimezoneName();
@@ -862,8 +985,18 @@ class SiteController extends AppController
         $responseData = array('model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid);
         return $this->renderWithData('changeUserinfo', $responseData);
     }
+
     public function actionStudentEnrollCourse()
     {
+        /**
+         * Can access: greater than equal to student.
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $model = new StudentEnrollCourseForm();
         $responseData = array('model' => $model,);
@@ -885,6 +1018,15 @@ class SiteController extends AppController
     }
     public function actionHideFromCourseList()
     {
+        /**
+         * Can access: greater than equal to student.
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         if (!$this->isGuestUser()) {
             $userId = $this->getUserId();
             $course = $this->getRequestParams();
@@ -896,6 +1038,15 @@ class SiteController extends AppController
     }
     public function actionUnhideFromCourseList()
     {
+        /**
+         * Can access: greater than equal to student.
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $userId = $this->getUserId();
@@ -928,6 +1079,15 @@ class SiteController extends AppController
 
     public function actionForm()
     {
+        /**
+         * Can access: greater than equal to student.
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $this->layout = 'master';
         $sessionId = $this->getSessionId();
@@ -965,6 +1125,15 @@ class SiteController extends AppController
 
     public function actionAction()
     {
+        /**
+         * Can access: greater than equal to student.
+         *  Student
+         *  Teacher
+         *  LCC
+         *  Diagnostics
+         *  Group Admin
+         *  Admin
+         */
         $this->guestUserHandler();
         $this->layout = 'master';
         $userId = $this->getUserId();
