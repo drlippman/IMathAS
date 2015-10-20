@@ -184,12 +184,12 @@ if (isset($params['id'])) {
                 width: 'auto', resizable: false,autoReposition: true,
                 closeText: "hide",
                 buttons: {
-                    "Nevermind": function () {
+                    "Cancel": function () {
                         $(this).dialog('destroy').remove();
                         return false;
                     },
 
-                    "Delete": function ()
+                    "Confirm": function ()
                     {
                         window.location ="external-tool?cid="+cid+"&id="+id+"&delete=true";
 
