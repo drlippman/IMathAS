@@ -120,11 +120,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions',
                 'imas_assessments.id = imas_assessment_sessions.assessmentid'
             )
-            ->where('imas_assessments.courseid = :courseId');
+            ->where(['imas_assessments.courseid' => $courseId]);
         if ($limuser > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['imas_assessment_sessions.userid' => $limuser]);
         }
-        $command = $query->createCommand()->bindValues(['courseId'=> $courseId]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }

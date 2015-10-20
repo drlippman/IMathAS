@@ -21,7 +21,7 @@ class Outcomes extends BaseImasOutcomes {
     }
     public static function getByCourseId($courseId)
     {
-        return self::find()-> select(['id','name'])->where(['courseid' => $courseId])->all();
+        return Outcomes::find()->select(['id','name'])->where(['courseid' => $courseId])->all();
     }
 
     public function insertOutcomes($courseId,$name)

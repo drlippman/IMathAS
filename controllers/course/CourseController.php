@@ -688,7 +688,7 @@ class CourseController extends AppController
         $model = new ThreadForm();
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $this->noValidRights($teacherId);
-        $query = Outcomes::getByCourse($courseId);
+        $query = Outcomes::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
         if (isset($params['tb'])) {
@@ -1093,33 +1093,6 @@ class CourseController extends AppController
         $this->setSessionData('courseId',$courseId);
         $teacherData = Teacher::getByUserId($userId,$courseId);
         $type = $this->getParamVal('type');
-        if($myRights > AppConstant::STUDENT_RIGHT)
-        {
-            switch ($type) {
-                case 'assessment':
-                    return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
-                    break;
-                case 'inlinetext':
-                    return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?cid=' .$courseId));
-                    break;
-                case 'linkedtext':
-                    return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId));
-                    break;
-                case 'forum':
-                    return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
-                    break;
-                case 'wiki':
-                    return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?cid='.$courseId));
-                    break;
-                case 'block':
-                    return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&block=0&tb=t'));
-                    break;
-                case 'calendar':
-                    break;
-                case '':
-                    break;
-            }
-        }
         if ($teacherData != null) {
             if ($myRights>AppConstant::STUDENT_RIGHT) {
                 $teacherId = $teacherData['id'];
@@ -1164,7 +1137,6 @@ class CourseController extends AppController
         }
         if (!isset($teacherId) && !isset($isTutor) && !isset($isStudent))
         {
-
             /*
              * loaded by a NON-teacher
              */
@@ -1184,7 +1156,7 @@ class CourseController extends AppController
                 AssessmentSession::deleteId($sessionTestId);
             }
 
-            if (($teacherId) && ($from) && ($to)) {
+            if (isset($teacherId) && ($from) && ($to)) {
                 $block = $this->getParamVal('block');
                 $result = $course->itemorder;
                 $items = unserialize($result);
@@ -1197,6 +1169,7 @@ class CourseController extends AppController
                      * -1 to adjust for 1-indexing
                      */
                     $sub =& $sub[$blockTree[$i]-1]['items'];
+
                 }
                 if (count($blockTree) > 1)
                 {
@@ -1255,7 +1228,7 @@ class CourseController extends AppController
                         array_splice($curBlock, $to-1, 0, $itemToMove);
                     }
                 }
-                $itemList = addslashes(serialize($items));
+                $itemList = serialize($items);
                 Course::setItemOrder($itemList, $courseId);
                 return $this->redirect('course?cid='.$courseId);
             }
@@ -1458,7 +1431,7 @@ class CourseController extends AppController
 
                     if (count($backTrack) > $depth)
                     {
-                        $backLink = "<span class=right><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+                        $backLink = "<span class='right back-link'><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
                     }
                     $_SESSION['backtrack'] = array($sendcrumb,$backTrack[count($backTrack)-1][1]);
                 } else {
@@ -1479,9 +1452,9 @@ class CourseController extends AppController
                     $curName = $backTrack[count($backTrack)-1][0];
                     if (count($backTrack) == 1)
                     {
-                        $backLink =  "<span class=right><a href=\"course?cid=$courseId&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
+                        $backLink =  "<span class='right back-link'><a href=\"course?cid=$courseId&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
                     } else {
-                        $backLink = "<span class=right><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+                        $backLink = "<spanclass='right back-link'><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
                     }
                 }
             } else {

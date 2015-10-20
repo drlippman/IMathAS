@@ -31,13 +31,12 @@ class WikiController extends AppController
         $userData = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $userId = $userData->id;
-        $courseId = $this->getParamVal('courseId');
         $wikiId = $this->getParamVal('wikiId');
+        $courseId = intval($this->getParamVal('cid'));
         $course = Course::getById($courseId);
         $subject = $this->getRequestParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
         $stugroupId = AppConstant::NUMERIC_ZERO;
-        $courseId = intval($this->getParamVal('courseId'));
         $id = intval($this->getParamVal('wikiId'));
         $groupId = intval($this->getParamVal('grp'));
         $frame = $this->getParamVal('framed');
@@ -436,7 +435,7 @@ class WikiController extends AppController
         $wikiid = $params['id'];
         $saveTitle = '';
         $teacherId = $this->isTeacher($user['id'], $courseId);
-        $this->noValidRights($teacherId);
+//        $this->noValidRights($teacherId);
         if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -536,7 +535,6 @@ class WikiController extends AppController
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['startdate'] = $startDate;
                 $finalArray['enddate'] = $endDate;
-//                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id.'&block='.$block);
                 $saveChanges = new Wiki();
                 $lastWikiId = $saveChanges->createItem($finalArray);
                 $saveItems = new Items();

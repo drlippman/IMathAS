@@ -1687,81 +1687,20 @@ class ShowItemCourse extends Component
     }
 
     public static function generateAddItem($blk,$tb)
-    {
-        global $courseId, $CFG;
-        if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
-            if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
-            if ($tb=='t' && $blk=='0') {
-                $html = '<div id="topadditem" class="additembox"><span><b>' . _('Add here:') . '</b> ';
-            } else if ($tb=='b' && $blk=='0') {
-                $html = '<div id="bottomadditem" class="additembox"><span><b>' . _('Add here:') . '</b> ';
-            } else {
-                $html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
-            }
-            $html .= "<a href=\"addassessment.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['assess'])) {
-                $html .= "<img alt=\"assessment\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['assess']}\"/> ";
-            }
-            $html .= _('Assessment') ."</a> | ";
+    { ?>
 
-            $html .= "<a href=\"addinlinetext.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['inline'])) {
+        <div class="row add-item" onclick="getAddItem('<?php echo $blk?>', '<?php echo $tb?>')">
+            <div class="col-md-1 plus-icon">
+                <input type="hidden" id="block" value="<?php echo $blk ?>">
+                <input type="hidden" id="tb-value" value="<?php echo $tb ?>">
+                <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png">
+            </div>
+            <div class="col-md-2 add-item-text">
+                <p><?php AppUtility::t('Add An Item...');?></p>
+            </div>
+        </div>
 
-                $html .= "<img alt=\"inline text\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['inline']}\"/> ";
-            }
-            $html .= _('Text') . "</a> | ";
-
-            $html .= "<a href=\"addlinkedtext.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['linked'])) {
-                $html .= "<img alt=\"linked text\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['linked']}\"/> ";
-            }
-            $html .= _('Link') . "</a> | ";
-
-            $html .= "<a href=\"addforum.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['forum'])) {
-                $html .= "<img alt=\"forum\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['forum']}\"/> ";
-            }
-            $html .= _('Forum') . "</a> | ";
-
-            $html .= "<a href=\"addwiki.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['wiki'])) {
-                $html .= "<img alt=\"wiki\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['wiki']}\"/> ";
-            }
-            $html .= _('Wiki') . "</a> | ";
-
-            $html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['folder'])) {
-                $html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
-            }
-            $html .= _('Block') . "</a> | ";
-
-            $html .= "<a href=\"addcalendar.php?block=$blk&tb=$tb&cid=$courseId\">";
-            if (isset($CFG['CPS']['miniicons']['calendar'])) {
-                $html .= "<img alt=\"calendar\" class=\"mida\" src=\"$imasroot"."img/{$CFG['CPS']['miniicons']['calendar']}\"/> ";
-            }
-            $html .= _('Calendar') . "</a>";
-            $html .= '</span>';
-            $html .= '</div>';
-
-        } else {
-            $html = "<select name=addtype id=\"addtype$blk-$tb\" onchange=\"additem('$blk','$tb')\" ";
-            if ($tb=='t') {
-                $html .= 'style="margin-bottom:5px;"';
-            }
-            $html .= ">\n";
-            $html .= "<option value=\"\">" . _('Add An Item...') . "</option>\n";
-            $html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
-            $html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
-            $html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
-            $html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
-            $html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
-            $html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";
-            $html .= "<option value=\"calendar\">" . _('Add Calendar') . "</option>\n";
-            $html .= "</select><BR>\n";
-        }
-        return $html;
-    }
-
+    <?php }
     public static function beginitem($canEdit,$aname=0) {
         if ($canEdit) {
             echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';

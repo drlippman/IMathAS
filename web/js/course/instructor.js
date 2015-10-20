@@ -28,23 +28,22 @@ function additem(blk,tb) {
         } else if(type == 'forum') {
             var toOpen = webPath+'forum/forum/add-forum?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
         } else if(type == 'wiki') {
+            alert(type);
             var toOpen = webPath+'wiki/wiki/add-wiki?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
         } else if(type == 'block') {
             var toOpen = webPath+'block/block/add-block?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
         } else if(type == 'calendar') {
-
             var toOpen = document.getElementById('calendar-display').value;
-//            var toOpen = webPath+'block/block/add-block?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
         }
         window.location = toOpen;
 }
 
 }
-function getAddItem(blk,tb){
+function getAddItem(blk,tb) {
+
     $('.add-item').on('click', function (evt)
     {
         var courseId = $('.calender-course-id').val();
-
         var html = '<div class="">' +
             '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'&block='+blk+'&tb='+tb+'">' +
             '<div class="assessment itemLink" >' +

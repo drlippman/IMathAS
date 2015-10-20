@@ -16,7 +16,7 @@ $(document).ready(function()
         });
 });
 
-function getAddItem(){
+function getAddItem123(){
     $('.add-item').on('click', function (evt)
     {
         var block = 0;
@@ -45,7 +45,7 @@ function getAddItem(){
             '<div class="item-name-small">Forum</div>'+
             '</div></a>' +
 
-            '<a href="../../wiki/wiki/add-wiki?courseId='+ courseId+'"><div class="wiki itemLink">' +
+            '<a href="../../wiki/wiki/add-wiki?cid='+ courseId+'"><div class="wiki itemLink">' +
             '<img class="icon-center icon-size" src="../../img/iconWiki.png">' +
             '<div class="item-name-small">Wiki</div>'+
             '</div></a>' +
