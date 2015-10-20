@@ -382,7 +382,7 @@ class Assessments extends BaseImasAssessments
         $query->select('ia.id,ias.bestscores')->from('imas_assessments AS ia');
         $query->join('INNER JOIN','imas_assessment_sessions AS ias',
                   'ia.id=ias.assessmentid');
-        $query->where(['ia.courseid= :courseId', 'ias.userid= :userId']);
+        $query->where('ia.courseid= :courseId', 'ias.userid= :userId');
         $command = $query->createCommand()->bindValues(['courseId' => $courseId, 'userId' => $userId]);
         $data = $command->queryAll();
         return $data;

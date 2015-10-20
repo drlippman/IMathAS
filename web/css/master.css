@@ -620,3 +620,6 @@ div.vidsegblock
 .padding-right-twenty{
     padding-right: 20px;
 }
+.text-area-alignment{
+    max-width: 100%;
+}

@@ -1427,7 +1427,7 @@ class CourseController extends AppController
             $plbList = implode(',',$prevLoadedbLocks);
             $obList = implode(',',$openBlocks);
 
-            $curBreadcrumb = $courseName;
+            $curBreadcrumb = '';
             if (($backTrack) && count($backTrack) > 0)
             {
                 if (($sessionData['ltiitemtype']) && $sessionData['ltiitemtype'] == 3)
@@ -1444,7 +1444,7 @@ class CourseController extends AppController
                         }
                         if ($i != count($backTrack)-1)
                         {
-                            $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\">";
+                            $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\" style='color: #ffffff;'>";
                         }
                         $sendcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\">".stripslashes($backTrack[$i][0]).'</a>';
                         $curBreadcrumb .= stripslashes($backTrack[$i][0]);
@@ -1461,13 +1461,13 @@ class CourseController extends AppController
                     }
                     $_SESSION['backtrack'] = array($sendcrumb,$backTrack[count($backTrack)-1][1]);
                 } else {
-                    $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder=0\">$courseName</a> ";
+                    $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder=0\" style='color: #ffffff;'>$courseName</a> ";
                     for ($i = 0; $i < count($backTrack); $i++)
                     {
                         $curBreadcrumb .= " &gt; ";
                         if ($i!=count($backTrack)-1)
                         {
-                            $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\">";
+                            $curBreadcrumb .= "<a href=\"course?cid=$courseId&folder={$backTrack[$i][1]}\" style='color: #ffffff;'>";
                         }
                         $curBreadcrumb .= stripslashes($backTrack[$i][0]);
                         if ($i != count($backTrack)-1)
@@ -1483,7 +1483,6 @@ class CourseController extends AppController
                         $backLink = "<span class=right><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
                     }
                 }
-//                print_r($curBreadcrumb); die;
             } else {
                 $curBreadcrumb .= $courseName;
                 $curName = ucfirst($courseName);
@@ -1495,7 +1494,7 @@ class CourseController extends AppController
                 $msgCnt = $result[0]['id'];
                 if ($msgCnt > 0)
                 {
-                    $newMsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$courseId\" style=\"color:red\">" . sprintf(_('New (%d)'), $msgCnt) . "</a>";
+                    $newMsgs = " <a href=\"#\" style=\"color:red\">" . sprintf(_('New (%d)'), $msgCnt) . "</a>";
                 } else {
                     $newMsgs = '';
                 }
@@ -1508,7 +1507,7 @@ class CourseController extends AppController
             }
             if (array_sum($newPostCnts) > 0)
             {
-                $newPostsCnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$courseId\" style=\"color:red\">" . sprintf(_('New (%d)'), array_sum($newPostCnts)) . "</a>";
+                $newPostsCnt = " <a href=\"#\" style=\"color:red\">" . sprintf(_('New (%d)'), array_sum($newPostCnts)) . "</a>";
             } else {
                 $newPostsCnt = '';
             }

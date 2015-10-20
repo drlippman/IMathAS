@@ -122,8 +122,8 @@ class GbCats extends BaseImasGbcats
                 'imas_gbcats AS toc',
                 'tc.name=toc.name'
             )
-            ->where(['tc.courseid= :ctc']);
-        $query->andWhere(['toc.courseid=:cid']);
+            ->where('tc.courseid= :ctc');
+        $query->andWhere('toc.courseid=:cid');
         $command = $query->createCommand()->bindValues(['ctc' => $ctc, 'cid' => $courseId]);
         $items = $command->queryAll();
         return $items;

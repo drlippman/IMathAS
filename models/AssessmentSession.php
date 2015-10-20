@@ -105,7 +105,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query = new Query();
         $query->select(['imas_assessment_sessions.id,count(*)'])->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
-            ->where(['imas_assessment_sessions.assessmentid :assessmentId', 'imas_students.courseid:courseId'])->count();
+            ->where(['imas_assessment_sessions.assessmentid=:assessmentId', 'imas_students.courseid=:courseId'])->count();
         $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
         $items = $command->queryAll();
         return $items;
@@ -231,12 +231,12 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query = new Query();
         $query->select(['imas_assessments.name'])->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_assessments', 'imas_assessments.id=imas_assessment_sessions.assessmentid')
-            ->where(['imas_assessment_sessions.id:assessmentId']);
+            ->where(['imas_assessment_sessions.id=' => $assessmentId]);
         if (!$isteacher && !$istutor) {
-            $query->andWhere(['imas_assessment_sessions.userid:userId']);
+            $query->andWhere(['imas_assessment_sessions.userid='=> $userId]);
         }
 
-        $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'userId' => $userId]);
+        $command = $query->createCommand();
         $items = $command->queryOne();
         return $items;
     }
@@ -247,7 +247,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query->select(['imas_assessment_sessions.assessmentid', 'imas_assessment_sessions.lti_sourcedid'])
             ->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_assessments', 'imas_assessment_sessions.assessmentid = imas_assessments.id ')
-            ->where(['imas_assessment_sessions.id:assessmentId', 'imas_assessments.courseid:courseId']);
+            ->where(['imas_assessment_sessions.id=:assessmentId', 'imas_assessments.courseid=:courseId']);
         $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
         $items = $command->queryOne();
         return $items;
@@ -275,7 +275,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query->select(['imas_assessment_sessions.id'])
             ->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
-            ->where(['imas_assessment_sessions.assessmentid:assessmentId', 'imas_students.courseid:courseId']);
+            ->where(['imas_assessment_sessions.assessmentid=:assessmentId', 'imas_students.courseid=:courseId']);
         $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
         $items = $command->queryAll();
         return $items;
@@ -337,10 +337,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions.userid=imas_students.userid'
             )
             ->where(['imas_students.courseid' => $courseId])
-            ->andWhere(['imas_assessment_sessions.assessmentid:assessmentId'])
+            ->andWhere('imas_assessment_sessions.assessmentid=:assessmentId')
             ->andWhere(['imas_students.locked' => AppConstant::ZERO_VALUE]);
         if ($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['imas_students.section:secfilter']);
+            $query->andWhere(['imas_students.section'=> $secfilter]);
         }
         $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'secfilter' => $secfilter]);
         $data = $command->queryAll();
@@ -352,7 +352,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query = new Query();
         $query->select(['*'])->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
-            ->where(['imas_assessment_sessions.assessmentid:assessmentId', 'imas_students.courseid:courseId']);
+            ->where(['imas_assessment_sessions.assessmentid=:assessmentId', 'imas_students.courseid=:courseId']);
         $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
         $items = $command->queryAll();
         return $items;
@@ -456,8 +456,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessments AS ia',
                 'ias.assessmentid=ia.id'
             )
-            ->where(['ias.id:asid'])
-            ->andWhere(['ia.courseid:courseId']);
+            ->where(['ias.id=:asid'])
+            ->andWhere(['ia.courseid=:courseId']);
         $command = $query->createCommand()->bindValues(['asid' => $asid, 'courseId' => $courseId]);
         $items = $command->queryOne();
         return $items;
@@ -580,7 +580,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessments',
                 'imas_assessments.id=imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessment_sessions.id:asid']);
+            ->where(['imas_assessment_sessions.id=:asid']);
         $command = $query->createCommand()->bindValue('asid', $asid);
         $items = $command->queryOne();
         return $items;

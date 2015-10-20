@@ -2,6 +2,7 @@
 use app\components\AppUtility;
 use \app\components\ShowItemCourse;
 use app\components\AppConstant;
+
 $this->title = ucfirst($course->name);
 $this->params['breadcrumbs'][] = $this->title; ?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
@@ -58,7 +59,8 @@ $this->params['breadcrumbs'][] = $this->title; ?>
 
 <?php } ?>
 <div class="tab-content shadowBox">
-<?php if($teacherId){?>
+<?php if($teacherId){
+    ?>
     <div class="row course-copy-export">
         <div class="col-md-2 course-top-menu">
             <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('Copy Items');?></a>
@@ -106,7 +108,8 @@ $this->params['breadcrumbs'][] = $this->title; ?>
                         <?php AppUtility::t('Student'); ?>
                 </li>
                 <li>
-                    <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?>">
+<!--                    <a href="--><?php //echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?><!--">-->
+                    <a href="#">
                         <?php AppUtility::t('Quick Rearrange'); ?>
                     </a>
                 </li>

@@ -516,8 +516,8 @@ class AdminController extends AppController
         return $this->successResponse($responseData);
     }
 
-   public function actionExternalTool()
-   {
+    public function actionExternalTool()
+    {
        $this->guestUserHandler();
        $user = $this->getAuthenticatedUser();
        $this->layout = 'master';
@@ -620,9 +620,13 @@ class AdminController extends AppController
                if ($params['id'] == 'new')
                {
                    $name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = AppConstant::NUMERIC_THREE; $grp = AppConstant::NUMERIC_ZERO;
+                    $pageTitle = "Add Tool";
+                   $buttonTitle = "Add Tool";
                }
                else
                {
+                   $pageTitle = "Edit Tool";
+                   $buttonTitle = "Save Tool";
                    $result = ExternalTools::getByRights($id, $isTeacher, $courseId, $isGrpAdmin, $groupId);
                    if (count($result) == AppConstant::NUMERIC_ZERO) { die("invalid id");}
                    $name = $result['name'];
@@ -639,6 +643,7 @@ class AdminController extends AppController
                    ${$v} = htmlentities(${$v});
                }
            } else{
+               $pageTitle = "External Tool";
                if($isAdmin){
                    $courseid = AppConstant::NUMERIC_ZERO;
                    $resultFirst = ExternalTools::getByCourseId($courseid);
@@ -652,7 +657,7 @@ class AdminController extends AppController
        }
        $this->includeCSS(['course/items.css']);
        $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
-       'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course);
+       'name' => $name,'pageTitle' => $pageTitle, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course, 'id' => $id, 'buttonTitle' => $buttonTitle);
        return $this->renderWithData('externalTool', $responseData);
    }
 

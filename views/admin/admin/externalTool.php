@@ -1,14 +1,7 @@
 <?php
 use \app\components\AppUtility;
 use \app\components\AppConstant;
-
-if (isset($params['id'])) {
-    $this->title = 'Edit Tool';
-    $this->params['breadcrumbs'] = $this->title;
-} else {
-    $this->title = 'External Tools';
-    $this->params['breadcrumbs'] = $this->title;
-}
+$this->title =  $pageTitle;
 if (isset($params['id'])) {
     echo '<form method="post" action="external-tool?cid=' . $courseId . $ltfrom . '&amp;id=' . $params['id'] . '">';
 }
@@ -86,8 +79,8 @@ if (isset($params['id'])) {
         <br class="form"/><br/>
 
         <div class="col-md-2"><?php AppUtility::t('Custom Parameters') ?></div>
-        <div class="col-md-3">
-            <textarea rows="2" cols="60" class="form-control" name="custom"><?php echo $custom; ?></textarea>
+        <div class="col-md-4">
+            <textarea rows="2" cols="60" class="form-control text-area-alignment" name="custom"><?php echo $custom; ?></textarea>
         </div>
         <br class="form"/><br/>
 
@@ -104,7 +97,7 @@ if (isset($params['id'])) {
         <br class="form"/><br/>
         <?php
         if ($isAdmin) {
-            echo '<div class="col-md-2">Scope of tool:</div>
+            echo '<div class="col-md-2">Scope of tool</div>
             <div class="col-md-8">';
             echo '<input type="radio" name="scope" value="0" ' . (($grp == AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> System-wide<br/>';
             echo '<input type="radio" name="scope" value="1" ' . (($grp > AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> Group';
@@ -114,7 +107,7 @@ if (isset($params['id'])) {
         <?php if (isset($params['id'])) { ?>
             <div class="header-btn col-sm-2 col-sm-offset-2 padding-bottom-thirty">
                 <button class="btn btn-primary page-settings" type="submit" value="submit">
-                    <i class="fa fa-share header-right-btn"></i> <?php AppUtility::t('Save'); ?> </button>
+                    <i class="fa fa-share header-right-btn"></i> <?php echo $buttonTitle; ?> </button>
             </div>
         <?php } ?>
         </form>
@@ -124,14 +117,13 @@ if (isset($params['id'])) {
             <div class="col-md-12 padding-top-twenty text-gray-background padding-left-thirty">';
         $str = "<p><b>";
         if ($isAdmin) {
-            $str .= 'System and Group Tools';
+            echo '<p><b>System and Group Tools</b></p>';
         } else if ($isGrpAdmin) {
-            $str .= 'Group Tools';
+            echo '<p><b>Group Tools</b></p>';
         } else {
-            $str .= 'System and Group Tools';
+            echo '<p><b>Course Tools</b></p>';
         }
         $str .= '</b></p>';
-
         echo '<ul class="nomark margin-left-zero">';
         if (count($resultFirst) == AppConstant::NUMERIC_ZERO) {
             echo '<span class="col-md-12 padding-left-zero">'.AppUtility::t('No tools',false).'</span>';
@@ -144,7 +136,8 @@ if (isset($params['id'])) {
                     } else {
                         echo ' (for group ' . $row['name'] . ')';
                     }
-                } ?>
+                }
+                ?>
                 <input type="hidden" id="id" value="<?php echo $row['nm'] ?>">
                 <?php
                 echo ' <a href=' . AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $courseId . $ltfrom . '&amp;id=' . $row['id']) . '>Edit</a> ';
@@ -163,6 +156,13 @@ if (isset($params['id'])) {
 </div>
 
 <script>
+    $(document).ready(function(){
+        $("#dialog").dialog();
+
+        $(window).resize(function() {
+            $("#dialog").dialog("option", "position", "center");
+        });
+    });
     function deleteExternalTool(ExternalToolId) {
         var courseId = $('#admin').val();
         jQuerySubmit('delete-external-tool-ajax', {cid: courseId, ExternalToolId: ExternalToolId}, 'removeResponseSuccess');
@@ -181,7 +181,7 @@ if (isset($params['id'])) {
             var html = '<div><p>' + message + '</p></div>';
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Delete External Tool', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
+                width: 'auto', resizable: false,autoReposition: true,
                 closeText: "hide",
                 buttons: {
                     "Nevermind": function () {
@@ -204,6 +204,8 @@ if (isset($params['id'])) {
                     })
                 }
             });
+
+
         }
     }
 
