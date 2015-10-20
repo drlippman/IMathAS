@@ -30,7 +30,7 @@ class Assessments extends BaseImasAssessments
         $query = new Query();
         $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
-            ->where(['courseid', $courseId])
+            ->where('courseid = :courseId')
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if (!$canviewall) {
             $query->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO]);
@@ -42,7 +42,7 @@ class Assessments extends BaseImasAssessments
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue(':courseId',$courseId);
         $data = $command->queryAll();
         return $data;
     }

@@ -27,7 +27,7 @@ AppAsset::register($this);
 <?php $messageCount = Yii::$app->session->get('messageCount');
       $postCount = Yii::$app->session->get('postCount');
       $totalCount = $messageCount + $postCount;
-       $user = Yii::$app->session->get('user');
+      $user = Yii::$app->session->get('user');
 ?>
 <body>
 <?php $this->beginBody() ?>

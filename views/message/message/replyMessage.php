@@ -40,8 +40,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="inner-reply-msg-content padding-top-thirty inner-reply-height">
         <div class="drop-down padding-top col-sm-12">
             <div class="col-sm-1"><?php echo AppUtility::t('To');?></div>
-            <div class="col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;<a
-                    href="#"><?php echo AppUtility::t('email');?></a>&nbsp;|&nbsp;<a href="#"><?php echo AppUtility::t('gradebook');?></a>
+            <div class="col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;
+
+                <?php if($userRights['rights'] == AppConstant::ADMIN_RIGHT) { ?>
+                <span class="text-deco-none padding-right-fifteen">
+                    <a class="btn1 reply-button" href="#"><?php echo AppUtility::t('email');?></a>
+                </span>
+                <span class="text-deco-none padding-right-ten">
+                    <a class="btn1 reply-button" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$fromUser['id']); ?>"><?php echo AppUtility::t('gradebook');?></a>
+                </span>
+                <?php } ?>
                <?php echo AppUtility::t('Last Login:'." ".date("F j, Y, g:i a",$fromUser->lastaccess));?>
             </div>
         </div>

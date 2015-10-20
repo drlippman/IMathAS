@@ -1087,8 +1087,10 @@ class CourseController extends AppController
         $isStudent = $this->isStudent($userId, $courseId);
         $stuView = $this->getParamVal('stuview');
         $params = $this->getRequestParams();
+        $this->checkSession($params);
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
+        $this->setSessionData('courseId',$courseId);
         $teacherData = Teacher::getByUserId($userId,$courseId);
         $type = $this->getParamVal('type');
         if($myRights > AppConstant::STUDENT_RIGHT)

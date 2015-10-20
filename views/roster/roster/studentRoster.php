@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </li>
         </ul>
     </div>
-    <div class="with-selected col-md-2 pull-left">
+    <div class="with-selected col-md-2 pull-left padding-left-right-zero">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"

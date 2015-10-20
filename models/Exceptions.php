@@ -62,7 +62,7 @@ class Exceptions extends BaseImasExceptions
                 'imas_assessments',
                 'imas_exceptions.assessmentid = imas_assessments.id'
             )
-            ->where(['imas_assessments.courseid:courseId']);
+            ->where('imas_assessments.courseid = :courseId');
         $command = $query->createCommand()->bindValue('courseId', $courseId);
         $data = $command->queryAll();
         return $data;

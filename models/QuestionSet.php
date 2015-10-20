@@ -155,7 +155,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public  static function getQuestionSetData($ids)
     {
-        return self::find()->select('id,description,extref,qtype,control')->where('IN','id',$ids)->all();
+        return self::find()->select('id,description,extref,qtype,control')->where(['IN','id',$ids])->all();
     }
 
     public static function updateVideoId($from,$to)

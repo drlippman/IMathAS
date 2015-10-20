@@ -48,9 +48,11 @@ function showStudentInformation(students)
         else {
             html += "<td><a>Is locked out</a></a></td>"
         }
-        html += "<td><div class='btn-group settings'> <a class='btn btn-primary disable-btn'>" +
-        "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
-        "<ul class='dropdown-menu roster-table'>" +
+        html += "<td><div class='btn-group settings width-eighty-per'> " +
+        "<a class='btn btn-primary dropdown-toggle width-hundread-per' data-toggle='dropdown' href='#'>" +
+            "<span class='padding-right-fifteen'><i class='fa fa-cog fa-fw'></i> Settings</span><span class='fa fa-caret-down'></span>" +
+        "</a>" +
+        "<ul class='dropdown-menu roster-table roster-table-dropdown'>" +
         "<li><a href='../../gradebook/gradebook/grade-book-student-detail?from=listusers&cid="+ courseId +"&studentId="+ student.id +"'><img class='small-icon' src='../../img/gradebook.png'></i> Grades</a></li>" +
         "<li><a class ='roster-make-exception' href='make-exception?cid="+courseId+"&student-data="+ student.id +"&section-data="+ student.section +"'><i class='fa fa-plus-square fa-fw'></i>&nbsp;Exception</a></li>" +
         "<li><a href='change-student-information?cid=" + courseId + "&uid=" + student.id + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Change Information</a></li>";

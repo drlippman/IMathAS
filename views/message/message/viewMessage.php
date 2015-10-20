@@ -20,13 +20,13 @@ $now = $currentTime;
 
 <?php } ?>
     <div class="item-detail-header">
-            <?php echo $this->render("../../itemHeader/_indexWithBackArrowButton", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 
     </div>
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page page-title-back-arrow"><span style="font-size: 10px">Back</span>&nbsp;&nbsp;<?php echo $this->title ?></div>
+                <div class="vertical-align title-page page-title-back-arrow"><?php echo $this->title ?></div>
             </div>
         </div>
     </div>
@@ -46,9 +46,17 @@ $now = $currentTime;
                  </div>
          </div>
          <div class="second-level-div row">
-             <div class="col-sm-2">
+             <div class="col-sm-2 padding-top-five">
                  <span>From: <?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName) ?></span>
              </div>
+             <?php if($userRights['rights'] == AppConstant::ADMIN_RIGHT) { ?>
+                 <span class="text-deco-none padding-right-fifteen">
+                    <a class="btn1 reply-button" href="#"><?php echo AppUtility::t('email');?></a>
+                 </span>
+                 <span class="text-deco-none">
+                    <a class="btn1 reply-button" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$fromUser['id']); ?>"><?php echo AppUtility::t('gradebook');?></a>
+                 <span>
+             <?php } ?>
          </div>
         <div class="col-md-12 message-body word-break-break-all">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
@@ -60,22 +68,20 @@ $now = $currentTime;
          <div class="reply message-body col-md-12 padding-left-zero">
              <?php $sent = $messageId;?>
              <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
-                    <span class="padding-left-fifteen text-deco-none">
+                    <span class="padding-left-fifteen padding-right-fifteen text-deco-none">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
-                            class="btn1  reply-button "> <i class="fa fa-reply"></i>&nbsp;&nbsp;<?php echo AppUtility::t('Reply')?></a>
+                            class="btn1 reply-button"> <i class="fa fa-reply"></i>&nbsp;&nbsp;<?php echo AppUtility::t('Reply')?></a>
                     </span>
-             <?php }?>
-             <span class="padding-left-twenty text-deco-none">
-                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
-            </span>
-             <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
-                 <span class="padding-left-twenty text-deco-none">
+                 <span class="padding-right-fifteen text-deco-none">
                     <a class="btn1 btn-bg-color" href="#" id="mark-delete"><?php echo AppUtility::t('Delete Message')?></a>
                  </span>
-                 <span class="padding-left-twenty text-deco-none">
+                 <span class="padding-right-fifteen text-deco-none">
                      <a class="btn1 btn-bg-color" href="#" id="mark-as-unread"><?php echo AppUtility::t('Mark As Unread ')?></a>
                  </span>
              <?php }?>
+             <span class="text-deco-none">
+                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
+            </span>
              <span class="pull-right btn-hover">
                  <?php if(($messages['isread']) < AppConstant::NUMERIC_SEVEN){?>
                       <a href="#" onclick='changeImage(this,false,<?php echo $messages['id'];?>)' class="btn1 flag-button"><img class="small-icon" src="<?php echo AppUtility::getAssetURL()?>img/flagempty.gif">&nbsp;&nbsp;<?php echo AppUtility::t('Flag')?></a>

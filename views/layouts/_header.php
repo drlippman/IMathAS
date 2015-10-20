@@ -6,6 +6,7 @@ use app\models\Student;
 use app\models\Course;
 use \app\components\AppConstant;
 use app\components\AppUtility;
+//$CID111 = AppUtility::getDataFromSession('courseId');
 $basePath = '/site/';
 $imgPath = AppUtility::getAssetURL().'img/';
 NavBar::begin([

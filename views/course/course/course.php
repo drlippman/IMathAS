@@ -209,9 +209,9 @@ if ($overwriteBody == 1) {
     } else {
         if (($teacherId) && $quickView!='on') {
             if ($folder == '0') {
-                echo '<p><b>Welcome to your course!</b></p>';
-                echo '<p>To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
-                echo 'link along the left side of the screen.</p><p>If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
+                echo '<p class="padding-left-fifteen"><b>Welcome to your course!</b></p>';
+                echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
+                echo 'link along the left side of the screen.</p><p class="padding-left-fifteen">If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
             }
             echo ShowItemCourse::generateAddItem($folder,'t');
         }
