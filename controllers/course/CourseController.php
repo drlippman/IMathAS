@@ -1082,6 +1082,7 @@ class CourseController extends AppController
         $userId = $user['id'];
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $courseId = $this->getParamVal('cid');
+        $this->setSessionData('courseId',$courseId);
         $teacherId = $this->isTeacher($userId, $courseId);
         $isStudent = $this->isStudent($userId, $courseId);
         $stuView = $this->getParamVal('stuview');
@@ -1361,7 +1362,6 @@ class CourseController extends AppController
                 if($result > 0)
                 {
                     foreach($result as $key => $line){
-                        AppUtility::dump($line);
                         $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
                     }
 

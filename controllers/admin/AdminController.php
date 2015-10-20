@@ -57,8 +57,9 @@ class AdminController extends AppController
 {
     public function beforeAction($action)
     {
+        $actionPath = Yii::$app->controller->action->id;
         $user = $this->getAuthenticatedUser();
-        return $this->accessForRightsMoreThanTeacher($user['rights']);
+        return $this->accessForAdminController($user['rights'],$actionPath);
     }
 
     public function actionIndex()
@@ -515,7 +516,7 @@ class AdminController extends AppController
         return $this->successResponse($responseData);
     }
 
-    public function actionExternalTool()
+   public function actionExternalTool()
    {
        $this->guestUserHandler();
        $user = $this->getAuthenticatedUser();
@@ -684,12 +685,31 @@ class AdminController extends AppController
                 $name = $course['name'];
                 break;
             case "deladmin":
-
+                if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                  break;
             case "chgpwd":
+                if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                  break;
             case "chgrights":
+                if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
             case "newadmin":
+            if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+            {
+                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                return $this->redirect($this->goHome());
+            }
             if ($getAction == "newadmin") {
                 $oldGroup = 0;
                 $oldRights = 10;
@@ -779,31 +799,76 @@ class AdminController extends AppController
             case "chgteachers":
                  break;
             case "importmacros":
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 break;
             case "importqimages":
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 break;
             case "importcoursefiles":
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 break;
             case "transfer":
                 $queryUser = User::getByUserRight($myRights, $groupId);
                  break;
             case "deloldusers":
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 break;
-            case "listltidomaincred":
+            case "listltidomaincred": // access for admin
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 $users = User::getByRights();
                 $groupsName = Groups::getIdAndName();
                 break;
-            case "modltidomaincred":
+            case "modltidomaincred": // // access for admin
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                  $user = User::getById($params['id']);
                 $groupsName = Groups::getIdAndName();
                 break;
-            case "listgroups":
+            case "listgroups": // access for admin
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 $groupsName = Groups::getIdAndName();
                 break;
-            case "modgroup":
+            case "modgroup": // access for admin
+                if ($myRights < AppConstant::ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 $groupsName = Groups::getById($params['id']);
                 break;
-            case "removediag":
+            case "removediag": //// access for admin,gadmin,diagnostic
+                if ($myRights < AppConstant::DIAGNOSTIC_CREATOR_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 break;
         }
         $this->includeCSS(['assessment.css','dataTables.bootstrap.css']);
@@ -815,6 +880,7 @@ class AdminController extends AppController
             'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser, 'getAction' => $getAction, 'getId' => $getId, 'line' => $line, 'resultGroup' => $resultGroup);
         return $this->renderWithData('forms',$responseData);
     }
+
     public function actionDeleteCourseAjax()
     {
         $params = $this->getRequestParams();
@@ -824,6 +890,7 @@ class AdminController extends AppController
         $responseData = array('name' => $name,'id' => $id);
         return $this->successResponse($responseData);
     }
+
     public function actionDeleteUserAjax()
     {
         $params = $this->getRequestParams();
@@ -831,7 +898,8 @@ class AdminController extends AppController
         $responseData = array('id' => $id);
         return $this->successResponse($responseData);
     }
-    public function actionActions()
+
+    public function actionActions()  // access only admin
     {
         $params = $this->getRequestParams();
         $allowmacroinstall = true;
@@ -845,27 +913,29 @@ class AdminController extends AppController
         switch($action) {
             case "emulateuser":
                 if ($myRights < AppConstant::ADMIN_RIGHT )
-                { break;}
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 $sessionId = $this->getSessionId();
                 $be = $params['uid'];
                 Sessions::updateUId($be,$sessionId);
                 break;
             case "chgrights":
-                if ($myRights < 100 && $params['newrights'] > 75)
+                if ($myRights < AppConstant::ADMIN_RIGHT && $params['newrights'] > AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    echo "You don't have the authority for this action";
-                    break;
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
-                if ($myRights < 75)
+                if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    echo "You don't have the authority for this action";
-                    break;
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
 
                 $group = $params['group'];
                 $newRights = $params['newrights'];
                 User::updateUserRight($myRights, $newRights, $group, $getId, $groupid);
-
                 if ($myRights == AppConstant::GROUP_ADMIN_RIGHT) { //update library groupids
                     $groupId = $params['group'];
                     Libraries::updateGroupIdAdmin($getId, $groupId);
@@ -874,7 +944,8 @@ class AdminController extends AppController
             case "resetpwd":
                 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                     break;
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $id = $this->getParamVal('id');
                 if (isset($params['newpw']))
@@ -896,7 +967,11 @@ class AdminController extends AppController
                 User::updatePassword($md5pw,$id,$myRights,$currentUser->groupid);
                 break;
             case "deladmin":
-
+                if ($myRights < 75)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
                     User::deleteAdmin($groupid, $getId);
@@ -917,12 +992,12 @@ class AdminController extends AppController
             case "chgpwd":
                 break;
             case "newadmin":
-                if ($myRights < 75)
+                if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    echo "You don't have the authority for this action";
-                    break;
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
-                if ($myRights < 100 && $params['newrights'] > 75)
+                if ($myRights < AppConstant::ADMIN_RIGHT && $params['newrights'] > AppConstant::GROUP_ADMIN_RIGHT)
                 {
                     break;
                 }
@@ -971,6 +1046,11 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
+            if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+            {
+                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                return $this->redirect($this->goHome());
+            }
             $avail = AppConstant::NUMERIC_THREE - $params['stuavail'] - $params['teachavail'];
             $istemplate = AppConstant::NUMERIC_ZERO;
             if ($myRights == AppConstant::ADMIN_RIGHT) {
@@ -1023,6 +1103,11 @@ class AdminController extends AppController
             }
             break;
             case "delete":
+                if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
                 $connection = $this->getDatabase();
                 $transaction = $connection->beginTransaction();
                 try{
@@ -1171,8 +1256,8 @@ class AdminController extends AppController
                 exit;
             case "importmacros":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=importmacros');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'macro/';
                 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
@@ -1233,8 +1318,8 @@ class AdminController extends AppController
                 }
             case "importqimages":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=importqimages');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'qimages/';
                 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
@@ -1264,8 +1349,8 @@ class AdminController extends AppController
                 }
             case "importcoursefiles":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=importcoursefiles');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'coursefile/';
                 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
@@ -1299,6 +1384,11 @@ class AdminController extends AppController
                      return $this->redirect('forms?action=importcoursefiles');
                 }
             case "transfer":
+                if($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+                {
+                   $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                   return $this->redirect($this->goHome());
+                }
                 $exec = false;
                 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
@@ -1334,8 +1424,8 @@ class AdminController extends AppController
             case "deloldusers":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=deloldusers');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $old = time() - AppConstant::SECONDS * AppConstant::SECONDS * AppConstant::HOURS * AppConstant::NUMERIC_THIRTY * $params['months'];
                 $who = $params['who'];
@@ -1360,8 +1450,8 @@ class AdminController extends AppController
             case "addgroup":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=listgroups');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
                 if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO)
@@ -1383,8 +1473,8 @@ class AdminController extends AppController
                 break;
             case "modgroup":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=listgroups');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
                 if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO) {
@@ -1404,8 +1494,8 @@ class AdminController extends AppController
                 break;
             case "delgroup":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action=listgroups');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 Groups::deleteById($params['id']);
                 User::updateGroupId($params['id']);
@@ -1413,8 +1503,8 @@ class AdminController extends AppController
                 break;
             case "modltidomaincred":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action = listltidomaincred');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 if ($params['id']=='new') {
                     $user = new User();
@@ -1426,8 +1516,8 @@ class AdminController extends AppController
             case "delltidomaincred":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
-                    return $this->redirect('forms?action = listltidomaincred');
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
                 }
                 User::deleteUserById($params['id']);
                 break;
@@ -1534,7 +1624,7 @@ class AdminController extends AppController
         return $this->renderWithData('diagOneTime',$responseData);
     }
 
-    public function actionImportLib()
+    public function actionImportLib() // access for admin,gadmin
     {
         $this->guestUserHandler();
         $overwriteBody = AppConstant::NUMERIC_ZERO;
@@ -1786,6 +1876,7 @@ class AdminController extends AppController
      ,'myRights' => $myRights,'parentsData' => $parents,'namesData' => $names);
         return $this->renderWithData('importLibrary',$responseData);
     }
+
     public function actionExportLib()
     {
         $this->guestUserHandler();
@@ -2027,6 +2118,7 @@ class AdminController extends AppController
         $responseData = array('courseId' => $courseId,'overwriteBody' => $overwriteBody,'body' => $body,'params' => $params,'myRights' => $myRights,'nonPrivate' => $nonPrivate);
         return $this->renderWithData('exportLibrary',$responseData);
     }
+
     function getChildLibs($lib)
     {
         global $libCnt,$libs,$nonPrivate;
@@ -2056,6 +2148,7 @@ class AdminController extends AppController
             }
         }
     }
+
     public function parseLibs($file)
     {
         if (!function_exists('gzopen'))
@@ -2297,6 +2390,7 @@ class AdminController extends AppController
         }
         return $qIds;
     }
+
     function writeQ($qd,$rights,$qn)
     {
         global $user,$isAdmin,$updateQ,$newQ,$isGrpAdmin,$params;
@@ -2407,10 +2501,12 @@ class AdminController extends AppController
             return $qSetId;
         }
     }
+
     function addslashes_deep($value=null)
     {
         return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
     }
+
     function setparentrights($alibid)
     {
         global $rights,$parents;
@@ -2468,7 +2564,7 @@ class AdminController extends AppController
             }
             $now = time();
             if (isset($remove)) {
-                if (isset($params['confirmed'])) {AppUtility::dump('dddd');
+                if (isset($params['confirmed'])) {
                     $result = LibraryItems::getDistinctQSet($params['remove']);
                     foreach($result as $key => $row) {
                         $qidstocheck[] = $row[0];
@@ -2507,7 +2603,7 @@ class AdminController extends AppController
                     $pagetitle = ($libcnt > AppConstant::NUMERIC_ZERO) ? "Error" : "Remove Library";
                 }
             } elseif(isset($params['remove']))
-            {AppUtility::dump('ll');
+            {
                 if (isset($params['confirmed']))
                 {
                     if ($params['remove']!='') {

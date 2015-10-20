@@ -102,14 +102,6 @@ function showall()
         $('.blockitems').show(i);
     }
 }
-function markall(forumId)
-{
-    jQuerySubmit('mark-all-read-ajax',{forumId: forumId },'markAllReadSuccess');
-}
-function markAllReadSuccess()
-{
-    window.location.reload();
-}
 var  flag =0;
 function changeProfileImage(element,id)
 {

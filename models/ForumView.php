@@ -85,9 +85,9 @@ class ForumView extends BaseImasForumViews
         }
     }
 
-    public static function getById($threadId, $CurrentUser)
+    public static function getById($threadId, $CurrentUserId)
     {
-        $lastview = ForumView::find(['lastview'])->where(['threadid' => $threadId, 'userid' => $CurrentUser['id']])->all();
+        $lastview = ForumView::find(['id'])->where(['threadid' => $threadId, 'userid' => $CurrentUserId])->all();
         return $lastview;
     }
 
@@ -129,6 +129,7 @@ class ForumView extends BaseImasForumViews
 
     public function  updateDataForPostByName($threadId,$userId,$now)
     {
+
         $query = new Query();
         $query ->select('id')
                 ->from('imas_forum_views')
@@ -139,17 +140,18 @@ class ForumView extends BaseImasForumViews
         if(count($data)>0)
         {
             $id = $data[0]['id'];
-            $query  = ForumView::findOne(['id' =>$id ]);
+            $query  = ForumView::findOne(['id' =>$id]);
                 $query->lastview = $now;
                 $query->save();
         }
         else
         {
-            $id = $data[0]['id'];
-            $query  = ForumView::findOne(['id' =>$id ]);
+
+            $query  = ForumView::findOne(['id' => $threadId ]);
             $query->userid = $userId;
-            $query->threadid =$id;
+            $query->threadid =$threadId;
             $query->lastview = $now;
+
             $query->save();
         }
     }

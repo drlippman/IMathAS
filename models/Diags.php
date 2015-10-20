@@ -19,9 +19,11 @@ class Diags extends BaseImasDiags
                 'imas_users',
                 'imas_users.id=imas_diags.ownerid'
             );
-        if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
+        if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
             $query->andWhere(['imas_diags.ownerid' => $userId]);
-        } else if ($myRights < AppConstant::NUMERIC_HUNDREAD) {
+        } else if ($myRights < AppConstant::NUMERIC_HUNDREAD)
+        {
             $query->andWhere(['imas_users.groupid' => $groupId]);
         }
         $query->orderBy('imas_diags.name');

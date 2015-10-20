@@ -243,6 +243,7 @@ class ForumPosts extends BaseImasForumPosts
     }
     public static function MarkAllRead($forumId,$dofilter = null,$limthreads = null)
     {
+
           $query = new Query();
           $query ->select(['DISTINCT(threadid)'])
                     ->from('imas_forum_posts ')

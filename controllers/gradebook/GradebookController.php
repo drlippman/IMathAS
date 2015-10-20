@@ -26,6 +26,7 @@ use app\models\GbItems;
 use app\models\GbScheme;
 use app\models\Grades;
 use app\models\Items;
+use app\models\Libraries;
 use app\models\LinkedText;
 use app\models\Log;
 use app\models\LoginLog;
@@ -51,6 +52,7 @@ use app\controllers\PermissionViolationException;
 use yii\rbac\Item;
 include ("../components/asidutil.php");
 include ("../components/htmLawed.php");
+require("../components/displayQuestion.php");
 class GradebookController extends AppController
 {
     public function beforeAction($action)
@@ -2076,11 +2078,14 @@ class GradebookController extends AppController
         }
         if ($gbItems['rubric'] != 0) {
             $rubricData = Rubrics::getById($gbItems['rubric']);
-            $rubricFinalData = array(
-                '0' => $rubricData['id'],
-                '1' => $rubricData['rubrictype'],
-                '2' => $rubricData['rubric'],
-            );
+           if(count($rubricData) > 0)
+           {
+               $rubricFinalData = array(
+                   '0' => $rubricData['id'],
+                   '1' => $rubricData['rubrictype'],
+                   '2' => $rubricData['rubric'],
+               );
+           }
         }
         $count = 0;
         $hassection = false;
@@ -2162,7 +2167,7 @@ class GradebookController extends AppController
             $keyValue++;
         }
 
-        $OutcomesData = Outcomes::getByCourse($courseId);
+        $OutcomesData = Outcomes::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
         if ($OutcomesData) {
@@ -3292,6 +3297,7 @@ class GradebookController extends AppController
                     $bestattemptslist = implode(',', $attempts);
                     $bestseedslist = implode(',', $seeds);
                     $bestlalist = implode('~', $lastanswers);
+
                     AssessmentSession::updateForClearScores($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist);
                 }
                 return $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
@@ -3636,7 +3642,7 @@ class GradebookController extends AppController
         $nonstartedper = round(100*$notstarted/$totalStudentcount,1);
         $qslist = implode(',',$itemArray);
         if($qslist) {
-            $questionSet = QuestionSet::getByQuestionId($qslist);
+            $questionSet = QuestionSet::getByQuestionId($itemArray);
             $questionData = array();
             foreach ($questionSet as $singleQuestionSet) {
                 $tempArray = array(
@@ -3756,10 +3762,10 @@ class GradebookController extends AppController
         return $this->renderWithData('itemAnalysisDetail',$responseData);
     }
 
-    public function getstunames($a) {
-        if (count($a)==0) { return array();}
-        $a = implode(',',$a);
-        $StudentNames = User::getNameByIdUsingINClause($a);
+    public function getstunames($array)
+    {
+        if (count($array)==0) { return array();}
+        $StudentNames = User::getNameByIdUsingINClause($array);
         $names = array();
         foreach($StudentNames as $StudentName) {
             $names[$StudentName['id']] = $StudentName['LastName'].', '.$StudentName['FirstName'];
@@ -4736,7 +4742,6 @@ class GradebookController extends AppController
         }
         $student = Student::getByCourseId($course->id,$userId);
         $latepasses = $student['latepass'];
-
         $responseData = array('body' => $body,'addr' => $addr,'latepasses' => $latepasses,'savetitle' => $savetitle,'etime' => $etime,'stime' => $sdate,'sdate' => $sdate,'edate' => $edate,'overwriteBody' => $overwriteBody,'pagetitle' => $pagetitle,'course' => $course,
            'from' => $from, 'params' => $params,'stuname' => $stuname,'page_isExceptionMsg' => $page_isExceptionMsg,'page_courseSelect' => $page_courseSelect,'asid' => $assessmentId,'isTeacher' => $isTeacher);
         return $this->renderWithData('exception',$responseData);
@@ -4744,7 +4749,173 @@ class GradebookController extends AppController
 
     public  function actionGradeAllQuestion()
     {
+        $params = $this->getRequestParams();
+        $cid = $params['cid'];
+        $stu = $params['stu'];
+        $gbmode = $params['gbmode'];
+        $aid = $params['aid'];
+        $qid = $params['qid'];
+        if (isset($params['ver'])) {
+            $ver = $params['ver'];
+        } else {
+            $ver = 'graded';
+        }
+        if (isset($params['page'])) {
+            $page = intval($params['page']);
+        } else
+        {
+            $page = -1;
+        }
+        if (isset($params['update']))
+        {
+            $allscores = array();
+            $grpscores = array();
+            $grpfeedback = array();
+            $locs = array();
+            foreach ($_POST as $k=>$v)
+            {
+                if (strpos($k,'-')!==false)
+                {
+                    $kp = explode('-',$k);
+                    if ($kp[0]=='ud')
+                    {
+                        //$locs[$kp[1]] = $kp[2];
+                        if (count($kp)==3)
+                        {
+                            if ($v=='N/A')
+                            {
+                                $allscores[$kp[1]][$kp[2]] = -1;
+                            } else
+                            {
+                                $allscores[$kp[1]][$kp[2]] = $v;
+                            }
+                        } else
+                        {
+                            if ($v=='N/A') {
+                                $allscores[$kp[1]][$kp[2]][$kp[3]] = -1;
+                            } else {
+                                $allscores[$kp[1]][$kp[2]][$kp[3]] = $v;
+                            }
+                        }
+                    }
+                }
+            }
+            if (isset($params['onepergroup']) && $params['onepergroup']==1)
+            {
+                foreach ($params['groupasid'] as $grp=>$asid)
+                {
+                    $grpscores[$grp] = $allscores[$asid];
+                    $grpfeedback[$grp] = $params['feedback-'.$asid];
+                }
+                $onepergroup = true;
+            } else {
+                $onepergroup = false;
+            }
+            $cnt = 0;
+            $assessmentSession = AssessmentSession::getDataForGrade($params,$page,$aid);
+            foreach($assessmentSession as $line)
+            {
+                if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
+                    $sp = explode(';',$line['bestscores']);
+                    $scores = explode(",",$sp[0]);
+                    if ($onepergroup) {
+                        if ($line['agroupid']==0) { continue;}
+                        foreach ($grpscores[$line['agroupid']] as $loc=>$sv) {
+                            if (is_array($sv)) {
+                                $scores[$loc] = implode('~',$sv);
+                            } else {
+                                $scores[$loc] = $sv;
+                            }
+                        }
+                        $feedback = $grpfeedback[$line['agroupid']];
+                    } else {
+                        foreach ($allscores[$line['id']] as $loc=>$sv) {
+                            if (is_array($sv)) {
+                                $scores[$loc] = implode('~',$sv);
+                            } else {
+                                $scores[$loc] = $sv;
+                            }
+                        }
+                        $feedback = $params['feedback-'.$line['id']];
+                    }
+                    $scorelist = implode(",",$scores);
+                    if (count($sp)>1)
+                    {
+                        $scorelist .= ';'.$sp[1].';'.$sp[2];
+                    }
+                    AssessmentSession::setBestScoreAndFeedback($scorelist,$feedback,$line['id']);
 
+                    if (strlen($line['lti_sourcedid'])>1)
+                    {
+                        //update LTI score
+
+                        LtiOutcomesUtility::calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$scores);
+                    }
+                }
+            }
+            if ($page == -1)
+            {
+                return $this->redirect('item-analysis?stu='.$stu.'&cid='.$cid.'&aid='.$aid.'&asid=average');
+            } else
+            {
+                $page++;
+                return $this->redirect('grade-all-question?stu='.$stu.'&cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&page='.$page);
+            }
+        }
+
+        list ($qsetid,$cat) = getqsetid($qid);
+        $assessmentData = Assessments::getByAssessmentId($aid);
+        $aname = $assessmentData['name'];$defpoints = $assessmentData['defpoints'];
+        $isgroup = $assessmentData['isgroup']; $groupsetid = $assessmentData['groupsetid']; $deffbtext = $assessmentData['deffeedbacktext'];
+
+        if ($isgroup > 0)
+        {
+            $groupnames = array();
+            $stuGroups = Stugroups::getByGrpSetIdAndName($groupsetid);
+            foreach ($stuGroups as $stuGroup )
+            {
+                $groupnames[$stuGroup['id']] = $stuGroup['name'];
+            }
+            $grplist = implode(',',array_keys($groupnames));
+            $groupmembers = array();
+            $stuGroupMembers = StuGroupMembers::getByStuGrpWithUser($grplist);
+            foreach($stuGroupMembers as $stuGroupMember)
+            {
+                if (!isset($groupmembers[$stuGroupMember['stugroupid']])) {  $groupmembers[$stuGroupMember['stugroupid']] = array();}
+                $groupmembers[$stuGroupMember['stugroupid']][] = $stuGroupMember['FirstName'].' '.$stuGroupMember['LastName'];
+            }
+
+        }
+        $questionData = Questions::getQuestionsAndQuestionSetData($qid);
+        $rubricData = Rubrics::getRubricByQuestionId($qid);
+        $rubricFinalData = array();
+        if(count($rubricData) > 0)
+        {
+            foreach($rubricData as $rubric)
+            {
+                $temp = array(
+                    '0' => $rubric['id'],
+                    '1' => $rubric['rubrictype'],
+                    '2' => $rubric['rubric'],
+                );
+                array_push($rubricFinalData,$temp);
+            }
+        }
+        if ($page!=-1)
+        {
+            $stulist = array();
+            $sessionData = AssessmentSession::getDataWithUserData($aid,$cid);
+            foreach ($sessionData as $session)
+            {
+                $stulist[] = $session['LastName'].', '.$session['FirstName'];
+            }
+        }
+        $assessmentSessionData = AssessmentSession::getDataWithUserDataFilterByPage($aid,$cid,$page);
+        $this->includeJS('gradebook/rubric.js');
+        $responseData = array('cnt' => $cnt,'qid' => $qid,'qsetid' => $qsetid,'cid' => $cid,'aid' => $aid,'stu' => $stu,'ver' => $ver,'gbmode' => $gbmode,'questionData' => $questionData,
+
+            'assessmentSessionData' => $assessmentSessionData,'stulist' => $stulist,'assessmentData' => $assessmentData,'page' => $page,'rubricFinalData' => $rubricFinalData);
+        return $this->renderWithData('gradeAllQuestion',$responseData);
     }
 
 }

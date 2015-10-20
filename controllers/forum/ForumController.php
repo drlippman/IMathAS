@@ -502,7 +502,7 @@ class ForumController extends AppController
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
         $responseData = array('params' => $params, 'flags' => $flags, 'lastview' => $lastview, 'newpost' => $newpost, 'postInformtion' => $postInformtion, 'postIds' => $postIds, 'groupnames' => $groupnames, 'curfilter' => $curfilter,
             'dofilter' => $dofilter, 'groupsetid' => $groupsetid, 'isteacher' => $isteacher, 'countOfPostId' => $countOfPostId, 'cid' => $courseId, 'users' => $currentUser,
-            'searchedPost' => $searchedPost, 'forumid' => $forumId, 'maxdate' => $maxdate, 'course' => $course, 'forumData' => $forumData, 'page' => $page, 'threadsperpage' => $threadsperpage, 'postcount' => $postcount);
+            'searchedPost' => $searchedPost, 'forumid' => $forumId,'taglist' => $taglist, 'maxdate' => $maxdate, 'course' => $course, 'forumData' => $forumData, 'page' => $page, 'threadsperpage' => $threadsperpage, 'postcount' => $postcount);
         return $this->renderWithData('thread', $responseData);
     }
 
@@ -1172,6 +1172,17 @@ class ForumController extends AppController
         $forumName = Forums::getById($forumId);
         $orderBy = 'postdate';
         $thread = ThreadForm::postByName($forumId, $sort, $orderBy);
+        $page = $params['page'];
+        $read = $params['read'];
+        if(isset($params['read']) && $read == 1)
+        {
+            $now = time();
+            $readThreadId = ForumPosts::MarkAllRead($forumId);
+            foreach ($readThreadId as $data) {
+                $viewsData = new ForumView();
+                $viewsData->updateDataForPostByName($data['threadid'], $userId, $now);
+            }
+        }
         if ($thread) {
             $nameArray = array();
             $sortByName = array();
@@ -1214,13 +1225,13 @@ class ForumController extends AppController
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/listpostbyname.js']);
             $status = AppConstant::NUMERIC_ONE;
-            $responseData = array('threadArray' => $finalSortedArray, 'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status, 'userRights' => $userRights, 'currentUserId' => $userId);
+            $responseData = array('threadArray' => $finalSortedArray,'page' => $page,'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status, 'userRights' => $userRights, 'currentUserId' => $userId);
             return $this->renderWithData('listPostByName', $responseData);
         } else {
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/listpostbyname.js']);
             $status = AppConstant::NUMERIC_ZERO;
-            $responseData = array('status' => $status, 'forumId' => $forumId, 'course' => $course);
+            $responseData = array('status' => $status, 'page' => $page,'forumId' => $forumId, 'course' => $course);
             return $this->renderWithData('listPostByName', $responseData);
         }
     }
@@ -1257,21 +1268,6 @@ class ForumController extends AppController
         }
         $responseData = array('displayCountData' => $countDataArray);
         return $this->successResponse($responseData);
-    }
-
-    public function actionMarkAllReadAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $forumId = $params['forumId'];
-        $now = time();
-        $userId = $this->getAuthenticatedUser()->id;
-        $readThreadId = ForumPosts::MarkAllRead($forumId);
-        foreach ($readThreadId as $data) {
-            $viewsData = new ForumView();
-            $viewsData->updateDataForPostByName($data['threadid'], $userId, $now);
-        }
-        return $this->successResponse();
     }
 
     public function actionAddForum()

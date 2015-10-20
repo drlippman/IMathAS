@@ -179,7 +179,7 @@ class Questions extends BaseImasQuestions
                 'imas_libraries',
                 'imas_questions.category=imas_libraries.id'
             )
-            ->where('imas_questions.id',':questionId');
+            ->where('imas_questions.id = :questionId');
         $command = $query->createCommand();
         $data = $command->bindValue(':questionId',$questionId)->queryOne();
         return $data;
@@ -310,6 +310,7 @@ class Questions extends BaseImasQuestions
     public static function getIdCatPoints($dataId)
     {
         $query = Questions::find()->select('id,category,points')->where(['IN','id' => $dataId])->all();
+
         return $query;
     }
 

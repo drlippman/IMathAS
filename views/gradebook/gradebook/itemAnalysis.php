@@ -180,7 +180,7 @@ if (!$isTeacher) {
                          <span class="red"><?php AppUtility::t('Withdrawn')?></span>
                     <?php }
                     echo "{$description[$qid]}</td>"; ?>
-                     <td><a href="<?php echo AppUtility::getHomeURL('gradebook','gradebook/gradeallq?stu='.$student.'&cid='.$cid.'&asid=average&aid='.$aid.'&qid='.$qid);?>"
+                     <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-all-question?stu='.$student.'&cid='.$cid.'&asid=average&aid='.$aid.'&qid='.$qid);?>"
                     <?php if (isset($needManualGrade[$qid])) {
                         echo 'class="manualgrade" ';
                     } ?> ><?php AppUtility::t('Grade')?></a></td>

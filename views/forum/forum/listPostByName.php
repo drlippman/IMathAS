@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php if($status == AppConstant::NUMERIC_ONE){?>
         <div class="midwrapper Align-buttons-post">
             <input type="button" id="expand" onclick="collapseall()" class="btn btn-primary add-new-thread" value="Expand All">
-            <input type="button"  onclick="markall(<?php echo $forumId;?>)" class="btn btn-primary add-new-thread" value="Mark All Read">
+            <a href="<?php echo AppUtility::getURLFromHome('forum','forum/list-post-by-name?cid='.$course->id.'&page='.$page.'&forumid='.$forumId.'&read=1');?>">Mark All Read</a>
             <br><br>
         </div>
 <?$count =0;?>

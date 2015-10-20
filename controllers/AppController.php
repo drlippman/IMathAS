@@ -742,12 +742,31 @@ function generaterandstring() {
         }
     }
 
-    public function accessForRightsMoreThanTeacher($rights){
-        if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
+    public function accessForAdminController($rights,$actionPath)
+    {
+        if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+        {
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }else if($rights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'index' || $actionPath == 'forms'))
+        {
+            return true;
+        }else if($rights >= AppConstant::GROUP_ADMIN_RIGHT && ($actionPath == 'add-new-user' || $actionPath == 'change-rights' ||$actionPath == 'import-question-set'
+            || $actionPath == 'export-question-set' || $actionPath == 'manage-lib' || $actionPath== 'export-lib' || $actionPath == 'import-lib' || $actionPath = 'child-libs'))
+        {
+            return true;
+        }else if($rights > AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'diagnostics' || $actionPath == 'diag-one-time'))
+        {
+            return true;
+        }else if($rights == AppConstant::ADMIN_RIGHT && ($actionPath == 'external-tool'))
+        {
+            return true;
+        }
+        else{
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect($this->goHome());
         }
-        return true;
+
     }
 
     public function isStudent($userId, $courseId){

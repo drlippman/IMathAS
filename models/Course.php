@@ -305,10 +305,12 @@ class Course extends BaseImasCourses {
                 'imas_users',
                 'imas_courses.ownerid=imas_users.id'
             );
-        if($myRights > AppConstant::ADMIN_RIGHT){
-            $query->andWhere(['imas_courses.available<4']);
+        if($myRights > AppConstant::ADMIN_RIGHT)
+        {
+            $query->andWhere(['<','imas_courses.available','4']);
         }
-        if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==AppConstant::NUMERIC_ZERO){
+        if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==AppConstant::NUMERIC_ZERO)
+        {
             $query->andWhere(['imas_courses.ownerid'=> $userId]);
         }
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > AppConstant::NUMERIC_ZERO)
@@ -321,7 +323,7 @@ class Course extends BaseImasCourses {
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-    }
+     }
 
     public static function getPicIcons($ctc)
     {
@@ -443,7 +445,7 @@ class Course extends BaseImasCourses {
                 'imas_teachers',
                 'imas_courses.id=imas_teachers.courseid'
             )
-            ->where(['imas_teachers.userid= :userId'])->orderBy('imas_courses.name');
+            ->where('imas_teachers.userid = :userId')->orderBy('imas_courses.name');
         $command = $query->createCommand()->bindValue('userId',$userId);
         $items = $command->queryAll();
         return $items;
