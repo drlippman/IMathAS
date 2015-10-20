@@ -792,10 +792,15 @@ function generaterandstring() {
         return $isStudent ;
     }
 
-    public function accessForTeacherAndAdmin($user,$courseId,$actionPath){
+    public function accessForQuestionController($user,$courseId,$actionPath){
         $isOwner = Course::isOwner($user['id'],$courseId);
-        if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)){
-            return true;
+        if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])){
+            if(($user['rights'] < AppConstant::GROUP_ADMIN_RIGHT) && ($actionPath == 'manage-question-set')){
+                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                return $this->redirect($this->goHome());
+            }else{
+                return true;
+            }
         }
         $teacherId = $this->isTeacher($user['id'], $courseId);
         if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) && ($actionPath == 'manage-question-set' || $actionPath == 'add-questions-save' ||
@@ -845,6 +850,24 @@ function generaterandstring() {
         } else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect($this->goHome());
+        }
+    }
+
+    public function accessForAssessmentController($user,$courseId,$actionPath){
+        $isOwner = Course::isOwner($user['id'],$courseId);
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $isStudent = $this->isStudent($user['id'], $courseId);
+        if(($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])){
+            return true;
+        }
+        if(($user['rights'] < AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-assessment' || $actionPath == 'change-assessment' || $actionPath == 'assessment-message' && !$isStudent)){
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }else if (($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+            return $this->noValidRights($teacherId);
+        }
+        else{
+            return true;
         }
     }
 }

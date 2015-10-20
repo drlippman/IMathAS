@@ -30,8 +30,8 @@ class QuestionController extends AppController
     {
         $actionPath = Yii::$app->controller->action->id;
         $user = $this->getAuthenticatedUser();
-        $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacherAndAdmin($user,$courseId,$actionPath);
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForQuestionController($user,$courseId,$actionPath);
     }
 
     public function actionAddQuestions()
@@ -3672,16 +3672,15 @@ class QuestionController extends AppController
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $myRights = $user['rights'];
-        $teacherid = $this->isTeacher($user['id'], $courseId);
+        $teacherId = $this->isTeacher($user['id'], $courseId);
         $this->layout = 'master';
-        $pagetitle = "Question Source";
-        if (!(isset($teacherid)) && $myRights<100) {
-            echo "You need to log in as a teacher to access this page";
-            exit;
+        if (!(isset($teacherId)) && $myRights < AppConstant::ADMIN_RIGHT) {
+            $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
+            return $this->redirect($this->goHome());
         }
         $isAdmin = false;
-        $qsetid = $params['id'];
-        $qSetData = QuestionSet::getByQuesSetId($qsetid);
+        $qSetId = $params['id'];
+        $qSetData = QuestionSet::getByQuesSetId($qSetId);
         $responseData = (['params' => $params, 'qSetData' => $qSetData, 'isAdmin' => $isAdmin, 'course' => $course]);
         return $this->renderWithData('viewSource', $responseData);
     }

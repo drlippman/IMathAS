@@ -36,6 +36,13 @@ use app\components\AppConstant;
 include("../components/handled.php");
 class AssessmentController extends AppController
 {
+    public function beforeAction($action)
+    {
+        $actionPath = Yii::$app->controller->action->id;
+        $user = $this->getAuthenticatedUser();
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForAssessmentController($user,$courseId,$actionPath);
+    }
     /*
      * Display password, when assessment need password.
      */
