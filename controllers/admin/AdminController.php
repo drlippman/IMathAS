@@ -1084,11 +1084,11 @@ class AdminController extends AppController
                 {
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
-                    $updateResult->updateCourse($params, $available, $toolSet, $defTime, $columnName, $columnValue);
+                    $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
                 }else{
                     $columnName = 'id'; $columnValue = $params['id'];
                     $updateResult = new Course();
-                    $updateResult->updateCourse($params, $available, $toolSet, $defTime, $columnName, $columnValue);
+                    $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
                 }
                 return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
             } else {

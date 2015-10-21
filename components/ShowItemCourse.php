@@ -60,6 +60,7 @@ class ShowItemCourse extends Component
         if ($canEdit)
         {
             echo ShowItemCourse::generateAddItem($parent,'t');
+            echo "<div style='margin-top: 20px'></div>";
         }
         for ($i = 0; $i < count($items); $i++)
         {

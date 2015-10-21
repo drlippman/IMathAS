@@ -97,7 +97,6 @@ class SiteController extends AppController
         if (!$this->isGuestUser()) {
             return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         } else {
-
             return $this->redirect(AppUtility::getURLFromHome('site','login'));
         }
     }

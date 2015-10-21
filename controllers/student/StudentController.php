@@ -17,7 +17,6 @@ class StudentController extends AppController
     public function actionStudentEnrollCourse()
     {
         $user = $this->getAuthenticatedUser();
-
         if($user['rights'] == AppConstant::GUEST_RIGHT)
         {
             $this->setWarningFlash("Guest user can't access this page.");
@@ -29,7 +28,7 @@ class StudentController extends AppController
         if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollCourseForm'];
-            $course = Course::getByIdAndEnrollmentKey($param['courseId'], $param['enrollmentKey']);
+            $course = Course::getEnrollData($param['courseId']);
             if ($course) {
                 $teacher = Teacher::getByUserId($user->id, $param['courseId']);
                 $tutor = Tutor::getByUserId($user->id, $param['courseId']);
@@ -50,6 +49,10 @@ class StudentController extends AppController
                     }
                     $this->setErrorFlash($errorMessage);
                 }
+            } elseif($course == null){
+                $this->setErrorFlash(AppConstant::COURSE_NOT_FOUND);
+            }elseif(($course['allowunenroll']&2)==2){
+                $this->setErrorFlash(AppConstant::CLOSED_FOR_SELF_ENROLL);
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_COMBINATION);
             }

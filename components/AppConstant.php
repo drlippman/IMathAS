@@ -268,4 +268,6 @@ class AppConstant
     const NOT_GROUP_MEMBER= "You are not yet a member of a group.  Contact your instructor to be added to a group.";
     const NO_DATA = "No data available";
     const BLOCK_POST = 'This page is blocked. In this forum, you must post your own thread before you can read those posted by others.';
+    const COURSE_NOT_FOUND = 'Course not found.';
+    const CLOSED_FOR_SELF_ENROLL = 'Course is closed for self enrollment.  Contact your instructor for access.';
 }

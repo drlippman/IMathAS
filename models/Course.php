@@ -631,4 +631,9 @@ class Course extends BaseImasCourses {
     public static function isOwner($userId,$courseId){
         return self::find()->select('ownerid')->where(['id' => $courseId])->one();
     }
+
+    public static function getEnrollData($courseId)
+    {
+        return self::find()->select('enrollkey,allowunenroll,deflatepass')->from('imas_courses')->where(['available' => '0'])->orWhere(['available' => 2])->andWhere(['id' => $courseId])->one();
+    }
 }
