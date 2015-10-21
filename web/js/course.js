@@ -58,7 +58,7 @@ function toggleblock(bnum,folder) {
       plblist = plblist.split(',');
 
     var loc = arraysearch(bnum,oblist);
-      if (node.className == 'blockitems') {
+      if (node.className == 'blockitems block-alignment') {
           if (arraysearch(bnum,loadedblocks)==-1) {
 	  	loadedblocks.push(bnum);
 	  }
@@ -75,7 +75,7 @@ function toggleblock(bnum,folder) {
 			plblist.push(folder);	
 		}
 	  }
-          node.className = 'blockitems';
+          node.className = 'blockitems block-alignment';
           //butn.value = 'Collapse';
 	  if (img != null) {
 		  img.src = path+'img/collapse.gif';

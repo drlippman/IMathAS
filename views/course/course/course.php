@@ -58,7 +58,11 @@ $this->params['breadcrumbs'][] = $this->title; ?>
 </div>
 
 <?php } ?>
-<div class="tab-content shadowBox">
+<?php if($user['rights'] == AppConstant::STUDENT_RIGHT){?>
+<div class="tab-content shadowBox course-page-setting student-course-setting">
+    <?php } elseif($user['rights'] >= AppConstant::STUDENT_RIGHT) {?>
+    <div class="tab-content shadowBox">
+    <?php }?>
 <?php if($teacherId){
     ?>
     <div class="row course-copy-export">

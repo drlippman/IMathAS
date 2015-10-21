@@ -938,7 +938,7 @@ class AppController extends Controller
            return true;
         } elseif($actionPath == 'index'|| $actionPath == 'login' || $actionPath == 'logout' || $actionPath == 'diagnostics' || $actionPath == 'registration' || $actionPath == 'student-register' || $actionPath == 'Work-in-progress' || $actionPath == 'forgot-password' || $actionPath == 'forgot-username' || $actionPath == 'check-browser' || $actionPath == 'reset-password' || $actionPath == 'helper-guide' || $actionPath == 'documentation' || $actionPath == 'help-for-student-answer' || $actionPath == 'instructor-document'){
            return true;
-        }else {
+        } else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect($this->goHome());
         }

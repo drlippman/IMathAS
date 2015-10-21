@@ -19,7 +19,7 @@ a:hover {
 div.item {
 	border: 1px solid #a9a9a9;
 	background-color: #fff;
-    margin-right: 20px;
+    /*margin-right: 20px;*/
 }
 
 /*Container for editor*/
@@ -41,7 +41,7 @@ div.blockitems, div.blockitems div.blockitems div.blockitems {
 }
 div.blockitems.block-alignment{
     margin-left: 93px;
-    margin-right: 20px;
+    /*margin-right: 20px;*/
 }
 
 /*Second level default block container*/

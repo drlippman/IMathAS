@@ -626,3 +626,15 @@ div.vidsegblock
 .back-link{
     margin-right: 20px;
 }
+
+.course-page-setting{
+    padding-top: 20px;
+    padding-left: 20px;
+}
+.student-course-setting .blockitems {
+     margin-left: 0px !important;
+}
+.student-course-setting .blockitems .item {
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+}
