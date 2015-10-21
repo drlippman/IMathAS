@@ -148,15 +148,24 @@ while ($row = mysql_fetch_row($result)) {
 		//continue;
 	}
 	
-	if (!isset($teacherid) && $row[6]>0 && $row[7]>0 && (!isset($exceptions[$row[0]]) || $exceptions[$row[0]][3]==0)) {
+	$showgrayedout = false;
+	if (!isset($teacherid) && abs($row[6])>0 && $row[7]>0 && (!isset($exceptions[$row[0]]) || $exceptions[$row[0]][3]==0)) {
 		$query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
 		   $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		   if (mysql_num_rows($r2)==0) {
-			   continue;
+		   	   if ($row[6]<0) { 
+		   	   	   $showgrayedout = true;
+		   	   } else {
+		   	   	   continue;
+		   	   }
 		   } else {
 			   $scores = explode(';',mysql_result($r2,0,0));
 			   if (getpts($scores[0])<$row[6]) {
-				   continue;
+				   if ($row[6]<0) { 
+					   $showgrayedout = true;
+				   } else {
+					   continue;
+				   }
 			   }
 		   }
 	}
@@ -189,7 +198,7 @@ while ($row = mysql_fetch_row($result)) {
 				$viewedassess[] = $r[0];
 			}
 		} 
-		if (($row[9]%10==1 || $row[9]%10-1>$latepasscnt) && $latepasses>0 && 
+		if (($row[9]%10==1 || $row[9]%10-1>$latepasscnt) && $latepasses>0 && !$showgrayedout &&
 		   ($now < $row[3] || ($row[9]>10 && $now-$row[3]<$latepasshrs*3600 && !in_array($row[0],$viewedassess)))) {
 			$lp = 1;
 		} else {
@@ -197,17 +206,21 @@ while ($row = mysql_fetch_row($result)) {
 		}
 		
 		
-		if ($canundolatepass) {
+		if ($canundolatepass && !$showgrayedout) {
 			$ulp = 1;
 		} else {
 			$ulp = 0;
 		}
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-		$colors = makecolor2($row[2],$row[3],$now);
+		if ($showgrayedout) {
+			$colors = '#ccc';
+		} else {
+			$colors = makecolor2($row[2],$row[3],$now);
+		}
 		$json = "{type:\"A\", time:\"$time\", ";
 		if ($now<$row[3] || $row[4]>$now || isset($teacherid) || $lp==1) { $json .= "id:\"$row[0]\",";}
-		if ($now>$row[3] && $now>$row[4] && !isset($teacherid)) { $json .= 'inactive:true,';}
+		if ((($now>$row[3] && $now>$row[4]) || $showgrayedout) && !isset($teacherid)) { $json .= 'inactive:true,';}
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 		$byid['A'.$row[0]] = array($moday,$tag,$colors,$json);
 	}
