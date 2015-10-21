@@ -123,3 +123,12 @@ table td {
 .available-after-time-picker .bootstrap-timepicker, .available-until-time-picker .bootstrap-timepicker {
     width: 100% !important;;
 }
+.ui-dialog {
+    zoom: 1;
+}
+.modify-group-table .dataTables_length label,.modify-group-table .dataTables_info{
+    float: left;
+}
+.modify-group-table .dataTables_paginate .pagination {
+    float: right;
+}

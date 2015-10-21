@@ -1370,3 +1370,13 @@ color:red;
 .width-eighty-per {
     width: 80%;
 }
+.padding-top-eighteen {
+    padding-top: 18px;
+}
+.margin-left-right-zero {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+.margin-left-minus-two {
+    margin-left: -2px !important;
+}

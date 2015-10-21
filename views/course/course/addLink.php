@@ -15,7 +15,7 @@ $this->title = $defaultValues['saveTitle'];
     ]);
    if ($linkData['id']){ ?>
         <input type="hidden" name="modifyFid" value="<?php echo $modifyForumId;?>">
-    <?php } ?>   ?>
+    <?php } ?>
 <?php } else { ?>
     <?php $form = ActiveForm::begin([
         'validateOnSubmit' => false,
@@ -400,9 +400,10 @@ $this->title = $defaultValues['saveTitle'];
         <div class="col-md-8 padding-left-eighteen">
             <?php
             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $defaultValues['gradeoutcomes'], 'Select an outcome...'); ?>
-            <?php } ?>
         </div>
     </div>
+        <?php } ?>
+
     <div class="col-md-offset-2 col-md-10 padding-top-fifteen">
         <div>
             <sup>*</sup>
@@ -414,5 +415,4 @@ $this->title = $defaultValues['saveTitle'];
             <i class="fa fa-share header-right-btn"></i><?php echo $defaultValues['saveButtonTitle']; ?></button>
     </div>
 </div>
-<?php
-ActiveForm::end();?>
+<?php ActiveForm::end(); ?>

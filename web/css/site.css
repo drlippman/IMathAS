@@ -941,7 +941,7 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
     font-weight:normal;
 }
 .margin-top-zero{
-    margin-top: 0px;
+    margin-top: 0px !important;
 }
 .inner-content-change-password
 {

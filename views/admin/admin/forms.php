@@ -66,21 +66,21 @@ switch ($action) {
             if ($getAction == "chgrights") { echo "&id=$getId"; }
             echo "\"><br>";
             if ($getAction == "newadmin") {
-                echo "<div class=col-md-2>New User username</div>  <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
-                echo "<div class=col-md-2>First Name</div> <input class='form form-control-1' type=text size=40 name=firstname><BR class=form>\n";
-                echo "<div class=col-md-2>Last Name</div> <input class='form form-control-1' type=text size=40 name=lastname><BR class=form>\n";
-                echo "<div class=col-md-2>Email</div> <input class='form form-control-1' type=text size=40 name=email><BR class=form>\n";
-                echo '<div class=col-md-2>Password</div> <input class="form form-control-1" type="text" size="40" name="password"/><br class="form"/>';
+                echo "<div class='col-md-2 col-sm-2'>New User username</div>  <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>First Name</div> <input class='form form-control-1' type=text size=40 name=firstname><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>Last Name</div> <input class='form form-control-1' type=text size=40 name=lastname><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>Email</div> <input class='form form-control-1' type=text size=40 name=email><BR class=form>\n";
+                echo '<div class="col-md-2 col-sm-2">Password</div> <input class="form form-control-1" type="text" size="40" name="password"/><br class="form"/>';
                 $oldGroup = 0;
                 $oldRights = 10;
             } else {
-                echo "<div class='col-md-12'><h2>{$line['FirstName']} {$line['LastName']}</h2></div>\n";
+                echo "<div class='col-md-12 col-sm-12'><h2>{$line['FirstName']} {$line['LastName']}</h2></div>\n";
                 $oldGroup = $line['groupid'];
                 $oldRights = $line['rights'];
 
             }
             ?>
-             <div class="col-md-2"><img class="help-img margin-left-zero" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>Set User rights to:</div>
+             <div class="col-md-2 col-sm-2"><img class="help-img margin-left-zero" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>Set User rights to:</div>
 
             <?php  echo "<div class='col-md-4 padding-left-zero'><input type=radio name=\"newrights\" value=\"5\" ";
             if ($oldRights == 5) {echo "CHECKED";}
@@ -107,7 +107,7 @@ switch ($action) {
             }
 
             if ($myRights == 100) {
-                echo "<div class=col-md-2>Assign to group: </div>";
+                echo "<div class='col-md-2 col-sm-2'>Assign to group: </div>";
                 echo "<div class='col-md-6 padding-left-zero'><select name=\"group\" class='form-control' id=\"group\">";
                 echo "<option value=0>Default</option>\n";
 
@@ -139,28 +139,28 @@ switch ($action) {
             echo "&id={$params['cid']}";
         }
         echo "\">";
-        echo "<div class='col-md-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
-                    <div class='col-md-12 margin-top-fifteen'>
+        echo "<div class='col-md-12 col-sm-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
+                    <div class='col-md-12 col-sm-12 margin-top-fifteen'>
                         <div class=col-md-3>Course ID</div>
                         <div class=col-md-4>$courseid</div>
                     </div>";
-        echo "<div class='col-md-12 margin-top-fifteen'>
+        echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                 <div class='col-md-3 padding-top-five'>" . AppUtility::t('Enter Course name', false) . "</div>
                 <div class=col-md-4>
 
                     <input class='form-control' required='please fill out this field' type=text size=80 name=\"coursename\" value=\"$name\">
                 </div>
               </div>";
-        echo "<div class='col-md-12 margin-top-fifteen'>
+        echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                     <div class='col-md-3 padding-top-five'>" . AppUtility::t('Enter Enrollment key', false) . "</div>
                     <div class=col-md-4>
                         <input class='form-control' type=text size=30 name=\"ekey\" value=\"$ekey\">
                     </div>
               </div>";
-        echo '<div class="col-md-12 margin-top-fifteen">
+        echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
                     <div class="col-md-3 padding-top-five">' . AppUtility::t('Available?', false) . '</div>
                     <div class="col-md-4 padding-left-zero">';
-        echo '<div class="col-md-12">';
+        echo '<div class="col-md-12 col-sm-12">';
         echo '<input type="checkbox" name="stuavail" value="1" ';
         if (($avail & 1) == AppConstant::NUMERIC_ZERO) {
             echo 'checked="checked"';
@@ -168,7 +168,7 @@ switch ($action) {
         echo '/><span class="padding-left-ten">' . AppUtility::t('Available to students', false) . '</span>
                             </div>
 
-                        <div class="col-md-12 margin-top-five">
+                        <div class="col-md-12 col-sm-12 margin-top-five">
                             <input type="checkbox" name="teachavail" value="2" ';
         if (($avail & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_ZERO) {
             echo 'checked="checked"';
@@ -178,7 +178,7 @@ switch ($action) {
                     </div>
               </div>';
         if ($params['action'] == "modify") {
-            echo '<div class="col-md-12 margin-top-fifteen">
+            echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
                         <div class="col-md-3 padding-top-five">' . AppUtility::t('Lock for assessment', false) . '</div>
                         <div class="col-md-4">
                             <select class="form-control" name="lockaid">';
@@ -202,7 +202,7 @@ switch ($action) {
         }
         if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1] == AppConstant::NUMERIC_ONE) {
             echo "
-            <div class='col-md-12 margin-top-twenty'>
+            <div class='col-md-12 col-sm-12 margin-top-twenty'>
                     <div class='col-md-3 select-text-margin'>" . AppUtility::t('Default start/end time for new items', false) . "
                     </div>
                     <div class=col-md-9>";
@@ -232,25 +232,25 @@ switch ($action) {
             </div>';
         }
         if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1] == AppConstant::NUMERIC_ONE) {
-            echo "<div class='col-md-12 margin-top-fifteen'>
+            echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                     <div class=col-md-3>" . AppUtility::t('Allow other instructors to copy course items', false) . "
                     </div>
-                    <div class='col-md-6 padding-left-zero'>
-                        <div class='col-md-12'>";
+                    <div class='col-md-6 col-sm-6 padding-left-zero'>
+                        <div class='col-md-12 col-sm-12'>";
             echo '<input type=radio name="copyrights" value="0" ';
             if ($copyrights == AppConstant::NUMERIC_ZERO) {
                 echo "checked=1";
             }
             echo '/><span class="padding-left-ten">' . AppUtility::t('Require enrollment key from everyone', false) . '</span>
                         </div>
-                        <div class="col-md-12 margin-top-five">
+                        <div class="col-md-12 col-sm-12 margin-top-five">
                         <input type=radio name="copyrights" value="1" ';
             if ($copyrights == AppConstant::NUMERIC_ONE) {
                 echo "checked=1";
             }
             echo '/><span class="padding-left-ten">' . AppUtility::t('No key required for group members, require key from others', false) . '</span>
                         </div>
-                        <div class="col-md-12 margin-top-five">
+                        <div class="col-md-12 col-sm-12 margin-top-five">
                         <input type=radio name="copyrights" value="2" ';
             if ($copyrights == AppConstant::NUMERIC_TWO) {
                 echo "checked=1";
@@ -262,47 +262,47 @@ switch ($action) {
         }
         if (!isset($CFG['CPS']['msgset']) || $CFG['CPS']['msgset'][1] == AppConstant::NUMERIC_ONE) {
             echo "
-            <div class='col-md-12 margin-top-fifteen'>
+            <div class='col-md-12 col-sm-12 margin-top-fifteen'>
 
                 <div class=col-md-3>" . AppUtility::t('Message System', false) . "</div>
 
                 <div class='col-md-5 padding-left-zero'>";
-            echo '<div class="col-md-12">
+            echo '<div class="col-md-12 col-sm-12">
                     <input type=radio name="msgset" value="0" ';
             if ($msgset == AppConstant::NUMERIC_ZERO) {
                 echo "checked=1";
             }
             echo '/><span class="padding-left-ten">' . AppUtility::t('On for send and receive', false) . '</span>
                     </div>
-                    <div class="col-md-12 margin-top-five">
+                    <div class="col-md-12 col-sm-12 margin-top-five">
                     <input type=radio name="msgset" value="1" ';
             if ($msgset == AppConstant::NUMERIC_ONE) {
                 echo "checked=1";
             }
             echo '/> <span class="margin-left-five">' . AppUtility::t('On for receive, students can only send to instructor', false) . '</span>
                     </div>
-                    <div class="col-md-12 margin-top-five">
+                    <div class="col-md-12 col-sm-12 margin-top-five">
                     <input type=radio name="msgset" value="2" ';
             if ($msgset == AppConstant::NUMERIC_TWO) {
                 echo "checked=1";
             }
             echo '/> <span class="margin-left-five">' . AppUtility::t('On for receive, students can only send to students', false) . '</span>
                     </div>
-                    <div class="col-md-12 margin-top-five">
+                    <div class="col-md-12 col-sm-12 margin-top-five">
                     <input type=radio name="msgset" value="3" ';
             if ($msgset == AppConstant::NUMERIC_THREE) {
                 echo "checked=1";
             }
             echo '/> <span class="margin-left-five">' . AppUtility::t('On for receive, students cannot send', false) . '</span>
                     </div>
-                    <div class="col-md-12 margin-top-five">
+                    <div class="col-md-12 col-sm-12 margin-top-five">
                     <input type=radio name="msgset" value="4" ';
             if ($msgset == AppConstant::NUMERIC_FOUR) {
                 echo "checked=1";
             }
             echo '/><span class="margin-left-five"> Off</span>
                     </div>
-                    <div class="col-md-12 margin-top-five">
+                    <div class="col-md-12 col-sm-12 margin-top-five">
                     <input type=checkbox name="msgmonitor" value="1" ';
             if ($msgmonitor == AppConstant::NUMERIC_ONE) {
                 echo "checked=1";
@@ -314,18 +314,18 @@ switch ($action) {
         }
         if (!isset($CFG['CPS']['toolset']) || $CFG['CPS']['toolset'][1] == AppConstant::NUMERIC_ONE) {
             echo "
-            <div class='col-md-12 margin-top-fifteen'>
+            <div class='col-md-12 col-sm-12 margin-top-fifteen'>
                 <div class=col-md-3>" . AppUtility::t('Navigation Links for Students', false) . "</div>
 
                 <div class='col-md-4 padding-left-zero'>";
-            echo '<div class="col-md-12">
+            echo '<div class="col-md-12 col-sm-12">
                 <input type="checkbox" name="toolset-cal" value="1" ';
             if (($toolset & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ZERO) {
                 echo 'checked="checked"';
             }
             echo '><span class="padding-left-ten">' . AppUtility::t('Calendar', false) . '</span>
                 </div>';
-            echo '<div class="col-md-12 margin-top-five">
+            echo '<div class="col-md-12 col-sm-12 margin-top-five">
                 <input type="checkbox" name="toolset-forum" value="2" ';
             if (($toolset & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_ZERO) {
                 echo 'checked="checked"';
@@ -349,7 +349,7 @@ switch ($action) {
         }
         if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1] == AppConstant::NUMERIC_ONE) {
             echo '
-            <div class="col-md-12 margin-top-fifteen">
+            <div class="col-md-12 col-sm-12 margin-top-fifteen">
                 <div class="col-md-3 padding-top-five">' . AppUtility::t('Auto-assign LatePasses on course enroll', false) . '</div>
                 <div class="col-md-5 display-flex">';
             echo '<input class="width-seventy-eight-per form-control" type="text" size="3" name="deflatepass" value="' . $deflatepass . '"/>
@@ -359,11 +359,11 @@ switch ($action) {
         }
         if (isset($enablebasiclti) && $enablebasiclti == true && isset($params['cid'])) {
             echo '
-            <div class="col-md-12 margin-top-fifteen">
+            <div class="col-md-12 col-sm-12 margin-top-fifteen">
             <div class="col-md-3">' . AppUtility::t('LTI access secret (max 10 chars; blank to not use)', false) . '</div>';
             echo '
 
-            <div class=col-md-6>
+            <div class="col-md-6 col-sm-6">
             <input class="form-control width-sixty-four-per display-inline-block" name="ltisecret" type="text" value="' . $ltisecret . '" maxlength="10"/> ';
             echo '<button class="margin-left-ten" type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">' . _('Show LTI key and URL') . '</button>';
             echo '<span id="ltiurl" style="display:none;">';
@@ -379,7 +379,7 @@ switch ($action) {
             </div>';
         }
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
-            echo '<div class="col-md-12 margin-top-twenty">
+            echo '<div class="col-md-12 col-sm-12 margin-top-twenty">
             <div class=col-md-3>' . AppUtility::t('Mark course as template?', false) . '</div>';
             echo '<div class=col-md-9><input type=checkbox name="isgrptemplate" value="2" ';
             if (($istemplate & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO) {
@@ -441,8 +441,8 @@ switch ($action) {
 
             </div>
         </div>
-        <div class='col-md-12 padding-twenty'>
-            <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
+        <div class='col-md-12 col-sm-12 padding-twenty'>
+            <div class='col-md-12 col-sm-12 text-gray-background padding-left-thirty padding-top-five'>
                 <h3><?php AppUtility::t('Install Macro File') ?></h3>
 
                 <p>
@@ -458,7 +458,7 @@ switch ($action) {
                 </p>
                 <input type="hidden" name="MAX_FILE_SIZE" value="300000"/>
 
-                <div class='col-md-12 padding-left-zero'>
+                <div class='col-md-12 col-sm-12 padding-left-zero'>
                     <span class='floatleft'><?php AppUtility::t('Import file') ?> </span>
               <span class='floatleft margin-left-ten'>
                    <input name="userfile" type="file"/>
@@ -476,8 +476,8 @@ switch ($action) {
     case "importqimages":
         ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importqimages">
-            <div class='col-md-12 padding-twenty'>
-                <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
+            <div class='col-md-12 col-sm-12 padding-twenty'>
+                <div class='col-md-12 col-sm-12 text-gray-background padding-left-thirty padding-top-five'>
                     <h3><?php AppUtility::t('Install Question Images') ?></h3>
 
                     <p>
@@ -512,8 +512,8 @@ switch ($action) {
         ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importcoursefiles">
 
-            <div class='col-md-12 padding-twenty'>
-                <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
+            <div class='col-md-12 col-sm-12 padding-twenty'>
+                <div class='col-md-12 col-sm-12 text-gray-background padding-left-thirty padding-top-five'>
                     <h3><?php AppUtility::t('Install Course files') ?></h3>
 
                     <p>
@@ -572,11 +572,11 @@ switch ($action) {
                     </div>
                 </div>
             </div>
-            <div class='col-md-12 padding-twenty'>
-                <div class='col-md-12 padding-top-five text-gray-background padding-left-thirty'>
+            <div class='col-md-12 col-sm-12 padding-twenty'>
+                <div class='col-md-12 col-sm-12 padding-top-five text-gray-background padding-left-thirty'>
                     <h3><?php AppUtility::t('Delete Old Users') ?></h3>
 
-                    <div class='col-md-12 margin-top-ten padding-left-zero'>
+                    <div class='col-md-12 col-sm-12 margin-top-ten padding-left-zero'>
                         <span><?php AppUtility::t('Delete Users older than') ?></span>
                          <span>
                             <input type=text class='margin-left-ten form-control display-inline-block width-five-per'
@@ -584,7 +584,7 @@ switch ($action) {
                             <span class='margin-left-ten'><?php AppUtility::t('Months') ?></span>
                         </span>
                     </div>
-                    <div class='col-md-12 margin-top-fifteen padding-left-zero'>
+                    <div class='col-md-12 col-sm-12 margin-top-fifteen padding-left-zero'>
                         <span><?php AppUtility::t('Delete Who') ?></span>
              <span>
                     <span class='margin-left-ten'><input type=radio name=who value="students" CHECKED>
@@ -608,7 +608,7 @@ switch ($action) {
         break;
     case "listltidomaincred":
         ?>
-        <div class="col-md-12 modify-lti-domain-credential">
+        <div class="col-md-12 col-sm-12 modify-lti-domain-credential">
             <form method=post action="actions?action=modltidomaincred&id=new">
                 <div id="headerforms" class="pagetitle">
                     <h3>
@@ -652,43 +652,43 @@ switch ($action) {
                     <?php } ?>
                     </tbody>
                 </table>
-                <div class='col-md-12 padding-left-zero'>
-                    <div class='col-md-12 padding-left-zero'>
+                <div class='col-md-12 col-sm-12 padding-left-zero'>
+                    <div class='col-md-12 col-sm-12 padding-left-zero'>
                         <?php AppUtility::t('Add new LTI key/secret') ?>
                     </div>
-                    <div class='margin-top-twenty col-md-12 padding-left-zero'>
-                <span class='col-md-2 padding-left-zero'>
+                    <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
+                <span class='col-md-2 col-sm-2 padding-left-zero'>
                     <?php AppUtility::t('Domain') ?>
                 </span>
 
-                        <div class='col-md-6 padding-left-zero'>
+                        <div class='col-md-6 col-sm-6 padding-left-zero'>
                             <input class='form-control' type=text name="ltidomain" size=20>
                         </div>
                     </div>
-                    <div class='margin-top-twenty col-md-12 padding-left-zero'>
-                <span class='col-md-2 padding-left-zero'>
+                    <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
+                <span class='col-md-2 col-sm-2 padding-left-zero'>
                     <?php AppUtility::t('Key') ?>
                 </span>
 
-                        <div class='col-md-6 padding-left-zero'>
+                        <div class='col-md-6 col-sm-6 padding-left-zero'>
                             <input class='form-control' type=text name="ltikey" size=20>
                         </div>
                     </div>
-                    <div class='margin-top-twenty col-md-12 padding-left-zero'>
-                <span class='col-md-2 padding-left-zero'>
+                    <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
+                <span class='col-md-2 col-sm-2 padding-left-zero'>
                     <?php AppUtility::t('Secret') ?>
                 </span>
 
-                        <div class='col-md-6 padding-left-zero'>
+                        <div class='col-md-6 col-sm-6 padding-left-zero'>
                             <input class='form-control' type=text name="ltisecret" size=20>
                         </div>
                     </div>
-                    <div class='margin-top-twenty col-md-12 padding-left-zero'>
-                <span class='col-md-2 padding-left-zero'>
+                    <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
+                <span class='col-md-2 col-sm-2 padding-left-zero'>
                     <?php AppUtility::t('Can create instructors') ?>
                 </span>
 
-                        <div class='col-md-6 padding-left-zero'>
+                        <div class='col-md-6 col-sm-6 padding-left-zero'>
                             <select class='form-control' name="createinstr">
                                 <option value="11" selected="selected"><?php AppUtility::t('No') ?></option>
                                 <option value="76"><?php AppUtility::t('Yes, and creates');
@@ -697,10 +697,10 @@ switch ($action) {
                             </select>
                         </div>
                     </div>
-                    <div class='margin-top-twenty col-md-12 padding-left-zero'>
-                        <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Associate with group') ?></span>
+                    <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
+                        <span class='col-md-2 col-sm-2 padding-left-zero'><?php AppUtility::t('Associate with group') ?></span>
 
-                        <div class='col-md-6 padding-left-zero' >
+                        <div class='col-md-6 col-sm-6 padding-left-zero' >
                             <select class='form-control' name='groupid'>
                                 <option value='0'><?php AppUtility::t('Default') ?></option>
                                 <div style="max-width: 300px">
@@ -712,9 +712,9 @@ switch ($action) {
                                 echo "</select>"; ?>
                         </div>
                     </div>
-                </div>
-                <div class="col-sm-2 padding-top-twenty padding-left-zero col-sm-offset-2">
+                <div class="col-sm-2 padding-top-twenty padding-left-three col-sm-offset-2">
                     <input class="margin-left-minus-five" type=submit value="<?php AppUtility::t('Add LTI Credentials') ?>">
+                </div>
                 </div>
         </div>
         </form>
@@ -725,7 +725,7 @@ switch ($action) {
             $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
             return $this->redirect('forms?action = listltidomaincred');
         } ?>
-        <div class="col-md-12 modify-lti-domain-group-padding">
+        <div class="col-md-12 col-sm-12 modify-lti-domain-group-padding">
             <form method=post action="actions?action=modltidomaincred&id=<?php echo $user['id'] ?>">
                 <div id="headerforms" class="pagetitle">
                     <h3>
@@ -736,37 +736,37 @@ switch ($action) {
                     <?php AppUtility::t('Modify LTI key/secret') ?>
                 </span>
 
-                <div class="col-md-12 padding-left-zero margin-top-fifteen">
-                    <span class="col-md-2 padding-left-zero select-text-margin">
+                <div class="col-md-12 col-sm-12 padding-left-zero margin-top-fifteen">
+                    <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin">
                         <?php AppUtility::t('Domain') ?>
                     </span>
-                    <span class="col-md-4 padding-left-zero">
+                    <span class="col-md-4 col-sm-4 padding-left-zero">
                         <input class="form-control" type=text name="ltidomain" value="<?php echo $user['email']; ?>"
                                size=20>
                     </span>
                 </div>
-                <div class="col-md-12 padding-left-zero margin-top-twenty">
-                    <span class="col-md-2 padding-left-zero select-text-margin">
+                <div class="col-md-12 col-sm-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin">
                         <?php AppUtility::t('Key') ?>
                     </span>
-                    <span class="col-md-4 padding-left-zero">
+                    <span class="col-md-4 col-sm-4 padding-left-zero">
                         <input class="form-control" type=text name="ltikey" value="<?php echo $user['SID'] ?>" size=20>
                     </span>
                 </div>
-                <div class="col-md-12 padding-left-zero margin-top-twenty">
-                    <span class="col-md-2 padding-left-zero select-text-margin">
+                <div class="col-md-12 col-sm-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin">
                         <?php AppUtility::t('Secret') ?>
                     </span>
-                    <span class="col-md-4 padding-left-zero">
+                    <span class="col-md-4 col-sm-4 padding-left-zero">
                         <input class="form-control" type=text name="ltisecret" value="<?php echo $user['password'] ?>"
                                size=20>
                     </span>
                 </div>
-                <div class="col-md-12 padding-left-zero margin-top-twenty">
-                    <span class="col-md-2 padding-left-zero select-text-margin">
+                <div class="col-md-12 col-sm-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin">
                         <?php AppUtility::t('Can create instructors') ?>
                     </span>
-                    <span class="col-md-4 padding-left-zero">
+                    <span class="col-md-4 col-sm-4 padding-left-zero">
                         <select class="form-control" name="createinstr">
                             <option value="11"
                                 <?php if ($user['rights'] == AppConstant::NUMERIC_ELEVEN) {
@@ -783,11 +783,11 @@ switch ($action) {
                         </select>
                     </span>
                 </div>
-                <div class="col-md-12 padding-left-zero margin-top-twenty">
-                    <span class="col-md-2 padding-left-zero select-text-margin">
+                <div class="col-md-12 col-sm-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin">
                         <?php AppUtility::t('Associate with group') ?>
                     </span>
-                    <span class="col-md-4 padding-left-zero">
+                    <span class="col-md-4 col-sm-4 padding-left-zero">
                         <select class="form-control" name="groupid">
                             <option value="0">
                                 <?php AppUtility::t('Default') ?>
@@ -805,19 +805,18 @@ switch ($action) {
                      </span>
                 </div>
                 <div class="col-sm-2 col-sm-offset-2 padding-top-thirty padding-left-zero">
-                    <input type=submit class="" value="<?php AppUtility::t('Update LTI Credentials') ?>">
+                    <input type=submit class="margin-left-minus-two" value="<?php AppUtility::t('Update LTI Credentials') ?>">
                 </div>
             </form>
         </div>
         <?php break;
     case "listgroups":
         ?>
-        <div class="col-md-12 modify-group-padding">
-            <form method=post
-                  action="<?php echo AppUtility::getURLFromHome('admin', 'admin/actions?action=addgroup'); ?>">
+        <div class="col-md-12 col-sm-12 modify-group-padding">
+            <form class="modify-group-table" method=post action="<?php echo AppUtility::getURLFromHome('admin', 'admin/actions?action=addgroup'); ?>">
 
                 <div id="headerforms" class="pagetitle">
-                    <h3>
+                    <h3 class="padding-left-thirteen padding-bottom-ten">
                         <?php AppUtility::t('Modify Groups') ?>
                     </h3>
                 </div>
@@ -849,7 +848,7 @@ switch ($action) {
                     }?>
                 </table>
                 <?php  echo "<div class='col-sm-12 padding-left-zero padding-top-ten'>
-                        <span class='floatleft select-text-margin col-sm-2 '>" . AppUtility::t('Add new group', false) . "</span>
+                        <span class='floatleft select-text-margin col-md-2 col-sm-3'>" . AppUtility::t('Add new group', false) . "</span>
                         <input class='width-thirty-per floatleft form-control subject' type=text name=gpname id=gpname size=50>
                         </div>";
                 ?>
@@ -865,7 +864,7 @@ switch ($action) {
         <?php break;
     case "modgroup":
         ?>
-        <div class="col-md-12 rename-group-padding">
+        <div class="col-md-12 col-sm-12 rename-group-padding">
             <?php $gpname = $groupsName['name']; ?>
             <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id'] ?>>
                 <div id="headerforms" class="pagetitle">
@@ -885,8 +884,8 @@ switch ($action) {
     case "removediag":
         echo '<div class=""><br>';
         echo "<div class='col-md-10'>" . AppUtility::t('Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.', false) . "</div><br>\n";
-        echo "<br> <div class='col-md-6 padding-left-zero'><div class='col-md-2'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\"></div>\n";
-        echo "<div class='col-md-2 padding-left-zero'><input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
+        echo "<br> <div class='col-md-6 col-sm-6 padding-left-zero'><div class='col-md-2 col-sm-2'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\"></div>\n";
+        echo "<div class='col-md-2 col-sm-2 padding-left-zero'><input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
         echo '</div>';
         break;
 }

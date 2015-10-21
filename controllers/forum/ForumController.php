@@ -1591,13 +1591,15 @@ class ForumController extends AppController
         }
         if ($this->isPostMethod()) {
             if ($params['modifyFid']) {
+                $outcomes = array();
                 if (isset($params['outcomes'])) {
                     foreach ($params['outcomes'] as $outcomeId) {
                         if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
                             $outcomes[] = intval($outcomeId);
                         }
                     }
-                    if ($outcomes != null) {
+                    if ($outcomes != null)
+                    {
                         $params['outcomes'] = implode(',', $outcomes);
                     } else {
                         $params['outcomes'] = " ";

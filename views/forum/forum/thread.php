@@ -51,8 +51,9 @@ $now = $currentTime;
 <input type="hidden" id="un-read" value="<?php echo $unRead; ?>">
 
 <div class="tab-content shadowBox ">
-    <div class="inner-content col-sm-12 padding-left-right-thirty">
-        <div class="view-drop-down  pull-left width-twenty-five-per">
+    <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-ten">
+        <div class="padding-left-zero col-md-5 col-sm-8">
+        <div class="view-drop-down col-md-8  col-sm-8 padding-left-right-zero">
         <span class="floatleft padding-right-ten padding-top-five"><?php echo AppUtility::t('View Options',false)?></span>
             <select name="seluid" class="form-control-forum form-control select_option width-fifty-five-per" id="">
                 <option value="-1" selected="selected"><?php echo AppUtility::t('Select')?></option>
@@ -64,44 +65,31 @@ $now = $currentTime;
                 if (count($newpost)>0) {?>
                     <option value="2"><?php echo AppUtility::t('Limit to New ')?></option>
                 <?php } }?>
-                <?php if (count($newpost)>0) {?>
-                    <option value="4"><?php echo AppUtility::t('Mark All Read')?></option>
-                <?php } ?>
+
             </select>
         </div>
-
-        <div class="view-drop-down padding-left-fifteen pull-left width-twenty-five-per">
-           <?php if ($isteacher && $groupsetid > 0)
-            {
-            natsort($groupnames);
-            echo '<span class="padding-right-ten padding-top-five floatleft">Filter By Group </span><select class="form-control width-fifty-five-per" id="ffilter" onChange="chgfilter()"><option value="-1" ';
-                    if ($curfilter==-1) { echo 'selected="1"';}
-                    echo '>All groups</option>';
-                    foreach ($groupnames as $gid=>$gname)
-                    {
-                    echo "<option value=\"$gid\" ";
-                    if ($curfilter==$gid) { echo 'selected="1"';}
-                    echo ">$gname</option>";
-                    }
-                    echo '</select>';
-
-            } ?>
+                    <?php if (count($newpost)>0) {?>
+        <div class="col-md-4 col-sm-4 padding-top-eighteen padding-left-right-zero">
+            <a>
+                <?php echo AppUtility::t('Mark All Read')?>
+            </a>
         </div>
-        <form id="myForm">
-        <div class="pull-right view-drop-down">
-            <a class="btn btn-primary search-button" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></a>
+                    <?php } ?>
         </div>
-        <div class="checkbox checkbox-thread override-hidden pull-right">
-            <label>
+        <div class="col-md-6 col-sm-12 padding-top-ten padding-left-right-zero floatright">
+        <span class="col-md-4 col-sm-4 padding-left-right-zero">
+             <input type="text" class="form-control" name="search" id="search_text" maxlength="30" placeholder="<?php echo AppUtility::t('Enter Search Terms')?>">
+        </span>
+        <span class="checkbox checkbox-thread override-hidden col-md-5 col-sm-5 padding-left-right-zero margin-left-right-zero">
+            <label class="margin-top-zero floatright padding-left-zero">
                 <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forum in Courses?')?>
 
                 <span class="cr"><i class="cr-icon fa fa-check"></i></span>
             </label>
-        </div>
-        <div class="view-drop-down pull-right">
-                <span class="">
-                 <input type="text" class="form-control" name="search" id="search_text" maxlength="30" placeholder="<?php echo AppUtility::t('Enter Search Terms')?>">
-               </span>
+        </span>
+        <span class="col-md-3 col-sm-2 padding-left-right-zero">
+            <a class="btn btn-primary search-button floatright" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></a>
+        </span>
         </div>
             <input type=hidden name=page value="<?php echo $page;?>">
             <input type=hidden name=cid value="<?php echo $course->id;?>">
@@ -133,6 +121,7 @@ $now = $currentTime;
     //            echo filter($row['imas_forum_posts.message']); ?>
                  <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
                  </div>
+
             <?php }
 echo '</div>';
 
@@ -198,16 +187,30 @@ echo '</div>';
     } ?>
 
             <?php
-
-            echo '<p>';
             $toshow = array();
             if ($page<0) {
-            } else {
-                if ($taglist!='') {
+            } else { ?>
+                <div class="col-sm-12 col-md-12 padding-top-twenty">
+                    <?php if ($isteacher && $groupsetid > 0)
+                    {
+                        natsort($groupnames);
+                        echo '<div class="col-md-4 col-sm-6"><span class="padding-right-ten padding-top-five floatleft">Filter By Group </span><select class="form-control width-fifty-five-per" id="ffilter" onChange="chgfilter()"><option value="-1" ';
+                        if ($curfilter==-1) { echo 'selected="1"';}
+                        echo '>All groups</option>';
+                        foreach ($groupnames as $gid=>$gname)
+                        {
+                            echo "<option value=\"$gid\" ";
+                            if ($curfilter==$gid) { echo 'selected="1"';}
+                            echo ">$gname</option>";
+                        }
+                        echo '</select></div>';
+
+                    } ?>
+               <?php if ($taglist!='') {
                     $p = strpos($taglist,':');
 
-                    $tagselect = 'Filter by '.substr($taglist,0,$p).': ';
-                    $tagselect .= '<select id="tagfilter" onChange="chgtagfilter()"><option value="" ';
+                    $tagselect = '<span class="col-md-3 col-sm-4"><span>Filter by </span>'.substr($taglist,0,$p);
+                    $tagselect .= '<select class="form-control width-fifty-per display-inline-block margin-left-ten" id="tagfilter" onChange="chgtagfilter()"><option value="" ';
                     if ($tagfilter=='') {
                         $tagselect .= 'selected="selected"';
                     }
@@ -219,17 +222,14 @@ echo '</div>';
                         if ($tag==$tagfilter) {$tagselect .= 'selected="selected"';}
                         $tagselect .= '>'.$tag.'</option>';
                     }
-                    $tagselect .= '</select>';
+                    $tagselect .= '</select></span>';
                     $toshow[] = $tagselect;
-                }
-            }
+                } ?>
+            <?php }
             echo implode(' | ',$toshow);
-
-            echo "</p>";
-
             ?>
 
-            <div id="data" class="col-sm-12 padding-left-right-thirty padding-top-thirty padding-bottom-ten">
+            </div><div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
                 <div class="overflow-x-auto">
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
@@ -353,4 +353,3 @@ echo '</div>';
             <div id="searchpost"></div>
    <?php } } ?>
 </div>
-<div>
