@@ -39,6 +39,13 @@ use app\components\UserPics;
 
 class SiteController extends AppController
 {
+    public function beforeAction($action)
+    {
+        $user = $this->getAuthenticatedUser();
+        $actionPath = Yii::$app->controller->action->id;
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForSiteController($user,$courseId, $actionPath);
+    }
     public function behaviors()
     {
         return [

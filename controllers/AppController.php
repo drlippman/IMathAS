@@ -911,18 +911,8 @@ class AppController extends Controller
         }
     }
 
-    public function accessForSiteController($user, $courseId, $actionPath)
-    {
-        $isStudent = $this->isStudent($user['id'], $courseId);
-        if (($user['rights'] > AppConstant::STUDENT_RIGHT) && ($actionPath == 'login' || $actionPath == 'diagnostics' || $actionPath == 'registration' || $actionPath == 'student-register' || $actionPath == 'forgot-password' || $actionPath == 'forgot-username' || $actionPath == 'check-browser' || $actionPath == 'reset-password' || $actionPath == 'logout' || $actionPath == 'dashboard' || $actionPath == 'change-password' || $actionPath == 'change-user-info')) {
-            return true;
-        } else if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'student-enroll-course' || $actionPath == 'hide-from-course-list' || $actionPath == 'unhide-from-course-list' || $actionPath == 'form' || $actionPath == 'action') && $isStudent) {
-            return true;
-        } else {
-            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
-        }
-    }
+
+
 
     public function accessForMessageController($user, $courseId, $actionPath)
     {
@@ -933,6 +923,21 @@ class AppController extends Controller
         } else if ($user['rights'] == AppConstant::GUEST_RIGHT) {
             return true;
         } else {
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect($this->goHome());
+        }
+    }
+
+    public function accessForSiteController($user, $courseId, $actionPath)
+    {
+        if(($user['rights'] >= AppConstant::GUEST_RIGHT) && ($actionPath == 'index'|| $actionPath == 'dashboard' || $actionPath == 'change-password' || $actionPath == 'change-user-info'))
+        {
+            return true;
+        } elseif(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'student-enroll-course' || $actionPath == 'hide-from-course-list' || $actionPath == 'unhide-from-course-list' || $actionPath == 'form' || $actionPath == 'action')){
+           return true;
+        } elseif($actionPath == 'login' || $actionPath == 'logout' || $actionPath == 'diagnostics' || $actionPath == 'registration' || $actionPath == 'student-register' || $actionPath == 'Work-in-progress' || $actionPath == 'forgot-password' || $actionPath == 'forgot-username' || $actionPath == 'check-browser' || $actionPath == 'reset-password' || $actionPath == 'helper-guide' || $actionPath == 'documentation' || $actionPath == 'help-for-student-answer' || $actionPath == 'instructor-document'){
+           return true;
+        }else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect($this->goHome());
         }
