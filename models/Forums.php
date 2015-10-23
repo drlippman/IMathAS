@@ -63,7 +63,8 @@ class Forums extends BaseImasForums {
             ->where('courseid=:courseId',[':courseId'=>$courseId])
             ->andWhere(['>', 'points', AppConstant::NUMERIC_ZERO])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
-        if ($catfilter>AppConstant::NUMERIC_NEGATIVE_ONE) {
+        if ($catfilter>AppConstant::NUMERIC_NEGATIVE_ONE)
+        {
             $query->andWhere('gbcategory=:gbCat',[':gbCat' => $catfilter]);
         }
         $query->orderBy('enddate, postby, replyby, startdate');

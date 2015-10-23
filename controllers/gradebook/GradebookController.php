@@ -3631,6 +3631,7 @@ class GradebookController extends AppController
         }
         $vidcnt = array();
         if (count($questionCount) > 0) {
+
             $qlist = implode(',', array_keys($questionCount));
             $contentTrackData = ContentTrack::getCourseIdUsingStudentTableJoin($courseId,array_keys($questionCount),$secfilter);
             foreach($contentTrackData as $row){

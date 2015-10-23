@@ -170,7 +170,7 @@ class ForumController extends AppController
                 return $this->redirect('forum?cid='.$cid);
             }
             $limthreads = implode(',',$threadids);
-            $maxPost = ForumPosts::getMaxPostDateWithThreadId($limthreads);
+            $maxPost = ForumPosts::getMaxPostDateWithThreadId($threadids);
             $postcount = array();
             $maxdate = array();
             foreach ($maxPost as $row)
@@ -471,12 +471,10 @@ class ForumController extends AppController
         $taglist = $forumData['taglist'];
         $enddate = $forumData['enddate'];
         $avail = $forumData['avail'];
-
         if (isset($studentId) && ($avail == 0 || ($avail == 1 && time() > $enddate))) {
             $this->setWarningFlash('This forum is closed.');
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid' . $courseId));
         }
-
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
         $allowmod = (($forumsettings & 2) == 2);
@@ -522,8 +520,6 @@ class ForumController extends AppController
                 }
                 if (count($limthreads) == 0) {
                     $limthreads = '0';
-                } else {
-                    $limthreads = implode(',', $limthreads);
                 }
             }
         } else {
@@ -534,16 +530,15 @@ class ForumController extends AppController
             $sessionData['tagfilter' . $forumId] = stripslashes($params['tagfilter']);
             $this->writesessiondata($sessionData, $sessionId);
             $tagfilter = stripslashes($params['tagfilter']);
-//        }
-//        else if (isset($sessionData['tagfilter' . $forumId]) && $sessionData['tagfilter' . $forumId] != '') {
-//            $tagfilter = $sessionData['tagfilter' . $forumId];
+        }
+        else if (isset($sessionData['tagfilter' . $forumId]) && $sessionData['tagfilter' . $forumId] != '') {
+            $tagfilter = $sessionData['tagfilter' . $forumId];
         } else {
             $tagfilter = '';
         }
 
         if ($tagfilter != '') {
             $threadIds = ForumPosts::getThreadId($limthreads, $dofilter, $tagfilter);
-
             $limthreads = array();
             foreach ($threadIds as $threadId) {
                 $limthreads[] = $threadId['threadid'];
@@ -551,8 +546,6 @@ class ForumController extends AppController
 
             if (count($limthreads) == 0) {
                 $limthreads = '0';
-            } else {
-                $limthreads = implode(',', $limthreads);
             }
             $dofilter = true;
         }
@@ -595,7 +588,6 @@ class ForumController extends AppController
             }
         }
         $postData = ForumPosts::getMaxPostDate($dofilter, $limthreads, $forumId);
-
         $postcount = array();
         $maxdate = array();
         foreach ($postData as $post) {
@@ -651,9 +643,8 @@ class ForumController extends AppController
                 $groupnames[$row['id']] = $row['name'];
             }
         }
-
-        $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpostlist, $flaggedlist);
-        $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpostlist, $flaggedlist, $sortby, $threadsperpage);
+        $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
+        $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);

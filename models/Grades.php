@@ -38,9 +38,9 @@ class Grades extends BaseImasGrades
             ->where([$sel]);
         if ($limuser > 0)
         {
-            $query->andWhere(["userid:limuser"]);
+            $query->andWhere('userid = :limuser',[':limuser' => $limuser]);
         }
-        $command = $query->createCommand()->bindValue('limuser', $limuser);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
@@ -105,10 +105,8 @@ class Grades extends BaseImasGrades
         $query	->select(['userid','score','feedback'])
             ->from('imas_grades')
             ->where(['gradetype' => 'offline'])
-            ->andWhere('gradetypeid=:gbitemId');
-        if($grades != 'all'){
-            $query->andWhere('userid=:grades');
-        }
+            ->andWhere('gradetypeid =: gbitemId');
+        $grades != 'all' ? $query->andWhere('userid=:grades') : $query->andWhere(':grades = :grades');
         $command = $query->createCommand()->bindValues(['gbitemId' => $gbitemId, 'grades' => $grades]);
         $data = $command->queryAll();
         return $data;

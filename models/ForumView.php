@@ -146,7 +146,6 @@ class ForumView extends BaseImasForumViews
         }
         else
         {
-
             $query  = ForumView::findOne(['id' => $threadId ]);
             $query->userid = $userId;
             $query->threadid =$threadId;
@@ -217,6 +216,11 @@ class ForumView extends BaseImasForumViews
 
     public static function getForumDataByUserId($userId,$dofilter,$limthreads)
     {
+        if (count($limthreads) == 0) {
+            $limthreads = '0';
+        } else {
+            $limthreads = implode(',', $limthreads);
+        }
         $query = "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid= :userId";
         if ($dofilter) {
             $query .= " AND threadid IN ($limthreads)";

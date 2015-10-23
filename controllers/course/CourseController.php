@@ -1496,7 +1496,8 @@ class CourseController extends AppController
                 $result = ContentTrack::getStatsData($courseId);
                 foreach($result as $key => $row)
                 {
-                    $hasStats[$row['typeid']] = true;
+
+                    $hasStats[$row['(CONCAT(SUBSTRING(type,1,1),typeid))']] = true;
                 }
             }
 

@@ -883,7 +883,7 @@ class AppController extends Controller
         $isStudent = $this->isStudent($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'get-block-items' || $actionPath == 'course' || $actionPath == 'show-linked-text' || $actionPath == 'get-assessment-data-ajax') && ($teacherId || $isStudent)) {
             return true;
-        } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-link' || $actionPath == 'modify-inline-text') && $teacherId) {
+        } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-link' || $actionPath == 'modify-inline-text' || $actionPath == 'copy-items-ajax' || $actionPath == 'delete-items-ajax') && $teacherId) {
             return true;
         } else if (($user['rights'] >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'add-remove-course'))) {
             return true;

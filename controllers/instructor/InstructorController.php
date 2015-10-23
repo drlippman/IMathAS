@@ -1065,11 +1065,13 @@ class InstructorController extends AppController
                                  $query['ancestors'] = intval($params['ctc']).','.$query['ancestors'];
                              }
                              $sets = '';
+
                              for ($i=0; $i<count($toCopyArr); $i++)
                              {
                                  if ($i> AppConstant::NUMERIC_ZERO){$sets .= ',';}
                                  $sets .= $toCopyArr[$i] . "='" . ($query[$i])."'";
                              }
+
                              Course::updateCourseForCopyCourse($courseId,$sets);
 
                          }

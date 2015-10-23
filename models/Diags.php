@@ -28,6 +28,13 @@ class Diags extends BaseImasDiags
         }
         $query->orderBy('imas_diags.name');
         $command = $query->createCommand();
+        if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $command = $command->bindValue(':userId',$userId);
+        } else if ($myRights < AppConstant::NUMERIC_HUNDREAD)
+        {
+            $command = $command->bindValue(':groupId',$groupId);
+        }
         $data = $command->queryAll();
         return $data;
     }

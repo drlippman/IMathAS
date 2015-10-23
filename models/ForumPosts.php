@@ -243,6 +243,11 @@ class ForumPosts extends BaseImasForumPosts
     }
     public static function MarkAllRead($forumId,$dofilter = null,$limthreads = null)
     {
+        if (count($limthreads) == 0) {
+            $limthreads = '0';
+        } else {
+            $limthreads = implode(',', $limthreads);
+        }
 
           $query = new Query();
           $query ->select(['DISTINCT(threadid)'])
@@ -314,9 +319,11 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getPostData($threadlist)
     {
-        $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
-        $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $query = new Query();
+        $query->select('imas_forum_posts.*,imas_users.LastName,imas_users.FirstName')
+            ->from('imas_forum_posts,imas_users')->where('imas_forum_posts.userid=imas_users.id')
+            ->andWhere('IN','imas_forum_posts.id',$threadlist);
+        return $query->createCommand()->queryAll();
     }
 
     public static function getByRefIds($refids)
@@ -326,17 +333,24 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getThreadId($limthreads,$dofilter,$tagfilter)
     {
-        $query = "SELECT threadid FROM imas_forum_posts WHERE tag='".addslashes($tagfilter)."'";
+        $query = new Query();
+        $query->select('threadid')->from('imas_forum_posts')->where(['tag' => $tagfilter]);
         if ($dofilter)
-{
-            $query .= " AND threadid IN ($limthreads)";
+        {
+            $query->andWhere('IN','threadid',$limthreads);
         }
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
     public static function getBySearchText($isTeacher,$now,$courseId,$searchlikes,$searchlikes2,$searchlikes3,$forumId,$limthreads,$dofilter,$params)
     {
-
+        if (count($limthreads) == 0) {
+            $limthreads = '0';
+        } else {
+            $limthreads = implode(',', $limthreads);
+        }
         if (isset($params['allforums']))
         {
             $query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
@@ -360,74 +374,86 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getMaxPostDate($dofilter,$limthreads,$forumId)
     {
-        $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
-        $query .= "WHERE forumid= '$forumId' ";
+        $query = new Query();
+        $query->select('threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate')
+            ->from('imas_forum_posts')->where('forumid = :forumId');
         if ($dofilter)
         {
-            $query .= " AND threadid IN ($limthreads)";
+            $query->andWhere(['IN','threadid',$limthreads]);
         }
-        $query .= "GROUP BY threadid";
-        $data = Yii::$app->db->createCommand($query);
-        return $data->queryAll();
+        $query->groupBy('threadid');
+        return $query->createCommand()->bindValues([':forumId' => $forumId])->queryAll();
     }
 
     public static function getForumPostId($forumId,$limthreads,$dofilter)
     {
-        $query = "SELECT COUNT(id) FROM imas_forum_posts WHERE parent=0 AND forumid= :forumId";
+        $query = new Query();
+        $query->select('COUNT(id)')->from('imas_forum_posts')->where('parent=0')
+        ->andWhere('forumid= :forumId');
         if ($dofilter)
         {
-        $query .= " AND threadid IN ($limthreads)";
+        $query->andWhere('IN','threadid',$limthreads);
         }
-        $data = Yii::$app->db->createCommand($query);
+        $data = $query->createCommand();
         $data->bindValue('forumId', $forumId);
         return $data->queryAll();
     }
 
     public static function getPostIds($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist)
     {
-        $query = "SELECT imas_forum_posts.id,count(imas_forum_views.userid) FROM imas_forum_views,imas_forum_posts ";
-        $query .= "WHERE imas_forum_views.threadid=imas_forum_posts.id AND imas_forum_posts.parent=0 AND ";
-        $query .= "imas_forum_posts.forumid= :forumId ";
+        $query = new Query();
+        $query->select('imas_forum_posts.id,count(imas_forum_views.userid)')->from('imas_forum_views,imas_forum_posts')
+            ->where('imas_forum_views.threadid=imas_forum_posts.id')->andWhere('imas_forum_posts.parent=0')
+            ->andWhere('imas_forum_posts.forumid= :forumId');
+
         if ($dofilter)
         {
-            $query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+            $query->andWhere('IN','imas_forum_posts.threadid',$limthreads);
         }
         if ($page==-1)
         {
-            $query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
+            $query->andWhere('IN','imas_forum_posts.threadid',$newpostlist);
         } else if ($page==-2)
         {
-            $query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
+            $query->andWhere('IN','imas_forum_posts.threadid',$flaggedlist);
         }
-        $query .= "GROUP BY imas_forum_posts.id";
-        $data = Yii::$app->db->createCommand($query);
+        $query->groupBy('imas_forum_posts.id');
+        $data = $query->createCommand();
         $data->bindValue('forumId', $forumId);
         return $data->queryAll();
     }
 
     public static function getPostDataForThread($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist,$sortby,$threadsperpage)
     {
-        $query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
-        $query .= "imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid= :forumId ";
-
-        if ($dofilter) {
-            $query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
+        $query = new Query();
+        $query->select('imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid')
+            ->from('imas_forum_posts,imas_users,imas_forum_threads')
+            ->where('imas_forum_posts.userid=imas_users.id')->andWhere('imas_forum_posts.threadid=imas_forum_threads.id')
+            ->andWhere('imas_forum_posts.parent=0')->andWhere('imas_forum_posts.forumid= :forumId');
+        if ($dofilter)
+        {
+            $query->andWhere('IN','imas_forum_posts.threadid',$limthreads);
         }
-        if ($page==-1) {
-            $query .= "AND imas_forum_posts.threadid IN ($newpostlist) ";
-        } else if ($page==-2) {
-            $query .= "AND imas_forum_posts.threadid IN ($flaggedlist) ";
+        if ($page==-1)
+        {
+            $query->andWhere('IN','imas_forum_posts.threadid',$newpostlist);
+        } else if ($page==-2)
+        {
+            $query->andWhere('IN','imas_forum_posts.threadid',$flaggedlist);
         }
-        if ($sortby==0) {
-            $query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
-        } else if ($sortby==1) {
-            $query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_threads.lastposttime DESC ";
+        if ($sortby==0)
+        {
+            $query->orderBy(['imas_forum_posts.posttype' => AppConstant::DESCENDING])->orderBy(['imas_forum_posts.id' => AppConstant::DESCENDING]);
+        } else if ($sortby==1)
+        {
+            $query->orderBy(['imas_forum_posts.posttype' => AppConstant::DESCENDING])->orderBy(['imas_forum_threads.lastposttime' => AppConstant::DESCENDING]);
         }
         $offset = ($page-1)*$threadsperpage;
-        if ($page>0) {
-            $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
+        if ($page>0)
+        {
+            $query->limit($threadsperpage)->offset($offset);
         }
-        $data = Yii::$app->db->createCommand($query);
+        $data = $query->createCommand();
         $data->bindValue('forumId', $forumId);
         return $data->queryAll();
     }
@@ -435,13 +461,14 @@ class ForumPosts extends BaseImasForumPosts
     public static function getPosts($userId,$forumId,$limthreads,$dofilter)
     {
         $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
-        $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userId') AS ifv ON ";
+        $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid= :userId) AS ifv ON ";
         $query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumId' AND imas_forum_posts.isanon=0 ";
-        if ($dofilter) {
+        if ($dofilter)
+        {
             $query .= "AND imas_forum_posts.threadid IN ($limthreads) ";
         }
         $query .= "ORDER BY imas_users.LastName,imas_users.FirstName,imas_forum_posts.postdate DESC";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return Yii::$app->db->createCommand($query)->bindValues(['userId' => $userId])->queryAll();
     }
 
     public static function threadCount($cid)
@@ -497,16 +524,15 @@ class ForumPosts extends BaseImasForumPosts
         if ($anyforumsgroup && !$isteacher) {
             $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
         }
-
         $query .= " ORDER BY imas_forum_threads.lastposttime DESC";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
 
     public static function getMaxPostDateWithThreadId($limthreads)
     {
-        $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
-        $query .= "WHERE threadid IN ($limthreads) GROUP BY threadid";
-        $data = Yii::$app->db->createCommand($query);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate')->from('imas_forum_posts')
+            ->where(['IN','threadid',$limthreads])->groupBy('threadid');
+        return $query->createCommand()->queryAll();
     }
 }

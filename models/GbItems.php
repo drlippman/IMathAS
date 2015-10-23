@@ -31,22 +31,23 @@ class GbItems extends BaseImasGbitems
         $query = new Query();
         $query->select(['*'])
             ->from('imas_gbitems')
-            ->where(['courseid'=>$courseId]);
+            ->where('courseid = :courseId');
         if (!$canviewall) {
             $query->andWhere(['<','showdate', $now]);
         }
         if (!$canviewall) {
-            $query->andWhere(['>','cntingb', 0]);
+            $query->andWhere(['>','cntingb', AppConstant::NUMERIC_ZERO]);
         }
         if ($istutor) {
-            $query->andWhere(['<','tutoredit', 2]);
+            $query->andWhere(['<','tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if ($catfilter>-1) {
-            $query->andWhere(['gbcategory' => $catfilter]);
+        if ($catfilter>-1)
+        {
+            $query->andWhere('gbcategory = :gbCat',[':gbCat' => $catfilter]);
         }
         $query->orderBy('showdate');
         $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;
     }
 
@@ -86,16 +87,17 @@ class GbItems extends BaseImasGbitems
         $query = new Query();
         $query->select(['*'])
             ->from('imas_gbitems')
-            ->where(['courseid'=>$courseId])
+            ->where('courseid = :courseId',[':courseId' => $courseId])
             ->andWhere(['<>','outcomes',''])
             ->andWhere(['<','showdate',$now])
             ->andWhere(['>','cntingb',0])
             ->andWhere(['<','cntingb',3]);
         if ($istutor) {
-            $query->andWhere(['<','tutoredit', 2]);
+            $query->andWhere(['<','tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if ($catfilter>-1) {
-            $query->andWhere(['gbcategory' => $catfilter]);
+        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE)
+        {
+            $query->andWhere('gbcategory=:gbCat',[':gbCat' => $catfilter]);
         }
         $query->orderBy('showdate');
         $command = $query->createCommand();

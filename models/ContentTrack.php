@@ -32,21 +32,18 @@ class ContentTrack extends BaseImasContentTrack
             )
             -> distinct('imas_content_track.userid')
             ->groupBy('imas_content_track.typeid')
-            -> where(['imas_students.courseid' => $courseId])
-            -> andWhere(['imas_content_track.courseid' => $courseId])
+            -> where('imas_students.courseid = :courseId')
+            -> andWhere('imas_content_track.courseid = :courseId')
             -> andWhere(['imas_content_track.type' => 'extref'])
             -> andWhere(['IN','imas_content_track.typeid',$qlist]);
-           if($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE){
-               $query->andWhere(['imas_students.section' => $secfilter]);
-           }
-        $command = $query->createCommand();
+            ($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE) ? $query->andWhere('imas_students.section = :secfilter') : $query->andWhere(':secfilter = :secfilter');
+        $command = $query->createCommand()->bindValues([':courseId' => $courseId,':secfilter' => $secfilter]);
         $data = $command->queryAll();
         return $data;
     }
 
     public static function getDistinctUserIdUsingCourseIdAndQuestionId($courseId,$questionId,$secfilter)
     {
-        $query = new Query();
         $query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid= :courseId AND ict.courseid= :courseId AND ict.type='extref' AND ict.typeid= :questionId AND ims.locked=0 ";
         if ($secfilter!=AppConstant::NUMERIC_NEGATIVE_ONE)
         {

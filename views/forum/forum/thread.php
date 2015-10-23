@@ -52,6 +52,7 @@ $now = $currentTime;
 
 <div class="tab-content shadowBox ">
     <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-ten">
+        <form id="myForm">
         <div class="padding-left-zero col-md-5 col-sm-8">
         <div class="view-drop-down col-md-8  col-sm-8 padding-left-right-zero">
         <span class="floatleft padding-right-ten padding-top-five"><?php echo AppUtility::t('View Options',false)?></span>

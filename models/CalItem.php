@@ -80,7 +80,7 @@ class CalItem extends BaseImasCalitems
     public static function InsertDataForCopy($calItemData)
     {
         $query = \Yii::$app->db->createCommand("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES $calItemData");
-        $data = $query->queryAll();
+        $query->queryAll();
 
     }
 

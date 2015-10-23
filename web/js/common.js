@@ -178,61 +178,62 @@ function alertPopUp(message, e){
     });
 }
 
-
-$(document).ready(function () {
-    $("input").keypress(function(e){
-        var subject = $(".subject").val();
-        $('#flash-message').hide();
-        if(subject.length > 60)
-        {
-            $('#flash-message').show();
-            $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters.");
-            return false;
-        }else{
-            $('#flash-message').hide();
-        }
-    });
-    $("input").keyup(function(e){
-        if(e.keyCode == 8 || e.keyCode == 46)
-        {
-            $('#flash-message').hide();
-        }
-    });
-});
-
-function submitForm()
-{
-    var subject = $(".subject").val();
-    if(subject.length < 1)
-    {
-        var html = '<div><p>No subject.Send anyway?</p></div>';
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Cancel": function () {
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "confirm": function () {
-                    $(this).dialog("close");
-                    $('#flash-message').hide();
-                    $('#form-id').submit();
-                    return true;
-                }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
-        });
-    }else if(subject.length > 60)
-    {
-        $('#flash-message').show();
-        $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters.");
-        return false;
-    }else{
-        $('#flash-message').hide();
-        $('#form-id').submit();
-    }
-}
+//
+//$(document).ready(function ()
+//{
+//    $("input").keypress(function(e){
+//        var subject = $(".subject").val();
+//        $('#flash-message').hide();
+//        if(subject.length > 60)
+//        {
+//            $('#flash-message').show();
+//            $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters.");
+//            return false;
+//        }else{
+//            $('#flash-message').hide();
+//        }
+//    });
+//    $("input").keyup(function(e){
+//        if(e.keyCode == 8 || e.keyCode == 46)
+//        {
+//            $('#flash-message').hide();
+//        }
+//    });
+//});
+//
+//function submitForm()
+//{
+//    var subject = $(".subject").val();
+//    if(subject.length < 1)
+//    {
+//        var html = '<div><p>No subject.Send anyway?</p></div>';
+//        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+//            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+//            width: 'auto', resizable: false,
+//            closeText: "hide",
+//            buttons: {
+//                "Cancel": function () {
+//                    $(this).dialog('destroy').remove();
+//                    return false;
+//                },
+//                "confirm": function () {
+//                    $(this).dialog("close");
+//                    $('#flash-message').hide();
+//                    $('#form-id').submit();
+//                    return true;
+//                }
+//            },
+//            close: function (event, ui) {
+//                $(this).remove();
+//            }
+//        });
+//    }else if(subject.length > 60)
+//    {
+//        $('#flash-message').show();
+//        $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters.");
+//        return false;
+//    }else{
+//        $('#flash-message').hide();
+//        $('#form-id').submit();
+//    }
+//}

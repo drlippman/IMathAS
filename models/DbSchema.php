@@ -7,12 +7,13 @@ use app\components\AppUtility;
 use yii\db\Query;
 
 class DbSchema extends BaseImasDbschema {
-    public static function getById($id){
+    public static function getById($id)
+    {
         return DbSchema::findOne(['id' => $id]);
-
     }
 
-    public static function setById($id){
+    public static function setById($id)
+    {
         $dbData = DbSchema::getById($id);
         if($dbData){
             $dbData->ver += AppConstant::NUMERIC_ONE;
@@ -33,7 +34,6 @@ class DbSchema extends BaseImasDbschema {
     }
     public static function insertData($lastFirstUpdate,$lastUpdate)
     {
-
         $query = "INSERT INTO imas_dbschema (id,ver) VALUES (3,$lastUpdate),(4,$lastFirstUpdate)";
         \Yii::$app->db->createCommand($query)->query();
     }

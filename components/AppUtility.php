@@ -3366,7 +3366,7 @@ class AppUtility extends Component
         }
         $threadlist = implode(',',$postthreads);
         $threaddata = array();
-        $result = ForumPosts::getPostData($threadlist);
+        $result = ForumPosts::getPostData($postthreads);
         foreach($result as $key => $tline) {
             $threaddata[$tline['id']] = $tline;
         }
