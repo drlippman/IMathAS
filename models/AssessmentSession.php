@@ -103,9 +103,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getByUserCourseAssessmentId($assessmentId, $courseId)
     {
         $query = new Query();
-        $query->select(['imas_assessment_sessions.id,count(*)'])->from('imas_assessment_sessions')
+        $query->select('imas_assessment_sessions.id,count(*)')->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
-            ->where(['imas_assessment_sessions.assessmentid=:assessmentId', 'imas_students.courseid=:courseId'])->count();
+            ->where('imas_assessment_sessions.assessmentid = :assessmentId')->andWhere('imas_students.courseid = :courseId');
         $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
         $items = $command->queryAll();
         return $items;

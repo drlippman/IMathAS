@@ -692,7 +692,7 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 	global $qi,$questions,$temp,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
-            $temp .= '<div class="review clearfix">';
+            $temp .= '<div class="review clearfix col-md-12 col-sm-12 show-test-question-answer">';
 		}
 		if ($sessiondata['isteacher']) {
             $temp .= '<span style="float:right;font-size:70%;text-align:right;">'._('Question ID: ').$qi[$questions[$qn]]['questionsetid'];

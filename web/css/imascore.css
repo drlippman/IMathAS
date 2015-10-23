@@ -1081,7 +1081,7 @@ background-color: #f8f8f8;
     margin-left: -5px !important;
 }
 .padding-thirty {
-    padding: 30px;
+    padding: 30px !important;
 }
 .padding-left-thirty-one {
     padding-left: 31px !important;
@@ -1379,4 +1379,10 @@ color:red;
 }
 .margin-left-minus-two {
     margin-left: -2px !important;
+}
+.margin-left-twenty {
+    margin-left: 20px !important;
+}
+.width-nineteen-per {
+    width: 19%;
 }

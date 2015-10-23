@@ -6,7 +6,7 @@ $this->title = $testsettings['name'];
 <?php
 if ($pwfail) {
     if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../instructor/instructor/index?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
+        $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../course/course/course?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?stu='.$studentid.'cid=' . $testsettings['courseid']]]);
     }
 }
@@ -16,7 +16,7 @@ if (isset($sessiondata['actas'])) {
    echo '<span class="color-white floatright">'.$userfullname.'</span>';
     if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype'] == 0) {
     } else {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $testsettings['courseid']]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $testsettings['courseid']]]);
     }
 
 
@@ -30,6 +30,6 @@ if (isset($sessiondata['actas'])) {
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
+<div class="tab-content shadowBox non-nav-tab-item padding-thirty">
     <?php echo $displayQuestions; ?>
 </div>

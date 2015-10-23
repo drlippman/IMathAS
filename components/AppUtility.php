@@ -1179,6 +1179,7 @@ class AppUtility extends Component
 
     public static function printTest($teacherid, $isteacher, $assessmentSessionId, $user, $course)
     {
+
         global $allowedmacros, $mathfuncs, $questions, $seeds, $responseString;
         $allowedmacros = array();
         $mathfuncs = array("sin", "cos", "tan", "sinh", "cosh", "tanh", "arcsin", "arccos", "arctan", "arcsinh", "arccosh", "sqrt", "ceil", "floor", "round", "log", "ln", "abs", "max", "min", "count");
@@ -3492,7 +3493,6 @@ class AppUtility extends Component
             }
             echo '<div class="cpmid">';
             if (!$useViewButtons) {
-//            print_r('priyanka'); die;
                 echo _('Quick View.'), " <a href=\"course.php?cid=$courseId&quickview=off\">", _('Back to regular view'), "</a>. ";
             }
             if (isset($CFG['CPS']['miniicons'])) {

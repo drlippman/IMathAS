@@ -820,11 +820,9 @@ class ShowItemCourse extends Component
                         $tlwrds = '';
                     }
 
-                    echo "<div class=title><b><a href=\"#\" ";
-                    /*if (isset($studentid)) {
-                           echo "data-base=\"assess-$typeid\" ";
-                    }*/ //moved to showtest
-                    if ($tlwrds != '') {
+                    echo "<div class=title><b>"; ?>
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"
+                    <?php if ($tlwrds != '') {
                         echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
                     }
                     echo ">{$line['name']}</a></b>";

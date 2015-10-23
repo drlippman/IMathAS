@@ -98,7 +98,6 @@ div.todoquestion {
 
 div.review {
 	/*background-color: #e0ffe0;*/
-	border: none !important;
 	margin-top: -4px;
 	margin-bottom: 20px;
 	padding: 5px;
@@ -123,7 +122,7 @@ div.float {
 
 div.match {
 	float:left;
-	padding: 5px;
+	/*padding: 5px;*/
 	padding-right: 30px;	
 }
 
@@ -189,7 +188,7 @@ input.unind {
 	margin-left: -15px;
 }
 p.centered {
-	text-align: center;
+	text-align: left;
 }
 
 table thead th {
@@ -765,5 +764,28 @@ span.inlinebtn:hover {
 .show-test-questions {
     background-color: #f8f8f8 !important;
     padding: 25px !important;
-    margin-bottom: 25px !important;
+    margin-bottom: 5px !important;
+}
+ul.nomark li {
+    margin-left: 0px !important;
+    padding-left: 0px !important;
+}
+ul.nomark {
+     margin-left: 0px !important;
+}
+div.review {
+    background-color: #F0F8FF !important;
+}
+.show-test-question-answer {
+    border: 1px solid #B0E0E6 !important;
+    padding: 15px 25px 15px 25px !important;
+}
+#MathJax-Element-16-Frame .graph-ques {
+    margin-left: 2px !important;
+}
+#MathJax-Element-17-Frame .graph-ques {
+    margin-left: 12px !important;
+}
+#MathJax-Element-18-Frame .graph-ques {
+    margin-left: 20px !important;
 }
