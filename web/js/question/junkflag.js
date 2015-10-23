@@ -4,15 +4,14 @@
 function toggleJunkFlagcolor(libitemid,tagged) {
 	var imgchg = document.getElementById("tag"+libitemid);
 	if (tagged==1) {
-		imgchg.src = imasroot+"/img/flagfilled.gif";
+		imgchg.src = imasroot+"img/flagfilled.gif";
 	} else {
-		imgchg.src = imasroot+"/img/flagempty.gif";
+		imgchg.src = imasroot+"img/flagempty.gif";
 	}
 }
 
 function toggleJunkFlag(libitemid) {
 	var tochg = document.getElementById("tag"+libitemid);
-	
 	if (tochg.src.match("filled")) {
 		submitJunkFlag(libitemid,0);
 	} else {
@@ -24,7 +23,7 @@ function toggleJunkFlag(libitemid) {
 function submitJunkFlag(libitemid,tagged) {
   var JunkFlagsaveurl = document.getElementById('junk-flag').value;
   url = JunkFlagsaveurl + '?libitemid='+libitemid+'&flag='+tagged;
-  if (window.XMLHttpRequest) { 
+  if (window.XMLHttpRequest) {
     req = new XMLHttpRequest(); 
   } else if (window.ActiveXObject) { 
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
@@ -36,8 +35,8 @@ function submitJunkFlag(libitemid,tagged) {
   } 
 }  
 
-function submitJunkFlagDone(url, libitemid, tagged) { 
-  if (req.readyState == 4) { // only if req is "loaded" 
+function submitJunkFlagDone(url, libitemid, tagged) {
+  if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK" 
 	    if (req.responseText.trim() == 'OK') {
 		    toggleJunkFlagcolor(libitemid, tagged);

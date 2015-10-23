@@ -5,7 +5,7 @@ use app\components\AppConstant;
 $this->title = AppUtility::t($pagetitle, false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php $imasroot = AppUtility::getHomeURL();?>
+<?php $imasroot = AppUtility::getAssetURL();?>
 <!--Get current time-->
 <div class="item-detail-header">
     <?php if(!empty($curBreadcrumb)){?>
@@ -299,9 +299,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input id='manage-question-set-search' class='margin-left-five form-control width-sixty-four-per display-inline-block' type=text size=15 name=search value=\"$search\">
                         </div>"; ?>
             <?php if ($isadmin){ ?>
-                        <div class='floatleft select-text-margin padding-right-seven-pt-six-per padding-bottom-fifteen'>
+                        <div class='floatleft select-text-margin padding-right-six-pt-three-per padding-bottom-fifteen'>
                             <?php } else {?>
-                <div class='floatleft select-text-margin padding-right-eighteen-pt-one-per padding-bottom-fifteen'>
+                <div class='floatleft select-text-margin padding-right-seventeen-per padding-bottom-fifteen'>
                     <?php } ?>
                         <?php echo"<div class='floatleft'> <input type=checkbox name=\"searchall\" value=\"1\" ";
                         if ($searchall==1) {echo "checked=1";}
