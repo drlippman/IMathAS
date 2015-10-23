@@ -268,7 +268,7 @@ class UtilitiesController extends AppController
                 $updatedLinkedText = LinkedText::updateVideoId($from,$to);
                 $updatedLinkedTextSummary = LinkedText::updateSummary($from,$to);
                 $updatedAssessment = Assessments::updateVideoId($from,$to);
-                $updatedAssessmentSummary = LinkedText::updateSummary($from,$to);
+                $updatedAssessmentSummary = Assessments::updateSummary($from,$to);
                 $updatedQuestionSet = QuestionSet::updateVideoId($from,$to);
             }
         }

@@ -336,4 +336,8 @@ class Libraries extends BaseImasLibraries
     {
         return Libraries::find()->select('name,id,sortorder')->where(['IN', 'id', $ids])->all();
     }
+
+    public function getLibData($inLibsSafeArray){
+        return self::find()->select('id,ownerid,userights,groupid')->where(['IN', 'id', $inLibsSafeArray])->all();
+    }
 }

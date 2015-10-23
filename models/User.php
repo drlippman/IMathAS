@@ -842,5 +842,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = $command->queryAll();
         return $data;
     }
+
+    public function getQuestionRights($userId){
+        return self::find()->select('qrightsdef')->where(['id' => $userId])->one();
+    }
 }
 

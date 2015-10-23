@@ -99,7 +99,7 @@ class QuestionController extends AppController
                             'assessmentid' => $assessmentId,
                             'points' => AppConstant::QUARTER_NINE,
                             'attempts' => AppConstant::QUARTER_NINE,
-                            'penalty' => AppConstant::QUARTER_NINE,
+                            'penalty' => AppConstant::QUARTER_NINE_STRING,
                             'questionsetid' => $questionSetId
                         );
                         $question = new Questions();
@@ -1725,7 +1725,7 @@ class QuestionController extends AppController
                 if (isset($params['usedef'])) {
                     $points = AppConstant::QUARTER_NINE;
                     $attempts = AppConstant::QUARTER_NINE;
-                    $penalty = AppConstant::QUARTER_NINE;
+                    $penalty = AppConstant::QUARTER_NINE_STRING;
                     $regen = AppConstant::NUMERIC_ZERO;
                     $showAns = AppConstant::NUMERIC_ZERO;
                     $rubric = AppConstant::NUMERIC_ZERO;
@@ -3063,10 +3063,12 @@ class QuestionController extends AppController
         $isAdmin = false;
         $isGrpAdmin = false;
         global $qSetId;
+        $this->layout = 'master';
         $makeLocal = $this->getParamVal('makelocal');
         $templateId = $this->getParamVal('templateid');
         $aid = $this->getParamVal('aid');
         $cid = $this->getParamVal('cid');
+        $course = Course::getById($cid);
         $getId = $this->getParamVal('id');
         $params = $this->getRequestParams();
         $now = time();
@@ -3102,7 +3104,7 @@ class QuestionController extends AppController
             $qTypes = array();
             $qParts = array();
             $questions = array();
-            $feedback = array();
+            $feedBack = array();
             $feedBackTxtDef = array();
             $feedBackTxtEssay = array();
             $answerBoxSize = array();
@@ -3110,11 +3112,11 @@ class QuestionController extends AppController
             $useEditor = array();
             $answer = array();
             $partial = array();
-            $qToL = array();
+            $qTol = array();
             for ($n=AppConstant::NUMERIC_ZERO;$n<$nParts;$n++)
             {
                 $qTypes[$n] = $params['qtype'.$n];
-                $feedback[$n] = array();
+                $feedBack[$n] = array();
                 if ($qTypes[$n] == 'choices')
                 {
                     $questions[$n] = array();
@@ -3123,7 +3125,7 @@ class QuestionController extends AppController
                 else if ($qTypes[$n] == 'number')
                 {
                     $partialAns[$n] = array();
-                    $qToL[$n] = (($params['qtol'.$n]=='abs')?'|':'') . $params['tol'.$n];
+                    $qTol[$n] = (($params['qtol'.$n]=='abs')?'|':'') . $params['tol'.$n];
                     $feedBackTxtDef[$n] = $params['fb'.$n.'-def'];
                     $answer[$n] = $params['txt'.$n.'-'.$params['ans'.$n]];
                     $params['pc'.$n.'-'.$params['ans'.$n]] = AppConstant::NUMERIC_ONE;
@@ -3315,15 +3317,15 @@ class QuestionController extends AppController
             {
                 if ($qTypes[0]=='choices')
                 {
-                    $code .= '$feedback = getFeedBackTxt($stuAnswers[$thisQ], $feedBackTxt, $answer)'."\n";
+                    $code .= '$feedBack = getFeedBackTxt($stuAnswers[$thisQ], $feedBackTxt, $answer)'."\n";
                 }
                 else if ($qTypes[0]=='number')
                 {
-                    $code .= '$feedback = getFeedBackTxtNumber($stuAnswers[$thisQ], $partialCredit, $feedBackTxt, $feedBackTxtDef, "'.$qToL[0].'")'."\n";
+                    $code .= '$feedBack = getFeedBackTxtNumber($stuAnswers[$thisQ], $partialCredit, $feedBackTxt, $feedBackTxtDef, "'.$qTol[0].'")'."\n";
                 }
                 else if ($qTypes[0]=='essay')
                 {
-                    $code .= '$feedback = getFeedBackTxtEssay($stuAnswers[$thisQ], $feedBackTxtEssay)'."\n";
+                    $code .= '$feedBack = getFeedBackTxtEssay($stuAnswers[$thisQ], $feedBackTxtEssay)'."\n";
                 }
             }
             else
@@ -3332,15 +3334,15 @@ class QuestionController extends AppController
                 {
                     if ($qTypes[$n]=='choices')
                     {
-                        $code .= '$feedback['.$n.'] = getFeedBackTxt($stuAnswers[$thisQ]['.$n.'], $feedBackTxt['.$n.'], $answer['.$n.'])'."\n";
+                        $code .= '$feedBack['.$n.'] = getFeedBackTxt($stuAnswers[$thisQ]['.$n.'], $feedBackTxt['.$n.'], $answer['.$n.'])'."\n";
                     }
                     else if ($qTypes[$n]=='number')
                     {
-                        $code .= '$feedback['.$n.'] = getFeedBackTxtNumber($stuAnswers[$thisQ]['.$n.'], $partialCredit['.$n.'], $feedBackTxt['.$n.'], $feedbacktxtdef['.$n.'], "'.$qToL[$n].'")'."\n";
+                        $code .= '$feedBack['.$n.'] = getFeedBackTxtNumber($stuAnswers[$thisQ]['.$n.'], $partialCredit['.$n.'], $feedBackTxt['.$n.'], $feedBackTxtDef['.$n.'], "'.$qTol[$n].'")'."\n";
                     }
                     else if ($qTypes[$n]=='essay')
                     {
-                        $code .= '$feedback['.$n.'] = getFeedBackTxEssay($stuAnswers[$thisQ]['.$n.'], $feedBackTxtEssay['.$n.'])'."\n";
+                        $code .= '$feedBack['.$n.'] = getFeedBackTxEssay($stuAnswers[$thisQ]['.$n.'], $feedBackTxtEssay['.$n.'])'."\n";
                     }
                 }
             }
@@ -3590,8 +3592,123 @@ class QuestionController extends AppController
                 echo 'This question is not formatted in a way that allows it to be editted with this tool.';
                 exit;
             }
-        }
+            $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+            $allowedmacros = $mathfuncs;
+            list($nParts, $qType, $qParts, $nHints, $qDisp, $questions, $feedBackTxt, $feedBackTxtDef, $feedBackTxtEssay, $answer, $hintText, $partialcredit, $qTol, $qTold, $answerBoxSize, $displayFormat, $scoreMethod, $qShuffle) = $this->getqvalues($code,$type);
+            $partial = array();
 
+            for ($n=0;$n<$nParts;$n++) {
+                $partial[$n] = array();
+                for ($i=0;$i<count($partialcredit[$n]);$i+=2) {
+                    if ($qType[$n]=="number") {
+                        $questions[$n][floor($i/2)] = $partialcredit[$n][$i];
+                        if ($partialcredit[$n][$i]==$answer[$n]) {
+                            $answerloc[$n] = floor($i/2);
+                        }
+                        $partial[$n][floor($i/2)] = $partialcredit[$n][$i+1];
+                    } else if ($qType[$n]=="choices") {
+                        $partial[$n][$partialcredit[$n][$i]] = $partialcredit[$n][$i+1];
+                    }
+                }
+                if ($qType[$n]=="number") {
+                    $answer[$n] = $answerloc[$n];
+                }
+            }
+            if ($nHints>0) { //strip out hints para
+                $qText = substr($qText, strpos($qText,'</p>')+4);
+            }
+        } else {
+            $myQ = true;
+            $id = 'new';
+            //new question
+            $nParts = 1;
+            $qParts = array(4,4,4,4,4,4,4,4,4,4);
+            $answer = array(0,0,0,0,0,0,0,0,0,0);
+            $qDisp = array("vert","vert","vert","vert","vert","vert","vert","vert","vert","vert");
+            $qShuffle = array("all","all","all","all","all","all","all","all","all","all");
+            $qType = array_fill(0,10,"choices");
+            $displayFormat = array();
+            $scoreMethod = array();
+            $answerBoxSize = array();
+            $nHints = 1;
+            $questions = array();
+            $feedBackTxt = array();
+            $feedBackTxtDef = array_fill(0,10,"Incorrect");
+            $hintText = array();
+            $qTol = array_fill(0,1,"abs");
+            $qText = "";
+
+            $line['description'] = "Enter description here";
+            $qRightsDef = new User();
+            $query = $qRightsDef->getQuestionRights($user['id']);
+            $line['userights'] = $query['qrightsdef'];
+            $line['author'] = $myName;
+            $line['deleted'] = 0;
+            if (isset($aid) && isset($sessiondata['lastsearchlibs'.$aid])) {
+                $inLibs = $sessiondata['lastsearchlibs'.$aid];
+            } else if (isset($sessiondata['lastsearchlibs'.$cid])) {
+                //$searchlibs = explode(",",$sessiondata['lastsearchlibs']);
+                $inLibs = $sessiondata['lastsearchlibs'.$cid];
+            } else {
+                $inLibs = $userdeflib;
+            }
+            $lockLibs='';
+
+            $author = $myName;
+            $inLibsSafeArray = explode(',',$inLibs);
+            $inLibsSafe = "'".implode("','",$inLibsSafeArray)."'";
+            if (!isset($aid) || isset($_GET['template'])) {
+                $libs = new Libraries();
+                $query = $libs->getLibData($inLibsSafeArray);
+                foreach ($query as $row) {
+                    if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE == AppConstant::NUMERIC_TWO)) || $row['ownerid']==$user['id']) {
+                        $oklibs[] = $row['id'];
+                    }
+                }
+                if (count($oklibs) > AppConstant::NUMERIC_ZERO) {
+                    $inLibs = implode(",",$oklibs);
+                } else {$inLibs = AppConstant::ZERO_VALUE;}
+            }
+            $addMod = "Add";
+
+        }
+        $inLibsSafeArray = explode(',',$inLibs);
+        $inLibsSafe = "'".implode("','",$inLibsSafeArray)."'";
+
+        $lNames = array();
+        if (substr($inLibs,0,1)==='0') {
+            $lNames[] = "Unassigned";
+        }
+        $query = Libraries::getByNameList($inLibsSafeArray);
+        foreach ($query as $row) {
+            $lNames[] = $row['name'];
+        }
+        $lNames = implode(", ",$lNames);
+
+        $dispVal = array("vert","horiz","select","inline","2column");
+        $dispLbl = array("Vertical list", "Horizontal list", "Pull-down", "Inline with text", "2 column");
+
+        $qTypeVal = array("choices","number","essay");
+        $qTypeLbl = array("Multiple-choice","Numeric","Essay");
+
+        $qTolVal = array("abs","rel");
+        $qTolLbl = array("absolute","relative");
+
+        $shuffleVal = array("all","last","none");
+        $shuffleLbl = array("no shuffle","shuffle all but last","shuffle all");
+        $useeditor = "text,popuptxt";
+        $this->includeCSS(['dataTables.bootstrap.css','handheld.css']);
+        $this->includeJS(['general.js','editor/tiny_mce.js','mathjs.js','assessment/modTutorialQuestion.js']);
+        $renderData = array('params' => $params, 'isAdmin' => $isAdmin,'course' => $course, 'addMod' => $addMod, 'editMsg' => $editMsg,
+            'id' => $id, 'cid' => $cid, 'line' => $line, 'inUseCnt' => $inUseCnt, 'myQ' => $myQ, 'fromPot' => $fromPot, 'author' => $author,
+            'userId' => $user['id'], 'groupID' => $groupID, 'isGrpAdmin' => $isGrpAdmin, 'inLibs' => $inLibs, 'lockLibs' => $lockLibs,
+            'lNames' => $lNames, 'nParts' => $nParts, 'qParts' => $qParts, 'qTypeVal' => $qTypeVal, 'qTypeLbl' => $qTypeLbl, 'qType' => $qType,
+            'dispVal' => $dispVal, 'dispLbl' => $dispLbl, 'qDisp' => $qDisp, 'qShuffle' => $qShuffle, 'shuffleLbl' => $shuffleLbl,
+            'shuffleVal' => $shuffleVal, 'qTolVal' => $qTolVal, 'qTol' => $qTol, 'qTolLbl' => $qTolLbl, 'qTold' => $qTold, 'answerBoxSize' => $answerBoxSize,
+            'displayFormat' => $displayFormat, 'scoreMethod' => $scoreMethod, 'answer' => $answer, 'questions' => $questions, 'feedBackTxt' => $feedBackTxt,
+            'partial' => $partial, 'feedBackTxtDef' => $feedBackTxtDef, 'feedBackTxtEssay' => $feedBackTxtEssay, 'nHints' => $nHints,
+            'hintText' => $hintText, 'feedBack' => $feedBack, 'qText' => $qText);
+        return $this->renderWithData('modTutorialQuestion', $renderData);
     }
 
     function stripSmartQuotesForTutorial($text)
@@ -3683,5 +3800,59 @@ class QuestionController extends AppController
         $qSetData = QuestionSet::getByQuesSetId($qSetId);
         $responseData = (['params' => $params, 'qSetData' => $qSetData, 'isAdmin' => $isAdmin, 'course' => $course]);
         return $this->renderWithData('viewSource', $responseData);
+    }
+
+    //return array (nparts, qparts, nhints, qdisp, questions, feedbacktxt, answer, hinttext)
+    function getqvalues($code,$type) {
+        $partialcredit = array();
+        $qTol = array();
+        $feedBackTxtDef = array();
+        $qtold = array();
+        $code = substr($code, 0, strpos($code,'//end stored'));
+        eval(interpret('control',$type,$code));
+
+        if (!isset($hintText)) {
+            $nHints = 0;
+        } else {
+            $nHints = count($hintText);
+        }
+
+        if ($type=='multipart') {
+            $qtypes = explode(',',$anstypes);
+            $nParts = count($qtypes);
+            $qParts = array();
+            for ($n=0;$n<$nParts;$n++) {
+                if ($qtypes[$n]=='number') {
+                    if (isset($reltolerance[$n])) {
+                        $qTol[$n] = 'rel';
+                        $qtold[$n] = $reltolerance[$n];
+                    }  else if (isset($abstolerance[$n])) {
+                        $qTol[$n] = 'abs';
+                        $qtold[$n] = $abstolerance[$n];
+                    }
+                    $qParts[$n] = count($partialcredit[$n])/2;
+                } else if ($qtypes[$n]=='choices') {
+                    $qParts[$n] = count($questions[$n]);
+                }
+            }
+
+            return array($nParts, $qtypes, $qParts, $nHints, $displayFormat, $questions, $feedBackTxt, $feedBackTxtDef, $feedBackTxtEssay, $answer, $hintText, $partialcredit, $qTol, $qtold, $answerBoxSize, $displayFormat, $scoreMethod, $noshuffle);
+        } else {
+            if ($type=='number') {
+                if (isset($reltolerance)) {
+                    $qTol[0] = 'rel';
+                    $qtold[0] = $reltolerance;
+                }  else if (isset($abstolerance)) {
+                    $qTol[0] = 'abs';
+                    $qtold[0] = $abstolerance;
+                }
+                $qParts = array(count($partialcredit)/2);
+            }else if ($type=='choices') {
+                $qParts = array(count($questions));
+            }else if ($type=='essay') {
+                $qParts = array(0);
+            }
+            return array(1, array($type), $qParts, $nHints, array($displayFormat), array($questions), array($feedBackTxt), array($feedBackTxtDef), array($feedBackTxtEssay), array($answer), $hintText, array($partialcredit), $qTol, $qtold, array($answerBoxSize), array($displayFormat), array($scoreMethod), array($noshuffle));
+        }
     }
 }

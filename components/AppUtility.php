@@ -3636,4 +3636,9 @@ class AppUtility extends Component
       <?php  }
         echo '</div>';
     }
+
+    public static function prepd($v) {
+    $v = str_replace('\\"','"',$v);
+    return htmlentities($v, ENT_COMPAT | ENT_HTML401,"UTF-8", false );
+    }
 }

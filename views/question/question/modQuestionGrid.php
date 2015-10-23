@@ -38,7 +38,7 @@ if ($params['process']== true) {
                 $questionArray['points'] = $points;
                 $questionArray['attempts'] = $attempts;
                 $questionArray['showhints'] = $showHints;
-                $questionArray['penalty'] = AppConstant::QUARTER_NINE;
+                $questionArray['penalty'] = AppConstant::QUARTER_NINE_STRING;
                 $questionArray['regen'] = AppConstant::NUMERIC_ZERO;
                 $questionArray['showans'] = AppConstant::NUMERIC_ZERO;
                 $questionArray['questionsetid'] = $questionSetId;
@@ -123,7 +123,7 @@ if ($params['process']== true) {
                     $addQuestions['points'] = $points;
                     $addQuestions['attempts'] = $attempts;
                     $addQuestions['showhints'] = $showHints;
-                    $addQuestions['penalty'] = '9999';
+                    $addQuestions['penalty'] = AppConstant::QUARTER_NINE_STRING;
                     $addQuestions['regen'] = AppConstant::NUMERIC_ZERO;
                     $addQuestions['showans'] = AppConstant::NUMERIC_ZERO;
                     $addQuestions['questionsetid'] = $questionSetId;
