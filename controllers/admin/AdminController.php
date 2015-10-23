@@ -224,30 +224,6 @@ class AdminController extends AppController
         $this->includeJS(['general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js','adminIndex.js']);
         return $this->renderWithData('index', ['showCid' => $showCid ,'users' => $users, 'page_userDataId' =>$page_userDataId,'page_userDataLastName' => $page_userDataLastName, 'page_userDataFirstName' => $page_userDataFirstName, 'page_userDataSid' => $page_userDataSid,'page_userDataEmail' => $page_userDataEmail,'page_userDataType' => $page_userDataType,'page_userDataLastAccess' => $page_userDataLastAccess, 'page_userSelectVal' => $page_userSelectVal,'page_userSelectLabel' => $page_userSelectLabel,'showusers' => $showusers,'myRights' => $myRights, 'page_courseList' => $page_courseList, 'resultTeacher' => $resultTeacher, 'page_diagnosticsId' => $page_diagnosticsId, 'page_diagnosticsName' => $page_diagnosticsName, 'page_diagnosticsAvailable' => $page_diagnosticsAvailable, 'page_diagnosticsPublic' => $page_diagnosticsPublic, 'page_userBlockTitle' => $page_userBlockTitle, 'showcourses' => $showcourses, 'page_teacherSelectVal' => $page_teacherSelectVal, 'page_teacherSelectLabel' => $page_teacherSelectLabel, 'userId' => $userId, 'userName' => $userName]);
     }
-/*
- * This method to add new user
- */
-    public function actionAddNewUser()
-    {
-        $this->guestUserHandler();
-        $this->layout = 'master';
-        $model = new AddNewUserForm();
-        if ($model->load($this->isPostMethod())){
-            $params = $this->getRequestParams();
-            $params = $params['AddNewUserForm'];
-            $params['SID'] = $params['username'];
-            $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
-            $params['password'] = AppUtility::passwordHash($params['password']);
-            $user = new User();
-            $model = new AddNewUserForm();
-            $user->attributes = $params;
-            $user->save();
-            $this->setSuccessFlash(AppConstant::ADD_NEW_USER);
-        }
-        $this->includeJS(["courseSetting.js"]);
-        $responseData = array('model' => $model);
-        return $this->renderWithData('addNewUser',$responseData);
-    }
 
     public function actionGetAllCourseUserAjax()
     {

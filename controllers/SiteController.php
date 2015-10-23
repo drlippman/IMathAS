@@ -7,8 +7,6 @@ use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\DiagOneTime;
 use app\models\Diags;
-use app\models\forms\ChangeUserInfoForm;
-use app\models\forms\DiagnosticForm;
 use app\models\forms\ForgotPasswordForm;
 use app\models\forms\ForgotUsernameForm;
 use app\models\forms\LoginForm;
@@ -31,21 +29,18 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\components\AppUtility;
 use app\models\forms\ChangePasswordForm;
-use yii\web\HttpException;
-use yii\web\Session;
-use yii\web\UploadedFile;
 use app\components\filehandler;
 use app\components\UserPics;
 
 class SiteController extends AppController
 {
-    public function beforeAction($action)
-    {
-        $user = $this->getAuthenticatedUser();
-        $actionPath = Yii::$app->controller->action->id;
-        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForSiteController($user,$courseId, $actionPath);
-    }
+//    public function beforeAction($action)
+//    {
+//        $user = $this->getAuthenticatedUser();
+//        $actionPath = Yii::$app->controller->action->id;
+//        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+//        return $this->accessForSiteController($user,$courseId, $actionPath);
+//    }
     public function behaviors()
     {
         return [
@@ -947,49 +942,6 @@ class SiteController extends AppController
         }
         $responseData = array('model' => $model,);
         return $this->renderWithData('changePassword', $responseData);
-    }
-
-    public function actionChangeUserInfo()
-    {
-        /**
-         * Can access: greater than equal to guest.
-         *  Guest
-         *  Student
-         *  Teacher
-         *  LCC
-         *  Diagnostics
-         *  Group Admin
-         *  Admin
-         */
-        $this->guestUserHandler();
-        $this->layout = 'master';
-        $tzname = AppUtility::getTimezoneName();
-        $userid = $this->getUserId();
-        $user = User::findByUserId($userid);
-        $model = new ChangeUserInfoForm();
-        if ($model->load($this->isPostMethod())) {
-            $params = $this->getRequestParams();
-            $params = $params['ChangeUserInfoForm'];
-
-            $model->file = UploadedFile::getInstance($model, 'file');
-            if ($model->file ) {
-                $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-                $model->remove=0;
-                if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
-                    User::updateImgByUserId($userid);
-            }
-            if($model->remove == 1){
-                User::deleteImgByUserId($userid);
-                unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-            }
-            User::saveUserRecord($params,$user);
-            $this->setSuccessFlash('Changes updated successfully.');
-            return $this->redirect('dashboard');
-        }
-        $this->includeCSS(['dashboard.css']);
-        $this->includeJS(['changeUserInfo.js']);
-        $responseData = array('model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid);
-        return $this->renderWithData('changeUserinfo', $responseData);
     }
 
     public function actionStudentEnrollCourse()

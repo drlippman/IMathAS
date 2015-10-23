@@ -39,7 +39,7 @@ function submitJunkFlag(libitemid,tagged) {
 function submitJunkFlagDone(url, libitemid, tagged) { 
   if (req.readyState == 4) { // only if req is "loaded" 
     if (req.status == 200) { // only if "OK" 
-	    if (req.responseText=='OK') {
+	    if (req.responseText.trim() == 'OK') {
 		    toggleJunkFlagcolor(libitemid, tagged);
 	    } else {
 		    alert(req.responseText);

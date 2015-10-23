@@ -1,192 +1,242 @@
 <?php
 use app\components\AppUtility;
-use app\components\AssessmentUtility;
-use app\components\CourseItemsUtility;
-use app\components\AppConstant;
-use yii\widgets\ActiveForm;
-$this->title = AppUtility::t('List Post By Name',false );
-$this->params['breadcrumbs'][] = $this->title;
-?>
-<div class="item-detail-header">
-    <?php if($userRights == 100 || $userRights == 20) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]);
-    } elseif($userRights == 10){
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
-    }?>
-</div>
-<div class = "title-container">
-    <div class="row">
-        <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
-        </div>
-    </div>
-</div>
-<div class="item-detail-content">
-    <?php if($userRights == 100 || $userRights == 20) {
-        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
-    } elseif($userRights == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
-    }?>
-</div>
 
-<?php
-echo '<div class="tab-content shadowBox ">';
-echo '<div id="headerpostsbyname" class="margin-left-twenty pagetitle">';
-echo "<h2>Posts by Name - $forumname</h2>\n";
-echo '</div>';
-?>
- <?php
+require("../components/filehandler.php");
+$pagetitle = "Forums";
+//$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 
-if ($haspoints && $caneditscore && $rubric != 0) {
-     if (count($rubricData) > 0)
-     {
 
-        echo printrubrics(array($rubricDataRow));
-    }
-}
-
-?>
-<div class="midwrapper margin-left-twenty">
-<!--    <input type="button" id="expand" onclick="collapseall()" class="btn btn-primary add-new-thread" value="Expand All">-->
-     <input type="button" value="Expand All" onclick="toggleshowall()" id="toggleall"/>
-    <button type="button" onclick="window.location.href='<?php echo AppUtility::getURLFromHome('forum','forum/list-post-by-name?cid='.$course->id.'&page='.$page.'&forumid='.$forumId.'&read=1');?>'">Mark All Read</button>
-    <br><br>
-</div>
-<?php
-$laststu = -1;
-$cnt = 0;
-if ($caneditscore && $haspoints) { ?>
-     <form method=post action="thread?cid=<?php echo $course->id ?>&forum=<?php echo $forumId?>&page=<?php echo $page?>&score=true" onsubmit="onsubmittoggle()">
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
+if ($searchtype != 'none')
+{ ?>
+    <a href="<?php echo  AppUtility::getURLFromHome('forum','forum/forums?cid='.$cid.'&clearsearch=true')?>">Forum List</a>
 <?php }
-$curdir = rtrim(dirname(__FILE__), '/\\');
-echo '<div class="margin-left-twenty padding-right-twenty">';
-foreach ($posts as $line)
-{
-    if ($line['userid']!=$laststu) {
-        if ($laststu!=-1) {
-            echo '</div>';
+echo "Forums</div>\n";
+
+//construct tag list selector
+$taginfo = array();
+foreach ($itemsimporder as $item) {
+    if (!isset($itemsassoc[$item])) { continue; }
+    $taglist = $forumdata[$itemsassoc[$item]]['taglist'];
+    if ($taglist=='') { continue;}
+    $p = strpos($taglist,':');
+    $catname = substr($taglist,0,$p);
+    if (!isset($taginfo[$catname])) {
+        $taginfo[$catname] = explode(',',substr($taglist,$p+1));
+    } else {
+        $newtags = array_diff(explode(',',substr($taglist,$p+1)), $taginfo[$catname]);
+        foreach ($newtags as $tag) {
+            $taginfo[$catname][] = $tag;
         }
-        echo "<b>{$line['LastName']}, {$line['FirstName']}</b>";
-        if ($line['hasuserimg']==1)
-        {
-            if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-                echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\"  onclick=\"changeProfileImage(this,{$line['userid']})\"  />";
+    }
+}
+if (count($taginfo)==0) {
+    $tagfilterselect = '';
+} else {
+    if (count($taginfo)>1) {
+        $tagfilterselect = 'Category: ';
+    } else {
+        $tagfilterselect = $catname .': ';
+    }
+    $tagfilterselect .= '<select name="tagfiltersel">';
+    $tagfilterselect .= '<option value="">All</option>';
+    foreach ($taginfo as $catname=>$tagarr) {
+        if (count($taginfo)>1) {
+            $tagfilterselect .= '<optgroup label="'.$catname.'">';
+        }
+        foreach ($tagarr as $tag) {
+            $tagfilterselect .= '<option value="'.$tag.'"';
+            if ($tag==$searchtag) { $tagfilterselect .= ' selected="selected"';}
+            $tagfilterselect .= '>'.$tag.'</option>';
+        }
+        if (count($taginfo)>1) {
+            $tagfilterselect .= '</optgroup>';
+        }
+    }
+    $tagfilterselect .= '</select>';
+}
+if ($searchtype=='none') {
+    echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
+} else {
+    echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
+}
+?>
+<div id="forumsearch">
+    <form method="post" action="search-forum?cid=<?php echo $cid;?>">
+        <p>
+            Search: <input type=text name="search" value="<?php echo $searchstr;?>" />
+            <input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects
+            <input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.
+            <?php
+            if ($tagfilterselect != '') {
+                echo "Limit by $tagfilterselect";
+            }
+            ?>
+            <input name="searchsubmit" type="submit" value="Search"/>
+        </p>
+    </form>
+</div>
+<?php
+
+
+if ($searchtype == 'thread') {
+    //doing a search of thread subjects
+      {
+
+        echo '<table class=forum><thead>';
+        echo '<tr><th>Topic</th><th>Forum</th><th>Replies</th><th>Views</th><th>Last Post Date</th></tr></thead><tbody>';
+        foreach ($threaddata as $line) {
+            if (isset($postcount[$line['id']])) {
+                $posts = $postcount[$line['id']];
+                $lastpost = AppUtility::tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
             } else {
-                  $imageUrl = $line['userid'].".jpg";
-                ?><img class="circular-profile-image Align-link-post padding-five" id="img<?php echo $imgCount?>"src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $line['userid']?>); /><?php
+                $posts = 0;
+                $lastpost = '';
             }
-        }else {
-            ?><img class="circular-profile-image Align-link-post padding-five" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/> <?php
+            echo "<tr id=\"tr{$line['id']}\" ";
+            if ($line['tagged']==1) {echo 'class="tagged"';}
+            echo "><td>";
+            echo "<span class=right>\n";
+            if ($line['tag']!='') { //category tags
+                echo '<span class="forumcattag">'.$line['tag'].'</span> ';
+            }
+
+            if ($line['tagged']==1) {
+                echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+            } else {
+                echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+            }
+
+            if ($isteacher) {
+                echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
+            }
+            if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
+                echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
+            }
+            if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
+                echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
+            }
+            echo "</span>\n";
+            if ($line['isanon']==1) {
+                $name = "Anonymous";
+            } else {
+                $name = "{$line['LastName']}, {$line['FirstName']}";
+            }
+            echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">{$line['subject']}</a></b>: $name";
+            echo "</td>\n";
+            echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">{$line['name']}</a></td>";
+            echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
+            echo "</td></tr>\n";
         }
-        echo '<div class="forumgrp">';
-        $laststu = $line['userid'];
-    }
-    echo '<div class="block">';
-    if ($line['parent']!=0) {
-        echo '<span style="color:green;">';
     }
 
-    echo '<span class="right">';
-    if ($haspoints) {
-        if ($caneditscore) {
-            echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
-            if (isset($scores[$line['id']])) {
-                echo $scores[$line['id']];
-            }
-            echo "\"/> Pts ";
-            if ($rubric != 0) {
-                echo printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
-            }
-        } else if (($line['ownerid']==$userId || $canviewscore) && isset($scores[$line['id']])) {
-            echo "<span class=red>{$scores[$line['id']]} pts</span> ";
+} else if ($searchtype == 'posts') {
+    //doing a search of all posts
+    if (!isset($CFG['CPS']['itemicons'])) {
+        $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
+            'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+            'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
+            'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png',
+            'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png',
+            'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png',
+            'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png');
+    } else {
+        $itemicons = $CFG['CPS']['itemicons'];
+    }
+    foreach($searchedPost as $line) {
+        echo "<div class=block>";
+        echo "<b>{$line['subject']}</b>";
+        echo ' (in '.$line['name'].')';
+        if ($line['isanon']==1) {
+            $name = "Anonymous";
+        } else {
+            $name = "{$line['LastName']}, {$line['FirstName']}";
         }
-    } ?>
-     <a href="<?php echo AppUtility::getURLFromHome('forum','forum/posts?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
-    <?php if ($isteacher || ($line['ownerid']==$userId && $allowmod)) { ?>
-         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$course->id.'&forumId = '.$forumId.'&threadId='.$line['id'] ) ?> ">Modify</a>
-    <?php }
-    if ($isteacher || ($allowdel && $line['ownerid']==$userId)) {
-//        echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={}\">Remove</a> \n";
-        ?><a href="#" name="tabs" data-var="<?php echo $line['id']?>" class="mark-remove" >Remove</a> <?php
-    }
-    if ($line['posttype']!=2 && $userRights > 5 && $allowreply) { ?>
-<!--        /forum/forum/?courseid=477&threadId=80923&forumid=19893&id=80929&listbypost=1-->
-         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/reply-post?courseid='.$course->id.'&forumid='.$forumId.'&threadId='.$line['threadid'].'&listbypost=1&id='.$line['id'])?>">Reply</a>
-    <?php }
-    echo '</span>';
-    echo "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
-    echo '<b>'.$line['subject'].'</b>';
-    if ($line['parent']!=0) {
-        echo '</span>';
-    }
-    $dt = AppUtility::tzdate("F j, Y, g:i a",$line['postdate']);
-    echo ', Posted: '.$dt;
-    if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
-        echo " <span style=\"color:red;\">New</span>\n";
-    }
-    echo '</div>';
-    echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
+        echo "<br/>Posted by: $name, ";
+        echo AppUtility::tzdate("F j, Y, g:i a",$line['postdate']);
 
-    if ($haspoints) {
-        if ($caneditscore && $ownerid[$child] != $userId)
-        {
-            echo '<hr/>';
-            echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
-            if ($feedback[$line['id']]!==null) {
-                echo $feedback[$line['id']];
+        echo "</div><div class=blockitems>";
+        if($line['files']!='') {
+            $fl = explode('@@',$line['files']);
+            if (count($fl)>2) {
+                echo '<p><b>Files:</b> ';//<ul class="nomark">';
+            } else {
+                echo '<p><b>File:</b> ';
             }
-            echo "</textarea>";
-        } else if (($ownerid[$child]==$userId || $canviewscore) && $feedback[$line['id']]!=null) {
-            echo '<div class="signup">Private Feedback: ';
-            echo $feedback[$line['id']];
-            echo '</div>';
+            for ($i=0;$i<count($fl)/2;$i++) {
+                //if (count($fl)>2) {echo '<li>';}
+                echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
+                $extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
+                if (isset($itemicons[$extension])) {
+                    echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+                } else {
+                    echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
+                }
+                echo $fl[2*$i].'</a> ';
+                //if (count($fl)>2) {echo '</li>';}
+            }
+            //if (count($fl)>2) {echo '</ul>';}
+            echo '</p>';
         }
+        echo filter($line['message']); ?>
+         <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['threadid'].'&page=-4'); ?>">Show full thread</a></p>
+        <?php echo "</div>\n";
     }
-    echo '</div>';
-    $cnt++;
+
+} else {
+    if (count($forumdata)==0) {
+        if ($isteacher) {
+            echo '<p>There are no forums in this class yet.  You can add forums from the course page.</p>';
+        } else {
+            echo '<p>There are no active forums at this time.</p>';
+        }
+    } else {
+        //default display
+        ?>
+        <table class=forum>
+            <thead>
+            <tr><th>Forum Name</th><th>Threads</th><th>Posts</th><th>Last Post Date</th></tr>
+            </thead>
+            <tbody>
+            <?php
+             foreach ($itemsimporder as $item) {
+                if (!isset($itemsassoc[$item])) { continue; }
+                $line = $forumdata[$itemsassoc[$item]];
+
+                if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {
+                    continue;
+                }
+                echo "<tr><td>";
+                if ($isteacher) { ?>
+                     <span class="right">
+                     <a href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$cid.'&fromforum=1&id='.$line['id']);?> ">Modify</a>
+                     </span>
+                <?php } ?>
+                 <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id']);?>"><?php echo $line['name'];?></a></b>
+                <?php if ($newcnt[$line['id']]>0) { ?>
+                     <a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id'].'&page=-1');?>" style="color:red">New Posts  (<?php echo $newcnt[$line['id']];?>) </a>
+                <?php }
+                echo "</td>\n";
+                if (isset($threadcount[$line['id']])) {
+                    $threads = $threadcount[$line['id']];
+                    $posts = $postcount[$line['id']];
+                    $lastpost = AppUtility::tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
+                } else {
+                    $threads = 0;
+                    $posts = 0;
+                    $lastpost = '';
+                }
+                echo "<td class=c>$threads</td><td class=c>$posts</td><td class=c>$lastpost</td></tr>\n";
+            }
+            ?>
+            </tbody>
+        </table>
+    <?php
+    }
 }
-echo '</div>';
-echo "<script>var bcnt = $cnt;</script>";
-if ($caneditscore && $haspoints) {
-    echo "<div><input type=submit value=\"Save Grades\" /></div>";
-    echo "</form>";
-}
 
-echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
 ?>
-         <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$course->id.'&forum='.$forumId.'&page='.$page); ?> ">Back to Thread List</a></p>
-         <?php echo '</div>';
-echo '</div>';
 
-function printrubriclink($rubricid,$points,$scorebox,$feedbackbox,$qn='null',$width=600) {
-    global $imasroot;
 
-    $out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
-    $out .= "<img border=0 src=\"$imasroot/img/assess.png\" alt=\"rubric\"></a>";
-    return $out;
-}
-function printrubrics($rubricarray) {
 
-    $out = '<script type="text/javascript">';
-    $out .= 'var imasrubrics = new Array();';
-    foreach ($rubricarray as $info) {
-        $out .= "imasrubrics[{$info[0]}] = {'type':{$info[1]},'data':[";
-        $data = unserialize($info[2]);
 
-        foreach ($data as $i=>$rubline) {
-            if ($i!=0) {
-                $out .= ',';
-            }
-            $out .= '["'.str_replace('"','\\"',$rubline[0]).'",';
-            $out .= '"'.str_replace('"','\\"',$rubline[1]).'"';
-            $out .= ','.$rubline[2];
-            $out .= ']';
-        }
-        $out .= ']};';
-    }
-    $out .= '</script>';
-
-    return $out;
-}
-
-?>

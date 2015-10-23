@@ -9,8 +9,6 @@ class CategoryScoresUtility extends Component
 
     public static function catscores($quests, $scores, $defptsposs, $defoutcome = AppConstant::NUMERIC_ZERO, $cid)
     {
-        $qlist = "'" . implode("','", $quests) . "'";
-
         $result = Questions::getIdCatPoints($quests);
         $cat = array();
         $pospts = array();

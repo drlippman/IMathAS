@@ -16,7 +16,7 @@ $availshow = $defaultValuesArray['availshow'];
 $asid = $defaultValuesArray['asid'];
 $pers = $defaultValuesArray['pers'];
 $stu = $params['stu'];
-include("../components/displayQuestion.php");
+
 //PROCESS ANY TODOS
 if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
 
@@ -569,7 +569,6 @@ for ($i = 0; $i < count($questions); $i++) {
     }
     $capturechoices = true;
     $choicesdata = array();
-
     $qtypes = displayq($i, $qsetid, $seeds[$i], $showa, false, $attempts[$i], false, false, false, $colors);
     echo $temp;
     echo '</div>';
@@ -804,7 +803,8 @@ if ($canedit && !isset($params['lastver']) && !isset($params['reviewver'])) {
 }
 echo "</form>";
 echo '<p>&nbsp;</p>';
-if ($countOfQuestion > 0) {
+
+if (count($countOfQuestion) > 0) {
     CategoryScoresUtility::catscores($questions, $scores, $line['defpoints'], $line['defoutcome'], $cid);
 }
 } else if ($links == 1) { //show grade detail question/category breakdown
@@ -826,8 +826,10 @@ if ($countOfQuestion > 0) {
     } else {
         echo "Last change: " . AppUtility::tzdate("F j, Y, g:i a", $line['endtime']) . "</p>\n";
     }
+
     if (count($questionIds) > 0) {
         $sp = explode(';', $line['bestscores']);
+
         CategoryScoresUtility::catscores(explode(',', $line['questions']), explode(',', $sp[0]), $line['defpoints'], $line['defoutcome'], $cid);
     }
     $scores = array();

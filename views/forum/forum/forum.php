@@ -59,19 +59,57 @@ $now = $currentTime;
  </div>
         <div class="main-div">
         <div id="display">
-            <table id="forum-table display-forum" class="forum-table table table-bordered table-striped table-hover data-table">
+<!--            <table id="forum-table display-forum" class="forum-table table table-bordered table-striped table-hover data-table">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>--><?php //echo AppUtility::t('Forum Name')?><!--</th>-->
+<!--                    --><?php //if($users->rights > AppConstant::STUDENT_RIGHT){?>
+<!--                    <th>--><?php //echo AppUtility::t('Modify')?><!--</th>-->
+<!--                    --><?php //}?>
+<!--                    <th>--><?php //echo AppUtility::t('Threads')?><!--</th>-->
+<!--                    <th>--><?php //echo AppUtility::t('Posts')?><!--</th>-->
+<!--                    <th>--><?php //echo AppUtility::t('Last Post Date')?><!--</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody class="forum-table-body">-->
+<!--                </tbody>-->
+<!--            </table>-->
+            <table class=forum>
                 <thead>
-                <tr>
-                    <th><?php echo AppUtility::t('Forum Name')?></th>
-                    <?php if($users->rights > AppConstant::STUDENT_RIGHT){?>
-                    <th><?php echo AppUtility::t('Modify')?></th>
-                    <?php }?>
-                    <th><?php echo AppUtility::t('Threads')?></th>
-                    <th><?php echo AppUtility::t('Posts')?></th>
-                    <th><?php echo AppUtility::t('Last Post Date')?></th>
-                </tr>
+                <tr><th>Forum Name</th><th>Threads</th><th>Posts</th><th>Last Post Date</th></tr>
                 </thead>
-                <tbody class="forum-table-body">
+                <tbody>
+                <?php
+                foreach ($itemsimporder as $item) {
+                    if (!isset($itemsassoc[$item])) { continue; }
+                    $line = $forumdata[$itemsassoc[$item]];
+
+                    if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {
+                        continue;
+                    }
+                    echo "<tr><td>";
+                    if ($isteacher) {
+                        echo '<span class="right">';
+                        echo "<a href=\"../course/addforum.php?cid=$cid&id={$line['id']}\">Modify</a> ";
+                        echo '</span>';
+                    }
+                    echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> ";
+                    if ($newcnt[$line['id']]>0) {
+                        echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newcnt[$line['id']]})</a>";
+                    }
+                    echo "</td>\n";
+                    if (isset($threadcount[$line['id']])) {
+                        $threads = $threadcount[$line['id']];
+                        $posts = $postcount[$line['id']];
+                        $lastpost = AppUtility::tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
+                    } else {
+                        $threads = 0;
+                        $posts = 0;
+                        $lastpost = '';
+                    }
+                    echo "<td class=c>$threads</td><td class=c>$posts</td><td class=c>$lastpost</td></tr>\n";
+                }
+                ?>
                 </tbody>
             </table>
         </div>

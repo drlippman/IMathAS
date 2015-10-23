@@ -38,11 +38,9 @@ class Assessments extends BaseImasAssessments
         if ($istutor) {
             $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory' => $catfilter]);
-        }
+        $catfilter > AppConstant::NUMERIC_NEGATIVE_ONE ? $query->andWhere(':gbcategory = :catfilter') : $query->andWhere(':catfilter = :catfilter');
         $query->orderBy('enddate, name');
-        $command = $query->createCommand()->bindValue(':courseId',$courseId);
+        $command = $query->createCommand()->bindValues([':courseId' => $courseId,':catfilter' => $catfilter]);
         $data = $command->queryAll();
         return $data;
     }
@@ -64,11 +62,9 @@ class Assessments extends BaseImasAssessments
         if ($istutor) {
             $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory' => $catfilter]);
-        }
+        $catfilter > AppConstant::NUMERIC_NEGATIVE_ONE ? $query->andWhere('gbcategory = :catfilter') : $query->andWhere(':catfilter = :catfilter');
         $query->orderBy('enddate, name');
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue(':catfilter',$catfilter);
         $data = $command->queryAll();
         return $data;
     }
@@ -169,25 +165,6 @@ class Assessments extends BaseImasAssessments
         }
     }
 
-    public static function findOneAssessmentDataForGradebook($courseId, $istutor, $isteacher, $catfilter)
-    {
-        $query = new Query();
-        $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
-            ->from('imas_assessments')
-            ->where(['courseid', $courseId])
-            ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
-        if ($istutor) {
-            $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
-        }
-        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory', $catfilter]);
-        }
-        $query->orderBy('enddate, name');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
-    }
-
     public static function setVidData($itemOrder, $viddata, $aid)
     {
         $assessmentData = Assessments::findOne(['id' => $aid]);
@@ -248,11 +225,9 @@ class Assessments extends BaseImasAssessments
             ->where('ia.courseid = :courseId')
             ->andWhere(['>', 'ia.defoutcome', AppConstant::ZERO_VALUE])
             ->orWhere(['<>', 'iq.category', AppConstant::ZERO_VALUE]);
-
         $command = $query->createCommand()->bindValue('courseId' , $courseId);
         $data = $command->queryAll();
         return $data;
-
     }
 
     public static function getByCourseIdJoinWithSessionData($assessmentId, $userId, $isteacher, $istutor)
@@ -265,14 +240,11 @@ class Assessments extends BaseImasAssessments
                 'imas_assessment_sessions',
                 'imas_assessments.id=imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessment_sessions.id' => $assessmentId]);
-        if (!$isteacher && !$istutor) {
-            $query->andWhere(['imas_assessment_sessions.userid' => $userId]);
-        }
-        $command = $query->createCommand();
+            ->where('imas_assessment_sessions.id = :assessmentId');
+        (!$isteacher && !$istutor) ? $query->andWhere('imas_assessment_sessions.userid = :userId') : $query->andWhere(':userId = :userId');
+        $command = $query->createCommand()->bindValues([':assessmentId' => $assessmentId,':userId' => $userId]);
         $data = $command->queryOne();
         return $data;
-
     }
 
     public static function getByGroupSetId($deleteGrpSet)
@@ -294,25 +266,12 @@ class Assessments extends BaseImasAssessments
 
     public static function getIdForGroups($grpSetId)
     {
-        $query = new Query();
-        $query->select(['id'])
-            ->from('imas_assessments')
-            ->where('groupsetid = :grpSetId');
-        $command = $query->createCommand()->bindValue('grpSetId',$grpSetId);
-        $data = $command->queryOne();
-        return $data;
-
+        return self::find()->select(['id'])->where(['groupsetid' => $grpSetId])->one();
     }
 
     public static function CommonMethodToGetAssessmentData($toCopy, $id)
     {
-        $query = new Query();
-        $query->select($toCopy)
-            ->from('imas_assessments')
-            ->where(['id' => $id]);
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        return self::find()->select($toCopy)->where(['id' => $id])->one();
     }
 
     public static function updateAssessmentData($setslist, $checkedlist)

@@ -929,7 +929,6 @@ class InstructorController extends AppController
                     $this->getblockinfo($item['items'],$parent.'-'.($k+1),$ids,$types,$names,$startdates,$enddates,$reviewdates,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix);
                 }
             }
-
         }
         return array('name' => $names, 'ids' => $ids, 'types' => $types, 'startdates' => $startdates, 'enddates' => $enddates, 'reviewdates' => $reviewdates, 'itemscourseorder' => $itemscourseorder, 'courseorder' => $courseorder, 'orderby' => $orderby, 'avails' => $avails, 'pres' => $pres, 'prefix' => $prefix);
     }

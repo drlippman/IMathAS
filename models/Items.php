@@ -92,4 +92,9 @@ class Items extends BaseImasItems
     {
         return self::find()->select(['id','itemtype','typeid'])->where(['courseid' => $courseId])->all();
     }
+
+    public static function getByCourseIdAndItenType($id, $itemType)
+    {
+        return Items::findAll(['courseid' => $id, 'itemtype' => $itemType]);
+    }
 }

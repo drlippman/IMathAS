@@ -301,4 +301,28 @@ class Forums extends BaseImasForums {
         $items = $command->queryAll();
         return $items;
     }
+
+    public static function getByCourseIdAndTeacher($courseId,$isteacher,$now)
+    {
+        $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$courseId'";
+        if (!$isteacher) {
+            $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate < $now AND imas_forums.enddate>$now)) ";
+        }
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getMaxPostDate($cid)
+    {
+        $query = new Query();
+        $query->select('imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate)')
+            ->from('imas_forums')
+            ->join('LEFT JOIN',
+                'imas_forum_posts',
+                'imas_forums.id=imas_forum_posts.forumid'
+            )
+            ->where('imas_forums.courseid = :courseId')->groupBy('imas_forum_posts.forumid')->orderBy('imas_forums.id');
+        $command = $query->createCommand()->bindValues(['courseId'=> $cid]);
+        $items = $command->queryAll();
+        return $items;
+    }
 }

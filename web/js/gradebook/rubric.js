@@ -5,7 +5,8 @@ var hasTouch;
 var rubricbase, lastrubricpos;
 
 function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
-	hasTouch = 'ontouchstart' in document.documentElement;
+	alert(GB_loaded);
+    hasTouch = 'ontouchstart' in document.documentElement;
 	if (GB_loaded == false) {
 		//var gb_overlay = document.createElement("div");
 		//gb_overlay.id = "GB_overlay";

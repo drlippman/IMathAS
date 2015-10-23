@@ -736,7 +736,7 @@ class AppController extends Controller
     {
         if (!$teacherId) {
             $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
         return true;
     }
@@ -745,7 +745,7 @@ class AppController extends Controller
     {
         if ($rights != AppConstant::ADMIN_RIGHT) {
             $this->setWarningFlash(AppConstant::REQUIRED_ADMIN_ACCESS);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
         return true;
     }
@@ -801,7 +801,7 @@ class AppController extends Controller
     {
         if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         } else if ($rights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'index' || $actionPath == 'forms')) {
             return true;
         } else if ($rights >= AppConstant::GROUP_ADMIN_RIGHT && ($actionPath == 'add-new-user' || $actionPath == 'change-rights' || $actionPath == 'import-question-set'
@@ -814,7 +814,7 @@ class AppController extends Controller
             return true;
         } else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
 
     }
@@ -835,7 +835,7 @@ class AppController extends Controller
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])) {
             if (($user['rights'] < AppConstant::GROUP_ADMIN_RIGHT) && ($actionPath == 'manage-question-set')) {
                 $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-                return $this->redirect($this->goHome());
+                return $this->redirect(Yii::$app->getHomeUrl());
             } else {
                 return true;
             }
@@ -849,7 +849,7 @@ class AppController extends Controller
         } else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId) || ($user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && $courseId != 'admin')) {
             if ($courseId == 'admin') {
                 $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-                return $this->redirect($this->goHome());
+                return $this->redirect(Yii::$app->getHomeUrl());
             } else {
                 return $this->noValidRights($teacherId);
             }
@@ -868,10 +868,10 @@ class AppController extends Controller
         $studentId = $this->isStudent($user['id'], $courseId);
         if (($user['rights'] < AppConstant::STUDENT_RIGHT) || (($user['rights'] == AppConstant::STUDENT_RIGHT) && ($actionPath == 'move-thread' || $actionPath == 'add-forum' || $actionPath == 'change-forum' || $actionPath == 'view-forum-grade'))) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         } else if (($user['rights'] == AppConstant::STUDENT_RIGHT && !$studentId) || ($user['rights'] > AppConstant::STUDENT_RIGHT && $user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && !$teacherId)) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         } else {
             return true;
         }
@@ -889,7 +889,7 @@ class AppController extends Controller
             return true;
         } else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
     }
 
@@ -903,16 +903,13 @@ class AppController extends Controller
         }
         if (($user['rights'] < AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-assessment' || $actionPath == 'change-assessment' || $actionPath == 'assessment-message' && !$isStudent)) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         } else if (($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
             return $this->noValidRights($teacherId);
         } else {
             return true;
         }
     }
-
-
-
 
     public function accessForMessageController($user, $courseId, $actionPath)
     {
@@ -924,23 +921,7 @@ class AppController extends Controller
             return true;
         } else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
-        }
-    }
-
-    public function accessForSiteController($user, $courseId, $actionPath)
-    {
-
-        if(($user['rights'] >= AppConstant::GUEST_RIGHT) && ($actionPath == 'dashboard' || $actionPath == 'change-password' || $actionPath == 'change-user-info'))
-        {
-            return true;
-        } elseif(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'student-enroll-course' || $actionPath == 'hide-from-course-list' || $actionPath == 'unhide-from-course-list' || $actionPath == 'form' || $actionPath == 'action')){
-           return true;
-        } elseif($actionPath == 'index'|| $actionPath == 'login' || $actionPath == 'logout' || $actionPath == 'diagnostics' || $actionPath == 'registration' || $actionPath == 'student-register' || $actionPath == 'Work-in-progress' || $actionPath == 'forgot-password' || $actionPath == 'forgot-username' || $actionPath == 'check-browser' || $actionPath == 'reset-password' || $actionPath == 'helper-guide' || $actionPath == 'documentation' || $actionPath == 'help-for-student-answer' || $actionPath == 'instructor-document'){
-           return true;
-        } else {
-            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect($this->goHome());
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
     }
 }

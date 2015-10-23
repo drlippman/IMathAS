@@ -232,7 +232,6 @@ class Student extends BaseImasStudents
         if ($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE) {
             $query->andWhere(['imas_students.section' => $secfilter]);
         }
-
         if ($hidelocked) {
             $query->andWhere(['imas_students.locked' => 0]);
         }

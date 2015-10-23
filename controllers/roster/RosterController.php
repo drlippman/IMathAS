@@ -1487,7 +1487,8 @@ class RosterController extends AppController
                 User::deleteImgByUserId($userId);
                 unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
             }
-            User::saveUserRecord($params, $user);
+            $users = new User();
+            $users->saveUserRecord($params,$user);
             Student::updateSectionAndCodeValue($params['section'], $userId, $params['code'], $courseId, $params);
             $this->setSuccessFlash(AppConstant::UPDATE_STUDENT_SUCCESSFULLY);
             return $this->redirect('student-roster?cid=' . $courseId);

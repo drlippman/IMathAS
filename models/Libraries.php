@@ -72,8 +72,8 @@ class Libraries extends BaseImasLibraries
     public static function getByQuestionId($questionid){
         $query = new Query();
         $query->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name')->from('imas_questions')
-            ->join('INNER JOIN','imas_libraries','imas_questions.category=imas_libraries.id')->where('imas_questions.id= :questionid')
-            ->createCommand($query)->bindValue('questionid',$questionid)->queryAll();
+            ->join('INNER JOIN','imas_libraries','imas_questions.category=imas_libraries.id')->where('imas_questions.id = :questionid')
+            ->createCommand()->bindValue(':questionid',$questionid)->queryAll();
     }
 
     public static function getAllQSetId($qids)

@@ -117,7 +117,6 @@ $("a[name=tabs]").on("click", function (event) {
             "confirm": function () {
                 $(this).dialog("close");
                 var threadId = threadsid;
-
                 jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
                 return true;
             }

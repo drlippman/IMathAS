@@ -146,6 +146,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByQuestionId($questionList)
     {
+        $questionList = implode(',',$questionList);
         $query  = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id AS qid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($questionList)";

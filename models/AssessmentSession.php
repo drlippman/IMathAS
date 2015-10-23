@@ -120,11 +120,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions',
                 'imas_assessments.id = imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessments.courseid' => $courseId]);
-        if ($limuser > AppConstant::NUMERIC_ZERO) {
-            $query->andWhere(['imas_assessment_sessions.userid' => $limuser]);
-        }
-        $command = $query->createCommand();
+            ->where('imas_assessments.courseid = :courseId');
+        $limuser > AppConstant::NUMERIC_ZERO ? $query->andWhere('imas_assessment_sessions.userid = :limuser' ) : $query->andWhere(':limuser = :limuser');
+        $command = $query->createCommand()->bindValues([':courseId' => $courseId,':limuser' => $limuser]);
         $data = $command->queryAll();
         return $data;
     }
@@ -138,11 +136,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions',
                 'imas_assessments.id = imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessments.courseid', $courseId]);
-        if ($limuser > AppConstant::NUMERIC_ZERO) {
-            $query->andWhere(['imas_assessment_sessions.userid', $limuser]);
-        }
-        $command = $query->createCommand();
+            ->where('imas_assessments.courseid = :courseId');
+        ($limuser > AppConstant::NUMERIC_ZERO) ? $query->andWhere('imas_assessment_sessions.userid = :limuser') : $query->andWhere(':limuser = :limuser');
+        $command = $query->createCommand()->bindValues([':courseId' => $courseId,':limuser' => $limuser]);
         $data = $command->queryAll();
         return $data;
     }
@@ -231,12 +227,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $query = new Query();
         $query->select(['imas_assessments.name'])->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_assessments', 'imas_assessments.id=imas_assessment_sessions.assessmentid')
-            ->where(['imas_assessment_sessions.id=' => $assessmentId]);
-        if (!$isteacher && !$istutor) {
-            $query->andWhere(['imas_assessment_sessions.userid='=> $userId]);
-        }
-
-        $command = $query->createCommand();
+            ->where('imas_assessment_sessions.id = :assessmentId');
+        (!$isteacher && !$istutor) ? $query->andWhere('imas_assessment_sessions.userid = :userId') : $query->andWhere(':userId = :userId');
+        $command = $query->createCommand()->bindValues([':assessmentId' => $assessmentId,':userId' => $userId]);
         $items = $command->queryOne();
         return $items;
     }
@@ -339,10 +332,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
             ->where(['imas_students.courseid' => $courseId])
             ->andWhere('imas_assessment_sessions.assessmentid=:assessmentId')
             ->andWhere(['imas_students.locked' => AppConstant::ZERO_VALUE]);
-        if ($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['imas_students.section'=> $secfilter]);
-        }
-        $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'secfilter' => $secfilter]);
+        $secfilter != AppConstant::NUMERIC_NEGATIVE_ONE ? $query->andWhere('imas_students.section = :secfilter') : $query->andWhere(':secfilter = :secfilter');
+        $command = $query->createCommand()->bindValues([':assessmentId' => $assessmentId,':secfilter' => $secfilter]);
         $data = $command->queryAll();
         return $data;
     }
@@ -441,7 +432,6 @@ class AssessmentSession extends BaseImasAssessmentSessions
             'imas_users.id=imas_assessment_sessions.userid'
             )
             ->where(['imas_assessment_sessions.agroupid= :groupId'])->orderBy('imas_users.LastName,imas_users.FirstName');
-
         $command = $query->createCommand()->bindValue('groupId', $groupId);
         $items = $command->queryAll();
         return $items;
@@ -642,16 +632,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
             )
             ->where('imas_assessment_sessions.assessmentid = :assessmentId')
              ->orderBy('imas_users.LastName')->orderBy('imas_users.FirstName');
-        if ($page != -1 && isset($params['userid']))
-        {
-            $query->andWhere('userid= :userid' );
-        }
+        ($page != -1 && isset($params['userid'])) ?  $query->andWhere('userid= :userid') : $query->andWhere(':userid= :userid' );
         $command = $query->createCommand();
-        $command->bindValue(':assessmentId',$assessmentId);
-        if ($page != -1 && isset($params['userid']))
-        {
-            $command->bindValue(':userid',$params['userid']);
-        }
+        $command->bindValue(':assessmentId',$assessmentId)->bindValue(':userid',$params['userid']);
         $items =  $command->queryAll();
         return $items;
     }

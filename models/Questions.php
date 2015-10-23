@@ -309,8 +309,7 @@ class Questions extends BaseImasQuestions
 
     public static function getIdCatPoints($dataId)
     {
-        $query = Questions::find()->select('id,category,points')->where(['IN','id' => $dataId])->all();
-
+        $query = Questions::find()->select('id,category,points')->where(['IN','id',$dataId])->all();
         return $query;
     }
 

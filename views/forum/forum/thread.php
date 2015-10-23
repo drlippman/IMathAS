@@ -208,18 +208,21 @@ echo '</div>';
                     } ?>
                <?php if ($taglist!='') {
                     $p = strpos($taglist,':');
-
                     $tagselect = '<span class="col-md-3 col-sm-4"><span>Filter by </span>'.substr($taglist,0,$p);
                     $tagselect .= '<select class="form-control width-fifty-per display-inline-block margin-left-ten" id="tagfilter" onChange="chgtagfilter()"><option value="" ';
-                    if ($tagfilter=='') {
+
+
+                    if ($tagfilter == '') {
                         $tagselect .= 'selected="selected"';
                     }
                     $tagselect .= '>All</option>';
                     $tags = explode(',',substr($taglist,$p+1));
+
                     foreach ($tags as $tag) {
+
                         $tag =  str_replace('"','&quot;',$tag);
                         $tagselect .= '<option value="'.$tag.'" ';
-                        if ($tag==$tagfilter) {$tagselect .= 'selected="selected"';}
+                        if ($tag == $tagfilter) {$tagselect .= 'selected="selected"';}
                         $tagselect .= '>'.$tag.'</option>';
                     }
                     $tagselect .= '</select></span>';

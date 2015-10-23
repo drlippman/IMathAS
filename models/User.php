@@ -69,15 +69,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $this->authKey === $authKey;
     }
 
-    public static function saveUserRecord($params, $user)
+    public function saveUserRecord($params, $user)
     {
-
         $params = AppUtility::removeEmptyAttributes($params);
         if (isset($params['password'])) {
             $params['password'] = AppUtility::passwordHash($params['password']);
         }
-        $user->attributes = $params;
-        $user->save();
+        $this->attributes = $params;
+        $this->save();
     }
 
     public static function findByEmail($email)
@@ -295,8 +294,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function insertDataFroGroups($stuList)
     {
-//        $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id IN ($stuList) ORDER BY LastName, FirstName";
-//        return Yii::$app->db->createCommand($query)->queryAll();
         return User::find()->select('FirstName,LastName,SID')->where(['IN','id',$stuList])->orderBy('LastName,FirstName')->all();
     }
 
