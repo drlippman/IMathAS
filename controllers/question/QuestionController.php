@@ -1116,7 +1116,7 @@ class QuestionController extends AppController
          */
         if (!($teacherId)) {
             $overwriteBody = AppConstant::NUMERIC_ONE;
-            $body = AppConstant::NO_TEACHER_RIGHTS;
+//            $body = AppConstant::NO_TEACHER_RIGHTS;
         } else {
             /*
              * Permissions are ok perform data manipulation

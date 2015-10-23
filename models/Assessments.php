@@ -459,4 +459,9 @@ class Assessments extends BaseImasAssessments
     {
         return self::find()->select(['name','summary','startdate','enddate','reviewdate','deffeedback','reqscore','reqscoreaid','avail','allowlate','timelimit'])->where(['id' => $typeId])->one();
     }
+
+    public static function getAssessmentDataId($line)
+    {
+        return Assessments::findOne(['id' => $line])->toArray();
+    }
 }

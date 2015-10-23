@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12"><b><?php AppUtility::t('Hello'); ?><?php echo $userName ?></b></div>
     <div class="col-md-12 margin-left-five"><h3><?php AppUtility::t('Courses'); ?></h3></div>
 
-    <div class='item margin-padding-admin-table padding-bottom'>
+    <div class='item margin-padding-admin-table padding-bottom margin-twenty'>
 
         <table class="display course-table table table-bordered table-striped table-hover data-table">
             <thead>

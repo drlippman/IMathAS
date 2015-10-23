@@ -730,4 +730,9 @@ class QuestionSet extends BaseImasQuestionset
         $query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights";
         return \Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getDescription($queId)
+    {
+        return self::find()->select('description')->where(['id' => $queId])->one();
+    }
 }

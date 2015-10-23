@@ -14,8 +14,6 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 
-	//$starttime = microtime(true);
-
     global $imasroot, $myrights, $showtips, $urlmode, $CFG, $temp;
     $urlmode = AppUtility::urlMode();
 	$imasroot = AppUtility::getHomeURL();

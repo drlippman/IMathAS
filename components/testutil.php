@@ -7,6 +7,7 @@ $imasroot = AppUtility::getHomeURL();
  *testsettings: assoc array of assessment settings
  *Returns:  id,questionsetid,category,points,penalty,attempts
  */
+
 function getquestioninfo($qns,$testsettings) {
     $connection = Yii::$app->getDb();
 	if (!is_array($qns)) {
@@ -64,8 +65,7 @@ function getquestioninfo($qns,$testsettings) {
  */
 function getansweights($qi,$code) {
 	global $seeds,$questions;
-
-	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+    if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
 	$i = array_search($qi,$questions);

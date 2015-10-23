@@ -882,12 +882,10 @@ class ShowItemCourse extends Component
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                        <?php }
                     }
-                    echo "<div class=title><b><a href=\"#\"";
-                    /*if (isset($studentid)) {
-                           echo " data-base=\"assess-$typeid\"";
-                    }*/ //moved to showtest
+                    echo "<div class=title><b>";?>
 
-                    echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $endDate).'.';
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"
+                    <?php echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $endDate).'.';
                     if ($line['reviewdate']!=2000000000) {
                         echo " ", _('until'), " $reviewdate \n";
                     }
@@ -948,7 +946,8 @@ class ShowItemCourse extends Component
                             echo "<div class=\">?</div>";
                         }
                     }
-                    echo "<div class=title><i> <a href=\"#\" >{$line['name']}</a></i>";
+                    echo "<div class=title><i>
+                    <a href=\"#\" >{$line['name']}</a></i>";
                     echo '<span class="instrdates">';
                     echo "<br/><i>$show</i>\n";
                     echo '</span>';
