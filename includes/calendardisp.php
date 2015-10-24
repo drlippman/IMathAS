@@ -160,7 +160,7 @@ while ($row = mysql_fetch_row($result)) {
 		   	   }
 		   } else {
 			   $scores = explode(';',mysql_result($r2,0,0));
-			   if (getpts($scores[0])<$row[6]) {
+			   if (round(getpts($scores[0]),1)+.02<abs($row[6])) {
 				   if ($row[6]<0) { 
 					   $showgrayedout = true;
 				   } else {
