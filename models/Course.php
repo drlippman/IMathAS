@@ -604,10 +604,11 @@ class Course extends BaseImasCourses {
     public static function getCourseOfStudent($userId)
     {
         $query = new Query();
-        $query->select('imas_courses.name,imas_courses.id,imas_students.hidefromcourselist')->from('imas_students,imas_courses')
-            ->where(['imas_students.courseid = imas_courses.id'])->andWhere(['imas_students.userid = :userId'])
+        $query->select('imas_courses.name,imas_courses.id,imas_students.hidefromcourselist')->from('imas_students')
+            ->join('INNER JOIN','imas_courses','imas_students.courseid = imas_courses.id')
+            ->where('imas_students.userid = :userId')
             ->andWhere(['imas_courses.available' => 0] or ['imas_courses.available' => 2])->orderBy('imas_courses.name');
-        $command = $query->createCommand()->bindValue('userId',$userId);
+        $command = $query->createCommand()->bindValue(':userId',$userId);
         $data = $command->queryAll();
         return $data;
     }
@@ -615,8 +616,9 @@ class Course extends BaseImasCourses {
     public static function getCourseOfTeacher($userId)
     {
         $query = new Query();
-        $query->select('imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid')->from('imas_teachers,imas_courses')
-            ->where('imas_teachers.courseid = imas_courses.id')->andWhere('imas_teachers.userid = :userId')
+        $query->select('imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid')->from('imas_teachers')->
+        join('INNER JOIN','imas_courses','imas_teachers.courseid = imas_courses.id')
+            ->where('imas_teachers.userid = :userId')
             ->andWhere(['imas_courses.available' => 0] or ['imas_courses.available' => 1])->orderBy('imas_courses.name');
         $command = $query->createCommand()->bindValue('userId',$userId);
         $data = $command->queryAll();
