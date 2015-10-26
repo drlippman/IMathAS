@@ -3193,7 +3193,6 @@ class AssessmentController extends AppController
                         $seqShowQuestion = seqshowqinfobar($i,$curq);
                         $qavail = $seqShowQuestion[0];
                         $temp .= $seqShowQuestion[1];
-//                        AppUtility::dump($temp);
                         if ($i==$curq) {
                             $temp .= '<div class="curquestion">';
                             basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);

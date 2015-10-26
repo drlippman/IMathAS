@@ -3409,7 +3409,7 @@ class AppUtility extends Component
             echo '</tr>';
         }
         echo '</tbody></table>';
-        echo '<script type="text/javascript">initSortTable("newpostlist",Array("S","S","S","D"),false);</script>';
+        echo '<script type="javascript">initSortTable("newpostlist",Array("S","S","S","D"),false);</script>';
 
         echo '</div>';
     }
@@ -3450,7 +3450,7 @@ class AppUtility extends Component
             echo '</tr>';
         }
         echo '</tbody></table>';
-        echo '<script type="text/javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
+        echo '<script type="javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
         echo '</div>';
 
     }

@@ -322,7 +322,7 @@ class ForumPosts extends BaseImasForumPosts
         $query = new Query();
         $query->select('imas_forum_posts.*,imas_users.LastName,imas_users.FirstName')
             ->from('imas_forum_posts,imas_users')->where('imas_forum_posts.userid=imas_users.id')
-            ->andWhere('IN','imas_forum_posts.id',$threadlist);
+            ->andWhere(['IN','imas_forum_posts.id',$threadlist]);
         return $query->createCommand()->queryAll();
     }
 

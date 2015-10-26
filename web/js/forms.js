@@ -1,7 +1,6 @@
 $(document).ready(function()
 {
     $('.admin-modify-groups-table').DataTable();
-    textValidation();
 });
 
 function deleteGroup(groupId)

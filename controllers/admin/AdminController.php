@@ -3012,7 +3012,7 @@ class AdminController extends AppController
                                     $query = QuestionSet::getQSetAndUserData($qSetId,$user->groupid);
                                     if($query)
                                     {
-                                        $affectedRow = QuestionSet::updateDataForImportQSet($qData[$qn],$now,$qSetId,$hasImg);
+                                        $affectedRow = QuestionSet::UpdateQuestionsetData($qData[$qn],$now,$qSetId,$hasImg);
                                     }
                                     else
                                     {
