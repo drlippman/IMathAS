@@ -605,8 +605,8 @@ class Course extends BaseImasCourses {
     {
         $query = new Query();
         $query->select('imas_courses.name,imas_courses.id,imas_students.hidefromcourselist')->from('imas_students,imas_courses')
-            ->where('imas_students.courseid=imas_courses.id')->andWhere('imas_students.userid= :userId')
-            ->andWhere('imas_courses.available = 0')->orWhere('imas_courses.available = 2')->orderBy('imas_courses.name');
+            ->where(['imas_students.courseid = imas_courses.id'])->andWhere(['imas_students.userid = :userId'])
+            ->andWhere(['imas_courses.available' => 0] or ['imas_courses.available' => 2])->orderBy('imas_courses.name');
         $command = $query->createCommand()->bindValue('userId',$userId);
         $data = $command->queryAll();
         return $data;
@@ -616,8 +616,8 @@ class Course extends BaseImasCourses {
     {
         $query = new Query();
         $query->select('imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid')->from('imas_teachers,imas_courses')
-            ->where('imas_teachers.courseid=imas_courses.id')->andWhere('imas_teachers.userid= :userId')
-            ->andWhere('imas_courses.available = 0')->orWhere('imas_courses.available = 1')->orderBy('imas_courses.name');
+            ->where('imas_teachers.courseid = imas_courses.id')->andWhere('imas_teachers.userid = :userId')
+            ->andWhere(['imas_courses.available' => 0] or ['imas_courses.available' => 1])->orderBy('imas_courses.name');
         $command = $query->createCommand()->bindValue('userId',$userId);
         $data = $command->queryAll();
         return $data;
