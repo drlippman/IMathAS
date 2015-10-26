@@ -464,4 +464,13 @@ class Assessments extends BaseImasAssessments
     {
         return Assessments::findOne(['id' => $line])->toArray();
     }
+    public static function getByAssessmentIdAsArray($id)
+    {
+        $assessment = Assessments::findOne(['id' => $id]);
+        if(is_object($assessment)) {
+            return $assessment->toArray();
+        } else {
+            return $assessment;
+        }
+    }
 }

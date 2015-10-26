@@ -455,30 +455,30 @@ class AssessmentController extends AppController
                     $assessmentData['avail'] = AppConstant::NUMERIC_ONE;
                     $assessmentData['reviewdate'] = AppConstant::NUMERIC_ZERO;
                     $timeLimit = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['displaymethod'] = "SkipAround";
-                    $assessmentData['defpoints'] = AppConstant::NUMERIC_TEN;
-                    $assessmentData['defattempts'] = AppConstant::NUMERIC_ONE;
+                    $assessmentData['displaymethod'] = isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
+                    $assessmentData['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']: AppConstant::NUMERIC_TEN;
+                    $assessmentData['defattempts'] = isset($CFG['AMS']['defattempts'])?$CFG['AMS']['defattempts']: AppConstant::NUMERIC_ONE;
                     $assessmentData['password'] = '';
-                    $testType = AppConstant::TEST_TYPE;
-                    $showAnswer = AppConstant::SHOW_ANSWER;
-                    $assessmentData['defpenalty'] = AppConstant::NUMERIC_TEN;
-                    $assessmentData['shuffle'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['minscore'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['isgroup'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['showhints'] = AppConstant::NUMERIC_ONE;
+                    $testType = isset($CFG['AMS']['testtype'])?$CFG['AMS']['testtype']: AppConstant::TEST_TYPE;
+                    $showAnswer = isset($CFG['AMS']['showans'])?$CFG['AMS']['showans']: AppConstant::SHOW_ANSWER;
+                    $assessmentData['defpenalty'] = isset($CFG['AMS']['defpenalty'])?$CFG['AMS']['defpenalty']: AppConstant::NUMERIC_TEN;
+                    $assessmentData['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']: AppConstant::NUMERIC_ZERO;
+                    $assessmentData['minscore'] = isset($CFG['AMS']['minscore'])?$CFG['AMS']['minscore']: AppConstant::NUMERIC_ZERO;
+                    $assessmentData['isgroup'] = isset($CFG['AMS']['isgroup'])?$CFG['AMS']['isgroup']: AppConstant::NUMERIC_ZERO;
+                    $assessmentData['showhints'] = isset($CFG['AMS']['showhints'])?$CFG['AMS']['showhints']: AppConstant::NUMERIC_ONE;
                     $assessmentData['reqscore'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['reqscoreaid'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['groupsetid'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['noprint'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['groupmax'] = AppConstant::NUMERIC_SIX;
-                    $assessmentData['allowlate'] = AppConstant::NUMERIC_ONE;
-                    $assessmentData['exceptionpenalty'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['tutoredit'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['eqnhelper'] = AppConstant::NUMERIC_ZERO;
+                    $assessmentData['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']: AppConstant::NUMERIC_ZERO;
+                    $assessmentData['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']: AppConstant::NUMERIC_SIX;
+                    $assessmentData['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']: AppConstant::NUMERIC_ONE;
+                    $assessmentData['exceptionpenalty'] = isset($CFG['AMS']['exceptionpenalty'])?$CFG['AMS']['exceptionpenalty']: AppConstant::NUMERIC_ZERO;
+                    $assessmentData['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']: AppConstant::NUMERIC_ZERO;
+                    $assessmentData['eqnhelper'] = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']: AppConstant::NUMERIC_ZERO;
                     $assessmentData['ltisecret'] = '';
-                    $assessmentData['caltag'] = AppConstant::CALTAG;
-                    $assessmentData['calrtag'] = AppConstant::CALRTAG;
-                    $assessmentData['showtips'] = AppConstant::NUMERIC_TWO;
+                    $assessmentData['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']: AppConstant::CALTAG;
+                    $assessmentData['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']: AppConstant::CALRTAG;
+                    $assessmentData['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:AppConstant::NUMERIC_TWO;
                     $useDefFeedback = false;
                     $defFeedback = AppConstant::DEFAULT_FEEDBACK;
                     $gradebookCategory = AppConstant::NUMERIC_ZERO;
@@ -1161,7 +1161,7 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
-        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$isdiag, $courseId, $attempts,$scores,$bestscores,$noindivscores,$showeachscore;
+        global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$timesontask,$isdiag, $courseId, $attempts,$scores,$bestscores,$noindivscores,$showeachscore,$reattempting,$bestrawscores,$firstrawscores,$bestattempts,$bestseeds,$bestlastanswers,$lastanswers,$bestquestions;
         $myrights = $user['rights'];
         $sessiondata = $this->getSessionData($sessionId);;
         if (!isset($CFG['TE']['navicons'])) {
@@ -1527,6 +1527,7 @@ class AssessmentController extends AppController
             $userid = $sessiondata['actas'];
         }
         $line = AssessmentSession::getById($testid);
+//        AppUtility::dump('ques');
         if (strpos($line['questions'],';')===false) {
             $questions = explode(",",$line['questions']);
             $bestquestions = $questions;
@@ -1555,7 +1556,6 @@ class AssessmentController extends AppController
             $timesontask = explode(',',$line['timeontask']);
         }
         $lti_sourcedid = $line['lti_sourcedid'];
-
         if (trim($line['reattempting'])=='') {
             $reattempting = array();
         } else {
@@ -1581,7 +1581,7 @@ class AssessmentController extends AppController
             AssessmentSession::setStartTime($starttime, $testid);
         }
 
-        $testsettings = Assessments::getByAssessmentId($line['assessmentid']);
+        $testsettings = Assessments::getByAssessmentIdAsArray($line['assessmentid']);
         if ($testsettings['displaymethod']=='VideoCue' && $testsettings['viddata']=='') {
             $testsettings['displaymethod']= 'Embed';
         }
@@ -1602,7 +1602,9 @@ class AssessmentController extends AppController
         $testsettings['timelimit'] = abs($testsettings['timelimit']);
         //do time limit mult
         $testsettings['timelimit'] *= $sessiondata['timelimitmult'];
-        list($testtype,$showans) = explode('-',$testsettings['deffeedback']);
+        list($testsettings['testtype'],$showans) = explode('-',$testsettings['deffeedback']);
+
+//        list($testsettings['testtype'],$showans) = explode('-',$testsettings['deffeedback']);
 
         //if submitting, verify it's the correct assessment
         if (isset($_POST['asidverify']) && $_POST['asidverify']!=$testid) {
@@ -1672,7 +1674,7 @@ class AssessmentController extends AppController
                 $this->leavetestmsg($sessiondata);
                 return $temp;
             }
-            $testtype="Practice";
+            $testsettings['testtype']="Practice";
             $testsettings['defattempts'] = 0;
             $testsettings['defpenalty'] = 0;
             $showans = '0';
@@ -1724,12 +1726,12 @@ class AssessmentController extends AppController
             }
         }
 
-        $allowregen = (!$superdone && ($testtype=="Practice" || $testtype=="Homework"));
-        $showeachscore = ($testtype=="Practice" || $testtype=="AsGo" || $testtype=="Homework");
-        $showansduring = (($testtype=="Practice" || $testtype=="Homework") && is_numeric($showans));
+        $allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
+        $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
+        $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($showans));
         $showansafterlast = ($showans==='F' || $showans==='J');
-        $noindivscores = ($testtype=="EndScore" || $testtype=="NoScores");
-        $reviewatend = ($testtype=="EndReview");
+        $noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
+        $reviewatend = ($testsettings['testtype']=="EndReview");
         $showhints = ($testsettings['showhints']==1);
         $showtips = $testsettings['showtips'];
         $regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
@@ -1921,7 +1923,7 @@ class AssessmentController extends AppController
                         $reloadqi = true;
                     }
                 }
-            } else if ($_GET['regenall']=="fromscratch" && $testtype=="Practice" && !$isreview) {
+            } else if ($_GET['regenall']=="fromscratch" && $testsettings['testtype']=="Practice" && !$isreview) {
                 filehandler::deleteasidfilesbyquery2('userid',$userid,$testsettings['id'],1);
                 AssessmentSession::deleteData($userid, $testsettings['id']);
                 return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/show-test?cid='.$testsettings['courseid'].'&id='.$testsettings['id']));
@@ -2170,7 +2172,7 @@ class AssessmentController extends AppController
                 $temp .= '<p>';
             }
 
-            if ($testtype=="Practice" && !$isreview) {
+            if ($testsettings['testtype']=="Practice" && !$isreview) {
                 $temp .= "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"show-test?regenall=fromscratch\">".'Create new version.'. "</a></div>";
             }
             if (!$isreview && !$superdone) {
@@ -2388,6 +2390,7 @@ class AssessmentController extends AppController
                     if ($shown) {$this->leavetestmsg($sessiondata);}
                 }
             } else if ($_GET['action']=="shownext") {
+
                 if (isset($_GET['score'])) {
                     $last = $_GET['score'];
 
@@ -2444,6 +2447,7 @@ class AssessmentController extends AppController
                     $toshow = addslashes($_GET['to']);
                     $done = false;
                 }
+
 
                 if (!$done) { //can show next
                     $temp .= '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
@@ -3088,7 +3092,7 @@ class AssessmentController extends AppController
                     $temp .= '<input type="submit" class="btn margin-left-twenty" name="saveforlater" value="'.'Save answers'. '" onclick="return confirm(\''.'This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'. '\');" />';
                     $temp .= "</form>\n";
                 } else {
-                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
                     $temp .= "</form>\n";
                     $this->leavetestmsg($sessiondata);
 
@@ -3100,7 +3104,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3128,7 +3132,7 @@ class AssessmentController extends AppController
                     $temp .= "<div class=inset><br/>\n";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
 
-                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3165,7 +3169,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testtype=="NoScores");
+                    $temp .= startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivscores,$testsettings['testtype']=="NoScores");
 
                     $this->leavetestmsg($sessiondata);
 
@@ -3397,7 +3401,6 @@ class AssessmentController extends AppController
                     $temp .= "<p>" .'Total Points Possible: '. totalpointspossible($qi) . "</p>";
                 }
 
-
                 $temp .= '</div>'; //ends either inset or formcontents div
                 if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
                     $temp .= "<p><a href=\"show-test?action=embeddone\">".'When you are done, click here to see a summary of your score'. "</a></p>\n";
@@ -3419,7 +3422,7 @@ class AssessmentController extends AppController
         } else if ($isltilimited || $sessiondata['intreereader']) {
 
         } else {
-            $temp .= "<a href=\"../course/course.php?cid={$testsettings['courseid']}\">".'Return to Course Page'. "</a></p>\n";
+            $temp .= "<a href=\"../../course/course/course?cid={$testsettings['courseid']}\">".'Return to Course Page'. "</a></p>\n";
         }
     }
 
@@ -3432,8 +3435,13 @@ class AssessmentController extends AppController
             if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
             if (getpts($scores[$i])>0) { $lastattempttotal += getpts($scores[$i]);}
         }
+
         $totpossible = totalpointspossible($qi);
-        $average = round(100*((float)$total)/((float)$totpossible),1);
+        $average = 0;
+        if($totpossible!=0)
+        {
+            $average = round(100*((float)$total)/((float)$totpossible),1);
+        }
 
         $doendredirect = false;
         $outmsg = '';
@@ -3573,7 +3581,7 @@ class AssessmentController extends AppController
                 $temp  .= "<p>".'<a href="show-test?regenall=all">Try similar problems</a> for all questions where allowed.'. "</p>";
             }
         }
-        if ($testtype!="NoScores") {
+        if ($testsettings['testtype']!="NoScores") {
             $hascatset = false;
             foreach($qi as $qii) {
                 if ($qii['category']!='0') {

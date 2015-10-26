@@ -411,8 +411,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function setStartTime($time, $id)
     {
         $assessment = AssessmentSession::findOne(['id' => $id]);
-        $assessment->starttime = $time;
-        $assessment->save();
+        if($assessment){
+            $assessment->starttime = $time;
+            $assessment->save();
+        }
     }
 
     public static function getAssessmentSessionDataToCopy($fieldstocopy,$testid){
