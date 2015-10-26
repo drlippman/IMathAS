@@ -135,8 +135,10 @@ class Questions extends BaseImasQuestions
 
     public static function getByQuestionSetId($allusedqids)
     {
-        $query = \Yii::$app->db->createCommand("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid")->queryAll();
-        return $query;
+        $query =  new Query();
+        $query->select(['questionsetid','COUNT(id)'])
+            ->from('imas_questions')->where(['IN', 'questionsetid', $allusedqids])->groupBy('questionsetid');
+       return $query->createCommand()->queryAll();
     }
 
     public static function getByAssessmentIdJoin($aidq)
@@ -220,6 +222,7 @@ class Questions extends BaseImasQuestions
     {
         $query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
         $query .= "SET imas_questions.questionsetid='$replaceby' WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid='$qsetid'";
+
         \Yii::$app->db->createCommand($query)->query();
 
     }
@@ -246,8 +249,19 @@ class Questions extends BaseImasQuestions
 
     public static function updateQuestionData($checkedlist)
     {
-        $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
-        Yii::$app->db->createCommand($query)->query();
+        $questions = Questions::find()->where('IN', 'assessmentid', $checkedlist)->all();
+        if($questions)
+        {
+            foreach($questions as $question)
+            {
+                $question->points = 9999;
+                $question->attempts = 9999;
+                $question->penalty = 9999;
+                $question->regen = 0;
+                $question->showans = 0;
+                $question->save();
+            }
+        }
     }
 
     public static function updateQuestionFields($params, $id){

@@ -652,7 +652,7 @@ class QuestionController extends AppController
                              */
                             if (count($pageQuestionTable) > AppConstant::NUMERIC_ZERO) {
                                 $allUsedQids = implode(',', array_keys($pageQuestionTable));
-                                $query = Questions::getByQuestionSetId($allUsedQids);
+                                $query = Questions::getByQuestionSetId(array_keys($pageQuestionTable));
                                 foreach ($query as $row) {
                                     $pageQuestionTable[$row['questionsetid']]['times'] = $row[COUNT('id')];
                                 }
@@ -2443,7 +2443,6 @@ class QuestionController extends AppController
                         if ($params['qtochg'] == '') {
                             $libArray = array();
                         }
-                        $chgList = "'" . implode("','", $libArray) . "'";
                         $allLibs = array();
                         $query = LibraryItems::getByList($libArray);
                         foreach ($query as $row) {
@@ -2452,7 +2451,7 @@ class QuestionController extends AppController
                         if ($isGrpAdmin) {
                             $query = LibraryItems::getByLibAndUserTable($groupId, $libArray);
                         } else {
-                            $query = LibraryItems::getByListAndOwnerId($isAdmin, $chgList, $userId);
+                            $query = LibraryItems::getByListAndOwnerId($isAdmin, $libArray, $userId);
                         }
                         $myLibs = array();
                         foreach ($query as $row) {
@@ -3023,7 +3022,7 @@ class QuestionController extends AppController
                  */
                 if (count($pageQuestionTable) > AppConstant::NUMERIC_ZERO) {
                     $allUsedQids = implode(',', array_keys($pageQuestionTable));
-                    $query = Questions::getByQuestionSetId($allUsedQids);
+                    $query = Questions::getByQuestionSetId(array_keys($pageQuestionTable));
                     foreach ($query as $row) {
                         $pageQuestionTable[$row['questionsetid']]['times'] = $row['COUNT(id)'];
                     }

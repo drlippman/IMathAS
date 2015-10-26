@@ -38,7 +38,7 @@ switch ($action) {
         }
         echo '</ol></p><BR class=form><br>';
         echo '<div class="col-md-10">' . AppUtility::t('If you forget these later, you can find them by viewing your course settings.', false) . '</div><BR class=form><br>';
-        echo '<div class=col-md-10><a href=' . AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $cid) . '>' . AppUtility::t('Enter the Course', false) . '</a></div>';
+        echo '<div class=col-md-10><a href=' . AppUtility::getURLFromHome('course', 'course/course?cid=' . $cid) . '>' . AppUtility::t('Enter the Course', false) . '</a></div>';
         break;
     case "delete":
         echo '<div id="headerforms" class="pagetitle col-md-10"><h2>' . AppUtility::t('Delete Course', false) . '</h2></div>';

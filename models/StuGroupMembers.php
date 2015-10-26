@@ -99,8 +99,8 @@ class StuGroupMembers extends BaseImasStugroupmembers
         $query->select(['i_u.LastName','i_u.FirstName'])
             ->from(['imas_stugroupmembers AS i_sg','imas_users AS i_u'])
             ->where(['i_u.id=i_sg.userid']);
-        $query->andWhere(['i_sg.stugroupid' => $groupId]);
-        $command = $query->createCommand();
+        $query->andWhere('i_sg.stugroupid= :groupId');
+        $command = $query->createCommand()->bindValue('groupId', $groupId);
         $data = $command->queryAll();
         return $data;
     }
@@ -124,9 +124,9 @@ class StuGroupMembers extends BaseImasStugroupmembers
         $query->select('i_sg.id')
             ->from('imas_stugroups AS i_sg')
             ->join('INNER JOIN','imas_stugroupmembers as i_sgm','i_sgm.stugroupid=i_sg.id')
-            ->where(['i_sgm.userid' =>  $userId]);
-        $query->andWhere(['i_sg.groupsetid' => $groupSetId]);
-        $command = $query->createCommand();
+            ->where('i_sgm.userid =:userId');
+        $query->andWhere('i_sg.groupsetid= :groupSetId');
+        $command = $query->createCommand()->bindValues(['userId' => $userId, 'groupSetId' => $groupSetId]);
         $data = $command->queryAll();
         return $data;
     }

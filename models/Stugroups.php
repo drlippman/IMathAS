@@ -125,6 +125,7 @@ class Stugroups extends BaseImasStugroups
         $query->select('i_sg.id')->from('imas_stugroups as i_sg')->join('INNER JOIN','imas_stugroupmembers as i_sgm','i_sg.id=i_sgm.stugroupid')
             ->where('i_sgm.userid = :userId')->andWhere('i_sg.groupsetid= :grpSetId');
         $command = $query->createCommand();
+
         return $command->bindValue('grpSetId', $grpSetId)->bindValue('userId', $userId)->queryAll();
     }
     public static function getByGrpSetIdAndName($groupsetId)

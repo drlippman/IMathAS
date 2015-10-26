@@ -3265,7 +3265,7 @@ class GradebookController extends AppController
                     $log = new Log();
                     $log->insertEntry($now,$assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
                 }
-                return $this->redirect('gradebook-view-assessment-deyails?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$courseId.'&uid='.$params['uid']);
+                return $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$courseId.'&uid='.$params['uid']);
             }
         }
         if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {

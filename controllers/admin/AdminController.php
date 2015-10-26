@@ -1959,8 +1959,7 @@ class AdminController extends AppController
                 {
                     $library[$k] = "'".$v."'";
                 }
-                $libList = implode(',',$library);
-                $libraryItemData = LibraryItems::getDataToExportLib($libList,$nonPrivate);
+                $libraryItemData = LibraryItems::getDataToExportLib($library,$nonPrivate);
                 $qAssoc = Array();
                 $libItems = Array();
                 $qCnt = 0;
@@ -2568,7 +2567,7 @@ class AdminController extends AppController
                         {
                             $qlist = implode(',',$qidstofix);
                             $updateQdata = new QuestionSet();
-                            $updateQdata->updateIdIn($qlist);
+                            $updateQdata->updateIdIn($qidstofix);
                         } else {
                             foreach($qidstofix as $qid) {
                                 $insertDataLibItem = new LibraryItems();
@@ -3744,11 +3743,11 @@ class AdminController extends AppController
                         $result = QuestionSet::getByOrUserId($qSetId,$groupId);
                         if (count($result) > AppConstant::NUMERIC_ZERO)
                         {
-                            $result = QuestionSet::updateQSetId($params,$now,$qSetId);
+                            QuestionSet::updateQSetId($params,$now,$qSetId);
                         }
                     } else {
 
-                        $result = QuestionSet::updateQSetAdmin($params,$now,$qSetId,$isAdmin,$userId);
+                            QuestionSet::updateQSetAdmin($params,$now,$qSetId,$isAdmin,$userId);
                     }
                     $page_updatedMsg = "Question Updated. ";
                 }

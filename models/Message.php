@@ -342,8 +342,15 @@ class Message extends BaseImasMsgs
 
     public static function setIsRead($userId)
     {
-        $query = "UPDATE imas_msgs SET isread=isread+2 WHERE msgto='$userId' AND isread<2";
-        Yii::$app->db->createCommand($query)->execute();
+        $messages = Message::find()->where(['msgto' => $userId])->andWhere(['<', 'isread', 2])->all();
+        if($messages)
+        {
+            foreach($messages as $message)
+            {
+                $message->isread = $message->isread+2;
+                $message->save();
+            }
+        }
     }
 
     public static function deleteByMsgFrom($userId)
@@ -358,8 +365,15 @@ class Message extends BaseImasMsgs
 
     public static function setMsgFrom($userId)
     {
-        $query = "UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom='$userId' AND isread<2";
-        Yii::$app->db->createCommand($query)->execute();
+        $messages = Message::find()->where(['msgto' => $userId])->andWhere(['<', 'isread', 2])->all();
+        if($messages)
+        {
+            foreach($messages as $message)
+            {
+                $message->isread = $message->isread+4;
+                $message->save();
+            }
+        }
     }
 
     public static function getNewMessageData($userid)

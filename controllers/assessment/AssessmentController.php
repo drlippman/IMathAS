@@ -909,7 +909,7 @@ class AssessmentController extends AppController
                     Assessments::updateAssessmentData($setsList,$checkedList);
                 }
                 if (isset($params['removeperq'])) {
-                    Questions::updateQuestionData($checkedList);
+                    Questions::updateQuestionData($checked);
                 }
                 if (isset($params['chgendmsg'])) {
                     if(strlen($checkedList) > AppConstant::NUMERIC_THREE){

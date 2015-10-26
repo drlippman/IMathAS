@@ -85,14 +85,19 @@ class LibraryItems extends BaseImasLibraryItems
     }
 
     public static function getLibIdByQidAndOwner($groupId,$qSetId,$userId,$isGrpAdmin,$isAdmin){
+        $query = new Query();
         if ($isGrpAdmin) {
-            $query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-            $query .= "AND imas_users.groupid!='$groupId' AND ili.qsetid='$qSetId'";
+            $query->select('ili.libid')->from('imas_library_items AS ili')
+                ->join('INNER JOIN', 'imas_users',
+                       'ili.ownerid=imas_users.id')
+                ->andWhere(['imas_users.groupid <> :groupId', [':groupId' => $groupId]])
+                ->andWhere('ili.qsetid=:qSetId', [':qSetId' => $qSetId]);
         } else if (!$isAdmin) {
-            $query = "SELECT libid FROM imas_library_items WHERE qsetid='$qSetId' AND imas_library_items.ownerid!='$userId'";
+            $query->select('libid')->from('imas_library_items')
+            ->where('qsetid= :qSetId', [':qSetId' => $qSetId])
+                ->andWhere(['imas_library_items.ownerid <> :userId', [':userId' => $userId]]);
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        return $query->createCommand()->queryAll();
     }
 
     public static function UpdateJunkFlag($id, $flag){
@@ -147,17 +152,21 @@ class LibraryItems extends BaseImasLibraryItems
     public static function getByLibAndUserTable($groupId,$list){
         $data = LibraryItems::find()->select('imas_library_items.qsetid, imas_library_items.libid')
             ->from('imas_library_items,imas_users')->where('imas_library_items.ownerid=imas_users.id')
-            ->andWhere(['imas_users.groupid' => $groupId] or ['imas_library_items.libid' => AppConstant::NUMERIC_ZERO])
+            ->andWhere('imas_users.groupid=:groupId'or ['imas_library_items.libid' => AppConstant::NUMERIC_ZERO], [':groupId' => $groupId])
             ->andWhere(['IN', 'imas_library_items.qsetid',$list])->all();
         return $data;
     }
 
-    public static function getByListAndOwnerId($isAdmin, $chgList, $userId){
-        $query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
-        $query .= "ili.libid=il.id WHERE ili.qsetid IN ($chgList)";
+    public static function getByListAndOwnerId($isAdmin, $chgList, $userId)
+    {
+        $query = new Query();
+        $query->select('ili.qsetid,ili.libid')->from('imas_library_items AS ili')
+            ->join('LEFT JOIN', 'imas_libraries AS il',
+                'ili.libid=il.id')
+            ->andWhere(['IN', 'ili.qsetid', $chgList]);
         if (!$isAdmin) {
             //unassigned, or owner and lib not closed or mine
-            $query .= " AND ((ili.ownerid='$userId' AND (il.ownerid='$userId' OR il.userights%3<>1)) OR ili.libid=0)";
+            $query->andWhere(['ili.ownerid' => $userId] and (['il.ownerid' => $userId] or ['<>','il.userights%3',1]) or['ili.libid' => 0]);
         }
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
@@ -170,14 +179,19 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataToExportLib($libList,$nonPrivate)
     {
-        $query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items ";
-        $query .= "JOIN imas_questionset ON imas_library_items.qsetid=imas_questionset.id ";
-        $query .= "WHERE imas_library_items.libid IN ($libList) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
+        $query = new Query();
+        $query->select('imas_library_items.qsetid,imas_library_items.libid')->from('imas_library_items')
+            ->join('INNER JOIN', 'imas_questionset',
+                'imas_library_items.qsetid=imas_questionset.id')
+            ->andWhere(['IN', 'imas_library_items.libid', $libList])
+            ->andWhere(['imas_library_items.junkflag' => 0])
+            ->andWhere(['imas_questionset.deleted' => 0]);
+
         if ($nonPrivate)
         {
-            $query .= " AND imas_questionset.userights>0";
+            $query->andWhere(['>', 'imas_questionset.userights', 0]);
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $data = $query->createCommand()->queryAll();
         return $data;
     }
 
@@ -269,6 +283,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getByLibIdWithLimit($lib, $offset)
     {
+        return 
         $query = "SELECT qsetid FROM imas_library_items WHERE libid='$lib' LIMIT $offset,1";
         return \Yii::$app->db->createCommand($query)->queryAll();
     }

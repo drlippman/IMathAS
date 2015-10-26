@@ -20,22 +20,23 @@ class QuestionSet extends BaseImasQuestionset
         return $data;
     }
 
-    public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes){
+    public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes)
+    {
         $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
         $query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
         $query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
-        $query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
+        $query .= " (imas_questionset.ownerid=':userid' OR imas_questionset.userights>0)";
 
         if ($searchall==0) {
             $query .= "AND imas_library_items.libid IN ($llist)";
         }
         if ($searchmine==1) {
-            $query .= " AND imas_questionset.ownerid='$userid'";
+            $query .= " AND imas_questionset.ownerid=':userid'";
         } else {
-            $query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') ";
+            $query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=':userid') ";
         }
         $query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->bindValue('userid', $userid)->queryAll();
         return $data;
     }
 
@@ -203,9 +204,9 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function updateAvgTime($avg,$qsid)
     {
-        $query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
-        return  \Yii::$app->db->createCommand($query)->query();
-
+        $questionSetId = QuestionSet::getByQuesSetId($qsid);
+        $questionSetId->avgtime = $avg;
+        $questionSetId->save();
     }
 
     public static function getIdAndAvgTime()
@@ -255,7 +256,7 @@ class QuestionSet extends BaseImasQuestionset
     public static function getByQSetIdAndGroupId($list, $groupId){
         $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
                 ->where(['IN','imas_questionset.id', $list])->andWhere('imas_questionset.ownerid=imas_users.id')
-                ->andWhere(['imas_users.groupid' => $groupId])->all();
+                ->andWhere('imas_users.groupid=:groupId', [':groupId' => $groupId])->all();
         return $data;
     }
 
@@ -283,7 +284,6 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getLastModDateAndId($UId)
     {
-
         return self::find()->select(['id', 'adddate','lastmoddate'])
             ->where(['uniqueid' => $UId])->one();
     }
@@ -303,37 +303,69 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function UpdateQuestionsetData($qd,$hasImg,$now,$qSetId)
     {
-        $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
-        $query.= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-        $query.= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
-        $query.= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',";
-        $query.= "adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
-        $data = \Yii::$app->db->createCommand($query)->execute();
-        return $data;
+        AppUtility::dump('hie');
+        $questionSetId = QuestionSet::getByQuesSetId($qSetId);
+        if($questionSetId)
+        {
+//            $questionSetId->description = strval($qd['description']);
+//            $questionSetId->author = strval($qd['author']);
+//            $questionSetId->qtype = strval($qd['qtype']);
+//            $questionSetId->control = strval($qd['control']);
+//            $questionSetId->qcontrol = strval($qd['qcontrol']);
+//            $questionSetId->qtext = strval($qd['qtext']);
+//            $questionSetId->answer = strval($qd['answer']);
+//            $questionSetId->extref = strval($qd['extref']);
+//            $questionSetId->license = intval($qd['license']);
+//            $questionSetId->ancestorauthors = strval($qd['ancestorauthors']);
+//            $questionSetId->otherattribution = strval($qd['otherattribution']);
+//            $questionSetId->solution = strval($qd['solution']);
+//            $questionSetId->solutionopts = intval($qd['solutionopts']);
+//            $questionSetId->adddate = intval($now);
+//            $questionSetId->lastmoddate = intval($now);
+         return $questionSetId->updateCounters(['description' => strval($qd['description']),'hasimg' => intval($hasImg),'author' => strval($qd['author']), 'qtype' => strval($qd['qtype']),
+                'control' => strval($qd['control']), 'qcontrol' => strval($qd['qcontrol']), 'qtext' => strval($qd['qtext']),
+                'answer' => strval($qd['answer']), 'extref' => strval($qd['extref']), 'license' => intval($qd['license']), 'ancestorauthors' => strval($qd['ancestorauthors']),
+                'otherattribution' => strval($qd['otherattribution']), 'solution' => strval($qd['solution']), 'solutionopts' => intval($qd['solutionopts']), 'adddate' => intval($now),
+                'lastmoddate' => intval($now)]);
+//            $questionSetId->save();
+//            return $questionSetId;
+        }
     }
 
     public static function UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin,$num)
     {
-        $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
-        $query.= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-        $query.= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
-        $query.= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
+        $query = QuestionSet::getByQuesSetId($qSetId);
         if($num == 0)
         {
             if (!$isAdmin)
             {
-                $query.= " AND ownerid=$user->id";
+                $query = QuestionSet::getIdByQidAndOwner($qSetId,$user->id);
             }
         }
         else if($num == 1)
         {
             if (!$isAdmin)
             {
-                $query .= " AND (ownerid='$user->id' OR userights>3)";
+                $query = QuestionSet::find()->where(['id' => $qSetId])->andWhere(['ownerid' => $user->id])->orWhere(['>','userights', AppConstant::NUMERIC_THREE])->one();
             }
         }
-        $data = \Yii::$app->db->createCommand($query)->execute();
-        return $data;
+        $query->description = strval($qd['description']);
+        $query->author = strval($qd['author']);
+        $query->qtype = strval($qd['qtype']);
+        $query->control = strval($qd['control']);
+        $query->qcontrol = $qd['qcontrol'];
+        $query->qtext = strval($qd['qtext']);
+        $query->answer = strval($qd['answer']);
+        $query->extref = strval($qd['extref']);
+        $query->license = intval($qd['license']);
+        $query->ancestorauthors = strval($qd['ancestorauthors']);
+        $query->otherattribution = strval($qd['otherattribution']);
+        $query->solution = strval($qd['solution']);
+        $query->solutionopts = intval($qd['solutionopts']);
+        $query->adddate = intval($now);
+        $query->lastmoddate = intval($now);
+        $query->hasimg = intval($hasImg);
+        $query->save();
     }
     public function InsertData($now,$user,$qd,$importUIdVal,$hasImg,$rights)
     {
@@ -577,21 +609,28 @@ class QuestionSet extends BaseImasQuestionset
         return self::find()->select(['id','uniqueid','adddate','lastmoddate'])->where(['IN', 'uniqueid', $uniqueId])->all();
     }
 
-    public static function updateDataForImportQSet($qdata,$now,$qSetId,$hasImg)
-    {
-        $query = "UPDATE imas_questionset SET description='{$qdata['description']}',author='{$qdata['author']}',";
-        $query .= "qtype='{$qdata['qtype']}',control='{$qdata['control']}',qcontrol='{$qdata['qcontrol']}',qtext='{$qdata['qtext']}',";
-        $query .= "answer='{$qdata['answer']}',extref='{$qdata['extref']}',license='{$qdata['license']}',ancestorauthors='{$qdata['ancestorauthors']}',otherattribution='{$qdata['otherattribution']}',";
-        $query .= "solution='{$qdata['solution']}',solutionopts='{$qdata['solutionopts']}',";
-        $query .= "adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
-        $data = \Yii::$app->db->createCommand($query)->execute();
-        return $data;
-    }
+//    public static function updateDataForImportQSet($qdata,$now,$qSetId,$hasImg)
+//    {
+//        $query = "UPDATE imas_questionset SET description='{$qdata['description']}',author='{$qdata['author']}',";
+//        $query .= "qtype='{$qdata['qtype']}',control='{$qdata['control']}',qcontrol='{$qdata['qcontrol']}',qtext='{$qdata['qtext']}',";
+//        $query .= "answer='{$qdata['answer']}',extref='{$qdata['extref']}',license='{$qdata['license']}',ancestorauthors='{$qdata['ancestorauthors']}',otherattribution='{$qdata['otherattribution']}',";
+//        $query .= "solution='{$qdata['solution']}',solutionopts='{$qdata['solutionopts']}',";
+//        $query .= "adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
+//        $data = \Yii::$app->db->createCommand($query)->execute();
+//        return $data;
+//    }
 
     public static function updateIdIn($qlist)
     {
-        $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
-        \Yii::$app->db->createCommand($query)->execute();
+        $query = QuestionSet::find()->where('IN', 'id', $qlist)->all();
+        if($query)
+        {
+            foreach($query as $qSet)
+            {
+                $qSet->deleted = AppConstant::NUMERIC_ONE;
+                $qSet->save();
+            }
+        }
     }
 
     public static function getById($clist)
@@ -608,17 +647,32 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function updateId($qlist)
     {
-       $query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qlist'";
-       return \Yii::$app->db->createCommand($query)->execute();
+        $questionSet = QuestionSet::find()->where('id', $qlist)->all();
+        if($questionSet)
+        {
+            foreach($questionSet as $qSet)
+            {
+                $qSet->deleted =AppConstant::NUMERIC_ONE;
+                $qSet->save();
+            }
+
+        }
+//       $query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qlist'";
+//       return \Yii::$app->db->createCommand($query)->execute();
     }
 
     public static function updateInAdmin($qsetid,$isadmin, $userid)
     {
-        $query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qsetid'";
+        $questionSet = QuestionSet::find()->where('id',$qsetid)->all();
+
         if (!$isadmin) {
-            $query .= " AND ownerid='$userid'";
+            $questionSet = QuestionSet::getIdByQidAndOwner($qsetid,$userid);
         }
-        return \Yii::$app->db->createCommand($query)->execute();
+        foreach($questionSet as $qSet)
+        {
+            $qSet->deleted = AppConstant::NUMERIC_ONE;
+            $qSet->save();
+        }
     }
 
     public static function getByOrUserId($qsetid,$groupid)
@@ -629,24 +683,42 @@ class QuestionSet extends BaseImasQuestionset
     }
 
     public static function updateQSetId($params,$now,$qSetId){
-        $query = "UPDATE imas_questionset SET description='{$params['description']}',";
-        $query .= "qtype='{$params['qtype']}',control='{$params['control']}',qcontrol='{$params['qcontrol']}',";
-        $query .= "qtext='{$params['qtext']}',answer='{$params['answer']}',lastmoddate=$now ";
-        $query .= "WHERE id='$qSetId'";
-        return \Yii::$app->db->createCommand($query)->execute();
+        $questionSet = QuestionSet::find()->where(['id', $qSetId])->all();
+        if($questionSet)
+        {
+            foreach($questionSet as $qSet)
+            {
+                $qSet->description = strval($params['description']);
+                $qSet->qtype = strval($params['qtype']);
+                $qSet->control = strval($params['control']);
+                $qSet->qcontrol = strval($params['qcontrol']);
+                $qSet->qtext = strval($params['qtext']);
+                $qSet->answer = strval($params['answer']);
+                $qSet->lastmodedate = intval($now);
+                $qSet->save();
+            }
+        }
     }
 
     public static function updateQSetAdmin($params,$now,$qSetId,$isadmin,$userid)
     {
-        $query = "UPDATE imas_questionset SET description='{$params['description']}',";
-        $query .= "qtype='{$params['qtype']}',control='{$params['control']}',qcontrol='{$params['qcontrol']}',";
-        $query .= "qtext='{$params['qtext']}',answer='{$params['answer']}',lastmoddate=$now ";
-        $query .= "WHERE id='$qSetId'";
+        $questionSet = QuestionSet::find()->where('id',$qSetId)->all();
         if (!$isadmin)
         {
-            $query .= " AND (ownerid='$userid' OR userights>3);";
+            $questionSet = QuestionSet::getIdByQidAndOwner($qSetId, $userid);
         }
-        return \Yii::$app->db->createCommand($query)->execute();
+
+        foreach($questionSet as $qSet)
+        {
+            $qSet->description = strval($params['description']);
+            $qSet->qtype = strval($params['qtype']);
+            $qSet->control = strval($params['control']);
+            $qSet->qcontrol = strval($params['qcontrol']);
+            $qSet->qtext = strval($params['qtext']);
+            $qSet->answer = strval($params['answer']);
+            $qSet->lastmoddate = intval($now);
+            $qSet->save();
+        }
     }
 
     public static function getByUIdQSetId($qsetid)
@@ -727,8 +799,10 @@ class QuestionSet extends BaseImasQuestionset
     }
     public static function getBrokenData()
     {
-        $query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $query = new Query();
+        $query->select(['userights', 'COUNT(id)'])
+            ->from('imas_questionset')->where(['broken'=> 1])->andWhere(['deleted' => AppConstant::NUMERIC_ZERO])->groupBy('userights');
+        return $query->createCommand()->queryAll();
     }
 
     public static function getDescription($queId)

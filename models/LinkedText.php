@@ -12,11 +12,11 @@ class LinkedText extends BaseImasLinkedtext
         $query = new Query();
         $query->select(['id', 'title', 'text', 'startdate', 'enddate', 'points', 'avail'])
             ->from('imas_linkedtext')
-            ->where(['courseid'=>$courseId])
+            ->where('courseid=:courseId',[':courseId' => $courseId])
             ->andWhere(['>', 'points', 0])
             ->andWhere(['>', 'avail', 0]);
         if (!$canviewall) {
-            $query->andWhere(['<','startdate', $now]);
+            $query->andWhere('startdate < :now', [':now' => $now]);
         }
 
         $query->orderBy('enddate, startdate');
@@ -111,7 +111,16 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function updateDataForCopyCourse($toupdate)
     {
-        $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)")->queryAll();
+        $linkText = LinkedText::find()->where(['IN', 'id',$toupdate])->all();
+        if($linkText)
+        {
+            foreach($linkText as $text)
+            {
+                $text->text = '<p>Unable to copy tool</p>';
+                $text->save();
+            }
+        }
+//        $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)")->queryAll();
     }
 
     public static function getByIdForCopy($toupdate)
@@ -121,7 +130,15 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function updateData($text,$id)
     {
-        $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='" . addslashes($text) . "' WHERE id={$id}")->queryAll();
+        $linkText = LinkedText::find()->where('id', $id)->all();
+        if($linkText)
+        {
+            foreach($linkText as $lText)
+            {
+                $lText->text = $text;
+                $lText->save();
+            }
+        }
     }
 
     public static function updateVideoId($from,$to)
@@ -147,7 +164,7 @@ class LinkedText extends BaseImasLinkedtext
         $query = new Query();
         $query ->select(['text','points','id'])
             ->from('imas_linkedtext')
-            ->where(['courseid' => $courseId]);
+            ->where('courseid:=courseId', [':courseId' => $courseId]);
         $query->andWhere(['LIKE','text','file:%']);
         $command = $query->createCommand();
         $data = $command->queryAll();

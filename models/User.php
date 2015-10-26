@@ -93,7 +93,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function findAllUsers($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->where(['rights' => [20, 40, 60, 75, 100]])->all();
-
     }
 
     public static function findAllUsersArray($sortBy, $order)
@@ -372,29 +371,33 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->join('LEFT JOIN', 'imas_groups',
                 'imas_users.groupid=imas_groups.id');
         if ($num == AppConstant::NUMERIC_ZERO) {
-            $query->where(['imas_users.SID' => $data]);
+            $query->where('imas_users.SID= :data');
         } elseif ($num == AppConstant::NUMERIC_ONE) {
-            $query->where(['imas_users.SID' => $data]);
+            $query->where('imas_users.SID= :data');
         }
-        $command = $query->createCommand();
+        $command = $query->createCommand()->bindValue('data', $data);
         $data = $command->queryAll();
         return $data;
     }
 
     public static function getDataByJoinForName($params)
     {
+        $lastName = $params['LastName'];
+        $firstName = $params['FirstName'];
         $query = "SELECT imas_users.*,imas_groups.name FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
-        if (!empty($params['LastName'])) {
-            $query .= "imas_users.LastName='{$params['LastName']}' ";
-            if (!empty($params['FirstName'])) {
+        if (!empty($lastName)) {
+            $query .= "imas_users.LastName=:lastName";
+            if (!empty($firstName)) {
                 $query .= "AND ";
             }
         }
-        if (!empty($params['FirstName'])) {
-            $query .= "imas_users.FirstName='{$params['FirstName']}' ";
+        if (!empty($firstName)) {
+            $query .= "imas_users.FirstName=:firstName";
         }
         $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $command =  Yii::$app->db->createCommand($query)->bindValues(['lastName' => $lastName, 'firstName' => $firstName]);
+        $data =  $command->queryAll();
+        return $data;
     }
 
     public static function updateGroupId($id)
@@ -436,7 +439,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess',':date']);
+            ->andWhere('imas_users.lastaccess > :date');
         $command = $query->createCommand();
         $data = $command->bindValue(':date',$date)->queryAll();
         return count($data);
@@ -448,7 +451,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query->select('imas_students.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess',':date']);
+            ->andWhere('imas_users.lastaccess > :date');
         if (count($skipCid) > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['NOT IN', 'imas_students.courseid', $skipCidS]);
         }
@@ -464,7 +467,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', ':date']);
+            ->andWhere('imas_users.lastaccess >:date');
         if (count($skipCid) > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['NOT IN', 'imas_students.courseid', $skipCidS]);
         }
@@ -549,12 +552,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function updatePassword($md5pw, $id, $myRights, $groupid)
     {
-        $query = "UPDATE imas_users SET password='$md5pw' WHERE id='{$id}'";
+        $user = User::getById($id);
         if ($myRights < AppConstant::ADMIN_RIGHT) {
-            $query .= " AND groupid='$groupid' AND rights<100";
+            $user = User::find()->where(['id' => $id])->andWhere(['groupid' => $groupid])->andWhere(['<', 'rights', 100])->one();
         }
-        Yii::$app->db->createCommand($query)->query();
-
+        $user->password = $md5pw;
+        $user->save();
     }
 
     public static function getUserDetailsByJoin($srch)
@@ -615,6 +618,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getByUserIdASDiagnoId($params)
     {
+        $diagnoId = $params['id'];
         $query = new Query();
         $query->select(['imas_users.id', 'imas_users.groupid'])
             ->from('imas_users')
@@ -622,8 +626,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                 'imas_diags',
                 'imas_users.id=imas_diags.ownerid'
             )
-            ->andWhere(['imas_diags.id' => $params['id']]);
-        $command = $query->createCommand();
+            ->andWhere('imas_diags.id= :diagnoId');
+        $command = $query->createCommand()->bindValue('diagnoId', $diagnoId);
         $data = $command->queryOne();
         return $data;
     }
@@ -721,12 +725,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
         if ($UserId != 'all')
         {
-            $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$UserId}' AND imas_students.courseid='$courseId'";
+            $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:UserId AND imas_students.courseid=:courseId";
         } else {
-            $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$courseId'";
+            $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseId";
         }
         if ($isTutor && isset($tutorSection) && $tutorSection!='') {
-            $query .= " AND imas_students.section='$tutorSection' ";
+            $query .= " AND imas_students.section=:tutorSection";
         }
 
         if ($hasSection && $sortOrder == "sec") {
@@ -734,14 +738,17 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         } else {
             $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $command = \Yii::$app->db->createCommand($query)->bindValues(['UserId' => $UserId, 'courseId' => $courseId, 'tutorSection' => $tutorSection]);
+        $data = $command->queryAll();
         return $data;
     }
 
     public static function userDataUsingForum($userId,$forumId)
     {
         $data = User::find()->select(['iu.LastName','iu.FirstName','i_f.name','i_f.points','i_f.tutoredit','i_f.enddate'])
-            ->from(['imas_users AS iu','imas_forums as i_f'])->where(['iu.id' => $userId])->andWhere(['i_f.id' => $forumId])->one();
+            ->from(['imas_users AS iu','imas_forums as i_f'])
+            ->where(['iu.id' => $userId])
+            ->andWhere(['i_f.id' => $forumId])->one();
         return $data;
     }
      public static function getDataById($id)
@@ -769,13 +776,17 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function updateUserRight($myRights, $newRights, $group, $id, $groupId)
     {
-        $query = "UPDATE imas_users SET rights='$newRights'";
-        if ($myRights == 100) {
-            $query .= ",groupid='$group'";
+        if ($myRights < 100) {
+            $user = User::find()->where(['id' => $id])->andWhere(['groupid' => $groupId])->andWhere(['<', 'rights', 100])->one();
         }
-        $query .= " WHERE id='$id'";
-        if ($myRights < 100) { $query .= " AND groupid='$groupId' AND rights<100"; }
-        return Yii::$app->db->createCommand($query)->execute();
+        else{
+            $user = User::getById($id);
+        }
+        $user->rights = $newRights;
+        if ($myRights == 100) {
+            $user->groupid = $group;
+        }
+       $user->save();
     }
 
     public static function updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qrightsdef, $deflib, $usedeflib, $layoutstr, $perpage,$chguserimg)
@@ -843,7 +854,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $data;
     }
 
-    public function getQuestionRights($userId){
+    public function getQuestionRights($userId)
+    {
         return self::find()->select('qrightsdef')->where(['id' => $userId])->one();
     }
     public static function getFirstLastName($userId)
@@ -851,4 +863,3 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return self::find()->select('LastName,FirstName')->where(['id' => $userId])->one();
     }
 }
-

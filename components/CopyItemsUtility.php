@@ -652,8 +652,7 @@ public static function handleextoolcopy($sourcecid,$courseId)
         }
         else
         {
-            $toupdate = implode(",", array_keys($exttooltrack, $row['id']));
-            LinkedText::updateDataForCopyCourse($toupdate);
+            LinkedText::updateDataForCopyCourse(array_keys($exttooltrack, $row['id']));
         }
         if ($doremap)
         {

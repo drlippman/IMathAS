@@ -102,6 +102,7 @@ class Thread extends BaseImasForumThreads
             $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$user->id')) ";
         }
         $query .= "GROUP BY imas_forum_threads.forumid";
+
         $data = \Yii::$app->db->createCommand($query)->bindValue(':cid',$cid)->bindValue(':userId',$user->id)->queryAll();
         return $data;
     }

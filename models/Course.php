@@ -224,7 +224,7 @@ class Course extends BaseImasCourses {
         $myClasses = Course::find()->where(['ownerid' => $userId])->all();
         foreach($myClasses as $key => $singleClass)
         {
-            $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
+            $items[] = ['label' => $singleClass->name, 'url' => '../../course/course/course?cid='.$singleClass['id']];
             if(count($myClasses) == $key+AppConstant::NUMERIC_ONE)
             {
                 array_push($items,'<li class="divider"></li>');
