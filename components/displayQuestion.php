@@ -13,7 +13,6 @@ require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
-
     global $imasroot, $myrights, $showtips, $urlmode, $CFG, $temp;
     $urlmode = AppUtility::urlMode();
 	$imasroot = AppUtility::getHomeURL();
@@ -346,7 +345,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
-		$temp = "<div class=inactive>";
+		$temp .= "<div class=inactive>";
         $temp .= filter($evaledqtext);
 	} else {
         $temp .= "<div id='question' class='question show-test-questions col-md-12 padding-top-bottom-fifteen'><div>\n";

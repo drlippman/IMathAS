@@ -22,4 +22,30 @@ function togglemainintroshow(el) {
         $(el).html("Show Intro/Instructions");
     }
 }
+$('.licensePopup').click(function(e)
+{
+    e.preventDefault();
+    var questionId= $(".question-id").val();
+    var html = '<div><p><Strong>Question License</Strong></p>' +
+        '<p>Question ID '+questionId +' (Universal ID 11435814263779)</p>'  +
+        '<p> This question was written by Lippman, David. This work is licensed under the<a target="Licence" href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
+        +'<p>The code that generated this question can be obtained by instructors by emailing abhishek.prajapati@tudip.com</p></div>';
+    $('<div  id="dialog"></div>').appendTo('body').html(html).dialog
+    ({
+        modal: true, title: 'License', zIndex: 10, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons:
+        {
+            "Cancel": function ()
+            {
+                $(this).dialog('destroy').remove();
+                return false;
+
+            }
+        }
+
+    });
+
+});
 

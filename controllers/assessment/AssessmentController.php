@@ -2425,7 +2425,7 @@ class AssessmentController extends AppController
 
                         $temp .= "</p>\n";
                         if (hasreattempts($last)) {
-                            $temp .= "<p><a href='#'>".'Reattempt last question'. "</a>.  ".'If you do not reattempt now, you will have another chance once you complete the test.'. "</p>\n";
+                            $temp .= "<p><a href=\"show-test?action=shownext&amp;to=$last&amp;reattempt=$last\">".'Reattempt last question'. "</a>.  ".'If you do not reattempt now, you will have another chance once you complete the test.'. "</p>\n";
                         }
                     }
                     if ($allowregen && $qi[$questions[$last]]['allowregen']==1) {
@@ -2450,15 +2450,15 @@ class AssessmentController extends AppController
 
 
                 if (!$done) { //can show next
-                    $temp .= '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
+                    $temp .= '<div class="right padding-bottom-ten"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
                     $temp .= filter("<div id=\"intro\" class=\"hidden\">{$testsettings['intro']}</div>\n");
 
                     $temp .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?action=shownext&amp;score=$toshow\" onsubmit=\"return doonsubmit(this)\">\n";
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-                    showqinfobar($toshow,true,true,2);
                     basicshowq($toshow,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
+                    showqinfobar($toshow,true,true,2,$sessiondata);
                     $temp .= '<input type="submit" class="btn" value="'.'Continue'. '" />';
                 } else { //are all done
                     $shown = $this->showscores($questions,$attempts,$testsettings);
@@ -2609,7 +2609,7 @@ class AssessmentController extends AppController
                             $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                             $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
                             $temp .= "<a name=\"beginquestions\"></a>\n";
-                            showqinfobar($next,true,true);
+                            showqinfobar($next,true,true,0,$sessiondata);
                             basicshowq($next,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                             $temp .= '<input type="submit" class="btn" value="'. _('Submit'). '" />';
                             if (($showans=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
@@ -2649,7 +2649,7 @@ class AssessmentController extends AppController
                         $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                         $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
                         $temp .= "<a name=\"beginquestions\"></a>\n";
-                        showqinfobar($next,true,true);
+                        showqinfobar($next,true,true,0,$sessiondata);
                         basicshowq($next,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                         $temp .= '<input type="submit" class="btn" value="'. _('Submit'). '" />';
                         if (($showans=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
@@ -2820,9 +2820,7 @@ class AssessmentController extends AppController
                                 }
                             }
                         }
-                        $seqShowQuestion = seqshowqinfobar($i,$toshow);
-                        $qavail = $seqShowQuestion[0];
-                        $temp .= $seqShowQuestion[1];
+                        $qavail = seqshowqinfobar($i,$toshow);
                         if ($i==$toshow) {
                             $temp .= '<div class="curquestion">';
                             basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
@@ -3000,7 +2998,7 @@ class AssessmentController extends AppController
 
                 }
 
-                showqinfobar($qn,true,false,true);
+                showqinfobar($qn,true,false,true,$sessiondata);
 
                 $temp .= '<script type="text/javascript">document.getElementById("disptime").value = '.time().';';
                 if (strpos($testsettings['intro'],'[PAGE')!==false || $sessiondata['intreereader']) {
@@ -3083,7 +3081,7 @@ class AssessmentController extends AppController
                 for ($i = 0; $i < count($questions); $i++) {
                     if (unans($scores[$i]) || amreattempting($i)) {
                         basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
-                        showqinfobar($i,true,false,1);
+                        showqinfobar($i,true,false,1,$sessiondata);
                         $numdisplayed++;
                     }
                 }
@@ -3114,8 +3112,8 @@ class AssessmentController extends AppController
                     $temp .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
-                    showqinfobar($i,true,true,2);
                     basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
+                    showqinfobar($i,true,true,2,$sessiondata);
                     $temp .= '<input type="submit" class="btn" value="'.'Next'. '" />';
                     $temp .= "</form>\n";
                 }
@@ -3152,7 +3150,7 @@ class AssessmentController extends AppController
                     $temp .= '<input type="hidden" name="disptime" value="'.time().'" />';
                     $temp .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
-                    showqinfobar($i,true,true);
+                    showqinfobar($i,true,true,0,$sessiondata);
                     basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores);
                     $temp .= '<input type="submit" class="btn" value="'.'Submit'. '" />';
                     if (($showans=='J' && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='J') {
@@ -3190,9 +3188,7 @@ class AssessmentController extends AppController
                                 }
                             }
                         }
-                        $seqShowQuestion = seqshowqinfobar($i,$curq);
-                        $qavail = $seqShowQuestion[0];
-                        $temp .= $seqShowQuestion[1];
+                        $qavail = seqshowqinfobar($i,$curq);
                         if ($i==$curq) {
                             $temp .= '<div class="curquestion">';
                             basicshowq($i,$showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores,false);
@@ -3373,7 +3369,7 @@ class AssessmentController extends AppController
                         $quesout .= ob_get_clean();
                     }
                     ob_start();
-                    showqinfobar($i,true,false,true);
+                    showqinfobar($i,true,false,0,true);
                     $reviewbar = ob_get_clean();
                     if (!$sessiondata['istutorial']) {
                         $reviewbar = str_replace('<div class="review">','<div class="review">'._('Question').' '.($i+1).'. ', $reviewbar);

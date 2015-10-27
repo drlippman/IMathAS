@@ -185,8 +185,8 @@ function totalpointspossible($qi) {
 	global $questions;
 	$poss = 0;
 	if (is_array($qi)) {
-		foreach ($questions as $qn) {
-			$poss += $qi[$qn]['points'];		
+        foreach ($questions as $qn) {
+			$poss += $qi[$qn]['points'];
 		}
 	}
 	return $poss;
@@ -497,17 +497,16 @@ function scorequestion($qn, $rectime=true) {
 //if limit=true, only records lastanswers
 function recordtestdata($limit=false) { 
 	global $isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
-	
-	if ($noraw) {
-		$bestscorelist = implode(',',$bestscores);
-	} else {
-		$bestscorelist = implode(',',$bestscores).';'.implode(',',$bestrawscores).';'.implode(',',$firstrawscores);
+
+    $bestscorelist = implode(',',$bestscores);
+	if (!$noraw) {
+		$bestscorelist = $bestscorelist .';'.implode(',',$bestrawscores).';'.implode(',',$firstrawscores);
 	}
 	$bestattemptslist = implode(',',$bestattempts);
 	$bestseedslist = implode(',',$bestseeds);
 	$bestlastanswers = str_replace('~','',$bestlastanswers);
 	$bestlalist = implode('~',$bestlastanswers);
-	$bestlalist = addslashes(stripslashes($bestlalist));
+    $bestlalist = addslashes(stripslashes($bestlalist));
 	
 	if ($noraw) {
 		$scorelist = implode(',',$scores);
@@ -669,7 +668,6 @@ function basicshowq($qn,$showansduring,$questions,$testsettings,$qi,$seeds,$show
 	} else {
 		$showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);	
 	}
-	
 	$regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
 	$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
 	if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
@@ -688,8 +686,8 @@ function basicshowq($qn,$showansduring,$questions,$testsettings,$qi,$seeds,$show
 }
 
 //shows basic points possible, attempts remaining bar
-function showqinfobar($qn,$inreview,$single,$showqnum=0) {
-	global $qi,$questions,$temp,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$sessiondata,$imasroot;
+function showqinfobar($qn,$inreview,$single,$showqnum=0,$sessiondata = false) {
+	global $qi,$questions,$temp,$attempts,$seeds,$testsettings,$noindivscores,$showeachscore,$scores,$bestscores,$imasroot;
 	if (!$sessiondata['istutorial']) {
 		if ($inreview) {
             $temp .= '<div class="review clearfix col-md-12 col-sm-12 show-test-question-answer">';
@@ -700,7 +698,7 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 		} else {
             $temp .= '<span style="float:right;font-size:70%"><a class="licensePopup" href="#">'._('License').'</a></span>';
 		}
-        $temp .= "<input type='hidden' class='question-id' value='".$questions[$qn]."'>";
+        $temp .= "<input type='hidden' class='question-id' value='".$qi[$questions[$qn]]['questionsetid']."'>";
 		if ($showqnum==1) {
             $temp .= _('Question').' '.($qn+1).'. ';
 		} else if ($showqnum==2) {
@@ -779,12 +777,11 @@ function showquestioncontactlinks($qn) {
 }
 
 //shows top info bar for seq mode
-function seqshowqinfobar($qn,$toshow) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds,$isreview;
+    function seqshowqinfobar($qn,$toshow) {
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds,$isreview,$temp;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
-    $temp='';
 	if ($qi[$questions[$qn]]['withdrawn']==1) {
 		$qlinktxt = "<span class=\"withdrawn\">" . _('Question') . ' ' .($qn+1)."</span>";
 	} else {
@@ -792,7 +789,7 @@ function seqshowqinfobar($qn,$toshow) {
 	}
 
 	if ($qn==$toshow) {
-		$temp .= '<div class="seqqinfocur">';
+		$temp .= '<div class="seqqinfocur padding-bottom-ten">';
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			if (isset($CFG['TE']['navicons'])) {
                 $temp .= "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
@@ -810,11 +807,11 @@ function seqshowqinfobar($qn,$toshow) {
                 $temp .= "<img src=\"$imasroot"."img/q_halfbox.gif\"/> ";
 		}
 		}
-        $temp .= "<span class=current><a name=\"curq\">$qlinktxt</a></span>  ";
+        $temp .= "<span class=current><a name=\"curq\">$qlinktxt</a></span>";
 	} else {
 		$thisscore = getpts($bestscores[$qn]);
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
-            $temp .= '<div class="seqqinfoavail">';
+            $temp .= '<div class="seqqinfoavail padding-bottom-ten">';
 			if (isset($CFG['TE']['navicons'])) {
                 $temp .= "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
@@ -823,7 +820,7 @@ function seqshowqinfobar($qn,$toshow) {
             $temp .= "<a href=\"show-test?action=seq&to=$qn#curq\" onclick=\"return confirm('".'Are you sure you want to jump to this question, discarding any work you have not submitted?'. "');\">$qlinktxt</a>.  ";
 			$qavail = true;
 		} else if (canimprove($qn) && !$noindivscores) {
-            $temp .= '<div class="seqqinfoavail">';
+            $temp .= '<div class="seqqinfoavail padding-bottom-ten">';
 			if (isset($CFG['TE']['navicons'])) {
 				if ($thisscore==0 || $noindivscores) {
                     $temp .= "<img src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
@@ -881,13 +878,13 @@ function seqshowqinfobar($qn,$toshow) {
 		if ($pts<0) { $pts = 0;}
         $temp .= sprintf('Points: %1$d out of %2$d possible.', $pts, $qi[$questions[$qn]]['points']). "  ";
 		if ($qn==$toshow) {
-			printf('%d available on this attempt.', $pointsremaining);
+		$temp .=	printf('%d available on this attempt.', $pointsremaining);
 		}
 	} else {
 		if ($pointsremaining == $qi[$questions[$qn]]['points']) {
             $temp .= 'Points possible:' ." ". $qi[$questions[$qn]]['points'];
 		} else {
-			printf('Points available on this attempt: %1$d of original %2$d', $pointsremaining, $qi[$questions[$qn]]['points']);
+            $temp .= printf('Points available on this attempt: %1$d of original %2$d', $pointsremaining, $qi[$questions[$qn]]['points']);
 		}
 		
 	}
@@ -921,7 +918,7 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 		if ($noindivscores) {
             $temp .= "<p>".'<a href="show-test?reattempt=all">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'. "</p>";
 		} else {
-            $temp .= "<p>".'<a href="show-test?reattempt=all">Reattempt test</a> on questions missed where allowed'. "</p>";
+            $temp .= "<p>".'<a href="../../assessment/assessment/show-test?reattempt=all">Reattempt test</a> on questions missed where allowed'. "</p>";
 		}
 	} else {
         $temp .= "<p>".'No attempts left on current versions of questions.'. "</p>\n";
