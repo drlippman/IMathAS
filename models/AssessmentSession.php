@@ -674,12 +674,13 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getDataWithUserData($assessmentId,$courseId)
     {
-
-        return self::find()->select('imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.*')
+            $query = new Query();
+        $query->select('imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.*')
             ->from('imas_users,imas_assessment_sessions,imas_students')->where('imas_assessment_sessions.userid=imas_users.id')
             ->andWhere('imas_students.userid=imas_users.id')->andWhere(['imas_students.courseid' => $courseId])
             ->andWhere(['imas_assessment_sessions.assessmentid' => $assessmentId])
-            ->orderBy('imas_users.LastName,imas_users.FirstName')->all();
+            ->orderBy('imas_users.LastName,imas_users.FirstName');
+        return $query->createCommand()->queryAll();
     }
 
     public static function getDataWithUserDataFilterByPage($aid,$cid,$page)
@@ -691,7 +692,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
             ->orderBy('imas_users.LastName,imas_users.FirstName');
         if ($page != -1)
         {
-            $query->limit($page)->offset(1);
+            $query->limit(1)->offset($page);
         }
         return $query->createCommand()->bindValues([':cid' => $cid,':aid' => $aid])->queryAll();
     }

@@ -55,18 +55,10 @@ class ForumController extends AppController
     public function actionSearchForum()
     {
         $cid = $this->getParamVal('cid');
-//        $countPost = $this->getNotificationDataForum($cid, $user);
-//        $msgList = $this->getNotificationDataMessage($cid, $user);
-//        $this->setSessionData('messageCount', $msgList);
-//        $this->setSessionData('postCount', $countPost);
-
         $course = Course::getById($cid);
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
-
 //        $this->layout = "master";
-//        $model = new ForumForm();
-//        $model->thread = 'subject';
         $teacherid = $this->isTeacher($user['id'],$cid);
         $tutorid = $this->isTutor($user['id'],$cid);
         $studentid = $this->isStudent($user['id'],$cid);

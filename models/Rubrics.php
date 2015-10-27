@@ -93,9 +93,8 @@ class Rubrics extends BaseImasRubrics
 
     public static function rubricDataByAssessmentId($assessmentId)
     {
-    $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
-    $query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid= :assessmentId AND rubric>0)";
-    return Yii::$app->db->createCommand($query)->bindValue(':assessmentId',$assessmentId)->queryAll();
+        $subquery = Questions::find()->select('rubric')->where(['assessmentid' => $assessmentId])->andWhere(['>','rubric',0])->distinct()->all();
+        return self::find()->select('id,rubrictype,rubric')->where('IN','id',$subquery)->all();
     }
 
     public static function getRubricByQuestionId($questionId)
