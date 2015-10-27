@@ -1888,10 +1888,12 @@ class ForumController extends AppController
                 $checked = $params['checked'];
                 $checkedList = "'" . implode("','", $checked) . "'";
                 $sets = array();
-                if (isset($params['chg-avail'])) {
-                    $sets[] = 'avail=' . intval($params['avail']);
+                if (isset($params['chg-avail']))
+                {
+                    $sets['avail'] = intval($params['avail']);
                 }
-                if (isset($params['chg-reply-by'])) {
+                if (isset($params['chg-reply-by']))
+                {
                     if ($params['reply'] == "Always") {
                         $replyBy = AppConstant::ALWAYS_TIME;
                     } else if ($params['reply'] == "Never") {
@@ -1899,7 +1901,7 @@ class ForumController extends AppController
                     } else {
                         $replyBy = AppUtility::parsedatetime($params['replyByDate'], $params['replyByTime']);
                     }
-                    $sets[] = "replyby='$replyBy'";
+                    $sets['replyby'] =  $replyBy;
                 }
 
                 if (isset($params['chg-post-by'])) {
@@ -1910,10 +1912,10 @@ class ForumController extends AppController
                     } else {
                         $postBy = AppUtility::parsedatetime($params['postDate'], $params['postTime']);
                     }
-                    $sets[] = "postby='$postBy'";
+                    $sets['postby'] =  $postBy ;
                 }
                 if (isset($params['chg-cal-tag'])) {
-                    $sets[] = "caltag='" . $params['cal-tag-post'] . '--' . $params['caltagreply'] . "'";
+                    $sets['caltag'] =  $params['cal-tag-post'] . '--' . $params['caltagreply'];
                 }
                 $sops = array();
                 if (isset($params['chg-allow-anon'])) {
@@ -1966,13 +1968,13 @@ class ForumController extends AppController
                     foreach ($sops as $op) {
                         $out = "($out $op)";
                     }
-                    $sets[] = "settings=$out";
+                    $sets['settings'] =  $out ;
                 }
                 if (isset($params['chg-def-display'])) {
-                    $sets[] = 'defdisplay=' . intval($params['default-display']);
+                    $sets['defdisplay'] =  intval($params['default-display']);
                 }
                 if (isset($params['chg-sort-by'])) {
-                    $sets[] = 'sortby=' . intval($params['sort-thread']);
+                    $sets['sortby'] =  intval($params['sort-thread']);
                 }
                 if (isset($params['chg-cnt-in-gb'])) {
                     if (is_numeric($params['points']) && $params['points'] == AppConstant::NUMERIC_ZERO) {
@@ -1982,34 +1984,35 @@ class ForumController extends AppController
                     } else if ($params['count-in-gradebook'] == AppConstant::NUMERIC_FOUR) {
                         $params['count-in-gradebook'] = AppConstant::NUMERIC_ZERO;
                     }
-                    $sets[] = 'cntingb=' . intval($params['count-in-gradebook']);
+                    $sets['cntingb'] =   intval($params['count-in-gradebook']);
                     if (is_numeric($params['points'])) {
-                        $sets[] = 'points=' . intval($params['points']);
+                        $sets['points'] =  intval($params['points']);
                     }
                 }
                 if (isset($params['chg-gb-cat'])) {
-                    $sets[] = "gbcategory='{$params['gradebook-category']}'";
+                    $sets['gbcategory'] =  $params['gradebook-category'];
                 }
                 if (isset($params['chg-forum-type'])) {
-                    $sets[] = "forumtype='{$params['forum-type']}'";
+                    $sets['forumtype'] =  $params['forum-type'];
                 }
-                if (isset($params['chg-tag-list'])) {
+                if (isset($params['chg-tag-list']))
+                {
                     if (isset($params['use-tags'])) {
                         $tagList = trim($params['taglist']);
                     } else {
                         $tagList = '';
                     }
-                    $sets[] = "taglist='$tagList'";
+                    $sets['taglist'] =  $tagList;
                 }
                 if (count($sets) > AppConstant::NUMERIC_ZERO & count($checked) > AppConstant::NUMERIC_ZERO) {
                     $setsList = implode(',', $sets);
                     $forum = new Forums();
-                    $forum->updateForumData($setsList, $checkedList);
+                    $forum->updateForumData($sets, $checked);
                 }
                 if (isset($params['chg-subscribe'])) {
                     if (isset($params['Get-email-notify-of-new-posts'])) {
                         //add any subscriptions we don't already have
-                        $subscriptionId = ForumSubscriptions::getByManyForumIdsANdUserId($checkedList, $currentUser['id']);
+                        $subscriptionId = ForumSubscriptions::getByManyForumIdsANdUserId($checked, $currentUser['id']);
                         $hasSubscribe = array();
                         if ($subscriptionId > AppConstant::NUMERIC_ZERO) {
                             foreach ($subscriptionId as $subscription) {

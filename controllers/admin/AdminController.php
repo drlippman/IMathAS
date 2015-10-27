@@ -1111,7 +1111,7 @@ class AdminController extends AppController
                         Course::setAvailable($params);
                     }
                 } else {
-                    $affectedRowsData = Course::deleteByCourseId($params, $myRights, $userId);
+                     Course::deleteByCourseId($params, $myRights, $userId);
                     if ($myRights == AppConstant::GROUP_ADMIN_RIGHT)
                     {
                         $result = Course::getCidAndUid($params, $groupid);
@@ -1121,7 +1121,6 @@ class AdminController extends AppController
                             break;
                         }
                     }
-                    if ($affectedRowsData == AppConstant::NUMERIC_ZERO) { break;}
                     $result = Assessments::getByAssId($params['id']);
                     if($result){
                     foreach($result as $key => $line){

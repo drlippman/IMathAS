@@ -270,7 +270,8 @@ function deleteasidfilesfromstring($str) {
 
 //need to exclude asid or agroupid we're deleting from 
 public static function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
-	if (is_array($val)) {
+
+    if (is_array($val)) {
 		$keylist = "'".implode("','",$val)."'";
 		$searchnot = "$tosearchby NOT IN ($keylist)";
 	} else {
@@ -286,16 +287,18 @@ public static function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=nul
 			$searchnot .= " AND assessmentid=$aid";
 		}
 	}
-	$n = preg_match_all('/@FILE:(.+?)@/',$str,$matches);
-	if ($n==0 || $n===false) {return 0;}
+    $n = preg_match_all('/@FILE:(.+?)@/',$str,$matches);
+    if ($n==0 || $n===false) {return 0;}
 	$todel = $matches[1];
-	$lookfor = array();
-	foreach ($matches[1] as $file) {
+    $lookfor = array();
+	foreach ($matches[1] as $file)
+    {
 		$file = addslashes($file);
 		$lookfor[] = "lastanswers LIKE '%$file%' OR bestlastanswers LIKE '%$file%' OR reviewlastanswers LIKE '%$file%'";
 	}
 	$lookforstr = implode(' OR ',$lookfor);
-	$query = AssessmentSession::dataForFileHandling($searchnot,$lookforstr);
+
+    $query = AssessmentSession::getSessionInfoForUnenroll($searchnot,$lookforstr);
 	$skip = array();
     foreach($query as $data)
     {
@@ -330,33 +333,34 @@ public static function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=nul
 	
 public static function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 
-	if (is_array($val)) {
+
+	if (is_array($val))
+    {
 		$keylist = "'".implode("','",$val)."'";
-		$searchwhere = "$tosearchby IN ($keylist)";
 		$searchnot = "$tosearchby NOT IN ($keylist)";
 	} else {
 		$val = addslashes($val);
-		$searchwhere = "$tosearchby=$val";
+
 		$searchnot = "$tosearchby<>$val";
 	}
-	if ($aid != null) {
+	if ($aid != null)
+    {
 		if (is_array($aid)) {
 			$keylist = "'".implode("','",$aid)."'";
-			$searchwhere .= " AND assessmentid IN ($keylist)";
+
 			$searchnot .= " AND assessmentid IN ($keylist)";
 		} else {
 			$aid = intval($aid);
-			$searchwhere .= " AND assessmentid=$aid";
+
 			$searchnot .= " AND assessmentid=$aid";
 		}
 	}
-	if ($lim>0) {
-		$searchwhere .= " LIMIT $lim";
-	}
-    $query = AssessmentSession::getSessionDataForUnenroll($searchwhere);
+    $query = AssessmentSession::getSessionDataForUnenroll($val,$tosearchby,$aid,$lim);
+
     if($query == "" || $query == null){
         return 0;
     }
+
     $todel = array();
 	foreach($query as $session){
         preg_match_all('/@FILE:(.+?)@/',$session['lastanswers'].$session['bestlastanswers'].$session['reviewlastanswers'],$matches);
@@ -366,14 +370,16 @@ public static function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0
             }
         }
     }
-	if (count($todel)==0) {return 0;}
+
+    if (count($todel)==0) {return 0;}
 	$lookfor = array();
 	foreach ($todel as $file) {
 		$file = addslashes($file);
 		$lookfor[] = "lastanswers LIKE '%$file%' OR bestlastanswers LIKE '%$file%' OR reviewlastanswers LIKE '%$file%'";
 	}
 	$lookforstr = implode(' OR ',$lookfor);
-    $query = AssessmentSession::getSessionInfoForUnenroll($searchnot, $lookforstr);
+
+    $query = AssessmentSession::getSessionInfoForUnenroll($val,$tosearchby,$aid,$lim, $todel);
 	$skip = array();
     foreach($query as $session){
         preg_match_all('/@FILE:(.+?)@/',$session['lastanswers'].$session['bestlastanswers'].$session['reviewlastanswers'],$exmatch);

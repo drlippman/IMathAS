@@ -73,9 +73,8 @@ class Exceptions extends BaseImasExceptions
 
     public static function getByUserIdForTreeReader($userId)
     {
-        $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid= :userId AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')");
-        $query->bindValue('userId',$userId);
-        return $query->queryAll();
+        return self::find()->select('items.id,ex.startdate,ex.enddate,ex.islatepass')->from('imas_exceptions AS ex,imas_items as items,imas_assessments as i_a')
+            ->where('ex.userid= :userId')->andWhere('ex.assessmentid=i_a.id')->andWhere('items.typeid = i_a.id' or ['items.itemtype' => 'Assessment'])->all();
     }
 
     public static function deleteByUserId($userId)
@@ -109,10 +108,16 @@ class Exceptions extends BaseImasExceptions
 
     public static function updateData($n, $newend, $userid, $aid)
     {
-        $query = "UPDATE imas_exceptions SET islatepass=islatepass- :n,enddate= :newend WHERE userid= :userid AND assessmentid= :aid";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['newend' => $newend,'userid' => $userid, 'aid' => $aid, 'n' => $n]);
-        $data->execute();
+        $exceptions = self::find()->where(['userid' => $userid])->andWhere(['assessmentid' => $aid])->all();
+        if($exceptions)
+        {
+            foreach($exceptions as $exception)
+            {
+                $exception->islatepass = $exception->islatepass - $n;
+                $exception->enddate = $newend;
+                $exception->save();
+            }
+        }
     }
 
     public static function getEndDateById($userId, $aid)
@@ -122,10 +127,16 @@ class Exceptions extends BaseImasExceptions
 
     public static function updateIsLatePass($addtime,$userid, $aid)
     {
-        $query = "UPDATE imas_exceptions SET enddate=enddate+ :addtime,islatepass=islatepass+1 WHERE userid= :userid AND assessmentid= :aid";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['userid' => $userid, 'aid' => $aid, 'addtime' => $addtime]);
-        return $data->execute();
+        $exceptions = self::find()->where(['userid' => $userid])->andWhere(['assessmentid' => $aid])->all();
+        if($exceptions)
+        {
+            foreach($exceptions as $exception)
+            {
+                $exception->islatepass = $exception->islatepass + 1;
+                $exception->enddate = $exception->enddate + $addtime;
+                $exception->save();
+            }
+        }
     }
 
     public function insertByUserData($userId, $assessmentId, $startdate, $enddate)
@@ -140,10 +151,11 @@ class Exceptions extends BaseImasExceptions
 
     public static function getExceptionDataLatePass($userId)
     {
-        $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore, items.typeid FROM ";
-        $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid= :userId AND ";
-        $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
-        $data = \Yii::$app->db->createCommand($query);
+        $query = new Query();
+        $query->select('items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore, items.typeid')
+            ->from('imas_exceptions AS ex,imas_items as items,imas_assessments as i_a')->where('ex.userid = :userId')
+            ->andWhere('ex.assessmentid = i_a.id')->andWhere('items.typeid = i_a.id' and ['items.itemtype' => 'Assessment']);
+        $data = $query->createCommand();
         $data->bindValue('userId',$userId);
         return $data->queryAll();
     }
@@ -165,8 +177,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function getItemData($userId)
     {
-        $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=':userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')");
-        $query->bindValue('userId', $userId);
-        return $query->queryAll();
+        return self::find()->select('items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore')->from('imas_exceptions AS ex,imas_items as items,imas_assessments as i_a')
+            ->where(['ex.userid' => $userId])->andWhere('ex.assessmentid = i_a.id')->andWhere('items.typeid = i_a.id' and ['items.itemtype' => 'Assessment'])->all();
     }
 }

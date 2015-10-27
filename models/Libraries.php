@@ -192,16 +192,11 @@ class Libraries extends BaseImasLibraries
 
     public static function updateById($params,$isadmin,$groupid,$isgrpadmin,$userid,$now)
     {
-//        $query = "UPDATE imas_libraries SET name='{$params['name']}',userights='{$params['rights']}',sortorder='{$params['sortorder']}',lastmoddate=$now";
         $query = Libraries::find()->where(['id' => $_GET['modify']])->one();
-
-//        $query .= " WHERE id='{$_GET['modify']}'";
         if (!$isadmin) {
-//            $query .= " AND groupid='$groupid'";
             $query = Libraries::find()->where(['id' => $_GET['modify'],'groupid' => $groupid])->one();
         }
         if (!$isadmin && !$isgrpadmin) {
-//            $query .= " AND ownerid='$userid'";
             $query = Libraries::find()->where(['id' => $_GET['modify'],'ownerid' => $userid])->one();
         }
         if($query)
@@ -216,7 +211,6 @@ class Libraries extends BaseImasLibraries
             }
             $query->save();
         }
-//        \Yii::$app->db->createCommand($query)->execute();
     }
 
     public static function updateByGrpIdUserId($params, $newgpid,$isadmin,$groupid, $isgrpadmin, $userid, $translist)
@@ -290,16 +284,7 @@ class Libraries extends BaseImasLibraries
             $query->groupid = $newgpid;
             $query->save();
         }
-
-//        $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='$idTransfer'";
-//        if (!$isadmin) {
-//            $query .= " AND groupid='$groupid'";
-//        }
-//        if (!$isadmin && !$isgrpadmin) {
-//            $query .= " AND ownerid='$userid'";
-//        }
-//        \Yii::$app->db->createCommand($query)->execute();
-    }
+     }
 
     public static function getCountOfId($parent)
     {

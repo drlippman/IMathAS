@@ -698,13 +698,17 @@ class AssessmentController extends AppController
                     return $this->redirect('change-assessment?cid='.$courseId);
                 }
                 $sets = array();
-                if (isset($params['chgdocopyopt'])) {
+                if (isset($params['chgdocopyopt']))
+                {
                     $toCopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
                     $row = Assessments::CommonMethodToGetAssessmentData($toCopy,$params['copyopt']);
+
                     $toCopyArray = explode(',', $toCopy);
+
                     foreach ($toCopyArray as $k=>$item) {
-                        $sets[] = "$item='".addslashes($row[$k])."'";
+                        $sets[$item] =  $row[$item];
                     }
+
                 } else {
                     $turnOnShuffle = AppConstant::NUMERIC_ZERO;
                     $turnOffShuffle = AppConstant::NUMERIC_ZERO;
@@ -770,108 +774,108 @@ class AssessmentController extends AppController
                         if (isset($params['timelimitkickout'])) {
                             $timeLimit = AppConstant::NUMERIC_NEGATIVE_ONE * $timeLimit;
                         }
-                        $sets[] = "timelimit='$timeLimit'";
+                        $sets['timelimit'] = intval($timeLimit);
                     }
                     if (isset($params['chgtutoredit'])) {
-                        $sets[] = "tutoredit='{$params['tutoredit']}'";
+                        $sets['tutoredit'] = intval($params['tutoredit']);
                     }
                     if (isset($params['chgdisplaymethod'])) {
-                        $sets[] = "displaymethod='{$params['displaymethod']}'";
+                        $sets['displaymethod'] = strval($params['displaymethod']);
                     }
                     if (isset($params['chgdefpoints'])) {
-                        $sets[] = "defpoints='{$params['defpoints']}'";
+                        $sets['defpoints'] = intval($params['defpoints']);
                     }
                     if (isset($params['chgdefattempts'])) {
-                        $sets[] = "defattempts='{$params['defattempts']}'";
+                        $sets['defattempts'] = intval($params['defattempts']);
                     }
                     if (isset($params['chgdefpenalty'])) {
-                        $sets[] = "defpenalty='{$params['defpenalty']}'";
+                        $sets['defpenalty'] = intval($params['defpenalty']);
                     }
                     if (isset($params['chgfeedback'])) {
-                        $sets[] = "deffeedback='$defaultFeedback'";
+                        $sets['deffeedback'] = strval($defaultFeedback);
                     }
                     if (isset($params['chggbcat'])) {
-                        $sets[] = "gbcategory='{$params['gbcat']}'";
+                        $sets['gbcategory'] = intval($params['gbcat']);
                     }
                     if (isset($params['chgallowlate'])) {
-                        $sets[] = "allowlate='$allowLate'";
+                        $sets['allowlate'] = intval($allowLate);
                     }
                     if (isset($params['chgexcpen'])) {
-                        $sets[] = "exceptionpenalty='{$params['exceptionpenalty']}'";
+                        $sets['exceptionpenalty'] = intval($params['exceptionpenalty']);
                     }
                     if (isset($params['chgpassword'])) {
-                        $sets[] = "password='{$params['assmpassword']}'";
+                        $sets['password'] = strval($params['assmpassword']);
                     }
                     if (isset($params['chghints'])) {
-                        $sets[] = "showhints='$showHints'";
+                        $sets['showhints'] = intval($showHints);
                     }
                     if (isset($params['chgshowtips'])) {
-                        $sets[] = "showtips='{$params['showtips']}'";
+                        $sets['showtips'] = intval($params['showtips']);
                     }
                     if (isset($params['chgnoprint'])) {
-                        $sets[] = "noprint='{$params['noprint']}'";
+                        $sets['noprint'] = intval($params['noprint']);
                     }
                     if (isset($params['chgisgroup'])) {
-                        $sets[] = "isgroup='{$params['isgroup']}'";
+                        $sets['isgroup'] = intval($params['isgroup']);
                     }
                     if (isset($params['chggroupmax'])) {
-                        $sets[] = "groupmax='{$params['groupmax']}'";
+                        $sets['groupmax'] = intval($params['groupmax']);
                     }
                     if (isset($params['chgcntingb'])) {
-                        $sets[] = "cntingb='{$params['cntingb']}'";
+                        $sets['cntingb'] = intval($params['cntingb']);
                     }
                     if (isset($params['chgminscore'])) {
                         if ($params['minscoretype'] == AppConstant::NUMERIC_ONE && trim($params['minscore']) != '' && $params['minscore'] > AppConstant::NUMERIC_ZERO) {
                             $params['minscore'] = intval($params['minscore']) + AppConstant::NUMERIC_TEN_THOUSAND;
                         }
-                        $sets[] = "minscore='{$params['minscore']}'";
+                        $sets['minscore'] = intval($params['minscore']);
                     }
                     if (isset($params['chgshowqcat'])) {
-                        $sets[] = "showcat='{$params['showqcat']}'";
+                        $sets['showcat'] = intval($params['showqcat']);
                     }
                     if (isset($params['chgeqnhelper'])) {
-                        $sets[] = "eqnhelper='{$params['eqnhelper']}'";
+                        $sets['eqnhelper'] = intval($params['eqnhelper']);
                     }
                     if (isset($params['chgcaltag'])) {
                         $caltag = $params['caltagact'];
-                        $sets[] = "caltag='$caltag'";
+                        $sets['caltag'] = strval($caltag);
                         $calrtag = $params['caltagrev'];
-                        $sets[] = "calrtag='$calrtag'";
+                        $sets['calrtag'] = strval($calrtag);
                     }
                     if (isset($params['chgmsgtoinstr'])) {
                         if (isset($params['msgtoinstr'])) {
-                            $sets[] = "msgtoinstr=1";
+                            $sets['msgtoinstr'] =  AppConstant::NUMERIC_ONE ;
                         } else {
-                            $sets[] = "msgtoinstr=0";
+                            $sets['msgtoinstr'] = AppConstant::NUMERIC_ZERO;
                         }
                     }
                     if (isset($params['chgposttoforum'])) {
                         if (isset($params['doposttoforum'])) {
-                            $sets[] = "posttoforum='{$params['posttoforum']}'";
+                            $sets['posttoforum'] = intval($params['posttoforum']);
                         } else {
-                            $sets[] = "posttoforum=0";
+                            $sets['posttoforum'] = AppConstant::NUMERIC_ZERO;
                         }
                     }
                     if (isset($params['chgdeffb'])) {
                         if (isset($params['usedeffb'])) {
-                            $sets[] = "deffeedbacktext='{$params['deffb']}'";
+                            $sets['deffeedbacktext'] = strval($params['deffb']);
                         } else {
-                            $sets[] = "deffeedbacktext=''";
+                            $sets['deffeedbacktext'] = '';
                         }
                     }
                     if (isset($params['chgreqscore'])) {
-                        $sets[] = "reqscore=0";
-                        $sets[] = "reqscoreaid=0";
+                        $sets['reqscore'] = AppConstant::NUMERIC_ZERO;
+                        $sets['reqscoreaid'] = AppConstant::NUMERIC_ZERO;
                     }
                     if (isset($params['chgistutorial'])) {
                         if (isset($params['istutorial'])) {
-                            $sets[] = "istutorial=1";
+                            $sets['istutorial'] = AppConstant::NUMERIC_ONE;
                         } else {
-                            $sets[] = "istutorial=0";
+                            $sets['istutorial'] = AppConstant::NUMERIC_ZERO;
                         }
                     }
                     if ($turnOnShuffle != AppConstant::NUMERIC_ZERO || $turnOffShuffle != AppConstant::NUMERIC_ZERO) {
-                        $shuffle = "shuffle = ((shuffle";
+                        $shuffle = " ((shuffle";
                         if ($turnOffShuffle > AppConstant::NUMERIC_ZERO) {
                             $shuffle .= " & ~$turnOffShuffle)";
                         } else {
@@ -881,33 +885,38 @@ class AssessmentController extends AppController
                             $shuffle .= " | $turnOnShuffle";
                         }
                         $shuffle .= ")";
-                        $sets[] = $shuffle;
+                        $sets['shuffle'] = $shuffle;
                     }
                 }
                 if (isset($params['chgavail'])) {
-                    $sets[] = "avail='{$params['avail']}'";
+                    $sets['avail'] = intval($params['avail']);
                 }
                 if (isset($params['chgintro'])) {
                     $assessmentData = Assessments::getByAssessmentId($params['intro']);
-                    $sets[] = "intro='" . addslashes($assessmentData['intro']) . "'";
+                    $sets['intro'] =   strval($assessmentData['intro']);;
                 }
                 if (isset($params['chgsummary'])) {
                     $assessmentData = Assessments::getByAssessmentId($params['summary']);
-                    $sets[] = "summary='" . addslashes($assessmentData['summary']) . "'";
+                    $sets['summary'] =  strval(addslashes($assessmentData['summary']));
                 }
                 if (isset($params['chgdates'])) {
                     $assessmentData = Assessments::getByAssessmentId($params['dates']);
-                    $sets[] = "startdate='{$assessmentData['startdate']}',enddate='{$assessmentData['enddate']}',reviewdate='{$assessmentData['reviewdate']}'";
+                    $sets['startdate'] = intval($assessmentData['startdate']);
+                    $sets['enddate'] =  intval($assessmentData['enddate']);
+                    $sets['reviewdate'] =  intval($assessmentData['reviewdate']);
                 }
                 if (isset($params['chgcopyendmsg'])) {
                     $assessmentData = Assessments::getByAssessmentId($params['copyendmsg']);
-                    $sets[] = "endmsg='" . addslashes($assessmentData['endmsg']) . "'";
+                    $sets['endmsg'] = strval($assessmentData['endmsg']);
                 }
-                if (count($sets) > AppConstant::NUMERIC_ZERO) {
-                    $setsList = implode(',', $sets);
+                if (count($sets) > AppConstant::NUMERIC_ZERO ) {
 
-                    Assessments::updateAssessmentData($setsList,$checkedList);
+                    foreach($checked as $id)
+                    {
+                        Assessments::updateAssessmentData($sets,$id);
+                    }
                 }
+
                 if (isset($params['removeperq'])) {
                     Questions::updateQuestionData($checked);
                 }
@@ -1527,7 +1536,6 @@ class AssessmentController extends AppController
             $userid = $sessiondata['actas'];
         }
         $line = AssessmentSession::getById($testid);
-//        AppUtility::dump('ques');
         if (strpos($line['questions'],';')===false) {
             $questions = explode(",",$line['questions']);
             $bestquestions = $questions;
@@ -2044,7 +2052,7 @@ class AssessmentController extends AppController
                     $fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting';
 
                     $rowgrptest = AssessmentSession::getAssessmentSessionDataToCopy($fieldstocopy,$testid);
-                    $rowgrptest = AppUtility::addslashes_deep($rowgrptest);
+
                     $insrow = "'".implode("','",$rowgrptest)."'";
                     $loginfo = "$userfullname creating group. ";
                     if (isset($CFG['GEN']['newpasswords'])) {
@@ -2075,10 +2083,9 @@ class AssessmentController extends AppController
                                     $fieldstocopy = explode(',',$fieldstocopy);
                                     $sets = array();
                                     foreach ($fieldstocopy as $k=>$val) {
-                                        $sets[] = "$val='{$rowgrptest[$k]}'";
+                                        $sets[$val] =  $rowgrptest[$val];
                                     }
-                                    $setslist = implode(',',$sets);
-                                    AssessmentSession::updateAssessmentSessionData($setslist,$row['id']);
+                                    AssessmentSession::updateAssessmentSessionData($sets,$row['id']);
 
                                     $temp .= "<p>". sprintf('%s added to group, overwriting existing attempt.', $thisusername). "</p>";
                                     $loginfo .= "$thisusername switched to group. ";
@@ -2087,8 +2094,14 @@ class AssessmentController extends AppController
                                 $stuGrpMember = new StuGroupMembers();
                                 $stuGrpMember->insertStuGrpMemberData($_POST['user'.$i], $sessiondata['groupid']);
 
+                                $sets['userid'] = $_POST['user'.$i];
+                                $fieldstocopy = explode(',',$fieldstocopy);
+                                foreach ($fieldstocopy as $k=>$val)
+                                {
+                                    $sets[$val] =  $rowgrptest[$val];
+                                }
                                 $assessmentSessionId = new AssessmentSession();
-                                $assessmentSessionId->insertAssessmentSessionData($_POST['user'.$i],$insrow,$fieldstocopy);
+                                $assessmentSessionId->insertAssessmentSessionData($sets);
 
                                 $temp .= "<p>". sprintf('%s added to group.', $thisusername). "</p>";
                                 $loginfo .= "$thisusername added to group. ";

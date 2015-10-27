@@ -274,10 +274,11 @@ class Assessments extends BaseImasAssessments
         return self::find()->select($toCopy)->where(['id' => $id])->one();
     }
 
-    public static function updateAssessmentData($setslist, $checkedlist)
+    public static function updateAssessmentData($setslist, $id)
     {
-        $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)";
-        Yii::$app->db->createCommand($query)->query();
+        $assessment = Assessments::findOne(['id' => $id]);
+        $assessment->attributes = $setslist;
+        $assessment->save();
     }
 
     public static function updateAssessmentForMassChange($startdate, $enddate, $reviewdate, $avail, $id)
@@ -363,19 +364,33 @@ class Assessments extends BaseImasAssessments
 
     public static function updateVideoId($from, $to)
     {
-        $query = "UPDATE imas_assessments SET intro=REPLACE(intro,'$from','$to') WHERE intro LIKE '%$from%'";
-        $connection = \Yii::$app->db;
-        $command = $connection->createCommand($query);
-        $rowCount = $command->execute();
+        $Assessments = Assessments::find()->where(['LIKE','intro',$from])->all();
+        $rowCount = 0;
+        if($Assessments)
+        {
+            foreach($Assessments as $Assessment)
+            {
+                $Assessment->summary = $to;
+                $Assessment->save();
+                $rowCount++;
+            }
+        }
         return $rowCount;
     }
 
     public static function updateSummary($from, $to)
     {
-        $query = "UPDATE imas_assessments SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
-        $connection = \Yii::$app->db;
-        $command = $connection->createCommand($query);
-        $rowCount = $command->execute();
+        $Assessments = Assessments::find()->where(['LIKE','summary',$from])->one();
+        $rowCount = 0;
+        if($Assessments)
+        {
+            foreach($Assessments as $Assessment)
+            {
+                $Assessment->summary = $to;
+                $Assessment->save();
+                $rowCount++;
+            }
+        }
         return $rowCount;
 
     }

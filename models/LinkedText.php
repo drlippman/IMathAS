@@ -120,7 +120,6 @@ class LinkedText extends BaseImasLinkedtext
                 $text->save();
             }
         }
-//        $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)")->queryAll();
     }
 
     public static function getByIdForCopy($toupdate)

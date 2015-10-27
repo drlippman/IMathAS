@@ -241,6 +241,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
         return $this->id;
     }
+
     public static function MarkAllRead($forumId,$dofilter = null,$limthreads = null)
     {
         if (count($limthreads) == 0) {
@@ -261,9 +262,11 @@ class ForumPosts extends BaseImasForumPosts
         $data = $command->queryAll();
         return $data;
     }
+
     public static function findByForumId($forumId){
         return ForumPosts::find()->where(['forumid' => $forumId])->all();
     }
+
     public static function deleteForumRelatedToCurse($forumlist){
         $query = ForumPosts::find()->join('INNER JOIN', 'imas_forum_threads', 'imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0')->where(['IN', 'imas_forum_threads.forumid', $forumlist])->all();
         if($query){
@@ -272,6 +275,7 @@ class ForumPosts extends BaseImasForumPosts
             }
         }
     }
+
     public static function selectForumPosts($forumlist){
         return ForumPosts::find()->select('id')->where(['IN','forumid',$forumlist])->andWhere(['<>','files',''])->all();
     }

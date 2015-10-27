@@ -50,6 +50,7 @@ class QuestionController extends AppController
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = '';
         $course = Course::getById($courseId);
+
         $this->checkSession($params);
         /*
          * Loaded by a NON-teacher

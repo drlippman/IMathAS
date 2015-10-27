@@ -44,15 +44,17 @@ class ContentTrack extends BaseImasContentTrack
 
     public static function getDistinctUserIdUsingCourseIdAndQuestionId($courseId,$questionId,$secfilter)
     {
-        $query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid= :courseId AND ict.courseid= :courseId AND ict.type='extref' AND ict.typeid= :questionId AND ims.locked=0 ";
+        $query = new Query();
+        $query->select('DISTINCT ict.userid')->from('imas_content_track AS ict')
+            ->join('INNER JOIN','imas_students AS ims','ict.userid=ims.userid')->where('ims.courseid= :courseId')
+            ->andWhere('ict.courseid= :courseId')->andWhere(['ict.type' => 'extref'])->andWhere('ict.typeid= :questionId')->andWhere(['ims.locked' => 0]);
         if ($secfilter!=AppConstant::NUMERIC_NEGATIVE_ONE)
         {
-        $query .= " AND ims.section='$secfilter' ";
+        $query->andWhere('ims.section = :secfilter',[':secfilter' => $secfilter]);
         }
         $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('secfilter',$secfilter);
-        $data->bindValue('courseId',$courseId);
-        $data->bindValue('questionId',$questionId);
+        $data->bindValue(':courseId',$courseId);
+        $data->bindValue(':questionId',$questionId);
         return $data->queryAll();
     }
 
@@ -154,13 +156,26 @@ class ContentTrack extends BaseImasContentTrack
 
     public static function getStatsData($courseId)
     {
-        $query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid= :courseId AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('courseId',$courseId);
-        return $data->queryAll();
+        $items = array(
+            '0' => 'inlinetext',
+            '1' => 'linkedsum',
+            '2' => 'linkedlink',
+            '3' => 'linkedintext',
+            '4' => 'linkedviacal',
+            '5' => 'assessintro',
+            '6' => 'assess',
+            '7' => 'assesssum',
+            '8' => 'wiki',
+            '9' => 'wikiintext',
+        );
+
+        $query = new Query();
+        $query->select('DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid))')->from('imas_content_track')->where('courseid= :courseId')
+            ->andWhere('IN','type',$items)->all();
     }
 
-    public static function getId($coursId, $userId,$type, $tId){
+    public static function getId($coursId, $userId,$type, $tId)
+    {
         return ContentTrack::find()->select('id')->where(['courseid' => $coursId, 'userid' => $userId, 'linkedlink' => $type, 'typeid' => $tId])->orderBy(['viewtime'=> SORT_DESC])->limit(1);
     }
 }

@@ -1016,15 +1016,12 @@ class InstructorController extends AppController
                      if (isset($params['checked']) && count($params['checked']) > AppConstant::NUMERIC_ZERO)
                      {
                          $checked = $params['checked'];
-                         $chkList = "'".implode("','",$checked)."'";
-                         $query = CalItem::getDataForCopyCourse($chkList,$params['ctc']);
-                         $insArr = array();
+                         $query = CalItem::getDataForCopyCourse($checked,$params['ctc']);
                          foreach($query as $data)
                          {
-                             $insArr[] = "('$courseId','".implode("','",AppUtility::addslashes_deep($data))."')";
+                             $calItem = new CalItem();
+                             $calItem->InsertDataForCopy($courseId,$data);
                          }
-                         $calItemData = implode(',',$insArr);
-                         CalItem::InsertDataForCopy($calItemData);
                          return $this->redirect('index?cid='.$courseId);
                      }
                  }
@@ -1065,15 +1062,11 @@ class InstructorController extends AppController
                                  $query['ancestors'] = intval($params['ctc']).','.$query['ancestors'];
                              }
                              $sets = '';
-
-                             for ($i=0; $i<count($toCopyArr); $i++)
+                             foreach ($toCopy as $copy)
                              {
-                                 if ($i> AppConstant::NUMERIC_ZERO){$sets .= ',';}
-                                 $sets .= $toCopyArr[$i] . "='" . ($query[$i])."'";
+                                 $sets[$copy]= $query[$copy];
                              }
-
                              Course::updateCourseForCopyCourse($courseId,$sets);
-
                          }
                          if (isset($params['copygbsetup']))
                          {

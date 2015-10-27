@@ -629,6 +629,7 @@ for ($i = 0; $i < count($questions); $i++) {
         } else {
             echo '<div>';
         }
+
         if ($canedit && $parts != '') {
             $togr = array();
             foreach ($qtypes as $k => $t) {
@@ -1103,3 +1104,16 @@ function printrubriclink($rubricid, $points, $scorebox, $feedbackbox, $qn = 'nul
 }
 
 ?>
+<script>
+    function quickgrade(qn,type,prefix,todo,vals) {
+        if (type==0) { //all
+            for (var i=0;i<todo;i++) {
+                document.getElementById(prefix+qn+"-"+i).value = vals[i];
+            }
+        } else {  //select
+            for (var i=0;i<todo.length;i++) {
+                document.getElementById(prefix+qn+"-"+todo[i]).value = vals[todo[i]];
+            }
+        }
+    }
+    </script>

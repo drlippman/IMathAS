@@ -170,16 +170,60 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
     }
 
-    public static function getSessionDataForUnenroll($searchWhere)
+    public static function getSessionDataForUnenroll($val,$tosearchby,$aid,$lim)
     {
-        $query = \Yii::$app->db->createCommand("SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchWhere")->queryAll();
-        return $query;
+        $query = new Query();
+        $query->select('lastanswers,bestlastanswers,reviewlastanswers')->from('imas_assessment_sessions');
+        if (is_array($val))
+        {
+            $query->where(['NOT IN',$tosearchby,$val]);
+        } else
+        {
+            $query->where($tosearchby <> ':val',[':val' => $val]);
+        }
+        if ($aid != null)
+        {
+            if (is_array($aid))
+            {
+                $query->andWhere(['IN','assessmentid',$aid]);
+            } else {
+                $query->andWhere('assessmentid = :assessmentid',[':assessmentid' => $aid]);
+            }
+        }
+        if ($lim > 0) {
+            $query->limit($lim);
+        }
+        return $query->createCommand()->queryAll();
     }
 
-    public static function getSessionInfoForUnenroll($searchNot, $lookForStr)
+    public static function getSessionInfoForUnenroll($val,$tosearchby,$aid,$lim, $todel)
     {
-        $query = \Yii::$app->db->createCommand("SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchNot AND ($lookForStr)")->queryAll();
-        return $query;
+        $query = new Query();
+        $query->select('lastanswers,bestlastanswers,reviewlastanswers')->from('imas_assessment_sessions');
+        if (is_array($val))
+        {
+            $query->where(['NOT IN',$tosearchby,$val]);
+        } else
+        {
+            $query->where($tosearchby <> ':val',[':val' => $val]);
+        }
+        if ($aid != null)
+        {
+            if (is_array($aid))
+            {
+                $query->andWhere(['IN','assessmentid',$aid]);
+            } else {
+                $query->andWhere('assessmentid = :assessmentid',[':assessmentid' => $aid]);
+            }
+        }
+        foreach ($todel as $file)
+        {
+            $query->andWhere(['LIKE','lastanswers',$file] or ['LIKE','bestlastanswers',$file] or ['LIKE','reviewlastanswers',$file]);
+        }
+        if ($lim > 0) {
+            $query->limit($lim);
+        }
+        return $query->createCommand()->queryAll();
     }
 
     public static function getByAssessmentId($assessmentId)
@@ -276,17 +320,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getIdForGroups($stuList, $data, $fieldsToCopy)
     {
-        $query = "SELECT id,$fieldsToCopy ";
-        $query .= "FROM imas_assessment_sessions WHERE userid IN ($stuList) AND assessmentid=' :data";
-        $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('data',$data);
-        $data->queryAll();
-    }
-
-    public static function dataForFileHandling($searchnot, $lookforstr)
-    {
-        $query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return self::find()->select(['id',$fieldsToCopy])->where(['assessmentid' => $data])->andWhere('IN','userid',$stuList)->all();
     }
 
     public static function getAGroupId($stuId, $data)
@@ -297,16 +331,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function updateAssessmentForStuGrp($id, $setsList)
     {
-        $query = Yii::$app->db->createCommand("UPDATE imas_assessment_sessions SET $setsList WHERE id= :id");
-        $query->bindValue('id', $id);
-        $query->queryAll();
-    }
-
-    public static function insertDataOfGroup($fieldsToCopy, $stuId, $insRow)
-    {
-        $query = "INSERT INTO imas_assessment_sessions (userid,$fieldsToCopy) ";
-        $query .= "VALUES ('$stuId',$insRow)";
-        Yii::$app->db->createCommand($query)->query();
+        $query = self::find()->where(['id' => $id])->one();
+        $query->attributes = $setsList;
+        $query->save();
     }
 
     public static function updateAssSessionForGrpByGrpIdAndUid($uid, $grpId)
@@ -366,9 +393,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getDataForUtilities($limitAid)
     {
-        $query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
-        $query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid= :limitAid";
-        $data = Yii::$app->db->createCommand($query);
+        $query = new Query();
+        $query->select('userid')->from('imas_assessment_sessions AS IAS')
+            ->join('NOT LIKE','IAS.scores','%-1%')->andWhere('assessmentid = :limitAid')->all();
+        $data = $query->createCommand();
         $data->bindValue('limitAid', $limitAid);
         return $data->queryAll();
     }
@@ -448,8 +476,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessments AS ia',
                 'ias.assessmentid=ia.id'
             )
-            ->where(['ias.id=:asid'])
-            ->andWhere(['ia.courseid=:courseId']);
+            ->where('ias.id = :asid')
+            ->andWhere('ia.courseid = :courseId');
         $command = $query->createCommand()->bindValues(['asid' => $asid, 'courseId' => $courseId]);
         $items = $command->queryOne();
         return $items;
@@ -597,19 +625,22 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
     }
 
-    public static function insertAssessmentSessionData($userId, $fieldstocopy,$insrow){
-        $query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) VALUES ('$userId',$insrow)";
-        $data = Yii::$app->db->createCommand($query)->execute();
-        return $data;
+    public function insertAssessmentSessionData($sets)
+    {
+        $this->attributes = $sets;
+        $this->save();
     }
 
-    public static function updateAssessmentSessionData($setslist, $id)
+    public static function updateAssessmentSessionData($sets, $id)
     {
-        $query = "UPDATE imas_assessment_sessions SET $setslist WHERE id = :id";
-        $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('id', $id);
-        return $data->execute();
+        $data = AssessmentSession::getById($id);
+        if($data)
+        {
+            $data->attributes = $sets;
+            $data->save();
+        }
     }
+
     public static function deleteId($data)
     {
         $data = AssessmentSession::find()->where(['id' => $data])->limit(1)->one();
@@ -643,22 +674,26 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function getDataWithUserData($assessmentId,$courseId)
     {
-        $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
-        $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$courseId' AND imas_assessment_sessions.assessmentid='$assessmentId' ";
-        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+
+        return self::find()->select('imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.*')
+            ->from('imas_users,imas_assessment_sessions,imas_students')->where('imas_assessment_sessions.userid=imas_users.id')
+            ->andWhere('imas_students.userid=imas_users.id')->andWhere(['imas_students.courseid' => $courseId])
+            ->andWhere(['imas_assessment_sessions.assessmentid' => $assessmentId])
+            ->orderBy('imas_users.LastName,imas_users.FirstName')->all();
     }
 
     public static function getDataWithUserDataFilterByPage($aid,$cid,$page)
     {
-        $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
-        $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
-        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+        $query = new Query();
+         $query->select('imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.*')->from('imas_users,imas_assessment_sessions,imas_students')
+            ->where('imas_assessment_sessions.userid=imas_users.id')->andWhere('imas_students.userid=imas_users.id')
+            ->andWhere('imas_students.courseid = :cid' )->andWhere('imas_assessment_sessions.assessmentid = :aid')
+            ->orderBy('imas_users.LastName,imas_users.FirstName');
         if ($page != -1)
         {
-            $query .= " LIMIT $page,1";
+            $query->limit($page)->offset(1);
         }
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return $query->createCommand()->bindValues([':cid' => $cid,':aid' => $aid])->queryAll();
     }
 }
 

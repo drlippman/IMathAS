@@ -256,14 +256,17 @@ class UtilitiesController extends AppController
             $body = AppConstant::NUMERIC_ONE;
             $message = AppConstant::NO_AUTHORITY;
         }
+
         if(!empty($params['from']) && ($params['to']))
         {
             $from = trim($params['from']);
             $to = trim($params['to']);
+
             if (strlen($from) != AppConstant::NUMERIC_ELEVEN || strlen($to) != AppConstant::NUMERIC_ELEVEN || preg_match('/[^A-Za-z0-9_\-]/',$from) || preg_match('/[^A-Za-z0-9_\-]/',$to))
             {
             }else
             {
+
                 $updatedInlineText = InlineText::updateVideoId($from,$to);
                 $updatedLinkedText = LinkedText::updateVideoId($from,$to);
                 $updatedLinkedTextSummary = LinkedText::updateSummary($from,$to);
@@ -720,7 +723,9 @@ class UtilitiesController extends AppController
             {
                 $lastUpdate = time();
             }
-            DbSchema::insertData($lastFirstUpdate,$lastUpdate);
+            $dbSchema = new DbSchema();
+            $dbSchema->insertData(3,$lastUpdate);
+            $dbSchema->insertData(4,$lastFirstUpdate);
         }
         else
         {

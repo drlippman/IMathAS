@@ -149,7 +149,7 @@ class GroupsController extends AppController
                                     }else
                                     {
                                         $grpAsIdExists = false;
-                                        $query = AssessmentSession::getIdForGroups($stuList,$data['id'],$fieldsToCopy);
+                                        $query = AssessmentSession::getIdForGroups($stuToAdd,$data['id'],$fieldsToCopy);
                                         if(count($query) > AppConstant::NUMERIC_ZERO)
                                         {
                                             $srcAsId = array_shift($query);
@@ -175,16 +175,24 @@ class GroupsController extends AppController
                                                 {
                                                     $logInfo .= "updating ias for $stuId.";
                                                     $sets = array();
-                                                    foreach ($fieldsToCopyArr as $k=>$val) {
-                                                        $sets[] = "$val='{$rowGrpTest[$k]}'";
+                                                    foreach ($fieldsToCopyArr as $k=>$val)
+                                                    {
+                                                        $sets[$val] =  $rowGrpTest[$val];
                                                     }
                                                     $setsList = implode(',',$sets);
-                                                    AssessmentSession::updateAssessmentForStuGrp($query['id'],$setsList);
+                                                    AssessmentSession::updateAssessmentForStuGrp($query['id'],$sets);
 
                                                 }else
                                                 {
                                                     $logInfo .= "inserting ias for $stuId.";
-                                                    AssessmentSession::insertDataOfGroup($fieldsToCopy,$stuId,$insRow);
+                                                    $sets = array();
+                                                    $sets['userid'] = $stuId;
+                                                    foreach ($fieldsToCopyArr as $k=>$val)
+                                                    {
+                                                        $sets[$val] =  $rowGrpTest[$val];
+                                                    }
+                                                    $assessmentSession = new AssessmentSession();
+                                                    $assessmentSession->insertAssessmentSessionData($sets);
                                                 }
                                             }
                                         }

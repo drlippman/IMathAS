@@ -129,7 +129,6 @@ class ForumView extends BaseImasForumViews
 
     public function  updateDataForPostByName($threadId,$userId,$now)
     {
-
         $query = new Query();
         $query ->select('id')
                 ->from('imas_forum_views')
@@ -183,20 +182,25 @@ class ForumView extends BaseImasForumViews
     public static function deleteByUserId($userId)
     {
         $views = ForumView::find()->where(['userid' => $userId])->all();
-        foreach($views as $view)
-        {
-            $view->delete();
+       if($views)
+       {
+            foreach ($views as $view) {
+                $view->delete();
+            }
         }
     }
 
     public static function deleteByForumId($forumId)
     {
-        $query = "DELETE imas_forum_views FROM imas_forum_views JOIN ";
-        $query .= "imas_forum_threads ON imas_forum_views.threadid=imas_forum_threads.id ";
-        $query .= "WHERE imas_forum_threads.forumid= :forumId";
-        $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('forumId', $forumId);
-        $data->execute();
+        $views = ForumView::find()->from('imas_forum_views,imas_forum_threads')->where('imas_forum_views.threadid=imas_forum_threads.id')
+            ->andWhere(['imas_forum_threads.forumid' => $forumId])->all();
+        if($views)
+        {
+            foreach ($views as $view)
+            {
+                $view->delete();
+            }
+        }
     }
 
     public static function getId($threadId, $UserId)
@@ -216,16 +220,13 @@ class ForumView extends BaseImasForumViews
 
     public static function getForumDataByUserId($userId,$dofilter,$limthreads)
     {
-        if (count($limthreads) == 0) {
-            $limthreads = '0';
-        } else {
-            $limthreads = implode(',', $limthreads);
+        $query = new Query();
+        $query->select('threadid,lastview,tagged')->from('imas_forum_views')->where('userid= :userId');
+        if ($dofilter)
+        {
+            $query->andWhere('IN','threadid',$limthreads);
         }
-        $query = "SELECT threadid,lastview,tagged FROM imas_forum_views WHERE userid= :userId";
-        if ($dofilter) {
-            $query .= " AND threadid IN ($limthreads)";
-        }
-        $data = Yii::$app->db->createCommand($query);
+        $data = $query->createCommand();
         $data->bindValue('userId', $userId);
         return $data->queryAll();
     }

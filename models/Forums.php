@@ -234,8 +234,11 @@ class Forums extends BaseImasForums {
 
     public static function updateForumData($setslist,$checkedlist)
     {
-        $query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist)";
-        Yii::$app->db->createCommand($query)->query();
+        $forums = Forums::find()->where(['IN','id',$checkedlist])->all();
+        foreach($forums as $forum)
+        {
+            $forum->attributes = $setslist;
+        }
     }
 
     public static function getForumName($forumId)
@@ -305,11 +308,14 @@ class Forums extends BaseImasForums {
 
     public static function getByCourseIdAndTeacher($courseId,$isteacher,$now)
     {
-        $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$courseId'";
-        if (!$isteacher) {
-            $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate < $now AND imas_forums.enddate>$now)) ";
+        $query = new Query();
+        $query->select('*')
+            ->from('imas_forums')->where(':imas_forums.courseid = courseid',[':courseid' => $courseId]);
+        if (!$isteacher)
+        {
+            $query->andWhere(['imas_forums.avail' => 2])->orWhere(['imas_forums.avail' => 2] and ['<','imas_forums.startdate',$now] and ['>','imas_forums.enddate',$now]);
         }
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return $query->createCommand()->queryAll();
     }
 
     public static function getMaxPostDate($cid)

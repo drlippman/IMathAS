@@ -251,8 +251,10 @@ class AppController extends Controller
             }
             return $this->redirect(AppUtility::getURLFromHome('site', 'login'));
         }
+
         $sessionData = array();
         $haveSession = Sessions::getById($sessionId);
+
         if ($haveSession > AppConstant::NUMERIC_ZERO) {
             $userId = $haveSession['userid'];
             $tzoffset = $haveSession['tzoffset'];
@@ -287,7 +289,9 @@ class AppController extends Controller
                 AppUtility::getURLFromHome('site', 'work-in-progress');
             }
         }
+
         $hasUserName = isset($userId);
+
         $hasLogin = isset($params['LoginForm']['password']);
         if (!$hasUserName && !$hasLogin && isset($params['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
             $hasLogin = true;
@@ -295,6 +299,7 @@ class AppController extends Controller
             $params['mathdisp'] = AppConstant::NUMERIC_ZERO;
             $params['graphdisp'] = AppConstant::NUMERIC_TWO;
         }
+
         if (isset($params['checksess']) && !$hasUserName) {
             echo '<html><body>';
             echo 'Unable to establish a session. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.';
@@ -306,15 +311,16 @@ class AppController extends Controller
         /*
          * Just put in username and password, trying to log in
          */
+
         if ($hasLogin && !$hasUserName) {
             /*
              * clean up old sessions
              */
+
             $now = time();
             $old = $now - AppConstant::GIVE_OLD_SESSION_TIME;
-            Sessions::deleteByTime($old);
-
             if (isset($CFG['GEN']['guesttempaccts']) && $params['LoginForm']['username'] == 'guest') { // create a temp account when someone logs in w/ username: guest
+
                 $dbData = DbSchema::getById(AppConstant::NUMERIC_TWO);
                 $guestCount = $dbData['id'];
                 DbSchema::setById(AppConstant::NUMERIC_TWO);

@@ -23,14 +23,12 @@ $imasroot = AppUtility::getHomeURL();
 //$AMT = new AMtoTeX;
 	function mathfiltercallback($arr) {
 		global $AMT,$mathimgurl,$coursetheme,$sessiondata;
-//        AppUtility::dump($arr[1]);
 //        $arr[1] = '-5+4';
 //        foreach($arr as $ar)
 //        {
 //
 //        }
 //        $arr = (object) $arr;
-//        AppUtility::dump($arr[1]);
 		//$arr[1] = str_replace(array('&ne;','&quot;','&lt;','&gt;','&le;','&ge;'),array('ne','"','lt','gt','le','ge'),$arr[1]);
 		$arr[1] = str_replace(array('&ne;','&quot;','&le;','&ge;','<','>'),array('ne','"','le','ge','&lt;','&gt;'),$arr[1]);
         $tex = $AMT->convert($arr[1]);

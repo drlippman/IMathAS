@@ -303,32 +303,14 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function UpdateQuestionsetData($qd,$hasImg,$now,$qSetId)
     {
-        AppUtility::dump('hie');
         $questionSetId = QuestionSet::getByQuesSetId($qSetId);
         if($questionSetId)
         {
-//            $questionSetId->description = strval($qd['description']);
-//            $questionSetId->author = strval($qd['author']);
-//            $questionSetId->qtype = strval($qd['qtype']);
-//            $questionSetId->control = strval($qd['control']);
-//            $questionSetId->qcontrol = strval($qd['qcontrol']);
-//            $questionSetId->qtext = strval($qd['qtext']);
-//            $questionSetId->answer = strval($qd['answer']);
-//            $questionSetId->extref = strval($qd['extref']);
-//            $questionSetId->license = intval($qd['license']);
-//            $questionSetId->ancestorauthors = strval($qd['ancestorauthors']);
-//            $questionSetId->otherattribution = strval($qd['otherattribution']);
-//            $questionSetId->solution = strval($qd['solution']);
-//            $questionSetId->solutionopts = intval($qd['solutionopts']);
-//            $questionSetId->adddate = intval($now);
-//            $questionSetId->lastmoddate = intval($now);
          return $questionSetId->updateCounters(['description' => strval($qd['description']),'hasimg' => intval($hasImg),'author' => strval($qd['author']), 'qtype' => strval($qd['qtype']),
                 'control' => strval($qd['control']), 'qcontrol' => strval($qd['qcontrol']), 'qtext' => strval($qd['qtext']),
                 'answer' => strval($qd['answer']), 'extref' => strval($qd['extref']), 'license' => intval($qd['license']), 'ancestorauthors' => strval($qd['ancestorauthors']),
                 'otherattribution' => strval($qd['otherattribution']), 'solution' => strval($qd['solution']), 'solutionopts' => intval($qd['solutionopts']), 'adddate' => intval($now),
                 'lastmoddate' => intval($now)]);
-//            $questionSetId->save();
-//            return $questionSetId;
         }
     }
 
@@ -609,17 +591,6 @@ class QuestionSet extends BaseImasQuestionset
         return self::find()->select(['id','uniqueid','adddate','lastmoddate'])->where(['IN', 'uniqueid', $uniqueId])->all();
     }
 
-//    public static function updateDataForImportQSet($qdata,$now,$qSetId,$hasImg)
-//    {
-//        $query = "UPDATE imas_questionset SET description='{$qdata['description']}',author='{$qdata['author']}',";
-//        $query .= "qtype='{$qdata['qtype']}',control='{$qdata['control']}',qcontrol='{$qdata['qcontrol']}',qtext='{$qdata['qtext']}',";
-//        $query .= "answer='{$qdata['answer']}',extref='{$qdata['extref']}',license='{$qdata['license']}',ancestorauthors='{$qdata['ancestorauthors']}',otherattribution='{$qdata['otherattribution']}',";
-//        $query .= "solution='{$qdata['solution']}',solutionopts='{$qdata['solutionopts']}',";
-//        $query .= "adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
-//        $data = \Yii::$app->db->createCommand($query)->execute();
-//        return $data;
-//    }
-
     public static function updateIdIn($qlist)
     {
         $query = QuestionSet::find()->where('IN', 'id', $qlist)->all();
@@ -657,8 +628,6 @@ class QuestionSet extends BaseImasQuestionset
             }
 
         }
-//       $query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qlist'";
-//       return \Yii::$app->db->createCommand($query)->execute();
     }
 
     public static function updateInAdmin($qsetid,$isadmin, $userid)

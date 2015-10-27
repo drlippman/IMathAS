@@ -13,6 +13,7 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
         $this->userid = $userId;
         $this->save();
     }
+
     public static function deleteSubscriptionsEntry($itemId,$userId)
     {
         $entry = ForumSubscriptions::findOne(['forumid' => $itemId,'userid' => $userId ]);
@@ -20,6 +21,7 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
             $entry->delete();
         }
     }
+
     public static function getByForumIdUserId($forumId,$userId)
     {
 
@@ -28,11 +30,9 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
             return $subscriptionsData;
         }
     }
+
     public static function getByManyForumIdsANdUserId($checkedlist,$currentUserId)
     {
-        $query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid=':userId'";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('userId',$currentUserId);
-        return $data->queryAll();
+        return self::find()->select('forumid')->where('IN','forumid',$checkedlist)->andWhere(['userid' => $currentUserId])->all();
     }
 }

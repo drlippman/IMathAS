@@ -3269,9 +3269,11 @@ class GradebookController extends AppController
             }
         }
         if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
-            if ($_GET['clearscores'] == "confirmed") {
+            if ($_GET['clearscores'] == "confirmed")
+            {
 
                 $assessmentSessionDataForClearScores = AssessmentSession::getAssessmentIDForClearScores($params['asid'],$courseId);
+
                 if ($assessmentSessionDataForClearScores) { //check that is the right cid
                     $agroupid =  $assessmentSessionData['agroupid'];
                     $aid= $assessmentSessionData['assessmentid'];
@@ -3280,6 +3282,7 @@ class GradebookController extends AppController
                     } else {
                         $qp =  array('id',$asid,$aid);
                     }
+
                     filehandler::deleteasidfilesbyquery2($qp[0], $qp[1], $qp[2], 1);
                     $ltisourcedIdAndSeed = AssessmentSession::getltisourcedIdAndSeed($qp);
                     $seeds = explode(',', $ltisourcedIdAndSeed['seeds']);
@@ -3401,7 +3404,9 @@ class GradebookController extends AppController
                 return $this->redirect('gradebook?stu='.$stu.'&cid='.$params['cid'].'&gbmode='.$gbmode);
             }
         }
+
         if (isset($params['clearq']) && isset($params['asid']) && $isteacher) {
+
             if ($params['confirmed'] == "true")
             {
                 $agroupid = $assessmentSessionData['agroupid'];
@@ -3706,7 +3711,8 @@ class GradebookController extends AppController
                 $students[] = $StudentId['userid'];
             }
             $studentNames = $this->getstunames($students);
-        } else if ($type=='help') {
+        } else if ($type=='help')
+        {
             $StudentIds = ContentTrack::getDistinctUserIdUsingCourseIdAndQuestionId($courseId,$questionId,$secfilter);
             foreach($StudentIds as $StudentId){
                 $students[] = $StudentId['userid'];
@@ -4912,11 +4918,8 @@ class GradebookController extends AppController
             }
         }
         $assessmentSessionData = AssessmentSession::getDataWithUserDataFilterByPage($aid,$cid,$page);
-        $this->includeJS('gradebook/rubric.js');
         $responseData = array('cnt' => $cnt,'qid' => $qid,'qsetid' => $qsetid,'cid' => $cid,'aid' => $aid,'stu' => $stu,'ver' => $ver,'gbmode' => $gbmode,'questionData' => $questionData,
-
             'assessmentSessionData' => $assessmentSessionData,'stulist' => $stulist,'assessmentData' => $assessmentData,'page' => $page,'rubricFinalData' => $rubricFinalData);
         return $this->renderWithData('gradeAllQuestion',$responseData);
     }
-
 }

@@ -32,10 +32,11 @@ class DbSchema extends BaseImasDbschema {
         return $command->queryAll();
 
     }
-    public static function insertData($lastFirstUpdate,$lastUpdate)
+    public function insertData($id,$var)
     {
-        $query = "INSERT INTO imas_dbschema (id,ver) VALUES (3,$lastUpdate),(4,$lastFirstUpdate)";
-        \Yii::$app->db->createCommand($query)->query();
+        $this->id = $id;
+        $this->ver = $var;
+        $this->save();
     }
 
     public static function updateData($update,$id)
