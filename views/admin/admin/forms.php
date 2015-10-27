@@ -558,7 +558,7 @@ switch ($action) {
         }
         echo "</select></div>\n";
         echo "<div class='col-md-10'><input type=submit value=\"Transfer\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></div>\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div>\n";
         echo "</div>";
         echo "</form>\n";
         break;

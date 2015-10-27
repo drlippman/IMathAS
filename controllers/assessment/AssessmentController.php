@@ -291,8 +291,8 @@ class AssessmentController extends AppController
                         /*check to see if students have already started assessment
                         *don't really care if groups exist - just whether asids exist
                         */
-                        $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId, $courseId);
-                        if ($assessmentSessionData > AppConstant::NUMERIC_ZERO) {
+                        $assessmentSessionData= AssessmentSession::getByUserCourseAssessmentId($assessmentId, $courseId);
+                        if ($assessmentSessionData['count(*)'] > AppConstant::NUMERIC_ZERO) {
                             $this->setErrorFlash(AppConstant::ASSESSMENT_ALREADY_STARTED);
                             exit;
                         }
@@ -412,6 +412,7 @@ class AssessmentController extends AppController
                     $title = AppConstant::MODIFY_ASSESSMENT;
                     $pageTitle = AppConstant::MODIFY_ASSESSMENT;
                     $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId, $courseId);
+                    $taken = ($assessmentSessionData['count(*)'] > 0);
                     list($testType, $showAnswer) = explode('-', $assessmentData['deffeedback']);
                     $startDate = $assessmentData['startdate'];
                     $endDate = $assessmentData['enddate'];
@@ -631,7 +632,7 @@ class AssessmentController extends AppController
         }
         $this->includeCSS(['course/items.css', 'course/course.css','gradebook.css','assessment.css']);
         $this->includeJS(["editor/tiny_mce.js","assessment/addAssessment.js", "general.js"]);
-        return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body,$page_formActionTag);
+        return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body,$page_formActionTag,$taken);
     }
 
     public function flatArray($outcomesData)
@@ -1125,7 +1126,7 @@ class AssessmentController extends AppController
      * @param $block
      * @return string
      */
-    public function addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body,$page_formActionTag)
+    public function addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body,$page_formActionTag,$taken)
     {
         return $this->renderWithData('addAssessment', ['course' => $course, 'assessmentData' => $assessmentData,
             'saveTitle' => $saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
@@ -1137,7 +1138,7 @@ class AssessmentController extends AppController
             'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets, 'pageOutcomesList' => $pageOutcomesList,
             'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory, 'sDate' => $sDate,'body'=>$body,
             'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
-            'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle, 'block' => $block,'page_formActionTag' => $page_formActionTag]);
+            'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle, 'block' => $block,'page_formActionTag' => $page_formActionTag, 'taken' => $taken]);
     }
 
     /**
@@ -3406,12 +3407,12 @@ class AssessmentController extends AppController
                     $temp .= '</p>';
                 }
                 if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
-                    $temp .= "<p>" .'Total Points Possible: '. totalpointspossible($qi) . "</p>";
+                    $temp .= "<p>Total Points Possible:". totalpointspossible($qi)."</p>";
                 }
 
                 $temp .= '</div>'; //ends either inset or formcontents div
                 if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
-                    $temp .= "<p><a href=\"show-test?action=embeddone\">".'When you are done, click here to see a summary of your score'. "</a></p>\n";
+                    $temp .= "<p><a href=\"show-test?action=embeddone\"> When you are done, click here to see a summary of your score</a></p>\n";
                 }
                 $temp .= '</form>';
             }

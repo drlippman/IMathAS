@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         <?php } ?>
         <?php if ($itemorder == '') { ?>
-            <div class="col-md-8 padding-left-zero"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
+            <div class="col-md-8"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
         <?php
                 echo '<div class="col-md-12 margin-bottom-thirty">';
                 echo "<p>No Questions currently in assessment</p>\n";

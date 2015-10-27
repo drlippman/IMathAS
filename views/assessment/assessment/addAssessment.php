@@ -262,7 +262,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-sm-12 margin-top-twenty padding-left-zero">
             <div class='col-sm-2'><?php AppUtility::t('Default points per problem')?></div>
             <div class='col-sm-10'>
-                <input class="form-control width-ten-per display-inline-block" type=text size=4 name=defpoints value="<?php echo $assessmentData['defpoints'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
+                <input class="form-control width-ten-per display-inline-block" type="text" size=4 name="defpoints" value="<?php echo $assessmentData['defpoints'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>
             </div><BR class=form>
             </div>
 
@@ -285,7 +285,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <span class="margin-left-five"> %</span>
                         </div>
                         <div class="col-sm-10 floatleft padding-left-ten padding-right-zero margin-left-minus-twenty-five">
-                            <select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';} ?> class="form-control width-sixty-per">
+                            <select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';} ?> class="form-control width-sixty-per">
                                 <option value="0" <?php if ($skipPenalty==AppConstant::NUMERIC_ZERO) {echo "selected=1";} ?>>per missed attempt</option>
                                 <option value="1" <?php if ($skipPenalty==AppConstant::NUMERIC_ONE) {echo "selected=1";} ?>>per missed attempt, after 1</option>
                                 <option value="2" <?php if ($skipPenalty==AppConstant::NUMERIC_TWO) {echo "selected=1";} ?>>per missed attempt, after 2</option>
@@ -597,7 +597,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-sm-12 padding-left-zero margin-top-twenty">
                 <div class="col-sm-2 select-text-margin">Use group set:<?php
-                    if ($assessmentSessionData) {
+                    if ($taken) {
                         if ($assessmentData['isgroup']== AppConstant::NUMERIC_ZERO) {
                             echo '<br/>Only empty group sets can be used after the assessment has started';
                         } else {
@@ -672,4 +672,5 @@ $this->params['breadcrumbs'][] = $this->title;
                 <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
             </div>
     </div>
-</div></form>
+</div>
+    </form>

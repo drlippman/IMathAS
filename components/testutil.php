@@ -904,7 +904,6 @@ function showquestioncontactlinks($qn) {
         $temp .= '<br/>'.$contactlinks;
 	}
     $temp .= '</div>';
-    echo $temp;
 	return $qavail;
 }
 

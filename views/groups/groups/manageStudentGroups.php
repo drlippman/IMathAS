@@ -33,9 +33,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
     <?php if(isset($grpSetId) || isset($addGrpSet) || isset($addGrp) || isset($renameGrp) || isset($renameGrpSet) || isset($deleteGrpSet)){?>
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Manage Student Groups', false)], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)]]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Manage Student Groups', false)], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)]]); ?>
     <?php }else{?>
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
     <?php }?>
 </div>
 <div class = "title-container">

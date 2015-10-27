@@ -259,7 +259,7 @@ if ($params['gbitem'] == 'new') {
                 }
             }
             if ($params['grades'] == 'all' && $params['gbitem'] != 'new' && $isteacher) { ?>
-                 <div class="col-sm-12"><div class="col-sm-2"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/upload-grades?gbmode='.$params['gbmode'].'&cid='.$params.'&gbitem='.$params['gbitem'])?>">Upload Grades</a></div></div>
+                 <div class="col-sm-12"><div class="col-sm-2"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/upload-grades?gbmode='.$params['gbmode'].'&cid='.$params['cid'].'&gbitem='.$params['gbitem'])?>">Upload Grades</a></div></div>
             <?php }
 
             echo '<div id="gradeboxes">';

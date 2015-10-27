@@ -284,7 +284,7 @@ function interpretline($str,$anstype,$countcnt) {
 //return array of arrays: array($symbol,$symtype)
 //types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
 function tokenize($str,$anstype,$countcnt) {
-	global $allowedmacros;
+	global $allowedmacros, $temp;
 	global $mathfuncs;
 	global $disallowedwords,$disallowedvar;
 	$i = 0;

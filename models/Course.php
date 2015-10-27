@@ -590,9 +590,9 @@ class Course extends BaseImasCourses {
     public static function getAllCourses()
     {
         $query = new Query();
-        $query	->select(['imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName'])
+        $query	->select('imas_courses.id,imas_courses.name,imas_users.LastName,imas_users.FirstName')
             ->from(['imas_courses', 'imas_users'])
-            ->where(['imas_users.id=imas_courses.ownerid']);
+            ->where('imas_users.id = imas_courses.ownerid');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
