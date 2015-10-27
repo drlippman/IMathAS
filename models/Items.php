@@ -68,11 +68,16 @@ class Items extends BaseImasItems
     }
 
     public static function getByAssessmentId($cid,$aid){
-        $query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
-        $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid= :cid AND ia.id<> :aid";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['cid' => $cid, 'aid'=> $aid]);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('ii.id AS itemid,ia.id,ia.name,ia.summary')
+            ->from('imas_items AS ii')
+            ->join('INNER JOIN',
+                'imas_assessments AS ia',
+                'ii.typeid=ia.id')
+            ->where('ii.itemtype=Assessment')
+            ->andWhere('ii.courseid= :cid', [':cid' => $cid])
+            ->andWhere('ia.id <> :aid', [':aid' => $aid]);
+        return $query->createCommand()->queryAll();
     }
 
     public static function getByItem($item)

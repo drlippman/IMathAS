@@ -71,16 +71,21 @@ class LibraryItems extends BaseImasLibraryItems
     }
 
     public static function getDestinctLibIdByIdAndOwner($groupId,$qSetId,$userId,$isGrpAdmin,$isAdmin){
+        $query = new Query();
         if ($isGrpAdmin) {
-            $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-            $query .= "AND imas_users.groupid='$groupId' AND ili.qsetid='$qSetId'";
+            $query->select('DISTINCT ili.libid')->from('imas_library_items AS ili')
+                ->join('INNER JOIN', 'imas_users',
+                    'ili.ownerid=imas_users.id')
+                ->andWhere(['imas_users.groupid = :groupId', [':groupId' => $groupId]])
+                ->andWhere('ili.qsetid=:qSetId', [':qSetId' => $qSetId]);
+
         } else {
-            $query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='$qSetId'";
+            $query->select('DISTINCT libid')->from('imas_library_items')->where(['qsetid =:qSetId', [':qSetId' => $qSetId]]);
             if (!$isAdmin) {
-                $query .= " AND ownerid='$userId'";
+                $query->andWhere(['ownerid= :userId', [':userId' => $userId]]);
             }
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $data = $query->createCommand()->queryAll();
         return $data;
     }
 
@@ -236,44 +241,57 @@ class LibraryItems extends BaseImasLibraryItems
         $this->save();
     }
 
-    public static function getDataByAdmin($safesearch, $llist, $checked, $clist)
+    public static function getDataByAdmin($safesearch, $llist, $checked)
     {
-        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
-        $query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE '%$safesearch%' ";
-        $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+        $query = new Query();
+        $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')->from('imas_questionset')
+            ->join('INNER JOIN',
+            'imas_library_items',
+            'imas_library_items.qsetid=imas_questionset.id')
+            ->where(['LIKE', 'imas_questionset.description', $safesearch])
+            ->andWhere(['IN', 'imas_library_items.libid', $llist]);
+
         if (count($checked) > 0)
         {
-            $query .= "AND imas_questionset.id NOT IN ($clist);";
+            $query->andWhere(['NOT IN', 'imas_questionset.id', $checked]);
         }
-
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return $query->createCommand()->queryAll();
     }
 
-    public static function getDataByGrpAdmin($groupid, $llist, $safesearch, $checked, $clist)
+    public static function getDataByGrpAdmin($groupid, $llist, $safesearch, $checked)
     {
-        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
-        $query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.description LIKE '%$safesearch%' ";
-        $query .= "AND imas_questionset.ownerid=imas_users.id ";
-        $query .= "AND (imas_users.groupid='$groupid' OR imas_questionset.userights>0) ";
-        $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+        $query = new Query();
+        $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')->from('imas_questionset,imas_library_items,imas_users')
+            ->where(['LIKE', 'imas_questionset.description', $safesearch])
+            ->andWhere('imas_questionset.ownerid=imas_users.id')
+        ->andWhere(['imas_users.groupid' => $groupid] or ['>', 'imas_questionset.userights', 0])
+        ->andWhere('imas_library_items.qsetid=imas_questionset.id')
+        ->andWhere(['IN', 'imas_library_items.libid', $llist]);
+
         if (count($checked) > 0)
         {
-            $query .= "AND imas_questionset.id NOT IN ($clist);";
+            $query->andWhere(['NOT IN', 'imas_questionset.id', $checked]);
         }
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return $query->createCommand()->queryAll();
     }
 
-    public static function getDataByUserId($userid,$safesearch,$llist, $checked, $clist)
+    public static function getDataByUserId($userid,$safesearch,$llist, $checked)
     {
-        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
-        $query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE '%$safesearch%' ";
-        $query .= "AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) ";
-        $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+        $query = new Query();
+        $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')
+            ->from('imas_questionset')
+            ->join('INNER JOIN',
+                'imas_library_items',
+                'imas_library_items.qsetid=imas_questionset.id')
+            ->where(['LIKE', 'imas_questionset.description', $safesearch])
+            ->andWhere(['imas_questionset.ownerid' => $userid] or ['>', 'imas_questionset.userights', 0])
+            ->andWhere(['IN', 'imas_library_items.libid', $llist]);
+
         if (count($checked) > 0)
         {
-            $query .= "AND imas_questionset.id NOT IN ($clist);";
+            $query->andWhere(['NOT IN', 'imas_questionset.id', $checked]);
         }
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return $query->createCommand()->queryAll();
     }
 
     public static function getQSetId($lib)
@@ -283,19 +301,21 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getByLibIdWithLimit($lib, $offset)
     {
-        return 
-        $query = "SELECT qsetid FROM imas_library_items WHERE libid='$lib' LIMIT $offset,1";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        return self::find()->select('qsetid')->where(['libid' => $lib])->limit(1)->offset($offset)->all();
     }
 
     public static function getByLibItem($groupid, $qsetid, $lib)
     {
-        $query = "SELECT imas_library_items FROM imas_library_items,imas_users WHERE ";
-        $query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid= :groupid AND ";
-        $query .= "imas_library_items.qsetid= :qsetid AND imas_library_items.libid= :lib";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues([':groupid' => $groupid,'qsetid' => $qsetid, ':lib' => $lib]);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('imas_library_items')
+            ->from('imas_library_items')
+            ->join('INNER JOIN',
+                'imas_users',
+                'imas_library_items.ownerid=imas_users.id')
+            ->where(['imas_users.groupid=: groupid', [':groupid' => $groupid]])
+            ->andWhere(['imas_library_items.qsetid=:qsetid', [':qsetid' => $qsetid]])
+            ->andWhere(['imas_library_items.libid:=lib', [':lib' => $lib]]);
+        return $query->createCommand()->queryAll();
     }
 
     public static function deleteLib($qsetid,$lib,$isadmin,$userid)
@@ -334,11 +354,16 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function  getDataForModTutorial($groupId,$id)
     {
-        $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-        $query .= "AND imas_users.groupid= :groupId AND ili.qsetid=' :id";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValues(['groupId' => $groupId, 'id' => $id]);
-        return $data->queryAll();
+        $query = new Query();
+        $query ->select('DISTINCT ili.libid')
+            ->from('imas_library_items AS ili')
+            ->join('INNER JOIN',
+            'imas_users',
+            'ili.ownerid=imas_users.id')
+            ->where(['imas_users.groupid=:groupId', [':groupId' => $groupId]]);
+        $query->andWhere(['ili.qsetid=:id', [':id' => $id]]);
+        $data = $query->createCommand()->queryAll();
+        return $data;
     }
 
     public static function getByQidIfNotAdmin($id,$isAdmin,$userId)

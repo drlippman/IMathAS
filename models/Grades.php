@@ -24,7 +24,10 @@ class Grades extends BaseImasGrades
     public static function GetOtherGrades($gradetypeselects, $limuser){
             $sel = implode(' OR ',$gradetypeselects);
             $query = "SELECT * FROM imas_grades WHERE ($sel)";
-            if ($limuser>0) { $query .= " AND userid= :userId ";}
+            if ($limuser>0)
+            {
+                $query .= " AND userid= :userId ";
+            }
         $data = \Yii::$app->db->createCommand($query);
         $data->bindValue('userId',$limuser);
         return $data->queryAll();
@@ -114,7 +117,8 @@ class Grades extends BaseImasGrades
 
     public static function updateScoreToStudent($score,$feedback,$studentId,$gbitem)
     {
-        $grade = Grades::find()->where(['userid' => $studentId])->andWhere(['gradetype' => 'exttool'])->andWhere(['gradetypeid' => $gbitem])->one();
+        $grade = Grades::find()->where(['userid' => $studentId])
+            ->andWhere(['gradetype' => 'exttool'])->andWhere(['gradetypeid' => $gbitem])->one();
         $grade->score = $score;
         $grade->feedback = $feedback;
         $grade->save();
@@ -136,23 +140,26 @@ class Grades extends BaseImasGrades
 
     public static function deleteById($id)
     {
-        $query = "DELETE FROM imas_grades WHERE gradetypeid= :id AND gradetype='exttool'";
-        $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('id', $id);
-        $data->execute();
+        $grades = Grades::find()->where(['gradetypeid' => $id, 'gradetype' => 'exttool'])->all();
+        foreach($grades as $grade)
+        {
+            $grade->delete();
+        }
     }
 
     public static function deleteByGradeId($id)
     {
-        $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid= :id";
-        $data = Yii::$app->db->createCommand($query);
-        $data->bindValue('id', $id);
-        $data->execute();
+        $grades = Grades::find()->where(['gradetype' => 'offline', 'gradetypeid' => $id])->all();
+        foreach($grades as $grade)
+        {
+            $grade->delete();
+        }
     }
 
     public static function getExternalToolUserId($gbItem,$users)
     {
-        return Grades::find()->where(['gradetype' => 'exttool'])->andWhere(['gradetypeid' => $gbItem])->andWhere(['IN','userid',$users])->all();
+        return Grades::find()->where(['gradetype' => 'exttool'])
+            ->andWhere(['gradetypeid' => $gbItem])->andWhere(['IN','userid',$users])->all();
     }
 
     public static function getExternalToolData($gbitemId,$grades)

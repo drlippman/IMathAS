@@ -107,11 +107,15 @@ class InlineText extends BaseImasInlinetext
 
     public static function updateVideoId($from,$to)
     {
-        $query = "UPDATE imas_inlinetext SET text=REPLACE(text,'$from','$to') WHERE text LIKE '%$from%'";
-        $connection=\Yii::$app->db;
-        $command=$connection->createCommand($query);
-        $rowCount=$command->execute();
-        return $rowCount;
+        $query = InlineText::find()->where(['LIKE', 'text', $from])->all();
+        if($query)
+        {
+            foreach($query as $line)
+            {
+                $line->text = $to;
+                $line->save();
+            }
+        }
     }
 
     public static function getFileOrder($id)

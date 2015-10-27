@@ -63,13 +63,9 @@ class GbCats extends BaseImasGbcats
 
     public static function getGbCatsForOutcomeMap($catList)
     {
-        $query = new Query();
-        $query->select(['id', 'name'])
+        return self::find()->select(['id', 'name'])
             ->from('imas_gbcats')
-            ->where(['IN','id', $catList]);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+            ->where(['IN','id', $catList])->all();
     }
 
     public static function getDataForCopyCourse($ctc)

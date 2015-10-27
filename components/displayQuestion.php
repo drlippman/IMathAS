@@ -5300,10 +5300,9 @@ function getqsetid($questionid) {
 }
 
 function getallqsetid($questions) {
-	$qids = "'".implode("','",$questions)."'";
 	$order = array_flip($questions);
 	$out = array();
-	$query = Libraries::getAllQSetId($qids);
+	$query = Libraries::getAllQSetId(implode("','",$questions));
 	foreach ($query as $row) {
 		$out[0][$order[$row[3]]] = $row['questionsetid'];// = array($row[0],$row[1]);
 		if ($row['name']==null) {

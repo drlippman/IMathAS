@@ -45,6 +45,11 @@ class Rubrics extends BaseImasRubrics
 
     public static function getByUserIdAndGroupIdAndList($userId,$groupid,$list)
     {
+//        $query = new Query();
+//        $query->select('id')
+//            ->from('imas_rubrics')
+//            ->where(['IN', 'id', $list])
+//            ->andWhere()
         $query = Yii::$app->db->createCommand("SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid= ':userId' OR groupid=':groupid')")->bindValues(['groupid' => $groupid,'userId' => $userId])->queryAll();
         return $query;
     }

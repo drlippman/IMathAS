@@ -2083,13 +2083,13 @@ class AdminController extends AppController
                         }
                     }
                     require dirname(__FILE__) . '/tar.class.php';
-                    if (file_exists(AppConstant::UPLOAD_DIRECTORY."Qimages.tar.gz"))
+                    if (file_exists(AppConstant::UPLOAD_DIRECTORY."qimages.tar.gz"))
                     {
-                        unlink(AppConstant::UPLOAD_DIRECTORY."Qimages.tar.gz");
+                        unlink(AppConstant::UPLOAD_DIRECTORY."qimages.tar.gz");
                     }
                     $tar = new tar();
                     $tar->addFiles($imgFiles);
-                    $tar->toTar(AppConstant::UPLOAD_DIRECTORY."Qimages.tar.gz",TRUE);
+                    $tar->toTar(AppConstant::UPLOAD_DIRECTORY."qimages.tar.gz",TRUE);
                 }
             }
         }
@@ -3437,13 +3437,13 @@ class AdminController extends AppController
             if (isset($search)) {
                 if ($isAdmin) {
                     $query = new LibraryItems();
-                    $query = $query->getDataByAdmin($safesearch, $llist, $checked, $clist);
+                    $query = $query->getDataByAdmin($safesearch, explode(',',$searchlibs), $checked);
                 } else if ($isGrpAdmin) {
                     $query = new LibraryItems();
-                    $query = $query->getDataByGrpAdmin($groupId, $llist, $safesearch, $checked, $clist);
+                    $query = $query->getDataByGrpAdmin($groupId, explode(',',$searchlibs), $safesearch, $checked);
                 } else {
                    $query = new LibraryItems();
-                   $query = $query->getDataByUserId($userId,$safesearch,$llist, $checked, $clist);
+                   $query = $query->getDataByUserId($userId,$safesearch,explode(',',$searchlibs), $checked);
                 }
 
                 if ($query != AppConstant::NUMERIC_ZERO) {

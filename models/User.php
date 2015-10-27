@@ -384,18 +384,18 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         $lastName = $params['LastName'];
         $firstName = $params['FirstName'];
-        $query = "SELECT imas_users.*,imas_groups.name FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
-        if (!empty($lastName)) {
-            $query .= "imas_users.LastName=:lastName";
-            if (!empty($firstName)) {
-                $query .= "AND ";
-            }
+        $query = new Query();
+        $query->select('imas_users.*,imas_groups.name')->from('imas_users')->join('LEFT JOIN','imas_groups')->where('imas_users.groupid=imas_groups.id');
+        if (!empty($lastName))
+        {
+            $query->andWhere('imas_users.LastName=:lastName');
         }
-        if (!empty($firstName)) {
-            $query .= "imas_users.FirstName=:firstName";
+        if (!empty($firstName))
+        {
+            $query->andWhere('imas_users.FirstName=:firstName');
         }
-        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-        $command =  Yii::$app->db->createCommand($query)->bindValues(['lastName' => $lastName, 'firstName' => $firstName]);
+        $query->orderBy('imas_users.LastName,imas_users.FirstName');
+        $command =  $query->createCommand()->bindValues(['lastName' => $lastName, 'firstName' => $firstName]);
         $data =  $command->queryAll();
         return $data;
     }

@@ -11,19 +11,25 @@ use yii\db\Query;
 class Libraries extends BaseImasLibraries
 {
     public static function getAllLibrariesByJoin(){
-        $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
-        $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = new Query();
+        $query->select('imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count')
+            ->from('imas_libraries')
+            ->join('LEFT JOIN',
+            'imas_library_items',
+            'imas_library_items.libid=imas_libraries.id')
+            ->groupBy('imas_libraries.id');
+        return $query->createCommand()->queryAll();
     }
 
     public static function getByQSetId($qSetId){
-        $query = "SELECT imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid ";
-        $query .= "FROM imas_libraries,imas_library_items WHERE imas_library_items.libid=imas_libraries.id ";
-        $query .= "AND imas_library_items.qsetid= :qSetId";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('qSetId',$qSetId);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('imas_libraries.id,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.groupid')
+            ->from('imas_libraries')
+            ->join('INNER JOIN',
+                'imas_library_items',
+                'imas_library_items.libid=imas_libraries.id')
+            ->where(['imas_library_items.qsetid= :qSetId', [':qSetId' => $qSetId]]);
+        return $query->createCommand()->queryAll();
     }
 
     public static function getByIdList($ids)
@@ -33,10 +39,13 @@ class Libraries extends BaseImasLibraries
 
     public static function getUserAndLibrary($questionId)
     {
-        $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid= :questionId";
-        $data = \Yii::$app->db->createCommand($query);
-        $data->bindValue('questionId', $questionId);
-        return $data->queryAll();
+        $query = new Query();
+        $query->select('imas_libraries.name,imas_users.LastName,imas_users.FirstName')
+            ->from('imas_libraries,imas_library_items,imas_users')
+            ->where('imas_libraries.id=imas_library_items.libid')
+            ->andWhere('imas_library_items.ownerid=imas_users.id')
+            ->andWhere(['imas_library_items.qsetid= :questionId', [':questionId' => $questionId]]);
+        return $query->createCommand()->queryAll();
     }
 
     public static function updateGroupId($id)
@@ -52,21 +61,28 @@ class Libraries extends BaseImasLibraries
         }
     }
 
-    public static function getQidAndLibID($aid){
-        $query = "SELECT imas_questions.id,imas_libraries.id AS libid,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
-        $query .= "WHERE imas_questions.assessmentid=':aid' AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
-        $query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
-        $data = \Yii::$app->db->createCommand($query)->bindValue(':aid',$aid)->queryAll();
-        return $data;
+    public static function getQidAndLibID($aid)
+    {
+        $query = new Query();
+        $query->select('imas_questions.id,imas_libraries.id AS libid,imas_libraries.name')
+            ->from('imas_questions,imas_library_items,imas_libraries')
+            ->where(['imas_questions.assessmentid=:aid', [':aid' => $aid]])
+            ->andWhere('imas_questions.questionsetid=imas_library_items.qsetid')
+            ->andWhere('imas_library_items.libid=imas_libraries.id')
+            ->orderBy('imas_questions.id');
+        return $query->createCommand()->queryAll();
     }
 
     public static function getById()
     {
-        $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
-        $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id ";
-        $query .= "GROUP BY imas_libraries.id";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = new Query();
+        $query->select('imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count')
+            ->from('imas_libraries')
+            ->join('LEFT JOIN',
+                'imas_library_items',
+                'imas_library_items.libid=imas_libraries.id')
+            ->groupBy('imas_libraries.id');
+        return $query->createCommand()->queryAll();
     }
 
     public static function getByQuestionId($questionid){
@@ -78,10 +94,14 @@ class Libraries extends BaseImasLibraries
 
     public static function getAllQSetId($qids)
     {
-        $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
-        $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = new Query();
+        $query->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id')
+            ->from('imas_questions')
+            ->join('LEFT JOIN',
+                'imas_libraries',
+                'imas_questions.category=imas_libraries.id')
+            ->where(['IN', 'imas_questions.id', $qids]);
+        return $query->createCommand()->queryAll();
     }
 
     public static function dataForImportLib($lookup)
@@ -91,17 +111,22 @@ class Libraries extends BaseImasLibraries
 
     public static function updateLibData($isGrpAdmin, $isAdmin,$name,$now,$id,$user)
     {
-        $query = "UPDATE imas_libraries SET name='{$name}',adddate=$now,lastmoddate=$now WHERE id={$id}";
+        $questionSet = Libraries::find()->where('id' ,$id)->one();
         if ($isGrpAdmin)
         {
-            $query .= " AND groupid='$user->groupid'";
+            $questionSet = Libraries::find()->where(['id' => $id, 'groupid' => $user->groupid])->one();
         }
         else if (!$isAdmin)
         {
-            $query .= " AND (ownerid='$user->id' or userights >1)";
+            $questionSet = Libraries::find()->where(['id' => $id])->andWhere(['ownerid' => $user->id] or ['>', 'userights', 2])->one();
         }
-        $data = \Yii::$app->db->createCommand($query)->execute();
-        return $data;
+        if($questionSet)
+        {
+            $questionSet->name = $name;
+            $questionSet->adddate = $now;
+            $questionSet->lastmoddate = $now;
+            $questionSet->save();
+        }
     }
 
     public function insertData($uniqueId,$now,$names,$user,$libRights,$parent)
@@ -167,24 +192,36 @@ class Libraries extends BaseImasLibraries
 
     public static function updateById($params,$isadmin,$groupid,$isgrpadmin,$userid,$now)
     {
-        $query = "UPDATE imas_libraries SET name='{$params['name']}',userights='{$params['rights']}',sortorder='{$params['sortorder']}',lastmoddate=$now";
-        if ($params['modify'] != $params['libs']) {
-            $query .= ",parent='{$params['libs']}'";
-        }
-        $query .= " WHERE id='{$_GET['modify']}'";
+//        $query = "UPDATE imas_libraries SET name='{$params['name']}',userights='{$params['rights']}',sortorder='{$params['sortorder']}',lastmoddate=$now";
+        $query = Libraries::find()->where(['id' => $_GET['modify']])->one();
+
+//        $query .= " WHERE id='{$_GET['modify']}'";
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+//            $query .= " AND groupid='$groupid'";
+            $query = Libraries::find()->where(['id' => $_GET['modify'],'groupid' => $groupid])->one();
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+//            $query .= " AND ownerid='$userid'";
+            $query = Libraries::find()->where(['id' => $_GET['modify'],'ownerid' => $userid])->one();
         }
-        \Yii::$app->db->createCommand($query)->execute();
+        if($query)
+        {
+            $query->name = $params['name'];
+            $query->userights = $params['rights'];
+            $query->sortorder = $params['sortorder'];
+            $query->lastmoddate = $now;
+            if ($params['modify'] != $params['libs'])
+            {
+                $query->parent = $params['libs'];
+            }
+            $query->save();
+        }
+//        \Yii::$app->db->createCommand($query)->execute();
     }
 
     public static function updateByGrpIdUserId($params, $newgpid,$isadmin,$groupid, $isgrpadmin, $userid, $translist)
     {
         $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
-
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";
         }
@@ -228,22 +265,40 @@ class Libraries extends BaseImasLibraries
 
     public static function getDataForLibTree()
     {
-        $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
-        $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = new Query();
+        $query->select('imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count')
+            ->from('imas_libraries')
+            ->join('LEFT JOIN',
+                'imas_library_items',
+                'imas_library_items.libid=imas_libraries.id')
+            ->groupBy('imas_libraries.id');
+        return $query->createCommand()->queryAll();
     }
 
     public static function updateByGrpUserIdSingle($params, $newgpid, $idTransfer, $isadmin, $groupid, $isgrpadmin, $userid)
     {
-        $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='$idTransfer'";
+        $query = Libraries::find()->where(['id' => $idTransfer])->one();
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+            $query = Libraries::find()->where(['id' => $idTransfer, 'groupid' => $groupid])->one();
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+            $query = Libraries::find()->where(['id' => $idTransfer, 'ownerid' => $userid])->one();
         }
-        \Yii::$app->db->createCommand($query)->execute();
+        if($query)
+        {
+            $query->ownerid = $params['newowner'];
+            $query->groupid = $newgpid;
+            $query->save();
+        }
+
+//        $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='$idTransfer'";
+//        if (!$isadmin) {
+//            $query .= " AND groupid='$groupid'";
+//        }
+//        if (!$isadmin && !$isgrpadmin) {
+//            $query .= " AND ownerid='$userid'";
+//        }
+//        \Yii::$app->db->createCommand($query)->execute();
     }
 
     public static function getCountOfId($parent)
