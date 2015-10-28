@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <input type="hidden" class="" value="<?php echo $courseId ?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course['name']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course['name']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 <div class="title-container">
     <div class="row">
@@ -251,7 +251,7 @@ if (!isset($params['versions'])) {
     $licurl = AppUtility::getURLFromHome('assessment', 'assessment/show-license?id=' . implode('-', $qn));
     echo '<hr/><p style="font-size:70%">License info at: <a href="' . $licurl . '">' . $licurl . '</a></p>';
 
-    echo "<div class=cbutn><a href=" . AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId) . ">Return to course page</a></div>\n";
+    echo "<div class=cbutn><a href=" . AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId) . ">Return to course page</a></div>\n";
 }
 ?>
 </div>

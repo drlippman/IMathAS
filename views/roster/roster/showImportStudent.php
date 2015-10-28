@@ -6,7 +6,7 @@ use app\components\AppConstant;
 
 //use app\widgets\FileInput;
 $this->title = 'Show imported students details';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Import student', 'url' => ['/roster/roster/import-student?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;

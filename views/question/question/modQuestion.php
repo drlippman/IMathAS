@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <form method=post action="mod-question?process=true&<?php echo "cid=$courseId&aid=$assessmentId";
     if (isset($params['id'])) {echo "&id={$params['id']}";} if (isset($params['qsetid'])) {echo "&qsetid={$params['qsetid']}";}?>">
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$course->id.'&aid='.$params['aid']] ,'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course', 'course/course?cid='.$course->id.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$course->id.'&aid='.$params['aid']] ,'page_title' => $this->title]); ?>
     </div>
     <!--Course name-->
     <div class = "title-container">

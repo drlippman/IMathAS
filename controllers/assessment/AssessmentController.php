@@ -1042,7 +1042,7 @@ class AssessmentController extends AppController
                 $sets = "endmsg='" .$messageString. "'";
                 Assessments::updateAssessmentData($sets,$params['aidlist']);
             }
-            return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
         }
         if (!isset($params['checked'])) {
             $query = Assessments::getByAssessmentId($params['aid']);
@@ -1369,7 +1369,7 @@ class AssessmentController extends AppController
                     } else {
                         if ($adata['isgroup']==3) {
                             $temp .= AppConstant::NOT_GROUP_MEMBER;
-                            $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$_GET['cid']).">Back</a>";
+                            $temp .= "<a href=".AppUtility::getURLFromHome('course', 'course/course?cid='.$_GET['cid']).">Back</a>";
                             return $temp;
                         }
                         $stuGrp = new Stugroups();
@@ -1619,14 +1619,14 @@ class AssessmentController extends AppController
         if (isset($_POST['asidverify']) && $_POST['asidverify']!=$testid) {
             $temp = 'Error.  It appears you have opened another assessment since you opened this one. ';
             $temp .= 'Only one open assessment can be handled at a time. Please reopen the assessment and try again. ';
-            $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$testsettings['courseid']).">";
+            $temp .= "<a href=".AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']).">";
             $temp .= 'Return to course page'."</a>";
             return $temp;
         }
         //verify group is ok
         if ($testsettings['isgroup']>0 && !$isteacher &&  ($line['agroupid']==0 || ($sessiondata['groupid']>0 && $line['agroupid']!=$sessiondata['groupid']))) {
             $temp = 'Error.  Looks like your group has changed for this assessment. Please reopen the assessment and try again.';
-            $temp .= "<a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$testsettings['courseid']).">";
+            $temp .= "<a href=".AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']).">";
             $temp .= 'Return to course page'."</a>";
             return $temp;
         }

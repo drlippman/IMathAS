@@ -9,10 +9,10 @@ if (isset($params['id'])) {
 <div class="item-detail-header">
     <?php
     if ($isTeacher) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id], 'page_title' => $this->title]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id], 'page_title' => $this->title]);
         if (isset($params['ltfrom'])) {
 
-            echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Modify Linked Text'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'add-linked-text?cid=' . $course->id . '&amp;id=' . $params['ltfrom']], 'page_title' => $this->title]);
+            echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Modify Linked Text'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'add-linked-text?cid=' . $course->id . '&amp;id=' . $params['ltfrom']], 'page_title' => $this->title]);
         }
     } else {
         if (isset($params['id'])) {

@@ -126,9 +126,9 @@ class ExternalTools extends BaseImasExternalTools
             ->from('imas_external_tools')
             ->where(['id' => $id]);
         if ($isTeacher) {
-            $query->andWhere(['courseid' => $courseId]);
+            $query->andWhere('courseid=:courseId', [':courseId' => $courseId]);
         } else if ($isGrpAdmin) {
-            $query->andWhere(['groupid' => $groupId]);
+            $query->andWhere(['groupid:groupId', ['groupId' => $groupId]]);
         }
         $command = $query->createCommand();
         $data = $command->queryOne();

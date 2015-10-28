@@ -642,7 +642,7 @@ $now = $currentTime;
                             <?php AppUtility::t('Student'); ?>
                     </li>
                     <li>
-                        <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?>">
+                        <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&quickview=on');?>">
                             <?php AppUtility::t('Quick Rearrange'); ?>
                         </a>
                     </li>
@@ -723,7 +723,7 @@ $now = $currentTime;
 
 <div class="col-md-12 align-linked-text-right padding-bottom-fifteen padding-right-twenty">
 <?php if($user->rights == 100 || $user->rights == 20) {?>
-        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id) ?>">Back</a>
+        <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">Back</a>
    <?php } elseif($user->rights == 10){ ?>
         <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $course->id) ?>">Back</a>
 <?php }?>

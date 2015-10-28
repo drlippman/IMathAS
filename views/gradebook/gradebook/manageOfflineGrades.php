@@ -11,7 +11,7 @@ use app\components\AssessmentUtility;
 $this->title = 'Manage Offline Grades';
 ?>
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 <form method=post action="manage-offline-grades?cid=<?php echo $course->id ?>">
 <div class="title-container">
@@ -22,7 +22,7 @@ $this->title = 'Manage Offline Grades';
     </div>
 </div>
     <div class="item-detail-content">
-        <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
+        <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
     </div>
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
     <?php

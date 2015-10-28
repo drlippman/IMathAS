@@ -1512,7 +1512,7 @@ class AdminController extends AppController
         }
         session_write_close();
         if (isset($params['cid'])) {
-            return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$params['cid']));
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$params['cid']));
         } else {
             return $this->redirect('index');
         }

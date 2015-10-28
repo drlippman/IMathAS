@@ -4,7 +4,7 @@ use app\components\AppUtility;
 $this->title = 'Manage Rubrics';
 ?>
 <div class="item-detail-header">
-   <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Offline Grades'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $courseId, AppUtility::getHomeURL() .'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
+   <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Offline Grades'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $courseId, AppUtility::getHomeURL() .'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">

@@ -6,7 +6,7 @@ use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\filehandler;
 $this->title = $pageTitle;
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 //include_once('../components/filehandler.php');
 

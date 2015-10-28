@@ -461,7 +461,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessment_sessions',
             'imas_users.id=imas_assessment_sessions.userid'
             )
-            ->where(['imas_assessment_sessions.agroupid= :groupId'])->orderBy('imas_users.LastName,imas_users.FirstName');
+            ->where('imas_assessment_sessions.agroupid= :groupId')->orderBy('imas_users.LastName,imas_users.FirstName');
         $command = $query->createCommand()->bindValue('groupId', $groupId);
         $items = $command->queryAll();
         return $items;
@@ -583,8 +583,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_users AS i_u',
                 'i_u.id=i_a_s.userid'
             )
-            ->where(['i_a_s.assessmentid= :aid'])
-            ->andWhere(['i_a_s.agroupid= :groupId'])->orderBy('LastName,FirstName');
+            ->where('i_a_s.assessmentid= :aid')
+            ->andWhere('i_a_s.agroupid= :groupId')->orderBy('LastName,FirstName');
 
         $command = $query->createCommand()->bindValues(['aid'=> $aid, 'groupId'=> $groupId]);
         $items = $command->queryAll();
@@ -600,7 +600,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 'imas_assessments',
                 'imas_assessments.id=imas_assessment_sessions.assessmentid'
             )
-            ->where(['imas_assessment_sessions.id=:asid']);
+            ->where('imas_assessment_sessions.id=:asid');
         $command = $query->createCommand()->bindValue('asid', $asid);
         $items = $command->queryOne();
         return $items;
@@ -677,10 +677,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
             $query = new Query();
         $query->select('imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.*')
             ->from('imas_users,imas_assessment_sessions,imas_students')->where('imas_assessment_sessions.userid=imas_users.id')
-            ->andWhere('imas_students.userid=imas_users.id')->andWhere(['imas_students.courseid' => $courseId])
-            ->andWhere(['imas_assessment_sessions.assessmentid' => $assessmentId])
+            ->andWhere('imas_students.userid=imas_users.id')->andWhere('imas_students.courseid=:courseId')
+            ->andWhere('imas_assessment_sessions.assessmentid=:assessmentId')
             ->orderBy('imas_users.LastName,imas_users.FirstName');
-        return $query->createCommand()->queryAll();
+        return $query->createCommand()->bindValues([':courseId' => $courseId, ':assessmentId' => $assessmentId])->queryAll();
     }
 
     public static function getDataWithUserDataFilterByPage($aid,$cid,$page)

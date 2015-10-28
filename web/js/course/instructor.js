@@ -72,7 +72,7 @@ function getAddItem(blk,tb) {
             '<div class="item-name-small">Wiki</div>'+
             '</div></a>' +
 
-            '<a href="../../instructor/instructor/index?cid='+ courseId+'&block='+blk+'&tb='+tb+'"><div class="calendar-pop-up itemLink">' +
+            '<a href="../../course/course/course?cid='+ courseId+'&block='+blk+'&tb='+tb+'"><div class="calendar-pop-up itemLink">' +
             '<img class="icon-center icon-size" src="../../img/iconCalendar.png">' +
             '<div class="item-name">Calendar</div>'+
             '</div></a>' +

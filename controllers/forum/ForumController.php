@@ -2027,7 +2027,7 @@ class ForumController extends AppController
                     }
                 }
                 $this->setWarningFlash(AppConstant::FORUM_UPDATED);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
             } else {
                 $this->setWarningFlash(AppConstant::NO_FORUM_SELECTED);
                 return $this->redirect('change-forum?cid=' . $courseId);

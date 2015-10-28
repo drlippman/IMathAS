@@ -238,7 +238,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if ($line['copyrights']<2) {
                                         echo "&copy;\n";
                                     } else {?>
-                                        <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$line['id'])?>" target="_blank"><?php AppUtility::t('Preview')?></a>
+                                        <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$line['id'])?>" target="_blank"><?php AppUtility::t('Preview')?></a>
                                     <?php }
                                     ?>
                                 </li>
@@ -352,7 +352,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         if ($line['copyrights']<1) {
                                             echo "&copy;\n";
                                         } else {?>
-                                            <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$line['id'])?>" target=\"_blank\">Preview</a>
+                                            <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$line['id'])?>" target=\"_blank\">Preview</a>
                                         <?php }
                                         ?>
                                     </li>
@@ -403,7 +403,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             if ($row['copyrights']<2) {
                                                                 echo "&copy;\n";
                                                             } else {?>
-                                                                <a href="<?php AppUtility::getURLFromHome('instructor','instructor/index?cid='.$row['id'])?>" target="_blank"><?php AppUtility::t('Preview')?></a>
+                                                                <a href="<?php AppUtility::getURLFromHome('course','course/course?cid='.$row['id'])?>" target="_blank"><?php AppUtility::t('Preview')?></a>
                                                             <?php }
                                                             ?>
                                                         </li>
@@ -435,7 +435,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                                     if ($row['copyrights ']<1) {
                                                                         echo "&copy;\n";
                                                                     } else {?>
-                                                                        <a href="<?php AppUtility::getURLFromHome('instructor','instructor/index?cid='.$row['id'])?>" target=\"_blank\">Preview</a>
+                                                                        <a href="<?php AppUtility::getURLFromHome('course','course/course?cid='.$row['id'])?>" target=\"_blank\">Preview</a>
                                                                     <?php }
                                                                     ?>
                                                                 </li>

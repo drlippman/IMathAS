@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <input type="hidden" class="" value="<?php echo $courseId = $course->id?>">
 <?php $imasroot = AppUtility::getHomeURL();?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $courseId]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $courseId]]); ?>
 </div>
 <!--Course name-->
 

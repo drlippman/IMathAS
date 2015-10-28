@@ -5,7 +5,7 @@ use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
 $this->title = $title;
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

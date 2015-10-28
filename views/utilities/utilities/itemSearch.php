@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo '<br/><input type="checkbox" name="checked[]" value="'.$row['id'].'" checked="checked"> '.$thisPerson .' ('.$row['groupname'].')';
                             $lastPerson= $thisPerson;
                         }?>
-                        <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$row['cid'])?>" target="_blank"><?php echo $row['cid']?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$row['cid'])?>" target="_blank"><?php echo $row['cid']?></a>
               <?php }
                 }
                 echo '</p>';

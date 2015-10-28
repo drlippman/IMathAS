@@ -569,7 +569,7 @@ class InstructorController extends AppController
                     CalItem::setDateByCourseId($this->shift, $courseId);
                 }
                 $this->setSuccessFlash('Time shift data update successfully');
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
             } else { //DEFAULT DATA MANIPULATION
                 $sdate = AppUtility::tzdate("m/d/Y", time());
                 $i = AppConstant::NUMERIC_ZERO;
@@ -704,7 +704,7 @@ class InstructorController extends AppController
                     $saveItemOrderIntoCourse = new Course();
                     $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
                 }
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id));
             }
             if ((!isset($params['folder']) || $params['folder'] == '') && !isset($sessiondata['folder'.$courseId])) {
                 $params['folder'] = '0';

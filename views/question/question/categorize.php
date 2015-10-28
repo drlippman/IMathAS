@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 //echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
 ?>
  <div class="item-detail-header">
-     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Add/Remove Questions'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'question/question/add-questions?aid='.$aid.'&cid='.$cid]]); ?>
+     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Add/Remove Questions'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'question/question/add-questions?aid='.$aid.'&cid='.$cid]]); ?>
  </div>
  <div class = "title-container">
         <div class="row">

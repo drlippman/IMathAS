@@ -487,7 +487,7 @@ class AppController extends Controller
                         if ($myRights < AppConstant::TEACHER_RIGHT) {
                             echo "<a href='" . AppUtility::getURLFromHome('course', 'course/index?cid=' . $sessionData['ltiitemid']) . "'>Return to home page</a>";
                         } else {
-                            echo "<a href='" . AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $sessionData['ltiitemid']) . "'>Return to home page</a>";
+                            echo "<a href='" . AppUtility::getURLFromHome('course', 'course/course?cid=' . $sessionData['ltiitemid']) . "'>Return to home page</a>";
                         }
                         exit;
                     }
@@ -496,7 +496,7 @@ class AppController extends Controller
                     if (!in_array(basename($urlParts['path']), array('show-assessment', 'print-test', 'messages', 'sent-message', 'view-message', 'view-conversation', 'work-in-progress', 'work-in-progress', 'work-in-progress'))) {
                         $assessment = Assessments::getCourseIdName($sessionData['ltiitemid']);
                         $courseId = $assessment['courseid'];
-                        AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId . '&id=' . $sessionData['ltiitemid']);
+                        AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId . '&id=' . $sessionData['ltiitemid']);
                         exit;
                     }
                 } else if ($sessionData['ltirole'] == 'instructor') {

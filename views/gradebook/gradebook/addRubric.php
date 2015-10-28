@@ -5,13 +5,13 @@ use app\components\AssessmentUtility;
 <div class="item-detail-header"> <?php
     if (isset($params['id']) || isset($params['nomanage'])) {
         if ($from=='modq') {
-            $breadcrumb = $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Question Settings','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' .$course->id , AppUtility::getHomeURL() .'gradebook/gradebook/modify-question?cid=' . $course->id.'aid='.$params['aid'].'id='.$params['qid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb = $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Question Settings','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' .$course->id , AppUtility::getHomeURL() .'gradebook/gradebook/modify-question?cid=' . $course->id.'aid='.$params['aid'].'id='.$params['qid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         } else if ($from=='addg') {
-            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Offline Grades','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-grades?cid=' . $course->id.'&gbitem='.$params['gbitem'].'&grades=all',AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Offline Grades','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-grades?cid=' . $course->id.'&gbitem='.$params['gbitem'].'&grades=all',AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         } else if ($from=='addf') {
-            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Forum','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-forum?cid=' . $course->id.'id='.$params['fid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Forum','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-forum?cid=' . $course->id.'id='.$params['fid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         }else{
-            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id ,AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id ,AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         }
 
         if ($params['id']=='new') {
@@ -20,7 +20,7 @@ use app\components\AssessmentUtility;
             $this->title = "Edit Rubric";
         }
     } else {
-        $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]);
+        $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
         $this->title = "Manage Rubrics";
     }
     echo $breadcrumb;
@@ -35,7 +35,7 @@ use app\components\AssessmentUtility;
         </div>
     </div>
     <div class="item-detail-content">
-        <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']); ?>
+        <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']); ?>
     </div>
 <div class="tab-content shadowBox">
 

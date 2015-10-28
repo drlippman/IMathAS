@@ -280,7 +280,7 @@ if ($overwriteBody==1) {
     if ($isfinal) {
         $licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
         echo '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
-        echo "<div class=cbutn><a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId).">Return to course page</a></div>\n";
+        echo "<div class=cbutn><a href=".AppUtility::getURLFromHome('course','course/course?cid='.$courseId).">Return to course page</a></div>\n";
     }
     echo "</form>\n";
 

@@ -11,7 +11,7 @@ $imasroot = AppUtility::getURLFromHome('instructor' ,'instructor/mass-change-dat
 $imasroot1 = AppUtility::getURLFromHome('instructor', 'instructor/mass-change-dates?cid='.$courseId.'&filter='.$filter)
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid='.$course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid='.$course->id]]); ?>
 </div>
 
 <div class = "title-container">
@@ -23,7 +23,7 @@ $imasroot1 = AppUtility::getURLFromHome('instructor', 'instructor/mass-change-da
 </div>
 
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
+    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 <div class="tab-content shadowBox">
 <?php

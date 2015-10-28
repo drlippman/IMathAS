@@ -123,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     {
                                         foreach($singleTeacher as $teacher)
                                         {
-                                            echo  '<li><a target="_blank" href="'.AppUtility::getURLFromHome('instructor','instructor/index?cid='.$teacher['id']).'">'.$teacher['name'].'(ID '.$teacher['id'].')</a></li>';
+                                            echo  '<li><a target="_blank" href="'.AppUtility::getURLFromHome('course','course/course?cid='.$teacher['id']).'">'.$teacher['name'].'(ID '.$teacher['id'].')</a></li>';
                                         }
                                     }
                                 }

@@ -10,9 +10,9 @@ if($commentType == "instr"){
 }
 echo '<div class="item-detail-header">';
 if($commentType == "instr") {
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Instructor Notes', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gb-comments?cid=' . $course->id.'&comtype=instr']]);
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Instructor Notes', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gb-comments?cid=' . $course->id.'&comtype=instr']]);
 }else{
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Gradebook Comments', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gb-comments?cid=' . $course->id]]);
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Gradebook Comments', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gb-comments?cid=' . $course->id]]);
 } ?>
 </div>
 
@@ -48,7 +48,7 @@ if (count($failures)>0) {
         </div>
     </div>
     <div class="item-detail-content">
-        <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
+        <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]); ?>
     </div>
 
     <div class="tab-content shadowBox upload-gradebook-comments-padding">

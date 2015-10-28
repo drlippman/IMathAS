@@ -39,7 +39,7 @@ $parents = $parentsData;
                     <?php if ($isAdmin || $isGrpAdmin) { ?>
                         <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index'); ?>"><?php AppUtility::t('Return to Admin page') ?></a>
                     <?php } else { ?>
-                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId); ?>"><?php AppUtility::t('Return to Course page') ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId); ?>"><?php AppUtility::t('Return to Course page') ?></a>
                     <?php } ?>
                 </div>
             <?php

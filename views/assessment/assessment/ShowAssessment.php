@@ -171,7 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     {
                         window.location ="../../course/course/index?cid="+courseId;
                     }else{
-                        window.location ="../../instructor/instructor/index?cid="+courseId;
+                        window.location ="../../course/course/course?cid="+courseId;
                     }
 
                     $(this).dialog('destroy').remove();

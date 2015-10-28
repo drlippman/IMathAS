@@ -198,7 +198,7 @@ class Course extends BaseImasCourses {
 
     public static function setOwner($params,$user){
         if($user->rights < AppConstant::GROUP_ADMIN_RIGHT){
-            $courseData = Course::findAll(['id' => $params['cid'],'ownerid' => $user->id]);
+            $courseData = Course::findOne(['id' => $params['cid'],'ownerid' => $user->id]);
         }else{
             $courseData = Course::findOne(['id' => $params['cid']]);
         }
@@ -311,7 +311,7 @@ class Course extends BaseImasCourses {
             );
         if($myRights > AppConstant::ADMIN_RIGHT)
         {
-            $query->andWhere(['<','imas_courses.available','4']);
+            $query->andWhere(['<','imas_courses.available',4]);
         }
         (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==AppConstant::NUMERIC_ZERO) ? $query->andWhere('imas_courses.ownerid = :userId') : $query->andWhere(':userId = :userId');
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > AppConstant::NUMERIC_ZERO)
@@ -336,6 +336,7 @@ class Course extends BaseImasCourses {
         return self::find()->select('ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid')
             ->from('imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups')->where('it.courseid=ic.id')
             ->andWhere('it.userid=iu.id')->andWhere('iu.groupid=imas_groups.id')->andWhere(['<>','iu.groupid',$groupId])
+            ->andWhere('<>','iu.id',$userId)
             ->andWhere(['<','ic.available',4])->orderBy('imas_groups.name,iu.LastName,iu.FirstName,ic.name')->all();
     }
     public static function getFromJoinOnTeacher($userId,$courseId)
