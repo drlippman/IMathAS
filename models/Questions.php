@@ -373,4 +373,9 @@ class Questions extends BaseImasQuestions
         $data = $command->queryOne();
         return $data;
     }
+
+    public static function getByINId($qlist)
+    {
+        return self::find()->select('id,points,questionsetid')->where(['IN', 'id', $qlist])->all();
+    }
 }

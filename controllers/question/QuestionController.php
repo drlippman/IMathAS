@@ -3783,7 +3783,7 @@ class QuestionController extends AppController
         return $this->renderWithData('libhelp', $responseData);
     }
 
-    public function actionViewSource(){
+    public function actionViewSource() {
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
@@ -3853,6 +3853,329 @@ class QuestionController extends AppController
                 $qParts = array(0);
             }
             return array(1, array($type), $qParts, $nHints, array($displayFormat), array($questions), array($feedBackTxt), array($feedBackTxtDef), array($feedBackTxtEssay), array($answer), $hintText, array($partialcredit), $qTol, $qtold, array($answerBoxSize), array($displayFormat), array($scoreMethod), array($noshuffle));
+        }
+    }
+
+    public function actionPrintLayoutWord()
+    {
+        global $temp;
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $params = $this->getRequestParams();
+        $this->layout = 'master';
+        $cid = $this->getParamVal('cid');
+        $course = Course::getById($cid);
+        $aid = intval($this->getParamVal('aid'));
+        $teacherId = $this->isTeacher($userId, $cid);
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $pageTitle = "Print Layout";
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $sessionData['texdisp'] = true;
+        $sessionData['texdoubleescape'] = true;
+
+        $sessionData['graphdisp'] = AppConstant::NUMERIC_ONE;
+        $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO;
+
+        /**
+         * CHECK PERMISSIONS AND SET FLAGS
+         */
+        if (!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to log in as a teacher to access this page";
+            //} else if (!isset($CFG['GEN']['pandocserver'])) {
+            //	$overwriteBody = 1;
+            //	$body = 'No pandoc server specified in config';
+            //}
+
+        } else {
+            /**
+             * PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+             */
+
+        }
+
+        if (!isset($_REQUEST['versions'])) {
+
+        } else {
+//            $out = '<!DOCTYPE html><html><body>';
+            require_once(Yii::$app->basePath . "/filter/filter.php");
+            $line = Assessments::getSelectedData($aid);
+            $ioQuestions = explode(",",$line['itemorder']);
+            $aname = $line['name'];
+            $questions = array();
+            foreach($ioQuestions as $k=>$q) {
+                if (strpos($q,'~')!==false) {
+                    $sub = explode('~',$q);
+                    if (strpos($sub[0],'|')===false) { //backwards compat
+                        $questions[] = $sub[array_rand($sub,1)];
+                    } else {
+                        $grpqs = array();
+                        $grpparts = explode('|',$sub[0]);
+                        array_shift($sub);
+                        if ($grpparts[1]==1) { // With replacement
+                            for ($i=0; $i<$grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub,1)];
+                            }
+                        } else if ($grpparts[1]==0) { //Without replacement
+                            shuffle($sub);
+                            for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
+                                $questions[] = $sub[$i];
+                            }
+                            if ($grpparts[0]>count($sub)) { //fix stupid inputs
+                                for ($i=count($sub); $i<$grpparts[0]; $i++) {
+                                    $questions[] = $sub[array_rand($sub,1)];
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $questions[] = $q;
+                }
+            }
+            $points = array();
+            $qn = array();
+            $questionsData = Questions::getByINId($questions);
+            foreach($questionsData as $row)
+            {
+                if ($row['points']==9999) {
+                    $points[$row['id']] = $line['defpoints'];
+                } else {
+                    $points[$row['id']] = $row['points'];
+                }
+                $qn[$row['id']] = $row['questionsetid'];
+            }
+            $numq = count($questions);
+            if (is_numeric($_REQUEST['versions'])) {
+                $copies = $_REQUEST['versions'];
+            } else {
+                $copies = 1;
+            }
+            $seeds = array();
+            for ($j=0; $j<$copies; $j++) {
+                $seeds[$j] = array();
+                if ($line['shuffle']&2) {  //all questions same random seed
+                    if ($shuffle&4) { //all students same seed
+                        $seeds[$j] = array_fill(0,count($questions),$aid+$j);
+                    } else {
+                        $seeds[$j] = array_fill(0,count($questions),rand(1,9999));
+                    }
+                } else {
+                    if ($shuffle&4) { //all students same seed
+                        for ($i = 0; $i<count($questions);$i++) {
+                            $seeds[$j][] = $aid + $i + $j;
+                        }
+                    } else {
+                        for ($i = 0; $i<count($questions);$i++) {
+                            $seeds[$j][] = rand(1,9999);
+                        }
+                    }
+                }
+            }
+
+            if ($_REQUEST['format']=='trad') {
+                for ($j=0; $j<$copies; $j++) {
+                    if ($j>0) {
+                        $temp .= $_REQUEST['vsep'].'<br/>';}
+
+                    $headerleft = '';
+                    $headerleft .= $line['name'];
+                    if ($copies>1) {
+                        $headerleft .= ' - Form ' . ($j+1);
+                    }
+                    if ((isset($_REQUEST['iname']) || isset($_REQUEST['cname'])) && isset($_REQUEST['aname'])) {
+                        $headerleft .= "<br/>";
+                    }
+                    $headerright = '';
+                    $temp .= "<div class=q>\n";
+                    $temp .= "<div class=hdrm>\n";
+
+                    $temp .= "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
+                    $temp .= "<div id=intro>{$line['intro']}</div>\n";
+                    $temp .= "</div>\n";
+                    $temp .= "</div>\n";
+
+
+                    for ($i=0; $i<$numq; $i++) {
+                        if ($i>0) { $temp .= $_REQUEST['qsep'];}
+                        list($newout,$sa[$j][$i]) = $this->printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+                        $temp .= $newout;
+                    }
+
+                }
+
+                if ($_REQUEST['keys']>0) { //print answer keys
+                    for ($j=0; $j<$copies; $j++) {
+                        $temp .= $_REQUEST['vsep'].'<br/>';
+                        $temp .= '<b>Key - Form ' . ($j+1) . "</b>\n";
+                        $temp .= "<ol>\n";
+                        for ($i=0; $i<$numq; $i++) {
+                            $temp .= '<li>';
+                            if (is_array($sa[$j][$i])) {
+                                $temp .= printfilter(filter(implode(' ~ ',$sa[$j][$i])));
+                            } else {
+                                $temp .= printfilter(filter($sa[$j][$i]));
+                            }
+                            $temp .= "</li>\n";
+                        }
+                        $temp .= "</ol>\n";
+                    }
+                }
+            }  else if ($_REQUEST['format']=='inter') {
+
+                $headerleft = '';
+                $headerleft .= $line['name'];
+                if ((isset($_REQUEST['iname']) || isset($_REQUEST['cname'])) && isset($_REQUEST['aname'])) {
+                    $headerleft .= "<br/>";
+                }
+                $headerright = '';
+                $temp .= "<div class=q>\n";
+                $temp .= "<div class=hdrm>\n";
+
+                $temp .= "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
+                $temp .= "<div id=intro>{$line['intro']}</div>\n";
+                $temp .= "</div>\n";
+                $temp .= "</div>\n";
+                for ($i=0; $i<$numq; $i++) {
+                    if ($i>0) { $temp .= $_REQUEST['qsep'];}
+                    for ($j=0; $j<$copies;$j++) {
+                        if ($j>0) { $temp .= $_REQUEST['qsep'];}
+                        list($newout,$sa[]) = $this->printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($_REQUEST['showqn']));
+                        $temp .= $newout;
+                    }
+                }
+                if ($_REQUEST['keys']>0) { //print answer keys
+                    $temp .= $_REQUEST['vsep'].'<br/>';
+                    $temp .= "<b>Key</b>\n";
+                    $temp .= "<ol>\n";
+                    for ($i=0; $i<count($sa); $i++) {
+                        $temp .= '<li>';
+                        if (is_array($sa[$i])) {
+                            $temp .= printfilter(filter(implode(' ~ ',$sa[$i])));
+                        } else {
+                            $temp .= printfilter(filter($sa[$i]));
+                        }
+                        $temp .= "</li>\n";
+                    }
+                    $temp .= "</ol>\n";
+                }
+            }
+//            $licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
+//            $out .= '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
+//            $temp .= '</body></html>';
+//            $out = preg_replace('|(<img[^>]*?)src="/|', '$1 src="'.$urlmode.$_SERVER['HTTP_HOST'].'/', $out);
+
+        }
+        $responseData = array('overwriteBody' => $overwriteBody, 'body' => $body, 'cid' => $cid, 'aid' => $aid, 'teacherId' => $teacherId, 'pageTitle' => $pageTitle, 'ioQuestions' => $ioQuestions, 'line' => $line, 'course' => $course);
+        return $this->renderWithData('printLayoutWord', $responseData);
+    }
+
+    function printq($qn,$qsetid,$seed,$pts,$showpts) {
+        global $isfinal,$imasroot,$urlmode, $temp;
+        srand($seed);
+
+        $qdata = QuestionSet::getDataById($qsetid);
+
+        if ($qdata['hasimg']>0) {
+            $result = QImages::getDataById($qsetid);
+            foreach($result as $row){
+                if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+                    ${$row['var']} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
+                } else {
+                    ${$row['var']} = "<img src=\"$imasroot/assessment/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
+                }
+            }
+        }
+        eval(interpret('control',$qdata['qtype'],$qdata['control']));
+        eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+        $toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
+        $toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
+        $toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
+        srand($seed+1);
+        eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+        srand($seed+2);
+        $la = '';
+
+        if (isset($choices) && !isset($questions)) {
+            $questions =& $choices;
+        }
+        if (isset($variable) && !isset($variables)) {
+            $variables =& $variable;
+        }
+        if ($displayformat=="select") {
+            unset($displayformat);
+        }
+
+        //pack options
+        if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
+        if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
+        if (isset($answerformat)) {$options['answerformat'] = $answerformat;}
+        if (isset($questions)) {$options['questions'] = $questions;}
+        if (isset($answers)) {$options['answers'] = $answers;}
+        if (isset($answer)) {$options['answer'] = $answer;}
+        if (isset($questiontitle)) {$options['questiontitle'] = $questiontitle;}
+        if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
+        if (isset($answersize)) {$options['answersize'] = $answersize;}
+        if (isset($variables)) {$options['variables'] = $variables;}
+        if (isset($domain)) {$options['domain'] = $domain;}
+        if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
+        if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
+        if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
+        if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
+        if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
+        if (isset($grid)) {$options['grid'] = $grid;}
+        if (isset($background)) {$options['background'] = $background;}
+
+        if ($qdata['qtype']=="multipart") {
+            if (!is_array($anstypes)) {
+                $anstypes = explode(",",$anstypes);
+            }
+            $laparts = explode("&",$la);
+            foreach ($anstypes as $kidx=>$anstype) {
+                list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
+            }
+        } else {
+            list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+        }
+
+        $temp .= "<div class=q>";
+        if ($isfinal) {
+            $temp .= "<div class=\"trq$qn\">\n";
+        } else {
+            $temp .= "<div class=m id=\"trq$qn\">\n";
+        }
+        if ($showpts) {
+            $temp .= ($qn+1).'. ('.$pts.' pts) ';
+        }
+        $temp .= "<div>\n";
+        //$retstrout .= $toevalqtext;
+        eval("\$evaledqtext = \"$toevalqtxt\";");
+        $temp .= printfilter(filter($evaledqtext));
+        $temp .= "</div>\n"; //end question div
+
+        if (strpos($toevalqtxt,'$answerbox')===false) {
+            if (is_array($answerbox)) {
+                foreach($answerbox as $iidx=>$abox) {
+                    $temp .= printfilter(filter("<div>$abox</div>\n"));
+                    $temp .= "<div class=spacer>&nbsp;</div>\n";
+                }
+            } else {  //one question only
+                $temp .= printfilter(filter("<div>$answerbox</div>\n"));
+            }
+
+
+        }
+
+
+        $temp .= "</div>";//end m div
+
+        $temp .= "&nbsp;";
+        $temp .= "</div>\n"; //end q div
+        if (!isset($showanswer)) {
+            return array($temp,$shans);
+        } else {
+            return array($temp,$showanswer);
         }
     }
 }

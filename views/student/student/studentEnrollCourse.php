@@ -21,8 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin([
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-7 col-md-offset-2\">{error}</div>",
-            'labelOptions' => ['class' => 'col-md-2 padding-left-fifteen'],
+            'template' => "{label}\n<div class=\"col-md-3 col-sm-5\">{input}</div>\n<div class=\"col-md-7 col-sm-9 col-md-offset-2\">{error}</div>",
+            'labelOptions' => ['class' => 'col-md-2 col-sm-4 padding-left-fifteen'],
         ],
     ]); ?>
     <br>
@@ -30,12 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
    <div class="padding-left-fifteen"><?php echo $form->field($model, 'courseId') ?></div>
    <div class="padding-left-fifteen"><?php echo $form->field($model, 'enrollmentKey') ?></div>
 
-    <div class="form-group" >
-        <div class="col-md-6" style="text-align: center">
-          <div class="col-md-2">  <?php echo Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?></div>
-          <div class="col-md-2"> <a class="btn btn-primary back-button" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a></div>
+
+        <div class="form-group col-md-6" style="text-align: center">
+          <div class="col-md-3 col-sm-3">  <?php echo Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?></div>
+          <div class="col-md-3 col-sm-3"> <a class="btn btn-primary back-button" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a></div>
         </div>
-    </div>
 
     <?php ActiveForm::end(); ?>
 </div>

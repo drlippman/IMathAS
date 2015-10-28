@@ -32,7 +32,7 @@ if ($overwriteBody == AppConstant::NUMERIC_ONE) {
 if (!isset($params['versions'])) {
 
     echo '<div class="print-test-header"><div class="col-md-12 margin-left-fifteen"><a href="print-test?cid=' . $courseId . '&aid=' . $assessmentId . '">Generate for in-browser printing</a></div>';
-    if (isset($CFG['GEN']['pandocserver'])) {
+    if (1) {
         echo ' |<div class="col-md-12"> <a href="print-layout-word?cid=' . $courseId . '&amp;aid=' . $assessmentId . '">Generate for Word</a></div>';
     } ?>
     </div>

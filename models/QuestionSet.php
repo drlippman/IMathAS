@@ -778,4 +778,9 @@ class QuestionSet extends BaseImasQuestionset
     {
         return self::find()->select('description')->where(['id' => $queId])->one();
     }
+
+    public static function getDataById($qsetid)
+    {
+        return self::find()->select('qtype,control,qcontrol,qtext,answer,hasimg')->where(['id' => $qsetid])->one();
+    }
 }

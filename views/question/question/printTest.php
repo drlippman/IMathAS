@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--Get current time-->
 <input type="hidden" class="" value="<?php echo $courseId = $course->id?>">
 <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course', 'course/course?cid='.$course->id] ,'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course','course/course?cid='.$course->id] ,'page_title' => $this->title]); ?>
 </div>
 <!--Course name-->
 <div class="title-container">
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     if (!isset($params['heights'])) {
     echo '<div class="print-test-header"><a class="margin-left-thirty" href="print-layout-bare?cid='.$courseId.'&amp;aid='.$assessmentId.'">Generate for cut-and-paste</a>';
-        if (isset($CFG['GEN']['pandocserver'])) {
+        if (1) {
         echo ' | <a href="print-layout-word?cid='.$courseId.'&amp;aid='.$assessmentId.'">Generate for Word</a>';
         }
         echo '</div>';

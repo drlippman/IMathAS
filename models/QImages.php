@@ -67,4 +67,9 @@ class QImages extends BaseImasQimages {
     {
         return self::find()->select(['var','filename'])->where(['qsetid' => $qSetId])->all();
     }
+
+    public static function getDataById($qSetId)
+    {
+        return self::find()->select(['var','filename', 'alttext'])->where(['qsetid' => $qSetId])->all();
+    }
 }
