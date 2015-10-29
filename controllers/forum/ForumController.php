@@ -58,7 +58,7 @@ class ForumController extends AppController
         $course = Course::getById($cid);
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
-//        $this->layout = "master";
+        $this->layout = "master";
         $teacherid = $this->isTeacher($user['id'],$cid);
         $tutorid = $this->isTutor($user['id'],$cid);
         $studentid = $this->isStudent($user['id'],$cid);
@@ -206,7 +206,7 @@ class ForumController extends AppController
             }
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
-        $this->includeJS(['forum/forum.js', 'general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
+        $this->includeJS(['forum/forum.js','forum/thread.js','general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
         $this->setReferrer();
         $this->includeCSS(['course/course.css']);
         $responseData = array('forums' => $forums,'threaddata' => $threaddata,'searchtag' => $searchtag,'newcnt' => $newcnt,'threadcount' => $threadcount,'postcount' => $postcount,'maxdate' => $maxdate,'forumdata' => $forumdata,'isteacher' => $isteacher,

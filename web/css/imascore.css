@@ -1392,3 +1392,13 @@ color:red;
 .padding-right-seventeen-per {
     padding-right: 17% !important;
 }
+.padding-top-bottom-ten {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+.padding-top-seven {
+    padding-top: 7px;
+}
+.margin-bottom-zero {
+    margin-bottom: 0px !important;
+}

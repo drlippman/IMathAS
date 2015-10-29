@@ -497,3 +497,24 @@ margin: 20px;
 .thread-dropdown > li > a {
     padding: 3px 10px !important;
 }
+table.search-forum {
+    border-collapse: collapse;
+    width: 100%;
+}
+table.search-forum td {
+    padding: 0.2em 0.5em;
+    border:	1px solid #000;
+}
+table.search-forum tr.sticky {
+    background-color: #dfd;
+}
+table.search-forum thead td {
+    border-bottom: 2px solid #00f;
+    text-align: center;
+    padding: 0.1em 0.5em;
+    background-color: #eef;
+}
+
+table.search-forum tr.tagged {
+    background-color: #dff;
+}

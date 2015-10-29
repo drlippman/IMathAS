@@ -933,7 +933,7 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 }
 
 function embedshowicon($qn) {
-	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds,$isreview;
+	global $qi,$questions,$attempts,$testsettings,$scores,$bestscores,$noindivscores,$showeachscore,$imasroot,$CFG,$sessiondata,$seeds,$isreview,$temp;
 	$reattemptsremain = hasreattempts($qn);
 	$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	$qavail = false;
@@ -944,53 +944,54 @@ function embedshowicon($qn) {
 	}
 	if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
 			if (isset($CFG['TE']['navicons'])) {
-				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
+                $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['untried']}\"/> ";
 			} else {
-				echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_fullbox.gif\"/> ";
+                $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/q_fullbox.gif\"/> ";
 			}
 	} else if (canimprove($qn) && !$noindivscores) {
 		if (isset($CFG['TE']['navicons'])) {
 			if ($thisscore==0 || $noindivscores) {
-				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+                $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 			} else {
-				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+                $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 			}
 		} else {
-			echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_halfbox.gif\"/> ";
+            $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/q_halfbox.gif\"/> ";
 		}
 	} else if ($reattemptsremain) {
 		if (isset($CFG['TE']['navicons'])) {
 			if (!$showeachscore) {
-				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+                $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 			} else {
 				if ($thisscore == $qi[$questions[$qn]]['points']) {
-					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
-				} else if ($thisscore==0) { 
-					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+                    $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
+				} else if ($thisscore==0) {
+                    $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 				} else {
-					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
+                    $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
 				}
 			}
 		} else {
-			echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
+            $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
 		}
 	} else {
 		if (isset($CFG['TE']['navicons'])) {
 			if (!$showeachscore) {
-				echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+                $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 			} else {
 				if ($thisscore == $qi[$questions[$qn]]['points']) {
-					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
-				} else if ($thisscore==0) { 
-					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+                    $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['correct']}\"/> ";
+				} else if ($thisscore==0) {
+                    $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 				} else {
-					echo "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
+                    $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/{$CFG['TE']['navicons']['partial']}\"/> ";
 				}
 			}
 		} else {
-			echo "<img class=\"embedicon\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
+            $temp .= "<img class=\"embedicon\" src=\"$imasroot"."img/q_emptybox.gif\"/> ";
 		}
 	}
+
 }
 
 //pull a new question from a question group on regen, if not in review mode
