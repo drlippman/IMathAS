@@ -9,10 +9,10 @@ if (isset($params['id'])) {
 <div class="item-detail-header">
     <?php
     if ($isTeacher) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id], 'page_title' => $this->title]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]);
         if (isset($params['ltfrom'])) {
 
-            echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Modify Linked Text'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'add-linked-text?cid=' . $course->id . '&amp;id=' . $params['ltfrom']], 'page_title' => $this->title]);
+            echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Modify Linked Text'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'add-linked-text?cid=' . $course->id . '&amp;id=' . $params['ltfrom']], 'page_title' => $this->title]);
         }
     } else {
         if (isset($params['id'])) {
@@ -46,46 +46,46 @@ if (isset($params['id'])) {
             <input type="hidden" id="name-external-tool" value="<?php echo $extName;?> ">
          <?php
             echo '<br/>';
-            echo '<div class="col-md-12">Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</div><br/><br/>';
+            echo '<div class="col-md-12 col-sm-12">Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</div><br/><br/>';
             echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'&amp;delete=true">';
-            echo '<div class="col-md-2"><input type=submit value="Yes, I\'m Sure"></div>';
+            echo '<div class="col-md-2  col-sm-2"><input type=submit value="Yes, I\'m Sure"></div>';
             echo '</form>';
         } else if (isset($params['id'])) {
 ?>
-            <br/><div class="col-md-2"><?php AppUtility::t('Tool Name')?></div>
-            <div class="col-md-10">
+            <br/><div class="col-md-2 col-sm-2"><?php AppUtility::t('Tool Name')?></div>
+            <div class="col-md-10 col-sm-10">
                 <input class="form-control-1" required="Please fill out this field" maxlength="30" size="40" type="text" name="tname" value="<?php echo $name;?>" />
             </div>
             <br class="form" /><br/>
 
-        <div class="col-md-2"><?php AppUtility::t('Launch URL') ?></div>
-        <div class="col-md-10">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Launch URL') ?></div>
+        <div class="col-md-10 col-sm-10">
             <input type="url" class="form-control-1" size="40" name="url" pattern="https?://.+"
                    value="<?php echo $url; ?>"/>
         </div>
         <br class="form"/><br/>
 
-        <div class="col-md-2"><?php AppUtility::t('Key') ?></div>
-        <div class="col-md-10">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Key') ?></div>
+        <div class="col-md-10 col-sm-10">
             <input type="text" class="form-control-1" size="40" maxlength="40" name="key" value="<?php echo $key; ?>"/>
         </div>
         <br class="form"/><br/>
 
-        <div class="col-md-2"><?php AppUtility::t('Secret') ?></div>
-        <div class="col-md-10">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Secret') ?></div>
+        <div class="col-md-10 col-sm-10">
             <input type="password" class="form-control-1" size="40" maxlength="40" name="secret"
                    value="<?php echo $secret; ?>"/>
         </div>
         <br class="form"/><br/>
 
-        <div class="col-md-2"><?php AppUtility::t('Custom Parameters') ?></div>
-        <div class="col-md-4">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Custom Parameters') ?></div>
+        <div class="col-md-4 col-sm-4">
             <textarea rows="2" cols="60" class="form-control text-area-alignment" name="custom"><?php echo $custom; ?></textarea>
         </div>
         <br class="form"/><br/>
 
-        <div class="col-md-2"><?php AppUtility::t('Privacy') ?></div>
-        <div class="col-md-8">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Privacy') ?></div>
+        <div class="col-md-8 col-sm-8">
             <input type="checkbox" name="privname"
                    value="1" <?php if (($privacy & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE) echo 'checked="checked"'; ?> /><span
                 class="padding-left-five">Send name</span><br/>
@@ -97,8 +97,8 @@ if (isset($params['id'])) {
         <br class="form"/><br/>
         <?php
         if ($isAdmin) {
-            echo '<div class="col-md-2">Scope of tool</div>
-            <div class="col-md-8">';
+            echo '<div class="col-md-2  col-sm-2">Scope of tool</div>
+            <div class="col-md-8  col-sm-8">';
             echo '<input type="radio" name="scope" value="0" ' . (($grp == AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> System-wide<br/>';
             echo '<input type="radio" name="scope" value="1" ' . (($grp > AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> Group';
             echo '</div>
@@ -113,8 +113,8 @@ if (isset($params['id'])) {
         </form>
 
     <?php } else {
-        echo '<div class="col-md-12 padding-twenty">
-            <div class="col-md-12 padding-top-twenty text-gray-background padding-left-thirty">';
+        echo '<div class="col-md-12  col-sm-12 padding-twenty">
+            <div class="col-md-12 col-sm-12 padding-top-twenty text-gray-background padding-left-thirty">';
         $str = "<p><b>";
         if ($isAdmin) {
             echo '<p><b>System and Group Tools</b></p>';
@@ -124,9 +124,13 @@ if (isset($params['id'])) {
             echo '<p><b>Course Tools</b></p>';
         }
         $str .= '</b></p>';
-        if (count($resultFirst) == AppConstant::NUMERIC_ZERO) {
-            echo '<span class="col-md-12 padding-left-zero">'.AppUtility::t('No tools',false).'</span>';
-        } else { ?>
+            if($resultFirst)
+            {
+                if (count($resultFirst) == AppConstant::NUMERIC_ZERO) {
+                    echo '<span class="col-md-12 col-sm-12 padding-left-zero">'.AppUtility::t('No tools',false).'</span>';
+                }
+            }
+         else { ?>
         <table class="display course-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
@@ -166,7 +170,7 @@ if (isset($params['id'])) {
             </tbody>
             </table>
         <?php
-        echo '<p class="col-md-12 padding-left-zero"><a href="' . AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $courseId . '&amp;id=new') . '">'.AppUtility::t('Add a Tool',false).'</a></p>';
+        echo '<p class="col-md-12 col-sm-12 padding-left-zero"><a href="' . AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $courseId . '&amp;id=new') . '">'.AppUtility::t('Add a Tool',false).'</a></p>';
         echo '</div></div>';
     } ?>
 

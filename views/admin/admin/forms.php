@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use kartik\time\TimePicker;
 use app\components\AppConstant;
 
-$this->title = AppUtility::t('Form', false);
+$this->title = $pageTitle;
 $imasroot = AppUtility::getHomeURL();
 if (isset($params['cid'])) {
     ?>
@@ -142,7 +142,7 @@ switch ($action) {
         echo "<div class='col-md-12 col-sm-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
                     <div class='col-md-12 col-sm-12 margin-top-fifteen'>
                         <div class='col-md-3 col-sm-3'>Course ID</div>
-                        <div class='col-md-4 col-sm-4'>$courseid</div>
+                        <div class='col-md-4 col-sm-6'>$courseid</div>
                     </div>";
         echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                 <div class='col-md-3 col-sm-3 padding-top-five'>" . AppUtility::t('Enter Course name', false) . "</div>
@@ -158,7 +158,7 @@ switch ($action) {
               </div>";
         echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
                     <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Available?', false) . '</div>
-                    <div class="col-md-4 col-sm-4 padding-left-zero">';
+                    <div class="col-md-4 col-sm-6 padding-left-zero">';
         echo '<div class="col-md-12 col-sm-12">';
         echo '<input type="checkbox" name="stuavail" value="1" ';
         if (($avail & 1) == AppConstant::NUMERIC_ZERO) {
@@ -233,7 +233,7 @@ switch ($action) {
             echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                     <div class='col-md-3 col-sm-3'>" . AppUtility::t('Allow other instructors to copy course items', false) . "
                     </div>
-                    <div class='col-md-6 col-sm-6 padding-left-zero'>
+                    <div class='col-md-6 col-sm-8 padding-left-zero'>
                         <div class='col-md-12 col-sm-12'>";
             echo '<input type=radio name="copyrights" value="0" ';
             if ($copyrights == AppConstant::NUMERIC_ZERO) {
@@ -264,7 +264,7 @@ switch ($action) {
 
                 <div class='col-md-3 col-sm-3'>" . AppUtility::t('Message System', false) . "</div>
 
-                <div class='col-md-5 padding-left-zero'>";
+                <div class='col-md-5 col-sm-7 padding-left-zero'>";
             echo '<div class="col-md-12 col-sm-12">
                     <input type=radio name="msgset" value="0" ';
             if ($msgset == AppConstant::NUMERIC_ZERO) {
@@ -313,9 +313,9 @@ switch ($action) {
         if (!isset($CFG['CPS']['toolset']) || $CFG['CPS']['toolset'][1] == AppConstant::NUMERIC_ONE) {
             echo "
             <div class='col-md-12 col-sm-12 margin-top-fifteen'>
-                <div class=col-md-3>" . AppUtility::t('Navigation Links for Students', false) . "</div>
+                <div class='col-md-3 col-sm-3'>" . AppUtility::t('Navigation Links for Students', false) . "</div>
 
-                <div class='col-md-4 padding-left-zero'>";
+                <div class='col-md-4 col-sm-4 padding-left-zero'>";
             echo '<div class="col-md-12 col-sm-12">
                 <input type="checkbox" name="toolset-cal" value="1" ';
             if (($toolset & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ZERO) {
@@ -337,7 +337,8 @@ switch ($action) {
 
         if (!isset($CFG['CPS']['chatset']) || $CFG['CPS']['chatset'][1] == AppConstant::NUMERIC_ONE) {
             if (isset($mathchaturl) && $mathchaturl != '') {
-                echo '<div class=col-md-3>Enable live chat</div><div class=col-md-10>';
+                echo '<div class="col-md-3 col-sm-3">Enable live chat</div>
+                <div class="col-md-10 col-sm-10">';
                 echo '<input type=checkbox name="chatset" value="1" ';
                 if ($chatset == AppConstant::NUMERIC_ONE) {
                     echo 'checked="checked"';
@@ -348,8 +349,8 @@ switch ($action) {
         if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1] == AppConstant::NUMERIC_ONE) {
             echo '
             <div class="col-md-12 col-sm-12 margin-top-fifteen">
-                <div class="col-md-3 padding-top-five">' . AppUtility::t('Auto-assign LatePasses on course enroll', false) . '</div>
-                <div class="col-md-5 display-flex">';
+                <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Auto-assign LatePasses on course enroll', false) . '</div>
+                <div class="col-md-5 col-sm-3 display-flex">';
             echo '<input class="width-seventy-eight-per form-control" type="text" size="3" name="deflatepass" value="' . $deflatepass . '"/>
                     <span class="margin-left-ten select-text-margin">' . AppUtility::t('LatePasses', false) . '<span>
                 </div>
@@ -358,7 +359,7 @@ switch ($action) {
         if (isset($enablebasiclti) && $enablebasiclti == true && isset($params['cid'])) {
             echo '
             <div class="col-md-12 col-sm-12 margin-top-fifteen">
-            <div class="col-md-3">' . AppUtility::t('LTI access secret (max 10 chars; blank to not use)', false) . '</div>';
+            <div class="col-md-3 col-sm-3">' . AppUtility::t('LTI access secret (max 10 chars; blank to not use)', false) . '</div>';
             echo '
 
             <div class="col-md-6 col-sm-6">
@@ -378,8 +379,8 @@ switch ($action) {
         }
         if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
             echo '<div class="col-md-12 col-sm-12 margin-top-twenty">
-            <div class=col-md-3>' . AppUtility::t('Mark course as template?', false) . '</div>';
-            echo '<div class=col-md-9><input type=checkbox name="isgrptemplate" value="2" ';
+            <div class="col-md-3 col-sm-3">' . AppUtility::t('Mark course as template?', false) . '</div>';
+            echo '<div class="col-md-9 col-sm-9"><input type=checkbox name="isgrptemplate" value="2" ';
             if (($istemplate & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO) {
                 echo 'checked="checked"';
             };
@@ -421,7 +422,7 @@ switch ($action) {
         <input type="hidden" name="avail" value="0">
         <input type="hidden" name="blockcnt" value="0">
 
-    <div class="col-sm-2 col-sm-offset-3 padding-top-twenty padding-left-twenty-three">
+    <div class="col-md-2 col-sm-2 col-sm-offset-3 padding-top-twenty padding-left-twenty-three">
         <button type='submit' value='Submit'>
             <i class='fa fa-share'></i>
             <?php AppUtility::t('Submit') ?>

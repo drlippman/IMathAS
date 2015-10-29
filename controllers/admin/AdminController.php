@@ -705,6 +705,7 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
+            $pageTitle = 'Course Settings';
             if ($params['action']=='modify')
             {
                 $line = Course::getById($params['cid']);
@@ -858,7 +859,8 @@ class AdminController extends AppController
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
             'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
-            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser, 'getAction' => $getAction, 'getId' => $getId, 'line' => $line, 'resultGroup' => $resultGroup);
+            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser, 'getAction' => $getAction, 'getId' => $getId, 'line' => $line, 'resultGroup' => $resultGroup,
+        'pageTitle' => $pageTitle);
         return $this->renderWithData('forms',$responseData);
     }
 
