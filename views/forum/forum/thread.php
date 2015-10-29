@@ -16,7 +16,7 @@ $now = $currentTime;
 <?php }?>
 <div class="item-detail-header">
     <?php if($users['rights'] == 100 || $users['rights'] == 20) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
     } elseif($users['rights'] == 10){
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
     }?>
@@ -298,200 +298,19 @@ echo '</div>';
                         } ?>
                          </td>
                         <td class="width-fifteen-per">
-                        <td class="width-fifteen-per">
-                            <div>
-                                <?php                   echo "<span class=\" text-align-center\">\n";
-                                if ($line['tag']!='') { //category tags
-                                    echo '<span class="forumcattag text-align-center">'.$line['tag'].'</span> ';
-                                }else{
-                                    echo '<span class="forumcattag text-align-center">     </span> ';
-                                }
-                                echo "</span>\n"; ?>
-                            </div>
-
-                            <div class="btn-group">
-                                <?php
-                                if ($line['posttype']==0) {
-
-                                    if (isset($flags[$line['id']])) { ?>
-
-                                        <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
-                                    <?php
-
-                                    } else { ?>
-
-                                        <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
-                        <?php
-
-                      }
-                                }else{
-                                    echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
-                                } ?>
-                                <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
-                                    <span class="fa fa-caret-down "></span>
-                                </a>
-                                <ul class="dropdown-menu thread-dropdown">
-
-                                    <?php if ($isteacher) { ?>
-                                        <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
-
-                                    <?php }
-                                    if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
-                                        <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
-                                    <?php }
-                                    if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
-                                        <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
-                                    <?php }
-                                    ?>
-                                </ul>
-                            </div>
-                        </td> <td class="width-fifteen-per">
                         <div>
-                            <?php                   echo "<span class=\" text-align-center\">\n";
-                            if ($line['tag']!='') { //category tags
-                                echo '<span class="forumcattag text-align-center">'.$line['tag'].'</span> ';
-                            }else{
-                                echo '<span class="forumcattag text-align-center">     </span> ';
-                            }
-                            echo "</span>\n"; ?>
-                        </div>
-
-                        <div class="btn-group">
-                            <?php
-                            if ($line['posttype']==0) {
-
-                                if (isset($flags[$line['id']])) { ?>
-
-                                    <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
-                                <?php
-
-                                } else { ?>
-
-                                    <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
-                        <?php
-
-                      }
-                            }else{
-                                echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
-                            } ?>
-                            <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
-                                <span class="fa fa-caret-down "></span>
-                            </a>
-                            <ul class="dropdown-menu thread-dropdown">
-
-                                <?php if ($isteacher) { ?>
-                                    <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
-
-                                <?php }
-                                if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
-                                    <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
-                                <?php }
-                                if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
-                                    <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
-                                <?php }
-                                ?>
-                            </ul>
-                        </div>
-                    </td> <td class="width-fifteen-per">
-                        <div>
-                            <?php                   echo "<span class=\" text-align-center\">\n";
-                            if ($line['tag']!='') { //category tags
-                                echo '<span class="forumcattag text-align-center">'.$line['tag'].'</span> ';
-                            }else{
-                                echo '<span class="forumcattag text-align-center">     </span> ';
-                            }
-                            echo "</span>\n"; ?>
-                        </div>
-
-                        <div class="btn-group">
-                            <?php
-                            if ($line['posttype']==0) {
-
-                                if (isset($flags[$line['id']])) { ?>
-
-                                    <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
-                                <?php
-
-                                } else { ?>
-
-                                    <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
-                        <?php
-
-                      }
-                            }else{
-                                echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
-                            } ?>
-                            <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
-                                <span class="fa fa-caret-down "></span>
-                            </a>
-                            <ul class="dropdown-menu thread-dropdown">
-
-                                <?php if ($isteacher) { ?>
-                                    <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
-
-                                <?php }
-                                if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
-                                    <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
-                                <?php }
-                                if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
-                                    <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
-                                <?php }
-                                ?>
-                            </ul>
-                        </div>
-                    </td> <td class="width-fifteen-per">
-                        <div>
-                            <?php                   echo "<span class=\" text-align-center\">\n";
-                            if ($line['tag']!='') { //category tags
-                                echo '<span class="forumcattag text-align-center">'.$line['tag'].'</span> ';
-                            }else{
-                                echo '<span class="forumcattag text-align-center">     </span> ';
-                            }
-                            echo "</span>\n"; ?>
-                        </div>
-
-                        <div class="btn-group">
-                            <?php
-                            if ($line['posttype']==0) {
-
-                                if (isset($flags[$line['id']])) { ?>
-
-                                    <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
-                                <?php
-
-                                } else { ?>
-
-                                    <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
-                        <?php
-
-                      }
-                            }else{
-                                echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
-                            } ?>
-                            <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
-                                <span class="fa fa-caret-down "></span>
-                            </a>
-                            <ul class="dropdown-menu thread-dropdown">
-
-                                <?php if ($isteacher) { ?>
-                                    <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
-
-                                <?php }
-                                if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
-                                    <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
-                                <?php }
-                                if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
-                                    <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
-                                <?php }
-                                ?>
-                            </ul>
-                        </div>
-                    </td>
+                    <?php                   echo "<span class=\" text-align-center\">\n";
+                if ($line['tag']!='') { //category tags
+                    echo '<span class="forumcattag text-align-center">'.$line['tag'].'</span> ';
+                }else{
+                    echo '<span class="forumcattag text-align-center">     </span> ';
+                }
+                 echo "</span>\n"; ?>
+</div>
 
                   <div class="btn-group">
 <?php
-                      if ($line['posttype']==0)
-                      {
+                      if ($line['posttype']==0) {
 
                       if (isset($flags[$line['id']])) { ?>
 
@@ -507,6 +326,8 @@ echo '</div>';
                       }else{
                           echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
                       } ?>
+
+
                   <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
                     <span class="fa fa-caret-down "></span>
                   </a>

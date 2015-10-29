@@ -550,6 +550,7 @@ class ForumController extends AppController
             $searchlikes = "(imas_forum_posts.message LIKE '%" . implode("%' AND imas_forum_posts.message LIKE '%", $searchterms) . "%')";
             $searchlikes2 = "(imas_forum_posts.subject LIKE '%" . implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms) . "%')";
             $searchlikes3 = "(imas_users.LastName LIKE '%" . implode("%' AND imas_users.LastName LIKE '%", $searchterms) . "%')";
+
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
             if(!$searchedPost)
             {

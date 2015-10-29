@@ -32,7 +32,7 @@ switch ($action) {
         echo '<div class=col-md-10><li>' . AppUtility::t('The course ID:', false) . '<b>' . $cid . '</b></li></div>';
         if (trim($params['ekey']) == '') {
             echo '<div class="col-md-10"><li>' . AppUtility::t('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key,', false);
-            echo '<a href="forms.php?action=modify&id=' . $cid . '">' . AppUtility::t('modify your course settings', false) . '</a></li>';
+            echo '<a href="forms?action=modify&id=' . $cid . '">' . AppUtility::t('modify your course settings', false) . '</a></li>';
         } else {
             echo '<div class=col-md-10><li>' . AppUtility::t('The enrollment key:', false) . '<b>' . $params['ekey'] . '</b></li></div>';
         }
@@ -141,25 +141,24 @@ switch ($action) {
         echo "\">";
         echo "<div class='col-md-12 col-sm-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
                     <div class='col-md-12 col-sm-12 margin-top-fifteen'>
-                        <div class=col-md-3>Course ID</div>
-                        <div class=col-md-4>$courseid</div>
+                        <div class='col-md-3 col-sm-3'>Course ID</div>
+                        <div class='col-md-4 col-sm-4'>$courseid</div>
                     </div>";
         echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
-                <div class='col-md-3 padding-top-five'>" . AppUtility::t('Enter Course name', false) . "</div>
-                <div class=col-md-4>
-
+                <div class='col-md-3 col-sm-3 padding-top-five'>" . AppUtility::t('Enter Course name', false) . "</div>
+                <div class='col-md-4 col-sm-4'>
                     <input class='form-control' required='please fill out this field' type=text size=80 name=\"coursename\" value=\"$name\">
                 </div>
               </div>";
         echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
-                    <div class='col-md-3 padding-top-five'>" . AppUtility::t('Enter Enrollment key', false) . "</div>
-                    <div class=col-md-4>
+                    <div class='col-md-3 col-sm-3 padding-top-five'>" . AppUtility::t('Enter Enrollment key', false) . "</div>
+                    <div class='col-md-4 col-sm-4'>
                         <input class='form-control' type=text size=30 name=\"ekey\" value=\"$ekey\">
                     </div>
               </div>";
         echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
-                    <div class="col-md-3 padding-top-five">' . AppUtility::t('Available?', false) . '</div>
-                    <div class="col-md-4 padding-left-zero">';
+                    <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Available?', false) . '</div>
+                    <div class="col-md-4 col-sm-4 padding-left-zero">';
         echo '<div class="col-md-12 col-sm-12">';
         echo '<input type="checkbox" name="stuavail" value="1" ';
         if (($avail & 1) == AppConstant::NUMERIC_ZERO) {
@@ -167,7 +166,6 @@ switch ($action) {
         }
         echo '/><span class="padding-left-ten">' . AppUtility::t('Available to students', false) . '</span>
                             </div>
-
                         <div class="col-md-12 col-sm-12 margin-top-five">
                             <input type="checkbox" name="teachavail" value="2" ';
         if (($avail & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_ZERO) {
@@ -180,7 +178,7 @@ switch ($action) {
         if ($params['action'] == "modify") {
             echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
                         <div class="col-md-3 padding-top-five">' . AppUtility::t('Lock for assessment', false) . '</div>
-                        <div class="col-md-4">
+                        <div class="col-md-4 col-sm-4">
                             <select class="form-control" name="lockaid">';
             echo '<option value="0" ';
             if ($lockaid == AppConstant::NUMERIC_ZERO) {
@@ -203,12 +201,12 @@ switch ($action) {
         if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1] == AppConstant::NUMERIC_ONE) {
             echo "
             <div class='col-md-12 col-sm-12 margin-top-twenty'>
-                    <div class='col-md-3 select-text-margin'>" . AppUtility::t('Default start/end time for new items', false) . "
+                    <div class='col-md-3 col-sm-3 select-text-margin'>" . AppUtility::t('Default start/end time for new items', false) . "
                     </div>
-                    <div class=col-md-9>";
+                    <div class='col-md-9 col-sm-9'>";
             echo '<span class="floatleft non-bold select-text-margin">' . AppUtility::t('Start', false) . '</span>';
 
-            echo '<div class ="col-md-4 time-input default-start-timepicker margin-left-five margin-right-minus-twenty">';
+            echo '<div class ="col-md-4 col-sm-4 time-input default-start-timepicker margin-left-five margin-right-minus-twenty">';
             echo TimePicker::widget([
                 'name' => 'defstime',
                 'value' => $defstimedisp,
@@ -218,7 +216,7 @@ switch ($action) {
             ]);
             echo '</div>';
             echo '<label class="floatleft non-bold select-text-margin padding-right-five">End</label>';
-            echo '<div class="col-md-4 default-end-timepicker">';
+            echo '<div class="col-md-4 col-sm-4 default-end-timepicker">';
             echo TimePicker::widget([
                 'name' => 'deftime',
                 'value' => $deftimedisp,
@@ -233,7 +231,7 @@ switch ($action) {
         }
         if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1] == AppConstant::NUMERIC_ONE) {
             echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
-                    <div class=col-md-3>" . AppUtility::t('Allow other instructors to copy course items', false) . "
+                    <div class='col-md-3 col-sm-3'>" . AppUtility::t('Allow other instructors to copy course items', false) . "
                     </div>
                     <div class='col-md-6 col-sm-6 padding-left-zero'>
                         <div class='col-md-12 col-sm-12'>";
@@ -264,7 +262,7 @@ switch ($action) {
             echo "
             <div class='col-md-12 col-sm-12 margin-top-fifteen'>
 
-                <div class=col-md-3>" . AppUtility::t('Message System', false) . "</div>
+                <div class='col-md-3 col-sm-3'>" . AppUtility::t('Message System', false) . "</div>
 
                 <div class='col-md-5 padding-left-zero'>";
             echo '<div class="col-md-12 col-sm-12">

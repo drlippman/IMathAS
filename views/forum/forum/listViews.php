@@ -2,9 +2,13 @@
 use app\components\AppUtility;
 
 require("../components/filehandler.php");
-$pagetitle = "Forums";
-//$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 
+//$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
+if ($searchtype=='none') {
+    $pagetitle = "Forums";
+} else {
+    $pagetitle = "Forum Search Results";
+}
 
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 if ($searchtype != 'none')
@@ -55,11 +59,7 @@ if (count($taginfo)==0) {
     }
     $tagfilterselect .= '</select>';
 }
-//if ($searchtype=='none') {
-//    echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
-//} else {
-//    echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
-//}
+
 ?>
 <div class="item-detail-header">
     <?php if($users->rights == 100 || $users->rights == 20) {
