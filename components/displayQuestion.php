@@ -2182,7 +2182,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
             		}
 			else {
 				$out .= "<img src=\"$imasroot"."img/tpineq.gif\" onclick=\"settool(this,$qn,10)\" class=\"sel\"/>";
-            			$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
+            			$out .= "<img src=\"$imasroot"."img/tpineqdash.gif\" onclick=\"settool(this,$qn,10.2)\"/>";
                 		$def = 10;
           		}
         	} else if ($answerformat[0]=='twopoint') {

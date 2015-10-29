@@ -1,6 +1,6 @@
 <?php
-namespace app\components;
 
+namespace app\components;
 
 use app\models\Exceptions;
 use app\models\Questions;
@@ -657,7 +657,7 @@ class  interpretUtility extends Component
         return $syms;
     }
 
-//loads a macro library	
+//loads a macro library
    public static function loadlibrary($str)
     {
         $str = str_replace(array("/", ".", '"'), "", $str);
@@ -763,7 +763,6 @@ class  interpretUtility extends Component
                     $url = trim(str_replace(array('"', '&nbsp;'), '', $url));
                     if (substr($url, 0, 18) == 'https://tegr.it/y/') {
                         $url = preg_replace('/[^\w:\/\.]/', '', $url);
-                        //$tag = '<script type="text/javascript" src="'.$url.'"></script>';
                         $url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=" . urlencode($url);
                         $tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 
@@ -784,21 +783,6 @@ class  interpretUtility extends Component
 
             if (preg_match_all($search, $str, $res, PREG_SET_ORDER)) {
                 foreach ($res as $resval) {
-                    /*if (!isset($GLOBALS['has_set_cdf_embed_script'])) {
-                        $GLOBALS['has_set_cdf_embed_script'] = true;
-                        $tag = '<script type="text/javascript" src="'.$urlmode.'www.wolfram.com/cdf-player/plugin/v2.1/cdfplugin.js"></script><script type="text/javascript">var cdf = new cdfplugin();';
-                    } else {
-                        $tag = '<script type="text/javascript">';
-                    }
-                    if (strpos($resval[3],'http')!==false) {
-                        list ($junk,$w,$h,$url) = $resval;
-                    } else {
-                        list ($junk,$url,$w,$h) = $resval;
-                    }
-
-                    $tag .= "cdf.embed('$url',$w,$h);</script>";
-                    $str = str_replace($resval[0], $tag, $str);
-                    */
                     if (strpos($resval[3], 'http') !== false) {
                         list ($junk, $w, $h, $url) = $resval;
                     } else {

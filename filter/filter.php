@@ -16,7 +16,6 @@ use app\components\AppUtility;
 		$AS = new AStoIMG;
 	}
 global $AS, $AMT, $imasroot;
-$imasroot = AppUtility::getHomeURL();
 //include($filterdir."/graph/asciisvgimg.php");
 //$AS = new AStoIMG;
 //include($filterdir."/math/ASCIIMath2TeX.php");
@@ -63,7 +62,7 @@ $imasroot = AppUtility::getHomeURL();
 			$AS->processShortScript($arr[2]);
 			$AS->outputimage($filterdir.'/graph/imgs/'.$fn.'.png');
 		}
-		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
+		return ('<img src="'.AppUtility::getBasePath().'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
 	}
 	function svgfilterscriptcallback($arr) {
 		global $filterdir, $AS, $imasroot;
@@ -94,7 +93,7 @@ $imasroot = AppUtility::getHomeURL();
             }
 
 		}
-		return ('<img src="'.$imasroot.'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
+		return ('<img src="'.AppUtility::getBasePath().'/filter/graph/imgs/'.$fn.'.png" style="'.$sty.'" alt="Graphs"/>');
 	}
 
 	function filter($str) {
@@ -166,7 +165,7 @@ $imasroot = AppUtility::getHomeURL();
 					$url = trim(str_replace(array('"','&nbsp;'),'',$url));
 					if (substr($url,0,18)=='https://tegr.it/y/') {
 						$url = preg_replace('/[^\w:\/\.]/','',$url);
-						$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".urlencode($url);
+						$url = "$imasroot/assessment/assessment/embed-helper?w=$w&amp;h=$h&amp;type=tegrity&amp;url=".urlencode($url);
 						$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 
 					} else {
@@ -192,7 +191,7 @@ $imasroot = AppUtility::getHomeURL();
 					} else {
 						list ($junk,$url,$w,$h) = $resval;
 					}
-					$url = "$imasroot/course/embedhelper.php?w=$w&amp;h=$h&amp;type=cdf&amp;url=".urlencode($url);
+					$url = "$imasroot/assessment/assessment/embed-helper?w=$w&amp;h=$h&amp;type=cdf&amp;url=".urlencode($url);
 					$tag = "<iframe width=\"$w\" height=\"$h\" src=\"$url\" frameborder=\"0\"></iframe>";
 					$str = str_replace($resval[0], $tag, $str);
 				}
@@ -241,7 +240,7 @@ $imasroot = AppUtility::getHomeURL();
 	}
 	function printfilter($str) {
 		global $imasroot;
-		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.$imasroot.'/filter/graph/imgs/$1"/></div>',$str);
+		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.AppUtility::getBasePath().'/filter/graph/imgs/$1"/></div>',$str);
 		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
 		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
 		if (isset($_POST['hidetxtboxes'])) {

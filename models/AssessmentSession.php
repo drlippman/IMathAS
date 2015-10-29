@@ -179,7 +179,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
             $query->where(['NOT IN',$tosearchby,$val]);
         } else
         {
-            $query->where($tosearchby <> ':val',[':val' => $val]);
+            $query->where(['<>',$tosearchby, $val ]);
         }
         if ($aid != null)
         {

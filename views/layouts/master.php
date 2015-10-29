@@ -64,6 +64,7 @@ AppAsset::register($this);
     </div>
 </div>
 <input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL();?>">
+<input type="hidden" class="base-path" value="<?php echo AppUtility::getBasePath();?>">
 <?php $this->endBody() ?>
 <div class="clear-both"></div>
 </body>

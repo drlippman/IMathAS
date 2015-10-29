@@ -2,7 +2,22 @@
 use app\components\AppUtility;
 $this->title = $testsettings['name'];
 ?>
+<script type="text/javascript">var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi";</script>
+<?php AppUtility::includeJS('ASCIIMathTeXImg_min.js') ?>
+<script type="text/x-mathjax-config">
+    if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
+    MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}});
+    } else {
+    MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}});
+    }
+    </script>
+<script type="javascript" src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
+<script type="javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>
 
+<?php //AppUtility::includeJS('confirmsubmit.js') ?>
+<?php //AppUtility::includeJS('AMhelpers.js') ?>
+<?php //AppUtility::includeJS('drawing.js') ?>
+<style type="text/css">span.MathJax { font-size: 105%;}</style>
 <?php
 if ($pwfail) {
     if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {

@@ -2249,7 +2249,6 @@ function cleanbytoken($str,$funcs = array()) {
 		$substr = $parts[$k];
 		if (trim($substr)=='') {$parts[$k] = ''; continue;}
 		$tokens = cleantokenize(trim($substr),$funcs);
-		//print_r($tokens);
 		$out = array();
 		$lasti = count($tokens)-1;
 		for ($i=0; $i<=$lasti; $i++) {

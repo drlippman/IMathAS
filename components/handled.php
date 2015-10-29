@@ -1,5 +1,7 @@
 <?php
 use app\components\AppConstant;
+use app\components\AppUtility;
+$imasroot  = AppUtility::getHomeURL();
 ?>
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -10,7 +12,7 @@ use app\components\AppConstant;
     //load filter
     $curdir = rtrim(dirname(__FILE__), '/\\');
     $loadgraphfilter = true;
-    require("$curdir/../filter/filter.php");
+//    require("$curdir/../filter/filter.php");
     ?>
     <script type="text/javascript">
         function init() {
@@ -102,7 +104,7 @@ use app\components\AppConstant;
     </style>
     <![endif]-->
     <script type="text/javascript" src="<?php echo $imasroot;?>js/excanvas.js?ver=<?php echo AppConstant::VERSION_NUMBER ?>"></script>
-    <script type="text/javascript" src="<?php echo $imasroot;?>js/drawing_min.js?ver=<?php echo AppConstant::VERSION_NUMBER ?>"></script>
+<!--    <script type="text/javascript" src="--><?php //echo $imasroot;?><!--js/drawing_min.js?ver=--><?php //echo AppConstant::VERSION_NUMBER ?><!--"></script>-->
     <?php
     echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
     if (isset($useeditor) && $sessiondata['useed']==1) {
