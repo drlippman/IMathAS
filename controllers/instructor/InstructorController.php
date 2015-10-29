@@ -1425,7 +1425,7 @@ class InstructorController extends AppController
                     }
                 }
                 $sub[$existingid]['name'] = stripslashes($val);
-                $itemOrder = addslashes(serialize($itemsforblock));
+                $itemOrder =  serialize($itemsforblock);
                 $query = new Course();
                 $query->setItemOrder($itemOrder, $courseId);
             }
@@ -1436,7 +1436,7 @@ class InstructorController extends AppController
         $newItems = array();
 
         $newItems = $this->additems($order);
-        $itemList = addslashes(serialize($newItems));
+        $itemList =  serialize($newItems);
         $query = new Course();
         $query->setItemOrder($itemList, $courseId);
 

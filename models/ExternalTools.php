@@ -32,7 +32,7 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function getId($courseId, $url)
     {
-        return self::find()->select('id')->from('imas_external_tools')->where(['url' => addslashes($url)])->andWhere(['courseid' => $courseId])->all();
+        return self::find()->select('id')->from('imas_external_tools')->where(['url' => $url])->andWhere(['courseid' => $courseId])->all();
     }
 
     public function insertData($courseId, $groupid, $rowsub)

@@ -671,11 +671,11 @@ class UtilitiesController extends AppController
                 foreach ($n as $qsId=>$nval)
                 {
                     if ($dosLowMethod) {
-                        $avg = addslashes($avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                        $avg =  $avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId];
                     }
                     else
                     {
-                        $avg = addslashes('0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                        $avg =  '0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId];
                     }
                     QuestionSet::updateAvgTime($avg,$qsId);
                 }
@@ -705,11 +705,11 @@ class UtilitiesController extends AppController
                     }
                     if ($dosLowMethod)
                     {
-                        $avg = addslashes($avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                        $avg =  $avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId];
                     }
                     else
                     {
-                        $avg = addslashes('0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                        $avg =  '0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId];
                     }
                     QuestionSet::updateAvgTime($avg,$qsId);
                 }
@@ -906,7 +906,7 @@ class UtilitiesController extends AppController
                         }
                     }
                 }
-                $message = $params['message'] . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br/> $sentTo </p>\n");
+                $message = $params['message'] .  ("<p>Instructor note: Message sent to these students from course $course->name: <br/> $sentTo </p>");
                 if ($params['self']!="allt")
                 {
                     $query = Teacher::getDataForUtilities($courseId,$user);

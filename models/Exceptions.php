@@ -80,8 +80,11 @@ class Exceptions extends BaseImasExceptions
     public static function deleteByUserId($userId)
     {
         $exceptions = Exceptions::find()->where(['userid' => $userId])->all();
-        foreach ($exceptions as $exception) {
-            $exception->delete();
+        if($exceptions)
+        {
+            foreach ($exceptions as $exception) {
+                $exception->delete();
+            }
         }
     }
 

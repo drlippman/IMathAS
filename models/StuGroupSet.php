@@ -64,7 +64,7 @@ class StuGroupSet extends BaseImasStugroupset
     public function  copyGroupSet($copyGrpSet, $courseId)
     {
         $query = StuGroupSet::find('name')->where(['id' => $copyGrpSet])->one();
-        $copiedName = addslashes($query['name']) . ' (copy)';
+        $copiedName = $query['name']. ' (copy)';
         $this->InsertGroupData($copiedName, $courseId);
         return $this->id;
     }

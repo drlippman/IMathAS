@@ -1430,7 +1430,6 @@ class QuestionController extends AppController
                     } else {
                         if (($filename = filehandler::storeuploadedqimage('imgfile', $filename)) !== false) {
                             $params['newimgvar'] = str_replace('$', '', $params['newimgvar']);
-                            $filename = addslashes($filename);
                             $questImageData = array();
                             $questImageData['var'] = $params['newimgvar'];
                             $questImageData['filename'] = $filename;
@@ -2087,7 +2086,7 @@ class QuestionController extends AppController
             /*
              *any old items will not get copied.
              */
-            $vidData = addslashes(serialize($newVidData));
+            $vidData =  serialize($newVidData);
         }
         /*
          * delete any removed questions
@@ -2672,7 +2671,7 @@ class QuestionController extends AppController
                                 $query = QuestionSet::getByIdUsingInClause($qToChg);
                             }
                             foreach ($query as $row) {
-                                $attr = addslashes($row['otherattribution']) . $params['addattr'];
+                                $attr =  $row['otherattribution'] . $params['addattr'];
                                 QuestionSet::setOtherAttributionById($attr, $row['id']);
                             }
                         }
@@ -3347,8 +3346,6 @@ class QuestionController extends AppController
                 }
             }
             $qText = $qTexPre . $qText;
-            $code = addslashes($code);
-            $qText = addslashes($qText);
             if ($id == 'new')
             {
                 $mt = microtime();
@@ -3738,7 +3735,7 @@ class QuestionController extends AppController
             $ischanged = true;
             if ($_GET['flag']==1) {
                 $now = time();
-                $msg = addslashes('Question '.$_GET['qsetid'].' marked broken by '.$userfullname);
+                $msg =  'Question '.$_GET['qsetid'].' marked broken by '.$userfullname;
                 $log = new Log();
                 $log->createLog($now, $msg);
                 if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {

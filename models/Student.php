@@ -66,8 +66,8 @@ class Student extends BaseImasStudents
     public static function updateSectionAndCodeValue($section, $userid, $code, $cid, $params = null)
     {
         $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
-        $student->section = $section;
-        $student->code = $code;
+        $student->section = count($section) != 0? trim($section): 'NULL';
+        $student->code = count($code) != 0?trim($code):'NULL';
         if($params != null)
         {
            if($params['locked'] == AppConstant::NUMERIC_ONE) {
@@ -469,8 +469,12 @@ class Student extends BaseImasStudents
     public static function deleteByUserId($userId)
     {
         $students = Student::find()->where(['userid' => $userId])->all();
-        foreach ($students as $student) {
-            $student->delete();
+        if($students)
+        {
+            foreach ($students as $student) {
+                $student->delete();
+            }
+
         }
     }
 
@@ -561,6 +565,39 @@ class Student extends BaseImasStudents
     public static function getStudentData($userId, $courseId)
     {
         return self::find()->select(['id','locked','timelimitmult', 'section'])->where(['userid' => $userId, 'courseid' => $courseId])->one();
+    }
+
+    public static function getDistinctSection($courseId)
+    {
+        $query = new Query();
+        $query->select('DISTINCT(section)')->from('imas_students')->where('imas_students.courseid = :cid')->andWhere(['IS NOT','imas_students.section',NULL])
+            ->orderBy('section');
+        return $query->createCommand()->bindValue(':cid',$courseId)->queryAll();
+    }
+
+    public static function getDistinctCode($courseId)
+    {
+        $query = new Query();
+        $query->select('DISTINCT(id)')->from('imas_students')->where('imas_students.courseid = :cid')->andWhere(['IS NOT','imas_students.code',NULL]);
+        return $query->createCommand()->bindValue(':cid',$courseId)->queryAll();
+    }
+
+    public static function defaultUserList($courseId,$sectionsort,$secfilter)
+    {
+        $query = new Query();
+        $query->select('imas_students.id,imas_students.userid,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.SID,imas_students.lastaccess,imas_students.section,imas_students.code,imas_students.locked,imas_users.hasuserimg,imas_students.timelimitmult')
+            ->from('imas_students,imas_users')->where('imas_students.userid = imas_users.id')->andWhere('imas_students.courseid = :courseId');
+        if ($secfilter > -1)
+        {
+            $query->andWhere('imas_students.section = :section',[':section' => $secfilter]);
+        }
+        if ($sectionsort)
+        {
+            $query->orderBy('imas_students.section,imas_users.LastName,imas_users.FirstName');
+        } else {
+            $query->orderBy('imas_users.LastName,imas_users.FirstName');
+        }
+        return $query->createCommand()->bindValue(':courseId',$courseId)->queryAll();
     }
 }
 

@@ -490,7 +490,8 @@ echo '</div>';
 
                   <div class="btn-group">
 <?php
-                      if ($line['posttype']==0) {
+                      if ($line['posttype']==0)
+                      {
 
                       if (isset($flags[$line['id']])) { ?>
 

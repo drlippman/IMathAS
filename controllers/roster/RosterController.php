@@ -14,6 +14,7 @@ use app\models\forms\ManageTutorsForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\ForumPosts;
 use app\models\Forums;
+use app\models\GbScheme;
 use app\models\InlineText;
 use app\models\Links;
 use app\models\LoginLog;
@@ -69,9 +70,53 @@ class RosterController extends AppController
         }else{
             $isImageColumnPresent = AppConstant::NUMERIC_ONE;
         }
+        $params = $this->getRequestParams();
+        $secfilter = $params['secfilter'];
+        $distinctSection = Student::getDistinctSection($courseId);
+        if (count($distinctSection) > 0)
+        {
+            $hassection = true;
+            $sectionselect = "<br/><select style=\"color: #000000\" id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
+            if ($secfilter==-1) {$sectionselect .= 'selected=1';}
+            $sectionselect .=  '>All</option>';
+            foreach($distinctSection as $section)
+            {
+                $sectionselect .=  "<option value=\"{$section['section']}\" ";
+                if ($section['section']==$secfilter)
+                {
+                    $sectionselect .=  'selected=1';
+                }
+                $sectionselect .=  ">{$section['section']}</option>";
+            }
+            $sectionselect .=  "</select>";
+        } else
+        {
+            $hassection = false;
+        }
+        $distinctCode = Student::getDistinctCode($courseId);
+        if (count($distinctCode) > 0)
+        {
+            $hascode = true;
+        } else {
+            $hascode = false;
+        }
+        if ($hassection)
+        {
+            $userSort = GbScheme::getByCourseId($courseId);
+            $sectionsort = ($userSort['usersort']==0);
+        } else
+        {
+            $sectionsort = false;
+        }
+        $resultDefaultUserList = Student::defaultUserList($courseId,$sectionsort,$secfilter);
+        $hasSectionRowHeader = ($hassection)? "<th class='width-eight-per'>Section$sectionselect</th>" : "";
+        $hasCodeRowHeader = ($hascode) ? "<th class='width-eight-per'>Code</th>" : "";
+        $hasSectionSortTable = ($hassection) ? "'S'," : "";
+        $hasCodeSortTable = ($hascode) ? "'N'," : "";
+
         $this->includeCSS(['dataTables.bootstrap.css', 'roster/roster.css', 'course/course.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/studentroster.js', 'general.js']);
-        $responseData = array('course' => $course, 'isImageColumnPresent' => $isImageColumnPresent);
+        $responseData = array('hasCodeSortTable' => $hasCodeSortTable,'hassection' => $hassection,'hascode' => $hascode,'hasSectionSortTable' => $hasSectionSortTable,'hasCodeRowHeader' => $hasCodeRowHeader,'resultDefaultUserList' => $resultDefaultUserList,'hasSectionRowHeader' => $hasSectionRowHeader,'course' => $course, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
     }
 
@@ -158,29 +203,34 @@ class RosterController extends AppController
         if ($students) {
             foreach ($students as $student) {
                 $users = User::getById($student['userid']);
-                if ($users['hasuserimg'] == 1) {
-                    $isImageColumnPresent = 1;
+
+                if (count($users) > 0)
+                {
+                    if ($users['hasuserimg'] == 1) {
+                        $isImageColumnPresent = 1;
+                    }
+                    if ($student->code != '') {
+                        $isCodePresent = true;
+                    }
+                    if ($student->section != '') {
+                        $isSectionPresent = true;
+                    }
+                    $tempArray = array('id' => $student->user->id
+                    , 'lastname' => $student->user->LastName,
+                        'firstname' => $student->user->FirstName,
+                        'email' => $student->user->email,
+                        'username' => $student->user->SID,
+                        'lastaccess' => $student->lastaccess,
+                        'locked' => $student->locked,
+                        'section' => $student->section,
+                        'code' => $student->code,
+                        'hasuserimg' => $student->user->hasuserimg,
+                    );
+                    array_push($studentArray, $tempArray);
                 }
-                if ($student->code != '') {
-                    $isCodePresent = true;
-                }
-                if ($student->section != '') {
-                    $isSectionPresent = true;
-                }
-                $tempArray = array('id' => $student->user->id
-                , 'lastname' => $student->user->LastName,
-                    'firstname' => $student->user->FirstName,
-                    'email' => $student->user->email,
-                    'username' => $student->user->SID,
-                    'lastaccess' => $student->lastaccess,
-                    'locked' => $student->locked,
-                    'section' => $student->section,
-                    'code' => $student->code,
-                    'hasuserimg' => $student->user->hasuserimg,
-                );
-                array_push($studentArray, $tempArray);
             }
         }
+
         $sort_by = array_column($studentArray, 'lastname');
         array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
         $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent, 'isImageColumnPresent' => $isImageColumnPresent);
@@ -243,9 +293,10 @@ class RosterController extends AppController
         }
         if ($this->isPost()) {
             $params = $this->getRequestParams();
-            if ($params['section']) {
+            if ($params['section'])
+            {
                 foreach ($params['section'] as $key => $section) {
-                    $code = trim($params['code'][$key]);
+                        $code = $params['code'][$key];
                     Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseId);
                 }
             }
@@ -851,7 +902,7 @@ class RosterController extends AppController
                 $subject = $selectedStudents['subject'];
                 $courseId = $selectedStudents['courseId'];
                 $course = Course::getById($courseId);
-                $messageToTeacher = $message . addslashes("<p>Instructor note: Email sent to these students from course $course->name: <br>$toList\n");
+                $messageToTeacher = $message .  ("<p>Instructor note: Email sent to these students from course $course->name: <br>$toList\n");
                 if ($selectedStudents['emailCopyToSend'] == 'singleStudent') {
                     $this->sendEmailToSelectedUser($subject, $message, $studentArray);
                 } elseif ($selectedStudents['emailCopyToSend'] == 'selfStudent') {
@@ -1026,7 +1077,7 @@ class RosterController extends AppController
                     foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
-                    $messageToTeacher = $messageBody . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
+                    $messageToTeacher = $messageBody .  ("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList");
                     $this->sendMassMessage($courseId, $user->id, $subject, $messageToTeacher, $save);
                 } elseif ($selectedStudents['messageCopyToSend'] == 'teachersAndStudents') {
                     foreach ($filteredStudents as $singleStudent) {
@@ -1034,7 +1085,7 @@ class RosterController extends AppController
                     }
                     $teachers = Teacher::getAllTeachers($courseId);
                     foreach ($teachers as $teacher) {
-                        $messageToTeacher = $messageBody . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
+                        $messageToTeacher = $messageBody .  ("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList");
                         $this->sendMassMessage($courseId, $teacher['userid'], $subject, $messageToTeacher, $save);
                     }
                 }
@@ -1177,7 +1228,7 @@ class RosterController extends AppController
                                             $seedsList = implode(',', $seeds);
                                             $lastAnswers = str_replace('~', '', $lastAnswers);
                                             $lastAnswersList = implode('~', $lastAnswers);
-                                            $lastAnswersList = addslashes(stripslashes($lastAnswersList));
+                                            $lastAnswersList =  stripslashes($lastAnswersList);
                                             $reattemptingList = implode(',', $reattempting);
                                             $finalParams = Array('id' => $query->id, 'scores' => $scoreList, 'attempts' => $attemptsList, 'seeds' => $seedsList, 'lastanswers' => $lastAnswersList, 'reattempting' => $reattemptingList);
                                             AssessmentSession::modifyExistingSession($finalParams);
@@ -1489,7 +1540,7 @@ class RosterController extends AppController
             }
             $users = new User();
             $users->saveUserRecord($params,$user);
-            Student::updateSectionAndCodeValue($params['section'], $userId, $params['code'], $courseId, $params);
+            Student::updateSectionAndCodeValue(trim($params['section']), $userId, trim($params['code']), $courseId, $params);
             $this->setSuccessFlash(AppConstant::UPDATE_STUDENT_SUCCESSFULLY);
             return $this->redirect('student-roster?cid=' . $courseId);
         }

@@ -378,4 +378,9 @@ class Questions extends BaseImasQuestions
     {
         return self::find()->select('id,points,questionsetid')->where(['IN', 'id', $qlist])->all();
     }
+
+    public static function getQuestionDataByRubric($assessmentId)
+    {
+      return Questions::find()->select('rubric')->where(['assessmentid' => $assessmentId])->andWhere(['>','rubric',0])->distinct()->asArray()->all();
+    }
 }

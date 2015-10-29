@@ -91,10 +91,9 @@ class Rubrics extends BaseImasRubrics
         return Rubrics::find()->select('id,name')->where(['ownerid' => $userId])->orWhere(['groupid' => $groupId])->orderBy('name')->all();
     }
 
-    public static function rubricDataByAssessmentId($assessmentId)
+    public static function rubricDataByAssessmentId($subquery)
     {
-        $subquery = Questions::find()->select('rubric')->where(['assessmentid' => $assessmentId])->andWhere(['>','rubric',0])->distinct()->all();
-        return self::find()->select('id,rubrictype,rubric')->where('IN','id',$subquery)->all();
+         return Rubrics::find()->select('id,rubrictype,rubric')->where(['IN','id',$subquery])->all();
     }
 
     public static function getRubricByQuestionId($questionId)

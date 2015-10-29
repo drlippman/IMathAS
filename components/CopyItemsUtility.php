@@ -574,13 +574,11 @@ public static function copyrubrics($offlinerubrics = array(),$userid=false,$grou
         {
             //echo "handing {$row[0]} which I don't have access to<br/>";
             $rubric = Rubrics::getById($singleData['id']);
-            $rubrow = AppUtility::addslashes_deep($rubric);
-            $rubricItems = Rubrics::getByUserIdAndGroupIdAndRubric($rubrow[2],$userid,$groupid);
-
+            $rubricItems = Rubrics::getByUserIdAndGroupIdAndRubric($rubric['rubric'],$userid,$groupid);
             if ($rubricItems > AppConstant::NUMERIC_ZERO) {
                 $newid = $rubricItems['id'];
             } else {
-                $rub = "'" . implode("','", $rubrow) . "'";
+                $rub = "'" . implode("','", $rubric) . "'";
                 $temp = new Rubrics();
                 $rubricId = $temp->createNewEntry($userid,AppConstant::NUMERIC_NEGATIVE_ONE,$rub);
                 $newid = $rubricId;

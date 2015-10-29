@@ -3483,8 +3483,15 @@ class GradebookController extends AppController
                 unset($params['clearq']);
             }
         }
-        if ($canedit) {
-            $rubrics = Rubrics::rubricDataByAssessmentId($assessmentData['assessmentid']);
+        if ($canedit)
+        {
+            $rubrics = Questions::getQuestionDataByRubric($assessmentData['assessmentid']);
+            $subquery = array();
+            foreach($rubrics as $rubric)
+            {
+                array_push($subquery,$rubric['rubric']);
+            }
+            $rubrics = Rubrics::rubricDataByAssessmentId($subquery);
         }
 
         if($links == 1){

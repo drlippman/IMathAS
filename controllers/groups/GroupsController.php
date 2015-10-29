@@ -296,7 +296,7 @@ class GroupsController extends AppController
                 {
                     foreach($groups as $group)
                     {
-                        $stuGroupName = addslashes($group['name']);
+                        $stuGroupName =  $group['name'];
                         $query = new Stugroups();
                         $newStuGrpId = $query->insertStuGrpData($stuGroupName,$NewGrpSetId);
                         $stuGroupMembersData = StuGroupMembers::findByStuGroupId($group['id']);
