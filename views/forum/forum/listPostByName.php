@@ -55,7 +55,8 @@ if ($haspoints && $caneditscore && $rubric != 0) {
 <?php
 $laststu = -1;
 $cnt = 0;
-if ($caneditscore && $haspoints) { ?>
+if ($caneditscore && $haspoints) {
+$urlmode = AppUtility::urlMode();?>
 <form method=post action="thread?cid=<?php echo $course->id ?>&forum=<?php echo $forumId?>&page=<?php echo $page?>&score=true" onsubmit="onsubmittoggle()">
     <?php }
     $curdir = rtrim(dirname(__FILE__), '/\\');

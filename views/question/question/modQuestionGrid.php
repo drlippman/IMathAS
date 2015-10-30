@@ -74,7 +74,6 @@ if ($params['process']== true) {
             if ($finalSeg != '') {
                 $vidData[] = $finalSeg;
             }
-            $vidData = addslashes(serialize($vidData));
         }
 
         if ($itemOrder == '') {

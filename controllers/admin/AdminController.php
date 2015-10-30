@@ -1072,7 +1072,7 @@ class AdminController extends AppController
             } else {
 
                 $blockcnt = AppConstant::NUMERIC_ONE;
-                $itemorder = addslashes(serialize(array()));
+                $itemorder =  serialize(array());
                 $query = new Course();
                 $cid = $query->create($userId, $params,$blockcnt);
 
@@ -1781,8 +1781,8 @@ class AdminController extends AppController
                                 {
                                     foreach($data as $row)
                                     {
-                                        $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row['control']));
-                                        $qText = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row['qtext']));
+                                        $control =  preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row['control']);
+                                        $qText =  preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row['qtext']);
                                         QuestionSet::updateQuestionSetToImportLib($control,$qText,$row['id']);
                                     }
                                 }
@@ -2483,11 +2483,6 @@ class AdminController extends AppController
         }
     }
 
-    function addslashes_deep($value=null)
-    {
-        return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
-    }
-
     function setparentrights($alibid)
     {
         global $rights,$parents;
@@ -3130,8 +3125,8 @@ class AdminController extends AppController
                         {
                             foreach($data as $row)
                             {
-                                $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row['control']));
-                                $qText = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row['qtext']));
+                                $control =  preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row['control']);
+                                $qText =  preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row['qtext']);
                                 QuestionSet::updateQuestionSetToImportLib($control,$qText,$row['id']);
                             }
                         }

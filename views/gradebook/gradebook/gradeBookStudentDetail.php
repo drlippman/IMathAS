@@ -6,7 +6,7 @@ use app\components\AppUtility;
 use app\components\AppConstant;
 
 use app\components\AssessmentUtility;
-
+$urlmode = AppUtility::urlMode();
 if($defaultValuesArray['studentId'] > 0){
     $this->title = AppUtility::t('Grade Book Student Detail', false);
 }else{

@@ -930,4 +930,22 @@ class AppController extends Controller
             return $this->redirect(Yii::$app->getHomeUrl());
         }
     }
+
+    public function accessForSiteController($user,$actionPath,$courseId = null)
+    {
+
+        if (($user['rights'] > AppConstant::GUEST_RIGHT) && ($actionPath == 'unhide-from-course-list'
+            || $actionPath == 'hide-from-course-list' || $actionPath == 'help-for-student-answer' || $actionPath == 'form' || $actionPath == 'action')) {
+            return true;
+        } else if ($actionPath == 'index' || $actionPath == 'login' || $actionPath == 'diagnostics' || $actionPath == 'registration'
+           || $actionPath == 'work-in-progress' || $actionPath == 'forgot-password' || $actionPath == 'forgot-username' || $actionPath == 'check-browser'
+           || $actionPath == 'reset-password' || $actionPath == 'logout' || $actionPath == 'dashboard' || $actionPath == 'change-password' || $actionPath == 'documentation'
+            || $actionPath == 'instructor-document' || $actionPath == 'helper-guide' || $actionPath == 'student-register' || $actionPath == 'error')
+        {
+            return true;
+        } else {
+            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+            return $this->redirect(Yii::$app->getHomeUrl());
+        }
+    }
 }

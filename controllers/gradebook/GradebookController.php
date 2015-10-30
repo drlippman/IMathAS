@@ -2513,7 +2513,7 @@ class GradebookController extends AppController
                     if ($feedbackColumn == -1) {
                         $feedback = '';
                     } else {
-                        $feedback = addslashes($data[$feedbackColumn]);
+                        $feedback =  $data[$feedbackColumn];
                     }
                     $score = $data[$scoreColumn];
                     if (!$score) {
@@ -3466,10 +3466,10 @@ class GradebookController extends AppController
                         $bestscorelist = implode(',', $bestscores);
                     }
                     $attemptslist = implode(",", $attempts);
-                    $lalist = addslashes(implode("~", $lastanswers));
+                    $lalist =  implode("~", $lastanswers);
 
                     $bestattemptslist = implode(',', $bestattempts);
-                    $bestlalist = addslashes(implode('~', $bestlastanswers));
+                    $bestlalist =  implode('~', $bestlastanswers);
                     $reattemptinglist = implode(',', $reattempting);
                     AssessmentSession::updateForClearScore($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$reattemptinglist,$bestlalist);
                     if (strlen($line['lti_sourcedid']) > 1) {
@@ -4692,7 +4692,7 @@ class GradebookController extends AppController
                         $seedslist = implode(',',$seeds);
                         $lastanswers = str_replace('~','',$lastanswers);
                         $lalist = implode('~',$lastanswers);
-                        $lalist = addslashes(stripslashes($lalist));
+                        $lalist =  stripslashes($lalist);
                         $reattemptinglist = implode(',',$reattempting);
 
                         $session['id'] = $assessmentSessionData['id'];

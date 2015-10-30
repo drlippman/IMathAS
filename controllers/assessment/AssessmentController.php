@@ -316,12 +316,12 @@ class AssessmentController extends AppController
                 if ($params['summary'] == AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
                     $params['summary'] = '';
                 } else {
-                    $params['summary'] = addslashes(htmLawed(stripslashes($params['summary']),$htmlawedconfig));
+                    $params['summary'] =  htmLawed(stripslashes($params['summary']),$htmlawedconfig);
                 }
                 if ($params['intro'] == AppConstant::DEFAULT_ASSESSMENT_INTRO) {
                     $params['intro'] = '';
                 } else {
-                    $params['intro'] = addslashes(htmLawed(stripslashes($params['intro']),$htmlawedconfig));
+                    $params['intro'] =  htmLawed(stripslashes($params['intro']),$htmlawedconfig);
                 }
                 $assessmentArray['courseid'] = intval($params['cid']);
                 $assessmentArray['name'] = strval($params['name']);
@@ -898,7 +898,8 @@ class AssessmentController extends AppController
                 }
                 if (isset($params['chgsummary'])) {
                     $assessmentData = Assessments::getByAssessmentId($params['summary']);
-                    $sets['summary'] =  strval(addslashes($assessmentData['summary']));
+
+                    $sets['summary'] =  strval( $assessmentData['summary']);
                 }
                 if (isset($params['chgdates'])) {
                     $assessmentData = Assessments::getByAssessmentId($params['dates']);
@@ -1379,9 +1380,9 @@ class AssessmentController extends AppController
                         $stuGrpMember->insertStuGrpMemberData($userid, $stugroupid);
                     }
                 }
-                $deffeedbacktext = addslashes($adata['deffeedbacktext']);
+                $deffeedbacktext =  $adata['deffeedbacktext'];
                 if (isset($sessiondata['lti_lis_result_sourcedid']) && strlen($sessiondata['lti_lis_result_sourcedid'])>1) {
-                    $ltisourcedid = addslashes(stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']));
+                    $ltisourcedid =  stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']);
                 } else {
                     $ltisourcedid = '';
                 }
@@ -1516,7 +1517,7 @@ class AssessmentController extends AppController
                 if (isset($sessiondata['lti_lis_result_sourcedid'])) {
                     $altltisourcedid = stripslashes($sessiondata['lti_lis_result_sourcedid'].':|:'.$sessiondata['lti_outcomeurl'].':|:'.$sessiondata['lti_origkey'].':|:'.$sessiondata['lti_keylookup']);
                     if ($altltisourcedid != $line['lti_sourcedid']) {
-                        $altltisourcedid = addslashes($altltisourcedid);
+                        $altltisourcedid =  $altltisourcedid;
                         AssessmentSession::setLtiSourceId($altltisourcedid, $line['id']);
                     }
                 }
@@ -1530,7 +1531,7 @@ class AssessmentController extends AppController
             $temp  .= 'Error.  Access test from course page';
             return $temp;
         }
-        $testid = addslashes($sessiondata['sessiontestid']);
+        $testid =  $sessiondata['sessiontestid'];
         $asid = $testid;
         $isteacher = $sessiondata['isteacher'];
         if (isset($sessiondata['actas'])) {
@@ -2112,7 +2113,7 @@ class AssessmentController extends AppController
                     $now = time();
                     if (isset($GLOBALS['CFG']['log'])) {
                         $log = new Log();
-                        $log->createLog($now, addslashes($loginfo));
+                        $log->createLog($now,  $loginfo);
                     }
                 } else {
                     $temp .=  '<div id="headershowtest" class="pagetitle"><h2>'.'Select group members'. '</h2></div>';
@@ -2458,7 +2459,7 @@ class AssessmentController extends AppController
                         $done = true;
                     }
                 } else if (isset($_GET['to'])) {
-                    $toshow = addslashes($_GET['to']);
+                    $toshow =  $_GET['to'];
                     $done = false;
                 }
 
@@ -4087,7 +4088,7 @@ class AssessmentController extends AppController
         if ($isTeacher && isset($asId)) {
             $testId = $asId;
         } else {
-            $testId = addslashes($sessionData['sessiontestid']);
+            $testId =  $sessionData['sessiontestid'];
         }
         $line = AssessmentSession::getById($testId);
 

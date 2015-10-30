@@ -144,7 +144,7 @@ class ForumController extends AppController
             $now = time();
             if ($searchstr != '') {
                 $searchstr = str_replace(' and ', ' ',$searchstr);
-                $searchterms = explode(" ",addslashes($searchstr));
+                $searchterms = explode(" ", $searchstr);
                 $searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
             }
             $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchlikes,$anyforumsgroup,$searchstr,$searchtag,$user->id);
@@ -175,7 +175,7 @@ class ForumController extends AppController
             //doing a search of all posts
             if ($searchstr != '') {
                 $searchstr = str_replace(' and ', ' ',$searchstr);
-                $searchterms = explode(" ",addslashes($searchstr));
+                $searchterms = explode(" ",$searchstr);
 
                 $searchlikes = "(imas_forum_posts.message LIKE '%".implode("%' AND imas_forum_posts.message LIKE '%",$searchterms)."%')";
                 $searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
@@ -211,7 +211,7 @@ class ForumController extends AppController
         $this->includeCSS(['course/course.css']);
         $responseData = array('forums' => $forums,'threaddata' => $threaddata,'searchtag' => $searchtag,'newcnt' => $newcnt,'threadcount' => $threadcount,'postcount' => $postcount,'maxdate' => $maxdate,'forumdata' => $forumdata,'isteacher' => $isteacher,
             'itemsassoc' => $itemsassoc,'threadids' => $threadids,'itemsimporder' => $itemsimporder,'searchedPost' => $searchedPost,'cid' => $cid, 'users' => $user, 'course' => $course,'searchtype' => $searchtype);
-        return $this->renderWithData('listViews', $responseData);
+        return $this->renderWithData('forum',$responseData);
     }
 
     /*

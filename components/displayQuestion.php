@@ -3752,7 +3752,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	} else if ($anstype == "essay") {
 		require_once("../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script-form');
-		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
+		$givenans =  htmLawed(stripslashes($givenans),$htmlawedconfig);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}

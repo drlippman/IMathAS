@@ -7,6 +7,7 @@ $this->title = 'Modify User Profile';
 $imasroot = AppConstant::UPLOAD_DIRECTORY;
 $pics = AppConstant::UPLOAD_DIRECTORY . $userId . '.jpg';
 $emailErr = "";
+$urlmode = AppUtility::urlMode();
 ?>
 <div class="item-detail-header">
     <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index'], 'page_title' => $this->title]); ?>

@@ -616,11 +616,6 @@ class AppUtility extends Component
         return array('title' => $title, 'level' => $n);
     }
 
-    public static function addslashes_deep($value)
-    {
-        return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
-    }
-
     public static function getRefererUri($refere)
     {
         $home = self::getHomeURL();
@@ -2225,7 +2220,8 @@ class AppUtility extends Component
     }
 
     public static function printq($qn,$qsetid,$seed,$pts,$showpts) {
-        global $isfinal,$imasroot,$urlmode,$displayformat,$anstypes,$evaledqtext;
+        $urlmode = AppUtility::urlMode();
+        global $isfinal,$imasroot,$displayformat,$anstypes,$evaledqtext;
         $homePath = AppUtility::getHomeURL()."Uploads";
         srand($seed);
         $qdata = QuestionSet::getSelectedDataByQuesSetId($qsetid);

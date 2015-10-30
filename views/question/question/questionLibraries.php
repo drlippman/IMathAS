@@ -64,7 +64,7 @@ $sortorder = array();
 
 foreach ($libraryData as $line)  {
     $id = $line['id'];
-    $name = addslashes($line['name']);
+    $name =  $line['name'];
     $parent = $line['parent'];
     if ($line['count']==0) {
         $isempty[$id] = true;

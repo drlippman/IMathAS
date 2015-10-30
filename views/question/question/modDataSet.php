@@ -9,6 +9,7 @@ if($courseId == 'admin') {
    $cname = 'Admin';
 }
 $this->params['breadcrumbs'][] = $this->title;
+$urlmode = AppUtility::urlMode();
 ?>
 <div class="item-detail-header">
     <?php if($params['cid'] == "admin"){ ?>

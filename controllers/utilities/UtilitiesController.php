@@ -817,8 +817,8 @@ class UtilitiesController extends AppController
                         if (!in_array($user['id'],$toIgnore))
                         {
                             $fullNames[$user['id']] = $user['LastName']. ', '.$user['FirstName'];
-                            $firstNames[$user['id']] = addslashes($user['FirstName']);
-                            $lastNames[$user['id']] = addslashes($user['LastName']);
+                            $firstNames[$user['id']] =  $user['FirstName'];
+                            $lastNames[$user['id']] =  $user['LastName'];
                         }
                     }
                 }
@@ -861,7 +861,7 @@ class UtilitiesController extends AppController
                 }
                 $sentTo = implode('<br/>',$fullNames);
                 $srt = AppConstant::INSTRUCTORNOTE;
-                $message = $params['message'] . addslashes("$srt $course->name: <br/> $sentTo </p>\n");
+                $message = $params['message'] .  "$srt $course->name: <br/> $sentTo </p>\n";
                 foreach($toList as $data)
                 {
                     $insert = new Message();

@@ -469,7 +469,7 @@ function scorequestion($qn, $rectime=true) {
 		}
         $connection = Yii::$app->getDb();
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
+		$query .= "('". $testsettings['courseid']."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
         $connection->createCommand($query)->execute();
 	}
 	
@@ -506,7 +506,7 @@ function recordtestdata($limit=false) {
 	$bestseedslist = implode(',',$bestseeds);
 	$bestlastanswers = str_replace('~','',$bestlastanswers);
 	$bestlalist = implode('~',$bestlastanswers);
-    $bestlalist = addslashes(stripslashes($bestlalist));
+    $bestlalist =  stripslashes($bestlalist);
 	
 	if ($noraw) {
 		$scorelist = implode(',',$scores);
@@ -517,7 +517,7 @@ function recordtestdata($limit=false) {
 	$seedslist = implode(',',$seeds);
 	$lastanswers = str_replace('~','',$lastanswers);
 	$lalist = implode('~',$lastanswers);
-	$lalist = addslashes(stripslashes($lalist));
+	$lalist =  stripslashes($lalist);
 	$timeslist = implode(',',$timesontask);
 	
 	$reattemptinglist = implode(',',$reattempting);

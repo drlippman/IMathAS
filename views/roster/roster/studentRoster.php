@@ -3,6 +3,7 @@ use app\components\AppUtility;
 
 $this->title = AppUtility::t('Roster', false);
 $this->params['breadcrumbs'][] = $this->title;
+$urlmode = AppUtility::urlMode();
 ?>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" id="image-id" value="<?php echo $isImageColumnPresent ?>">

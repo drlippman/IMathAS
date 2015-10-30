@@ -34,13 +34,13 @@ use app\components\UserPics;
 
 class SiteController extends AppController
 {
-//    public function beforeAction($action)
-//    {
-//        $user = $this->getAuthenticatedUser();
-//        $actionPath = Yii::$app->controller->action->id;
-//        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
-//        return $this->accessForSiteController($user,$courseId, $actionPath);
-//    }
+    public function beforeAction($action)
+    {
+        $user = $this->getAuthenticatedUser();
+        $actionPath = Yii::$app->controller->action->id;
+        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        return $this->accessForSiteController($user,$actionPath,$courseId);
+    }
     public function behaviors()
     {
         return [
@@ -289,7 +289,7 @@ class SiteController extends AppController
             foreach ($superpw as $k=>$v) {
                 $superpw[$k] = strtolower($v);
             }
-            $diagSID = $params['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
+            $diagSID = $params['SID'].'~'. $diagqtr.'~'.$pcid;
             if ($entrynotunique)
             {
                 $diagSID .= '~'.preg_replace('/\W/','',$sel1[$params['course']]);
@@ -944,22 +944,6 @@ class SiteController extends AppController
         return $this->renderWithData('changePassword', $responseData);
     }
 
-    public function actionStudentEnrollCourse()
-    {
-        /**
-         * Can access: greater than equal to student.
-         *  Student
-         *  Teacher
-         *  LCC
-         *  Diagnostics
-         *  Group Admin
-         *  Admin
-         */
-        $this->guestUserHandler();
-        $model = new StudentEnrollCourseForm();
-        $responseData = array('model' => $model,);
-        return $this->renderWithData('studentEnrollCourse', $responseData);
-    }
     public function actionHelperGuide()
     {
         $params = $this->getRequestParams();
@@ -974,6 +958,7 @@ class SiteController extends AppController
     {
         return $this->renderWithData('document');
     }
+
     public function actionHideFromCourseList()
     {
         /**
@@ -994,6 +979,7 @@ class SiteController extends AppController
                 return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
             }
     }
+
     public function actionUnhideFromCourseList()
     {
         /**
@@ -1028,6 +1014,7 @@ class SiteController extends AppController
         $this->includeCSS(['infopages.css']);
         return $this->renderWithData('helpForStudentAnswer');
     }
+
     public function actionInstructorDocument()
     {
         $this->layout = 'master';
@@ -1212,5 +1199,4 @@ class SiteController extends AppController
             return $this->redirect('dashboard');
         }
     }
-
 }

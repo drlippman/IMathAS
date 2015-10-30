@@ -423,9 +423,9 @@ class CourseController extends AppController
                     $isplaylist = AppConstant::NUMERIC_ZERO;
                 }
 
-                $params['title'] = addslashes(htmlentities(stripslashes($params['title'])));
+                $params['title'] =  htmlentities(stripslashes($params['title']));
 
-                $params['text'] = addslashes(stripslashes($_POST['text']));
+                $params['text'] =  stripslashes($_POST['text']);
                 $outcomes = array();
                 if (isset($params['outcomes'])) {
                     foreach ($params['outcomes'] as $o) {
@@ -1291,7 +1291,7 @@ class CourseController extends AppController
                 } else {
                     $sub['newflag'] = AppConstant::NUMERIC_ZERO;
                 }
-                $itemList = addslashes(serialize($items));
+                $itemList =  serialize($items);
                 Course::setItemOrder($itemList, $courseId);
             }
 

@@ -350,7 +350,7 @@ class QuestionController extends AppController
                     /*
                      * output item array
                      */
-                    $jsArray .= '[' . $subs[$j] . ',' . $line['questionsetid'] . ',"' . addslashes(filter(str_replace(array("\r\n", "\n", "\r"), " ", $line['description']))) . '","' . $line['qtype'] . '",' . $line['points'] . ',';
+                    $jsArray .= '[' . $subs[$j] . ',' . $line['questionsetid'] . ',"' .  filter(str_replace(array("\r\n", "\n", "\r"), " ", $line['description'])) . '","' . $line['qtype'] . '",' . $line['points'] . ',';
                     if ($line['userights'] > AppConstant::NUMERIC_THREE || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['ownerid'] == $userId || $adminAsTeacher) { //can edit without template?
                         $jsArray .= AppConstant::ONE_VALUE;
                     } else {
@@ -1194,8 +1194,8 @@ class QuestionController extends AppController
         if (isset($params['qtext'])) {
             $now = time();
             $params['qtext'] = $this->stripSmartQuotes(stripslashes($params['qtext']));
-            $params['control'] = addslashes($this->stripSmartQuotes(stripslashes($params['control'])));
-            $params['qcontrol'] = addslashes($this->stripSmartQuotes(stripslashes($params['qcontrol'])));
+            $params['control'] =  $this->stripSmartQuotes(stripslashes($params['control']));
+            $params['qcontrol'] = $this->stripSmartQuotes(stripslashes($params['qcontrol']));
             $params['solution'] = $this->stripSmartQuotes(stripslashes($params['solution']));
             $params['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm', '$1', $params['qtext']);
             $params['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm', '$1', $params['solution']);
@@ -1208,8 +1208,6 @@ class QuestionController extends AppController
                 require_once("../components/htmLawed.php");
                 $params['qtext'] = convertdatauris($params['qtext']);
             }
-            $params['qtext'] = addslashes($params['qtext']);
-            $params['solution'] = addslashes($params['solution']);
             /*
              * handle help references
              */
@@ -1290,7 +1288,8 @@ class QuestionController extends AppController
                 /*
                  * check is owner or is allowed to modify
                  */
-                if (!$isAdmin && !$isGrpAdmin) {
+                if (!$isAdmin && !$isGrpAdmin)
+                {
                     $query = QuestionSet::getByUserIdGroupId($params['id'], $userId, $groupId);
                     if (count($query) == AppConstant::NUMERIC_ZERO) {
                         $isOk = false;
@@ -1364,7 +1363,6 @@ class QuestionController extends AppController
                         $ancestorAuthors = $lastAuthor;
                     }
                 }
-                $ancestorAuthors = addslashes($ancestorAuthors);
                 $questionSetArray = array();
                 $questionSetArray['uniqueid'] = $uQid;
                 $questionSetArray['adddate'] = $now;
