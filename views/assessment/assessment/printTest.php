@@ -9,7 +9,7 @@ use app\components\AppUtility;
 AppUtility::includeJS('ASCIIMathTeXImg_min.js');
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course, $assessmentName], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course', 'course/course?cid='.$course->id, AppUtility::getHomeURL().'assessment/assessment/show-assessment?id='.$assessmentId.'&cid='.$course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course, $assessmentName], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id, AppUtility::getHomeURL().'assessment/assessment/show-assessment?id='.$assessmentId.'&cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 <div class = "title-container">
     <div class="row">

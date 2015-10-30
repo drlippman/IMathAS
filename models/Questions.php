@@ -307,9 +307,9 @@ class Questions extends BaseImasQuestions
                 'imas_questionset as iqs',
                 'iq.questionsetid=iqs.id'
             )
-            ->where('imas_questions.id',':questionId');
+            ->where('iq.assessmentId =:aId');
         $command = $query->createCommand();
-        $data = $command->bindValue(':iq.assessmentid',$aid)->queryAll();
+        $data = $command->bindValue(':aId',$aid)->queryAll();
         return $data;
     }
 

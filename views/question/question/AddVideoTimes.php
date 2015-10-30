@@ -13,9 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
     <?php if($params['cid'] == "admin"){ ?>
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'ManageQuestionSet'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course', 'course/course?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/manage-question-set?cid=admin'] ,'page_title' => $this->title]);?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'ManageQuestionSet'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/manage-question-set?cid=admin'] ,'page_title' => $this->title]);?>
     <?php } else{ ?>
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course', 'course/course?cid='.$courseIdadmin,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$aid] ,'page_title' => $this->title]);?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$courseIdadmin,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$aid] ,'page_title' => $this->title]);?>
     <?php }?>
 </div>
 <div class = "title-container">
@@ -23,48 +23,66 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
-<div class="tab-content shadowBox padding-bottom-thirty">
-    <br>
-    <div class="shadow-content modify-data-shadow-box">
+<div class="tab-content shadowBox col-md-12 col-sm-12">
+    <div class="shadow-content modify-data-shadow-box col-sm-12 col-md-12">
         <h2><?php AppUtility::t('Video Navigation and Question Cues');?></h2>
-        <div style="float:right; width: 453px; height: 275px;"><div id="player"></div></div>
-        <p><?php AppUtility::t('This page allows you to setup your assessment to be cued to a video.  For each
-            question, give a title to the video segment that leads up to that question, and select
-            the time when that segment ends and the question should show.  You can grab this
-            from the playing video, type the time in min:sec form.  Make sure all times are at least
-            one second before the end of the video.');?></p>
+        <div class="col-md-12 col-sm-12 padding-left-zero">
+            <div class="col-md-7 col-sm-12 padding-left-zero">
+            <p class="padding-top-zero"><?php AppUtility::t('This page allows you to setup your assessment to be cued to a video.  For each
+                question, give a title to the video segment that leads up to that question, and select
+                the time when that segment ends and the question should show.  You can grab this
+                from the playing video, type the time in min:sec form.  Make sure all times are at least
+                one second before the end of the video.');?></p>
 
-        <p><?php AppUtility::t('If your video contains a followup segment to a question (such as a solution),
-            you can indicate this and specify when the followup ends.  The next segment will
-            then start from the end of this followup.');?></p>
+            <p><?php AppUtility::t('If your video contains a followup segment to a question (such as a solution),
+                you can indicate this and specify when the followup ends.  The next segment will
+                then start from the end of this followup.');?></p>
+            </div>
+            <div class="col-md-5 col-sm-12">
+                <div id="player"></div>
+            </div>
+        </div>
         <form method="post" style="clear:both;" onsubmit="return validatevidform(this);">
-        <p><?php AppUtility::t('YouTube video ID');?><input class="form-control-import-question" type="text" name="vidid" id="vidid" value="<?php echo $vidId;?>"/>
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-bottom-twenty">
+            <span class="col-md-2 col-sm-2 padding-left-zero padding-top-seven"><?php AppUtility::t('YouTube video ID');?></span>
+            <span class="col-md-4 padding-left-zero">
+                <input class="form-control-import-question" type="text" name="vidid" id="vidid" value="<?php echo $vidId;?>"/>
+            </span>
+            <span class="col-md-2 col-sm-2 padding-left-zero">
                 <input type="button" value="Load Video" onclick="loadnewvideo()"/>
-        </p>
+            </span>
+        </div>
 
             <?php
 
             for ($i=0;$i<$n;$i++)
             {
-                echo '<div class="insblock" id="insat'.$i.'">';
-                echo '<a href="javascript:void(0)" onclick="addsegat('.$i.'); return false;">Add video segment break</a></div>';
+                echo '<div class="col-md-12 insblock" id="insat'.$i.'">';
+                echo '<span class="col-md-6 col-sm-6 padding-left-zero padding-top-ten padding-bottom-ten"><a class="" href="javascript:void(0)" onclick="addsegat('.$i.'); return false;">Add video segment break</a></span></div>';
                 if (isset($qn[$i]))
                 {
-                    echo '<div class="vidsegblock">';
-                    echo 'Segment title: <input type="text" class="seg-title" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
-                    echo 'Ends at: <input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/> ';
-                    echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> ';
-                    echo 'Question '.($qn[$i]+1).': '.$qTitle[$qidByNum[$qn[$i]]];
+                    echo '<div class="vidsegblock col-md-12 col-sm-12 padding-left-zero">';
+                    echo '<div class="col-md-12 col-sm-12">
+                    <span class="col-md-2 padding-left-zero padding-top-seven">Segment title</span>
+                    <span class="col-md-4 padding-left-zero"><input type="text" class="seg-title" name="segtitle'.$i.'" value="'.$title[$i].'"/></span>';
+                    echo '<span class="col-md-1 padding-top-seven">Ends at</span>
+                    <span class="col-md-4 padding-left-zero"><input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/></span>';
+                    echo '<span class="col-md-1">
+                    <input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/>
+                    </span></div>';
+
+                    echo '<div class="col-md-12 padding-top-ten padding-bottom-ten">
+                    <span class="col-md-4 padding-left-zero">Question '.($qn[$i]+1).' '.$qTitle[$qidByNum[$qn[$i]]].'</span>';
                     echo '<input type="hidden" name="qn'.$i.'" value="'.$qn[$i].'"/>';
-                    echo '<br/>';
-                    echo 'Has followup? <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
+                    echo '<span class="col-md-4 padding-left-zero"><span>Has followup?</span>
+                     <span><input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
                     if ($hasFollowUp[$i])
                     {
-                        echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
+                        echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /></span></span> </div><span id="followupspan'.$i.'">';
                     }
                     else
                     {
-                        echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
+                        echo ' onclick="updatefollowup('.$i.',this);" /></span></span> </div> <span id="followupspan'.$i.'" style="display:none;">';
                     }
                     echo 'Followup title: <input class="seg-title" type="text" size="20" name="followuptitle'.$i.'" value="'.$followUpTitle[$i].'"/> ';
                     echo 'Ends at: <input class="seg-title" type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="'.$followUpEndDTime[$i].'"/> ';
@@ -79,15 +97,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 else
                 {
-                    echo '<div class="vidsegblock">';
+                    echo '<div class="col-md-12 col-sm-12 vidsegblock">';
                     echo 'Segment title: <input class="seg-title" type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
                     echo 'Ends at: <input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/> ';
                     echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a></div>';
                 }
             }
-            echo '<div class="insblock" id="insat'.$n.'">';
+            echo '<div class="col-md-12 insblock nnnnnnnnn" id="insat'.$n.'">';
             echo '<a href="javascript:void(0)" onclick="addsegat('.$n.'); return false;">Add video segment break</a></div>';
-            echo '<div class="vidsegblock">';
+            echo '<div class="vidsegblock col-md-12">';
             echo 'Remainder of video segment title (if any): <input class="seg-title" type="text" size="20" name="finalseg" value="'.$finalSegTitle.'"/></div>';
             echo '<p><input type="submit" value="Submit"/></p>';
             echo '</form>';
@@ -240,7 +258,7 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
         var insat = document.getElementById("insat"+n);
 
         var newins = document.createElement("div");
-        newins.className = "insblock";
+        newins.className = "col-md-12 col-sm-12 insblock";
         newins.id = "insat"+(curnumseg+1);
         newins.innerHTML = '<a href="javascript:void(0)" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>';
         insat.parentNode.insertBefore(newins, insat);
@@ -250,7 +268,7 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
         html += '<input type="button" value="grab" onclick="grabcurvidtime('+curnumseg+',0);"/>';
         html += ' <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a>';
         var newseg = document.createElement("div");
-        newseg.className = "vidsegblock";
+        newseg.className = "col-md-12 col-sm-12 vidsegblock";
         newseg.innerHTML = html;
         insat.parentNode.insertBefore(newseg, insat);
         curnumseg++;

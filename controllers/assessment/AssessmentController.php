@@ -3390,7 +3390,7 @@ class AssessmentController extends AppController
                         $reviewbar = str_replace('<div class="review">','<div class="review">'._('Question').' '.($i+1).'. ', $reviewbar);
                     }
                     $quesout .= $reviewbar;
-                    $quesout .= '</diembediconv>';
+                    $quesout .= '</div>';
                     $intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
                 }
                 $intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p>\s*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);

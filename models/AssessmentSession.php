@@ -187,7 +187,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
             {
                 $query->andWhere(['IN','assessmentid',$aid]);
             } else {
-                $query->andWhere('assessmentid = :assessmentid',[':assessmentid' => $aid]);
+                $query->andWhere('assessmentid =:assessmentid',[':assessmentid' => $aid]);
             }
         }
         if ($lim > 0) {
@@ -309,11 +309,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getAssessmentIDs($assessmentId, $courseId)
     {
         $query = new Query();
-        $query->select(['imas_assessment_sessions.id'])
+        $query->select('imas_assessment_sessions.id')
             ->from('imas_assessment_sessions')
             ->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
-            ->where(['imas_assessment_sessions.assessmentid=:assessmentId', 'imas_students.courseid=:courseId']);
-        $command = $query->createCommand()->bindValues(['assessmentId' => $assessmentId, 'courseId' => $courseId]);
+            ->where('imas_assessment_sessions.assessmentid =:assessmentId')->andWhere('imas_students.courseid =:courseId');
+        $command = $query->createCommand()->bindValues([':assessmentId' => $assessmentId, ':courseId' => $courseId]);
         $items = $command->queryAll();
         return $items;
     }
