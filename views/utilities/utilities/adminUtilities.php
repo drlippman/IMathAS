@@ -80,10 +80,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo '<li>Rights: '.$user['rights'].'</li>';
                             echo '<li>Reset Password to <input type="text" name="newpw"/> <input class="form-control-utility" type="submit" style="width: 60px; height: 32px; border-radius: 2px; margin-left: 5px" value="Go"/></li>';?>
                             <?php
-                            if(count($queryForCourse)>0)
+                            if($countOfCourseData > 0)
                             {
                                 echo '<li>Enrolled as student in: <ul>';
-
 
                                 foreach($queryForCourse as $key=>$data)
                                 {
@@ -91,14 +90,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if($key == $user['id'])
                                     {
                                         foreach($data as $d)
-                                        {
-                                            echo  '<li><a target="_blank" href="'.AppUtility::getURLFromHome('course','course/index?cid='.$d['id']).'">'.$d['name'].'(ID '.$d['id'].')</a></li>';
-                                        }
+                                        { ?>
+                                            <li><a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid=' .$d['id'])?>"      target="_blank" ><?php echo $d['name'].'(ID '.$d['id'].')' ?></a> </li>
+                                      <?php  }
                                     }
                                 }
                                 echo '</ul></li>';
                             }
-                            if($queryFromCourseForTutor)
+                            if($countTutorData > 0)
                             {
                                 echo '<li>Tutor in: <ul>';
                                 foreach($queryFromCourseForTutor as $key=>$singleTutor)
@@ -107,14 +106,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     {
                                         foreach($singleTutor as $tutor)
                                         {
-                                            echo '<li><a target="_blank" href="../course/course.php?cid='.$tutor['id'].'">'.$tutor['name'].' (ID '.$tutor['id'].')</a></li>';
+                                            echo '<li><a target="_blank" href="../course/course?cid='.$tutor['id'].'">'.$tutor['name'].' (ID '.$tutor['id'].')</a></li>';
                                         }
                                     }
                                 }
                                 echo '</ul></li>';
                             }
 
-                            if($queryFromCourseForTeacher)
+                            if($countOfTeacher > 0)
                             {
                                 echo '<li>Teacher in: <ul>';
                                 foreach($queryFromCourseForTeacher as $key=>$singleTeacher)
@@ -129,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 echo '</ul></li>';
                             }
-                            if($queryForLtiUser)
+                            if($countOfLti > 0)
                             {
                                 echo '<li>LTI connections: <ul>';
                                 foreach($queryForLtiUser as $key=>$singleLtiUser)
@@ -138,7 +137,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     {
                                         foreach($singleLtiUser as $user)
                                         {
-                                            echo '<li>'.$user['org'].' <a href="utils.php?removelti='.$user['id'].'">Remove connection</a></li>';
+                                            echo '<li>'.$user['org'].' <a href="utils?removelti='.$user['id'].'">Remove connection</a></li>';
                                         }
                                     }
                                 }
@@ -149,7 +148,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }
             }else{?>
-
                 <form method="post" action="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=lookup');?>">
                     <?php echo AppUtility::t('Look up user:', false)?>
                     <p></p><div class="align-lookup">

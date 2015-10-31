@@ -171,7 +171,9 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getExternalRef()
     {
-        return self::find()->select(['uniqueid','lastmoddate','extref'])->from(['imas_questionset'])->where(['<>','extref',''])->all();
+        $query = "SELECT uniqueid,lastmoddate,extref FROM imas_questionset WHERE extref<>''";
+        return $data = \Yii::$app->db->createCommand($query)->queryAll();
+//        return self::find()->select(['uniqueid','lastmoddate','extref'])->where(['<>','extref',''])->all();
     }
     public static function getWrongLibFlag()
     {

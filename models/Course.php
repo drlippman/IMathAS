@@ -396,7 +396,7 @@ class Course extends BaseImasCourses {
                 'imas_students AS istu',
                 'istu.courseid=ic.id'
             )
-            ->where(['istu.userid= :id']);
+            ->where('istu.userid= :id');
         $command = $query->createCommand()->bindValue('id',$id);
         $items = $command->queryAll();
         return $items;
@@ -410,7 +410,7 @@ class Course extends BaseImasCourses {
                 'imas_tutors AS istu',
                 'istu.courseid=ic.id'
             )
-            ->where(['istu.userid= :id']);
+            ->where('istu.userid=:id');
         $command = $query->createCommand()->bindValue('id',$id);
         $items = $command->queryAll();
         return $items;
@@ -424,7 +424,7 @@ class Course extends BaseImasCourses {
                 'imas_teachers AS istu',
                 'istu.courseid=ic.id'
             )
-            ->where(['istu.userid= :id']);
+            ->where('istu.userid= :id');
         $command = $query->createCommand()->bindValue('id',$id);
         $items = $command->queryAll();
         return $items;

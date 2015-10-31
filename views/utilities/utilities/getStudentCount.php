@@ -47,10 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 $grpData = '';
                 if($stuName)
                 {
-
                         foreach($stuName as $singleName)
                         {
-
                             if($singleName['name'] != $lastGroup)
                             {
                                 if($lastGroup != '')
@@ -62,8 +60,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $grpData = '';
                                 $lastGroup = $singleName['name'];
                             }
-                            $grpData .= "{$singleName['lastname']}:  {$singleName['id']}<br/>";
-                            $grpCnt += $singleName['id'];
+                            $grpData .= "{$singleName['LastName']}:  {$singleName['COUNT(DISTINCT s.id)']}<br/>";
+                            $grpCnt += $singleName['COUNT(DISTINCT s.id)'];
                         }
                 }
                     echo "<b>$lastGroup</b>: $grpCnt<br/>";

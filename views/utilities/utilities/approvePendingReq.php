@@ -29,9 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
         else{?>
             <?php if(empty($findPendingUser))
             {
+
                 AppUtility::t('No one to approve');
             }
-            else{?>
+            else{                ?>
 
                     <h2>Account Approval</h2>
                     <form method="post" action="<?php echo AppUtility::getURLFromHome('utilities','utilities/approve-pending-req?go=true&amp;skipn='.$offset);?>">
@@ -47,22 +48,28 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo '<p><a target="checkver" href="https://www.google.com/search?q='.urlencode($findPendingUser['FirstName'].' '.$findPendingUser['LastName'].' '.$matches[1]).'">Search</a></p>';
                             }
                         }?>
-                        <p><?php AppUtility::t('Group: ');?>
-                            <select  name="group"><option value="-1"><?php AppUtility::t('New Group');?></option>
+                        <p><?php AppUtility::t('Group: ');
+                            ?>
+                            <select name="group"><option value="-1"><?php AppUtility::t('New Group');?></option>
                                 <?php
                                 if($groupsName)
                                 {
                                     foreach($groupsName as $grpName)
                                     {
-                                        echo '<option class="form-control" value="'.$grpName['id'].'">'.$grpName['Name'].'</option>';
+                                        echo '<option class="form-control" value="'.$grpName['id'].'">'.$grpName['name'].'</option>';
                                     }
                                 }
                                 ?>
                             </select><br><br>
-                            <?php echo AppUtility::t('New group:',false)?>
+                            <?php echo AppUtility::t('New group:',false);
+                            ?>
                             <input class="form-control-utility" type="text" name="newgroup" size="40"/></p>
                             <br>
-                            <p><input class="form-control-utility" type="submit" name="approve" value="Approve" /> <input type="submit" name="deny" value="Deny" /> <input type="submit" name="skip" value="Skip" /></p>
+                            <div class="form-group">
+                                <span><input type="submit" name="approve" value="Approve" /></span>
+                                <span class="padding-left-one-em"><input type="submit" name="deny" value="Deny" /></span>
+                                <span class="padding-left-one-em"><input type="submit" name="skip" value="Skip" /></span>
+                            </div>
                     </form>
             <?php }?>
     <?php  }?>

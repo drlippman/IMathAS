@@ -947,7 +947,7 @@ class ShowItemCourse extends Component
                         }
                     }
                     echo "<div class=title><i>
-                    <a href=\"#\" >{$line['name']}</a></i>";
+                    <a href=\"#\">{$line['name']}</a></i>";
                     echo '<span class="instrdates">';
                     echo "<br/><i>$show</i>\n";
                     echo '</span>';
@@ -1422,7 +1422,7 @@ class ShowItemCourse extends Component
                        <?php }
                     }
                     echo "<div class=title> "; ?>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'])?>"><?php echo$line['name']?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id']);?>"><?php echo $line['name']?></a></b>
                   <?php  if (isset($newPostCnts[$line['id']]) && $newPostCnts[$line['id']]>0 ) { ?>
                         <a style="color:red" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'],'&page=-1')?>"><?php echo sprintf(_('New Posts (%s)'),$newPostCnts[$line['id']])?></a>
                   <?php  }
@@ -1470,7 +1470,7 @@ class ShowItemCourse extends Component
                              src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                     <?php }
                     echo "<div class=title><i>"; ?>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'])?>"><?php echo$line['name']?></a></b></i>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'])?>"><?php echo $line['name']?></a></b></i>
                    <?php if (($newPostCnts[$line['id']]) && $newPostCnts[$line['id']]>0 ) { ?>
                         <a style="color:red" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'],'&page=-1')?>"><?php sprintf(_('New Posts (%s)'),$newPostCnts[$line['id']])?></a>
                    <?php }

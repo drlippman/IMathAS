@@ -66,8 +66,9 @@ class Groups extends BaseImasGroups
         return Groups::find()->select(['id', 'name'])->all();
     }
 
-    public static function getName($id)
-    {
-        return Groups::find()->select('name')->where(['id' => $id])->one();
-    }
+//    public static function getName($id)
+//    {
+//        AppUtility::dump($id);
+//        return Groups::find()->select(['name'])->where(['id' => $id])->one();
+//    }
 }

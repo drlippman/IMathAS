@@ -488,16 +488,29 @@ class Student extends BaseImasStudents
 
     public static function getstuDetails($start, $now, $end)
     {
-        $query = "SELECT g.name,u.LastName,u.FirstName,c.id,c.name AS cname, COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_teachers AS t ";
-        $query .= "ON s.courseid=t.courseid AND s.lastaccess > :start";
-        if ($end != $now) {
-            $query .= "AND s.lastaccess<$end ";
+        $query = new Query();
+        $query->select('g.name,u.LastName,u.FirstName,c.id,c.name AS cname, COUNT(DISTINCT s.id)')
+            ->from('imas_students AS s')
+            ->join('INNER JOIN',
+            'imas_teachers AS t',
+            's.courseid=t.courseid');
+        $query->where('s.lastaccess >:start');
+        if($end != $now)
+        {
+            $query->andWhere('s.lastaccess <', $end);
         }
-        $query .= "JOIN imas_courses AS c ON t.courseid=c.id ";
-        $query .= "JOIN imas_users as u ";
-        $query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id,c.id ORDER BY g.name,u.LastName,u.FirstName,c.name";
-        return \Yii::$app->db->createCommand($query)->bindValue('start', $start)->queryAll();
-
+        $query->join('INNER JOIN',
+            'imas_courses AS c',
+        't.courseid=c.id');
+        $query->join('INNER JOIN',
+        'imas_users as u',
+        'u.id=t.userid');
+        $query->join('INNER JOIN',
+        'imas_groups AS g',
+        'g.id=u.groupid');
+        $query->groupBy('u.id,c.id');
+        $query->orderBy('g.name,u.LastName,u.FirstName,c.name');
+        return $query->createCommand()->bindValue('start', $start)->queryAll();
     }
 
     public static function deleteByCourseId($courseId)

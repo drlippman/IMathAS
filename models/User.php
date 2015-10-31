@@ -388,17 +388,19 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $lastName = $params['LastName'];
         $firstName = $params['FirstName'];
         $query = new Query();
-        $query->select('imas_users.*,imas_groups.name')->from('imas_users')->join('LEFT JOIN','imas_groups')->where('imas_users.groupid=imas_groups.id');
+        $query->select('imas_users.*,imas_groups.name')->from('imas_users')
+            ->join('LEFT JOIN','imas_groups',
+                'imas_users.groupid=imas_groups.id');
         if (!empty($lastName))
         {
-            $query->andWhere('imas_users.LastName=:lastName');
+            $query->andWhere('imas_users.LastName=:lastName',[':lastName' => $lastName]);
         }
         if (!empty($firstName))
         {
-            $query->andWhere('imas_users.FirstName=:firstName');
+            $query->andWhere('imas_users.FirstName=:firstName',[':firstName' => $firstName]);
         }
         $query->orderBy('imas_users.LastName,imas_users.FirstName');
-        $command =  $query->createCommand()->bindValues(['lastName' => $lastName, 'firstName' => $firstName]);
+        $command =  $query->createCommand();
         $data =  $command->queryAll();
         return $data;
     }
@@ -486,12 +488,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_teachers'])
             ->where('imas_users.id=imas_teachers.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', ':date']);
+            ->andWhere(['>', 'imas_users.lastaccess', $date]);
         if (count($skipCid) > AppConstant::NUMERIC_ZERO) {
             $query->andWhere(['NOT IN', 'imas_teachers.courseid', $skipCidS]);
         }
         $command = $query->createCommand();
-        $data = $command->bindValue(':date',$date)->queryAll();
+        $data = $command->queryAll();
         return count($data);
     }
 
@@ -502,9 +504,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->distinct('imas_users.id')
             ->from(['imas_users', 'imas_students'])
             ->where('imas_users.id=imas_students.userid')
-            ->andWhere(['>', 'imas_users.lastaccess', ':date']);
+            ->andWhere(['>', 'imas_users.lastaccess', $date]);
         $command = $query->createCommand();
-        $data = $command->bindValue(':date',$date)->queryAll();
+        $data = $command->queryAll();
         return count($data);
     }
 

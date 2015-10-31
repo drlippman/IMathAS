@@ -82,20 +82,28 @@ class UtilitiesController extends AppController
                     {
                         foreach($queryForUser as $userData)
                         {
-
-                            $queryForCourse[$userData['id']] = Course::queryForCourse($userData['id']);
-                            $queryFromCourseForTutor[$userData['id']] = Course::queryFromCourseForTutor($userData['id']);
-                            $queryFromCourseForTeacher[$userData['id']] = Course::queryFromCourseForTeacher($userData['id']);
-                            $queryForLtiUser[] = LtiUserForm::getUserData($userData['id']);
+                            $courseData = Course::queryForCourse($userData['id']);
+                            $tutorData = Course::queryFromCourseForTutor($userData['id']);
+                            $countTutorData = count($tutorData);
+                            $countOfCourseData = count($courseData);
+                            $teacherData = Course::queryFromCourseForTeacher($userData['id']);
+                            $countOfTeacher = count($teacherData);
+                            $ltiData = LtiUserForm::getUserData($userData['id']);
+                            $countOfLti = count($ltiData);
+                            $queryForCourse[$userData['id']] = $courseData;
+                            $queryFromCourseForTutor[$userData['id']] = $tutorData;
+                            $queryFromCourseForTeacher[$userData['id']] = $teacherData;
+                            $queryForLtiUser[] = $ltiData;
                         }
-
                     }
                 }
 
                 }
         }
         $this->includeCSS(['utilities.css']);
-        $responseData = array('form' => $form,'debug' => $debug,'body' => $body,'message' => $message,'queryForCourse' => $queryForCourse,'queryFromCourseForTutor' => $queryFromCourseForTutor,'queryFromCourseForTeacher' => $queryFromCourseForTeacher,'queryForLtiUser' => $queryForLtiUser,'params' => $params,'queryForUser' => $queryForUser);
+        $responseData = array('form' => $form,'debug' => $debug,'body' => $body,'message' => $message,'countOfCourseData' => $countOfCourseData,'countTutorData' => $countTutorData,'queryFromCourseForTeacher' => $queryFromCourseForTeacher,'queryForLtiUser' => $queryForLtiUser,'params' => $params,'queryForUser' => $queryForUser,
+        'queryForCourse' => $queryForCourse, 'queryFromCourseForTutor' => $queryFromCourseForTutor, 'countOfTeacher' => $countOfTeacher,
+        'countOfLti' => $countOfLti);
         return $this->render('adminUtilities',$responseData);
     }
 
@@ -385,7 +393,8 @@ class UtilitiesController extends AppController
         }
         $groupsName = Groups::getIdAndName();
         $this->includeCSS(['utilities.css']);
-        return $this->renderWithData('approvePendingReq',['findPendingUser' => $findPendingUser,'details' => $details,'groupsName' => $groupsName,'message' => $message,'body' => $body,'offset' => $offset]);
+        $responseData = array('findPendingUser' => $findPendingUser,'details' => $details,'groupsName' => $groupsName,'message' => $message,'body' => $body,'offset' => $offset);
+        return $this->renderWithData('approvePendingReq', $responseData);
     }
 
     public function actionListWrongLibFlag()
