@@ -91,7 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     {
                                         foreach($data as $d)
                                         { ?>
-                                            <li><a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid=' .$d['id'])?>"      target="_blank" ><?php echo $d['name'].'(ID '.$d['id'].')' ?></a> </li>
+                                            <li><a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid=' .$d['id'])?>" target="_blank" ><?php echo $d['name'].'(ID '.$d['id'].')' ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a> </li>
                                       <?php  }
                                     }
                                 }
@@ -105,9 +105,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if($key == $user['id'] && $singleTutor)
                                     {
                                         foreach($singleTutor as $tutor)
-                                        {
-                                            echo '<li><a target="_blank" href="../course/course?cid='.$tutor['id'].'">'.$tutor['name'].' (ID '.$tutor['id'].')</a></li>';
-                                        }
+                                        { ?>
+                                            <li><a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid=' .$tutor['id'])?>" target="_blank" ><?php echo $tutor['name'].' (ID '.$tutor['id'].')' ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a> </li>
+                                        <?php }
                                     }
                                 }
                                 echo '</ul></li>';
@@ -121,9 +121,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if($key == $user['id'])
                                     {
                                         foreach($singleTeacher as $teacher)
-                                        {
-                                            echo  '<li><a target="_blank" href="'.AppUtility::getURLFromHome('course','course/course?cid='.$teacher['id']).'">'.$teacher['name'].'(ID '.$teacher['id'].')</a></li>';
-                                        }
+                                        { ?>
+                                            <li><a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid=' .$teacher['id'])?>" target="_blank" ><?php echo $teacher['name'].'(ID '.$teacher['id'].')' ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a> </li>
+                                      <?php  }
                                     }
                                 }
                                 echo '</ul></li>';
