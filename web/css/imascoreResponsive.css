@@ -12,6 +12,13 @@
     .mobile-show {
         display: inline-block;
     }
+    .addvt-grabbtn-mobile {
+        padding-top: 1em;
+        padding-left: 0px;
+    }
+    .addvt-question-text-padding-mobile {
+        padding-top: 1.5em;
+    }
 }
 
 /* Smartphones (portrait) */
@@ -33,6 +40,13 @@
     }
     .content {
         margin-left: 0px;
+    }
+    .addvt-grabbtn-mobile {
+        padding-top: 1em;
+        padding-left: 0px;
+    }
+    .addvt-question-text-padding-mobile {
+        padding-top: 1.5em;
     }
 }
 /*iPhone 6 Portrait*/
@@ -68,6 +82,13 @@
 
 /*iPhone 6 and iPhone 6+ portrait and landscape*/
 @media only screen and (max-device-width: 640px), only screen and (max-device-width: 667px), only screen and (max-width: 480px){
+    .addvt-grabbtn-mobile {
+        padding-top: 1em;
+        padding-left: 0px;
+    }
+    .addvt-question-text-padding-mobile {
+        padding-top: 1.5em;
+    }
 }
 
 /*iPhone 6 and iPhone 6+ portrait*/
@@ -93,6 +114,10 @@
     }
     .mobile-show {
         display: none;
+    }
+    .addvt-grabbtn-mobile {
+        padding-top: 1em;
+        padding-left: 0px;
     }
 }
 

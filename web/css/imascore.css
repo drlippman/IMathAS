@@ -1402,3 +1402,28 @@ color:red;
 .margin-bottom-zero {
     margin-bottom: 0px !important;
 }
+.width-nine-per {
+    width: 9% !important;
+}
+.margin-left-minus-five-per {
+    margin-left: -5% !important;
+}
+.margin-left-minus-three {
+    margin-left: -3% !important;
+}
+.margin-bottom-one-pt-five-em {
+    margin-bottom: 1.5em !important;
+}
+.padding-top-two-pt-em {
+    padding-top: 2.5em;
+}
+.padding-top-bottom-one-pt-five-em {
+    padding-top: 1.5em !important;
+    padding-bottom: 1.5em !important;
+}
+.padding-top-pt-five-em {
+    padding-top: 0.5em;
+}
+.add-video-video-player iframe {
+    width: 100% !important;
+}

@@ -986,6 +986,7 @@ class QuestionController extends AppController
             $videoId = '';
         }
         $this->includeJS(['editor/plugins/media/js/embed.js']);
+        $this->includeCSS(['question/question.css']);
         $responseData = array('n' => $n, 'qn' => $qn, 'title' => $title, 'endTime' => $endTime, 'qTitle' => $qTitle, 'qidByNum' => $qidByNum, 'hasFollowUp' => $hasFollowUp, 'followUpTitle' => $followUpTitle, 'showLink' => $showLink, 'finalSegTitle' => $finalSegTitle, 'followUpEndDTime' => $followUpEndDTime, 'vidId' => $videoId, 'course' => $course, 'courseId' => $courseId, 'aid' => $aid);
         return $this->renderWithData('AddVideoTimes', $responseData);
     }

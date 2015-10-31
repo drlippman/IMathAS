@@ -18,13 +18,18 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$courseIdadmin,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$aid] ,'page_title' => $this->title]);?>
     <?php }?>
 </div>
-<div class = "title-container">
+<div class="title-container">
+    <div class="row">
+        <div class="vertical-align title-page">
+            <?php echo $this->title; ?>
+        </div>
+    </div>
 </div>
-<div class="item-detail-content">
+<div class="item-detail-content padding-top-two-pt-em">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
-<div class="tab-content shadowBox col-md-12 col-sm-12">
-    <div class="shadow-content modify-data-shadow-box col-sm-12 col-md-12">
+<div class="tab-content shadowBox col-md-12 col-sm-12 add-video-times-shadowbox">
+    <div class="padding-left-zero shadow-content modify-data-shadow-box col-sm-12 col-md-12">
         <h2><?php AppUtility::t('Video Navigation and Question Cues');?></h2>
         <div class="col-md-12 col-sm-12 padding-left-zero">
             <div class="col-md-7 col-sm-12 padding-left-zero">
@@ -38,14 +43,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 you can indicate this and specify when the followup ends.  The next segment will
                 then start from the end of this followup.');?></p>
             </div>
-            <div class="col-md-5 col-sm-12">
+            <div class="col-md-5 col-sm-12 add-video-video-player">
                 <div id="player"></div>
             </div>
         </div>
         <form method="post" style="clear:both;" onsubmit="return validatevidform(this);">
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-bottom-twenty">
-            <span class="col-md-2 col-sm-2 padding-left-zero padding-top-seven"><?php AppUtility::t('YouTube video ID');?></span>
-            <span class="col-md-4 padding-left-zero">
+            <span class="col-md-2 col-sm-3 padding-left-zero padding-top-seven"><?php AppUtility::t('YouTube video ID');?></span>
+            <span class="col-md-4 col-sm-4 padding-left-zero">
                 <input class="form-control-import-question" type="text" name="vidid" id="vidid" value="<?php echo $vidId;?>"/>
             </span>
             <span class="col-md-2 col-sm-2 padding-left-zero">
@@ -57,57 +62,84 @@ $this->params['breadcrumbs'][] = $this->title;
 
             for ($i=0;$i<$n;$i++)
             {
-                echo '<div class="col-md-12 insblock" id="insat'.$i.'">';
-                echo '<span class="col-md-6 col-sm-6 padding-left-zero padding-top-ten padding-bottom-ten"><a class="" href="javascript:void(0)" onclick="addsegat('.$i.'); return false;">Add video segment break</a></span></div>';
+                echo '<div class="col-md-12 col-sm-12 insblock margin-bottom-one-pt-five-em" id="insat'.$i.'">';
+                echo '<span class="col-md-6 col-sm-6 padding-left-zero padding-top-ten padding-bottom-ten">
+                <a class="" href="javascript:void(0)" onclick="addsegat('.$i.'); return false;">Add video segment break</a>
+                </span>
+                </div>';
                 if (isset($qn[$i]))
                 {
-                    echo '<div class="vidsegblock col-md-12 col-sm-12 padding-left-zero">';
-                    echo '<div class="col-md-12 col-sm-12">
-                    <span class="col-md-2 padding-left-zero padding-top-seven">Segment title</span>
-                    <span class="col-md-4 padding-left-zero"><input type="text" class="seg-title" name="segtitle'.$i.'" value="'.$title[$i].'"/></span>';
-                    echo '<span class="col-md-1 padding-top-seven">Ends at</span>
-                    <span class="col-md-4 padding-left-zero"><input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/></span>';
-                    echo '<span class="col-md-1">
+                    echo '<div class="vidsegblock col-md-12 col-sm-12 padding-left-zero margin-bottom-one-pt-five-em">';
+                    echo '<div class="col-md-12 col-sm-12 padding-top-fifteen padding-bottom-five">
+                    <span class="col-md-2 col-sm-2 padding-left-zero padding-right-zero padding-top-seven">Segment title</span>
+                    <span class="col-md-3 col-sm-4 margin-left-minus-five-per">
+                        <input type="text" class="seg-title" name="segtitle'.$i.'" value="'.$title[$i].'"/>
+                    </span>';
+                    echo '<span class="col-md-1 col-sm-1 padding-top-seven padding-right-zero">Ends at</span>
+                    <span class="col-md-1 col-sm-2">
+                    <input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/>
+                    </span>';
+                    echo '<span class="col-md-1 col-sm-2">
                     <input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/>
-                    </span></div>';
+                    </span>';
+                    echo '<span class="col-md-4 col-sm-6 padding-left-zero addvt-question-text-padding-mobile">Question '.($qn[$i]+1).' '.$qTitle[$qidByNum[$qn[$i]]].'</span>';
+                    echo '<input type="hidden" name="qn'.$i.'" value="'.$qn[$i].'"/></div>';
 
-                    echo '<div class="col-md-12 padding-top-ten padding-bottom-ten">
-                    <span class="col-md-4 padding-left-zero">Question '.($qn[$i]+1).' '.$qTitle[$qidByNum[$qn[$i]]].'</span>';
-                    echo '<input type="hidden" name="qn'.$i.'" value="'.$qn[$i].'"/>';
-                    echo '<span class="col-md-4 padding-left-zero"><span>Has followup?</span>
+                    echo '<div class="col-md-12 col-sm-12 padding-top-ten padding-bottom-ten">
+                    <span class="col-md-4 col-sm-4 padding-left-zero">
+                    <span>Has followup?</span>
                      <span><input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
                     if ($hasFollowUp[$i])
                     {
-                        echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /></span></span> </div><span id="followupspan'.$i.'">';
+                        echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /></span></span></div>
+                        <span class="col-md-12 col-sm-12 padding-top-bottom-ten" id="followupspan'.$i.'">';
                     }
                     else
                     {
-                        echo ' onclick="updatefollowup('.$i.',this);" /></span></span> </div> <span id="followupspan'.$i.'" style="display:none;">';
+                        echo ' onclick="updatefollowup('.$i.',this);" /></span></span></div>
+                        <span class="col-md-12 col-sm-12 padding-top-bottom-ten" id="followupspan'.$i.'" style="display:none;">';
                     }
-                    echo 'Followup title: <input class="seg-title" type="text" size="20" name="followuptitle'.$i.'" value="'.$followUpTitle[$i].'"/> ';
-                    echo 'Ends at: <input class="seg-title" type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="'.$followUpEndDTime[$i].'"/> ';
-                    echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',1);"/> ';
-                    echo 'Show link in navigation? <input type="checkbox" name="showlink'.$i.'" value="1" ';
+                    echo '<span class="col-md-2 col-sm-2 padding-left-zero padding-right-zero padding-top-seven">Followup title</span>
+                    <span class="col-md-3 col-sm-4 margin-left-minus-five-per">
+                    <input class="seg-title" type="text" size="20" name="followuptitle'.$i.'" value="'.$followUpTitle[$i].'"/> </span>';
+                    echo '<span class="col-md-1 col-sm-1 padding-right-zero padding-top-seven">Ends at</span>
+                    <span class="col-md-1 col-sm-2">
+                        <input class="seg-title" type="text" size="4" name="followupend'.$i.'" id="followupend'.$i.'" value="'.$followUpEndDTime[$i].'"/>
+                    </span>';
+                    echo '<span class="col-md-1 col-sm-2"><input type="button" value="grab" onclick="grabcurvidtime('.$i.',1);"/></span>';
+                    echo '<span class="col-md-3 col-sm-4 padding-top-seven padding-left-zero addvt-question-text-padding-mobile">Show link in navigation?
+                    <input type="checkbox" name="showlink'.$i.'" value="1" ';
                     if ($showLink[$i])
                     {
                         echo 'checked="checked"';
                     }
-                    echo '/></span>';
-                    echo '</div>';
+                    echo '/></span>
+                    </span>';
                 }
                 else
                 {
                     echo '<div class="col-md-12 col-sm-12 vidsegblock">';
-                    echo 'Segment title: <input class="seg-title" type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
-                    echo 'Ends at: <input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/> ';
-                    echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a></div>';
+                    echo '<span>Segment title</span>
+                    <input class="seg-title" type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
+                    echo '<span class="col-md-1 col-sm-1 padding-top-seven padding-right-zero">Ends at</span>
+                    <input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/> ';
+                    echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/>
+                    <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a>
+                    </div>';
                 }
+                echo '</div>';
             }
-            echo '<div class="col-md-12 insblock nnnnnnnnn" id="insat'.$n.'">';
-            echo '<a href="javascript:void(0)" onclick="addsegat('.$n.'); return false;">Add video segment break</a></div>';
-            echo '<div class="vidsegblock col-md-12">';
-            echo 'Remainder of video segment title (if any): <input class="seg-title" type="text" size="20" name="finalseg" value="'.$finalSegTitle.'"/></div>';
-            echo '<p><input type="submit" value="Submit"/></p>';
+            echo '<div class="col-md-12 col-sm-12 insblock margin-bottom-one-pt-five-em" id="insat'.$n.'">
+            <span class="col-md-6 col-sm-6 padding-left-zero padding-top-ten padding-bottom-ten">';
+            echo '<a href="javascript:void(0)" onclick="addsegat('.$n.'); return false;">Add video segment break</a>
+            </span></div>';
+            echo '<div class="vidsegblock col-md-12 col-sm-12 padding-top-bottom-ten">';
+            echo '<span class="col-md-4 col-sm-6 padding-top-seven">Remainder of video segment title (if any)</span>
+            <span class="col-md-3 col-sm-3 padding-left-zero margin-left-minus-three">
+                <input class="seg-title" type="text" size="20" name="finalseg" value="'.$finalSegTitle.'"/>
+            </span>
+            </div>';
+            echo '<div class="col-md-4 col-sm-4 padding-left-zero padding-top-fifteen"><input type="submit" value="Submit"/></div>';
             echo '</form>';
             ?>
     </div>
@@ -258,17 +290,23 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
         var insat = document.getElementById("insat"+n);
 
         var newins = document.createElement("div");
-        newins.className = "col-md-12 col-sm-12 insblock";
+        newins.className = "col-md-12 col-sm-12 insblock margin-bottom-one-pt-five-em";
         newins.id = "insat"+(curnumseg+1);
-        newins.innerHTML = '<a href="javascript:void(0)" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>';
+        newins.innerHTML = '<span class="col-md-6 col-sm-6 padding-left-zero padding-top-ten padding-bottom-ten">' +
+            '<a href="javascript:void(0)" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>' +
+            '</span>';
         insat.parentNode.insertBefore(newins, insat);
 
-        var html = 'Segment title: <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
-        html += 'Ends at: <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
-        html += '<input type="button" value="grab" onclick="grabcurvidtime('+curnumseg+',0);"/>';
-        html += ' <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a>';
+        var html = '<span class="col-md-2 col-sm-2 padding-top-pt-five-em">Segment title</span>' +
+            '<span class="col-md-3 col-sm-3 margin-left-minus-five-per"><input class="form-control" type="text" size="20" name="segtitle'+curnumseg+'" value=""/></span>';
+        html += '<span class="col-md-1 col-sm-1 padding-top-seven padding-right-zero">Ends at</span> ' +
+            '<span class="col-md-1 col-sm-2"><input class="form-control" type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/></span>';
+        html += '<span class="col-md-1 col-sm-1 padding-left-zero">' +
+            '<input class="form-control" type="button" value="grab" onclick="grabcurvidtime('+curnumseg+',0);"/>' +
+            '</span>';
+        html += '<div class="col-md-1 col-sm-1 padding-top-pt-five-em"><a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a></div>';
         var newseg = document.createElement("div");
-        newseg.className = "col-md-12 col-sm-12 vidsegblock";
+        newseg.className = "col-md-12 col-sm-12 vidsegblock margin-bottom-one-pt-five-em padding-top-bottom-one-pt-five-em";
         newseg.innerHTML = html;
         insat.parentNode.insertBefore(newseg, insat);
         curnumseg++;
@@ -299,7 +337,7 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
                 },
                 "Yes, Remove": function ()
                 {
-                    var divtodelete = el.parentNode;
+                    var divtodelete = el.parentNode.parentNode;
                     divtodelete.parentNode.removeChild(get_previoussibling(divtodelete));
                     divtodelete.parentNode.removeChild(divtodelete);
                     $(this).dialog('destroy').remove();
