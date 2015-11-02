@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 {
                                     foreach($groupsName as $grpName)
                                     {
-                                        echo '<option class="form-control" value="'.$grpName['id'].'">'.$grpName['name'].'</option>';
+                                        echo '<option class="" value="'.$grpName['id'].'">'.$grpName['name'].'</option>';
                                     }
                                 }
                                 ?>

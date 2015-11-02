@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         }else if (isset($_POST['setparent'])) {
             ?>
-            <form method=post action="managelibs.php?cid=<?php echo $cid ?>">
+            <form method=post action="manage-lib?cid=<?php echo $cid ?>">
                 <input type=hidden name=setparent value="<?php echo $tlist ?>">
                 <div class="col-md-10 padding-left-zero"><div class="col-md-3 padding-left-zero"><?php AppUtility::t('New Parent Library')?></div>
                     <div class="col-md-3 padding-left-zero">

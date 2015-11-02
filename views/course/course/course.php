@@ -234,7 +234,6 @@ if ($overwriteBody == 1) {
 
         ?>
         <?php
-
         if (($teacherId)) {
             ?>
             <div class=cp>
@@ -248,3 +247,32 @@ if ($overwriteBody == 1) {
         echo "document.cookie = 'loadedblocks-$courseId=0';</script>\n";
     }
 }?></div>
+
+
+    <script>
+        /**
+         * Modal pop up for locked course.
+         */
+        function locked()
+        {
+                alert('hey');
+                var html = '<div><p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p></div>';
+                var cancelUrl = $(this).attr('href');
+                e.preventDefault();
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons: {
+                        "Ok": function () {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    }
+                });
+        }
+
+    </script>

@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <br>
     <div class="align-copy-course">
         <form method="post">
-            <p>Search <input class="form-control-utility" type="text" name="search" size="40" value="<?php htmlentities(stripslashes($params['search']))?>">
+            <p>Search <input class="form-control-utility" type="text" name="search" size="40" value="<?php (($params['search']))?>">
              <input type="submit" style="border-radius: 2px; height: 32px;" value="Search"/></p>
         <?php
         if($body == AppConstant::NUMERIC_ONE)
@@ -35,7 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             foreach($blockTitles as $singleBlock)
             {
-                if (count($det)>0){ ?>
+                if (count($det)>0){
+                    AppUtility::dump($det);?>
                     <?php echo '<a target="_blank" href="#">'.$det[1].'</a> in'.$singleBlock['name'].'<br/>';?>
                 <?php }
             }

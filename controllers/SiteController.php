@@ -692,14 +692,11 @@ class SiteController extends AppController
          *  Admin
          */
         global $homeLayout,  $hideOnPostsWidget, $newMsgCnt,  $brokenCnt,  $user, $myRights,  $twoColumn,  $pagelayout,  $page_newmessagelist, $page_coursenames,  $page_newpostlist,  $postThreads,
-         $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses,  $courses, $newPostCnt, $page_teacherCourseData, $page_tutorCourseData, $page_studentCourseData;
+        $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses,  $courses, $newPostCnt, $page_teacherCourseData, $page_tutorCourseData, $page_studentCourseData;
         $this->layout = 'master';
         if (!$this->isGuestUser()) {
             $user = $this->getAuthenticatedUser();
             $myRights = $user['rights'];
-            $students = Student::getByUserId($user->id);
-            $tutors = Tutor::getByUser($user->id);
-            $teachers = Teacher::getTeacherByUserId($user->id);
             $courses = Course::getByName($user->id);
             $studCourse = Course::getCourseOfStudent($user->id);
             $userLayoutData = User::getUserHomeLayoutInfo($user->id);
@@ -725,7 +722,6 @@ class SiteController extends AppController
 
             $showMessagesGadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
             $showPostsGadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
-
 
             $twoColumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
             /**

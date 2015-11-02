@@ -165,7 +165,14 @@ class Course extends BaseImasCourses {
     }
     public static function getByCourseAndUser($cid)
     {
-        return self::find()->select('imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons')->join('INNER JOIN','imas_users','imas_users.id = imas_courses.ownerid')->where(['imas_courses.id' => $cid])->all();
+        $query = new Query();
+        $query->select('imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons')
+            ->from('imas_courses')
+            ->join('INNER JOIN',
+                'imas_users',
+                'imas_users.id = imas_courses.ownerid');
+        $query->where(['imas_courses.id' => $cid]);
+        return $query->createCommand()->queryOne();
     }
     public static function UpdateItemOrder($finalBlockItems,$course,$blockCnt)
     {

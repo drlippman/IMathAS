@@ -1076,7 +1076,7 @@ class CourseController extends AppController
         global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights,
                $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
                $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess,
-               $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useViewButtons,$previewshift, $useviewButtons;
+               $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useViewButtons,$previewshift, $useviewButtons, $courseStudent;
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $myRights = $user['rights'];
@@ -1093,6 +1093,13 @@ class CourseController extends AppController
         $sessionData = $this->getSessionData($sessionId);
         $this->setSessionData('courseId',$courseId);
         $teacherData = Teacher::getByUserId($userId,$courseId);
+        $courseStudent = Course::getByCourseAndUser($courseId);
+        $lockaid = $courseStudent['lockaid']; //ysql_result($result,0,2);
+//        if ($isStudent && ($lockaid > 0)) {
+//            echo '<p>This course is currently locked for an assessment</p>';
+//            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
+//            exit;
+//        }
         $type = $this->getParamVal('type');
         if ($teacherData != null) {
             if ($myRights>AppConstant::STUDENT_RIGHT) {

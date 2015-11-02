@@ -3057,7 +3057,7 @@ class AppUtility extends Component
     }
 
     public static function printCourses($data,$title,$type=null, $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null) {
-        global $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses;
+        global $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses, $isStudent;
         if (count($data) == 0 && $type == 'tutor') {
             return;
         }
@@ -3065,10 +3065,16 @@ class AppUtility extends Component
         echo '<div class="block"><h3>'.$title.'</h3></div>';
         echo '<div class="blockitems"><ul class="nomark courselist">';
         for ($i=0; $i<count($data); $i++) {
+            $courseStudent = Course::getByCourseAndUser($data[$i]['id']);
+            $lockId = $courseStudent['lockaid'];
             echo '<li>';
             if ($type=='take') {
                 echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
             } ?>
+<!--            --><?php //if()
+//            {
+//
+//            } ?>
             <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
             <?php echo $data[$i]['name'].'</a>';
             if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {

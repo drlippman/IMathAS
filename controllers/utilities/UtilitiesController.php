@@ -520,7 +520,8 @@ class UtilitiesController extends AppController
             {
                 foreach($blockTitles as $singleBlock)
                 {
-                    $items = unserialize($singleBlock['itemorder']);
+                    $items = stripslashes($singleBlock['itemorder']);
+                    $items = unserialize($items);
                     $det = $this->getStr($items, $Search, '0');
                 }
             }
