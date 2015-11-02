@@ -520,8 +520,7 @@ class UtilitiesController extends AppController
             {
                 foreach($blockTitles as $singleBlock)
                 {
-                    $items = stripslashes($singleBlock['itemorder']);
-                    $items = unserialize($items);
+                    $items = unserialize($singleBlock['itemorder']);
                     $det = $this->getStr($items, $Search, '0');
                 }
             }
@@ -963,22 +962,24 @@ class UtilitiesController extends AppController
 
     public function getStr($items,$str,$parent)
     {
-        foreach ($items as $k=>$it)
+        if($items)
         {
-            if (is_array($it)) {
-                if (stripos($it['name'],$str)!==false) {
-                    return array($parent.'-'.($k+1), $it['name']);
-                } else {
-                    $val = $this->getStr($it['items'], $str, $parent.'-'.($k+1));
-                    if (count($val)> AppConstant::NUMERIC_ZERO)
-                    {
-                        return $val;
+            foreach ($items as $k=>$it)
+            {
+                if (is_array($it)) {
+                    if (stripos($it['name'],$str)!==false) {
+                        return array($parent.'-'.($k+1), $it['name']);
+                    } else {
+                        $val = $this->getStr($it['items'], $str, $parent.'-'.($k+1));
+                        if (count($val)> AppConstant::NUMERIC_ZERO)
+                        {
+                            return $val;
+                        }
                     }
                 }
             }
         }
         return array();
-
     }
     public function fixSub($items)
     {

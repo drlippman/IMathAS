@@ -819,7 +819,7 @@ switch ($action) {
                         <?php AppUtility::t('Modify Groups') ?>
                     </h3>
                 </div>
-                <table class='admin-modify-groups-table margin-top-twenty table table-bordered table-striped table-hover data-table'>
+                <table class='margin-top-twenty table table-bordered table-striped table-hover data-table'>
                     <thead>
                     <tr>
                         <th><?php AppUtility::t('Group Name') ?></th>
@@ -846,13 +846,13 @@ switch ($action) {
                         echo "</tr>";
                     }?>
                 </table>
-                <?php  echo "<div class='col-sm-12 padding-left-zero padding-top-ten'>
-                        <span class='floatleft select-text-margin col-md-2 col-sm-3'>" . AppUtility::t('Add new group', false) . "</span>
-                        <input class='width-thirty-per floatleft form-control subject' type=text name=gpname id=gpname size=50>
+                <?php  echo "<div class='col-md-12 col-sm-12 padding-left-zero padding-top-ten'>
+                        <span class='select-text-margin col-md-2 col-sm-3 padding-left-zero'>" . AppUtility::t('Add new group', false) . "</span>
+                        <span class='col-md-3 col-sm-3 padding-left-zero'><input class='display-inline-block form-control subject' type=text name=gpname id=gpname size=50></span>
                         </div>";
                 ?>
                 </tbody>
-            <div class="col-sm-4 padding-top-twenty padding-bottom-twenty">
+            <div class="col-md-12 col-sm-12 padding-top-twenty padding-bottom-twenty padding-left-zero">
                 <button type=submit value="<?php AppUtility::t('Add Group') ?>">
                     <i class="fa fa-share header-right-btn"></i>
                     <?php AppUtility::t('Add Group') ?>

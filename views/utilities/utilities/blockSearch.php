@@ -32,11 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
         if (isset($params['search']))
         {
             echo '<p>';
-
             foreach($blockTitles as $singleBlock)
             {
                 if (count($det)>0){
-                    AppUtility::dump($det);?>
+                    ?>
                     <?php echo '<a target="_blank" href="#">'.$det[1].'</a> in'.$singleBlock['name'].'<br/>';?>
                 <?php }
             }
