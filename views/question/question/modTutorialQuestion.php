@@ -25,7 +25,7 @@ $placeinhead = '<style type="text/css">
     }
  </style>';
 ?>
-<div class="item-detail-header">
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, $title ], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid='. $params['cid'], $url] ]); ?>
 </div>
     <div id="headermoddataset" class="pagetitle">
@@ -38,9 +38,9 @@ $placeinhead = '<style type="text/css">
 if ($editMsg != '' || $_GET['id']!='new') {
     echo '<p>'.$editMsg;
     if ($id!='new') {
-        echo ' <a href="mod-data-set?cid='.$cid.'&id='.$id.'">Open in the regular question editor</a>';
+        echo '<div class="col-md-12 col-sm-12 padding-bottom-one-em"> <a href="mod-data-set?cid='.$cid.'&id='.$id.'">Open in the regular question editor</a></div>';
     } else {
-        echo ' <a href="mod-data-set?cid='.$cid.'">Open in the regular question editor</a>';
+        echo '<div class="col-md-12 col-sm-12 padding-bottom-one-em"><a href="mod-data-set?cid='.$cid.'">Open in the regular question editor</a></div>';
     }
     echo '</p>';
 }
@@ -94,17 +94,24 @@ if ($fromPot==1) {
 }
 ?>">
 
-    <p>
-        Description:<BR>
-        <textarea cols=60 rows=4 name=description <?php if (!$myQ) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea>
-    </p>
-    <p>
-        Author: <?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>">
-    </p>
-    <p>
+    <div class="col-md-12 mod-tutorial-question-textarea ">
+        <span>Description</span>
+        <textarea cols=60 rows=4 name=description <?php if (!$myQ) echo "readonly=\"readonly\"";?>>
+            <?php echo $line['description'];?>
+        </textarea>
+    </div>
+    <div class="col-md-12 col-sm-12 padding-top-two-em">
+        <span class="floatleft">Author</span>
+        <span class="col-md-2 col-sm-2">
+            <?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>">
+        </span>
+    </div>
+    <div class="col-md-12 col-sm-12 padding-top-two-em">
         <?php
         if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$userId || ($line['userights']==3 && $line['groupid']==$groupId) || $isAdmin || ($isGrpAdmin && $line['groupid']==$groupId)) {
-            echo "Use Rights <select name=userights>\n";
+           echo "<span class='floatleft'>Use Rights</span>
+            <span class='col-md-4 col-sm-4'>
+            <select class='form-control' name=userights>";
             echo "<option value=\"0\" ";
             if ($line['userights']==0) {echo "SELECTED";}
             echo ">Private</option>\n";
@@ -120,7 +127,8 @@ if ($fromPot==1) {
         }
         ?>
         </select>
-    </p>
+        </span>
+    </div>
     <script>
         var curlibs = '<?php echo $inLibs;?>';
         var locklibs = '<?php echo $lockLibs;?>';
@@ -128,45 +136,62 @@ if ($fromPot==1) {
             window.open('libtree.php?libtree=popup&cid=<?php echo $cid;?>&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
         }
     </script>
-    <p>
-        My library assignments: <span id="libnames"><?php echo $lNames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inLibs;?>">
-        <input type=button value="Select Libraries" onClick="libselect()">
-    </p>
+    <div class="col-md-12 col-sm-12 padding-top-two-em">
+        <span>My library assignments</span>
+        <span id="libnames">
+            <?php echo $lNames;?>
+        </span>
+        <input type=hidden name="libs" id="libs" size="10" value="<?php echo $inLibs;?>">
+        <span class="padding-left-one-em">
+            <input type=button value="Select Libraries" onClick="libselect()">
+        </span>
+    </div>
 
-    <p>This question has
-        <?php
-
-        AppUtility::writeHtmlSelect("nparts",range(1,10),range(1,10), $nParts,null,null,'onchange="changenparts(this)"');
-        ?>
-        parts.</p>
+    <div class="col-md-12 col-sm-12 padding-top-two-em">
+        <span class="floatleft">This question has</span>
+        <span class="col-md-1 col-sm-1"><?php AppUtility::writeHtmlSelect("nparts",range(1,10),range(1,10), $nParts,null,null,'onchange="changenparts(this)"'); ?></span>
+        <span class="col-md-1 col-sm-1 padding-top-pt-five-em">parts</span>
+    </div>
 
     <?php
     for ($n=0;$n<10;$n++) {
         if (!isset($qParts[$n])) { $qParts[$n] = 4;}
-        echo '<div id="partwrapper'.$n.'"';
+        echo '<div class="col-md-12 col-sm-12 padding-left-zero" id="partwrapper'.$n.'"';
         if ($n>=$nParts) {echo ' style="display:none;"';};
         echo '>';
+        echo '<div class="col-md-12 col-sm-12"><h4>Part '.($n).' Question</h4></div>';
 
-        echo '<h4>Part '.($n).' Question</h4>';
-        echo '<p>This part is ';
+        echo '<div class="col-md-12 col-sm-12 padding-top-two-em">
+
+        <span class="floatleft padding-top-pt-five-em">This part is</span>
+        <span class="col-md-2 col-sm-2">';
         AppUtility::writeHtmlSelect("qtype$n",$qTypeVal,$qTypeLbl, $qType[$n], null, null, 'onchange="changeqtype('.$n.',this)"');
+        echo '</span>
 
-        echo ' with ';
-
+        <span class="floatleft padding-top-pt-five-em">with</span>';
         if ($qType[$n]!='essay') { // if it has question parts
             echo '<span class="hasparts'.$n.'">';
         } else {
             echo '<span class="hasparts'.$n.'" style="display:none;">';
         }
-
+        echo '
+        <span class="col-md-1 col-sm-1">';
         AppUtility::writeHtmlSelect("qparts$n",range(1,6),range(1,6), $qParts[$n],null,null,'onchange="changeqparts('.$n.',this)"');
-
+        echo '</span>';
         //choices
         echo '<span id="qti'.$n.'mc" ';
         if (isset($qType[$n]) && $qType[$n]!='choices') {echo ' style="display:none;"';};
-        echo '> choices.  Display those ';
+        echo '><span class="floatleft padding-top-pt-five-em">choices</span>
+
+
+        <span class="floatleft padding-top-pt-five-em padding-left-two-em">Display those</span>
+        <span class="col-md-2 col-sm-2">';
         AppUtility::writeHtmlSelect("qdisp$n",$dispVal,$dispLbl, $qDisp[$n]);
-        echo '. Shuffle: ';
+        echo '
+        </span>
+
+        <span class="floatleft padding-top-pt-five-em">Shuffle</span>
+        <span class="col-md-2 col-sm-2">';
         AppUtility::writeHtmlSelect("qshuffle$n",$shuffleVal,$shuffleLbl, $qShuffle[$n]);
         echo '</span>';
 
@@ -197,23 +222,32 @@ if ($fromPot==1) {
 
 
         echo '</span>';
-        echo '</p>';
+        echo '</div>';
 
         if ($qType[$n]!='essay') { // if it has question parts
-            echo '<div class="hasparts'.$n.'">';
+            echo '<div class="col-md-12 col-sm-12 padding-top-two-em hasparts'.$n.'">';
         } else {
-            echo '<div class="hasparts'.$n.'" style="display:none;">';
+            echo '<div class="padding-top-two-em hasparts'.$n.'" style="display:none;">';
         }
-        echo '<table class="choicetbl"><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qType[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit (0-1)</th></tr></thead><tbody>';
+        echo '<table class="choicetbl display table table-bordered table-striped table-hover data-table">
+        <thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qType[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit (0-1)</th></tr></thead>
+        <tbody>';
         for ($i=0;$i<6;$i++) {
             echo '<tr id="qc'.$n.'-'.$i.'" ';
             if ($i>=$qParts[$n]) {echo ' style="display:none;"';};
-            echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
+            echo '>
+            <td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
             if ($i==$answer[$n]) {echo 'checked="checked"';}
-            echo '/></td>';
-            echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?AppUtility::prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
-            echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedBackTxt[$n][$i])?AppUtility::prepd($feedBackTxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
-            echo '<td><input autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?$partial[$n][$i]:"").'"/></td>';
+            echo '/>
+            </td>';
+            echo '<td><input class="form-control" autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?AppUtility::prepd($questions[$n][$i]):"").'"/>
+            <span class="col-md-2 col-sm-2 padding-left-zero padding-top-one-em"><input type="button" class="txted width-hundread-per" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/><span></td>';
+            echo '<td>
+            <input class="form-control" autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedBackTxt[$n][$i])?AppUtility::prepd($feedBackTxt[$n][$i]):"").'"/>
+            <span class="col-md-2 col-sm-2 padding-left-zero padding-top-one-em "><input type="button" class="txted width-hundread-per" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></span></td>';
+            echo '<td>
+            <input class="form-control margin-bottom-three-pt-five" autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?$partial[$n][$i]:"").'"/>
+            </td>';
 
             echo '</tr>';
         }
@@ -223,6 +257,7 @@ if ($fromPot==1) {
         echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="60" value="'.(isset($feedBackTxtDef[$n])?AppUtility::prepd($feedBackTxtDef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
         echo '</tbody></table>';
         echo '</div>'; //end hasparts holder div
+
         echo '<div id="essay'.$n.'wrap" ';
         if ($qType[$n]!='essay') {echo ' style="display:none;"';};
         echo '> Feedback to show: <br/>';
@@ -233,37 +268,46 @@ if ($fromPot==1) {
         echo '</div>'; //end partwrapper div
     }
 
-    echo '<h4>Hints</h4>';
-    echo '<p>This question has ';
-    AppUtility::writeHtmlSelect("nhints",range(0,4),range(0,4), $nHints,null,null,'onchange="changehparts(this)"');
-    echo 'hints.</p>';
+    echo '<div class="col-md-12"><h4><b>Hints</b></h4></div>';
+    echo '<div class="col-md-12 col-sm-12 ">
+        <span class="floatleft padding-top-pt-five-em">This question has</span>
+        <span class="col-md-1">';
+        AppUtility::writeHtmlSelect("nhints",range(0,4),range(0,4), $nHints,null,null,'onchange="changehparts(this)"');
+        echo '</span>
+        <span class="padding-top-pt-five-em floatleft">hints</span>
+    </div>';
     for ($n=0;$n<4;$n++) {
-        echo '<p id="hintwrapper'.$n.'"';
+        echo '<div class="col-md-12 col-sm-12 padding-top-two-em" id="hintwrapper'.$n.'"';
         if ($n>=$nHints) {echo ' style="display:none;"';};
-        echo '>Hint '.($n+1).':';
-        echo '<input autocomplete="off" id="hint'.$n.'" name="hint'.$n.'" type="text" size="80" value="'.(isset($hintText[$n])?AppUtility::prepd($hintText[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'hint'.$n.'\')"/></p>';
+        echo '>
+        <span class="floatleft padding-top-pt-five-em">Hint '.($n+1).'</span>';
+        echo '<span class="col-md-6 col-sm-6"><input class="form-control" autocomplete="off" id="hint'.$n.'" name="hint'.$n.'" type="text" size="80" value="'.(isset($hintText[$n])?AppUtility::prepd($hintText[$n]):"").'"/></span>
+        <span class="col-md-1 col-sm-1"><input class="width-hundread-per" type="button" class="txted" value="E" onclick="popupeditor(\'hint'.$n.'\')"/></span>
+        </div>';
     }
 
-    echo '<h4>Question Text</h4>';
-    echo '<p>In the question text, enter <span id="anstipsingle" ';
+    echo '<div class="col-md-12 colsm-12 padding-top-two-em">
+        <h4><b>Question Text</b></h4>
+    </div>';
+    echo '<div class="col-md-12 col-sm-12 padding-top-two-em">In the question text, enter <span id="anstipsingle" ';
     if ($nParts!=1) {echo 'style="display:none;" ';}
     echo '><b>$answerbox</b> to place the question list into the question.  Enter <b>$feedback</b> to indicate where the feedback should be displayed.</span> <span id="anstipmult" ';
     if ($nParts==1) {echo 'style="display:none;" ';}
     echo '><b>$answerbox[0]</b> to place the question list for Part 0, <b>$answerbox[1]</b> to place the question list for Part 1, and so on.  Similarly, ';
-    echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should be displayed, and so on.</span></p>';
+    echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should be displayed, and so on.</span></div>';
 
     ?>
 
-    <div class=editor>
+    <div class="col-md-12 col-sm-12 mod-tutorial-question-textarea editor padding-top-two-em">
         <textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qText);?></textarea>
     </div>
 
-    <div class="editor" id="GB_window" style="display:none; position: absolute; height: auto;">
+    <div class="col-md-12 col-sm-12 mod-tutorial-question-textarea editor padding-top-two-em" id="GB_window" style="display:none; position: absolute; height: auto;">
         <div id="GB_caption" style="cursor:move;";><span style="float:right;"><span class="pointer clickable" onclick="GB_hide()">[X]</span></span> Edit Text</div>
         <textarea cols="60" rows="6" id="popuptxt" name="popuptxt" style="width: 100%"></textarea>
         <input type="button" value="Save" onclick="popuptxtsave()"/>
     </div>
-    <p><input type="submit" value="Save and Test"/></p>
+    <div class="col-md-3 col-sm-3 padding-top-two-em"><input type="submit" value="Save and Test"/></div>
     <p>&nbsp;</p>
 
 </form>

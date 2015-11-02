@@ -293,3 +293,6 @@ padding-left: 0.7em !important;
 padding-top: 0.4em !important;
 padding-right: 2.5em !important;
 }
+.mod-tutorial-question-textarea iframe {
+    max-width: 100%;
+}

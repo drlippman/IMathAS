@@ -3693,8 +3693,8 @@ class QuestionController extends AppController
         $shuffleVal = array("all","last","none");
         $shuffleLbl = array("no shuffle","shuffle all but last","shuffle all");
         $useeditor = "text,popuptxt";
-        $this->includeCSS(['dataTables.bootstrap.css','handheld.css']);
-        $this->includeJS(['general.js','editor/tiny_mce.js','mathjs.js','assessment/modTutorialQuestion.js']);
+        $this->includeCSS(['dataTables.bootstrap.css','handheld.css', 'question/question.css']);
+        $this->includeJS(['general.js','editor/tiny_mce.js','mathjs.js','assessment/modTutorialQuestion.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
         $renderData = array('params' => $params, 'isAdmin' => $isAdmin,'course' => $course, 'addMod' => $addMod, 'editMsg' => $editMsg,
             'id' => $id, 'cid' => $cid, 'line' => $line, 'inUseCnt' => $inUseCnt, 'myQ' => $myQ, 'fromPot' => $fromPot, 'author' => $author,
             'userId' => $user['id'], 'groupID' => $groupID, 'isGrpAdmin' => $isGrpAdmin, 'inLibs' => $inLibs, 'lockLibs' => $lockLibs,
