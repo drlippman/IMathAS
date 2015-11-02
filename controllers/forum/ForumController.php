@@ -63,10 +63,10 @@ class ForumController extends AppController
         $tutorid = $this->isTutor($user['id'],$cid);
         $studentid = $this->isStudent($user['id'],$cid);
         if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-            echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-            exit;
+            $this->setErrorFlash('You are not enrolled in this course.');
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
-        if (isset($teacherid)) {
+        if ($teacherid) {
             $isteacher = true;
         } else {
             $isteacher = false;
@@ -106,6 +106,7 @@ class ForumController extends AppController
         //get general forum info and page order
         $now = time();
         $forums = Forums::getByCourseIdAndTeacher($cid,$isteacher,$now);
+
         $forumdata = array();
         $anyforumsgroup = false;
         foreach($forums as $line )
@@ -129,7 +130,9 @@ class ForumController extends AppController
                 $itemsimporder[] = $item['id'];
             }
         }
+
         $maxitemnum = max($itemsimporder) + 1;
+
 //capture any forums that are not in imas_items
         foreach ($forumdata as $fid=>$line)
         {
@@ -148,6 +151,7 @@ class ForumController extends AppController
                 $searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
             }
             $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchlikes,$anyforumsgroup,$searchstr,$searchtag,$user->id);
+
             $threaddata = array();
             $threadids = array();
             foreach ($searchedPost as $line )
@@ -156,12 +160,6 @@ class ForumController extends AppController
                 $threadids[] = $line['id'];
             }
 
-            if (count($threadids)==0)
-            {
-                $this->setWarningFlash('No result found for your search');
-                return $this->redirect('forum?cid='.$cid);
-            }
-            $limthreads = implode(',',$threadids);
             $maxPost = ForumPosts::getMaxPostDateWithThreadId($threadids);
             $postcount = array();
             $maxdate = array();
@@ -183,14 +181,12 @@ class ForumController extends AppController
 
             }
             $searchedPost = ForumPosts::getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$user->id);
-            if(count($searchedPost) == 0)
-            {
-                $this->setWarningFlash('No result found for your search');
-                return $this->redirect('forum?cid='.$cid);
-            }
+
         } else {
+
                 //default display
             $forumPost = ForumPosts::threadCount($cid);
+
             foreach ($forumPost as $post) {
                 $threadcount[$post['id']] = $post['COUNT(imas_forum_posts.id)'];
             }
@@ -204,121 +200,16 @@ class ForumController extends AppController
             foreach ($forumThreadCount as $row) {
                 $newcnt[$row['forumid']] = $row['COUNT(imas_forum_threads.id)'];
             }
+
         }
-        $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
+
+        $this->includeCSS(['dataTables.bootstrap.css', 'roster.css','forums.css', 'dashboard.css']);
         $this->includeJS(['forum/forum.js','forum/thread.js','general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
         $this->setReferrer();
         $this->includeCSS(['course/course.css']);
-        $responseData = array('forums' => $forums,'threaddata' => $threaddata,'searchtag' => $searchtag,'newcnt' => $newcnt,'threadcount' => $threadcount,'postcount' => $postcount,'maxdate' => $maxdate,'forumdata' => $forumdata,'isteacher' => $isteacher,
+        $responseData = array('searchedPost' => $searchedPost,'threadids' => $threadids,'forums' => $forums,'threaddata' => $threaddata,'searchtag' => $searchtag,'newcnt' => $newcnt,'threadcount' => $threadcount,'postcount' => $postcount,'maxdate' => $maxdate,'forumdata' => $forumdata,'isteacher' => $isteacher,
             'itemsassoc' => $itemsassoc,'threadids' => $threadids,'itemsimporder' => $itemsimporder,'searchedPost' => $searchedPost,'cid' => $cid, 'users' => $user, 'course' => $course,'searchtype' => $searchtype);
         return $this->renderWithData('forum',$responseData);
-    }
-
-    /*
-    * Controller Action To Search All threads By Subject
-    */
-    public function actionGetForumNameAjax()
-    {
-        $this->guestUserHandler();
-        $param = $this->getRequestParams();
-        $userId = $this->getAuthenticatedUser()->id;
-        $search = $param['search'];
-        $courseId = $param['courseId'];
-        $query = ForumForm::byAllSubject($search, $courseId, $userId);
-        if ($query) {
-            $searchThread = array();
-            foreach ($query as $data) {
-                $username = User::getById($data['userid']);
-                $postdate = Thread::getById($data['threadid']);
-                $repliesCount = ForumPosts::findCount($data['threadid']);
-                $tempArray = array
-                (
-                    'parent' => $data['parent'],
-                    'forumIdData' => $data['forumid'],
-                    'threadId' => $data['threadid'],
-                    'subject' => $data['subject'],
-                    'views' => $data['views'],
-                    'replyBy' => $repliesCount[0]['count'],
-                    'postdate' => AppController::customizeDate($postdate->lastposttime),
-                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-                );
-                array_push($searchThread, $tempArray);
-            }
-            $this->includeJS(['forum/forum.js', 'forum/thread.js']);
-            return $this->successResponse($searchThread);
-        } else {
-            return $this->terminateResponse("No data Found");
-        }
-    }
-
-    /*
-    * Controller Action To Display All The Forums
-    */
-    public function actionGetForumsAjax()
-    {
-        $this->guestUserHandler();
-        $currentTime = time();
-        $param = $this->getRequestParams();
-        $cid = $param['cid'];
-        $sort = AppConstant::DESCENDING;
-        $orderBy = 'id';
-        $threadArray = array();
-        $forums = Forums::getByCourseIdOrdered($cid, $sort, $orderBy);
-        $user = $this->getAuthenticatedUser();
-        $NewPostCounts = Thread::findNewPostCnt($cid, $user);
-        if ($forums) {
-            $forumArray = array();
-            foreach ($forums as $key => $forum) {
-                $threadCount = ForumThread::findThreadCount($forum['id']);
-                $postCount = count($forum->imasForumPosts);
-                $lastObject = '';
-                if ($postCount > AppConstant::NUMERIC_ZERO) {
-                    $lastObject = $forum->imasForumPosts[$postCount - AppConstant::NUMERIC_ONE];
-                }
-                $flag = AppConstant::NUMERIC_ZERO;
-                foreach ($NewPostCounts as $count) {
-                    if ($count['forumid'] == $forum['id']) {
-                        $tempArray = array
-                        (
-                            'forumId' => $forum['id'],
-                            'forumName' => $forum['name'],
-                            'threads' => count($threadCount),
-                            'posts' => $postCount,
-                            'currentTime' => $currentTime,
-                            'endDate' => $forum['enddate'],
-                            'rights' => $user['rights'],
-                            'avail' => $forum['avail'],
-                            'startDate' => $forum['startdate'],
-                            'countId' => $count['forumid'],
-                            'count' => $count['COUNT(imas_forum_threads.id)'],
-                            'lastPostDate' => ($lastObject != '') ? AppController::customizeDate($lastObject->postdate) : '',
-                        );
-                        $flag = AppConstant::NUMERIC_ONE;
-                        array_push($forumArray, $tempArray);
-                    }
-                }
-                if ($flag == AppConstant::NUMERIC_ZERO) {
-                    $tempArray = array
-                    (
-                        'forumId' => $forum['id'],
-                        'forumName' => $forum['name'],
-                        'threads' => count($threadCount),
-                        'posts' => $postCount,
-                        'currentTime' => $currentTime,
-                        'endDate' => $forum['enddate'],
-                        'rights' => $user['rights'],
-                        'avail' => $forum['avail'],
-                        'startDate' => $forum['startdate'],
-                        'countId' => AppConstant::NUMERIC_ZERO,
-                        'lastPostDate' => ($lastObject != '') ? AppController::customizeDate($lastObject->postdate) : '',
-                    );
-                    array_push($forumArray, $tempArray);
-                }
-            }
-            $this->includeCSS(['forums.css']);
-            $this->includeJS(['forum/forum.js']);
-            return $this->successResponse($forumArray);
-        }
     }
 
     /*Controller action to show new post to user*/
@@ -400,7 +291,8 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         if (($isteacher || isset($tutorId)) && isset($params['score'])) {
 
-            if (isset($tutorId)) {
+            if (isset($tutorId))
+            {
                 if ($forumData['tutoredit'] != 1) {
                     //no rights to edit score
                     exit;
@@ -508,8 +400,10 @@ class ForumController extends AppController
                 }
 
                 foreach ($threadData as $thread) {
-                    $limthreads[] = $thread['threadid'];
+
+                    $limthreads[] = $thread['id'];
                 }
+
                 if (count($limthreads) == 0) {
                     $limthreads = '0';
                 }
@@ -517,22 +411,27 @@ class ForumController extends AppController
         } else {
             $groupid = 0;
         }
+
         if (isset($params['tagfilter']))
         {
+
             $sessionData['tagfilter' . $forumId] = stripslashes($params['tagfilter']);
             $this->writesessiondata($sessionData, $sessionId);
-            $tagfilter = stripslashes($params['tagfilter']);
-        }
-        else if (isset($sessionData['tagfilter' . $forumId]) && $sessionData['tagfilter' . $forumId] != '') {
+            $tagfilter =  $params['tagfilter'];
+
+        }else if (isset($sessionData['tagfilter' . $forumId]) && $sessionData['tagfilter' . $forumId] != '')
+        {
             $tagfilter = $sessionData['tagfilter' . $forumId];
         } else {
             $tagfilter = '';
         }
 
-        if ($tagfilter != '') {
+        if ($tagfilter != '')
+        {
             $threadIds = ForumPosts::getThreadId($limthreads, $dofilter, $tagfilter);
             $limthreads = array();
-            foreach ($threadIds as $threadId) {
+            foreach ($threadIds as $threadId)
+            {
                 $limthreads[] = $threadId['threadid'];
             }
 
@@ -542,29 +441,27 @@ class ForumController extends AppController
             $dofilter = true;
         }
 
-        if (isset($params['search']) && trim($params['search']) != '') {
-
+        if (isset($params['search']) && trim($params['search']) != '')
+        {
             $safesearch = $params['search'];
             $safesearch = str_replace(' and ', ' ', $safesearch);
             $searchterms = explode(" ", $safesearch);
             $searchlikes = "(imas_forum_posts.message LIKE '%" . implode("%' AND imas_forum_posts.message LIKE '%", $searchterms) . "%')";
             $searchlikes2 = "(imas_forum_posts.subject LIKE '%" . implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms) . "%')";
             $searchlikes3 = "(imas_users.LastName LIKE '%" . implode("%' AND imas_users.LastName LIKE '%", $searchterms) . "%')";
-
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
-            if(!$searchedPost)
-            {
-                $this->setWarningFlash('No result found for your search');
-                return $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
-            }
         }
 
         if (isset($params['markallread'])) {
 
             $readPost = ForumPosts::MarkAllRead($forumId, $dofilter, $limthreads);
+
             $now = time();
-            foreach ($readPost as $row) {
+            foreach ($readPost as $row)
+            {
+
                 $views = ForumView::getId($row['threadid'], $currentUser['id']);
+
                 if (count($views) > 0) {
 
                     ForumView::setLastview($views['id']);
@@ -580,7 +477,9 @@ class ForumController extends AppController
                 }
             }
         }
+
         $postData = ForumPosts::getMaxPostDate($dofilter, $limthreads, $forumId);
+
         $postcount = array();
         $maxdate = array();
         foreach ($postData as $post) {
@@ -638,6 +537,7 @@ class ForumController extends AppController
         }
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
+
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
@@ -1194,68 +1094,68 @@ class ForumController extends AppController
     /*
      * Controller Action To Search All Post In A Forum
      */
-    public function actionGetSearchPostAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $courseId = $params['courseid'];
-        $now = time();
-        $forum = Forums::getByCourseId($courseId);
-        $search = $params['search'];
-        $checkBoxVal = $params['value'];
-        $sort = AppConstant::DESCENDING;
-        $orderBy = 'postdate';
-        $query = ForumForm::byAllpost($search, $sort, $orderBy);
-        if ($query) {
-            $searchPost = array();
-            foreach ($forum as $forumId) {
-                foreach ($query as $data) {
-                    if ($forumId['id'] == $data['forumid']) {
-                        if ($this->getAuthenticatedUser()->rights == AppConstant::NUMERIC_TEN) {
-                            if ($forumId['enddate'] > $now) {
-                                $username = User::getById($data['userid']);
-                                $postdate = Thread::getById($data['threadid']);
-                                $forumName = Forums::getById($data['forumid']);
-                                $tempArray = array
-                                (
-                                    'forumIdData' => $data['forumid'],
-                                    'threadId' => $data['threadid'],
-                                    'subject' => $data['subject'],
-                                    'views' => $data['views'],
-                                    'forumName' => ucfirst($forumName->name),
-                                    'postdate' => AppController::customizeDate($postdate->lastposttime),
-                                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-                                    'message' => $data['message'],
-                                );
-                                array_push($searchPost, $tempArray);
-                            }
-                        } else {
-                            $username = User::getById($data['userid']);
-                            $postdate = Thread::getById($data['threadid']);
-                            $forumName = Forums::getById($data['forumid']);
-                            $tempArray = array
-                            (
-                                'forumIdData' => $data['forumid'],
-                                'threadId' => $data['threadid'],
-                                'subject' => $data['subject'],
-                                'views' => $data['views'],
-                                'forumName' => ucfirst($forumName->name),
-                                'postdate' => AppController::customizeDate($postdate->lastposttime),
-                                'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-                                'message' => $data['message'],
-                            );
-                            array_push($searchPost, $tempArray);
-                        }
-                    }
-                }
-            }
-            $this->includeJS(['forum/forum.js', 'forum/thread.js']);
-            $responseData = array('data' => $searchPost, 'checkvalue' => $checkBoxVal, 'search' => $search);
-            return $this->successResponse($responseData);
-        } else {
-            return $this->terminateResponse('No data');
-        }
-    }
+//    public function actionGetSearchPostAjax()
+//    {
+//        $this->guestUserHandler();
+//        $params = $this->getRequestParams();
+//        $courseId = $params['courseid'];
+//        $now = time();
+//        $forum = Forums::getByCourseId($courseId);
+//        $search = $params['search'];
+//        $checkBoxVal = $params['value'];
+//        $sort = AppConstant::DESCENDING;
+//        $orderBy = 'postdate';
+//        $query = ForumForm::byAllpost($search, $sort, $orderBy);
+//        if ($query) {
+//            $searchPost = array();
+//            foreach ($forum as $forumId) {
+//                foreach ($query as $data) {
+//                    if ($forumId['id'] == $data['forumid']) {
+//                        if ($this->getAuthenticatedUser()->rights == AppConstant::NUMERIC_TEN) {
+//                            if ($forumId['enddate'] > $now) {
+//                                $username = User::getById($data['userid']);
+//                                $postdate = Thread::getById($data['threadid']);
+//                                $forumName = Forums::getById($data['forumid']);
+//                                $tempArray = array
+//                                (
+//                                    'forumIdData' => $data['forumid'],
+//                                    'threadId' => $data['threadid'],
+//                                    'subject' => $data['subject'],
+//                                    'views' => $data['views'],
+//                                    'forumName' => ucfirst($forumName->name),
+//                                    'postdate' => AppController::customizeDate($postdate->lastposttime),
+//                                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
+//                                    'message' => $data['message'],
+//                                );
+//                                array_push($searchPost, $tempArray);
+//                            }
+//                        } else {
+//                            $username = User::getById($data['userid']);
+//                            $postdate = Thread::getById($data['threadid']);
+//                            $forumName = Forums::getById($data['forumid']);
+//                            $tempArray = array
+//                            (
+//                                'forumIdData' => $data['forumid'],
+//                                'threadId' => $data['threadid'],
+//                                'subject' => $data['subject'],
+//                                'views' => $data['views'],
+//                                'forumName' => ucfirst($forumName->name),
+//                                'postdate' => AppController::customizeDate($postdate->lastposttime),
+//                                'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
+//                                'message' => $data['message'],
+//                            );
+//                            array_push($searchPost, $tempArray);
+//                        }
+//                    }
+//                }
+//            }
+//            $this->includeJS(['forum/forum.js', 'forum/thread.js']);
+//            $responseData = array('data' => $searchPost, 'checkvalue' => $checkBoxVal, 'search' => $search);
+//            return $this->successResponse($responseData);
+//        } else {
+//            return $this->terminateResponse('No data');
+//        }
+//    }
 
     /*
      * Controller Action To Search Post Of That Forum

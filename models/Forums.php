@@ -310,12 +310,13 @@ class Forums extends BaseImasForums {
     {
         $query = new Query();
         $query->select('*')
-            ->from('imas_forums')->where('imas_forums.courseid = courseid',[':courseid' => $courseId]);
+            ->from('imas_forums')->where('imas_forums.courseid=imas_forums.courseid');
         if (!$isteacher)
         {
             $query->andWhere(['imas_forums.avail' => 2])->orWhere(['imas_forums.avail' => 2] and ['<','imas_forums.startdate',$now] and ['>','imas_forums.enddate',$now]);
         }
-        return $query->createCommand()->queryAll();
+        $query->andWhere('imas_forums.courseid = :courseId');
+        return $query->createCommand()->bindValue(':courseId',$courseId)->queryAll();
     }
 
     public static function getMaxPostDate($cid)

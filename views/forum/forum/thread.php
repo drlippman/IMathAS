@@ -71,7 +71,8 @@ $now = $currentTime;
         </div>
                     <?php if (count($newpost)>0) {?>
         <div class="col-md-4 col-sm-4 padding-top-eighteen padding-left-right-zero">
-            <a>
+<!--            $toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button>";-->
+            <a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?page='.$page.'&cid='.$cid.'&forum='.$forumid.'&markallread=true')?>">
                 <?php echo AppUtility::t('Mark All Read')?>
             </a>
         </div>
@@ -128,12 +129,6 @@ echo '</div>';
 
             }else
         {
-            if (count($postInformtion) == 0)
-            {
-                echo '<div class="col-sm-12 padding-left-thirty padding-top-thirty">';
-                echo ' <h4>No posts have been made yet.  Click Add New Thread to start a new discussion </h4>';
-                echo '</div>';
-            }else{
 
     if ($page > 0) {
         $numpages = ceil($countOfPostId['id'] / $threadsperpage);
@@ -207,7 +202,7 @@ echo '</div>';
                         echo '</select></div>';
 
                     } ?>
-               <?php if ($taglist!='') {
+               <?php if ($taglist != '') {
                     $p = strpos($taglist,':');
                     $tagselect = '<span class="col-md-3 col-sm-4"><span>Filter by </span>'.substr($taglist,0,$p);
                     $tagselect .= '<select class="form-control width-fifty-per display-inline-block margin-left-ten" id="tagfilter" onChange="chgtagfilter()"><option value="" ';
@@ -231,7 +226,14 @@ echo '</div>';
                 } ?>
             <?php }
             echo implode(' | ',$toshow);
-            ?>
+
+            if (count($postInformtion) == 0)
+            {
+                echo '<div class="col-sm-12 padding-left-thirty padding-top-thirty">';
+                echo ' <h4>No posts have been made yet.  Click Add New Thread to start a new discussion </h4>';
+                echo '</div>';
+            }else
+            {            ?>
 
             </div><div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
                 <div class="overflow-x-auto">

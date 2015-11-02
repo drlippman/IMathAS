@@ -338,10 +338,10 @@ class ForumPosts extends BaseImasForumPosts
     public static function getThreadId($limthreads,$dofilter,$tagfilter)
     {
         $query = new Query();
-        $query->select('threadid')->from('imas_forum_posts')->where(['tag' => $tagfilter]);
+        $query->select('threadid')->from('imas_forum_posts')->where(['LIKE','tag',$tagfilter]);
         if ($dofilter)
         {
-            $query->andWhere('IN','threadid',$limthreads);
+            $query->andWhere(['IN','threadid',$limthreads]);
         }
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -398,7 +398,7 @@ class ForumPosts extends BaseImasForumPosts
         ->andWhere('forumid= :forumId');
         if ($dofilter)
         {
-        $query->andWhere('IN','threadid',$limthreads);
+        $query->andWhere(['IN','threadid',$limthreads]);
         }
         $data = $query->createCommand();
         $data->bindValue('forumId', $forumId);
@@ -414,14 +414,14 @@ class ForumPosts extends BaseImasForumPosts
 
         if ($dofilter)
         {
-            $query->andWhere('IN','imas_forum_posts.threadid',$limthreads);
+            $query->andWhere(['IN','imas_forum_posts.threadid',$limthreads]);
         }
         if ($page==-1)
         {
-            $query->andWhere('IN','imas_forum_posts.threadid',$newpostlist);
+            $query->andWhere(['IN','imas_forum_posts.threadid',$newpostlist]);
         } else if ($page==-2)
         {
-            $query->andWhere('IN','imas_forum_posts.threadid',$flaggedlist);
+            $query->andWhere(['IN','imas_forum_posts.threadid',$flaggedlist]);
         }
         $query->groupBy('imas_forum_posts.id');
         $data = $query->createCommand();
@@ -438,14 +438,14 @@ class ForumPosts extends BaseImasForumPosts
             ->andWhere('imas_forum_posts.parent=0')->andWhere('imas_forum_posts.forumid= :forumId');
         if ($dofilter)
         {
-            $query->andWhere('IN','imas_forum_posts.threadid',$limthreads);
+            $query->andWhere(['IN','imas_forum_posts.threadid',$limthreads]);
         }
         if ($page==-1)
         {
-            $query->andWhere('IN','imas_forum_posts.threadid',$newpostlist);
+            $query->andWhere(['IN','imas_forum_posts.threadid',$newpostlist]);
         } else if ($page==-2)
         {
-            $query->andWhere('IN','imas_forum_posts.threadid',$flaggedlist);
+            $query->andWhere(['IN','imas_forum_posts.threadid',$flaggedlist]);
         }
         if ($sortby==0)
         {
@@ -486,7 +486,7 @@ class ForumPosts extends BaseImasForumPosts
     }
     public static function getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$userid)
     {
-        $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
+        $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.posttype,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
         if ($anyforumsgroup && !$isteacher) {
@@ -511,7 +511,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getBySearchTextForThread($isteacher, $now, $cid, $searchlikes,$anyforumsgroup,$searchstr,$searchtag,$userid)
     {
-        $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
+        $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.posttype,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
         $query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";

@@ -205,7 +205,7 @@ class ForumView extends BaseImasForumViews
 
     public static function getId($threadId, $UserId)
     {
-        return ForumView::find(['id'])->where(['threadid' => $threadId, 'userid' => $UserId])->all();
+        return ForumView::find(['id'])->where(['threadid' => $threadId, 'userid' => $UserId])->one();
     }
 
     public static function setLastview($threadId)
@@ -221,10 +221,11 @@ class ForumView extends BaseImasForumViews
     public static function getForumDataByUserId($userId,$dofilter,$limthreads)
     {
         $query = new Query();
+
         $query->select('threadid,lastview,tagged')->from('imas_forum_views')->where('userid= :userId');
         if ($dofilter)
         {
-            $query->andWhere('IN','threadid',$limthreads);
+            $query->andWhere(['IN','threadid',$limthreads]);
         }
         $data = $query->createCommand();
         $data->bindValue('userId', $userId);

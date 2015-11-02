@@ -17,7 +17,6 @@ function toggleDate( )
 {
     var startDate = $( "#datepicker-id input" ).val();
     var endDate = $( "#datepicker-id1 input" ).val();
-    console.log(startDate);
     if(endDate < todaysdate)
     {
         $('#following-link').show();

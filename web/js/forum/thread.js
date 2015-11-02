@@ -37,7 +37,7 @@ $(document).ready(function ()
              window.location = "thread?cid="+courseid+"&forum="+forumid+"&markallread=true&page="+page;
          }
      });
- }{}
+ }
  function change()
  {
      $('#change-button').click(function(){

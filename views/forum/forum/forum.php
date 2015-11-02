@@ -2,16 +2,12 @@
 use app\components\AppUtility;
 
 require("../components/filehandler.php");
-$pagetitle = "Forums";
-//$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
-
-
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
-if ($searchtype != 'none')
-{ ?>
-    <a href="<?php echo  AppUtility::getURLFromHome('forum','forum/forums?cid='.$cid.'&clearsearch=true')?>">Forum List</a>
-<?php }
-echo "Forums</div>\n";
+if ($searchtype=='none')
+{
+    $pagetitle = "Forums";
+} else {
+    $pagetitle = "Forum Search Results";
+}
 
 //construct tag list selector
 $taginfo = array();
@@ -30,6 +26,7 @@ foreach ($itemsimporder as $item) {
         }
     }
 }
+
 if (count($taginfo)==0) {
     $tagfilterselect = '';
 } else {
@@ -38,7 +35,7 @@ if (count($taginfo)==0) {
     } else {
         $tagfilterselect = $catname .'';
     }
-    $tagfilterselect .= '<select class="display-inline-block width-fifty-per form-control margin-left-five" name="tagfiltersel">';
+    $tagfilterselect .= '<select class="display-inline-block width-fifty-per form-control margin-left-five"  name="tagfiltersel">';
     $tagfilterselect .= '<option value="">All</option>';
     foreach ($taginfo as $catname=>$tagarr) {
         if (count($taginfo)>1) {
@@ -55,16 +52,12 @@ if (count($taginfo)==0) {
     }
     $tagfilterselect .= '</select>';
 }
-//if ($searchtype=='none') {
-//    echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
-//} else {
-//    echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
-//}
 ?>
 <div class="item-detail-header">
-    <?php if($users->rights == 100 || $users->rights == 20) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
-    } elseif($users->rights == 10){
+    <?php if($searchtype != 'none') {
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id.'&clearsearch=true']]);
+    } else
+    {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
     }?>
 </div>
@@ -113,48 +106,68 @@ if (count($taginfo)==0) {
                 </div>
             </form>
         </div>
-        <?php if ($searchtype == 'thread') { ?>
+ <?php
+
+ $isblank = 0;
+ if(count($threadids)==0 && $searchtype == 'thread')
+ {
+     $isblank = 1;
+ }else if(count($searchedPost) == 0 && $searchtype == 'posts'){
+     $isblank = 1;
+ }?>
+        <?php if($isblank)
+        {
+            echo '<div class="col-md-12 title-option">';
+            echo '<h4>No result found for your search</h4>';
+            echo '</div>';
+        } else if ($searchtype == 'thread') { ?>
             <!--    doing a search of thread subjects-->
             <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty">
-                <?php echo '<table class=search-forum><thead>';
-                echo '<tr><th>Topic</th><th>Forum</th><th>Replies</th><th>Views</th><th>Last Post Date</th></tr></thead><tbody>';
+                <?php echo '<table class="search-forum "><thead>';
+                echo '<tr><th class="width-twelve-five-per">Topic</th><th class="width-fourty-five-per">Forum</th><th>Replies</th><th>Views</th><th class="width-twelve-per">Last Post Date</th></tr></thead><tbody>';
                 foreach ($threaddata as $line) {
                     if (isset($postcount[$line['id']])) {
                         $posts = $postcount[$line['id']];
-                        $lastpost = AppUtility::tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
+                        $lastpost = AppUtility::tzdate("F j, Y, g:i a", $maxdate[$line['id']]);
                     } else {
                         $posts = 0;
                         $lastpost = '';
                     }
                     echo "<tr id=\"tr{$line['id']}\" ";
-                    if ($line['tagged']==1) {echo 'class="tagged"';}
-                    echo "><td>";?>
-                    <div>
-                        <?php                   echo "<span class=\" text-align-center\">\n";
-                        if ($line['tag']!='') { //category tags
-                            echo '<span class="forumcattag text-align-center">'.$line['tag'].'</span> ';
-                        }else{
-                            echo '<span class="forumcattag text-align-center">     </span> ';
-                        }
-                        echo "</span>\n"; ?>
-                    </div>
+                    if ($line['tagged'] == 1) {
+                        echo 'class="tagged"';
+                    }
+                    echo "><td>"; ?>
+
+                    <?php echo "<span class=\" text-align-center\">\n";
+                    if ($line['tag'] != '')
+                    { //category tags
+                        echo '<span class="forumcattag text-align-center">' . $line['tag'] . '</span> ';
+                    } else {
+                        echo '<span class="forumcattag text-align-center">     </span> ';
+                    }
+                    echo "</span>\n"; ?>
+
+
                     <div class="btn-group floatright">
-                        <!--                --><?php //if ($line['tagged']==1) {
-                        //                    echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
-                        //                } else {
-                        //                    echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
-                        //                }
-                        if ($line['tagged']==1) { ?>
+                    <?php
+                    if ($line['posttype']==0) {
+                    if ($line['tagged'] == 1) { ?>
 
-                            <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
-                        <?php
+                        <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"
+                           onClick="changeImage(this,'true',<?php echo $line['id'] ?>)"> <i class='fa fa-flag'></i>
+                            Unflag</a>
+                    <?php
 
-                        } else { ?>
+                    } else { ?>
 
                         <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
                         <?php
 
-                        } ?>
+                    }
+                }else{
+                        echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
+                    } ?>
                         <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
                             <span class="fa fa-caret-down "></span>
                         </a>
@@ -175,16 +188,21 @@ if (count($taginfo)==0) {
                     </div>
 
 
+                    <div>
                     <?php
                     if ($line['isanon']==1) {
                         $name = "Anonymous";
                     } else {
                         $name = "{$line['LastName']}, {$line['FirstName']}";
-                    }
-                    echo "<b><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['id']}&page=-4\">{$line['subject']}</a></b>: $name";
-                    echo "</td>\n";
-                    echo "<td class=\"c\"><a href=\"thread.php?cid=$cid&forum={$line['forumid']}\">{$line['name']}</a></td>";
-                    echo "<td class=c>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
+                    } ?>
+                     <b><a class="width-hundread-per word-break-all-width" href="<?php echo AppUtility::getURLFromHome('forum','forum/post?&page=-4&courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id']);?> "> <?php echo $line['subject'] ?></a></b>&nbsp;<?php echo $name?>
+
+
+                     </div>
+                     </td>
+
+                     <td class="c width-hundread-per word-break-all-width"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['forumid']);?>"><?php echo $line['name']?></a></td>
+                    <?php echo "<td class='C '>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
                     echo "</td></tr>\n";
                 } ?>
                 </tbody>
@@ -245,7 +263,8 @@ if (count($taginfo)==0) {
                 <?php echo "</div></div>\n";
             }
 
-        } else {
+        }else {
+
             if (count($forumdata)==0) {
                 if ($isteacher) {
                     echo '<p>There are no forums in this class yet.  You can add forums from the course page.</p>';
@@ -255,28 +274,43 @@ if (count($taginfo)==0) {
             } else {
                 //default display
                 ?>
-                <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty">
+<!--        --><?php
+//        foreach ($itemsimporder as $item) {
+//            if (!isset($itemsassoc[$item])) {
+//                continue;
+//            }
+//            $line = $forumdata[$itemsassoc[$item]];
+//        }
+                ?>
+        <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty myScrollTable">
                     <table class=search-forum>
                         <thead>
-                        <tr><th>Forum Name</th><th>Threads</th><th>Posts</th><th>Last Post Date</th></tr>
+                        <tr><th class="width-sixty-per">Forum Name</th><th class="width-three-per">Threads</th><th class="width-three-per">Posts</th><th class="width-twenty-four-per">Last Post Date</th></tr>
                         </thead>
                         <tbody>
                         <?php
-                        foreach ($itemsimporder as $item) {
+                        foreach ($itemsimporder as $item)
+                        {
                             if (!isset($itemsassoc[$item])) { continue; }
                             $line = $forumdata[$itemsassoc[$item]];
+//                            if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)))
+//                            {
+//                                continue;
+//                            }
+                            echo "<tr>
+                            <td class=''>";?>
 
-                            if (!$isteacher && !($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now))) {
-                                continue;
-                            }
-                            echo "<tr><td>";
-                            if ($isteacher) { ?>
-                                <span class="right">
-                     <a href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$cid.'&fromforum=1&id='.$line['id']);?> ">Modify</a>
+
+                         <?php   if ($isteacher) { ?>
+
+                                <span class="floatright">
+                     <a href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$cid.'&fromforum=1&id='.$line['id']);?> ">&nbsp;Modify</a>
                      </span>
+
                             <?php } ?>
-                            <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id']);?>"><?php echo $line['name'];?></a></b>
-                            <?php if ($newcnt[$line['id']]>0) { ?>
+                            <b><a class="word-break-break-all width-hundread-per" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id']);?>"><?php echo $line['name'];?></a></b>
+                            <?php if ($newcnt[$line['id']]>0)
+                                { ?>
                                 <a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id'].'&page=-1');?>" style="color:red">New Posts  (<?php echo $newcnt[$line['id']];?>) </a>
                             <?php }
                             echo "</td>\n";

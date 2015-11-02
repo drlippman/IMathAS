@@ -11,9 +11,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 ?>
 <div class="item-detail-header">
     <?php if($currentUser->rights > AppConstant::STUDENT_RIGHT) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forum=' . $forumId]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forum=' . $forumId]]);
     } else{
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forum=' . $forumId]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Forum', false),AppUtility::t('Thread', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id,AppUtility::getHomeURL() .'forum/forum/thread?cid=' . $course->id . '&forum=' . $forumId]]);
     }?>
 </div>
 <div class = "title-container">
