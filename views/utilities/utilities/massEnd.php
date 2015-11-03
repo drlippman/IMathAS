@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo "<form method=post action=''>\n";
                 } else if ($calledFrom=='itemsearch')
                 {
-                    echo "<form method=post action='".AppUtility::getURLFromHome('utilities','utilities/item-search?masssend='.$sendType)."'>\n";
+                    echo "<form method=post action='item-search?masssend='.$sendType>\n";
                 }
                 echo "<span class=form><label for=\"subject\">Subject:</label></span>";
                 echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"{$line['subject']}\"></span><br class=form>\n";

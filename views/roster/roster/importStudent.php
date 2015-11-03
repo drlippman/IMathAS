@@ -16,7 +16,7 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
 <?php if($courseId == 'admin'){ ?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index']]); ?>
 <?php }else{?>
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, AppUtility::t('Roster', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'roster/roster/student-roster?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, AppUtility::t('Roster', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'roster/roster/student-roster?cid=' . $course->id]]); ?>
 <?php } ?>
 </div>
     <div class="title-container">
@@ -32,17 +32,17 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
 <div class="inner-content">
-    <fieldset>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-sm-5 clear-both col-sm-offset-3\">{error}</div>",
-                'labelOptions' => ['class' => 'col-sm-3  text-align-left'],
+                'template' => "{label}\n<div class=\"col-md-4 col-sm-4\">{input}</div>\n<div class=\"col-sm-5 clear-both col-sm-offset-3\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-3 col-sm-3  text-align-left'],
             ],
         ]); ?>
-        <div class="text-label"><?php echo AppUtility::t("Register and enroll students from a CSV (comma separated values) file", false)?></div>
+        <div class="text-label">
+            <?php echo AppUtility::t("Register and enroll students from a CSV (comma separated values) file", false)?></div>
         <?php echo $form->field($model, 'file')->fileInput(); ?>
         <?php echo $form->field($model, 'headerRow')->radioList([AppConstant::NUMERIC_ONE => 'Yes',AppConstant::NUMERIC_ZERO=>'No']); ?>
         <?php echo $form->field($model, 'firstName')->textInput(); ?>
@@ -71,7 +71,6 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
             echo "This class";
         } ?>
         </div>
-    </fieldset>
     <div class="form-group">
         <div class="col-sm-offset-3 roster-submit">
             <?php echo Html::submitButton(AppUtility::t('Submit and Review', false), ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>

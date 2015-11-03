@@ -78,7 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo '<li>Email: '.$user['email'].'</li>';
                             echo '<li>Last Login: '.AppUtility::tzdate("n/j/y g:ia", $user['lastaccess']).'</li>';
                             echo '<li>Rights: '.$user['rights'].'</li>';
-                            echo '<li>Reset Password to <input type="text" name="newpw"/> <input class="form-control-utility" type="submit" style="width: 60px; height: 32px; border-radius: 2px; margin-left: 5px" value="Go"/></li>';?>
+                            echo '<li>Reset Password to <input type="text" class="form-control-1" name="newpw"/> <input class="form-control-utility" type="submit" style="width: 60px; height: 32px; border-radius: 2px; margin-left: 5px" value="Go"/></li>';?>
                             <?php
                             if($countOfCourseData > 0)
                             {
