@@ -220,7 +220,7 @@ class QuestionSet extends BaseImasQuestionset
         $query = new Query();
         $query->select('iq.id,iq.category,iqs.description')->from('imas_questions AS iq')
             ->join('INNER JOIN','imas_questionset as iqs','iq.questionsetid=iqs.id')->where('iq.assessmentid = :aid');
-        $query->createCommand()->bindValue(':aid',$aid)->queryAll();
+        return $query->createCommand()->bindValue(':aid',$aid)->queryAll();
     }
 
     public static function getQtext($id){

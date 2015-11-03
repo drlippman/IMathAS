@@ -74,7 +74,7 @@ class Items extends BaseImasItems
             ->join('INNER JOIN',
                 'imas_assessments AS ia',
                 'ii.typeid=ia.id')
-            ->where('ii.itemtype=Assessment')
+            ->where(['ii.itemtype' =>'Assessment'])
             ->andWhere('ii.courseid= :cid', [':cid' => $cid])
             ->andWhere('ia.id <> :aid', [':aid' => $aid]);
         return $query->createCommand()->queryAll();

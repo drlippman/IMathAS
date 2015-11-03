@@ -28,7 +28,7 @@ class Libraries extends BaseImasLibraries
             ->join('INNER JOIN',
                 'imas_library_items',
                 'imas_library_items.libid=imas_libraries.id')
-            ->where(['imas_library_items.qsetid= :qSetId', [':qSetId' => $qSetId]]);
+            ->where('imas_library_items.qsetid= :qSetId', [':qSetId' => $qSetId]);
         return $query->createCommand()->queryAll();
     }
 
@@ -44,7 +44,7 @@ class Libraries extends BaseImasLibraries
             ->from('imas_libraries,imas_library_items,imas_users')
             ->where('imas_libraries.id=imas_library_items.libid')
             ->andWhere('imas_library_items.ownerid=imas_users.id')
-            ->andWhere(['imas_library_items.qsetid= :questionId', [':questionId' => $questionId]]);
+            ->andWhere('imas_library_items.qsetid= :questionId', [':questionId' => $questionId]);
         return $query->createCommand()->queryAll();
     }
 
@@ -66,7 +66,7 @@ class Libraries extends BaseImasLibraries
         $query = new Query();
         $query->select('imas_questions.id,imas_libraries.id AS libid,imas_libraries.name')
             ->from('imas_questions,imas_library_items,imas_libraries')
-            ->where(['imas_questions.assessmentid=:aid', [':aid' => $aid]])
+            ->where('imas_questions.assessmentid= :aid', [':aid' => $aid])
             ->andWhere('imas_questions.questionsetid=imas_library_items.qsetid')
             ->andWhere('imas_library_items.libid=imas_libraries.id')
             ->orderBy('imas_questions.id');
