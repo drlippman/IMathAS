@@ -2930,6 +2930,24 @@ function getscorenonzero() {
 	}
 	return $out;
 }
+
+function getiscorrect() {
+	global $rawscores;
+	$out = array();
+	for ($i=0;$i<count($rawscores);$i++) {
+		if (strpos($rawscores[$i],'~')===false) {
+			$out[$i+1] = ($rawscores[$i]<0)?-1:(($rawscores[$i]==1)?1:0);
+		} else {
+			$sp = explode('~',$rawscores[$i]);
+			$out[$i+1] = array();
+			for ($j=0;$j<count($sp);$j++) {
+				$out[$i+1][$j] = ($sp[$j]==1)?1:0;
+			}
+		}
+	}
+	return $out;
+}
+
 function ABarray($s,$n) {
 	$out = array();
 	for ($i=$s;$i<$s+$n;$i++) {

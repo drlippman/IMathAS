@@ -123,6 +123,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}
+	if (isset($GLOBALS['rawscores'])) {
+		$scoreiscorrect = getiscorrect();
+	}
 	
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
@@ -240,6 +243,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		//$toevalqtxt = preg_replace('/\$answerbox(\[\d+\])?/','',$toevalqtxt);
 	}
 	
+	
 	//create hintbuttons
 	if (isset($hints) && $showhints) {
 		//$hintkeys = array_keys($hints);
@@ -247,6 +251,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$lastkey = max(array_keys($hints));
 		if ($qdata['qtype']=="multipart" && is_array($hints[$lastkey])) { //individual part hints
 			foreach ($hints as $iidx=>$hintpart) {
+				if (isset($scoreiscorrect) && $scoreiscorrect[$thisq][$iidx]==1) {continue;}
 				$lastkey = max(array_keys($hintpart));
 				if ($attemptn>$lastkey) {
 					$usenum = $lastkey;
@@ -264,8 +269,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				}
 				
 			}
-		} else { //one hint for question
+		} else if (!isset($scoreiscorrect) || $scoreiscorrect[$thisq]!=1) { //one hint for question
 			//$lastkey = end(array_keys($hints));
+			
 			if ($attemptn>$lastkey) {
 				$usenum = $lastkey;
 			} else {
