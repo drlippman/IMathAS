@@ -1,5 +1,6 @@
 //dropdown menu
 var imasroot = $('.home-path').val();
+var basepath = $('.base-path').val();
 var closetimer	= 0;
 var ddmenuitem	= 0;
 var homemenuloaded = 0;
@@ -302,8 +303,8 @@ function initeditor(edmode,edids,css) {
         table_styles: "Gridded=gridded;Gridded Centered=gridded centered",
         cleanup_callback : "imascleanup",
         convert_urls: false,
-        AScgiloc : '../../../filter/graph/svgimg.php',
-        ASdloc : '/js/d.svg'
+        AScgiloc : basepath+'/filter/graph/svgimg.php',
+        ASdloc : imasroot+'js/d.svg'
 	}
 	if (edmode=="exact") {
 		edsetup.elements = edids
@@ -398,14 +399,13 @@ addLoadEvent(setselectbycookie);
 
 var recordedunload = false;
 function recclick(type,typeid,info,txt) {
-    var cid = 10;alert(txt);
+    var cid = 10;
 	if (cid > 0) {
 		var extradata = '',m;
 		if ((m = window.location.href.match(/showlinkedtext.*?&id=(\d+)/)) !== null && recordedunload==false) {
 			extradata = '&unloadinglinked='+m[1];
 			recordedunload = true;
 		}
-        alert('imasroot');
 		jQuery.ajax({
 			type: "POST",
 			url: imasroot+'assessment/assessment/rec-track-ajax?cid='+cid,

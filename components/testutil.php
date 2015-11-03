@@ -469,7 +469,7 @@ function scorequestion($qn, $rectime=true) {
 		}
         $connection = Yii::$app->getDb();
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		$query .= "('". $testsettings['courseid']."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
+		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
         $connection->createCommand($query)->execute();
 	}
 	
@@ -506,7 +506,7 @@ function recordtestdata($limit=false) {
 	$bestseedslist = implode(',',$bestseeds);
 	$bestlastanswers = str_replace('~','',$bestlastanswers);
 	$bestlalist = implode('~',$bestlastanswers);
-    $bestlalist =  stripslashes($bestlalist);
+    $bestlalist = addslashes(stripslashes($bestlalist));
 	
 	if ($noraw) {
 		$scorelist = implode(',',$scores);
@@ -517,7 +517,7 @@ function recordtestdata($limit=false) {
 	$seedslist = implode(',',$seeds);
 	$lastanswers = str_replace('~','',$lastanswers);
 	$lalist = implode('~',$lastanswers);
-	$lalist =  stripslashes($lalist);
+	$lalist = addslashes(stripslashes($lalist));
 	$timeslist = implode(',',$timesontask);
 	
 	$reattemptinglist = implode(',',$reattempting);
@@ -547,7 +547,7 @@ function recordtestdata($limit=false) {
 		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) { 
 			//update lti record.  We only do this for single assessment placements
 			
-			require_once("../components/ltioutcomes.php");
+//			require_once("../components/ltioutcomes.php");
 			
 			$total = 0;
 			for ($i =0; $i < count($bestscores);$i++) {
@@ -555,7 +555,7 @@ function recordtestdata($limit=false) {
 			}
 			$totpossible = totalpointspossible($qi);
 			$grade = round($total/$totpossible,4);
-			$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade);
+			$res = \app\components\LtiOutcomesUtility::updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade);
 			
 		}
 	}

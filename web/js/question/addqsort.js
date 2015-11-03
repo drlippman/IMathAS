@@ -418,7 +418,7 @@ function generateTable() {
 	return html;
 }
 
-function submitChanges() { 
+function submitChanges() {
   url = AHAHsaveurl + '&order='+generateOutput();
   var target = "submitnotice";
   document.getElementById(target).innerHTML = ' Saving Changes... ';
@@ -437,11 +437,11 @@ function submitChanges() {
 function ahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK" 
-	    if (req.responseText=='OK') {
+	    if (req.responseText.trim()=='OK') {
 		    document.getElementById(target).innerHTML='';
 		    refreshTable();
 	    } else {
-		    document.getElementById(target).innerHTML=req.responseText;
+		    document.getElementById(target).innerHTML=req.responseText.trim();
 		    itemarray = olditemarray;
 	    }
     } else {

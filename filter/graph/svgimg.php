@@ -29,6 +29,6 @@
 			$AS->processShortScript($_GET['sscr']);
 			$AS->outputimage($imgdir.$fn.'.png');
 		}
-	}
+	}\app\components\AppUtility::dump(header("Location: $urlmode$host$uri/$imgdir$fn.png"));
 	header("Location: $urlmode$host$uri/$imgdir$fn.png");
 ?>

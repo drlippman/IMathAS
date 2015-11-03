@@ -543,7 +543,7 @@ class UtilitiesController extends AppController
             $message = AppConstant::NO_AUTHORITY;
         }
         ini_set('display_errors',AppConstant::NUMERIC_ONE);
-        error_reporting(E_ALL);
+        error_reporting(0);
         @set_time_limit(AppConstant::NUMERIC_ZERO);
         ini_set("max_input_time", "3600");
         ini_set("max_execution_time", "3600");

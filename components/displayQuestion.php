@@ -3750,9 +3750,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return ($score);
 		//return $correct;
 	} else if ($anstype == "essay") {
-		require_once("../includes/htmLawed.php");
+		require_once("htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script-form');
-		$givenans =  htmLawed(stripslashes($givenans),$htmlawedconfig);
+		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
@@ -5559,45 +5559,45 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 	$shorttip = '';
 	if (in_array('fraction',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4) or as a whole number (like 4 or -2)'), $eword);
-		$shorttip = $islist? 'Enter a list of fractions or whole numbers':'Enter a fraction or whole number';
+		$shorttip = $islist?_('Enter a list of fractions or whole numbers'):_('Enter a fraction or whole number');
 	} else if (in_array('reducedfraction',$ansformats)) {
 		if (in_array('fracordec',$ansformats)) {
 			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6), as a whole number (like 4 or -2), or as an exact decimal (like 0.5 or 1.25)'), $eword);
-			$shorttip = $islist?'Enter a list of reduced fractions, whole numbers, or exact decimals':'Enter a reduced fraction, whole number, or exact decimal';
+			$shorttip = $islist?_('Enter a list of reduced fractions, whole numbers, or exact decimals'):_('Enter a reduced fraction, whole number, or exact decimal');
 		} else {
 			$tip .= sprintf(_('Enter %s as a reduced fraction (like 5/3, not 10/6) or as a whole number (like 4 or -2)'), $eword);
-			$shorttip = $islist?'Enter a list of reduced fractions or whole numbers':'Enter a reduced fraction or whole number';
+			$shorttip = $islist?_('Enter a list of reduced fractions or whole numbers'):_('Enter a reduced fraction or whole number');
 		}
 	} else if (in_array('mixednumber',$ansformats)) {
-		$tip .= sprintf('Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;', $eword);
-		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a mixed number or whole number';
+		$tip .= sprintf(_('Enter %s as a reduced mixed number or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
+		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a mixed number or whole number');
 	} else if (in_array('mixednumberorimproper',$ansformats)) {
-		$tip .= sprintf('Enter %s as a reduced mixed number, reduced proper or improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;', $eword);
-		$shorttip = $islist?'Enter a list of mixed numbers or whole numbers':'Enter a reduced mixed number, proper or improper fraction, or whole number';
+		$tip .= sprintf(_('Enter %s as a reduced mixed number, reduced proper or improper fraction, or as a whole number.  Example: 2 1/2 = 2 &frac12;'), $eword);
+		$shorttip = $islist?_('Enter a list of mixed numbers or whole numbers'):_('Enter a reduced mixed number, proper or improper fraction, or whole number');
 	} else if (in_array('fracordec',$ansformats)) {
-		$tip .= sprintf('Enter %s as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)', $eword);
-		$shorttip = $islist?'Enter a list of fractions or exact decimals':'Enter a fraction or exact decimal';
+		$tip .= sprintf(_('Enter %s as a fraction (like 3/5 or 10/4), a whole number (like 4 or -2), or exact decimal (like 0.5 or 1.25)'), $eword);
+		$shorttip = $islist?_('Enter a list of fractions or exact decimals'):_('Enter a fraction or exact decimal');
 	} else if (in_array('scinot',$ansformats)) {
 		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
-		$shorttip = $islist?'Enter a list of numbers using scientific notation':'Enter a number using scientific notation';
+		$shorttip = $islist?_('Enter a list of numbers using scientific notation'):_('Enter a number using scientific notation');
 	} else {
-		$tip .= sprintf('Enter %s as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)', $eword);
-		$shorttip = $islist?'Enter a list of mathematical expressions':'Enter a mathematical expression';
+		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
+		$shorttip = $islist?_('Enter a list of mathematical expressions'):_('Enter a mathematical expression');
 	}
 	if ($calledfrom != 'calcmatrix') {
-		$tip .= "<br/>".'Enter DNE for Does Not Exist, oo for Infinity';
+		$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
 	}
 	if (in_array('nodecimal',$ansformats)) {
-		$tip .= "<br/>".'Decimal values are not allowed';
+		$tip .= "<br/>" . _('Decimal values are not allowed');
 	} else if (isset($reqdecimals)) {
 		if ($reqdecimals == 0) {
-			$tip .= "<br/>".'Your answer should be accurate to the nearest whole number.';
+			$tip .= "<br/>" . _('Your answer should be accurate to the nearest whole number.');
 		} else {
-			$tip .= "<br/>" . sprintf('Your answer should be accurate to %d decimal places.', $reqdecimals);
+			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
 		}
 	}
 	if (in_array('notrig',$ansformats)) {
-		$tip .= "<br/>".'Trig functions (sin,cos,etc.) are not allowed';
+		$tip .= "<br/>" . _('Trig functions (sin,cos,etc.) are not allowed');
 	}
 	if ($doshort) {
 		return array($tip,$shorttip);

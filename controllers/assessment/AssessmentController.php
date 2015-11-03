@@ -2526,7 +2526,7 @@ class AssessmentController extends AppController
                                 $temp .= "</p>";
                             }
                             $temp .= "<p>";
-                            $temp .= _('Score on last attempt: ');
+                            $temp .= 'Score on last attempt: ';
                             $temp .= printscore($scores[$qn],$qn);
                             $temp .= "</p>\n";
                             $temp .= "<p>".'Score in gradebook: ';

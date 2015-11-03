@@ -12,7 +12,6 @@ $imasroot  = AppUtility::getHomeURL();
     //load filter
     $curdir = rtrim(dirname(__FILE__), '/\\');
     $loadgraphfilter = true;
-//    require("$curdir/../filter/filter.php");
     ?>
     <script type="text/javascript">
         function init() {
@@ -49,13 +48,10 @@ $imasroot  = AppUtility::getHomeURL();
         } else {
             $coursetheme = $sessiondata['coursetheme'];
         }
-        echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/$coursetheme\"/>\n";
     }
     echo '<link rel="stylesheet" href="'.$imasroot.'css/handheld.css?ver='.AppConstant::VERSION_NUMBER.'" media="handheld,only screen and (max-device-width:480px)"/>';
     if ($isdiag) {
         echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot"."diag/print.css?ver=".AppConstant::VERSION_NUMBER." media=\"print\"/>\n";
-    } else {
-//        echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot"."css/print.css?ver=".AppConstant::VERSION_NUMBER." media=\"print\"/>\n";
     }
     if (!isset($sessiondata['mathdisp'])) {
         echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; function rendermathnode(el) {AMprocessNode(el);}</script>';

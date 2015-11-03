@@ -450,7 +450,7 @@ class AppController extends Controller
             $basePhysicalDir = rtrim(dirname(__FILE__), '/\\');
             if ($myRights == AppConstant::ADMIN_RIGHT && (isset($params['debug']) || isset($sessionData['debugmode']))) {
                 ini_set('display_errors', AppConstant::NUMERIC_ONE);
-                error_reporting(E_ALL ^ E_NOTICE);
+                error_reporting(0);
                 if (isset($params['debug'])) {
                     $sessionData['debugmode'] = true;
                     $this->writesessiondata($sessionData, $sessionId);
