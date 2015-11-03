@@ -19,7 +19,7 @@ $urlmode = AppUtility::urlMode();
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
+<div class="col-md-12 col-sm-12 tab-content shadowBox non-nav-tab-item">
 <?php switch ($action) {
     case "newuser":
         break;
@@ -35,55 +35,132 @@ $urlmode = AppUtility::urlMode();
             } else {
             document.getElementById("pwinfo").style.display="none";
             }
-		} </script>';
+		} </script>'; ?>
 
-        echo "<form enctype=\"multipart/form-data\" method=post action=\"action?action=chguserinfo$gb\">\n";
-        echo '<fieldset id="userinfoprofile"><legend>Profile Settings</legend>';
-        echo "<div class='col-md-2'><label for=\"firstname\">Enter First Name:</label></div>
-        <div class='col-md-8'><input class='form form-control-1' type=text size=20 id=firstname name=firstname  value=\"{$line['FirstName']}\" /></div><br class=\"form\" />";
-        echo "<div class=col-md-2><label for=\"lastname\">Enter Last Name:</label></div> <div class='col-md-6'><input class=form type=text size=20 id=lastname name=lastname value=\"{$line['LastName']}\"></div><BR class=form>\n";
+        <form enctype="multipart/form-data" method=post action="action?action=chguserinfo <?php echo $gb ?>" >
+        <div class="col-md-4 col-sm-4 font-size-twenty-one padding-top-one-em"><?php AppUtility::t('Profile Settings'); ?></div>
 
-        if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
-            echo '<div class="col-md-2">'._('Group').':</div><div class="col-md-6">'.$groupResult['name'].'</div><br class="form"/>';
-        }
-        echo '<div class="col-md-2"><label for="dochgpw">Change Password?</label></div> <div class="col-md-6"><input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" /></div><br class="form" />';
-        echo '<div style="display:none" id="pwinfo">';
-        echo "<div class='col-md-2'><label for=\"oldpw\">Old password:</label></div> <div class='col-md-6'><input class=form type=password id=oldpw name=oldpw size=40 /></div> <BR class=form>\n";
-        echo "<div class='col-md-2'><label for=\"newpw1\">Change password:</label></div> <div class='col-md-6'> <input class=form type=password id=newpw1 name=newpw1 size=40></div> <BR class=form>\n";
-        echo "<div class=col-md-2><label for=\"newpw1\">Confirm password:</label></div> <div class='col-md-6'> <input class=form type=password id=newpw2 name=newpw2 size=40></div> <BR class=form>\n";
-        echo '</div>';
-        echo "<div class=col-md-2><label for=\"email\">E-mail address:</label></div> <div class='col-md-6'> <input class=form type=text size=60 id=email name=email value=\"{$line['email']}\"></div><BR class=form>\n";
-        echo "<div class=col-md-2><label for=\"msgnot\">Notify me by email when I receive a new message:</label></div><div class=col-md-6><input type=checkbox id=msgnot name=msgnot ";
-        if ($line['msgnotify']==1) {echo "checked=1";}
-        echo " /></div><BR class=form>\n";
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-3 padding-top-pt-five-em">
+                <label for="firstname"><?php AppUtility::t('Enter First Name'); ?></label>
+            </div>
+            <div class="col-md-8 col-sm-8">
+                <input class='form form-control-1' type=text size=20 id="firstname" name=firstname  value="<?php echo $line['FirstName'] ?>" />
+            </div>
+        </div>
 
-        echo "<div class=col-md-2><label for=\"stupic\">Picture:</label></div>";
-        echo "<div class=\"col-md-6\">";
-        if ($line['hasuserimg'] == 1) {
-            if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-                echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
-            } else {
-                $curdir = rtrim(dirname(__FILE__), '/\\');
-                $galleryPath = "Uploads/";
-                ?>
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-3 padding-top-pt-five-em">
+                <label for="lastname"><?php AppUtility::t('Enter Last Name'); ?></label>
+            </div>
+            <div class="col-md-6 col-sm-6">
+            <input class='form form-control' type=text size=20 id=lastname name=lastname value="<?php echo $line['LastName'] ?>" >
+            </div>
+        </div>
 
-                <img src=<?php echo AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$userId.'.jpg'?>>
-                <?php echo"<input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
-            }
-        } else {
-            echo "No Pic ";
-        }
-        echo '<br/><input type="file" name="stupic"/></div><br class="form" />';
-        echo '<div class="col-md-2"><label for="perpage">Messages/Posts per page:</label></div>';
-        echo '<div class="col-md-6"><select name="perpage">';
-        for ($i=10;$i<=100;$i+=10) {
-            echo '<option value="'.$i.'" ';
-            if ($i==$line['listperpage']) {echo 'selected="selected"';}
-            echo '>'.$i.'</option>';
-        }
-        echo '</select></div><br class="form" />';
+        <?php if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) { ?>
+            <div class="col-md-12 col-sm-12 padding-left-zero padding-one-em">
+                <div class="col-md-2 col-sm-3 padding-top-pt-five-em"><?php AppUtility::t(Group); ?></div>
+                <div class="col-md-6 col-sm-7"><?php echo $groupResult['name'] ?></div>
+            </div>
+        <?php } ?>
 
-        $pagelayout = explode('|',$line['homelayout']);
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-3 padding-top-pt-five-em">
+                <label for="dochgpw"><?php AppUtility::t('Change Password?'); ?></label>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-2">
+                <input type="checkbox" name="dochgpw" onclick="togglechgpw(this.checked)" />
+            </div>
+        </div>
+
+        <div style="display:none" id="pwinfo">
+            <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+                <div class="col-md-2 col-sm-3">
+                    <label for="oldpw"><?php AppUtility::t('Old password'); ?></label>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <input class="form form-control" type=password id=oldpw name=oldpw size=40 />
+                </div>
+            </div>
+            <div class='col-md-12 col-sm-12 padding-left-zero padding-top-one-em'>
+                <div class="col-md-2 col-sm-3">
+                    <label for="newpw1"><?php AppUtility::t('Change password'); ?></label>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <input class="form form-control" type=password id=newpw1 name=newpw1 size=40>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+                <div class="col-md-2 col-sm-3">
+                    <label for="newpw1"><?php AppUtility::t('Confirm password'); ?></label>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                        <input class="form form-control" type=password id=newpw2 name=newpw2 size=40>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-3 col-xs-3 padding-top-pt-five-em">
+                <label for="email"><?php AppUtility::t('E-mail address'); ?></label>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <input class="form form-control" type=text size=60 id="email" name=email value="<?php echo $line['email'] ?>" >
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
+                <input type=checkbox id=msgnot name=msgnot <?php if ($line['msgnotify']==1) {echo "checked=1";} ?> />
+                <label for="msgnot"><?php AppUtility::t('Notify me by email when I receive a new message') ?></label>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-3">
+                <label for="stupic"><?php AppUtility::t('Picture'); ?></label>
+            </div>
+            <div class="col-md-8 col-sm-8 padding-left-zero">
+               <div class="col-md-3 col-sm-4">
+                   <?php if ($line['hasuserimg'] == 1) {
+                        if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+                            echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\"/>
+                            <input type=\"checkbox\" name=\"removepic\" value=\"1\" />
+                            <span>".AppUtility::t('Remove')."</span>";
+                        } else {
+                            $curdir = rtrim(dirname(__FILE__), '/\\');
+                            $galleryPath = "Uploads/";
+                            ?>
+                            <img src=<?php echo AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$userId.'.jpg'?>>
+                            <?php echo"<input type=\"checkbox\" name=\"removepic\" value=\"1\" />
+                            <span>".AppUtility::t('Remove',false)."</span>";
+                        }
+                    } else {
+                        echo "No Pic ";
+                    } ?>
+               </div>
+               <div class="col-md-4 col-sm-6">
+                   <input type="file" name="stupic">
+               </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
+            <div class="col-md-2 col-sm-3">
+                <label for="perpage"><?php AppUtility::t('Messages/Posts per page'); ?></label>
+            </div>
+            <div class="col-md-2 col-sm-2">
+                <select class="form-control" name="perpage">
+                    <?php for ($i=10;$i<=100;$i+=10) {
+                        echo '<option value="'.$i.'" ';
+                        if ($i==$line['listperpage']) {echo 'selected="selected"';}
+                        echo '>'.$i.'</option>';
+                    } ?>
+                </select>
+            </div>
+        </div>
+        <?php $pagelayout = explode('|',$line['homelayout']);
         foreach($pagelayout as $k=>$v) {
             if ($v=='') {
                 $pagelayout[$k] = array();
@@ -93,30 +170,46 @@ $urlmode = AppUtility::urlMode();
         }
         $hpsets = '';
         if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(2,$CFG['GEN']['fixedhomelayout'])) {
-            $hpsets .= '<input type="checkbox" name="homelayout10" ';
-            if (in_array(10,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
-            $hpsets .=  ' /> New messages widget<br/>';
-
-            $hpsets .= '<input type="checkbox" name="homelayout11" ';
+            $hpsets .= '<div class="col-md-10 col-sm-10">
+                <input type="checkbox" name="homelayout10" ';
+                if (in_array(10,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
+                $hpsets .=  ' />
+                <span>'.AppUtility::t('New messages widget',false).'</span>
+            </div>';
+            $hpsets .= '<div class="col-md-10 col-sm-10">
+            <input type="checkbox" name="homelayout11" ';
             if (in_array(11,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
-            $hpsets .= ' /> New forum posts widget<br/>';
+            $hpsets .= ' />
+            <span>'.AppUtility::t('New forum posts widget',false).'</span>
+            </div>';
         }
         if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(3,$CFG['GEN']['fixedhomelayout'])) {
-            $hpsets .= '<input type="checkbox" name="homelayout3-0" ';
-            if (in_array(0,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
-            $hpsets .= ' /> New messages notes on course list<br/>';
-            $hpsets .= '<input type="checkbox" name="homelayout3-1" ';
-            if (in_array(1,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
-            $hpsets .= ' /> New posts notes on course list<br/>';
-        }
-        if ($hpsets != '') {
-            echo '<div class="col-md-2">Show on home page:</div><div class="col-md-6">';
-            echo $hpsets;
-            echo '</div><br class="form" />';
 
+            $hpsets .= '<div class="col-md-10 col-sm-10">
+            <input type="checkbox" name="homelayout3-0" ';
+            if (in_array(0,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
+            $hpsets .= ' />
+            <span>New messages notes on course list</span>
+            </div>';
+
+            $hpsets .= '<div class="col-md-10 col-sm-10">
+                <input type="checkbox" name="homelayout3-1" ';
+                if (in_array(1,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
+                $hpsets .= ' />
+                <span>'.AppUtility::t('New posts notes on course list',false).'</span>
+            </div>';
         }
+        if ($hpsets != '') { ?>
+            <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+                <div class="col-md-2 col-sm-3"><?php AppUtility::t('Show on home page') ?></div>
+                <div class="col-md-8 col-sm-8 padding-left-zero">
+                    <?php echo $hpsets; ?>
+                </div>
+            </div>
+        <?php }
+
         if (isset($CFG['GEN']['translatewidgetID'])) {
-            echo '<div class="col-md-2">Attempt to translate pages into another language:</div>';
+            echo '<div class="col-md-2">'.AppUtility::t('Attempt to translate pages into another language').'</div>';
             echo '<div class="col-md-6">';
             echo '<div id="google_translate_element"></div><script type="text/javascript">';
             echo ' function googleTranslateElementInit() {';
@@ -125,19 +218,20 @@ $urlmode = AppUtility::urlMode();
             echo '<br class="form"/>';
             unset($CFG['GEN']['translatewidgetID']);
         }
-        echo '</fieldset>';
 
-        if ($myRights > 19) {
-            echo '<fieldset id="userinfoinstructor"><legend>Instructor Options</legend>';
-            echo "<div class=col-md-2><label for=\"qrd\">Make new questions private by default?<br/>(recommended for new users):</label></div><div class=col-md-6><input type=checkbox id=qrd name=qrd ";
-            if ($line['qrightsdef'] == 0) {
-                echo "checked=1";
-            }
-            echo " /></div><BR class=form>\n";
-            if ($line['deflib'] == 0) {
+        if ($myRights > 19) { ?>
+        <div class="col-md-4 col-sm-4 font-size-twenty-one padding-top-two-em"><?php AppUtility::t('Instructor Options') ?></div>
+            <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 padding-top-one-em">
+                <input class="floatleft" type="checkbox" id="qrd" name="qrd" <?php if ($line['qrightsdef'] == 0) { echo "checked=1"; } ?> />
+                <div class="col-md-11 col-sm-11 padding-right-zero">
+                    <label for="qrd"><?php AppUtility::t('Make new questions private by default?(recommended for new users)') ?></label>
+                </div>
+            </div>
+
+        <?php if ($line['deflib'] == 0) {
                 $lName = "Unassigned";
             } else {
-                $lName ;
+                $lName;
             }
 
             echo "<script type=\"text/javascript\">";
@@ -152,41 +246,63 @@ $urlmode = AppUtility::urlMode();
             echo "function setlibnames(libn) {";
             echo "  document.getElementById(\"libnames\").innerHTML = libn;";
             echo "}";
-            echo "</script>";
-            echo "<div class=col-md-2>Default question library:</div><div class=col-md-6> <span id=\"libnames\">$lName</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"{$line['deflib']}\">\n";
-            echo " <input type=button value=\"Select Library\" onClick=\"libselect()\"></div><br class=form> ";
+            echo "</script>"; ?>
 
-            echo "<div class=col-md-2>Use default question library for all templated questions?</div>";
-            echo "<div class=col-md-6><input type=checkbox name=\"usedeflib\"";
-            if ($line['usedeflib']==1) {echo "checked=1";}
-            echo "> ";
-            echo "</div><br class=form>";
-            echo "<div class='col-md-12'>Default question library is used for all local (assessment-only) copies of questions created when you ";
-            echo "edit a question (that's not yours) in an assessment.  You can elect to have all templated questions ";
-            echo "be assigned to this library.</div>";
-            echo '</fieldset>';
+            <div class='col-sm-12 col-md-12 padding-left-zero padding-top-one-em'>
+                <div class='col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero'>Default question library</div>
+                <div class='col-md-9 col-sm-8'>
+                    <span class='col-md-2 col-sm-3 padding-top-pt-five-em padding-left-zero' id="libnames"> <?php echo $lName ?> </span>
+                    <input type=hidden name=\"libs\" id=\"libs\"  value="<?php echo $line['deflib'] ?>" >
+                    <div class='col-md-2 col-sm-4 padding-left-zero'>
+                        <input type=button value="Select Library" onClick="libselect()">
+                    </div>
+                </div>
+            </div>
 
-        }
-        if ($tzname != '') {
+            <div class='col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 padding-left-zero padding-top-one-em'>
+                <div class="col-md-12 col-sm-12">
+                    <div class='floatleft'>
+                            <input type=checkbox name="usedeflib" <?php if ($line['usedeflib']==1) {echo "checked=1";} ?> >
+                    </div>
+                    <div class='col-md-8 col-sm-10'>Use default question library for all templated questions?</div>
+                </div>
+            </div>
+            <div class='col-md-12 col-sm-12 padding-top-one-em'>
+                Default question library is used for all local (assessment-only) copies of questions created when you
+                edit a question (that's not yours) in an assessment.  You can elect to have all templated questions
+                be assigned to this library.
+            </div>
 
-            echo '<fieldset><legend>Timezone</legend>';
-            echo '<div class="col-md-12">Due Dates and other times are being shown to you correct for the <b>'.$tzname.'</b> timezone.</div>';
-            echo '<div class="col-md-12">You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.</div>';
-            echo '<div class="col-md-12">Set timezone to: <select name="settimezone" id="settimezone">';
-            $timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
-            foreach ($timezones as $tz) {
-                echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
-            }
-            echo '</select></div>';
-            echo '</fieldset>';
+        <?php } if ($tzname != '') { ?>
+            <div class="col-md-4 col-sm-4 font-size-twenty-one padding-top-one-em">Timezone</div>
+            <div class="col-md-12 col-sm-12 padding-top-one-em">
+                <?php AppUtility::t('Due Dates and other times are being shown to you correct for the'); ?>
+                <b> <?php echo $tzname ?> </b><?php AppUtility::t('timezone.'); ?>
+            </div>
+            <div class="col-md-12 col-sm-12 padding-top-one-em">
+                You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.
+            </div>
+            <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
+                <span class="col-md-2 col-sm-3">Set timezone to</span>
+                <span class="col-md-2 col-sm-3 padding-left-zero">
+                    <select class="form-control margin-left-zero" name="settimezone" id="settimezone">
+                    <?php $timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
+                    foreach ($timezones as $tz) {
+                        echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
+                    } ?>
+                   </select>
+               </span>
+            </div>
+        <?php } ?>
+        <div class="col-md-2 col-sm-2 padding-top-one-em padding-bottom-two-em">
+            <input type=submit value='Update Info'>
+        </div>
+<!--        <p>-->
+<!--            <a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts-->
+<!--        </p>-->
+        </form>
+    <?php break;
 
-
-        }
-        echo "<div class=submit><input type=submit value='Update Info'></div>\n";
-
-        //echo '<p><a href="forms.php?action=googlegadget">Get Google Gadget</a> to monitor your messages and forum posts</p>';
-        echo "</form>\n";
-        break;
     case "forumwidgetsettings":
         echo '<div id="headerforms" class="pagetitle"><h2>Forum Widget Settings</h2></div>';
         echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
@@ -230,5 +346,5 @@ $urlmode = AppUtility::urlMode();
         echo '<input type="submit" value="Save Changes"/>';
         echo '</form>';
         break;
-}?>
+} ?>
 </div>

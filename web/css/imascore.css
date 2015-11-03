@@ -1445,7 +1445,12 @@ color:red;
 .margin-bottom-three-pt-five {
     margin-bottom: 3.5em;
 }
-.width-three-per
-{
+.width-three-per {
     width: 3%;
+}
+.font-size-twenty-one {
+    font-size: 21px;
+}
+.padding-bottom-two-em {
+    padding-bottom: 2em;
 }
