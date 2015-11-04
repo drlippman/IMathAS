@@ -230,7 +230,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$courseid=$cid;
 			}
 			
-			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\" onsubmit=\"return checkrecipient();\">\n";
+			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\"";
+			if (!isset($_GET['to'])) {
+				echo " onsubmit=\"return checkrecipient();\"";
+			}
+			echo ">\n";
 			echo "<span class=form>To:</span><span class=formright>\n";
 			if (isset($_GET['to'])) {
 				$query = "SELECT iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg FROM imas_users AS iu ";
