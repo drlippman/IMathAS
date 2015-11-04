@@ -27,7 +27,7 @@ class AssessmentUtility extends Component
 
     public static function writeHtmlMultiSelect($name, $valList, $labelList, $selectedVals = array(), $defaultLabel = null)
     {
-        echo "<div class=\"multisel\"><select class='form-control' name=\"{$name}[]\" id=\"$name\">";
+        echo "<div class=\"multisel\"><div class='col-md-4 col-sm-6'><select class='form-control' name=\"{$name}[]\" id=\"$name\">";
         if (isset($defaultLabel)) {
             echo " <option value=\"null\" selected=\"selected\">$defaultLabel</option>\n";
         }
@@ -54,7 +54,8 @@ class AssessmentUtility extends Component
                 echo "	<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
             }
         }
-        echo '</select><br><input type="button" value="Add Another" onclick="addmultiselect(this,\'' . $name . '\')"/>';
+        echo '</select></div>
+        <div class="col-md-6 col-sm-6"><input type="button" value="Add Another" onclick="addmultiselect(this,\'' . $name . '\')"/></div>';
         if (count($selectedVals) > AppConstant::NUMERIC_ZERO) {
             foreach ($selectedVals as $v) {
                 echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';

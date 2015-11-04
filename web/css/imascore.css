@@ -582,16 +582,9 @@ span.boxed {
 	padding: 2px 5px;
 }
 a.attach {
-    /*background: url(editor/plugins/attach/img/ed_attach.gif) center left no-repeat;*/
     padding-left: 20px;
 }
-/*div.forumgrp img {*/
-	/*max-width: 90%;*/
-	/*height: auto;*/
-/*}*/
-div.multisel {
-	display: inline-block;
-}
+
 div.multiselitem {
 	background-color: #eee;
 	margin-bottom: 2px;
@@ -1453,4 +1446,7 @@ color:red;
 }
 .padding-bottom-two-em {
     padding-bottom: 2em;
+}
+.padding-top-one-pt-five-em {
+    padding-top: 1.5em;
 }

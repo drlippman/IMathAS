@@ -71,3 +71,7 @@ label.inline-checkbox{
 .add-link-padding {
     padding:  10px 15px 20px 15px !important;
 }
+.summary-inline-text table {
+    width: 100%;
+    max-width: 100% !important;
+}
