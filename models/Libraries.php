@@ -148,10 +148,10 @@ class Libraries extends BaseImasLibraries
         $query = new Query();
         $query	->select(['*'])
             ->from('imas_libraries')
-            ->where('name = :name');
-        $query->andWhere('parent = :parents' );
+            ->where('name = :name', [':name' => $name]);
+        $query->andWhere('parent = :parents', [':parents' => $parents]);
         $command = $query->createCommand();
-        $data = $command->bindValue(':parents',$parents)->queryAll();
+        $data = $command->queryAll();
         return $data;
     }
 

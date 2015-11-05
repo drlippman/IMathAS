@@ -2,24 +2,40 @@ var cnt = new Array();
 
 function additem(inloc,outloc) {
 	var text = document.getElementById(inloc).value;
-	document.getElementById(inloc).value = '';
-	var outn = document.getElementById(outloc);
-	var newn = document.createElement("tr");
-	var newid = outloc+'-'+cnt[outloc];
-	cnt[outloc] += 1;
-	newn.id = 'tr'+newid;
-	var newtd = document.createElement("td");
-	var html = "<input type=hidden name="+newid+" id="+newid+" value='"+text+"'>" + text;
-	newtd.innerHTML = html;
-	newn.appendChild(newtd);
-	
-	html = "  <a href='#' onclick=\"return removeitem('"+newid+"','"+outloc+"')\">Remove</a>";
-	html += " <a href='#' onclick=\"return moveitemup('"+newid+"','"+outloc+"')\">Move up</a>";
-	html += " <a href='#' onclick=\"return moveitemdown('"+newid+"','"+outloc+"')\">Move down</a>";
-	newtd = document.createElement("td");
-	newtd.innerHTML = html;
-	newn.appendChild(newtd);
-	outn.appendChild(newn);
+    ValidateIPaddress(text);
+    if(ValidateIPaddress(text) == true)
+    {
+        document.getElementById(inloc).value = '';
+        var outn = document.getElementById(outloc);
+        var newn = document.createElement("tr");
+        var newid = outloc+'-'+cnt[outloc];
+        cnt[outloc] += 1;
+
+        newn.id = 'tr'+newid;
+        var newtd = document.createElement("td");
+        var html = "<input type=hidden name="+newid+" id="+newid+" value='"+text+"'>" + text;
+        newtd.innerHTML = html;
+        newn.appendChild(newtd);
+
+        html = "  <a href='#' onclick=\"return removeitem('"+newid+"','"+outloc+"')\">Remove</a>";
+        html += " <a href='#' onclick=\"return moveitemup('"+newid+"','"+outloc+"')\">Move up</a>";
+        html += " <a href='#' onclick=\"return moveitemdown('"+newid+"','"+outloc+"')\">Move down</a>";
+        newtd = document.createElement("td");
+        newtd.innerHTML = html;
+        newn.appendChild(newtd);
+        outn.appendChild(newn);
+    } else {
+        alert("Enter valid IP address.")
+    }
+}
+function ValidateIPaddress(ipaddress)
+{
+    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress))
+    {
+        return (true)
+    }
+    alert("You have entered an invalid IP address!")
+    return (false)
 }
 function onenter(e,inloc,outloc) {
 	if (window.event) {

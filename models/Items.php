@@ -102,4 +102,14 @@ class Items extends BaseImasItems
     {
         return Items::findAll(['courseid' => $id, 'itemtype' => $itemType]);
     }
+
+    public static function getByItemTypeAndId($id)
+    {
+        return self::find()->select('id')->where(['itemtype' => 'LinkedText', 'typeid' => $id])->one();
+    }
+
+    public static function getByItemTypeAndIdWiki($id)
+    {
+        return self::find()->select('id')->where(['itemtype' => 'LinkedText', 'typeid' => $id])->one();
+    }
 }

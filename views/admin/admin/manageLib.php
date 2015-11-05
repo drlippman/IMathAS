@@ -46,25 +46,27 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type="hidden" class="transfer-post" value="<?php echo $tlist ?>" name="transfer">
             <form method=post action="manage-lib?cid=<?php echo $cid ?>">
                 <input type=hidden name=transfer value="<?php echo $tlist ?>">
-                Transfer library ownership to:
-                <?php AppUtility::writeHtmlSelect ("newowner",$page_newOwnerListVal,$page_newOwnerListLabel,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
-                <p>
-                    <input type=submit value="Transfer">
-                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
-                </p>
+                <div class="col-md-12 col-sm-12 padding-left-zero">
+                    <div class="col-md-3 col-sm-4 padding-left-zero"><?php AppUtility::t('Transfer library ownership to');?></div>
+                   <div class="col-md-4 col-sm-4 padding-left-zero"><?php AppUtility::writeHtmlSelect ("newowner",$page_newOwnerListVal,$page_newOwnerListLabel,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?></div>
+                </div>
+                <div class="col-lg-8 col-sm-8 padding-left-zero">
+                    <div class="col-md-2 col-sm-2 padding-left-zero"><input type=submit value="Transfer"></div>
+                    <div class="col-md-2 col-sm-2 padding-left-zero"><input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'"></div>
+                </div>
             </form>
         <?php
         } else if (isset($_POST['chgrights'])) {
             ?>
             <form method=post action="manage-lib?cid=<?php echo $cid ?>">
                 <input type=hidden name=chgrights value="<?php echo $tlist ?>">
-                <div class="col-md-10 col-sm-12 padding-left-zero"><div class="col-md-3 padding-left-zero"><?php AppUtility::t('Library use rights')?> </div>
+                <div class="col-md-10 col-sm-12 padding-left-zero"><div class="col-md-3 col-sm-4 padding-left-zero"><?php AppUtility::t('Library use rights')?> </div>
 		<div class="col-md-4 col-sm-4 padding-left-zero">
 			<?php AppUtility::writeHtmlSelect ("newrights",$page_libRightsVal,$page_libRightsLabel,$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</div></div><br class=form><br/>
                 <div class="col-md-10 col-sm-12 padding-left-zero">
                     <div class="col-md-2 col-sm-2 padding-left-zero"><input type=submit value="Change Rights"></div>
-                    <div class="col-md-3 col-sm-3 padding-left-zero"><input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'"></div>
+                    <div class="col-md-3 col-sm-3"><input type=button value="Cancel" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'"></div>
                 </div>
             </form>
         <?php
@@ -124,32 +126,33 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
     <form method=post action="manage-lib?cid=<?php echo $cid ?>&modify=<?php echo $_GET['modify'] ?>">
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Library Name')?></div>
-        <div class="col-md-10 col-sm-12"><input type=text class="form-control-1" name="name" maxlength="60" required="Please fill out this field." value="<?php echo $name ?>" size=20></div><br class=form><br>
+        <div class="col-md-10 col-sm-10"><input type=text class="form-control-1" name="name" maxlength="60" required="Please fill out this field." value="<?php echo $name ?>" size=20></div><br class=form><br>
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Rights')?> </div>
 		<div class="col-md-4 col-sm-4">
 			<?php AppUtility::writeHtmlSelect ("rights",$page_libRightsVal,$page_libRightsLabel,$rights,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
 		</div><br class=form><br>
 
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Sort order')?></div>
-		<div class="col-md-10 col-sm-12">
+		<div class="col-md-10 col-sm-10">
 			<input type="radio" name="sortorder" value="0" <?php AppUtility::writeHtmlChecked($sortorder,0); ?> /><span class="padding-left-five"><?php AppUtility::t('Creation date')?></span><br/>
 			<input type="radio" name="sortorder" value="1" <?php AppUtility::writeHtmlChecked($sortorder,1); ?> /><span class="padding-left-five"><?php AppUtility::t('Alphabetical')?></span>
 		</div><br class=form><br>
 
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Parent Library')?></div>
-		<div class="col-md-10 col-sm-12">
+		<div class="col-md-10 col-sm-10">
 			<span id="libnames"><?php echo $lnames ?></span>
 			<input type=hidden name="libs" id="libs"  value="<?php echo $parent ?>">
 			<input type=button value="Select Library" onClick="libselect()">
 		</div><br class=form><br>
         <div class="submit col-md-10 col-sm-12">
-           <div class="col-md-2 col-sm-2 padding-left-zero"> <input type=submit value="Save Changes"></div>
-           <div class="col-md-6 col-sm-6"><input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'"></div>
+           <div class="col-md-4 col-sm-5 padding-left-zero"> <input type=submit value="Save Changes"></div>
+           <div class="col-md-2 col-sm-3"><input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'"></div>
         </div><br/>
-    </form><br/>
-
-    <i>Note</i>: <?php AppUtility::t('Creating a library with rights less restrictive than the parent library will force
-    the parent library to match the rights of the child library.')?>
+    </form><br/><br>
+    <div class="col-md-12 col-sm-12">
+        <i>Note</i>: <?php AppUtility::t('Creating a library with rights less restrictive than the parent library will force
+        the parent library to match the rights of the child library.')?>
+    </div>
 <?php
 } else { //DEFAULT DISPLAY
         echo $page_AdminModeMsg;

@@ -649,4 +649,19 @@ class Course extends BaseImasCourses {
     {
         return self::find()->select('enrollkey,allowunenroll,deflatepass')->from('imas_courses')->where(['available' => '0'])->orWhere(['available' => 2])->andWhere(['id' => $courseId])->one();
     }
+
+    public static function getDataPublicly($courseId)
+    {
+        return self::find()->select('name,itemorder,hideicons,picicons,allowunenroll,msgset,chatset,topbar,cploc')->where(['id' => $courseId])->one();
+    }
+
+    public static function getDataPubliclyForBlock($courseId)
+    {
+        return self::find()->select('name,itemorder,hideicons,picicons,allowunenroll,msgset,topbar,cploc')->where(['id' => $courseId])->one();
+    }
+
+    public static function getIdPublicly($courseId)
+    {
+        return self::find()->select('itemorder,name,theme')->where(['id' => $courseId])->one();
+    }
 }

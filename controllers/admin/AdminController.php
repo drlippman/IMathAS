@@ -332,7 +332,6 @@ class AdminController extends AppController
                 $forceregen = AppConstant::NUMERIC_ZERO;
             }
             foreach($sel1 as $k=>$s1) {
-
                 $page_selectValList[$k] = array();
                  $page_selectLabelList[$k] = array();
                 $page_selectName[$k] = "aid" . $k;
@@ -423,7 +422,7 @@ class AdminController extends AppController
                     $owner = $userId;
                 }
             } else {
-                 //STEP 1, ADD MODE
+                //STEP 1, ADD MODE
                 $diagname = '';
                 $cid = AppConstant::NUMERIC_ZERO;
                 $public = AppConstant::NUMERIC_SEVEN;

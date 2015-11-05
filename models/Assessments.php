@@ -359,7 +359,7 @@ class Assessments extends BaseImasAssessments
 
     public static function getByCId($cid)
     {
-        return Assessments::find()->select(['id,name'])->where(['courseid' => $cid])->all();
+        return Assessments::find()->select(['id','name'])->where(['courseid' => $cid])->all();
     }
 
     public static function updateVideoId($from, $to)

@@ -209,4 +209,9 @@ class LinkedText extends BaseImasLinkedtext
     {
         return LinkedText::find()->where(['id' => $id])->andWhere(['courseid' => $courseId])->one();
     }
+
+    public static function getLinkedDataPublicly($id)
+    {
+        return self::find()->select('text,title')->where(['id' => $id])->one();
+    }
 }

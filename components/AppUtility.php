@@ -3071,10 +3071,6 @@ class AppUtility extends Component
             if ($type=='take') {
                 echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
             } ?>
-<!--            --><?php //if()
-//            {
-//
-//            } ?>
             <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
             <?php echo $data[$i]['name'].'</a>';
             if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {
@@ -3085,10 +3081,10 @@ class AppUtility extends Component
             }
             if ($showNewMsgNote && isset($newMsgCnt[$data[$i]['id']]) && $newMsgCnt[$data[$i]['id']]>0) {
 
-                echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$data[$i]['id']]), '</a>';
+                echo ' <a class="newnote" href="msgs/msg-list?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$data[$i]['id']]), '</a>';
             }
             if ($showNewPostNote && isset($newPostCnt[$data[$i]['id']]) && $newPostCnt[$data[$i]['id']]>0) {
-                echo ' <a class="newnote" href="forums/newthreads.php?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newPostCnt[$data[$i]['id']]), '</a>';
+                echo ' <a class="newnote" href="forums/new-threads?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newPostCnt[$data[$i]['id']]), '</a>';
             }
             echo '</li>';
         }

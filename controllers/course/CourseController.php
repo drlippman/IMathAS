@@ -1246,7 +1246,7 @@ class CourseController extends AppController
                 $overwriteBody = AppConstant::NUMERIC_ONE;
                 $body = _("Course does not exist.  <a href='#'>Return to main page</a>") . "</body></html>\n";
             }
-
+//AppUtility::dump($line);
             $allowUnEnroll = $line['allowunenroll'];
             $hideIcons = $line['hideicons'];
             $graphicalIcons = ($line['picicons']==1);
@@ -1666,9 +1666,9 @@ class CourseController extends AppController
                 $showItems = new ShowItemCourse();
                 $showItems->showItems($items,$folder);
             } else if ($teacherId) {
-                echo ShowItemCourse::generateAddItem($folder,'b');
+                $courseData = new ShowItemCourse();
+                echo $courseData->generateAddItem($folder,'b');
          }
-
 //            if ($firstLoad) {
 //                echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;</script>\n";
 //            }
@@ -1864,5 +1864,254 @@ class CourseController extends AppController
             return false;
         }
         return $this->successResponse();
+    }
+
+    public function actionPublic()
+    {
+        global $teacherId,$courseId,$userId,$openBlocks,$firstLoad,$previewShift,
+               $hideIcons,$graphicalIcons,$isPublic;
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $isPublic = true;
+        $courseId = $this->getParamVal('cid');
+        $folder = $this->getParamVal('folder');
+        $line = Course::getDataPublicly($courseId);
+        $teacherId = $this->isTeacher($userId, $courseId);
+
+        if($line != null){
+            $courseName = $line['name'];
+            $hideIcons = $line['hideicons'];
+            $graphicalIcons = ($line['picicons']==1);
+            $pageTitle = $line['name'];
+            $items = unserialize($line['itemorder']);
+            $breadCrumbBase = "<a href=\"public?cid=$courseId\">$courseName</a>";
+
+            if (!isset($folder) || $folder =='') {
+                $folder = '0';
+            }
+            $blockIsPublic = false;
+            if ($folder != '0') {
+                $now = time();
+                $blocktree = explode('-',$folder);
+                $backtrack = array();
+                for ($i = 1; $i < count($blocktree); $i++) {
+                    $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+                    if ($items[$blocktree[$i]-1]['public']==1) {
+                        $blockIsPublic = true;
+                    }
+                    if (!isset($teacherId) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+                        $folder = 0;
+                        $items = unserialize($line['itemorder']);
+                        unset($backtrack);
+                        unset($blocktree);
+                        break;
+                    }
+                    $items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                }
+                if (!$blockIsPublic) {
+                    $folder = 0;
+                    $items = unserialize($line['itemorder']);
+                    unset($backtrack);
+                    unset($blocktree);
+//			break;
+                }
+            }
+
+            $openBlocks = Array(0);
+            $prevloadedblocks = array(0);
+            if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+            {
+
+                $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+                $firstLoad = false;
+            } else {
+                $firstLoad = true;
+            }
+            if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='') {$prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);}
+            $plblist = implode(',',$prevloadedblocks);
+            $oblist = implode(',',$openBlocks);
+
+            $curBreadcrumb = $breadCrumbBase;
+
+            if (isset($backtrack) && count($backtrack)>0) {
+                $curBreadcrumb .= "<a href=\"public?cid=$courseId&folder=0\">$courseName</a> ";
+                for ($i = 0; $i < count($backtrack); $i++) {
+                    $curBreadcrumb .= "&gt; ";
+                    if ($i!=count($backtrack)-1) {
+                        $curBreadcrumb .= "<a href=\"public?cid=$courseId&folder={$backtrack[$i][1]}\">";
+                    }
+                    $curBreadcrumb .= stripslashes($backtrack[$i][0]);
+                    if ($i!=count($backtrack)-1) {
+                        $curBreadcrumb .= "</a>";
+                    }
+                }
+                $curname = $backtrack[count($backtrack)-1][0];
+                if (count($backtrack)==1) {
+                    $backlink =  "<span class=right><a href=\"public?cid=$courseId&folder=0\">Back</a></span><br class=\"form\" />";
+                } else {
+                    $backlink = "<span class=right><a href=\"public?cid=$courseId&folder=".$backtrack[count($backtrack)-2][1]."\">Back</a></span><br class=\"form\" />";
+                }
+            } else {
+                $curBreadcrumb .= $courseName;
+                $curname = $courseName;
+            }
+        }
+        $responseData = array('curname' => $curname, 'curBreadcrumb' => $curBreadcrumb, 'items' => $items, 'blockIsPublic' => $blockIsPublic, 'oblist' => $oblist, 'plblist' => $plblist, 'cid' => $courseId);
+        return $this->renderWithData('public', $responseData);
+    }
+
+    public function actionGetBlockItemsPublic()
+    {
+        global $teacherId,$courseId,$userId,$openBlocks,$firstLoad,$previewShift,
+               $hideIcons,$graphicalIcons,$isPublic;
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $isPublic = true;
+
+        $courseId = $this->getParamVal('cid');
+        $folder = $this->getParamVal('folder');
+        $line = Course::getDataPubliclyForBlock($courseId);
+        $teacherId = $this->isTeacher($userId, $courseId);
+        $hideIcons = $line['hideicons'];
+        $graphicalIcons = ($line['picicons']==1);
+        $pageTitle = $line['name'];
+        $items = unserialize($line['itemorder']);
+
+        $blockIsPublic = false;
+
+        if (strpos($folder,'-') !== false) {
+
+            $now = time();
+            $blocktree = explode('-',$folder);
+            $backtrack = array();
+            for ($i = 1;$i < count($blocktree); $i++) {
+                $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+                if ($items[$blocktree[$i]-1]['public']==1) {
+                    $blockIsPublic = true;
+                }
+                if (!isset($teacherId) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+                    $folder = 0;
+                    $items = unserialize($line['itemorder']);
+                    unset($backtrack);
+                    unset($blocktree);
+                    break;
+                }
+                $items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+            }
+        }
+        if (!$blockIsPublic) {
+            echo "Content not public";
+            exit;
+        }
+
+        $openBlocks = Array(0);
+        if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='') {
+            $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+        }
+        if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='') {
+            $prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
+        } else {
+            $prevloadedblocks = array();
+        }
+        if (in_array($_GET['folder'],$prevloadedblocks)) {
+            $firstLoad = false;
+        } else {
+            $firstLoad = true;
+        }
+
+        if (count($items) > 0) {
+            $courseData = new ShowItemCourse();
+            $courseData->showitems($items,$folder,$blockIsPublic);
+        }
+        if ($firstLoad) {
+            echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;</script>\n";
+        }
+    }
+
+    public function actionShowLinkedTextPublic()
+    {
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $courseId = intval($this->getParamVal('cid'));
+        $from = $this->getParamVal('from');
+        $id = $this->getParamVal('id');
+
+        if (!isset($courseId)) {
+            echo "Need course id";
+            exit;
+        }
+
+        if (isset($from)) {
+            $publicCid = $courseId;  //swap out cid's before calling validate
+            $cid = intval($from);
+            $courseId = intval($from);
+            $fcid = $cid;
+            $courseId = $publicCid;
+        }  else if (preg_match('/cid=(\d+)/',$_SERVER['HTTP_REFERER'],$matches) && $matches[1] != $courseId) {
+            $publicCid = $courseId;  //swap out cid's before calling validate
+            $courseId = intval($matches[1]);
+            $courseId = intval($matches[1]);
+            $fcid = $courseId;
+            $courseId = $publicCid;
+        } else {
+            $fcid = 0;
+        }
+
+        $itemId = Items::getByItemTypeAndId($id);
+        $courseData = Course::getIdPublicly($courseId);
+        $items = unserialize($courseData);
+        $courseName = $courseData['name'];
+        if ($fcid == 0) {
+            $breadcrumbbase = "<a href=\"public?cid=$cid\">$courseName</a> &gt; ";
+        }  else {
+            $breadcrumbbase = "$breadcrumbbase <a href=\"course?cid=$fcid\">$courseName</a> &gt; ";
+        }
+
+        if (!$this->findinpublic($items,$itemId)) {
+            echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
+            exit;
+        }
+        $isPublic = true;
+
+        if (!isset($id)) {
+            echo "<html><body>No item specified.</body></html>\n";
+            exit;
+        }
+
+        $linkData = LinkedText::getLinkedDataPublicly($id);
+        $text = $linkData['text'];
+        $title = $linkData['title'];
+        $titlesImp = strip_tags($title);
+
+        $responseData = array('titlesImp' => $titlesImp, 'text' => $text, 'fcid' => $fcid, 'courseId' => $courseId, 'from' => $from, 'breadcrumbbase' => $breadcrumbbase);
+        return $this->renderWithData('showLinkedTextPublic', $responseData);
+    }
+
+    function findinpublic($items,$id) {
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+                if ($item['public']==1) {
+                    if ($this->finditeminblock($item['items'],$id)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    function finditeminblock($items,$id) {
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+                if ($this->finditeminblock($item['items'],$id)) {
+                    return true;
+                }
+            } else {
+                if ($item==$id) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

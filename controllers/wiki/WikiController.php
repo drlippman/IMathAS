@@ -564,4 +564,91 @@ class WikiController extends AppController
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag);
         return $this->render('addWiki', $returnData);
     }
+
+    public function actionViewWikiPublic()
+    {
+        $user = $this->getAuthenticatedUser();
+        $courseId = intval($this->getParamVal('cid'));
+        $from = $this->getParamVal('from');
+        $id = intval($this->getParamVal('id'));
+        if (!isset($courseId)) {
+            echo "Need course id";
+            exit;
+        }
+
+        if (isset($from)) {
+            $publicCid = $courseId;  //swap out cid's before calling validate
+            $courseId = $from;
+            $courseId = $from;
+            $fcid = $courseId;
+            $courseId = $publicCid;
+        } else {
+            $fcid = 0;
+        }
+
+        if (!isset($id)) {
+            echo "<html><body>No item specified.</body></html>\n";
+            exit;
+        }
+
+        $itemId = Items::getByItemTypeAndIdWiki($id);
+        $courseData = Course::getIdPublicly($courseId);
+        $items = unserialize($courseData);
+
+        $courseName = $courseData['name'];
+        if ($fcid == 0) {
+            $breadcrumbbase = "<a href=\"#\">$courseName</a> &gt; ";
+        } else {
+            $breadcrumbbase = "$breadcrumbbase <a href=\"#\">$courseName</a> &gt; ";
+        }
+
+        if (!$this->findinpublic($items,$itemId)) {
+            echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
+            exit;
+        }
+        $isPublic = true;
+
+        $wikiData = Wiki::getDataById($id);
+        $wikiName = $wikiData['name'];
+        $now = time();
+
+        $wikiRevisionData = WikiRevision::getRevisionDataPublicly($id);
+        $text = $wikiRevisionData['revision'];
+        if (strlen($text)>6 && substr($text,0,6)=='**wver') {
+            $wikiver = substr($text,6,strpos($text,'**',6)-6);
+            $text = substr($text,strpos($text,'**',6)+2);
+        } else {
+            $wikiver = 1;
+        }
+
+        $responseData = array('wikiData' => $wikiData, 'breadcrumbbase' => $breadcrumbbase, 'text' => $text);
+        return $this->renderWithData('viewWikiPublic', $responseData);
+    }
+
+    function findinpublic($items,$id) {
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+                if ($item['public']==1) {
+                    if ($this->finditeminblock($item['items'],$id)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    function finditeminblock($items,$id) {
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+                if ($this->finditeminblock($item['items'],$id)) {
+                    return true;
+                }
+            } else {
+                if ($item==$id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

@@ -186,4 +186,19 @@ class WikiRevision extends BaseImasWikiRevisions
         $data->bindValues(['typeid' => $typeid, 'wikiGrpId' => $wikiGrpId]);
         return $data->queryAll();
     }
+
+    public static function getRevisionDataPublicly($wikiId)
+    {
+        $query = new Query();
+        $query	->select(['i_w_r.id as revision_id','i_w_r.revision','i_w_r.time','i_u.LastName','i_u.FirstName','i_u.id as user_id'])
+            ->from('imas_wiki_revisions as i_w_r')
+            ->join(	'INNER JOIN',
+                'imas_users as i_u',
+                'i_u.id=i_w_r.userid')
+            ->where('i_w_r.wikiid= :wikiId')
+            ->orderBy(['i_w_r.id' => AppConstant::DESCENDING]);
+        $command = $query->createCommand();
+        $data = $command->bindValue(':wikiId',$wikiId)->queryOne();
+        return $data;
+    }
 }

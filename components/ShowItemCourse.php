@@ -20,6 +20,7 @@ class ShowItemCourse extends Component
         global $teacherId,$isTutor,$isStudent,$courseId,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights;
         global $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,$studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess, $courseStudent;
         $lockId = $courseStudent['lockaid'];
+
         $imasroot = AppUtility::getHomeURL();
         if (!($CFG['CPS']['itemicons'])) {
             $itemIcons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
