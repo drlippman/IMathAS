@@ -25,7 +25,7 @@ $this->title = $defaultValues['saveTitle'];
     ?>
 <?php } ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 <div class="title-container">
     <div class="row">
@@ -42,19 +42,19 @@ $this->title = $defaultValues['saveTitle'];
                    value="<?php echo str_replace('"', '&quot;', $defaultValues['title']); ?>">
         </div>
     </div>
-    <div class="col-md-12 col-sm-12">
+    <div class="col-md-12 col-sm-12 padding-top-one-pt-five-em padding-right-zero">
         <div class="col-md-2 col-sm-2">
             <?php AppUtility::t('Summary') ?>
         </div>
         <?php $summary = $defaultValues['summary']; ?>
-        <?php echo "<div class='col-md-10 col-sm-10'>
-                <div class= 'editor'>
+        <?php echo "<div class='padding-left-zero col-md-10 col-sm-10'>
+                <div class='editor col-md-12 col-sm-12 add-link-summary-textarea'>
                     <textarea cols=5 rows=12 id=summary name=summary style='width: 100%'>$summary</textarea>
                 </div>
                 </div>"; ?>
     </div>
 
-    <div class="col-md-12 col-sm-12">
+    <div class="col-md-12 col-sm-12 padding-top-one-pt-five-em">
         <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Link type') ?> </div>
         <div class="col-md-4 col-sm-4">
             <select class="form-control" id="linktype" name="linktype" onchange="linktypeupdate(this)">
@@ -73,17 +73,15 @@ $this->title = $defaultValues['saveTitle'];
             </select>
         </div>
     </div>
-    <BR class=form>
-    <div class="col-md-12 col-sm-12" id="textinput" <?php if ($defaultValues['type'] != 'text')
+    <div class="col-md-12 col-sm-12 padding-top-one-pt-five-em" id="textinput" <?php if ($defaultValues['type'] != 'text')
     {
         echo 'style="display:none;"';
     } ?> >
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Text') ?></div>
         <?php $text = $defaultValues['text']; ?>
-        <div class="col-md-10 col-sm-10">
-            <div class=editor>
-                <textarea cols=80 rows=20 id=text name=text
-                          style="width: 100%"><?php echo htmlentities($line['text']); ?><?php echo $text ?></textarea>
+        <div class="col-md-10 col-sm-10 padding-left-zero padding-right-zero">
+            <div class="editor col-md-12 col-sm-12 add-link-summary-textarea">
+                <textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']); ?><?php echo $text ?></textarea>
             </div>
         </div>
     </div>
@@ -205,138 +203,157 @@ $this->title = $defaultValues['saveTitle'];
         </div>
     </div>
 
-<div class="col-md-12 col-sm-12 padding-left-zero">
+<div class="col-md-12 col-sm-12 padding-top-one-em">
     <div class="col-md-2 col-sm-2"><?php AppUtility::t('Open page in') ?> </div>
     <div class="col-md-10 col-sm-10">
         <div class="col-md-3 col-sm-4 padding-left-zero">
             <input type=radio name="open-page-in" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['open-page-in'], AppConstant::NUMERIC_ZERO); ?>  />
-            <span class="padding-left">
+            <span class="padding-left-pt-five-em">
                 <?php AppUtility::t("Current window/tab") ?>
             </span>
         </div>
         <div class="col-md-3 col-sm-4 padding-left-zero">
             <input type=radio name="open-page-in" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['open-page-in'], AppConstant::NUMERIC_ONE); ?>  />
-            <span class="padding-left">
+            <span class="padding-left-pt-five-em">
                 <?php AppUtility::t("New window/tab") ?>
             </span>
         </div>
     </div>
  </div>
 
-    <div class="col-md-12 col-sm-12">
-        <div class=col-md-2 col-sm-2><?php AppUtility::t('Visibility') ?></div>
-        <div class=col-md-10 col-sm-10>
-            <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ONE); ?>onclick="document.getElementById('datedivwithcalendar').style.display='block';document.getElementById('datediv').style.display='none';"/>
-            <span><?php AppUtility::t("Show by Dates") ?></span>
-            <label class="non-bold">
-                <input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ZERO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='none';"/>
-                <span class="padding-left"><?php AppUtility::t("Hide") ?></span>
-            </label>
+    <div class="col-md-12 col-sm-12 padding-top-one-em">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Visibility') ?></div>
+        <div class="col-md-10 col-sm-10 padding-left-zero">
+            <span class="col-md-3 col-sm-4">
+                <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ONE); ?>onclick="document.getElementById('datedivwithcalendar').style.display='block';document.getElementById('datediv').style.display='none';"/>
+                <span class="padding-left-pt-five-em"><?php AppUtility::t("Show by Dates") ?></span>
+            </span>
+            <span class="col-md-2 col-sm-3 padding-left-pt-eight-em">
+                <label class="non-bold">
+                    <input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ZERO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='none';"/>
+                    <span class="padding-left-pt-five-em"><?php AppUtility::t("Hide") ?></span>
+                </label>
+            </span>
+            <span class="col-md-3 col-sm-4">
             <label class="non-bold">
                 <input type=radio name="avail" value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_TWO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='block';"/>
-                <span class="padding-left"><?php AppUtility::t("Show Always") ?></span>
+                <span class="padding-left-pt-five-em"><?php AppUtility::t("Show Always") ?></span>
+            </label>
         </div>
     </div>
 
-    <div id="datedivwithcalendar"
-         style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
-        <div class='col-md-2 col-sm-2 select-text-margin'><?php AppUtility::t('Available After') ?></div>
-        <div class=col-md-10 col-sm-10>
-            <input type=radio name="available-after" class="pull-left select-text-margin"
-                   value="0" <?php if ($defaultValues['startDate'] == 0) {
-                echo 'checked=1';
-            } ?>/><span class="pull-left padding-left-twenty select-text-margin"><?php AppUtility::t("Always until end date") ?></span>
-            <label class="pull-left non-bold" style="padding-left: 40px">
-                <input type=radio name="available-after" class="select-text-margin pull-left" value="1" <?php if ($defaultValues['startDate'] == 1) { echo 'checked=1';
-                } ?>/></label>
-            <?php
-            echo '<div class = "time-input pull-left col-md-4">';
-            echo DatePicker::widget([
-                'name' => 'sdate',
-                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => $defaultValues['sDate'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose' => true,
-                    'format' => 'mm/dd/yyyy']
-            ]);
-            echo '</div>'; ?>
-            <?php
-            echo '<label class="select-text-margin end pull-left non-bold"> at </label>';
-            echo '<div class="pull-left col-md-4">';
-
-            echo TimePicker::widget([
-                'name' => 'stime',
-                'value' => $defaultValues['sTime'],
-                'pluginOptions' => [
-                    'showSeconds' => false,
-                    'class' => 'time'
-                ]
-            ]);
-            echo '</div>'; ?>
+    <div class="col-md-12 col-sm-12 padding-top-one-em" id="datedivwithcalendar" style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
+        <div class='col-md-2 col-sm-2 select-text-margin padding-right-zero'>
+            <?php AppUtility::t('Available After') ?>
         </div>
-        <BR class=form><br>
+        <div class="col-md-10 col-sm-10">
+            <span class="col-md-3 col-sm-5 padding-left-zero padding-right-zero">
+                <input type=radio name="available-after" class="pull-left select-text-margin" value="0" <?php if ($defaultValues['startDate'] == 0) { echo 'checked=1';} ?>/>
+                <span class="pull-left padding-left-pt-eight-em select-text-margin">
+                    <?php AppUtility::t("Always until end date") ?>
+                </span>
+            </span>
+            <span class="col-md-3 col-sm-5 padding-left-zero padding-right-zero">
+                <label class="pull-left non-bold">
+                    <input type=radio name="available-after" class="select-text-margin pull-left" value="1" <?php if ($defaultValues['startDate'] == 1) { echo 'checked=1'; } ?>/>
+                </label>
+                <div class = "time-input pull-left col-md-10 col-sm-8 padding-left-pt-eight-em add-link-date-font padding-right-zero">
+                    <?php echo DatePicker::widget([
+                        'name' => 'sdate',
+                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                        'value' => $defaultValues['sDate'],
+                        'removeButton' => false,
+                        'pluginOptions' => [
+                            'autoclose' => true,
+                            'format' => 'mm/dd/yyyy']
+                    ]); ?>
+                </div>
+            </span>
 
-        <div class='col-md-2 col-sm-2 select-text-margin'><?php AppUtility::t('Available Until') ?></div>
-        <div class=col-md-10 col-sm-10>
-            <label class="pull-left non-bold select-text-margin">
-                <input type=radio name="available-until" value="2000000000" <?php if ($defaultValues['endDate'] == AppConstant::ALWAYS_TIME) { echo 'checked=1';} ?>/>
-                <span class="padding-left">
+            <div class="col-md-5 col-sm-7 padding-left-zero">
+                <label class="select-text-margin end pull-left non-bold"> at </label>
+                <div class="pull-left col-md-10 col-sm-9 add-link-date-font">
+                    <?php   echo TimePicker::widget([
+                        'name' => 'stime',
+                        'value' => $defaultValues['sTime'],
+                        'pluginOptions' => [
+                            'showSeconds' => false,
+                            'class' => 'time'
+                        ]
+                    ]); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-sm-12 padding-top-one-em">
+        <div class='col-md-2 col-sm-2 padding-right-zero select-text-margin'>
+            <?php AppUtility::t('Available Until') ?>
+        </div>
+        <div class="col-md-10 col-sm-10">
+            <label class="col-md-3 col-sm-5 padding-left-zero padding-right-zero">
+                <input class="floatleft select-text-margin" type=radio name="available-until" value="2000000000" <?php if ($defaultValues['endDate'] == AppConstant::ALWAYS_TIME) { echo 'checked=1';} ?>/>
+                <span class="pull-left padding-left-pt-eight-em select-text-margin non-bold">
                     <?php AppUtility::t("Always after start date") ?>
                 </span>
             </label>
-            <label class="pull-left" style="padding-left: 32px">
-                <input type=radio name="available-until" class="select-text-margin pull-left" value="1"  <?php if ($defaultValues['endDate'] == 1) { echo 'checked=1'; } ?>/>
-            </label>
-            <?php
-            echo '<div class = "time-input pull-left col-md-4">';
-            echo DatePicker::widget([
-                'name' => 'edate',
-                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => $defaultValues['eDate'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose' => true,
-                    'format' => 'mm/dd/yyyy']
-            ]);
-            echo '</div>'; ?>
-            <?php
-            echo '<label class="end pull-left non-bold select-text-margin"> at </label>';
-            echo '<div class="pull-left col-md-4">';
+            <span class="col-md-3 col-sm-5 padding-left-zero padding-right-zero">
+                <label class="pull-left">
+                    <input type=radio name="available-until" class="select-text-margin pull-left" value="1"  <?php if ($defaultValues['endDate'] == 1) { echo 'checked=1'; } ?>/>
+                </label>
+                <?php
+                echo '<div class = "time-input pull-left col-md-10 col-sm-8 padding-left-pt-eight-em add-link-date-font padding-right-zero">';
+                echo DatePicker::widget([
+                    'name' => 'edate',
+                    'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                    'value' => $defaultValues['eDate'],
+                    'removeButton' => false,
+                    'pluginOptions' => [
+                        'autoclose' => true,
+                        'format' => 'mm/dd/yyyy']
+                ]); ?>
+                </div>
+            </span>
 
-            echo TimePicker::widget([
-                'name' => 'etime',
-                'value' => $defaultValues['eTime'],
-                'pluginOptions' => [
-                    'showSeconds' => false,
-                    'class' => 'time'
-                ]
-            ]);
-            echo '</div>'; ?>
+        <div class="col-md-5 col-sm-7 padding-left-zero">
+           <label class="end pull-left non-bold select-text-margin"> at </label>
+           <div class="pull-left col-md-10 col-sm-9 add-link-date-font">
+               <?php echo TimePicker::widget([
+                    'name' => 'etime',
+                    'value' => $defaultValues['eTime'],
+                    'pluginOptions' => [
+                        'showSeconds' => false,
+                        'class' => 'time'
+                    ]
+                ]); ?>
+            </div>
+         </div>
         </div>
-        <BR class=form>
+    </div>
 
-        <div class="col-md-12 col-sm-12 padding-top-ten padding-left-zero padding-bottom-twenty">
-            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Place on Calendar?') ?></div>
-            <div class="col-md-10 col-sm-10 padding-left-three">
+        <div class="col-md-12 col-sm-12 padding-top-ten">
+            <div class="col-md-2 col-sm-2">
+                <?php AppUtility::t('Place on Calendar?') ?>
+            </div>
+            <div class="col-md-10 col-sm-10 padding-left-zero">
                 <div class="col-md-12 col-sm-12">
                     <input type=radio name="oncal" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_ZERO); ?>  />
-                    <span class="padding-left"><?php AppUtility::t('No') ?></span>
+                    <span class="padding-left-pt-five-em"><?php AppUtility::t('No') ?></span>
                 </div>
                 <div class="col-md-12 col-sm-12 padding-top-ten">
                     <input type=radio name="oncal" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_ONE); ?>  />
-                    <span class="padding-left">
+                    <span class="padding-left-pt-five-em">
                         <?php AppUtility::t('Yes, on Available after date (will only show after that date)') ?>
                     </span>
                 </div>
                 <div class="col-md-12 col-sm-12 padding-top-ten">
                     <input type=radio name="oncal" value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_TWO); ?>  />
-                    <span class="padding-left-fifteen">
+                    <span class="padding-left-pt-five-em">
                         <?php AppUtility::t(' Yes, on Available until date') ?>
                     </span>
                 </div>
                 <div class="col-md-12 col-sm-12 padding-top-ten">
-                    <span class="padding-left-thirty-five">
+                    <span class="padding-left-two-em">
                         <?php AppUtility::t('With tag') ?>
                     </span>
                     <span class="padding-left">
@@ -345,8 +362,6 @@ $this->title = $defaultValues['saveTitle'];
                 </div>
             </div>
         </div>
-
-    </div>
 
     <div id="datediv" class="col-md-12 col-sm-12 padding-left-zero" style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_TWO) ? "block" : "none"; ?>">
         <div class=col-md-2 col-sm-2>
@@ -404,13 +419,13 @@ $this->title = $defaultValues['saveTitle'];
     </div>
         <?php } ?>
 
-    <div class="col-md-offset-2 col-md-10 col-sm-10 padding-top-fifteen">
+    <div class="col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10 padding-left-two-em padding-top-one-em">
         <div>
             <sup>*</sup>
             <span>Avoid quotes in the filename</span>
         </div>
     </div>
-    <div class="header-btn col-sm-offset-2 col-sm-6 padding-top-twenty-five padding-bottom-ten">
+    <div class="header-btn col-md-6 col-sm-6 col-sm-offset-2 col-md-offset-2 padding-left-two-em padding-top-one-em padding-bottom-ten">
         <button class="btn btn-primary page-settings" type="submit" value="Submit">
             <i class="fa fa-share header-right-btn"></i><?php echo $defaultValues['saveButtonTitle']; ?></button>
     </div>

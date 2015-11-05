@@ -75,3 +75,9 @@ label.inline-checkbox{
     width: 100%;
     max-width: 100% !important;
 }
+.add-link-date-font input, .add-forum-date-font input {
+    font-size: 12px;
+}
+.add-link-summary-textarea table,.add-link-summary-textarea iframe,.add-forum-summary-textarea table,.add-forum-summary-textarea iframe {
+    max-width: 100% !important;
+}
