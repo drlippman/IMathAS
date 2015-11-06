@@ -85,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="editor-summary">
        <div class="col-sm-2"><?php AppUtility::t('Summary')?></div>
         <div class="col-sm-10">
-            <div class='editor summary-html-lord'>
+            <div class='editor summary-html-lord add-assessment-summary-textarea'>
                 <textarea cols=5 rows=12 id=summary name=summary style='width: 100%;'><?php echo $assessmentData["summary"];?></textarea>
             </div><br>
         </div>
@@ -94,7 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <div class="col-sm-2"><?php AppUtility::t('Intro/Instructions')?></div>
         <div class="col-sm-10">
-            <div class='editor instructions-html-lord'>
+            <div class='editor instructions-html-lord add-assessment-summary-textarea'>
             <textarea cols=5 rows=12 id='intro' name='intro' style='width: 100%'><?php echo $assessmentData["intro"];?></textarea></div><br>
         </div>
     </div>

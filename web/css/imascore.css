@@ -1456,3 +1456,16 @@ padding-left: 0.5em;
 .padding-left-pt-eight-em {
     padding-left: 0.8em;
 }
+.padding-left-one-pt-two-em {
+    padding-left: 1.2em;
+}
+.padding-left-pt-six-em {
+    padding-left: 0.6em;
+}
+.padding-left-one-pt-five-em {
+    padding-left: 1.5em;
+}
+.bootstrap-timepicker-widget input {
+    padding: 5px !important;
+    font-size: 12px;
+}

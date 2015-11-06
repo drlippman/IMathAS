@@ -81,3 +81,10 @@ label.inline-checkbox{
 .add-link-summary-textarea table,.add-link-summary-textarea iframe,.add-forum-summary-textarea table,.add-forum-summary-textarea iframe {
     max-width: 100% !important;
 }
+.add-assessment-summary-textarea iframe, .add-wiki-summary-textarea iframe{
+    max-width: 100% !important;
+
+}
+.add-assessment-summary-textarea table, .add-wiki-summary-textarea table {
+    width: 100% !important;
+}

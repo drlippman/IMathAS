@@ -23,21 +23,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="tab-content shadowBox non-nav-tab-item">
         <div class="name-of-item">
-            <div class="col-sm-2"><?php AppUtility::t('Name of Wiki')?></div>
-            <div class="col-sm-10">
+            <div class="col-md-2 col-sm-2 padding-top-pt-five-em"><?php AppUtility::t('Name of Wiki')?></div>
+            <div class="col-md-10 col-sm-10">
                 <?php $title = AppUtility::t('Enter title here', false);
                 if($defaultValue['name']){
                       $title = $defaultValue['name'];
                     } ?>
-                <input class="input-item-title" type=text size=0 name=name value="<?php echo $defaultValue['title'];?>">
+                <input class="input-item-title form-control" type=text size=0 name=name value="<?php echo $defaultValue['title'];?>">
             </div>
         </div>
         <BR class=form>
 
         <div class="editor-summary">
-            <div class="col-sm-2"><?php AppUtility::t('Description')?></div>
-            <div class="col-sm-10">
-                <div class=editor>
+            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Description')?></div>
+            <div class="col-md-10 col-sm-10">
+                <div class="editor add-wiki-summary-textarea">
                     <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
                         <?php $text = "";
                         if($defaultValue['description'])
@@ -51,23 +51,45 @@ $this->params['breadcrumbs'][] = $this->title;
         </div><BR class=form>
 
         <div class="visibility-item">
-            <div class="col-sm-2"><?php AppUtility::t('Visibility')?></div>
-            <div class="col-sm-10">
+            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Visibility')?></div>
+            <div class="col-md-10 col-sm-10">
 
-                <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($defaultValue['avail'], AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
-                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],0);?>/><span class='padding-left'><?php AppUtility::t('Hide')?></span></label>
-                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/><span class='padding-left'><?php AppUtility::t('Show Always')?></span></label>
+                <span class="col-md-3 col-sm-3 padding-left-zero">
+                    <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($defaultValue['avail'], AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/>
+                    <span class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
+                </span>
+
+                <span class="col-md-2 col-sm-2 padding-left-zero">
+                    <label class="non-bold">
+                        <input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],0);?>/>
+                        <span class='padding-left'><?php AppUtility::t('Hide')?></span>
+                    </label>
+                </span>
+
+                <span class="col-md-3 col-sm-3 padding-left-zero">
+                    <label class="non-bold">
+                        <input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/>
+                        <span class='padding-left'><?php AppUtility::t('Show Always')?></span>
+                    </label>
+                </span>
+
             </div>
             <div>
                 <div id="datediv" style="display:<?php echo ($defaultValue['avail']==1)?"block":"none"; ?>"><BR class=form><br>
-                    <div class="col-sm-2"><?php AppUtility::t('Available After')?></div>
-                <div class=col-sm-10>
+                <div class="col-md-2 col-sm-2 padding-top-pt-five-em">
+                    <?php AppUtility::t('Available After')?>
+                </div>
+                <div class="col-md-10 col-sm-10">
+                    <span class="floatleft padding-top-pt-five-em col-md-3 col-sm-4 padding-left-zero">
+                        <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 0); ?>/>
+                        <span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
+                    </span>
+                    <label class="padding-top-pt-five-em pull-left">
+                        <input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 1); ?>/>
+                    </label>
 
-                    <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 0); ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
-                    <label class="pull-left" style="padding-left: 41px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 1); ?>/></label>
-                    <?php
-                    echo '<div class = "time-input pull-left col-sm-4">';
-                    echo DatePicker::widget([
+                    <div class = "time-input pull-left col-md-3 col-sm-4 padding-left-one-pt-five-em">
+                    <?php  echo DatePicker::widget([
                         'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
                         'value' => $defaultValue['sDate'],
@@ -75,28 +97,30 @@ $this->params['breadcrumbs'][] = $this->title;
                         'pluginOptions' => [
                             'autoclose' => true,
                             'format' => 'mm/dd/yyyy' ]
-                    ]);
-                    echo '</div>';?>
-                    <?php
-                    echo '<label class="end pull-left non-bold">at</label>';
-                    echo '<div class="pull-left col-sm-4">';
-                    echo TimePicker::widget([
-                        'name' => 'stime',
-                        'value' => $defaultValue['sTime'],
-                        'pluginOptions' => [
-                            'showSeconds' => false,
-                            'class' => 'time'
-                        ]
-                    ]);
-                    echo '</div>';?>
+                    ]); ?>
+                    </div>
+                    <label class="end pull-left non-bold padding-top-pt-five-em">at</label>
+                    <div class="mobile-add-wiki-time-picker pull-left col-md-4 col-sm-4">
+                        <?php  echo TimePicker::widget([
+                            'name' => 'stime',
+                            'value' => $defaultValue['sTime'],
+                            'pluginOptions' => [
+                                'showSeconds' => false,
+                                'class' => 'time'
+                            ]
+                        ]); ?>
+                    </div>
                 </div><BR class=form><br>
 
-                 <div class=col-sm-2><?php AppUtility::t('Available Until')?></div>
-                <div class=col-sm-10>
-                    <label class="pull-left non-bold"><input type=radio name="available-until" class="pull-left" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 0); ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
-                    <label class="pull-left" style="padding-left: 34px"><input type=radio name="available-until" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 1); ?>/></label>
+                 <div class="col-md-2 col-sm-2 padding-top-pt-five-em"><?php AppUtility::t('Available Until')?></div>
+                <div class="col-md-10 col-sm-10">
+                    <label class="pull-left non-bold padding-top-pt-five-em col-md-3 col-sm-4 padding-left-zero padding-right-zero">
+                        <input type=radio name="available-until" class="pull-left" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 0); ?>/>
+                        <span class="padding-left"><?php AppUtility::t('Always after start date')?></span>
+                    </label>
+                    <label class="padding-top-pt-five-em pull-left"><input type=radio name="available-until" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 1); ?>/></label>
                     <?php
-                    echo '<div class = "time-input  col-sm-4">';
+                    echo '<div class = "time-input col-md-3 col-sm-4">';
                     echo DatePicker::widget([
                         'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -108,8 +132,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left non-bold"> at </label>';
-                    echo '<div class="pull-left col-sm-4">';
+                    echo '<label class="end pull-left non-bold padding-top-pt-five-em"> at </label>';
+                    echo '<div class="pull-left col-md-4 col-sm-4 mobile-add-wiki-time-picker">';
 
                     echo TimePicker::widget([
                         'name' => 'etime',
@@ -125,8 +149,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <BR class=form>
         </div>
             <div class="group-wiki">
-        <div class="col-sm-2"><?php AppUtility::t('Group wiki?')?></div>
-        <div class="col-sm-4 dropdown">
+        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Group wiki?')?></div>
+        <div class="col-md-3 col-sm-3 dropdown">
 <?php
 if ($started) {
     AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
@@ -139,40 +163,49 @@ if ($started) {
     </div>
   <br class="form"/><br class="form"/>
 
-        <div class=col-sm-2><?php AppUtility::t('Students can edit')?></div>
-		<div class=col-sm-10>
-            <input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/><span class='padding-left'><?php AppUtility::t('Always')?></span><br>
-            <input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/><span class="padding-left"><?php AppUtility::t('Never')?></span><br>
-            <label class="pull-left non-bold"><input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/><span class='padding-left'><?php AppUtility::t('Before')?></span></label>
-            <?php
-            echo '<div class = "col-sm-4 time-input">';
-            echo DatePicker::widget([
-                'name' => 'Calendar',
-                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => $defaultValue['rdatetype'],
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose' => true,
-                    'format' => 'mm/dd/yyyy' ]
-            ]);
-            echo '</div>';?>
-            <?php
-            echo '<label class="end col-sm-1 non-bold"> at </label>';
-            echo '<div class="pull-left col-sm-4">';
+        <div class="col-md-2 col-sm-2 padding-right-zero"><?php AppUtility::t('Students can edit')?></div>
+		<div class="col-md-10 col-sm-10 padding-left-zero">
+            <span class="col-md-12 col-sm-12">
+                <input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>
+                <span class='padding-left'><?php AppUtility::t('Always')?></span>
+            </span>
+            <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                <input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/>
+                <span class="padding-left"><?php AppUtility::t('Never')?></span>
+            </span>
 
-            echo TimePicker::widget([
-                'name' => 'calendar_end_time',
-                'value' => time(),
-                'pluginOptions' => [
-                    'showSeconds' => false,
-                    'class' => 'time'
-                ]
-            ]);
-            echo '</div>';?>
-
+            <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                <label class="pull-left non-bold padding-top-pt-five-em">
+                    <input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>
+                    <span class='padding-left'><?php AppUtility::t('Before')?></span>
+                </label>
+               <div class = "col-md-3 col-sm-4 time-input">
+                    <?php    echo DatePicker::widget([
+                        'name' => 'Calendar',
+                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                        'value' => $defaultValue['rdatetype'],
+                        'removeButton' => false,
+                        'pluginOptions' => [
+                            'autoclose' => true,
+                            'format' => 'mm/dd/yyyy' ]
+                    ]); ?>
+                </div>
+                <label class="end floatleft non-bold padding-top-pt-five-em"> at </label>
+                <div class="pull-left col-md-4 col-sm-5">
+                    <?php  echo TimePicker::widget([
+                        'name' => 'calendar_end_time',
+                        'value' => time(),
+                        'pluginOptions' => [
+                            'showSeconds' => false,
+                            'class' => 'time'
+                        ]
+                    ]); ?>
+                </div>
+            </span>
         </div>
-            <div class="header-btn col-sm-6 col-sm-offset-2 padding-top-thirty padding-bottom-thirty">
-                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultValue['saveTitle'] ?></button>
-            </div>
+
+        <div class="header-btn col-md-6 col-sm-6 col-sm-offset-2 padding-top-thirty padding-bottom-thirty">
+            <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultValue['saveTitle'] ?></button>
+        </div>
     </form>
 </div>

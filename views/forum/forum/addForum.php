@@ -176,61 +176,64 @@ $this->title = $pageTitle;
                 }        ?>
             </div>
         </div>
-        <div class="item-alignment col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
             <div class="floatleft">
                 <input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowAnonymous']) { echo "checked=1";}?> >
             </div>
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-4 col-sm-4 padding-left-pt-six-em">
                 <?php AppUtility::t('Allow anonymous posts')?>
             </div>
         </div>
 
-        <div class="item-alignment col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
             <div class="floatleft">
                 <input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowModify']) { echo "checked=1";}?>><br>
             </div>
-            <div class="col-md-6 col-sm-6"><?php AppUtility::t('Allow students to modify posts')?></div>
+            <div class="col-md-6 col-sm-6 padding-left-pt-six-em">
+                <?php AppUtility::t('Allow students to modify posts')?>
+            </div>
         </div>
 
-        <div class="item-alignment col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
             <div class="floatleft">
                 <input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowDelete']) { echo "checked=1";}?>><br>
             </div>
-            <div class="col-md-6 col-sm-6">
+            <div class="col-md-6 col-sm-8 padding-left-pt-six-em">
                 <?php AppUtility::t('Allow students to delete own posts (if no replies)')?>
             </div>
         </div>
 
-        <div class="item-alignment col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
             <div class="floatleft">
                 <input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowLikes']) { echo "checked=1";}?>><br>
             </div>
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-4 col-sm-4 padding-left-pt-six-em">
                 <?php AppUtility::t('Turn on "liking" posts')?>
             </div>
         </div>
 
 
-        <div class="item-alignment col-md-12 col-sm-12 padding-left-zero">
-            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Viewing before posting')?></div>
-            <div class="col-md-10 col-sm-10">
-                <input type="checkbox" name="viewing-before-posting" value="16"<?php if ($defaultValue['viewAfterPost']) { echo "checked=1";}?>>
-                <label class="padding-left non-bold"><?php AppUtility::t('Prevent students from viewing posts until they have created a thread.
-                You will likely also want to disable modifying posts')?></label>
+        <div class="padding-top-one-em col-md-12 col-sm-12 padding-left-zero">
+            <div class="col-md-2 col-sm-2 padding-right-zero"><?php AppUtility::t('Viewing before posting')?></div>
+            <div class="col-md-10 col-sm-10 padding-left-one-pt-two-em">
+                <input class="floatleft" type="checkbox" name="viewing-before-posting" value="16"<?php if ($defaultValue['viewAfterPost']) { echo "checked=1";}?>>
+                <label class="col-sm-11 col-md-11 padding-left non-bold padding-left-pt-six-em">
+                    <?php AppUtility::t('Prevent students from viewing posts until they have created a thread.You will likely also want to disable modifying posts')?>
+                </label>
             </div>
         </div>
 
-        <div class="item-alignment col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
             <div class="floatleft">
                 <input type="checkbox" name="Get-email-notify-of-new-posts" value="1"<?php if ($defaultValue['hasSubScrip']) { echo "checked=1";}?>><br>
             </div>
-            <div class="col-md-4 col-sm-4">
+            <div class="col-md-6 col-sm-6">
                 <?php AppUtility::t('Get email notify of new posts')?>
             </div>
          </div>
 
-        <div class="item-alignment col-md-12 col-sm-12 padding-left-zero">
-            <div class="col-md-2 col-sm-2">
+        <div class="padding-top-one-em col-md-12 col-sm-12 padding-left-zero">
+            <div class="col-md-2 col-sm-2 padding-right-zero">
                 <?php AppUtility::t('Default display')?>
             </div>
             <div class="col-md-3 col-sm-4">
@@ -241,95 +244,162 @@ $this->title = $pageTitle;
             </div>
         </div>
 
-                    <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Sort threads by')?></div>
-                            <div class="col-md-10 col-sm-10">
-                                <input type=radio name="sort-thread" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],0);?>><span class="padding-left"><?php AppUtility::t('Thread start date')?></span><br>
-                                <input type=radio name="sort-thread" value="1"<?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],1);?>/><span class="padding-left"><?php AppUtility::t('Most recent reply date')?></span>
-                            </div><br class="form"/>
-                    </div>
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-2 padding-right-zero">
+                <?php AppUtility::t('Sort threads by')?>
+            </div>
+            <div class="col-md-10 col-sm-10 padding-left-zero">
+                <span class="col-md-12 col-sm-12">
+                    <input type=radio name="sort-thread" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],0);?> >
+                    <span class="padding-left">
+                        <?php AppUtility::t('Thread start date')?>
+                    </span>
+                </span>
+                <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                    <input type=radio name="sort-thread" value="1"<?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],1);?>/>
+                    <span class="padding-left">
+                        <?php AppUtility::t('Most recent reply date')?>
+                    </span>
+                </span>
+            </div>
+        </div>
 
-                    <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Students can create new threads')?></div>
-                        <div class="col-md-10 col-sm-10">
-                            <input type=radio name="post" value="2000000000" <?php if ($defaultValue['postBy']==2000000000) { echo "checked=1";}?>><span class="padding-left"><?php AppUtility::t('Always')?></span><br>
-                            <input type=radio name="post" value="0" <?php if ($defaultValue['postBy']==0) { echo "checked=1";}?>><span class="padding-left"><?php AppUtility::t('Never')?></span><br>
-                            <input type=radio name="post" class="pull-left " value="1" <?php if ($defaultValue['postBy'] == 1) { echo "checked=1";}?> >
-                            <?php
-                            echo '<label class="end pull-left non-bold padding-left"> Before</label>';
-                            echo '<div class = "col-md-4 col-sm-4 time-input">';
-                            echo DatePicker::widget([
-                                'name' => 'postDate',
-                                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                                'value' => $defaultValue['postDate'],
-                                'removeButton' => false,
-                                'pluginOptions' => [
-                                    'autoclose' => true,
-                                    'format' => 'mm/dd/yyyy']
-                            ]);
-                            echo '</div>'; ?>
-                            <?php
-                            echo '<label class="end pull-left non-bold"> at </label>';
-                            echo '<div class=" col-md-6 col-sm-6">';
-                            echo TimePicker::widget([
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-2">
+                <?php AppUtility::t('Students can create new threads')?>
+            </div>
+            <div class="col-md-10 col-sm-10">
+                <span class="col-md-12 col-sm-12 padding-left-zero">
+                    <input type=radio name="post" value="2000000000" <?php if ($defaultValue['postBy']==2000000000) { echo "checked=1";}?>>
+                    <span class="padding-left"><?php AppUtility::t('Always')?></span>
+                </span>
+                <span class="col-md-12 col-sm-12 padding-left-zero padding-top-pt-five-em">
+                    <input type=radio name="post" value="0" <?php if ($defaultValue['postBy']==0) { echo "checked=1";}?>>
+                    <span class="padding-left">
+                        <?php AppUtility::t('Never')?>
+                    </span>
+                </span>
+
+                <span class="col-md-12 col-sm-12 padding-left-zero padding-top-pt-five-em">
+                    <span class="floatleft padding-top-pt-five-em">
+                        <input type=radio name="post" class="pull-left " value="1" <?php if ($defaultValue['postBy'] == 1) { echo "checked=1";}?> >
+                        <label class="end pull-left non-bold padding-left"> Before</label>
+                    </span>
+                    <div class = "col-md-4 col-sm-4 time-input">
+                        <?php echo DatePicker::widget([
+                            'name' => 'postDate',
+                            'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                            'value' => $defaultValue['postDate'],
+                            'removeButton' => false,
+                            'pluginOptions' => [
+                                'autoclose' => true,
+                                'format' => 'mm/dd/yyyy']
+                        ]); ?>
+                    </div>
+                    <label class="end pull-left non-bold padding-top-pt-five-em"> at </label>
+                    <div class=" col-md-6 col-sm-6">
+                        <?php   echo TimePicker::widget([
                                 'name' => 'postTime',
                                 'value' =>  $defaultValue['postByTime'],
                                 'pluginOptions' => [
                                     'showSeconds' => false,
                                     'class' => 'time'
-                                ]
-                            ]);
-                            echo '</div>'; ?>
-                        </div>
-                        </div><BR class=form>
-                        <div class="item-alignment">
-                            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Students can reply to posts')?></div>
-                            <div class="col-md-10 col-sm-10">
-                                <input type=radio name="reply" value="2000000000" <?php if ($defaultValue['replyBy']==2000000000) { echo "checked=1";}?>><span class="padding-left"><?php AppUtility::t('Always')?></span><br>
-                                <input type=radio name="reply" value="0" <?php if ($defaultValue['replyBy']==0) { echo "checked=1";}?>><span class="padding-left"><?php AppUtility::t('Never')?></span><br>
-                                <input type=radio name="reply" class="pull-left "value="1" <?php if ($defaultValue['replyBy'] == 1) { echo "checked=1";}?> >
-                                <?php
-                                echo '<label class="end pull-left non-bold padding-left">Before</label>';
-                                echo '<div class = "col-md-4 col-sm-4 time-input">';
-                                echo DatePicker::widget([
-                                    'name' => 'replyByDate',
-                                    'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                                    'value' => $defaultValue['replyByDate'],
-                                    'removeButton' => false,
-                                    'pluginOptions' => [
-                                        'autoclose' => true,
-                                        'format' => 'mm/dd/yyyy']
-                                ]);
-                                echo '</div>'; ?>
-                                <?php
-                                echo '<label class="end pull-left non-bold"> at </label>';
-                                echo '<div class=" col-md-6 col-sm-6">';
-                                echo TimePicker::widget([
-                                    'name' => 'replyByTime',
-                                    'value' => $defaultValue['replyByTime'],
-                                    'pluginOptions' => [
-                                        'showSeconds' => false,
-                                        'class' => 'time'
-                                    ]
-                                ]);
-                                echo '</div>'; ?>
-                    </div></div><BR class=form>
-
-                    <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Calendar icon')?></div>
-                           <div class="col-md-10 col-sm-10">
-                        <?php AppUtility::t('New Threads')?><span class="padding-left"><input type="text" name="calendar-icon-text1" value="<?php echo $defaultValue['postTag'];?>" size="2"></span> ,
-                        <label class="padding-left non-bold"><?php AppUtility::t('Replies')?><span class="padding-left"><input type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2"></span></label>
-                            </div><br class=form>
+                                 ]
+                        ]); ?>
                     </div>
-                 <div class="item-alignment">
-                    <div class="col-md-2 col-sm-2"><?php AppUtility::t('Count in gradebook?')?></div>
-                    <div class="col-md-10 col-sm-10">
-                        <input type=radio name="count-in-gradebook" value="0" <?php if ($defaultValue['cntInGb'] == 0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/><span class="padding-left"><?php AppUtility::t('No')?></span><br>
-                        <input type=radio name="count-in-gradebook" value="1" <?php if ($defaultValue['cntInGb'] == 1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/><span class='padding-left'><?php AppUtility::t('Yes')?></span><br>
-                        <input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb'] == 4 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/><span class='padding-left'><?php AppUtility::t('Yes, but hide from students for now')?></span><br>
-                        <input type=radio name="count-in-gradebook" value="2" <?php if ($defaultValue['cntInGb'] == 2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/><span class='padding-left'><?php AppUtility::t('Yes, as extra credit')?></span>
-                </div></div><br class="form"/>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="col-md-2 col-sm-2">
+                <?php AppUtility::t('Students can reply to posts')?>
+            </div>
+            <div class="col-md-10 col-sm-10">
+                <span class="col-md-12 col-sm-12 padding-left-zero">
+                    <input type=radio name="reply" value="2000000000" <?php if ($defaultValue['replyBy']==2000000000) { echo "checked=1";}?>>
+                    <span class="padding-left"><?php AppUtility::t('Always')?></span>
+                </span>
+                <span class="col-md-12 col-sm-12 padding-left-zero padding-top-pt-five-em">
+                    <input type=radio name="reply" value="0" <?php if ($defaultValue['replyBy']==0) { echo "checked=1";}?>>
+                    <span class="padding-left"><?php AppUtility::t('Never')?></span>
+                </span>
+                <span class="col-md-12 col-sm-12 padding-left-zero padding-top-pt-five-em">
+                    <span class="floatleft padding-top-pt-five-em">
+                        <input type=radio name="reply" class="pull-left "value="1" <?php if ($defaultValue['replyBy'] == 1) { echo "checked=1";}?> >
+                        <label class="end pull-left non-bold padding-left">Before</label>
+                    </span>
+                    <div class = "col-md-4 col-sm-4 time-input">
+                        <?php    echo DatePicker::widget([
+                            'name' => 'replyByDate',
+                            'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                            'value' => $defaultValue['replyByDate'],
+                            'removeButton' => false,
+                            'pluginOptions' => [
+                                'autoclose' => true,
+                                'format' => 'mm/dd/yyyy']
+                        ]); ?>
+                    </div>
+                    <label class="end pull-left non-bold padding-top-pt-five-em"> at </label>
+                    <div class=" col-md-6 col-sm-6">
+                        <?php echo TimePicker::widget([
+                            'name' => 'replyByTime',
+                            'value' => $defaultValue['replyByTime'],
+                            'pluginOptions' => [
+                                'showSeconds' => false,
+                                'class' => 'time'
+                            ]
+                        ]); ?>
+                    </div>
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+            <div class="padding-top-pt-five-em col-md-2 col-sm-2">
+                <?php AppUtility::t('Calendar icon')?>
+            </div>
+            <div class="col-md-10 col-sm-10 padding-left-zero">
+                <label class="col-md-5 col-sm-5 non-bold">
+                    <span class="floatleft padding-top-pt-five-em">
+                        <?php AppUtility::t('New Threads')?>
+                    </span>
+                    <span class="col-md-7 col-sm-7">
+                        <input class="form-control" type="text" name="calendar-icon-text1" value="<?php echo $defaultValue['postTag'];?>" size="2">
+                    </span>
+                </label>
+                <label class="col-md-5 col-sm-5 non-bold padding-left-zero">
+                    <span class="floatleft padding-top-pt-five-em">
+                        <?php AppUtility::t('Replies')?>
+                    </span>
+                    <span class="col-md-7 col-sm-7">
+                        <input class="form-control" type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2">
+                    </span>
+                </label>
+            </div>
+        </div>
+     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+        <div class="col-md-2 col-sm-2">
+            <?php AppUtility::t('Count in gradebook?')?>
+        </div>
+        <div class="col-md-10 col-sm-10 padding-left-zero">
+            <span class="col-md-12 col-sm-12">
+                <input type=radio name="count-in-gradebook" value="0" <?php if ($defaultValue['cntInGb'] == 0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>
+                <span class="padding-left"><?php AppUtility::t('No')?></span>
+            </span>
+            <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                <input type=radio name="count-in-gradebook" value="1" <?php if ($defaultValue['cntInGb'] == 1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>
+                <span class='padding-left'><?php AppUtility::t('Yes')?></span>
+            </span>
+            <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                <input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb'] == 4 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>
+                <span class='padding-left'><?php AppUtility::t('Yes, but hide from students for now')?></span>
+            </span>
+            <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                <input type=radio name="count-in-gradebook" value="2" <?php if ($defaultValue['cntInGb'] == 2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>
+                <span class='padding-left'><?php AppUtility::t('Yes, as extra credit')?></span>
+            </span>
+        </div>
+     </div>
 
                     <div id="gbdetail" <?php if ($defaultValue['cntInGb']==0 && $defaultValue['points']==0) { echo 'style="display:none;"';}?>><br>
 
@@ -382,24 +452,35 @@ $this->title = $pageTitle;
                     </div>
                         <?php } ?>
                         </div>
-                        <div class="item-alignment">
-                       <div class="col-md-2 col-sm-2"><?php AppUtility::t('Forum Type')?></div>
-                            <div class="col-md-10 col-sm-10">
-                                <input type=radio name="forum-type" value="0" <?php if ($defaultValue['forumType']==0) { echo 'checked=1';}?>/><span class="padding-left"><?php AppUtility::t('Regular forum')?></span><br>
-                                <input type=radio name="forum-type" value="1" <?php if ($defaultValue['forumType']==1) { echo 'checked=1';}?>/><span class='padding-left'><?php AppUtility::t('File sharing forum')?></span><br>
-                            </div>
-                       </div><br class="form"/>
-                    <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Categorize posts?')?></div>
-                         <div class="col-md-6 col-sm-6">
-                             <input type=checkbox name="categorize-posts" value="1" <?php if ($defaultValue['tagList'] != '') {echo "checked=1";} ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/>
-                              <span id="tagholder" style="display:<?php echo ($defaultValue['tagList'] == '') ? "none" : "inline"; ?>">
-                              <span class="padding-left"><?php AppUtility::t('Enter in format CategoryDescription:category,category,category')?></span><br><br>
-                              <input class="form-control" type="text" size="50" height="20" name="taglist" value="<?php echo $defaultValue['tagList']; ?>"  >
-                              </span><br class=form><br class=form>
-            </div>
-                        <div class="header-btn col-sm-6 col-sm-offset-2 padding-top-ten padding-bottom-thirty">
-                            <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
-                        </div>
-                   </div>
+    <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+        <div class="col-md-2 col-sm-2">
+            <?php AppUtility::t('Forum Type')?>
+        </div>
+        <div class="col-md-10 col-sm-10 padding-left-zero">
+            <span class="col-md-12 col-sm-12">
+                <input type=radio name="forum-type" value="0" <?php if ($defaultValue['forumType']==0) { echo 'checked=1';}?>/>
+                <span class="padding-left"><?php AppUtility::t('Regular forum')?></span>
+            </span>
+            <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
+                <input type=radio name="forum-type" value="1" <?php if ($defaultValue['forumType']==1) { echo 'checked=1';}?>/>
+                <span class='padding-left'><?php AppUtility::t('File sharing forum')?></span>
+            </span>
+        </div>
+    </div>
+    <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+        <div class="col-md-2 col-sm-2">
+            <?php AppUtility::t('Categorize posts?')?>
+        </div>
+         <div class="col-md-10 col-sm-10">
+             <input type=checkbox name="categorize-posts" value="1" <?php if ($defaultValue['tagList'] != '') {echo "checked=1";} ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/>
+             <span id="tagholder" style="display:<?php echo ($defaultValue['tagList'] == '') ? "none" : "inline"; ?>">
+                 <span class="padding-left"><?php AppUtility::t('Enter in format CategoryDescription:category,category,category')?></span>
+                 <input class="form-control" type="text" size="50" height="20" name="taglist" value="<?php echo $defaultValue['tagList']; ?>"  >
+              </span>
+         </div>
+
+   </div>
+    <div class="header-btn col-md-offset-2 col-sm-offset-2 col-md-6 col-sm-6 padding-top-ten padding-bottom-thirty">
+        <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
+    </div>
     </form>
