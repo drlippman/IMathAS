@@ -159,6 +159,11 @@ class UtilitiesController extends AppController
         $this->includeCSS(['utilities.css']);
         return $this->renderWithData('rescueCourse',['items' => $items,'recoveredItems' => $recoveredItems]);
     }
+
+    /**
+     * @return string
+     * Student count
+     */
     public function actionGetStudentCount()
     {
         $this->guestUserHandler();
@@ -196,11 +201,20 @@ class UtilitiesController extends AppController
         }
         $skipCidS =implode(',',$skipCid);
         $date = $now - AppConstant::SECONDS_CONVERSION*$days;
+        /*
+         * Get Student count
+         */
         $stuCount = User::getStuCount($skipCid,$date,$skipCidS);
         $queryForStu = User::queryForStu($skipCid,$date,$skipCidS);
         $teacherCnt = User::getCountByJoin($skipCid,$date,$skipCidS);
+        /**
+         * Get student details.
+         */
         $stuName = Student::getFNameAndLNameByJoin($date);
         $date = $now - AppConstant::SECONDS*AppConstant::SECONDS;
+        /**
+         * Get distinct student data.
+         */
         $queryByDistinctCnt = User::getStuData($date);
         $email = $this->getParamVal('email');
         if(isset($email) && $user->rights > AppConstant::GROUP_ADMIN_RIGHT)

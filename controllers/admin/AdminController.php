@@ -55,13 +55,13 @@ use yii\base\Exception;
 
 class AdminController extends AppController
 {
+
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
         $user = $this->getAuthenticatedUser();
         return $this->accessForAdminController($user['rights'],$actionPath);
     }
-
     public function actionIndex()
     {
         $this->guestUserHandler();
@@ -3766,7 +3766,6 @@ class AdminController extends AppController
                 require("../components/displayQuestion.php");
                 if (isset($params['seed']))
                 {
-
                     list($score,$rawscores) = scoreq(AppConstant::NUMERIC_ZERO,$qSetId,$params['seed'],$params['qn0']);
                     $page_lastScore = "<p>Score on last answer: $score/1</p>\n";
                 }
