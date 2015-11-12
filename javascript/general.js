@@ -544,6 +544,21 @@ function hidefromcourselist(el,cid) {
 }
 
 jQuery(document).ready(function($) {
+	$(window).on("message", function(e) {
+		if (e.originalEvent.data.match(/lti\.frameResize/)) {
+			var edata = JSON.parse(e.originalEvent.data);
+			var frames = document.getElementsByTagName('iframe');
+			for (var i = 0; i < frames.length; i++) {
+			    if (frames[i].contentWindow === e.originalEvent.source) {
+				$(frames[i]).height(edata.height); //the height sent from iframe
+				break;
+			    }
+			}
+		}
+	});
+});
+
+jQuery(document).ready(function($) {
 	$('a').each(setuptracklinks);	
 	$('a[href*="youtu"]').each(setupvideoembeds);
 	$('a[href*="vimeo"]').each(setupvideoembeds);	

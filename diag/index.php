@@ -11,7 +11,7 @@
  	ini_set('session.gc_maxlifetime',86400);
 	session_start();
 	$sessionid = session_id();
-	
+		
 	if (!isset($_GET['id'])) {
 		$query = "SELECT id,name FROM imas_diags WHERE public=3 OR public=7";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -305,6 +305,7 @@ $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+$flexwidth = true;
 require("../header.php");
 $pagetitle =$line['name'];
 require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");

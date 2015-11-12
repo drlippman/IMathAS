@@ -121,7 +121,7 @@
 		$addtoquerystring = "ekey=".urlencode($_POST['ekey']);
 	}
 	require("validate.php");
-	
+	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
 			$query = "SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id='{$_GET['cid']}'";
