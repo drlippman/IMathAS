@@ -322,7 +322,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
 		}
 		$showanswerloc .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
-	} else {
+	} else if ($doshowans) {
 		$showanswerloc = array();
 		foreach($entryTips as $iidx=>$entryTip) {
 			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
@@ -344,7 +344,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				}
 			}
 			$showanswerloc[$iidx] .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
-			
+		}
+		if (!is_array($answerbox) && count($showanswerloc)==1) { //not a multipart question
+			$showanswerloc = $showanswerloc[0];
 		}
 	}
 	
@@ -371,6 +373,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		} else {
 			$evaledqtext = str_replace('[AB]', $answerbox, $evaledqtext);
 			$toevalqtxt .= '$answerbox';
+		}
+	}
+	if (strpos($evaledqtext,'[SAB')!==false) {
+		if (is_array($showanswerloc)) {
+			foreach($showanswerloc as $iidx=>$saloc) {
+				if (strpos($evaledqtext,'[SAB'.$iidx.']')!==false) {
+					$evaledqtext = str_replace('[SAB'.$iidx.']', $saloc, $evaledqtext);
+					$toevalqtxt .= '$showanswerloc['.$iidx.']';  //to prevent autoadd
+				}
+			}
+		} else {
+			$evaledqtext = str_replace('[SAB]', $showanswerloc, $evaledqtext);
+			$toevalqtxt .= '$showanswerloc';
 		}
 	}
 	if ($returnqtxt) {
