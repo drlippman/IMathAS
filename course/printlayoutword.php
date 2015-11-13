@@ -30,7 +30,8 @@ $sessiondata['texdoubleescape'] = true;
 
 $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 2;
-
+$loadgraphfilter = true;
+$hidedrawcontrols = true;
 
 
 if ($overwriteBody==1) {
@@ -60,7 +61,7 @@ if ($overwriteBody==1) {
 	echo '<p>NOTE: In some versions of Word, variables in equations may appear incorrectly at first.  To fix this, ';
 	echo 'select everything (Control-A), then under the Equation Tools menu, click Linear then Professional.</p>';
 	
-	echo '<div class="submit"><input type="submit" value="Download"/></div></form>';
+	echo '<div class="submit"><input type="submit" value="Continue"/></div></form>';
 
 	
 } else {		

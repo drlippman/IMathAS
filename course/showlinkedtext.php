@@ -17,6 +17,7 @@
 	if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
 		$shownav = false;
 		$flexwidth = true;
+		$nologo = true;
 	} else {
 		$shownav = true;
 	}

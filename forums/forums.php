@@ -318,7 +318,7 @@ if ($searchtype == 'thread') {
 		$query .= "AND imas_forum_posts.tag='$searchtag' ";
 	}
 	if (!$isteacher) {
-		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) AND (imas_forums.settings&16)=0 ";
 	}
 	if ($anyforumsgroup && !$isteacher) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";

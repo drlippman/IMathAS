@@ -387,7 +387,7 @@ if (!(isset($teacherid))) {
 			
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
 		
-			$query = "SELECT ic.id,ic.name,ic.termsurl FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
+			$query = "SELECT ic.id,ic.name,ic.termsurl,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
 			$myCourseResult = mysql_query($query) or die("Query failed : " . mysql_error());
 		/*	$i=0;
 			$page_mineList = array();
@@ -413,9 +413,10 @@ if (!(isset($teacherid))) {
 		}
 	}
 }
-function writeCourseInfo($line, $skipcopyright = false) {
+
+function writeCourseInfo($line, $skipcopyright=2) {
 	$itemclasses = array();
-	if ($line['copyrights']<2 && !$skipcopyright) {
+	if ($line['copyrights']<$skipcopyright) {
 		$itemclasses[] = 'copyr';
 	} 
 	if ($line['termsurl']!='') {
@@ -427,14 +428,15 @@ function writeCourseInfo($line, $skipcopyright = false) {
 	}
 	echo '>';
 	echo $line['name'];
-	if (!$skipcopyright) {
-		if ($line['copyrights']<2) {
-			echo "&copy;\n"; 
-		} else {
-			echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-		}	
-	}
+	
+	if ($line['copyrights']<$skipcopyright) {
+		echo "&copy;\n"; 
+	} else {
+		echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+	}	
 }
+
+
 /******* begin html output ********/
 
 if (!isset($_GET['loadothers'])) {
@@ -762,7 +764,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 
 					<li><span class=dd>-</span>
 						<?php
-						writeCourseInfo($line, true);
+						writeCourseInfo($line, -1);
 						?> 
 					</li>
 <?php
@@ -806,7 +808,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 							<li>
 								<span class=dd>-</span>
 								<?php
-								writeCourseInfo($line);
+								writeCourseInfo($line, 1);
 								?>  
 							</li>
 <?php
@@ -876,7 +878,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 				<li>
 					<span class=dd>-</span>
 					<?php
-					writeCourseInfo($line);
+					writeCourseInfo($line, 1);
 					?>
 				</li>
 

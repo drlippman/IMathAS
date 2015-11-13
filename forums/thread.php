@@ -91,6 +91,8 @@
 
 	$allowmod = (($forumsettings&2)==2);
 	$allowdel = ((($forumsettings&4)==4) || $isteacher);
+	$postbeforeview = (($forumsettings&16)==16);
+	$canviewall = (isset($teacherid) || isset($tutorid));
 	$dofilter = false;
 	$now = time();
 	$grpqs = '';
@@ -173,6 +175,17 @@
 	
 		echo "<h2>Forum Search Results</h2>";
 		
+		if (!isset($_GET['allforums'])) {
+			$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$oktoshow = (mysql_num_rows($result)>0);
+			if (!$oktoshow) {
+				echo '<p>'._('This search is blocked. In this forum, you must post your own thread before you can read those posted by others.').'</p>';
+				require("../footer.php");
+				exit;
+			}
+		}
+		
 		$safesearch = $_GET['search'];
 		$safesearch = str_replace(' and ', ' ',$safesearch);
 		$searchterms = explode(" ",$safesearch);
@@ -183,7 +196,7 @@
 			$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
 			$query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
 			if (!$isteacher) {
-				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) AND (imas_forums.settings&16)=0 ";
 			}
 			$query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid='$cid' AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
 		} else {
