@@ -5,13 +5,13 @@ use app\components\AssessmentUtility;
 <div class="item-detail-header"> <?php
     if (isset($params['id']) || isset($params['nomanage'])) {
         if ($from=='modq') {
-            $breadcrumb = $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Question Settings','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' .$course->id , AppUtility::getHomeURL() .'gradebook/gradebook/modify-question?cid=' . $course->id.'aid='.$params['aid'].'id='.$params['qid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb = $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Question Settings','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' .$course->id , AppUtility::getHomeURL() .'gradebook/gradebook/modify-question?cid=' . $course->id.'aid='.$params['aid'].'id='.$params['qid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         } else if ($from=='addg') {
-            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Offline Grades','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-grades?cid=' . $course->id.'&gbitem='.$params['gbitem'].'&grades=all',AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Offline Grades','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-grades?cid=' . $course->id.'&gbitem='.$params['gbitem'].'&grades=all',AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         } else if ($from=='addf') {
-            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Forum','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-forum?cid=' . $course->id.'id='.$params['fid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Forum','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() .'gradebook/gradebook/add-forum?cid=' . $course->id.'id='.$params['fid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         }else{
-            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id ,AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
+            $breadcrumb =  $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id ,AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         }
 
         if ($params['id']=='new') {
@@ -40,7 +40,7 @@ use app\components\AssessmentUtility;
 <div class="tab-content shadowBox">
 
 
-    <div class="col-md-12 add-rubic-form">
+    <div class="col-md-12 col-sm-12 add-rubic-form">
 
 <?php
 
@@ -53,13 +53,20 @@ if ($overwriteBody==1) {
 ?>
     <?php
     if (!isset($params['id'])) {  //displaying "Manage Rubrics" page ?>
-    <div class="col-md-12 edit-rubric-form padding-left-zero padding-top-twenty-five"><div class="col-md-12 margin-bottom-fifteen"><div class="col-md-3">Select a rubric to edit or</div> <div class="col-md-3"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&id=new')?>">Add a new rubric</a></div></div>
+    <div class="col-md-12 col-sm-12 edit-rubric-form padding-left-zero padding-top-twenty-five">
+        <div class="col-md-12 col-sm-12 margin-bottom-fifteen">
+            <div class="col-md-3 col-sm-4">Select a rubric to edit or</div>
+            <div class="col-md-3 col-sm-4">
+                <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&id=new')?>">Add a new rubric</a>
+            </div>
+        </div>
         <?php
         foreach($rubricsName as $rubricName){
-        echo '<div class="col-md-12 padding-top-ten"><div class="col-md-3">';
+        echo '<div class="col-md-12 col-sm-12 padding-top-ten">
+        <div class="col-sm-4 col-md-3 word-break-break-all">';
             echo "{$rubricName['name']}" ?>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-sm-3">
             <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&id='.$rubricName['id'].$fromstr);?> ">Edit</a></div></div>
         <?php }
     echo '</div>';
@@ -75,15 +82,20 @@ if ($overwriteBody==1) {
         $rubtypeval = array(1,0,3,4,2);
         $rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only'); ?>
 
-            <?php echo '<div class="col-sm-12"><div class="col-sm-2 select-text-margin">Name</div><div class="col-sm-4">  <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
+            <?php echo '<div class="col-sm-12 col-md-12">
+            <div class="col-sm-2 col-md-2 select-text-margin">Name</div>
+            <div class="col-sm-6 col-md-4"> <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
 
-        echo '<div class="col-sm-12 padding-top-fifteen"><div class="col-sm-2 select-text-margin">Rubric Type</div> <div class="col-sm-4">';
+        echo '<div class="col-sm-12 col-md-12 padding-top-fifteen">
+        <div class="col-sm-2 col-md-2 select-text-margin">Rubric Type</div>
+        <div class="col-sm-6 col-md-4">';
         AssessmentUtility::writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');
         echo '</div></div>';
 
-        echo '<div class="col-sm-12 padding-top-fifteen padding-bottom-five"><div class="col-sm-offset-2 col-sm-4">Share with Group<input class="margin-left-ten" type="checkbox" name="rubisgroup" '.AssessmentUtility::getHtmlChecked($rubgrp,-1,1).' /></div>';
+        echo '<div class="col-sm-12 col-md-12 padding-top-fifteen padding-bottom-five">
+        <div class="col-sm-offset-2 col-sm-4 col-md-offset-2 col-md-4">Share with Group<input class="margin-left-ten" type="checkbox" name="rubisgroup" '.AssessmentUtility::getHtmlChecked($rubgrp,-1,1).' /></div>';
         echo '
-        <div class="col-md-12">
+        <div class="col-md-12 col-sm-12">
         <table class="width-hundread-per margin-top-fifteen">
         <thead><tr><th>Rubric Item<br/>Shows in feedback</th><th>Instructor Note<br/>Not in feedback</th><th><span id="pointsheader" ';
         if ($rubtype==2) {echo 'style="display:none;" ';}
@@ -108,7 +120,7 @@ if ($overwriteBody==1) {
         }
         echo '</table></div>'; ?>
             <?php    if (isset($params['id'])) {?>
-                <div class="header-btn padding-left-twenty col-sm-4 padding-top-twenty">
+                <div class="header-btn padding-left-twenty col-md-4 col-sm-4 padding-top-twenty">
                     <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $savetitle ?></button>
                 </div>
             <?php } ?>

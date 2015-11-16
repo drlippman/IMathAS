@@ -55,6 +55,7 @@ use yii\db\Exception;
 use yii\helpers\Html;
 use app\components\CopyItemsUtility;
 
+require("../components/S3.php");
 class CourseController extends AppController
 {
     public $filehandertypecfiles = 'local';
@@ -1015,7 +1016,7 @@ class CourseController extends AppController
     {
         if ($type == 'cfile') {
             if ($GLOBALS['filehandertypecfiles'] == 's3') {
-                $s3 = new S3($GLOBALS['AWSkey'], $GLOBALS['AWSsecret']);
+                $s3 = new \S3($GLOBALS['AWSkey'], $GLOBALS['AWSsecret']);
                 return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/' . $key, false);
             } else {
                 $base = rtrim(dirname(dirname(__FILE__)), '/\\') . '/course/files/';
@@ -1023,7 +1024,7 @@ class CourseController extends AppController
             }
         } else {
             if ($GLOBALS['filehandertype'] == 's3') {
-                $s3 = new S3($GLOBALS['AWSkey'], $GLOBALS['AWSsecret']);
+                $s3 = new \S3($GLOBALS['AWSkey'], $GLOBALS['AWSsecret']);
                 return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, false);
             } else {
                 $base = rtrim(dirname(dirname(__FILE__)), '/\\') . '/filestore/';

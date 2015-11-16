@@ -3,7 +3,7 @@ $(document).ready(function ()
 {
     $('.select_option').val(-1);
     page = $('#page').val();
-    forumid= $('#forumid').val();
+    forumid= $('#forum').val();
     courseid = $("#courseid").val();
     change();
     select();
@@ -19,7 +19,6 @@ $(document).ready(function ()
          }
          else if(selected == 1)
          {
-
              $('.forum-table').DataTable().destroy();
              window.location = "thread?page=-2&cid="+courseid+"&forum="+forumid;
          }
@@ -31,10 +30,6 @@ $(document).ready(function ()
          else if(selected == 3)
          {
              window.location = "thread?page=1&cid="+courseid+"&forum="+forumid;
-         }
-         else if(selected == 4)
-         {
-             window.location = "thread?cid="+courseid+"&forum="+forumid+"&markallread=true&page="+page;
          }
      });
  }
@@ -75,10 +70,9 @@ $(document).ready(function ()
 
      });
  }
-function changeImage(element,checkFlagValue, rowId) {
-
+function changeImage(element,checkFlagValue, rowId)
+{
     var userId = $("#user-id").val();
-
     var row = {rowId: rowId,userId:userId};
     jQuerySubmit('change-image-ajax', row,'flagResponse');
 
@@ -91,12 +85,10 @@ function flagResponse()
 }
 
 function markAsRemoveSuccess(response) {
-    var forumid = $("#forumid").val();
-    var courseid = $("#courseid").val();
     var result = JSON.parse(response);
     if(result.status == 0)
     {
-        window.location = "thread?cid="+courseid+"&forum="+forumid;
+       window.location.reload();
     }
 }
 

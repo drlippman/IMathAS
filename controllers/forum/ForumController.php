@@ -122,16 +122,24 @@ class ForumController extends AppController
         $this->flattenitems($itemorder,$itemsimporder);
         $itemsassoc = array();
         $items = Items::getByCourseIdAndItenType($cid,'Forum');
-             $itemsimporder = $addto;
-        foreach ($items as $item) {
+        if(count($addto) > 0)
+        {
+            $itemsimporder = $addto;
+        }
+
+        foreach ($items as $item)
+        {
             $itemsassoc[$item['id']] = $item['typeid'];
             if (!in_array($item['id'],$itemsimporder)) {
                 //capture any forums that are in imas_items but not imas_courses.itemorder
                 $itemsimporder[] = $item['id'];
             }
         }
+        if(count($itemsimporder) > 0)
+        {
+            $maxitemnum = max($itemsimporder) + 1;
+        }
 
-        $maxitemnum = max($itemsimporder) + 1;
 
 //capture any forums that are not in imas_items
         foreach ($forumdata as $fid=>$line)
@@ -202,9 +210,8 @@ class ForumController extends AppController
             }
 
         }
-
         $this->includeCSS(['dataTables.bootstrap.css', 'roster.css','forums.css', 'dashboard.css']);
-        $this->includeJS(['forum/forum.js','forum/thread.js','general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
+        $this->includeJS(['forum/thread.js','general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
         $this->setReferrer();
         $this->includeCSS(['course/course.css']);
         $responseData = array('searchedPost' => $searchedPost,'threadids' => $threadids,'forums' => $forums,'threaddata' => $threaddata,'searchtag' => $searchtag,'newcnt' => $newcnt,'threadcount' => $threadcount,'postcount' => $postcount,'maxdate' => $maxdate,'forumdata' => $forumdata,'isteacher' => $isteacher,
@@ -504,9 +511,8 @@ class ForumController extends AppController
                 $newpost[] = $tid;
             }
         }
-        $newpostlist = implode(',', $newpost);
-
-        if ($page == -1 && count($newpost) == 0) {
+        if ($page == -1 && count($newpost) == 0)
+        {
             $page = 1;
         } else if ($page == -2 && count($flags) == 0)
         {
@@ -537,7 +543,6 @@ class ForumController extends AppController
         }
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
-
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
@@ -622,7 +627,7 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $thread = ThreadForm::thread($forumId);
         $threadArray = array();
-        $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
+
         foreach ($thread as $data) {
             if (($data['id']) == $threadId) {
                 $tempArray = array(
@@ -639,7 +644,8 @@ class ForumController extends AppController
         }
         $forumPostData = ForumPosts::getbyid($threadId);
         $threadCreatedUserData = User::getById($forumPostData[0]['userid']);
-        if ($this->isPostMethod()) {
+        if ($this->isPostMethod())
+        {
             $params = $this->getRequestParams();
             $files = ForumPosts::getFileDetails($params['threadId']);
             if ($files == '') {
@@ -660,7 +666,8 @@ class ForumController extends AppController
                     }
                 }
             }
-            if ($_FILES['file-0']) {
+            if ($_FILES['file-0'])
+            {
                 $j = 0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY . 'forumFiles/';
 
@@ -686,17 +693,26 @@ class ForumController extends AppController
                 }
                 $fileName = implode('@@', $files);
             }
-            if (strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO) {
+            if (strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO)
+            {
                 $threadIdOfPost = ForumPosts::modifyPost($params, $fileName);
                 $contentTrackRecord = new ContentTrack();
                 if ($currentUser->rights == AppConstant::STUDENT_RIGHT) {
                     $contentTrackRecord->insertForumData($currentUser->id, $courseId, $forumId, $threadId, $threadIdOfPost, $type = AppConstant::NUMERIC_TWO);
                 }
-                $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
+                if($params['from'] == 1)
+                {
+                    $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
+                }else
+                {
+                    $this->redirect('list-post-by-name?page=1&cid='.$courseId.'&forumid='.$forumId);
+                }
+
             }
         }
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
+        $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
         $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser, 'threadCreatedUserData' => $threadCreatedUserData, 'forumData' => $forumData, 'forumPostData' => $forumPostData);
         return $this->renderWithData('modifyPost', $responseData);
     }

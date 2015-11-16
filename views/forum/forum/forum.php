@@ -53,6 +53,7 @@ if (count($taginfo)==0) {
     $tagfilterselect .= '</select>';
 }
 ?>
+
 <div class="item-detail-header">
     <?php if($searchtype != 'none') {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/search-forum?cid=' . $course->id.'&clearsearch=true']]);
@@ -75,6 +76,8 @@ if (count($taginfo)==0) {
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
+<input type="hidden" id="courseid" value="<?php echo $course->id; ?>">
+<input type="hidden" id="user-id" value="<?php echo $users['id'];?>">
 <div class="tab-content shadowbox">
     <div class="col-md-12 col-sm-12 padding-left-right-zero padding-bottom-thirty">
         <div id="forumsearch">
@@ -266,11 +269,15 @@ if (count($taginfo)==0) {
         }else {
 
             if (count($forumdata)==0) {
-                if ($isteacher) {
-                    echo '<p>There are no forums in this class yet.  You can add forums from the course page.</p>';
+                echo '<div class="col-sm-12 padding-left-thirty padding-top-thirty">';
+
+                if ($isteacher)
+                {
+                    echo '<h4 class="">There are no forums in this class yet.  You can add forums from the course page.</h4>';
                 } else {
-                    echo '<p>There are no active forums at this time.</p>';
+                    echo '<h4>There are no active forums at this time.</h4>';
                 }
+                echo '</div>';
             } else {
                 //default display
                 ?>

@@ -102,9 +102,9 @@ $urlmode = AppUtility::urlMode();?>
                 echo "<span class=red>{$scores[$line['id']]} pts</span> ";
             }
         } ?>
-        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/posts?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
+        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
         <?php if ($isteacher || ($line['ownerid']==$userId && $allowmod)) { ?>
-        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$course->id.'&forumId = '.$forumId.'&threadId='.$line['id'] ) ?> ">Modify</a>
+        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$course->id.'&forumId='.$forumId.'&threadId='.$line['id'] ) ?> ">Modify</a>
     <?php }
         if ($isteacher || ($allowdel && $line['ownerid']==$userId)) {
 //        echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={}\">Remove</a> \n";

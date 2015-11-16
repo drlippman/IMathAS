@@ -7,6 +7,7 @@ use app\models\AssessmentSession;
 use Yii;
 use yii\base\Component;
 
+require("S3.php");
 
 @set_time_limit(0);
 ini_set("max_input_time", "600");
@@ -34,7 +35,7 @@ public  static function storecontenttofile($content,$key,$sec="private") {
 		} else {
 			$sec = "private";
 		}
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		if ($s3->putObject($content,$GLOBALS['AWSbucket'],$key,$sec)) {
 			return true;
 		} else {
@@ -66,7 +67,7 @@ public static function relocatecoursefileifneeded($file, $key, $sec="public")
 		} else {
 			$sec = "private";
 		}
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		if ($s3->putObjectFile($file,$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
 			return true;
 		} else {
@@ -84,7 +85,7 @@ public static function relocatefileifneeded($file, $key, $sec="public") {
 		} else {
 			$sec = "private";
 		}
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		if ($s3->putObjectFile($file,$GLOBALS['AWSbucket'],$key,$sec)) {
 			return filehandler::getuserfileurl($key);
 		} else {
@@ -104,7 +105,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 			$sec = "private";
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],$key,$sec)) {
 				return true;
 			} else {
@@ -140,7 +141,7 @@ public static function storeuploadedcoursefile($id,$key,$sec="public-read") {
 			$sec = "private";
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			$t=0;
 			$fn = $key;
 			while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false) !==false) {
@@ -187,7 +188,7 @@ public static function storeuploadedqimage($id,$key,$sec="public-read") {
 			$sec = "private";
 		}
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			$t=0;
 			$fn = $key;
 			while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'qimages/'.$key, false) !==false) {
@@ -230,7 +231,7 @@ public  static function getasidfileurl($file) {
 
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3object = "adata/$file";
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],$s3object,7200);
 	} else {
 		return AppUtility::getHomeURL().'/filestore/adata/'.$file;
@@ -241,7 +242,7 @@ function getasidfilepath($file) {
 	global $imasroot;
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3object = "adata/$file";
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		return $s3->queryStringGet($GLOBALS['AWSbucket'],$s3object,7200);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\');
@@ -284,7 +285,7 @@ public static function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=nul
     }
 	$deled = array();
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
 			$s3object = "adata/$file";
@@ -335,7 +336,7 @@ public static function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0
     }
 	$deled = array();
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
 			$s3object = "adata/$file";
@@ -390,8 +391,9 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 //delete all assessment files for an assessmentid
 public static function deleteallaidfiles($aid) {
 	$delcnt = 0;
-	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+	if ($GLOBALS['filehandertype'] == 's3')
+    {
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"adata/$aid/");
 		if ($arr!=false) {
 			foreach ($arr as $k=>$file) {
@@ -413,7 +415,7 @@ public static function deleteallaidfiles($aid) {
 
 function getuserfiles($uid,$img=false) {
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
 			if ($img) {
@@ -456,7 +458,7 @@ function getuserfiles($uid,$img=false) {
 }
 function deleteuserfile($uid,$file) {
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "ufiles/$uid/$file";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
@@ -475,7 +477,7 @@ function deleteuserfile($uid,$file) {
 
 function deleteforumfile($postid,$file) {
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "ffiles/$postid/$file";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
@@ -494,7 +496,7 @@ function deleteforumfile($postid,$file) {
 
 public static function deletecoursefile($file) {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "cfiles/$file";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
@@ -516,7 +518,7 @@ public static function deletecoursefile($file) {
 }
 public static function deleteqimage($file) {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "qimages/$file";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
@@ -535,7 +537,7 @@ public static function deleteqimage($file) {
 
 function deletefilebykey($key) {
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "$key";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
@@ -555,7 +557,7 @@ function deletefilebykey($key) {
 public static function deleteallpostfiles($postid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ffiles/$postid/");
 		if ($arr!=false) {
 			foreach ($arr as $s3object) {
@@ -578,7 +580,7 @@ public static function deleteallpostfiles($postid) {
 public static function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
 			foreach ($arr as $s3object) {
@@ -601,7 +603,7 @@ public static function deletealluserfiles($uid) {
 public  static function doesfileexist($type,$key) {
 	if ($type=='cfile') {
 		if ($GLOBALS['filehandertypecfiles'] == 's3') {
-			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false);
 		} else {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
@@ -609,7 +611,7 @@ public  static function doesfileexist($type,$key) {
 		}
 	} else {
 		if ($GLOBALS['filehandertype'] == 's3') {
-			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+			$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, false);
 		} else {
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
@@ -620,7 +622,7 @@ public  static function doesfileexist($type,$key) {
 
 function copycoursefile($key,$dest) {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3->getObject($GLOBALS['AWSbucket'], 'cfiles/'.$key, $dest);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
@@ -629,7 +631,7 @@ function copycoursefile($key,$dest) {
 }
 function copyqimage($key,$dest) {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
-		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3->getObject($GLOBALS['AWSbucket'], 'qimages/'.$key, $dest);
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
@@ -658,7 +660,8 @@ public static function recursiveRmdir($dir) {
 }
 public static function unlinkRecursive($dir, $deleteRootToo) {
     $cnt = 0;
-    if(!$dh = @opendir($dir))  {
+    if(!$dh = @opendir($dir))
+    {
         return;
     }
     while (false !== ($obj = readdir($dh)))  {

@@ -24,14 +24,14 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div class="tab-content shadowBox">
 
-    <div class="col-md-12 padding-left-zero padding-right-zero">
+    <div class="col-md-12 col-sm-12 padding-left-zero padding-right-zero">
         <?php
         if ($commentType == "instr") {
             ?>
-            <div class="col-md-12 modify-gradebook-comments-background">
+            <div class="col-md-12 col-sm-12 modify-gradebook-comments-background">
                 <a class="padding-left-fifteen padding-top-twenty-five" href="gb-comments?cid=<?php echo $course->id ?>"><?php AppUtility::t('View/Edit Student comments') ?></a>
             </div>
-            <div class="padding-left-thirty col-md-12">
+            <div class="padding-left-thirty col-md-12 col-sm-12">
                 <div class="padding-top-twenty-five">
                     <?php AppUtility::t('These notes will only display on this page and gradebook exports. They will not be visible to students.') ?>
                 </div>
@@ -40,10 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
         <?php } else { ?>
-            <div class="col-md-12 modify-gradebook-comments-background">
+            <div class="col-md-12 col-sm-12 modify-gradebook-comments-background">
                 <a class="padding-left-fifteen" href="gb-comments?cid=<?php echo $course->id ?>&comtype=instr"><?php AppUtility::t('View/Edit Instructor notes') ?></a>
             </div>
-            <div class="padding-left-thirty col-md-12">
+            <div class="padding-left-thirty col-md-12 col-sm-12">
                 <div class="padding-top-twenty-five">
                     <?php AppUtility::t('These comments will display at the top of the student\'s gradebook score list.') ?>
                 </div>
@@ -53,9 +53,9 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         <?php } ?>
     </div>
-    <div class="col-md-12 padding-left-thirty padding-bottom-thirty inner-content-gradebook padding-top-zero">
-        <span class="col-sm-2 padding-zero"><?php AppUtility::t('Add/Replace to all') ?></span>
-    <span class="col-sm-10 padding-zero">
+    <div class="col-md-12 col-sm-12 padding-left-thirty padding-bottom-thirty inner-content-gradebook padding-top-zero">
+        <span class="col-md-2 col-sm-3 padding-zero"><?php AppUtility::t('Add/Replace to all') ?></span>
+    <span class="col-md-10 col-sm-9 padding-zero">
         <div class="col-sm-8 padding-zero">
             <textarea cols="50" rows="3" id="comment_txt" class="form-control"></textarea><br>
             <input type="hidden" id="isComment" name="isComment" value="1"/>
@@ -72,8 +72,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php foreach ($studentsInfo as $student) { ?>
             <br class="form">
             <span
-                class="col-sm-2 padding-zero"><?php echo ucfirst($student['LastName'] . ", " . ucfirst($student['FirstName'])); ?></span>
-            <span class="col-sm-10 padding-zero">
+                class="col-md-2 col-sm-3 padding-zero"><?php echo ucfirst($student['LastName'] . ", " . ucfirst($student['FirstName'])); ?></span>
+            <span class="col-md-10 col-sm-9 padding-zero">
             <div class="col-sm-8 padding-zero">
                 <textarea class="form-control comment-text-id" cols="50" rows="3"
                           name="<?php echo $student['id']; ?>"><?php if ($commentType == "instr") {
@@ -87,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         }
         ?>
-        <div class="col-sm-4 col-sm-offset-2 padding-left-zero padding-top-thirty">
+        <div class="col-md-4 col-md-offset-2 col-sm-4 col-sm-offset-3 padding-left-zero padding-top-thirty">
             <button type="submit" class="btn btn-primary" id="gbComments">
                 <i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Save Comments') ?>
             </button>

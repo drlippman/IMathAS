@@ -711,7 +711,9 @@ class AppController extends Controller
     {
         $isTeacher = false;
         $teacher = Teacher::getByUserId($userId, $courseId);
-        if ($teacher) {
+        $user = User::getById($userId);
+        if ($teacher || $user['rights'] == AppConstant::ADMIN_RIGHT)
+        {
             $isTeacher = true;
         }
         return $isTeacher;
@@ -867,11 +869,13 @@ class AppController extends Controller
     public function accessForTeacherAndStudentForumController($user, $courseId, $actionPath)
     {
         $isOwner = Course::isOwner($user['id'], $courseId);
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $studentId = $this->isStudent($user['id'], $courseId);
+
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)) {
             return true;
         }
-        $teacherId = $this->isTeacher($user['id'], $courseId);
-        $studentId = $this->isStudent($user['id'], $courseId);
+
         if (($user['rights'] < AppConstant::STUDENT_RIGHT) || (($user['rights'] == AppConstant::STUDENT_RIGHT) && ($actionPath == 'move-thread' || $actionPath == 'add-forum' || $actionPath == 'change-forum' || $actionPath == 'view-forum-grade'))) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
@@ -885,8 +889,12 @@ class AppController extends Controller
 
     public function accessForCourseController($user, $courseId, $actionPath)
     {
+        $isOwner = Course::isOwner($user['id'], $courseId);
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $isStudent = $this->isStudent($user['id'], $courseId);
+        if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])) {
+            return true;
+        }
         if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'get-block-items' || $actionPath == 'course' || $actionPath == 'show-linked-text' || $actionPath == 'get-assessment-data-ajax') && ($teacherId || $isStudent)) {
             return true;
         } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-link' || $actionPath == 'modify-inline-text' || $actionPath == 'copy-items-ajax' || $actionPath == 'delete-items-ajax') && $teacherId) {

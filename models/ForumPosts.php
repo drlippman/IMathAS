@@ -407,6 +407,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getPostIds($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist)
     {
+
         $query = new Query();
         $query->select('imas_forum_posts.id,count(imas_forum_views.userid)')->from('imas_forum_views,imas_forum_posts')
             ->where('imas_forum_views.threadid=imas_forum_posts.id')->andWhere('imas_forum_posts.parent=0')

@@ -44,91 +44,94 @@ $now = $currentTime;
 </div>
 
 <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
-<input type="hidden" id="forumid" value="<?php echo $forumid; ?>">
+<input type="hidden" id="fromforum" value="1">
 <input type="hidden" id="courseid" value="<?php echo $course->id; ?>">
 <input type="hidden" id="user-id" value="<?php echo $users['id'];?>">
 <input type="hidden" id="settings" value="<?php echo $forumData['settings'];?>">
 <input type="hidden" id="un-read" value="<?php echo $unRead; ?>">
+<input type="hidden" name="from" value="<?php echo $unRead; ?>">
 
 <div class="tab-content shadowBox ">
-    <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-ten">
-        <form id="myForm">
-        <div class="padding-left-zero col-md-5 col-sm-8">
-        <div class="view-drop-down col-md-8  col-sm-8 padding-left-right-zero">
-        <span class="floatleft padding-right-ten padding-top-five"><?php echo AppUtility::t('View Options',false)?></span>
-            <select name="seluid" class="form-control-forum form-control select_option width-fifty-five-per" id="">
-                <option value="-1" selected="selected"><?php echo AppUtility::t('Select')?></option>
-                <option value="0"><?php echo AppUtility::t('List Post by Name')?></option>
-                <option value="1"><?php echo AppUtility::t('Limit to Flagged ')?></option>
-                <?php if($page < 0){?>
-                <option value="3"><?php echo AppUtility::t('Show All')?></option>
-                <?php }else{
-                if (count($newpost)>0) {?>
-                    <option value="2"><?php echo AppUtility::t('Limit to New ')?></option>
-                <?php } }?>
+        <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-ten">
+                <form id="myForm">
+                    <div class="padding-left-zero col-md-5 col-sm-8">
+                        <div class="view-drop-down col-md-8  col-sm-8 padding-left-right-zero">
+                        <span class="floatleft padding-right-ten padding-top-five"><?php echo AppUtility::t('View Options',false)?></span>
+                            <select name="seluid" class="form-control-forum form-control select_option width-fifty-five-per" id="">
+                                <option value="-1" selected="selected"><?php echo AppUtility::t('Select')?></option>
+                                <option value="0"><?php echo AppUtility::t('List Post by Name')?></option>
+                                <option value="1"><?php echo AppUtility::t('Limit to Flagged ')?></option>
+                                <?php if($page < 0)
+                                {?>
+                                <option value="3"><?php echo AppUtility::t('Show All')?></option>
+                                <?php }else{
+                                if (count($newpost)>0) {?>
+                                    <option value="2"><?php echo AppUtility::t('Limit to New ')?></option>
+                                <?php } }?>
 
-            </select>
-        </div>
-                    <?php if (count($newpost)>0) {?>
-        <div class="col-md-4 col-sm-4 padding-top-eighteen padding-left-right-zero">
-<!--            $toshow[] =  "<button type=\"button\" onclick=\"window.location.href='thread.php?page=$page&cid=$cid&forum=$forumid&markallread=true'\">"._('Mark all Read')."</button>";-->
-            <a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?page='.$page.'&cid='.$cid.'&forum='.$forumid.'&markallread=true')?>">
-                <?php echo AppUtility::t('Mark All Read')?>
-            </a>
-        </div>
-                    <?php } ?>
-        </div>
-        <div class="col-md-6 col-sm-12 padding-top-ten padding-left-right-zero floatright">
-        <span class="col-md-4 col-sm-4 padding-left-right-zero">
-             <input type="text" class="form-control" name="search" id="search_text" maxlength="30" placeholder="<?php echo AppUtility::t('Enter Search Terms')?>">
-        </span>
-        <span class="checkbox checkbox-thread override-hidden col-md-5 col-sm-5 padding-left-right-zero margin-left-right-zero">
-            <label class="margin-top-zero floatright padding-left-zero">
-                <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forum in Courses?')?>
+                            </select>
+                        </div>
+                                <?php if (count($newpost)>0) {?>
+                        <div class="col-md-4 col-sm-4 padding-top-eighteen padding-left-right-zero">
+                            <a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?page='.$page.'&cid='.$cid.'&forum='.$forumid.'&markallread=true')?>">
+                                <?php echo AppUtility::t('Mark All Read')?>
+                            </a>
+                        </div>
+                                <?php } ?>
+                    </div>
+                        <div class="col-md-6 col-sm-12 padding-top-ten padding-left-right-zero floatright">
+                        <span class="col-md-4 col-sm-4 padding-left-right-zero">
+                             <input type="text" class="form-control" name="search" id="search_text" maxlength="30" placeholder="<?php echo AppUtility::t('Enter Search Terms')?>">
+                        </span>
+                        <span class="checkbox checkbox-thread override-hidden col-md-5 col-sm-5 padding-left-right-zero margin-left-right-zero">
+                            <label class="margin-top-zero floatright padding-left-zero">
+                                <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forum in Courses?')?>
 
-                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-            </label>
-        </span>
-        <span class="col-md-3 col-sm-2 padding-left-right-zero">
-            <a class="btn btn-primary search-button floatright" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></a>
-        </span>
+                                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                            </label>
+                        </span>
+                        <span class="col-md-3 col-sm-2 padding-left-right-zero">
+                            <a class="btn btn-primary search-button floatright" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></a>
+                        </span>
+                        </div>
+
+                    <input type=hidden id="page" name=page value="<?php echo $page;?>">
+                    <input type=hidden id="cid" name=cid value="<?php echo $course->id;?>">
+                    <input type=hidden id="forum" name=forum value="<?php echo $forumid;?>">
+                </form>
         </div>
-            <input type=hidden name=page value="<?php echo $page;?>">
-            <input type=hidden name=cid value="<?php echo $course->id;?>">
-            <input type=hidden name=forum value="<?php echo $forumid;?>">
-        </form>
-    </div>
-        <?php
-        if (isset($params['search']) && trim($params['search'])!='')
-        {
-            echo "<h2 class='col-sm-12 padding-bottom-ten padding-left-twenty-eight'>Forum Search Results</h2>";
-        echo '<div class="col-sm-12 padding-left-right-thirty padding-bottom-ten">';
-            foreach ($searchedPost as $row )
+
+    <?php
+            if (isset($params['search']) && trim($params['search'])!='')
             {
-            echo "<div class=block>";
-                echo "<b>{$row['subject']}</b>";
-                if (isset($params['allforums'])) {
-                echo ' (in '.$row['name'].')';
-                }
-                if ($row['isanon'] == 1) {
-                $name = "Anonymous";
-                } else {
-                $name = "{$row['FirstName']} {$row['LastName']}";
-                }
-                echo "<br/>Posted by: $name, ";
-                echo AppUtility::tzdate("F j, Y, g:i a",$row['postdate']);
+                echo "<h2 class='col-sm-12 padding-bottom-ten padding-left-twenty-eight'>Forum Search Results</h2>";
+            echo '<div class="col-sm-12 padding-left-right-thirty padding-bottom-ten">';
+                foreach ($searchedPost as $row )
+                {
+                echo "<div class=block>";
+                    echo "<b>{$row['subject']}</b>";
+                    if (isset($params['allforums'])) {
+                    echo ' (in '.$row['name'].')';
+                    }
+                    if ($row['isanon'] == 1) {
+                    $name = "Anonymous";
+                    } else {
+                    $name = "{$row['FirstName']} {$row['LastName']}";
+                    }
+                    echo "<br/>Posted by: $name, ";
+                    echo AppUtility::tzdate("F j, Y, g:i a",$row['postdate']);
 
-                echo "</div>
-                <div class=blockitems>";
-    //            echo filter($row['imas_forum_posts.message']); ?>
-                 <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
-                 </div>
+                    echo "</div>
+                    <div class=blockitems>";
+        //            echo filter($row['imas_forum_posts.message']); ?>
+                     <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
+                     </div>
 
-            <?php }
-echo '</div>';
+                    <?php }
+                 echo '</div>';
 
             }else
-        {
+            {
 
     if ($page > 0) {
         $numpages = ceil($countOfPostId['id'] / $threadsperpage);
@@ -184,8 +187,9 @@ echo '</div>';
 
             <?php
             $toshow = array();
-            if ($page<0) {
-            } else { ?>
+            if ($page<0)
+            {
+            }else { ?>
                 <div class="col-sm-12 col-md-12 padding-top-twenty">
                     <?php if ($isteacher && $groupsetid > 0)
                     {
@@ -224,6 +228,7 @@ echo '</div>';
                     $tagselect .= '</select></span>';
                     $toshow[] = $tagselect;
                 } ?>
+                </div>
             <?php }
             echo implode(' | ',$toshow);
 
@@ -235,7 +240,7 @@ echo '</div>';
             }else
             {            ?>
 
-            </div><div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
+             <div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
                 <div class="overflow-x-auto">
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
@@ -251,23 +256,24 @@ echo '</div>';
                    <tbody class="forum-table-body">
 
         <?php
+
                     foreach ($postIds as $row) {
                     $uniqviews[$row['id']] = $row['count(imas_forum_views.userid)']-1;
                     }
 
 
-
                     foreach ($postInformtion as $line )
                     {
-
-                    if (isset($postcount[$line['id']])) {
+                    if (isset($postcount[$line['id']]))
+                    {
                     $posts = $postcount[$line['id']];
                     $lastpost = AppUtility::tzdate("F j, Y, g:i a",$maxdate[$line['id']]);
                     } else {
                     $posts = 0;
                     $lastpost = '';
                     }
-                    echo "<tr id=\"tr{$line['id']}\"";
+
+                        echo "<tr id=\"tr{$line['id']}\"";
                               if ($line['posttype']>0) {
                     echo "class=sticky";
                     } else if (isset($flags[$line['id']])) {
