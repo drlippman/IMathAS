@@ -18,45 +18,45 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
-<div class="inner-content">
+<div class="col-md-12 col-sm-12 padding-left-two-em padding-right-two-em padding-bottom-two-em">
 
-<input type="hidden" class="courseId" value="<?php echo $courseId ?>">
-<?php $sectionArray = $section?>
+    <input type="hidden" class="courseId" value="<?php echo $courseId ?>">
+    <?php $sectionArray = $section?>
     <p><div id="user-div"></div></p>
-<div>
+    <div>
 
-<table class='list display-tutor-table table table-bordered table-striped table-hover data-table' bPaginate = 'false'>
-    <thead>
-        <th><?php AppUtility::t('Tutor Name')?></th>
-        <th><?php AppUtility::t('Limit to Section')?></th>
-        <th><?php AppUtility::t('Remove')?>?  <?php AppUtility::t('Check')?> <a id="check-all" class="check-all" href="#"><?php AppUtility::t('All')?></a> /
-            <a id="check-none" class="uncheck-all" href="#"><?php AppUtility::t('None')?></a></th>
-    </thead>
-    <tbody class="tutor-table-body">
-        <div>
-            <?php
+        <table class='padding-left-zero list display-tutor-table table table-bordered table-striped table-hover data-table' bPaginate = 'false'>
+            <thead>
+            <th><?php AppUtility::t('Tutor Name')?></th>
+            <th><?php AppUtility::t('Limit to Section')?></th>
+            <th><?php AppUtility::t('Remove')?>?  <?php AppUtility::t('Check')?> <a id="check-all" class="check-all" href="#"><?php AppUtility::t('All')?></a> /
+                <a id="check-none" class="uncheck-all" href="#"><?php AppUtility::t('None')?></a></th>
+            </thead>
+            <tbody class="tutor-table-body">
+            <div>
+                <?php
                 foreach($tutors as $value)
                 {
-                  echo "<tr><td>{$value['Name']}</td><td><select class = 'show-section' id='{$value['id']}' name = 'select-section'><option value = ''>All</option>" ?>
+                    echo "<tr><td>{$value['Name']}</td><td><select class = 'show-section' id='{$value['id']}' name = 'select-section'><option value = ''>All</option>" ?>
                     <?php
-                        foreach($section as $key => $option)
+                    foreach($section as $key => $option)
+                    {
+                        if($option !== null || $option != "")
+                        {
+                            if($option != $value['section'])
                             {
-                                if($option !== null || $option != "")
+                                echo"<option value = '{$option}'>$option</option>";
+                            }
+                            else
+                            {
+                                if($value['section'] != null)
                                 {
-                                    if($option != $value['section'])
-                                        {
-                                            echo"<option value = '{$option}'>$option</option>";
-                                        }
-                                    else
-                                    {
-                                        if($value['section'] != null)
-                                            {
-                                                echo"<option value = '{$option}' selected='selected'>$option</option>";
-                                            }
-                                    }
+                                    echo"<option value = '{$option}' selected='selected'>$option</option>";
                                 }
                             }
-                            echo "</select><td>
+                        }
+                    }
+                    echo "</select><td>
                                                <div class='checkbox override-hidden'>
                     <label>
                         <input type='checkbox' name='tutor-check' value='{$value['id']}' class = 'master'>
@@ -65,17 +65,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 </td></tr>";
                 }
-            ?>
-        </div>
-    </tbody>
-</table>
-</div><br><br>
+                ?>
+            </div>
+            </tbody>
+        </table>
+    </div><br><br>
 
-<p><b><?php AppUtility::t('Add new tutors.')?></b> <?php AppUtility::t('Provide a list of usernames below, separated by commas, to add as tutors.')?></p>
-<br>
-    <textarea name = "newTutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
-<br><br>
-<a class = "btn btn-primary" id = "update-button"><?php AppUtility::t('Update')?></a>
-<a class="btn btn-primary back-btn-width" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
+    <p><b><?php AppUtility::t('Add new tutors.')?></b> <?php AppUtility::t('Provide a list of usernames below, separated by commas, to add as tutors.')?></p>
+    <br>
+    <textarea class="max-width-hundread" name = "newTutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
+    <br><br>
+    <a class = "btn btn-primary" id = "update-button"><?php AppUtility::t('Update')?></a>
+<span class="padding-left-one-em"><a class="btn btn-primary back-btn-width" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">
+        <?php AppUtility::t('Back')?></a></span>
 </div>
 </div>

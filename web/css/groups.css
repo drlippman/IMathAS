@@ -5,10 +5,10 @@
 }
 /*.btn-primary-1*/
 /*{*/
-    /*color: #FFF;*/
-    /*background-color: #12856D;*/
-    /*text-transform: capitalize;*/
-    /*border-radius: 0px;*/
+/*color: #FFF;*/
+/*background-color: #12856D;*/
+/*text-transform: capitalize;*/
+/*border-radius: 0px;*/
 /*}*/
 
 .align-groups
@@ -41,7 +41,7 @@ input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:
 
 .form-control-grp
 {
-    width: 35%;
+    width: 100%;
     height: 34px;
     padding: 6px 12px;
     font-size: 14px;
@@ -81,4 +81,3 @@ input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:
 {
     margin-left: -2px!important;
 }
-
