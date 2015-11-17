@@ -877,10 +877,9 @@ class ShowItemCourse extends Component
                             <img alt="assess" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                       <?php  } else { ?>
-<!--                            <img alt="assess" class="floatleft item-icon-alignment"-->
-<!--                                 src="--><?php //echo AppUtility::getAssetURL() ?><!--img/iconAssessment.png"/>-->
-                            <?php echo "<div class=icon style=\"background-color: #99f;\">?</div>";
-                       }
+                            <img alt="assess" class="floatleft item-icon-alignment"
+                                 src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
+                      <?php }
                     }
                     echo "<div class=title><b>";?>
 

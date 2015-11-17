@@ -371,14 +371,15 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query = new Query();
         $query->select(['imas_users.*', 'imas_groups.name'])
             ->from('imas_users')
-            ->join('LEFT JOIN', 'imas_groups',
+            ->join('LEFT JOIN',
+                'imas_groups',
                 'imas_users.groupid=imas_groups.id');
         if ($num == AppConstant::NUMERIC_ZERO) {
-            $query->where('imas_users.SID= :data');
+            $query->andWhere('imas_users.SID=:data', [':data' => $data]);
         } elseif ($num == AppConstant::NUMERIC_ONE) {
-            $query->where('imas_users.SID= :data');
+            $query->andWhere('imas_users.email=:data', [':data' => $data]);
         }
-        $command = $query->createCommand()->bindValue('data', $data);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }

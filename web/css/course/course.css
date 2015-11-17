@@ -138,13 +138,14 @@ div.dialog-items{
 }
 
 .mvsel{
-    width: 93px !important;
+    width: 80px !important;
     float: left!important;
     background-color: #6d6d6d;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 14px;
     font-weight: bold;
     padding-left: 10px;
+    line-height: 1.42857;
 }
 .arrow{
     color: #ffffff;

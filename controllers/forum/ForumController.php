@@ -210,7 +210,7 @@ class ForumController extends AppController
             }
 
         }
-        $this->includeCSS(['dataTables.bootstrap.css', 'roster.css','forums.css', 'dashboard.css']);
+        $this->includeCSS(['dataTables.bootstrap.css','forums.css', 'dashboard.css']);
         $this->includeJS(['forum/thread.js','general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
         $this->setReferrer();
         $this->includeCSS(['course/course.css']);
