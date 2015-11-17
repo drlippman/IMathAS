@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <div class="item-detail-content padding-top-two-em">
-        <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
+        <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
     </div>
     <input type="hidden" id="course-id" value="<?php echo $courseId?>">
     <input type="hidden" id="outcome-url" value="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$courseId.'&save=save')?>">

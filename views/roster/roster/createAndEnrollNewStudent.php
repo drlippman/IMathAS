@@ -23,13 +23,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
-<div class="inner-content">
+<div class="inner-content col-md-12 col-sm-12 padding-left-three-em">
     <?php $form = ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-md-3\">{input}</div>\n<div class=\"col-md-7 col-md-offset-3\">{error}</div>",
-                'labelOptions' => ['class' => 'col-md-3 select-text-margin'],
+                'template' => "{label}\n
+                <div class=\"col-md-3 col-sm-4\">{input}</div>\n
+                <div class=\"col-md-7 col-md-offset-2 col-sm-6 col-sm-offset-3\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-2 col-sm-3 select-text-margin padding-right-zero padding-left-zero'],
             ],
         ]
     ) ?>
@@ -41,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $form->field($model, 'section') ?>
     <?php echo $form->field($model, 'code') ?>
     <div class="form-group">
-        <div class="col-md-offset-3 col-md-3">
+        <div class="col-md-offset-2 col-md-2 col-sm-offset-3 col-sm-3 padding-right-zero">
             <?php echo Html::submitButton(AppUtility::t('Create and Enroll', false), ['class' => 'btn btn-primary', 'id' => 'enroll-btn', 'name' => 'enroll-button']) ?>
         </div>
     </div>

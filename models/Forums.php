@@ -211,7 +211,7 @@ class Forums extends BaseImasForums {
 
     public static function getForumsForOutcomeMap($courseId)
     {
-        return self::find()->select(['id','cntingb','name','gbcategory','outcomes'])->where('courseId', $courseId)->andWhere(['<>','outcomes',''])->all();
+        return self::find()->select(['id','cntingb','name','gbcategory','outcomes'])->where(['courseId' => $courseId])->andWhere(['<>','outcomes',''])->all();
     }
 
     public static function getByGroupSetId($deleteGrpSet)

@@ -1487,3 +1487,15 @@ div.multiselitem {
 .margin-top-one-pt-five-em {
     margin-top: 1.5em !important;
 }
+.margin-left-one-em {
+margin-left: 1em;
+}
+.padding-left-three-em {
+    padding-left: 3em;
+}
+.margin-top-minus-eight {
+    margin-top: -8px;
+}
+.margin-left-pt-five-em {
+    margin-left: 0.5em;
+}

@@ -34,20 +34,28 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]
     ) ?>
-      <div>
+      <div class="col-md-12 col-sm-12">
           <h4><?php AppUtility::t('Select a course to choose students from');?>:</h4>
         <?php
              foreach($data as $value)
              {
-                 echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='name' value='{$value['id']}'><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>"." " ."<td>{$value['name']}</td></div></tr>";
+                 echo "
+                 <tr>
+                     <div class='radio student-enroll override-hidden col-md-12 col-sm-12 padding-left-zero'>
+                         <label class='checkbox-size'>
+                             <td><input type='radio' name='name' value='{$value['id']}'>
+                             <span class='cr'><i class='cr-icon fa fa-check'></i></span>
+                         </label></td>"." " ."
+                         <td>{$value['name']}</td>
+                     </div>
+                 </tr>";
              }
         ?>
     </div>
-    <div class="form-group">
-        <div class="col-md-11">
-            <br>
+    <div class="form-group col-md-12 col-sm-12 padding-top-one-pt-five-em">
+        <div class="col-md-12 col-sm-12">
             <?php echo Html::submitButton(AppUtility::t('Choose Students', false), ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back');?></a>
+            <a class="margin-left-one-em btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back');?></a>
         </div>
     </div>
     <?php ActiveForm::end(); ?>

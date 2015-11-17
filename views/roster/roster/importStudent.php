@@ -31,14 +31,14 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
-<div class="inner-content">
+<div class="inner-content col-md-12 col-sm-12">
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
+            'options' => ['class' => 'form-horizontal col-md-12 col-sm-12', 'enctype' => 'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-md-4 col-sm-4\">{input}</div>\n<div class=\"col-sm-5 clear-both col-sm-offset-3\">{error}</div>",
-                'labelOptions' => ['class' => 'col-md-3 col-sm-3  text-align-left'],
+                'template' => "{label}\n<div class=\"col-md-4 col-sm-6\">{input}</div>\n<div class=\"col-md-5 col-sm-5 clear-both col-md-offset-3 col-sm-offset-4\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-3 col-sm-4  text-align-left'],
             ],
         ]); ?>
         <div class="text-label">
@@ -50,12 +50,12 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
         <?php echo $form->field($model, 'lastName')->textInput(); ?>
         <?php echo $form->field($model, 'nameLastColumn')->dropDownList([AppConstant::NUMERIC_ZERO => 'Whole entry', AppConstant::NUMERIC_ONE => 'First word in entry', AppConstant::NUMERIC_TWO => 'Second word in entry', AppConstant::NUMERIC_THREE => 'Last word in entry',], ['prompt' => 'Select entry']) ?>
         <?php echo $form->field($model, 'emailAddress')->textInput(); ?>
-        <?php echo $form->field($model, 'userName')->radioList([AppConstant::NUMERIC_ONE => 'Yes, Column: <input type="text" name=unloc size=4 value="2">',AppConstant::NUMERIC_ZERO=>'No, Use as username: firstname_lastname']); ?>
-        <?php echo $form->field($model, 'setPassword')->radioList([AppConstant::NUMERIC_ZERO => 'First 4 characters of username',AppConstant::NUMERIC_ONE=>'Last 4 characters of username',AppConstant::NUMERIC_THREE=>'Use value in column: <input type="text" name="pwcol" size=4 value="1">',AppConstant::NUMERIC_TWO=>'Set to: <input type="text" name="defpw" value="password"   >']); ?>
-        <?php echo $form->field($model, 'codeNumber')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes, use value in column: <input type="text" name="code" size=4 value="1">']); ?>
-        <?php echo $form->field($model, 'sectionValue')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes, use: <input type="text" name="secval" size=6 value="">',AppConstant::NUMERIC_TWO => 'Yes, use value in column: <input type="text" name="seccol" size=4 value="4">']); ?>
-        <span class="col-sm-3 padding-left-zero"><b>Enroll students in</b></span>
-            <div class="col-sm-4 padding-left-ten">
+        <?php echo $form->field($model, 'userName')->radioList([AppConstant::NUMERIC_ONE => '<span class="col-md-12 col-sm-12 margin-top-minus-eight padding-left-pt-five-em">Yes, Column <input class="form-control display-inline-block width-fourty-per margin-left-pt-five-em" type="text" name=unloc size=4 value="2"></span>',AppConstant::NUMERIC_ZERO=>'<span class="col-md-12 col-sm-12 padding-left-pt-five-em">No, Use as username: firstname_lastname</span>']); ?>
+        <?php echo $form->field($model, 'setPassword')->radioList([AppConstant::NUMERIC_ZERO => '<span class="col-md-12 col-sm-12 padding-left-pt-five-em">First 4 characters of username</span>',AppConstant::NUMERIC_ONE=>'<span class="col-md-12 col-sm-12 padding-left-pt-five-em">Last 4 characters of username</span>',AppConstant::NUMERIC_THREE=>'<span class="col-md-12 col-sm-12 padding-left-pt-five-em margin-top-minus-eight">Use value in column <input class="form-control margin-left-pt-five-em width-thirty-per display-inline-block" type="text" name="pwcol" size=4 value="1"></span>',AppConstant::NUMERIC_TWO=>'<span class="col-md-12 col-sm-12 padding-left-pt-five-em margin-top-minus-eight">Set to <input class="form-control margin-left-pt-five-em width-seventy-eight-per display-inline-block" type="text" name="defpw" value="password"   ></span>']); ?>
+        <?php echo $form->field($model, 'codeNumber')->radioList([AppConstant::NUMERIC_ZERO=>'<span class="col-md-12 col-sm-12 padding-left-pt-five-em">No</span>',AppConstant::NUMERIC_ONE => '<span class="col-md-12 col-sm-12 margin-top-minus-eight padding-left-pt-five-em">Yes, use value in column<input class="form-control margin-left-pt-five-em display-inline-block width-twenty-five-per" type="text" name="code" size=4 value="1"></span>']); ?>
+        <?php echo $form->field($model, 'sectionValue')->radioList([AppConstant::NUMERIC_ZERO=>'<span class="col-md-12 col-sm-12 padding-left-pt-five-em">No</span>',AppConstant::NUMERIC_ONE => '<span class="col-md-12 col-sm-12 margin-top-minus-eight padding-left-pt-five-em">Yes, use<input class="form-control margin-left-pt-five-em display-inline-block width-fifty-five-per" type="text" name="secval" size=6 value=""></span>',AppConstant::NUMERIC_TWO => '<span class="col-md-12 col-sm-12 margin-top-minus-eight padding-left-pt-five-em">Yes, use value in column<input class="form-control margin-left-pt-five-em width-twenty-five-per display-inline-block" type="text" name="seccol" size=4 value="4"></span>']); ?>
+        <span class="col-md-3 col-sm-4 padding-left-zero"><b>Enroll students in</b></span>
+            <div class="col-md-4 col-sm-6 padding-left-pt-five-em">
         <?php
         if ($courseId == "admin")
         { ?>
@@ -71,10 +71,12 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
             echo "This class";
         } ?>
         </div>
-    <div class="form-group">
-        <div class="col-sm-offset-3 roster-submit">
-            <?php echo Html::submitButton(AppUtility::t('Submit and Review', false), ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
+    <div class="form-group col-md-12 col-sm-12 padding-top-one-em">
+        <div class="col-sm-offset-4 col-md-offset-3 roster-submit">
+            <div class="col-md-12 col-sm-12 padding-left-pt-five-em">
+                <?php echo Html::submitButton(AppUtility::t('Submit and Review', false), ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
+                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
+            </div>
         </div>
     </div>
 <?php ActiveForm::end(); ?>
