@@ -765,7 +765,7 @@ class ShowItemCourse extends Component
                         if ($graphicalIcons) { ?>
                             <img alt="assess" class="floatleft item-icon-alignment"src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                         <?php } else {
-                            echo "<div class= " . ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now) . ";\">"; ?>
+                            echo "<div class= icon" . ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now) . ";\">"; ?>
                              <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                            <?php echo"</div>";
                         }
@@ -877,9 +877,10 @@ class ShowItemCourse extends Component
                             <img alt="assess" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                       <?php  } else { ?>
-                            <img alt="assess" class="floatleft item-icon-alignment"
-                                 src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
-                       <?php }
+<!--                            <img alt="assess" class="floatleft item-icon-alignment"-->
+<!--                                 src="--><?php //echo AppUtility::getAssetURL() ?><!--img/iconAssessment.png"/>-->
+                            <?php echo "<div class=icon style=\"background-color: #99f;\">?</div>";
+                       }
                     }
                     echo "<div class=title><b>";?>
 
@@ -941,7 +942,7 @@ class ShowItemCourse extends Component
                             <img alt="assess" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                        <?php } else {
-                            echo "<div class=\">?</div>";
+                            echo "<div class=icon\">?</div>";
                         }
                     }
                     echo "<div class=title><i>"; ?>
@@ -981,6 +982,7 @@ class ShowItemCourse extends Component
                         </div>
                    <?php }
                     echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
+                    ShowItemCourse::enditem($canEdit);
                 }
             } else if ($line['itemtype'] == "InlineText") {
                 /**

@@ -55,7 +55,6 @@ use yii\db\Exception;
 use yii\helpers\Html;
 use app\components\CopyItemsUtility;
 
-require("../components/S3.php");
 class CourseController extends AppController
 {
     public $filehandertypecfiles = 'local';
