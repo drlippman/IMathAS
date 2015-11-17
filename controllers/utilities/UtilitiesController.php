@@ -116,6 +116,7 @@ class UtilitiesController extends AppController
                              */
                             $ltiData = LtiUserForm::getUserData($userData['id']);
                             $countOfLti = count($ltiData);
+
                             $queryForCourse[$userData['id']] = $courseData;
                             $queryFromCourseForTutor[$userData['id']] = $tutorData;
                             $queryFromCourseForTeacher[$userData['id']] = $teacherData;

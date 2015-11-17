@@ -82,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php
                             if($countOfCourseData > 0)
                             {
-                                echo '<li>Enrolled as student in: <ul>';
+                                echo '<li>Enrolled as student in <ul>';
 
                                 foreach($queryForCourse as $key=>$data)
                                 {
@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                             if($countTutorData > 0)
                             {
-                                echo '<li>Tutor in: <ul>';
+                                echo '<li>Tutor in <ul>';
                                 foreach($queryFromCourseForTutor as $key=>$singleTutor)
                                 {
                                     if($key == $user['id'] && $singleTutor)
@@ -115,7 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             if($countOfTeacher > 0)
                             {
-                                echo '<li>Teacher in: <ul>';
+                                echo '<li>Teacher in <ul>';
                                 foreach($queryFromCourseForTeacher as $key=>$singleTeacher)
                                 {
                                     if($key == $user['id'])
@@ -130,7 +130,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                             if($countOfLti > 0)
                             {
-                                echo '<li>LTI connections: <ul>';
+                                echo '<li>LTI connections <ul>';
                                 foreach($queryForLtiUser as $key=>$singleLtiUser)
                                 {
                                     if($key == $user['id'] && $singleLtiUser)
