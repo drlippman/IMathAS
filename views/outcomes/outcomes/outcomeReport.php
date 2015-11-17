@@ -6,14 +6,25 @@ use app\components\AppUtility;
 $this->title = 'Outcome Report';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div><h3>Outcomes  Report</h3></div>
-    <?php
-    $typeSel = 'Show for scores: '.'<select id="typeSel" onchange="chgtype()">';
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Course Outcomes', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'outcomes/outcomes/add-outcomes?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container padding-bottom-two-em">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page">
+                <?php echo $this->title ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php  $typeSel = 'Show for scores '.'<select class="form-control display-inline-block width-fourty-per" id="typeSel" onchange="chgtype()">';
     $typeSel .= '<option value="0" '.($type== 0?'selected="selected"':'').'>'.'Past Due scores'.'</option>';
     $typeSel.= '<option value="1" '.($type== 1?'selected="selected"':'').'>'.'Past Due and Attempted scores'.'</option>';
     $typeSel.= '</select>';?>
 
 <input type="hidden" id="course-id" value="<?php echo $courseId?>">
+<div class="tab-content shadowBox padding-two-em">
 <?php
     if($report == AppConstant::NUMERIC_ZERO)
     {
@@ -153,7 +164,7 @@ $this->params['breadcrumbs'][] = $this->title;
         $print->printOutcomes($outcomesData,AppConstant::NUMERIC_ZERO,$finalData,$cnt,$n,$type,$headerData);
         echo '</table>';
     }?>
-
+</div>
 <script>
     function chgtype()
    {

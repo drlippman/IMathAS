@@ -32,33 +32,38 @@ if($gradebook == AppConstant::NUMERIC_ONE){
     <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
     <input type="hidden" name="courseId" value='<?php echo $course->id ?>'/>
     <div>
-        <div class="col-md-1 form-content select-text-margin"><b><?php AppUtility::t('Subject')?></b></div>
-        <div class="col-md-11 padding-left-fifteen form-content"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></div>
+        <div class="col-md-1 col-sm-2 form-content select-text-margin"><b><?php AppUtility::t('Subject')?></b></div>
+        <div class="col-md-11 col-sm-10 padding-left-fifteen form-content"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></div>
     </div>
-    <div class="col-md-12 form-content">
-        <div class="col-md-1 padding-top-five form-content"><b><?php AppUtility::t('Message')?></b></div>
-        <?php echo "<div class='col-md-11 padding-left-fifteen form-content'><div class= 'editor'>
+    <div class="col-md-12 col-sm-12 form-content">
+        <div class="col-md-1 col-sm-2 padding-top-five form-content">
+            <b><?php AppUtility::t('Message')?></b>
+        </div>
+        <?php echo "<div class='col-md-11 col-sm-10 padding-left-fifteen form-content'>
+        <div class= 'editor email-message-textarea'>
         <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>";
         echo "</textarea></div></div><br>"; ?>
     </div>
     <div>
-    <p class="col-md-11 padding-left-fifteen col-md-offset-1 form-content"><i><?php AppUtility::t('Note:')?></i> &nbsp;<b><?php AppUtility::t('FirstName')?></b>&nbsp;<?php AppUtility::t('and')?> <b>&nbsp;<?php AppUtility::t('LastName')?></b>&nbsp;<?php AppUtility::t('can be used as form-mail fields that will autofill with each student\'s first/last name')?>
+    <p class="col-md-11 col-sm-10 padding-left-fifteen col-md-offset-1 col-sm-offset-2 form-content"><i><?php AppUtility::t('Note:')?></i> &nbsp;<b><?php AppUtility::t('FirstName')?></b>&nbsp;<?php AppUtility::t('and')?> <b>&nbsp;<?php AppUtility::t('LastName')?></b>&nbsp;<?php AppUtility::t('can be used as form-mail fields that will autofill with each student\'s first/last name')?>
     </p>
     </div>
     <div>
-        <div class="col-md-1 form-content"><b><?php AppUtility::t('Send copy to')?></b>
+        <div class="col-md-1 col-sm-2 form-content"><b><?php AppUtility::t('Send copy to')?></b>
         </div>
-        <div class="col-md-11 form-content">
-            <span class="col-md-11"><input type="radio" name="emailCopyToSend" id="self" value="singleStudent"><span class="margin-left-five"> <?php AppUtility::t('Only Students')?></span></span>
-            <span class="col-md-11 margin-top-five"><input type="radio" name="emailCopyToSend" id="self" value="selfStudent" checked="checked"><span class="margin-left-five"> <?php AppUtility::t('Students and you')?></span></span>
-            <span class="col-md-11 margin-top-five"><input type="radio" name="emailCopyToSend" id="self" value="allTeacher"><span class="margin-left-five"> <?php AppUtility::t('Students and all instructors of this course')?></span></span>
+        <div class="col-md-11 col-sm-10 form-content">
+            <span class="col-md-11 col-sm-11"><input type="radio" name="emailCopyToSend" id="self" value="singleStudent"><span class="margin-left-five"> <?php AppUtility::t('Only Students')?></span></span>
+            <span class="col-md-11 col-sm-11 margin-top-five"><input type="radio" name="emailCopyToSend" id="self" value="selfStudent" checked="checked"><span class="margin-left-five"> <?php AppUtility::t('Students and you')?></span></span>
+            <span class="col-md-11 col-sm-11 margin-top-five"><input type="radio" name="emailCopyToSend" id="self" value="allTeacher"><span class="margin-left-five"> <?php AppUtility::t('Students and all instructors of this course')?></span></span>
         </div>
     </div>
-    <div class="col-md-12 padding-left-zero padding-top-ten">
-    <div class="col-md-1 form-content select-text-margin"><b><?php AppUtility::t('Limit send ')?></b> </div>
-    <div class="col-md-11 roster-assessment">
-        <span class="col-md-3 form-content select-text-margin"><?php AppUtility::t('To students who haven\'t completed')?></span>
-        <span class="form-content col-md-4">
+    <div class="col-md-12 col-sm-12 padding-left-zero padding-top-ten">
+    <div class="col-md-1 col-sm-2 form-content padding-top-one-pt-two"><b><?php AppUtility::t('Limit send ')?></b> </div>
+    <div class="col-md-11 col-sm-10 roster-assessment">
+        <span class="floatleft padding-top-one-pt-two padding-right-pt-five-em">
+            <?php AppUtility::t('To students who haven\'t completed')?>
+        </span>
+        <span class="form-content col-md-4 col-sm-4">
             <select name="roster-assessment-data" id="roster-assessment-data" class="form-control">
               <option value='0'><?php AppUtility::t('Don\'t limit - send to all')?>
               </option>
@@ -71,7 +76,7 @@ if($gradebook == AppConstant::NUMERIC_ONE){
         </span>
     </div>
     </div>
-    <div class="col-md-offset-1 col-md-11 margin-top-twenty">
+    <div class="col-md-offset-1 col-md-11 col-sm-offset-2 col-sm-10 margin-top-twenty">
         <input type="submit" class="btn btn-primary" id="email-button" value="<?php AppUtility::t('Send Email')?>">
         <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
             <a class="btn btn-primary back-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
@@ -79,9 +84,9 @@ if($gradebook == AppConstant::NUMERIC_ONE){
             <a class="btn btn-primary back-btn margin-left-ten" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
         <?php } ?>
     </div>
-    <div class="col-md-12 padding-left-zero margin-top-five">
-        <div class="col-md-12 form-content"><?php AppUtility::t('Unless limited, message will be sent to')?></div>
-        <div class="col-md-11 col-md-offset-1 form-content list"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
+    <div class="col-md-12 col-sm-12 padding-left-zero margin-top-five">
+        <div class="col-md-12 col-sm-12 form-content"><?php AppUtility::t('Unless limited, message will be sent to')?></div>
+        <div class="col-md-11 col-md-offset-1 col-sm-10 col-sm-offset-2 form-content list"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
                 <?php echo "<li>".ucfirst($studentDetail['LastName']).", ". ucfirst($studentDetail['FirstName'])." (". ($studentDetail['SID']).")</li>" ?>
             <?php } ?>
         </div>

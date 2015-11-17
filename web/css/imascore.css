@@ -1499,3 +1499,12 @@ margin-left: 1em;
 .margin-left-pt-five-em {
     margin-left: 0.5em;
 }
+.padding-two-em {
+    padding: 2em;
+}
+.padding-right-pt-five-em {
+    padding-right: 0.5em;
+}
+.padding-top-one-pt-two {
+ padding-top: 1.2em !important;
+}

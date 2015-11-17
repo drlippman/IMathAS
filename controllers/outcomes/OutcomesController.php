@@ -155,7 +155,9 @@ class OutcomesController extends AppController
     public function actionOutcomeReport()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $report = $this->getParamVal('report');
         $studentsOutcome = $this->getParamVal('stud');
         $typeSelected = $this->getParamVal('type');
@@ -195,7 +197,7 @@ class OutcomesController extends AppController
         $this->includeJS('tablesorter.js');
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
-        return $this->render('outcomeReport',['courseId' => $courseId,'finalData' => $finalData,'outc' => $outc,'headerData' => $outcomeInfo,'report' => $report,'report' => $report,'selectedOutcome' => $selectedOutcome,'outcomesData' => $outcomes,'type' => $type]);
+        return $this->render('outcomeReport',['courseId' => $courseId,'finalData' => $finalData,'outc' => $outc,'headerData' => $outcomeInfo,'report' => $report,'report' => $report,'selectedOutcome' => $selectedOutcome,'outcomesData' => $outcomes,'type' => $type,'course' => $course]);
     }
 
     public function actionOutcomeMap()

@@ -235,3 +235,6 @@ margin-bottom: 25px;
 .roster-table-dropdown>li>a {
     padding-left: 5px !important;
 }
+.email-message-textarea table,.email-message-textarea iframe,.message-message-textarea table,.message-message-textarea iframe {
+    max-width: 100% !important;
+}
