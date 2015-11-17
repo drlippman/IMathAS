@@ -49,22 +49,22 @@ class ShowItemCourse extends Component
         $now = time() + $previewShift;
 
         $blocklist = array();
-        for ($i = 0; $i < count($items); $i++)
+        for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++)
         {
             if (is_array($items[$i]))
             {
                 /*
                  * if is a block
                  */
-                $blocklist[] = $i+1;
+                $blocklist[] = $i+AppConstant::NUMERIC_ONE;
             }
         }
         if ($canEdit)
         {
             echo ShowItemCourse::generateAddItem($parent,'t');
-            echo "<div style='margin-top: 20px'></div>";
+//            echo "<div style='margin-top: 20px'></div>";
         }
-        for ($i = 0; $i < count($items); $i++)
+        for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++)
         {
             if (is_array($items[$i]))
             {
@@ -73,13 +73,13 @@ class ShowItemCourse extends Component
                  */
                 $turnonpublic = false;
                 if ($isPublic && !$inpublic) {
-                    if (($items[$i]['public']) && $items[$i]['public'] == 1) {
+                    if (($items[$i]['public']) && $items[$i]['public'] == AppConstant::NUMERIC_ONE) {
                         $turnonpublic = true;
                     } else {
                         continue;
                     }
                 }
-                if (($items[$i]['grouplimit']) && count($items[$i]['grouplimit']) > 0 && !$viewAll) {
+                if (($items[$i]['grouplimit']) && count($items[$i]['grouplimit']) > AppConstant::NUMERIC_ZERO && !$viewAll) {
                     if (!in_array('s-'.$studentInfo['section'],$items[$i]['grouplimit'])) {
                         continue;
                     }
@@ -88,18 +88,18 @@ class ShowItemCourse extends Component
                 if ($canEdit) {
                     echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
                 }
-                if ($items[$i]['startdate'] == 0) {
+                if ($items[$i]['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startDate = _('Always');
                 } else {
                     $startDate = AppUtility::formatdate($items[$i]['startdate']);
                 }
-                if ($items[$i]['enddate'] == 2000000000) {
+                if ($items[$i]['enddate'] == AppConstant::ALWAYS_TIME) {
                     $endDate = _('Always');
                 } else {
                     $endDate = AppUtility::formatdate($items[$i]['enddate']);
                 }
 
-                $bnum = $i+1;
+                $bnum = $i+AppConstant::NUMERIC_ONE;
                 if (in_array($items[$i]['id'],$openBlocks))
                 {
                     $isopen = true;
@@ -107,7 +107,7 @@ class ShowItemCourse extends Component
                 {
                     $isopen = false;
                 }
-                if (strlen($items[$i]['SH']) == 1 || $items[$i]['SH'][1] == 'O') {
+                if (strlen($items[$i]['SH']) == AppConstant::NUMERIC_ONE || $items[$i]['SH'][1] == 'O') {
                     $availbeh = _('Expanded');
                 } else if ($items[$i]['SH'][1]=='F') {
                     $availbeh = _('as Folder');
@@ -122,24 +122,24 @@ class ShowItemCourse extends Component
                     list($titlebg,$titletxt,$bicolor) = explode(',',$items[$i]['colors']);
                 }
                 if (!($items[$i]['avail'])) { //backwards compat
-                    $items[$i]['avail'] = 1;
+                    $items[$i]['avail'] = AppConstant::NUMERIC_ONE;
                 }
-                if ($items[$i]['avail'] == 2 || ($items[$i]['avail'] == 1 && $items[$i]['startdate']<$now && $items[$i]['enddate'] > $now))
+                if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO || ($items[$i]['avail'] == AppConstant::NUMERIC_ONE && $items[$i]['startdate']<$now && $items[$i]['enddate'] > $now))
                 {
                     /*
                      * if "available"
                      */
-                    if ($firstLoad && (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O')) {
+                    if ($firstLoad && (strlen($items[$i]['SH'])== AppConstant::NUMERIC_ONE || $items[$i]['SH'][1]=='O')) {
                         echo "<script> oblist = oblist + ',".$items[$i]['id']."';</script>\n";
                         $isopen = true;
 
                     }
-                    if ($items[$i]['avail']==2) {
+                    if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = sprintf(_('Showing %s Always'), $availbeh);
                     } else {
                         $show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startDate, $endDate);
                     }
-                    if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') {
+                    if (strlen($items[$i]['SH'])> AppConstant::NUMERIC_ONE && $items[$i]['SH'][1]=='F') {
                         /*
                          * show as folder
                          */
@@ -155,7 +155,7 @@ class ShowItemCourse extends Component
                         }
                         echo ">";
 
-                        if (($hideIcons&16) == 0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             if ($isPublic) {
                                 echo "<span class=left><a href=\"#\" border=0>";
                             } else {
@@ -173,7 +173,7 @@ class ShowItemCourse extends Component
                         } else {
                             echo "<a href=\"#\" $astyle><b>{$items[$i]['name']}</b></a> ";
                         }
-                        if (($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+                        if (($items[$i]['newflag']) && $items[$i]['newflag']== AppConstant::NUMERIC_ONE) {
                             echo "<span style=\"color:red;\">", _('New'), "</span>";
                         }
                         if ($viewAll) {
@@ -201,7 +201,7 @@ class ShowItemCourse extends Component
                                 </li>
                             </ul></span>
                         <?php }
-                        if (($hideIcons&16) == 0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
                         }
                         echo '<div class="clear"></div>';
@@ -209,7 +209,7 @@ class ShowItemCourse extends Component
                         if ($canEdit) {
                             echo '</div>'; //itemwrapper
                         }
-                    } else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') {
+                    } else if (strlen($items[$i]['SH'])> AppConstant::NUMERIC_ONE && $items[$i]['SH'][1]=='T') {
                         /*
                          * show as tree reader
                          */
@@ -228,7 +228,7 @@ class ShowItemCourse extends Component
                         }
                         echo ">";
                         $treeReaderLink = AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId.'&folder='.$parent-$bnum);
-                        if (($hideIcons&16)==0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             if ($isPublic) {
                             } else {
                                 echo "<span class=left><a href=\"#\" border=0>";
@@ -244,7 +244,7 @@ class ShowItemCourse extends Component
                         } else { ?>
                              <a href="<?php echo AppUtility::getURLFromHome('block','block/tree-reader?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><b><?php echo $items[$i]['name'];?></b></a>
                         <?php }
-                        if (($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+                        if (($items[$i]['newflag']) && $items[$i]['newflag']== AppConstant::NUMERIC_ONE) {
                             echo "<span style=\"color:red;\">", _('New'), "</span>";
                         }
                         if ($viewAll) {
@@ -276,7 +276,7 @@ class ShowItemCourse extends Component
                             </span>
                            <?php
                         }
-                        if (($hideIcons&16)==0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
                         }
                         echo '<div class="clear"></div>';
@@ -297,7 +297,7 @@ class ShowItemCourse extends Component
                         }
                         echo ">";
 
-                        if (($hideIcons&16) == 0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "<span class=left>";
                             echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot"."img/";
                             if ($isopen)
@@ -316,7 +316,7 @@ class ShowItemCourse extends Component
                         }
                         echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
                         echo "<b><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
-                        if (($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+                        if (($items[$i]['newflag']) && $items[$i]['newflag']== AppConstant::NUMERIC_ONE) {
                             echo "<span style=\"color:red;\">", _('New'), "</span>";
                         }
                         if ($viewAll) {
@@ -348,7 +348,7 @@ class ShowItemCourse extends Component
                             </ul></span>
                            <?php
                         }
-                        if (($hideIcons&16)==0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
                         }
                         echo "</div>\n";
@@ -361,7 +361,7 @@ class ShowItemCourse extends Component
                             echo "<div class=hidden ";
                         }
                         $style = '';
-                        if (($items[$i]['fixedheight']) && $items[$i]['fixedheight']>0) {
+                        if (($items[$i]['fixedheight']) && $items[$i]['fixedheight'] > AppConstant::NUMERIC_ZERO) {
                             if (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE 6')!==false) {
                                 $style .= 'overflow: auto; height: expression( this.offsetHeight > '.$items[$i]['fixedheight'].' ? \''.$items[$i]['fixedheight'].'px\' : \'auto\' );';
                             } else {
@@ -378,20 +378,19 @@ class ShowItemCourse extends Component
                         if ($isopen) {
 
                             $this->showItems($items[$i]['items'],$parent.'-'.$bnum,$inpublic||$turnonpublic);
-
                         } else {
                             echo _('Loading content...');
                         }
                         echo "</div>";
                     }
-                } else if ($viewAll || ($items[$i]['SH'][0] == 'S' && $items[$i]['avail'] > 0)) { //if "unavailable"
-                    if ($items[$i]['avail'] == 0) {
+                } else if ($viewAll || ($items[$i]['SH'][0] == 'S' && $items[$i]['avail'] > AppConstant::NUMERIC_ZERO)) { //if "unavailable"
+                    if ($items[$i]['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else if ($items[$i]['SH'][0] == 'S') {
                         $show = _('Currently Showing');
-                        if (strlen($items[$i]['SH']) > 1 && $items[$i]['SH'][1] == 'F') {
+                        if (strlen($items[$i]['SH']) > AppConstant::NUMERIC_ONE && $items[$i]['SH'][1] == 'F') {
                             $show .= _(' as Folder. ');
-                        } else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') {
+                        } else if (strlen($items[$i]['SH'])> AppConstant::NUMERIC_ONE && $items[$i]['SH'][1]=='T') {
                             $show .= _(' as TreeReader. ');
                         } else {
                             $show .= _(' Collapsed. ');
@@ -401,7 +400,7 @@ class ShowItemCourse extends Component
                         $show = "Currently Hidden. ";
                         $show .= sprintf(_('Showing %1$s %2$s to %3$s'), $availbeh, $startDate, $endDate);
                     }
-                    if (strlen($items[$i]['SH']) > 1 && $items[$i]['SH'][1] == 'F')
+                    if (strlen($items[$i]['SH']) > AppConstant::NUMERIC_ONE && $items[$i]['SH'][1] == 'F')
                     {
                        /*
                         * show as folder
@@ -417,7 +416,7 @@ class ShowItemCourse extends Component
                             $astyle = '';
                         }
                         echo ">";
-                        if (($hideIcons&16) == 0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             if ($graphicalIcons) {
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['folder']}\"></a></span>";
@@ -428,7 +427,7 @@ class ShowItemCourse extends Component
                         }
                         echo "<a href=\"course?cid=$courseId&folder=$parent-$bnum\" $astyle><b>";
                         if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
-                        if (($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+                        if (($items[$i]['newflag']) && $items[$i]['newflag']== AppConstant::NUMERIC_ONE) {
                             echo " <span style=\"color:red;\">", _('New'), "</span>";
                         }
                         if ($viewAll) {
@@ -459,7 +458,7 @@ class ShowItemCourse extends Component
                         <?php
                         }
 
-                        if (($hideIcons&16) == 0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
                         }
                         echo '<div class="clear"></div>';
@@ -467,7 +466,7 @@ class ShowItemCourse extends Component
                         if ($canEdit) {
                             echo '</div>'; //itemwrapper
                         }
-                    } else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') { //show as tree reader
+                    } else if (strlen($items[$i]['SH'])> AppConstant::NUMERIC_ONE && $items[$i]['SH'][1]=='T') { //show as tree reader
                         if ($canEdit) {
                             echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
                         }
@@ -479,7 +478,7 @@ class ShowItemCourse extends Component
                             $astyle = '';
                         }
                         echo ">";
-                        if (($hideIcons&16) == 0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "<span class=left><a href=\"#\" border=0>";
                             if ($graphicalIcons) {
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['foldertree']}\"></a></span>";
@@ -490,7 +489,7 @@ class ShowItemCourse extends Component
                         } ?>
                         <a href="<?php echo AppUtility::getURLFromHome('block','block/tree-reader?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><b><?php echo $items[$i]['name'];?></b></a>
                        <?php if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
-                        if (($items[$i]['newflag']) && $items[$i]['newflag']==1) {
+                        if (($items[$i]['newflag']) && $items[$i]['newflag'] == AppConstant::NUMERIC_ONE) {
                             echo " <span style=\"color:red;\">", _('New'), "</span>";
                         }
                         if ($viewAll) {
@@ -523,7 +522,7 @@ class ShowItemCourse extends Component
                           <?php  echo '</span>';
                         }
 
-                        if (($hideIcons&16)==0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
                         }
                         echo '<div class="clear"></div>';
@@ -543,7 +542,7 @@ class ShowItemCourse extends Component
                             $astyle = '';
                         }
                         echo ">";
-                        if (($hideIcons&16)==0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "<span class=left>";
                             echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot"."img/";
                             if ($isopen) {echo _('collapse');} else {echo _('expand');}
@@ -563,7 +562,7 @@ class ShowItemCourse extends Component
                             echo "<i><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
                         }
                         echo "</b></span> ";
-                        if (($items[$i]['newflag']) && $items[$i]['newflag'] == 1) {
+                        if (($items[$i]['newflag']) && $items[$i]['newflag'] == AppConstant::NUMERIC_ONE) {
                             echo "<span style=\"color:red;\">", _('New'), "</span>";
                         }
                         if ($viewAll) {
@@ -595,7 +594,7 @@ class ShowItemCourse extends Component
                             </ul></span>
                             <?php echo '</span>';
                         }
-                        if (($hideIcons&16)==0) {
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
                         }
                         echo "</div>\n";
@@ -611,7 +610,7 @@ class ShowItemCourse extends Component
                         //	echo "style=\"background-color:$bicolor;\"";
                         //}
                         $style = '';
-                        if ($items[$i]['fixedheight']>0) {
+                        if ($items[$i]['fixedheight'] > AppConstant::NUMERIC_ZERO) {
                             if (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE 6')!==false) {
                                 $style .= 'overflow: auto; height: expression( this.offsetHeight > '.$items[$i]['fixedheight'].' ? \''.$items[$i]['fixedheight'].'px\' : \'auto\' );';
                             } else {
@@ -648,7 +647,7 @@ class ShowItemCourse extends Component
             if ($line['itemtype'] == "Calendar") {
                 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 if ($isPublic) { continue;}
-                echo "<div class=item>\n";
+//                echo "<div class=item>\n";1 calender
                 ShowItemCourse::beginitem($canEdit); ?>
                 <div class="col-lg-12 padding-alignment calendar-container">
                     <div class='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
@@ -670,8 +669,7 @@ class ShowItemCourse extends Component
 //                showcalendar("course");
 //                enditem($canEdit);//
                 echo "</div>";
-            } else if ($line['itemtype'] == "Assessment")
-            {
+            } else if ($line['itemtype'] == "Assessment") {
                 /**
                  * Assessment
                  */
@@ -687,7 +685,7 @@ class ShowItemCourse extends Component
                 if (($studentInfo['timelimitmult'])) {
                     $line['timelimit'] *= $studentInfo['timelimitmult'];
                 }
-                if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul')!==0 && strpos($line['summary'],'<ol')!==0) {
+                if (strpos($line['summary'],'<p ') !== AppConstant::NUMERIC_ZERO && strpos($line['summary'],'<ul') !== AppConstant::NUMERIC_ZERO && strpos($line['summary'],'<ol')!==0) {
                     $line['summary'] = '<p>'.$line['summary'].'</p>';
                     if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
                         $line['summary'] = '';
@@ -697,48 +695,47 @@ class ShowItemCourse extends Component
                     $rec = "data-base=\"assesssum-$typeid\" ";
                     $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
                 }
-
                 /*
                  * check for exception
                  */
                 $canundolatepass = false;
-                $latepasscnt = 0;
+                $latepasscnt = AppConstant::NUMERIC_ZERO;
                 if (($exceptions[$items[$i]]))
                 {
                     /*
                      * if latepass and it's before original due date or exception is for more than a latepass past now
                      */
-                    if ($exceptions[$items[$i]][2]>0 && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latePassHrs*60*60)) {
+                    if ($exceptions[$items[$i]][2] > AppConstant::NUMERIC_ZERO && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latePassHrs*AppConstant::NUMERIC_SIXTY*AppConstant::NUMERIC_SIXTY)) {
                         $canundolatepass = true;
                     }
 
-                    $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latePassHrs*3600));
+                    $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO));
                     $line['startdate'] = $exceptions[$items[$i]][0];
                     $line['enddate'] = $exceptions[$items[$i]][1];
                 }
 
-                if ($line['startdate'] == 0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startDate = _('Always');
                 } else {
                     $startDate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate']== 2000000000) {
+                if ($line['enddate']== AppConstant::ALWAYS_TIME) {
                     $endDate =  _('Always');
                 } else {
                     $endDate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($line['reviewdate'] == 2000000000) {
-                    $reviewdate = _('Always');
+                if ($line['reviewdate'] == AppConstant::ALWAYS_TIME) {
+                    $reviewdate = 'Always';
                 } else {
                     $reviewdate = AppUtility::formatdate($line['reviewdate']);
                 }
                 $nothidden = true;
-                if ($line['reqscore'] > 0 && $line['reqscoreaid'] > 0 && !$viewAll && $line['enddate']>$now
-                    && (!($exceptions[$items[$i]]) || $exceptions[$items[$i]][3] == 0))
+                if ($line['reqscore'] > AppConstant::NUMERIC_ZERO && $line['reqscoreaid'] > AppConstant::NUMERIC_ZERO && !$viewAll && $line['enddate']>$now
+                    && (!($exceptions[$items[$i]]) || $exceptions[$items[$i]][3] == AppConstant::NUMERIC_ZERO))
                 {
                     $bestScore = $line['reqscoreaid'];
                     $result = AssessmentSession::getBestScore($bestScore, $userId);
-                    if ($result == 0) {
+                    if ($result == AppConstant::NUMERIC_ZERO) {
                         $nothidden = false;
                     } else {
                         $scores = explode(';',$result[0]['bestscores']);
@@ -747,7 +744,7 @@ class ShowItemCourse extends Component
                         }
                     }
                 }
-                if (!$haveCalcedViewedAssess && $line['avail'] >0 && $line['enddate'] < $now && $line['allowlate'] > 10)
+                if (!$haveCalcedViewedAssess && $line['avail'] > AppConstant::NUMERIC_ZERO && $line['enddate'] < $now && $line['allowlate'] > AppConstant::NUMERIC_TEN)
                 {
                     $haveCalcedViewedAssess = true;
                     $viewedAssess = array();
@@ -758,13 +755,13 @@ class ShowItemCourse extends Component
                     }
                 }
 
-                if ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now && $nothidden)
+                if ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate'] < $now && $line['enddate'] > $now && $nothidden)
                 {
                     /*
                      * regular show
                      */
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
-                    if (($hideIcons&1) == 0) {
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 2 assessmene
+                    if (($hideIcons&1) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
                             <img alt="assess" class="floatleft item-icon-alignment"src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                         <?php } else {
@@ -779,40 +776,40 @@ class ShowItemCourse extends Component
                         $endname = _('Due');
                     }
                     $line['timelimit'] = abs($line['timelimit']);
-                    if ($line['timelimit'] > 0) {
-                        if ($line['timelimit'] > 3600) {
-                            $tlhrs = floor($line['timelimit']/3600);
-                            $tlrem = $line['timelimit'] % 3600;
-                            $tlmin = floor($tlrem/60);
-                            $tlsec = $tlrem % 60;
+                    if ($line['timelimit'] > AppConstant::NUMERIC_ZERO) {
+                        if ($line['timelimit'] > AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO) {
+                            $tlhrs = floor($line['timelimit']/AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO);
+                            $tlrem = $line['timelimit'] % AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO;
+                            $tlmin = floor($tlrem/AppConstant::NUMERIC_SIXTY);
+                            $tlsec = $tlrem % AppConstant::NUMERIC_SIXTY;
                             $tlwrds = "$tlhrs " . _('hour');
-                            if ($tlhrs > 1)
+                            if ($tlhrs > AppConstant::NUMERIC_ONE)
                             {
                                 $tlwrds .= "s";
                             }
-                            if ($tlmin > 0) {
+                            if ($tlmin > AppConstant::NUMERIC_ZERO) {
                                 $tlwrds .= ", $tlmin " . _('minute');
                             }
-                            if ($tlmin > 1) {
+                            if ($tlmin > AppConstant::NUMERIC_ONE) {
                                 $tlwrds .= "s";
                             }
-                            if ($tlsec > 0) {
+                            if ($tlsec > AppConstant::NUMERIC_ZERO) {
                                 $tlwrds .= ", $tlsec " . _('second');
                             }
-                            if ($tlsec > 1) {
+                            if ($tlsec > AppConstant::NUMERIC_ONE) {
                                 $tlwrds .= "s";
                             }
-                        } else if ($line['timelimit'] > 60) {
-                            $tlmin = floor($line['timelimit']/60);
-                            $tlsec = $line['timelimit'] % 60;
+                        } else if ($line['timelimit'] > AppConstant::NUMERIC_SIXTY) {
+                            $tlmin = floor($line['timelimit']/AppConstant::NUMERIC_SIXTY);
+                            $tlsec = $line['timelimit'] % AppConstant::NUMERIC_SIXTY;
                             $tlwrds = "$tlmin " . _('minute');
-                            if ($tlmin > 1) {
+                            if ($tlmin > AppConstant::NUMERIC_ONE) {
                                 $tlwrds .= "s";
                             }
-                            if ($tlsec > 0) {
+                            if ($tlsec > AppConstant::NUMERIC_ZERO) {
                                 $tlwrds .= ", $tlsec " . _('second');
                             }
-                            if ($tlsec > 1) {
+                            if ($tlsec > AppConstant::NUMERIC_ONE) {
                                 $tlwrds .= "s";
                             }
                         } else {
@@ -828,12 +825,12 @@ class ShowItemCourse extends Component
                         echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
                     }
                     echo ">{$line['name']}</a></b>";
-                    if ($line['enddate'] != 2000000000) {
+                    if ($line['enddate'] != AppConstant::ALWAYS_TIME) {
                         echo "<BR> $endname $endDate \n";
                     }
                     if ($canEdit) {
                         echo '<span class="instronly">';
-                        if ($line['allowlate']>0) {
+                        if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
                         } ?>
                         <div class="floatright common-setting">
@@ -861,21 +858,21 @@ class ShowItemCourse extends Component
                             </ul>
                         </div>
 
-                    <?php } else if (($line['allowlate']%10==1 || $line['allowlate']%10-1>$latepasscnt) && $latePasses>0) {
+                    <?php } else if (($line['allowlate']%AppConstant::NUMERIC_TEN == AppConstant::NUMERIC_ONE || $line['allowlate']%AppConstant::NUMERIC_TEN-1>$latepasscnt) && $latePasses > AppConstant::NUMERIC_ZERO) {
                         echo " <a href=\"#\">", _('Use LatePass'), "</a>";
                         if ($canundolatepass) {
                             echo " | <a href=\"#\">", _('Un-use LatePass'), "</a>";
                         }
-                    } else if ($line['allowlate']>0 && ($sessionData['stuview'])) {
+                    } else if ($line['allowlate'] > AppConstant::NUMERIC_ZERO && ($sessionData['stuview'])) {
                         echo _(' LatePass Allowed');
-                    } else if ($line['allowlate']>0 && $canundolatepass) {
+                    } else if ($line['allowlate'] > AppConstant::NUMERIC_ZERO && $canundolatepass) {
                         echo " <a href=\"#\">", _('Un-use LatePass'), "</a>";
                     }
                     echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
-                    if (($hideIcons&1)==0) {
+                } else if($line['avail'] == AppConstant::NUMERIC_ONE && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 3 assessment
+                    if (($hideIcons&1) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
                             <img alt="assess" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
@@ -888,15 +885,15 @@ class ShowItemCourse extends Component
 
                     <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"
                     <?php echo ">{$line['name']}</a></b><BR> ", sprintf(_('Past Due Date of %s.  Showing as Review'), $endDate).'.';
-                    if ($line['reviewdate']!=2000000000) {
+                    if ($line['reviewdate'] != AppConstant::ALWAYS_TIME) {
                         echo " ", _('until'), " $reviewdate \n";
                     }
-                    if ($line['allowlate']>10 && ($now - $line['enddate'])<$latePassHrs*3600 && !in_array($typeid,$viewedAssess) && $latePasses>0 && !($sessionData['stuview'])) {
+                    if ($line['allowlate'] > AppConstant::NUMERIC_TEN && ($now - $line['enddate'])<$latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO && !in_array($typeid,$viewedAssess) && $latePasses > AppConstant::NUMERIC_ZERO && !($sessionData['stuview'])) {
                         echo " <a href=\"#\">", _('Use LatePass'), "</a>";
                     }
                     if ($canEdit) {
                         echo '<span class="instronly">';
-                        if ($line['allowlate']>0) {
+                        if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">LP</span> |';
                         } ?>
                         <div class="floatright common-setting">
@@ -924,23 +921,22 @@ class ShowItemCourse extends Component
                             </ul>
                         </div>
 
-                   <?php } else if (($sessionData['stuview']) && $line['allowlate']>10 && ($now - $line['enddate'])<$latePassHrs*3600) {
+                   <?php } else if (($sessionData['stuview']) && $line['allowlate'] > AppConstant::NUMERIC_TEN && ($now - $line['enddate'])<$latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO) {
                         echo _(' LatePass Allowed');
                     }
                     echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i></div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
                 } else if ($viewAll) { //not avail to stu
-                    if ($line['avail']==0) {
+                    if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
                         $show = sprintf(_('Available %1$s until %2$s'), $startDate, $endDate);
-                        if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
-                            $show .= sprintf(_(', Review until %s'), $reviewdate);
+                        if ($line['reviewdate'] > AppConstant::NUMERIC_ZERO && $line['enddate'] != ALWAYS_TIME) {
+                            $show = sprintf(', Review until %s', $reviewdate);
                         }
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
-                    if (($hideIcons&1)==0) {
-
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 4 assessment
+                    if (($hideIcons&1) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
                             <img alt="assess" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
@@ -954,9 +950,8 @@ class ShowItemCourse extends Component
                     echo "<br/><i>$show</i>\n";
                     echo '</span>';
                     if ($canEdit) {
-
                         echo '<span class="instronly">';
-                        if ($line['allowlate']>0) {
+                        if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
                         }?>
 
@@ -994,7 +989,7 @@ class ShowItemCourse extends Component
                 $typeid = $line['typeid'];
                 $line = InlineText::getById($typeid);
 
-                $isvideo = (preg_match_all('/youtu/',$line['text'],$matches) > 1) && ($line['isplaylist'] > 0);
+                $isvideo = (preg_match_all('/youtu/',$line['text'],$matches) > AppConstant::NUMERIC_ONE) && ($line['isplaylist'] > AppConstant::NUMERIC_ZERO);
                 if ($isvideo) {
                     $json = array();
                     preg_match_all('/<a[^>]*(youtube\.com|youtu\.be)(.*?)"[^>]*?>(.*?)<\/a>/',$line['text'],$matches, PREG_SET_ORDER);
@@ -1007,16 +1002,16 @@ class ShowItemCourse extends Component
                         }
                         $vidid = $p2[0];
                         if (preg_match('/.*[^r]t=((\d+)m)?((\d+)s)?.*/',$m[2],$tm)) {
-                            $start = ($tm[2]?$tm[2]*60:0) + ($tm[4]?$tm[4]*1:0);
+                            $start = ($tm[2]?$tm[2]*AppConstant::NUMERIC_SIXTY:0) + ($tm[4]?$tm[4]*1:0);
                         } else if (preg_match('/start=(\d+)/',$m[2],$tm)) {
                             $start = $tm[1];
                         } else {
-                            $start = 0;
+                            $start = AppConstant::NUMERIC_ZERO;
                         }
                         if (preg_match('/end=(\d+)/',$m[2],$tm)) {
                             $end = $tm[1];
                         } else {
-                            $end = 0;
+                            $end = AppConstant::NUMERIC_ZERO;
                         }
                         $json[] = '{"name":"'.str_replace('"','\\"',$m[3]).'", "vidid":"'.str_replace('"','\\"',$vidid).'", "start":'.$start.', "end":'.$end.'}';
                         $line['text'] = str_replace($m[0],'<a href="#" onclick="playliststart('.$typeid.','.$k.');return false;">'.$m[3].'</a>',$line['text']);
@@ -1031,7 +1026,7 @@ class ShowItemCourse extends Component
                     $playlist .= '<script type="text/javascript">playlist['.$typeid.'] = ['.implode(',',$json).'];</script>';
                     $line['text'] = $playlist;
 
-                } else if (strpos($line['text'],'<p ') !== 0 && strpos($line['text'],'<ul ') !== 0 && strpos($line['text'],'<ol ') !== 0) {
+                } else if (strpos($line['text'],'<p ') !== AppConstant::NUMERIC_ZERO && strpos($line['text'],'<ul ') !== AppConstant::NUMERIC_ZERO && strpos($line['text'],'<ol ') !== 0) {
                     $line['text'] = '<p>'.$line['text'].'</p>';
                     if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['text'])) {
                         $line['text'] = '';
@@ -1041,28 +1036,28 @@ class ShowItemCourse extends Component
                     $rec = "data-base=\"inlinetext-$typeid\" ";
                     $line['text'] = str_replace('<a ','<a '.$rec, $line['text']);
                 }
-                if ($line['startdate']==0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startDate = _('Always');
                 } else {
                     $startDate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate'] == 2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $endDate = _('Always');
                 } else {
                     $endDate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($line['avail']==2 || ($line['startdate'] < $now && $line['enddate'] > $now && $line['avail'] == 1)) {
-                    if ($line['avail'] == 2) {
+                if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['startdate'] < $now && $line['enddate'] > $now && $line['avail'] == AppConstant::NUMERIC_ONE)) {
+                    if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');
                         $color = '#0f0';
                     } else {
                         $show = _('Showing until:') . " $endDate";
                         $color = ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now);
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]);// echo "<div class=item>\n";
+                    ShowItemCourse::beginitem($canEdit,$items[$i]);// echo "<div class=item>\n"; 5 inline text
                     echo '<a name="inline'.$typeid.'"></a>';
                     if ($line['title']!='##hidden##') {
-                        if (($hideIcons&2)==0) {
+                        if (($hideIcons&2) == AppConstant::NUMERIC_ZERO) {
                             if ($graphicalIcons) { ?>
                                 <img alt="assess" class="floatleft item-icon-alignment"
                                      src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -1123,7 +1118,7 @@ class ShowItemCourse extends Component
                     }
                     echo filter("<div class=itemsum>{$line['text']}\n");
                     $result = InstrFiles::getFileName($typeid);
-                    if (count($result) > 0) {
+                    if (count($result) > AppConstant::NUMERIC_ZERO) {
                         echo '<ul class="fileattachlist">';
                         $filenames = array();
                         $filedescr = array();
@@ -1141,12 +1136,12 @@ class ShowItemCourse extends Component
                     echo "</div>";
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
                 } else if ($viewAll) {
-                    if ($line['avail']==0) {
+                    if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
                         $show = sprintf(_('Showing %1$s until %2$s'), $startDate, $endDate);
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 6 inline text
                     if ($line['title']!='##hidden##') {
                         if ($graphicalIcons) { ?>
                             <img alt="assess" class="floatleft item-icon-alignment"
@@ -1182,7 +1177,7 @@ class ShowItemCourse extends Component
                    <?php }
                     echo filter("</div><div class=itemsum>{$line['text']}\n");
                     $result = InstrFiles::getFileName($typeid);
-                    if ($result > 0)
+                    if ($result > AppConstant::NUMERIC_ZERO)
                     {
                         echo '<ul class="fileattachlist">';
                         $filenames = array();
@@ -1205,7 +1200,7 @@ class ShowItemCourse extends Component
                 $typeid = $line['typeid'];
                 $line = LinkedText::getById($typeid);
 
-                if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul ')!==0 && strpos($line['summary'],'<ol ')!==0) {
+                if (strpos($line['summary'],'<p ') !== AppConstant::NUMERIC_ZERO && strpos($line['summary'],'<ul ') !== AppConstant::NUMERIC_ZERO && strpos($line['summary'],'<ol ') !== AppConstant::NUMERIC_ZERO) {
                     $line['summary'] = '<p>'.$line['summary'].'</p>';
                     if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['summary'])) {
                         $line['summary'] = '';
@@ -1215,17 +1210,17 @@ class ShowItemCourse extends Component
                     $rec = "data-base=\"linkedsum-$typeid\" ";
                     $line['summary'] = str_replace('<a ','<a '.$rec, $line['summary']);
                 }
-                if ($line['startdate'] == 0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startDate = _('Always');
                 } else {
                     $startDate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate'] == 2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $endDate = _('Always');
                 } else {
                     $endDate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($line['target'] == 1) {
+                if ($line['target'] == AppConstant::NUMERIC_ONE) {
                     $target = 'target="_blank"';
                 } else {
                     $target = '';
@@ -1236,7 +1231,7 @@ class ShowItemCourse extends Component
                 } else if (substr(strip_tags($line['text']),0,5)=="file:") {
                     $filename = substr(strip_tags($line['text']),5);
                     $alink = filehandler::getcoursefileurl($filename);
-                    $ext = substr($filename,strrpos($filename,'.')+1);
+                    $ext = substr($filename,strrpos($filename,'.')+ AppConstant::NUMERIC_ONE);
                     switch($ext) {
                         case 'xls': $icon = 'xls'; break;
                         case 'pdf': $icon = 'pdf'; break;
@@ -1276,16 +1271,16 @@ class ShowItemCourse extends Component
                     $rec = '';
                 }
 
-                if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
-                    if ($line['avail']==2) {
+                if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate'] < $now && $line['enddate'] > $now)) {
+                    if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');
                         $color = '#0f0';
                     } else {
                         $show = _('Showing until:') . " $endDate";
                         $color = ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now);
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
-                    if (($hideIcons&4)==0) {
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 7 link
+                    if (($hideIcons&4) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
                             <img alt="link to web" class="floatleft"
                                  src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
@@ -1333,12 +1328,12 @@ class ShowItemCourse extends Component
                     echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
                 } else if ($viewAll) {
-                    if ($line['avail']==0) {
+                    if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
                         $show = sprintf(_('Showing %1$s until %2$s'), $startDate, $endDate);
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 8 link
                     if ($graphicalIcons) { ?>
                         <img alt="link to web" class="floatleft"
                              src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
@@ -1382,39 +1377,40 @@ class ShowItemCourse extends Component
                 $typeid = $line['typeid'];
                 $line = Forums::getById($typeid);
 
-                if (strpos($line['description'],'<p ')!==0) {
+                if (strpos($line['description'],'<p ') !== AppConstant::NUMERIC_ZERO) {
                     $line['description'] = '<p>'.$line['description'].'</p>';
                     if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
                         $line['description'] = '';
                     }
                 }
-                if ($line['startdate']==0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startDate = _('Always');
                 } else {
                     $startDate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate']==2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $endDate = _('Always');
                 } else {
                     $endDate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-                    if ($line['avail']==2) {
+                if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && $line['enddate']>$now)) {
+                    if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');
                         $color = '#0f0';
                     } else {
                         $show = _('Showing until:') . " $endDate";
                         $color = ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now);
                     }
+
                     $duedates = "";
-                    if ($line['postby']>$now && $line['postby']!=2000000000) {
+                    if ($line['postby']>$now && $line['postby'] != AppConstant::ALWAYS_TIME) {
                         $duedates .= sprintf(_('New Threads due %s. '), AppUtility::formatdate($line['postby']));
                     }
-                    if ($line['replyby']>$now && $line['replyby']!=2000000000) {
+                    if ($line['replyby']>$now && $line['replyby'] != AppConstant::ALWAYS_TIME) {
                         $duedates .= sprintf(_('Replies due %s. '), AppUtility::formatdate($line['replyby']));
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
-                    if (($hideIcons&8)==0) {
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 9 forum
+                    if (($hideIcons&8) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
                             <img alt="text item" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
@@ -1425,7 +1421,7 @@ class ShowItemCourse extends Component
                     }
                     echo "<div class=title> "; ?>
                     <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id']);?>"><?php echo $line['name']?></a></b>
-                  <?php  if (isset($newPostCnts[$line['id']]) && $newPostCnts[$line['id']]>0 ) { ?>
+                  <?php  if (isset($newPostCnts[$line['id']]) && $newPostCnts[$line['id']] > AppConstant::NUMERIC_ZERO) { ?>
                         <a style="color:red" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'],'&page=-1')?>"><?php echo sprintf(_('New Posts (%s)'),$newPostCnts[$line['id']])?></a>
                   <?php  }
                     if ($viewAll) {
@@ -1458,12 +1454,12 @@ class ShowItemCourse extends Component
                     echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
                 } else if ($viewAll) {
-                    if ($line['avail']==0) {
+                    if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
                         $show = sprintf(_('Showing %1$s until %2$s'), $startDate, $endDate);
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 10 forum
                     if ($graphicalIcons) { ?>
                         <img alt="text item" class="floatleft item-icon-alignment"
                              src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
@@ -1473,7 +1469,7 @@ class ShowItemCourse extends Component
                     <?php }
                     echo "<div class=title><i>"; ?>
                     <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'])?>"><?php echo $line['name']?></a></b></i>
-                   <?php if (($newPostCnts[$line['id']]) && $newPostCnts[$line['id']]>0 ) { ?>
+                   <?php if (($newPostCnts[$line['id']]) && $newPostCnts[$line['id']] > AppConstant::NUMERIC_ZERO) { ?>
                         <a style="color:red" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$line['id'],'&page=-1')?>"><?php sprintf(_('New Posts (%s)'),$newPostCnts[$line['id']])?></a>
                    <?php }
                     echo '<span class="instrdates">';
@@ -1508,35 +1504,35 @@ class ShowItemCourse extends Component
                 // if ($isPublic) { continueo;}
                 $typeid = $line['typeid'];
                 $line = Wiki::getById($typeid);
-                if ($isPublic && $line['groupsetid'] > 0)
+                if ($isPublic && $line['groupsetid'] > AppConstant::NUMERIC_ZERO)
                 {
                     continue;
                 }
-                if (strpos($line['description'],'<p ')!==0) {
+                if (strpos($line['description'],'<p ') !== AppConstant::NUMERIC_ZERO) {
                     $line['description'] = '<p>'.$line['description'].'</p>';
                     if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$line['description'])) {
                         $line['description'] = '';
                     }
                 }
-                if ($line['startdate'] == 0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startDate = _('Always');
                 } else {
                     $startDate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate'] == 2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $endDate = _('Always');
                 } else {
                     $endDate = AppUtility::formatdate($line['enddate']);
                 }
                 $hasnew = false;
-                if ($viewAll || $line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
-                    if ($line['groupsetid'] > 0 && !$canEdit) {
+                if ($viewAll || $line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate'] < $now && $line['enddate'] > $now)) {
+                    if ($line['groupsetid'] > AppConstant::NUMERIC_ZERO && !$canEdit) {
                         $groupSetId = $line['groupsetid'];
                         $result = Stugroups::getStuGrpId($userId, $groupSetId);
-                        if (count($result) > 0) {
+                        if (count($result) > AppConstant::NUMERIC_ZERO) {
                             $wikigroupid = $result[0]['id'];
                         } else {
-                            $wikigroupid = 0;
+                            $wikigroupid = AppConstant::NUMERIC_ZERO;
                         }
                     }
                     $wikilastviews = array();
@@ -1555,8 +1551,8 @@ class ShowItemCourse extends Component
                         }
                     }
                 }
-                if ($line['avail'] == 2 || ($line['avail'] == 1 && $line['startdate'] < $now && $line['enddate'] > $now)) {
-                    if ($line['avail'] == 2) {
+                if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate'] < $now && $line['enddate'] > $now)) {
+                    if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');
                         $color = '#0f0';
                     } else {
@@ -1564,11 +1560,11 @@ class ShowItemCourse extends Component
                         $color = ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now);
                     }
                     $duedates = "";
-                    if ($line['editbydate'] > $now && $line['editbydate'] != 2000000000) {
+                    if ($line['editbydate'] > $now && $line['editbydate'] != AppConstant::ALWAYS_TIME) {
                         $duedates .= sprintf(_('Edits due by %s. '), AppUtility::formatdate($line['editbydate']));
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
-                    if (($hideIcons&8)==0) {
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 11 wiki
+                    if (($hideIcons&8) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
                             <img alt="assess" class="floatleft item-icon-alignment"
                                  src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
@@ -1627,12 +1623,12 @@ class ShowItemCourse extends Component
                     echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
                 } else if ($viewAll) {
-                    if ($line['avail']==0) {
+                    if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
                         $show = sprintf(_('Showing %1$s until %2$s'), $startDate, $endDate);
                     }
-                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n";
+                    ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 12 wiki
                     if ($graphicalIcons) { ?>
                         <img alt="assess" class="floatleft item-icon-alignment"
                              src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
@@ -1678,7 +1674,7 @@ class ShowItemCourse extends Component
                 }
             }
         }
-        if (count($items)>0) {
+        if (count($items) > AppConstant::NUMERIC_ZERO) {
             if ($canEdit)
             {
                 echo ShowItemCourse::generateAddItem($parent,'b');
@@ -1701,12 +1697,12 @@ class ShowItemCourse extends Component
         </div>
 
     <?php }
-    public static function beginitem($canEdit,$aname=0) {
+    public static function beginitem($canEdit,$aname=AppConstant::NUMERIC_ZERO) {
         if ($canEdit) {
             echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
         }
-        echo "<div class=item>\n";
-        if ($aname != 0) {
+        echo "<div class=item>\n"; // 13 function
+        if ($aname != AppConstant::NUMERIC_ZERO) {
             echo "<a name=\"$aname\"></a>";
         }
     }
@@ -1725,10 +1721,10 @@ class ShowItemCourse extends Component
         //$now = time();
         if ($etime<$now) {
             $color = "#ccc";
-        } else if ($etime-$now < 605800) {  //due within a week
-            $color = "#f".dechex(floor(16*($etime-$now)/605801))."0";
-        } else if ($etime-$now < 1211600) { //due within two weeks
-            $color = "#". dechex(floor(16*(1-($etime-$now-605800)/605801))) . "f0";
+        } else if ($etime-$now < AppConstant::NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ZERO) {  //due within a week
+            $color = "#f".dechex(floor(AppConstant::SIXTEEN*($etime-$now)/AppConstant::NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ONE))."0";
+        } else if ($etime-$now < AppConstant::NUMERIC_ONE_TWO_ONE_ONE_SIX_ZERO_ZERO) { //due within two weeks
+            $color = "#". dechex(floor(AppConstant::SIXTEEN*(AppConstant::NUMERIC_ONE -($etime-$now-AppConstant::NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ZERO)/AppConstant::NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ONE))) . "f0";
         } else {
             $color = "#0f0";
         }
@@ -1739,9 +1735,9 @@ class ShowItemCourse extends Component
         if (!$GLOBALS['colorshift']) {
             return "#ff0";
         }
-        if ($etime==2000000000 && $now >= $stime) {
+        if ($etime == AppConstant::ALWAYS_TIME && $now >= $stime) {
             return '#0f0';
-        } else if ($stime==0) {
+        } else if ($stime == AppConstant::NUMERIC_ZERO) {
             return ShowItemCourse::makecolor($etime,$now);
         }
         if ($etime==$stime) {
@@ -1752,7 +1748,7 @@ class ShowItemCourse extends Component
             $color = '#ccc';
         } else if ($r<.5) {
             $color = '#f'.dechex(floor(32*$r)).'0';
-        } else if ($r<1) {
+        } else if ($r < AppConstant::NUMERIC_ONE) {
             $color = '#'.dechex(floor(32*(1-$r))).'f0';
         } else {
             $color = '#0f0';
@@ -1762,8 +1758,8 @@ class ShowItemCourse extends Component
 
     public static function generatemoveselect($num,$count,$blk,$blocklist) {
         global $toolset;
-        if (($toolset&4)==4) {return '';}
-        $num = $num+1;  //adjust indexing
+        if (($toolset&4) == AppConstant::NUMERIC_FOUR) {return '';}
+        $num = $num + AppConstant::NUMERIC_ONE;  //adjust indexing
         $html = "<select class=\"mvsel\" id=\"$blk-$num\" onchange=\"moveitem($num,'$blk')\">\n";
         for ($i = 1; $i <= $count; $i++) {
             $html .= "<option value=\"$i\" ";
@@ -1836,17 +1832,17 @@ public static function makeTopMenu() {
         echo '</div>';
 
     }
-    if (($courseNewFlag&1)==1) {
+    if (($courseNewFlag&1) == AppConstant::NUMERIC_ONE) {
         $gbnewflag = ' <span class="red">' . _('New') . '</span>';
     } else {
         $gbnewflag = '';
     }
-    if (($teacherId) && count($topBar[1])>0 && $topBar[2]==0) {
+    if (($teacherId) && count($topBar[1]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) {
 
-    } else if (((count($topBar[0]) > 0 && $topBar[2] == 0) || ($previewshift > -1 && !$useviewButtons))) {
+    } else if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || ($previewshift > -1 && !$useviewButtons))) {
         echo '<div class=breadcrumb>';
-        if ($topBar[2]==0) {
-            if (in_array(0,$topBar[0]) && $msgSet<4) { //messages
+        if ($topBar[2] == AppConstant::NUMERIC_ZERO) {
+            if (in_array(0,$topBar[0]) && $msgSet < AppConstant::NUMERIC_FOUR) { //messages
                 echo "<a href=\"#\">", _('Messages'), "</a>$newMsgs &nbsp; ";
             }
             if (in_array(3,$topBar[0])) { //forums
@@ -1861,24 +1857,24 @@ public static function makeTopMenu() {
             if (in_array(9,$topBar[0])) { //Log out
                 echo "<a href=\"#\">", _('Log Out'), "</a>";
             }
-            if ($previewshift>-1 && count($topBar[0])>0) { echo '<br />';}
+            if ($previewshift>-1 && count($topBar[0]) > AppConstant::NUMERIC_ZERO) { echo '<br />';}
         }
         if ($previewshift>-1 && !$useviewButtons) {
             echo _('Showing student view. Show view:'), ' <select id="pshift" onchange="changeshift()">';
             echo '<option value="0" ';
-            if ($previewshift==0) {echo "selected=1";}
+            if ($previewshift == AppConstant::NUMERIC_ZERO) {echo "selected=1";}
             echo '>', _('Now'), '</option>';
             echo '<option value="3600" ';
-            if ($previewshift==3600) {echo "selected=1";}
+            if ($previewshift == AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO) {echo "selected=1";}
             echo '>', _('1 hour from now'), '</option>';
             echo '<option value="14400" ';
-            if ($previewshift==14400) {echo "selected=1";}
+            if ($previewshift == AppConstant::NUMERIC_ONE_FOUR_FOUR_ZERO_ZERO) {echo "selected=1";}
             echo '>', _('4 hours from now'), '</option>';
             echo '<option value="86400" ';
-            if ($previewshift==86400) {echo "selected=1";}
+            if ($previewshift == AppConstant::MAX_SESSION_TIME) {echo "selected=1";}
             echo '>', _('1 day from now'), '</option>';
             echo '<option value="604800" ';
-            if ($previewshift==604800) {echo "selected=1";}
+            if ($previewshift == AppConstant::WEEK_TIME) {echo "selected=1";}
             echo '>', _('1 week from now'), '</option>';
             echo '</select>';
             echo " <a href=\"course?cid=$courseId&teachview=1\">", _('Back to instructor view'), "</a>";

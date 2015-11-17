@@ -788,7 +788,7 @@ class QuestionController extends AppController
             }
         }
         $this->includeCSS(['question/question.css', 'course/course.css', 'roster/roster.css']);
-        $this->includeJS(['jquery.min.js', 'question/addqsort.js', 'question/addquestions.js', 'tablesorter.js', 'general.js', 'question/junkflag.js']);
+        $this->includeJS(['jquery.min.js', 'question/addquestions.js', 'tablesorter.js', 'general.js', 'question/junkflag.js']);
         $responseArray = $this->addQuestionRenderData($course, $assessmentId, $params, $overwriteBody, $body, $defPoints, $searchLibs, $beenTaken, $pageAssessmentName, $itemOrder, $sessionData, $jsArray, $displayMethod, $lNames, $search, $searchAll, $searchMine, $newOnly, $noSearchResults, $pageLibRowHeader, $pageUseAvgTimes, $pageLibsToUse, $alt, $lNamesArray, $pageLibQIds, $pageQuestionTable, $qid, $pageAssessmentQuestions, $pageAssessmentList, $address);
         return $this->renderWithData('addQuestions', $responseArray);
     }

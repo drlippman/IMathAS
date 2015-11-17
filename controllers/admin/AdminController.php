@@ -3422,13 +3422,12 @@ class AdminController extends AppController
 
             if (substr($searchlibs, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ONE) == "0")
                 $lnames[] = "Unassigned";
+            $resultLib = Libraries::getByNameList(explode(',',$searchlibs));
 
-            $resultLib = Libraries::getByNameList($llist);
             foreach($resultLib as $key => $row) {
                     $lnames[] = $row['name'];
             }
             $lnames = implode(", ",$lnames);
-
             if (isset($search)) {
                 if ($isAdmin) {
                     $query = new LibraryItems();
@@ -3556,7 +3555,7 @@ class AdminController extends AppController
                 exit;
             }
         }
-        $this->includeJS(['tablesorter.js', 'general.js']);
+        $this->includeJS(['jquery.min.js','question/addquestions.js', 'tablesorter.js', 'general.js']);
         $responseData = array('myRights' => $myRights, 'isTeacher' => $isTeacher, 'overWriteBody' => $overWriteBody, 'body' => $body, 'params' => $params, 'cid' => $cId, 'search' => $search, 'searchlibs' => $searchlibs, 'page_pChecked' => $page_pChecked, 'lnames' => $lnames,
         'page_hasSearchResults' => $page_hasSearchResults, 'checked' => $checked, 'page_nChecked' => $page_nChecked);
         return $this->renderWithData('exportQuestionSet', $responseData);

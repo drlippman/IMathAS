@@ -271,5 +271,9 @@ class AppConstant
     const BLOCK_POST = 'This page is blocked. In this forum, you must post your own thread before you can read those posted by others.';
     const COURSE_NOT_FOUND = 'Course not found.';
     const CLOSED_FOR_SELF_ENROLL = 'Course is closed for self enrollment. Contact your instructor for access.';
-    const PAN_DOC_SERVER = '54.191.55.159';
+    const NUMERIC_THREE_SIX_ZERO_ZERO = 3600;
+    const NUMERIC_ONE_FOUR_FOUR_ZERO_ZERO = 14400;
+    const NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ZERO = 605800;
+    const NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ONE = 605801;
+    const NUMERIC_ONE_TWO_ONE_ONE_SIX_ZERO_ZERO = 1211600;
 }

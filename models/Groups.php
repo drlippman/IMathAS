@@ -68,7 +68,6 @@ class Groups extends BaseImasGroups
 
 //    public static function getName($id)
 //    {
-//        AppUtility::dump($id);
 //        return Groups::find()->select(['name'])->where(['id' => $id])->one();
 //    }
 }

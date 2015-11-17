@@ -123,7 +123,6 @@ class AssessmentController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$params['cid'].'&id='.$params['id']));
                 } else {
                     $overwriteBody = AppConstant::NUMERIC_ONE;
-
                     $assessmentName = $assessmentData['name'];
                     $body = "<h3>$assessmentName</h3>";
                     $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
@@ -142,9 +141,9 @@ class AssessmentController extends AppController
                     } else {
                         $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                     }
-                    if ($params['doreview'] == AppConstant::NUMERIC_ZERO) {
+                    if ($params['doreview'] == AppConstant::ZERO_VALUE) {
                         $reviewDate = AppConstant::NUMERIC_ZERO;
-                    } else if ($params['doreview'] == AppConstant::ALWAYS_TIME) {
+                    } else if ($params['doreview'] == AppConstant::AlWAYS_TIME_VALUE) {
                         $reviewDate = AppConstant::ALWAYS_TIME;
                     } else {
                         $reviewDate = AppUtility::parsedatetime($params['rdate'], $params['rtime']);
@@ -3747,7 +3746,7 @@ class AssessmentController extends AppController
             $temp  .= "$earned/$poss</p>";
         }
         if (!$isdiag && $testsettings['noprint']==0) {
-            $temp  .= "<p><a href=\"#\" onclick=\"window.open('../../assessment/assessment/show-print-test','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">".'Print11111111 Version'. "</a></p> ";
+            $temp  .= "<p><a href=\"#\" onclick=\"window.open('../../assessment/assessment/show-print-test','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">".'Print Version'. "</a></p> ";
         }
 
         $temp  .= "</div>\n";

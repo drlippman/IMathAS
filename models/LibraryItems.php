@@ -244,12 +244,17 @@ class LibraryItems extends BaseImasLibraryItems
     public static function getDataByAdmin($safesearch, $llist, $checked)
     {
         $query = new Query();
-        $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')->from('imas_questionset')
+        $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')
+            ->from('imas_questionset')
             ->join('INNER JOIN',
-            'imas_library_items',
-            'imas_library_items.qsetid=imas_questionset.id')
-            ->where(['LIKE','imas_questionset.description','%'.$safesearch.'%'])
-            ->andWhere(['IN', 'imas_library_items.libid', $llist]);
+                'imas_library_items',
+                'imas_library_items.qsetid=imas_questionset.id')
+
+            ->where(['IN', 'imas_library_items.libid', $llist]);
+        if (count($safesearch) > 0)
+        {
+            $query->andWhere(['LIKE','imas_questionset.description',$safesearch]);
+        }
         if (count($checked) > 0)
         {
             $query->andWhere(['NOT IN', 'imas_questionset.id', $checked]);
@@ -260,13 +265,17 @@ class LibraryItems extends BaseImasLibraryItems
     public static function getDataByGrpAdmin($groupid, $llist, $safesearch, $checked)
     {
         $query = new Query();
-        $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')->from('imas_questionset,imas_library_items,imas_users')
-            ->where(['LIKE', 'imas_questionset.description', $safesearch])
-            ->andWhere('imas_questionset.ownerid=imas_users.id')
+        $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')
+            ->from('imas_questionset,imas_library_items,imas_users')
+            ->where('imas_questionset.ownerid=imas_users.id')
+            ->andWhere('imas_library_items.qsetid=imas_questionset.id')
         ->andWhere(['imas_users.groupid' => $groupid] or ['>', 'imas_questionset.userights', 0])
-        ->andWhere('imas_library_items.qsetid=imas_questionset.id')
-        ->andWhere(['IN', 'imas_library_items.libid', $llist]);
 
+        ->andWhere(['IN', 'imas_library_items.libid', $llist]);
+        if (count($safesearch) > 0)
+        {
+            $query->andWhere(['LIKE','imas_questionset.description',$safesearch]);
+        }
         if (count($checked) > 0)
         {
             $query->andWhere(['NOT IN', 'imas_questionset.id', $checked]);
@@ -274,7 +283,7 @@ class LibraryItems extends BaseImasLibraryItems
         return $query->createCommand()->queryAll();
     }
 
-    public static function getDataByUserId($userid,$safesearch,$llist, $checked)
+    public static function getDataByUserId($userid,$safesearch,$llist,$checked)
     {
         $query = new Query();
         $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')

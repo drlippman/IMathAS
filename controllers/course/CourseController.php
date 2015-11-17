@@ -1247,7 +1247,6 @@ class CourseController extends AppController
                 $overwriteBody = AppConstant::NUMERIC_ONE;
                 $body = _("Course does not exist.  <a href='#'>Return to main page</a>") . "</body></html>\n";
             }
-//AppUtility::dump($line);
             $allowUnEnroll = $line['allowunenroll'];
             $hideIcons = $line['hideicons'];
             $graphicalIcons = ($line['picicons']==1);

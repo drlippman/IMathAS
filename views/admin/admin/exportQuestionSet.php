@@ -56,20 +56,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo "<div class='col-md-12'>".AppUtility::t('No Questions currently marked for export',false)."</div>\n";
             } else {
                 ?>
-                <?php AppUtility::t('Check') ?>
-                <a href="#" onclick="return chkAllNone('pform','pchecked[]',true)"><?php AppUtility::t('All') ?></a>
-                <a href="#" onclick="return chkAllNone('pform','pchecked[]',false)"><?php AppUtility::t('None') ?></a>
+<!--                --><?php //AppUtility::t('Check') ?>
+<!--                <a href="#" onclick="return chkAllNone('pform','pchecked[]',true)">--><?php //AppUtility::t('All') ?><!--</a>-->
+<!--                <a href="#" onclick="return chkAllNone('pform','pchecked[]',false)">--><?php //AppUtility::t('None') ?><!--</a>-->
 
 
-                <table cellpadding=5 class=gb>
+                <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
                     <thead>
-                    <tr>
-                        <th></th>
+                    <tr><th class="questionId">
+                            <div class="checkbox override-hidden">
+                                <label style="padding-left:0px">
+                                    <input type="checkbox" name="header-checked"  value="">
+                                    <span class="cr">
+                                        <i class="cr-icon fa fa-check"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </th>
                         <th><?php AppUtility::t('Description') ?></th>
                         <th><?php AppUtility::t('Type') ?></th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="potential-question-information-table">
                     <?php
                     $alt = AppConstant::NUMERIC_ZERO;
                     for ($i = AppConstant::NUMERIC_ZERO; $i < count($page_pChecked); $i++) {
@@ -101,16 +109,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             <div class="col-md-12"><h3><?php AppUtility::t('Export Settings') ?></h3></div>
             <div class=col-md-2><?php AppUtility::t('Library Description') ?></div>
-            <div class=col-md-6>
-                <textarea name="libdescription" rows=4 cols=60></textarea>
+            <div class="col-md-6 col-sm-6">
+                <textarea name="libdescription" class="form-control text-area-alignment" rows=4 cols=60></textarea>
             </div>
             <br class=form><br/>
 
             <div class=col-md-2><?php AppUtility::t('Library Name') ?></div>
-            <div class=col-md-6><input type=text name="libname" size="40"/></div>
-            <br class=form>
+            <div class=col-md-6><input type=text class="form-control" name="libname" size="40"/></div>
+            <br class=form><br/>
 
-            <div class=submit><input name="export" type=submit value="Export"></div>
+            <div class=submit><input name="export" type=submit value="Export"></div><br class=form>
         </form>
     <?php
     } else {
@@ -131,19 +139,25 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "<div class='col-md-12'>".AppUtility::t('No Questions matched search',false)."</div>\n";
     } else {
     ?>
-    <?php AppUtility::t('Check') ?>
-        <a href="#" onclick="return chkAllNone('pform','nchecked[]',true)"><?php AppUtility::t('All') ?></a>
-        <a href="#" onclick="return chkAllNone('pform','nchecked[]',false)"><?php AppUtility::t('None') ?></a>
+<!--    --><?php //AppUtility::t('Check') ?>
+<!--        <a href="#" onclick="return chkAllNone('pform','nchecked[]',true)">--><?php //AppUtility::t('All') ?><!--</a>-->
+<!--        <a href="#" onclick="return chkAllNone('pform','nchecked[]',false)">--><?php //AppUtility::t('None') ?><!--</a>-->
 
-        <table cellpadding=5 id=myTable class=gb>
+        <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
             <thead>
-            <tr>
-                <th></th>
+            <tr><th class="questionId">
+                    <div class="checkbox override-hidden">
+                        <label style="padding-left:0px">
+                            <input type="checkbox" name="header-checked"  value="">
+                            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                        </label>
+                    </div>
+                </th>
                 <th><?php AppUtility::t('Description') ?></th>
                 <th><?php AppUtility::t('Type') ?></th>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="potential-question-information-table">
             <?php
             $alt = AppConstant::NUMERIC_ZERO;
             for ($i = AppConstant::NUMERIC_ZERO; $i < count($page_nChecked); $i++) {
@@ -166,9 +180,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             </tbody>
         </table>
-        <script type="text/javascript">
-            initSortTable('myTable', Array(false, 'S', 'S'), true);
-        </script>
     <?php
     }
         echo "<div class='col-md-12'>".AppUtility::t(' Note: Export of questions with static image files is not yet supported.')."</div>";
