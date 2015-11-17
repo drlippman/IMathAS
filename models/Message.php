@@ -380,9 +380,9 @@ class Message extends BaseImasMsgs
     {
         $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
         $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
-        $query .= "imas_msgs.msgto=':userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+        $query .= "imas_msgs.msgto=$userid AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
         $query .= "ORDER BY senddate DESC ";
-        return Yii::$app->db->createCommand($query)->bindValue(':userid',$userid)->queryAll();
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 
     public static function getUserById($userid)
@@ -397,6 +397,7 @@ class Message extends BaseImasMsgs
         if($data){
             $this->attributes = $data;
             $this->save();
+            return $this->id;
         }
     }
     public static function getCountOfId($userid, $cid)
@@ -405,6 +406,135 @@ class Message extends BaseImasMsgs
         $data = \Yii::$app->db->createCommand($query);
         $data->bindValues(['userid'=> $userid, 'cid'=> $cid]);
         return $data->queryAll();
+    }
+
+    public function updateReply($getReplyTo, $filter){
+        $msgData = self::findOne(['id' => $getReplyTo]);
+        if($msgData){
+            $msgData->replied = AppConstant::NUMERIC_ONE;
+            if($filter){
+                $msgData->isread = $msgData->isread&~AppConstant::NUMERIC_ONE;
+            }
+            $msgData->save();
+        }
+    }
+
+    public function getBaseIdById($id){
+        return self::find()->select('baseid')->where(['id' => $id])->one();
+    }
+
+    public function updateBaseParentId($baseId, $getReplyTo, $msgId){
+        $messageData = self::findOne(['id' => $msgId]);
+        if($messageData){
+            $messageData->baseid = $baseId;
+            $messageData->parent = $getReplyTo;
+            $messageData->save();
+        }
+    }
+
+    public function getMessageTitleAndName($id){
+        return self::find()->select('title,message,courseid')->where(['id' => $id])->one();
+    }
+
+    public function updateIsReadById($params)
+    {
+        $setIsRead = self::find()->where(['IN', 'id', $params])->andWhere(['isread&1' => AppConstant::NUMERIC_ONE])->all();
+        if($setIsRead)
+        {
+            foreach($setIsRead as $isRead){
+                $isRead->isread = (($isRead->isread)&~1);
+                $isRead->save();
+            }
+        }
+    }
+
+    public function updateIsReadMarkRead($params)
+    {
+        $setIsRead = self::find()->where(['IN', 'id', $params])->andWhere(['isread&1' => AppConstant::NUMERIC_ZERO])->all();
+        if($setIsRead)
+        {
+            foreach($setIsRead as $isRead){
+                $isRead->isread = (($isRead->isread)|~1);
+                $isRead->save();
+            }
+        }
+    }
+
+    public function deleteMessage($params){
+        $setIsRead = self::find()->where(['IN', 'id', $params])->andWhere(['isread&4' => AppConstant::NUMERIC_FOUR])->all();
+        if($setIsRead)
+        {
+            foreach($setIsRead as $isRead){
+                $isRead->delete();
+            }
+        }
+    }
+
+    public function updateIsReadRemove($params)
+    {
+        $setIsRead = self::find()->where(['IN', 'id', $params])->all();
+        if($setIsRead)
+        {
+            foreach($setIsRead as $isRead){
+                $isRead->isread = (($isRead->isread)|2);
+                $isRead->save();
+            }
+        }
+    }
+
+    public function deleteMessageById($id){
+        $setIsRead = self::find()->where(['id' => $id])->andWhere(['isread&4' => AppConstant::NUMERIC_FOUR])->one();
+        if($setIsRead)
+        {
+            $setIsRead->delete();
+        }
+    }
+
+    public function updateIsReadRemoveId($id)
+    {
+        $setIsRead = self::find()->where(['id' => $id])->one();
+        if($setIsRead)
+        {
+            $setIsRead->isread = (($setIsRead->isread)|2);
+            $setIsRead->save();
+        }
+    }
+
+    public function getCountOfIdByMsgTo($userId, $filtercid, $filteruid, $limittotagged){
+        $query  = new Query();
+        $query->select(['COUNT(id)'])
+            ->from('imas_msgs ')
+            ->where('msgto= :userId',[':userId' => $userId])
+            ->andWhere(['isread&2' => AppConstant::NUMERIC_ZERO]);
+            if ($filtercid>AppConstant::NUMERIC_ZERO) {
+                $query->andWhere('courseid = :courseId', [':courseId' => $filtercid]);
+            }
+            if ($filteruid>AppConstant::NUMERIC_ZERO) {
+                $query->andWhere('msgfrom = :msgFrom', [':msgFrom' => $filteruid]);
+            }
+            if ($limittotagged==1) {
+                $query->andWhere(['isread&8' => AppConstant::NUMERIC_EIGHT]);
+            }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function getCountOfIdByIsRead($userId, $filtercid, $limittotagged){
+        $query  = new Query();
+        $query->select(['COUNT(id)'])
+            ->from('imas_msgs ')
+            ->where('msgto= :userId',[':userId' => $userId])
+            ->andWhere(['isread&2' => AppConstant::NUMERIC_ZERO]);
+        if ($filtercid > AppConstant::NUMERIC_ZERO) {
+            $query->andWhere('courseid = :courseId', [':courseId' => $filtercid]);
+        }
+        if ($limittotagged==1) {
+            $query->andWhere(['isread&8' => AppConstant::NUMERIC_EIGHT]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 }
 

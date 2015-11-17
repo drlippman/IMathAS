@@ -48,7 +48,7 @@ class Tutor extends BaseImasTutors
         return static::findAll(['userid' => $userId]);
     }
 
-    Public static function findTutorsToList($courseId)
+    Public static function findTutorsToList($courseId,$isteacher,$section)
     {
         $query = new Query();
         $query->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
@@ -56,8 +56,12 @@ class Tutor extends BaseImasTutors
             ->join('INNER JOIN',
                 'imas_users',
                 'imas_users.id = imas_tutors.userid')
-            ->where('imas_tutors.courseid = :courseId')
-            ->orderBy('imas_users.LastName');
+            ->where(':courseId = :courseId');
+            if(!$isteacher && $section!=null){
+                $query->andWhere(['imas_tutors.section' => $section])->orWhere(['imas_tutors.section' => '']);
+            }
+        $query->andWhere('imas_tutors.courseid = :courseId');
+            $query->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->bindValue(':courseId',$courseId)->queryAll();
         return $data;

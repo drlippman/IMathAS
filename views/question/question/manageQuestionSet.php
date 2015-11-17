@@ -234,10 +234,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 <span>Select the new rights for these questions</span>
                 <span class="display-inline-block margin-left-fifteen">
                     <select class="form-control" name="newrights">
-                        <option value="4">Allow use and modifications by all</option>
-                        <option value="3">Allow use by all and modifications by group</option>
-                        <option value="2" selected="selected">Allow use, use as template, no modifications</option>
                         <option value="0">Private</option>
+                        <option value="2" selected="selected">Allow use, use as template, no modifications</option>
+                        <option value="3">Allow use by all and modifications by group</option>
+                        <option value="4">Allow use and modifications by all</option>
                     </select>
                 </span>
             </div>

@@ -863,8 +863,21 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return self::find()->select('qrightsdef')->where(['id' => $userId])->one();
     }
-    public static function getFirstLastName($userId)
+    public function getFirstLastName($userId)
     {
         return self::find()->select('LastName,FirstName')->where(['id' => $userId])->one();
+    }
+
+    public function getMsgEmail($id){
+        return self::find()->select('msgnotify,email')->where(['id' => $id])->one();
+    }
+
+    public function getUserStudentData($to,$fetchtCourseId){
+        $query = new Query();
+        $query->select('iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg')->from('imas_users AS iu')
+            ->join('LEFT JOIN','imas_students AS i_s','iu.id=i_s.userid')->where('i_s.courseid=:fetchtCourseId')->andWhere('iu.id = :to');
+        $command = $query->createCommand()->bindValues([':to'=>$to, ':fetchtCourseId' => $fetchtCourseId]);
+        $data = $command->queryAll();
+        return $data;
     }
 }

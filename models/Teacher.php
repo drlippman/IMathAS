@@ -111,4 +111,8 @@ class Teacher extends BaseImasTeachers
         $command = $query->createCommand();
         return $command->bindValue(':userid',$userId)->queryAll();
     }
+
+    public function getId($courseId,$userId){
+        return self::find()->select('id')->where(['courseid' => $courseId, 'userid' => $userId])->all();
+    }
 }

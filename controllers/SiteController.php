@@ -753,7 +753,6 @@ class SiteController extends AppController
                 /**
                  * check for new messages
                  */
-
                 $result = Message::getUserById($user->id);
                 foreach($result as $key => $row){
                     $newMsgCnt[$row['courseid']] = $row['COUNT(id)'];
@@ -766,7 +765,6 @@ class SiteController extends AppController
              *
              * check to see if the user is enrolled as a student
              */
-
             $stuHasHiddenCourses = false;
             if ($studCourse == 0) {
                 $noClass = true;

@@ -1546,7 +1546,8 @@ class InstructorController extends AppController
             } else if ($sType == 'A') {
                 $query = new ContentTrack();
                 $queryResult = $query->getDataForAssessment($courseId,$typeId);
-                $q2 = Assessments::getAssessmentName($typeId);
+                $assessmentQbj = new Assessments();
+                $q2 = $assessmentQbj->getAssessmentName($typeId);
             } else if ($sType == 'W') {
                 $query = new ContentTrack();
                 $queryResult = $query->getDataForWiki($courseId,$typeId);

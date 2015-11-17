@@ -4119,9 +4119,9 @@ class AssessmentController extends AppController
         $timesontask = explode("~",$line['timeontask']);
         if ($isTeacher) {
             if ($line['userid'] != $userId) {
-                $row = User::getFirstLastName($line['userid']);
+                $userObj = new User();
+                $row = $userObj->getFirstLastName($line['userid']);
                 $userFullName = $row['LastName']." ".$row['FirstName'];
-
             }
             $userId= $line['userid'];
         }

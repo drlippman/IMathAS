@@ -34,6 +34,10 @@ class UtilitiesController extends AppController
         return $this->accessForAdmin($user['rights']);
     }
 
+    /**
+     * @return string
+     * Admin utilities.
+     */
     public function actionAdminUtilities()
     {
         $this->guestUserHandler();
@@ -56,22 +60,32 @@ class UtilitiesController extends AppController
         if (isset($form))
         {
 
+            /**
+             * User lookup
+             */
             if ($form == 'lookup')
             {
                 if(!empty($params['LastName']) || !empty($params['FirstName']) || !empty($params['SID']) || !empty($params['email']))
                 {
-
                     if(!empty($params['SID']))
                     {
+                        /**
+                         * get user details by its SID.
+                         */
                         $queryForUser = User::getDataByJoin($params['SID'],AppConstant::NUMERIC_ZERO);
                     }
                     elseif(!empty($params['email']))
                     {
+                        /**
+                         * get user details by its email.
+                         */
                         $queryForUser = User::getDataByJoin($params['email'],AppConstant::NUMERIC_ONE);
-
                     }
                     else
                     {
+                        /**
+                         * get user details by its firstname or lastname.
+                         */
                         $queryForUser = User::getDataByJoinForName($params);
                     }
                     if(!$queryForUser)
@@ -82,12 +96,24 @@ class UtilitiesController extends AppController
                     {
                         foreach($queryForUser as $userData)
                         {
+                            /**
+                             * get course data.
+                             */
                             $courseData = Course::queryForCourse($userData['id']);
+                            /**
+                             * get tutor data.
+                             */
                             $tutorData = Course::queryFromCourseForTutor($userData['id']);
                             $countTutorData = count($tutorData);
                             $countOfCourseData = count($courseData);
+                            /**
+                             * get teacher data.
+                             */
                             $teacherData = Course::queryFromCourseForTeacher($userData['id']);
                             $countOfTeacher = count($teacherData);
+                            /**
+                             * get LTI data.
+                             */
                             $ltiData = LtiUserForm::getUserData($userData['id']);
                             $countOfLti = count($ltiData);
                             $queryForCourse[$userData['id']] = $courseData;
@@ -97,7 +123,6 @@ class UtilitiesController extends AppController
                         }
                     }
                 }
-
                 }
         }
         $this->includeCSS(['utilities.css']);
@@ -176,6 +201,9 @@ class UtilitiesController extends AppController
         }
         $now = time();
         $date = mktime(AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_SEVEN,AppConstant::NUMERIC_TEN,AppConstant::YEAR_TWENTY_ELEVEN);
+        /**
+         * To get distinct user details.
+         */
         $studentCount = User::getDistinctUserCount($date);
         $days = $this->getParamVal('days');
         if(isset($days))
@@ -191,6 +219,9 @@ class UtilitiesController extends AppController
         } else {
             $skipCid= array();
         }
+        /**
+         * getting template details.
+         */
         $queryForCid = Course::getDataByTemplate();
         if($queryForCid)
         {
@@ -947,7 +978,6 @@ class UtilitiesController extends AppController
                 {
                     mail($addy,$subject,$message,$headers);
                 }
-
             }
             if ($calledFrom=='lu')
             {

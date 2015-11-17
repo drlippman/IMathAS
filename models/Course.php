@@ -664,4 +664,12 @@ class Course extends BaseImasCourses {
     {
         return self::find()->select('itemorder,name,theme')->where(['id' => $courseId])->one();
     }
+
+    public function getNameById($id){
+        return self::find()->select('name')->where(['id' => $id])->one();
+    }
+
+    public function getMsgSet($id){
+        return self::find()->select('msgset')->where(['id' => $id])->one();
+    }
 }

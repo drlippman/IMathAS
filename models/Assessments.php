@@ -463,9 +463,9 @@ class Assessments extends BaseImasAssessments
         $linkText->save();
     }
 
-    public static function getAssessmentName($typeId)
+    public function getAssessmentName($typeId)
     {
-        return Assessments::find()->select('name')->where(['id' => $typeId])->one();
+        return self::find()->select('name')->where(['id' => $typeId])->one();
     }
 
     public static function getCourseIdName($typeId)
