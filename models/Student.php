@@ -494,7 +494,7 @@ class Student extends BaseImasStudents
             ->join('INNER JOIN',
             'imas_teachers AS t',
             's.courseid=t.courseid');
-        $query->where('s.lastaccess >:start');
+        $query->where('s.lastaccess >:start', [':start' => $start]);
         if($end != $now)
         {
             $query->andWhere('s.lastaccess <', $end);
@@ -510,7 +510,7 @@ class Student extends BaseImasStudents
         'g.id=u.groupid');
         $query->groupBy('u.id,c.id');
         $query->orderBy('g.name,u.LastName,u.FirstName,c.name');
-        return $query->createCommand()->bindValue('start', $start)->queryAll();
+        return $query->createCommand()->queryAll();
     }
 
     public static function deleteByCourseId($courseId)
