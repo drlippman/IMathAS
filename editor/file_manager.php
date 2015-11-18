@@ -13,6 +13,7 @@ include("file_manager/lang/lang_eng.php");
 
 //which images to use
 $delete_image 			= "file_manager/x.png";
+$update_image			= "../img/updating.gif";
 $file_small_image 		= "file_manager/file_small.png";
 
 //custom configuration from here on ..
@@ -51,7 +52,12 @@ if (isset($_REQUEST["action"]))
 	}
 	else if ($_REQUEST["action"] == "delete_file")
 	{
-		deleteuserfile($userid,$_REQUEST["item_name"]);
+		if (deleteuserfile($userid,$_REQUEST["item_name"])) {
+			echo 'OK';
+		} else {
+			echo 'FAIL';
+		}
+		exit;
 	}
 }
 
@@ -62,13 +68,21 @@ if (isset($_REQUEST["action"]))
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><?php echo $strings["title"]; ?></title>
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+  if (!window.jQuery) {  document.write('<script src="../javascript/jquery.min.js"><\/script>');}
+</script>
 <script language="javascript" type="text/javascript" src="<?php echo $imasroot?>/editor/tiny_mce_popup.js"></script>
 <link href="file_manager/styles.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
 var FileBrowserDialogue = {
     init : function () {
         // Here goes your code for setting your custom things onLoad.
+<?php
+if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
+	echo '         FileBrowserDialogue.mySubmit("'. getuserfileurl("ufiles/$userid/".$filename) .'");';
+}
+?>
     },
     mySubmit : function (filename) {
         var win = tinyMCEPopup.getWindowArg("window");
@@ -132,26 +146,37 @@ if ($type=="img") {
 </script>
 </head>
 <body>
-<div class="td_close">
-<a class="close" href="javascript: tinyMCEPopup.close();"><?php echo $strings["close"]; ?></a>
-</div>
-<div class="td_main">
 <?php
 $files = getuserfiles($userid,$type=="img");
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
+	echo '<div class="td_main">';
+	echo 'Inserting...';
+	echo '</div></body></html>';
+	exit;
+	/*
 	echo 'Just uploaded:<br/>';
 	echo "<a href='#' onClick='delete_file(\"" . basename("ufiles/$userid/".$filename) . "\")'>";
 	echo "<img border=0 src='" . $delete_image . "'></a> ";
 	echo "<img src='" . $file_small_image . "'> ";
 	echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl("ufiles/$userid/".$filename) . "\");'>" . basename("ufiles/$userid/".$filename) . "</a><br>\n";
 	echo '<hr/>';
+	*/
 }
-foreach ($files as $k=>$v) {
-	echo "<a href='#' onClick='delete_file(\"" . basename($v['name']) . "\")'>";
-	echo "<img border=0 src='" . $delete_image . "'></a> ";
-	echo "<img src='" . $file_small_image . "'> ";
-	echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br>\n";
-
+if (isset($_REQUEST['showfiles'])) {
+	echo '<div class="td_main">';
+	foreach ($files as $k=>$v) {
+		echo "<div><a href='#' onClick='delete_file(\"" . basename($v['name']) . "\", this)'>";
+		echo "<img border=0 src='" . $delete_image . "'></a> ";
+		echo "<img src='" . $file_small_image . "'> ";
+		echo "<a class='file' href='#' onClick='FileBrowserDialogue.mySubmit(\"" . getuserfileurl($v['name']) . "\");'>" . basename($v['name']) . "</a><br></div>\n";
+	
+	}
+	if (count($files)==0) {
+		echo '<div>No files to show</div>';
+	}
+} else {
+	echo '<div class="upload">';
+	echo '<p><a href="file_manager.php?showfiles=true">Show previously uploaded files</a></p>';	
 }
 ?>
 </div>
@@ -177,12 +202,25 @@ upload files with private information.
 </div>
 <script>
 
-function delete_file(file_name)
+function delete_file(file_name, el)
 {
 	if (confirm("Are you sure you want to delete this file?  If you delete it, it will no longer be accessible or viewable from anywhere you've used it.")) {
-		document.getElementById("hidden_action").value = "delete_file";
-		document.getElementById("hidden_item_name").value = file_name;
-		document.getElementById("hidden_form").submit();
+		$(el).children("img").attr("src", "<?php echo $update_image;?>");
+		$.ajax({
+		  url: "file_manager.php",
+		  data: { action: "delete_file", item_name: file_name }
+		})
+		  .done(function( msg ) {
+		    if (msg=='OK') {
+		    	    $(el).parent().remove();
+		    } else {
+		    	    alert("Error deleting file");
+		    	    $(el).children("img").attr("src", "<?php echo $delete_image;?>");
+		    }
+		  });
+		//document.getElementById("hidden_action").value = "delete_file";
+		//document.getElementById("hidden_item_name").value = file_name;
+		//document.getElementById("hidden_form").submit();
 	}
 }
 </script>

@@ -1972,6 +1972,28 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
 				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" ';
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
+				
+				$la = preg_replace_callback('/<a[^>]*href="(.*)?"[^>]*>(.*?)<\/a>/', function ($m) {
+					global $gradededessayexpandocnt;
+					if (!isset($gradededessayexpandocnt)) {
+						$gradededessayexpandocnt = 0;
+					}
+					if (strpos($m[0],'target=')===false) {
+						$ret = '<a target="_blank" '.substr($m[0], 2);
+					} else {
+						$ret = $m[0];
+					}
+					$url = $m[1];
+					$extension = substr($url,strrpos($url,'.')+1,3);
+					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
+						$ret .= " <span class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayimg$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
+						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" src=\"$url\" />";
+					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
+						$ret .= " <span class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
+						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+					}
+					return $ret;
+				   }, $la);
 			}
 				
 			$out .= filter($la);
