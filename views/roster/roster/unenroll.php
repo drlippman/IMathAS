@@ -29,7 +29,7 @@ if($gradebook != AppConstant::NUMERIC_ONE) {
     echo $this->render("_toolbarRoster", ['course' => $course]);
 }
 ?>
-<div class="padding15">
+<div class="col-md-12 col-sm-12 padding-left-two-em padding-top-bottom-one-pt-five-em">
     <?php
     if($gradebook == AppConstant::NUMERIC_ONE) {
         echo "<form method=post action=\"unenroll?cid={$course->id}&uid={$studentId}&confirmed=true&gradebook=1\">";
@@ -88,8 +88,12 @@ if($gradebook != AppConstant::NUMERIC_ONE) {
     <p>
         <?php $studentData = implode(',', $arr); ?>
         <input type="hidden" name="studentData" value="<?php echo $studentData ?>"/>
-        <input type=submit class="secondarybtn" value="<?php AppUtility::t('Unenroll')?>">
-        <input type=submit name="lockinstead" value="<?php AppUtility::t('Lock Students Out Instead')?>">
+        <span class="padding-right-one-em">
+            <input type=submit class="secondarybtn" value="<?php AppUtility::t('Unenroll')?>">
+        </span>
+        <span class="padding-right-one-em">
+            <input type=submit name="lockinstead" value="<?php AppUtility::t('Lock Students Out Instead')?>">
+        </span>
         <?php
         if($gradebook == AppConstant::NUMERIC_ONE) {
             echo "<input type=button value='".AppUtility::t('Nevermind', false)."' class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."gradebook/gradebook/gradebook?cid=$course->id'\">";

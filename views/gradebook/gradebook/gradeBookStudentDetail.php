@@ -84,12 +84,12 @@ if($totalData['isTutor']){
     }?>
 </div>
 
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox col-md-12 col-sm-12">
 
 <?php if ($canviewall) {  ?>
     <br>
-    <div class="col-md-12 display-inline-block">
-        <div class="display-inline-block width-twenty-five-per">
+    <div class="col-md-12 col-sm-12 display-inline-block padding-right-zero">
+        <div class="display-inline-block col-md-3 col-sm-4 padding-right-zero padding-left-zero">
                <div class="display-inline-block"><?php AppUtility::t('Category')?></div>&nbsp;
                <div class="display-inline-block width-fifty-percentage">
                     <select id="filtersel" class="form-control display-inline-block" onchange="chgfilter()">
@@ -113,9 +113,9 @@ if($totalData['isTutor']){
                   </select>
                </div>
         </div>
-        <div class="display-inline-block width-twenty-five-per">
+        <div class="display-inline-block col-md-3 col-sm-4 padding-right-zero padding-left-zero">
             <div class="display-inline-block"> <?php AppUtility::t('Not Counted');?></div>&nbsp;
-             <div class='display-inline-block width-fifty-percentage'>
+             <div class='display-inline-block width-fifty-five-per'>
                  <select id="toggle2" class='form-control' onchange=chgtoggle()>
                      <option value=0 <?php AssessmentUtility::writeHtmlSelected($hidenc,0);?> > <?php AppUtility::t('Show all')?> </option>
                      <option value=1 <?php AssessmentUtility::writeHtmlSelected($hidenc,1); ?> > <?php AppUtility::t('Show stu view')?> </option>
@@ -124,7 +124,7 @@ if($totalData['isTutor']){
              </div>
         </div>
 
-        <div class="display-inline-block width-twenty-five-per">
+        <div class="display-inline-block col-md-3 col-sm-4 padding-right-zero">
             <div class="display-inline-block"> <?php AppUtility::t('Show');?></div>&nbsp;
             <div class='display-inline-block width-fifty-percentage'>
                 <select class='form-control' id="toggle3" onchange="chgtoggle()">
@@ -136,9 +136,9 @@ if($totalData['isTutor']){
                 </select>
             </div>
         </div>
-        <div class="display-inline-block width-twenty-four-per">
+        <div class="display-inline-block col-md-3 col-sm-4 padding-right-zero mobile-gradebook-student-detail-dropdown">
             <div class="display-inline-block"> <?php AppUtility::t('Links') ?></div>&nbsp;
-            <div class=' display-inline-block width-eight-four-per'>
+            <div class=' display-inline-block width-eighty-per'>
                 <select class='form-control' id="toggle1" onchange="chgtoggle()">
                  <option value=0 <?php AssessmentUtility::writeHtmlSelected($links,0); ?> > <?php AppUtility::t('View/Edit')?> </option>
                  <option value=1 <?php AssessmentUtility::writeHtmlSelected($links,1); ?> > <?php AppUtility::t ('Scores')?> </option>
@@ -150,9 +150,10 @@ if($totalData['isTutor']){
     </div>
     <?php } ?>
   <br><br>
-    <div class="inner-content-gradebook">
-       <div class="button-container col-md-12 padding-zero">
-   <div class="col-md-9 margin-left-minus-fifteen">
+    <div class="inner-content-gradebook col-md-12 col-sm-12 padding-right-ten">
+       <div class="button-container col-md-12 col-sm-12 padding-zero">
+   <div class="col-md-12 col-sm-12 padding-left-zero padding-right-zero">
+           <div class="col-md-9 col-sm-9 margin-left-minus-fifteen">
         <?php
 if ($availshow==4) {
 $availshow=1;
@@ -170,25 +171,25 @@ if ($studentId>0) {
         $usersort = $stugbmode['usersort'];
     } else {
     $usersort = 1;
-    }
-   echo '<div>';
-    if ($gradebook[1][4][2]==1)
-    {
-    if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true)
-    {
-    echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gradebook[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida margin-bottom-ten\"/> ";
-    } else { ?>
- <img src=" <?php echo AppUtility::getAssetURL().AppConstant::UPLOAD_DIRECTORY.$gradebook[1][4][0].'.jpg' ?>" style="float: left;width: 40px;height: 35px; padding-right:5px;" onclick="togglepic(this)" class="mida margin-bottom-ten">
-   <?php }
     } ?>
-     </div>
+<div>
+        <?php    if ($gradebook[1][4][2]==1)
+            {
+            if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true)
+            {
+            echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gradebook[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida margin-bottom-ten\"/> ";
+            } else { ?>
+         <img src=" <?php echo AppUtility::getAssetURL().AppConstant::UPLOAD_DIRECTORY.$gradebook[1][4][0].'.jpg' ?>" style="float: left;width: 40px;height: 35px; padding-right:5px;" onclick="togglepic(this)" class="mida margin-bottom-ten">
+           <?php }
+            } ?>
+</div>
                    <div class="">
                        <?php
                        if ($gradebook[1][4][2]==1)
                        { ?>
-                       <span class="col-md-4">
+                       <span class="col-md-4 col-sm-4">
                            <?php }else{ ?>
-                           <span class="col-md-4 margin-left-minus-fifteen">
+                           <span class="col-md-4 col-sm-4 margin-left-minus-fifteen">
                                <?php }
     echo '<select id="userselect" class="form-control"   onchange="chgstu(this)">';
         $lastsec = '';
@@ -239,7 +240,7 @@ if ($studentId>0) {
     </div>
     </div>
 <?php if ($isteacher) { ?>
-    <span class="inner-page-options col-md-3 padding-zero pull-right">
+    <span class="inner-page-options col-md-3 col-sm-3 padding-zero pull-right">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
 
             <li class="dropdown">
@@ -295,6 +296,7 @@ if ($studentId>0) {
             </li>
         </ul>
     </span>
+    </div>
 <?php } else if ($istutor) { ?>
     <?php
 echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
@@ -306,12 +308,11 @@ echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
     <br/>
     </div>  </div> <?php
 }
-echo '<br><br><br>';
 if (trim($gbcomment)!='' || $isteacher) {
 if ($isteacher) { ?>
  <form method=post action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
-    Gradebook Comment: <input type=submit value="Update Comment"><br/><br/>
-  <textarea class="text-area-padding" name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
+    Gradebook Comment <input type=submit value="Update Comment"><br/><br/>
+  <textarea class="text-area-padding max-width-hundred-per" name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
      </form>
     <?php
 } else { ?>
@@ -337,7 +338,7 @@ echo $lpmsg;
         <input type="hidden" name="stusection" value="<?php echo $stusection?>">
      <?php echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
-    echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
+    echo _('With selected'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
     } ?>
      <br><br>
           <table id="myTable" class="table table-bordered table-striped table-hover data-table" style="position:relative;">
@@ -717,8 +718,6 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
     }
 
     echo "</form>";
-
-echo "<script class='javascript'>initSortTable('myTable',Array($sarr),false);</script>\n";
 
 echo "<p class='text-area-padding'>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
                             echo '</div>';?>

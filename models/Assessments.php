@@ -491,4 +491,9 @@ class Assessments extends BaseImasAssessments
             return $assessment;
         }
     }
+
+    public static function getDataWithUserId($userId)
+    {
+        return self::find()->select('name,itemorder')->where(['id' => $userId])->all();
+    }
 }

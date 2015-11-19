@@ -77,12 +77,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo "<div class='alert alert-danger alert-margin-bottom'>".AppUtility::t('No exceptions currently exist for the selected students.', false)."</div>";
                     } ?>
                     <br>
-                    <div class="col-md-12 padding-left-five">
-                        <h4 class="col-md-12 padding-left-zero"><?php AppUtility::t('Make New Exception')?></h4>
-                        <div class="col-md-12 padding-left-zero">
-                            <div class="col-md-5 padding-left-zero" id="datePicker-id1">
-                                <span class="select-text-margin col-md-4"><?php AppUtility::t('Available After')?></span>
-                                <span class="col-md-8">
+                    <div class="col-md-12 col-sm-12 padding-left-five">
+                        <h4 class="col-md-12 col-sm-12 padding-left-zero"><?php AppUtility::t('Make New Exception')?></h4>
+                        <div class="col-md-12 col-sm-12 padding-left-zero">
+                            <div class="col-md-5 col-sm-6 padding-left-zero" id="datePicker-id1">
+                                <span class="select-text-margin col-md-4 col-sm-4 padding-right-zero"><?php AppUtility::t('Available After')?></span>
+                                <span class="col-md-8 col-sm-8">
                                     <?php
                                     echo DatePicker::widget([
                                         'name' => 'startDate',
@@ -96,9 +96,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ?>
                                 </span>
                             </div>
-                            <div class="col-md-5 padding-left-zero" id="timepicker-id">
-                                <span class="select-text-margin col-md-1 padding-left-five"><?php AppUtility::t('at')?></span>
-                                <span class="col-md-11">
+                            <div class="col-md-5 col-sm-6 padding-left-zero" id="timepicker-id">
+                                <span class="select-text-margin col-md-1 col-sm-1 padding-left-five"><?php AppUtility::t('at')?></span>
+                                <span class="col-md-11 col-sm-11">
                                 <?php
                                 echo TimePicker::widget([
                                     'name' => 'startTime',
@@ -114,10 +114,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                  </span>
                             </div>
                         </div>
-                        <div class="col-md-12 margin-top-twenty padding-left-zero">
-                            <div class="col-sm-5 padding-left-zero" id="datePicker-id2">
-                                <span class="select-text-margin col-md-4"><?php AppUtility::t('Available Until')?></span>
-                                <span class="col-md-8">
+                        <div class="col-md-12 col-sm-12 margin-top-twenty padding-left-zero">
+                            <div class="col-md-5 col-sm-6 padding-left-zero" id="datePicker-id2">
+                                <span class="select-text-margin col-md-4 col-sm-4 padding-right-zero"><?php AppUtility::t('Available Until')?></span>
+                                <span class="col-md-8 col-sm-8">
                                 <?php
                                 echo DatePicker::widget([
                                     'name' => 'endDate',
@@ -131,9 +131,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ?>
                                 </span>
                             </div>
-                            <div class="col-sm-5 padding-left-zero" id="timepicker-id1">
-                                <span class="col-md-1 select-text-margin padding-left-five"><?php AppUtility::t('at')?></span>
-                                <span class="col-md-11">
+                            <div class="col-md-5 col-sm-6 padding-left-zero" id="timepicker-id1">
+                                <span class="col-md-1 col-sm-1 select-text-margin padding-left-five"><?php AppUtility::t('at')?></span>
+                                <span class="col-md-11 col-sm-11">
                                 <?php
                                 echo TimePicker::widget([
                                     'name' => 'endTime',
@@ -149,9 +149,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </span>
                             </div>
                         </div>
-                        <div class="col-md-12 padding-left-zero">
-                            <div class="col-md-12 margin-top-fifteen padding-left-zero"><?php AppUtility::t('Set Exception for assessments')?></div>
-                            <div class="col-md-12 padding-left-zero margin-left-minus-six">
+                        <div class="col-md-12 col-sm-12 padding-left-zero">
+                            <div class="col-md-12 col-sm-12 margin-top-fifteen padding-left-zero"><?php AppUtility::t('Set Exception for assessments')?></div>
+                            <div class="col-md-12 col-sm-12 padding-left-zero margin-left-minus-six">
                                 <ul class='assessment-list'>
                                 <?php foreach ($assessments as $assessment) { ?>
 
@@ -169,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </ul>
                             </div>
                         </div>
-                      <div class="col-md-12 padding-left-zero margin-top-five">
+                      <div class="col-md-12 col-sm-12 padding-left-zero margin-top-five">
                             <input type="submit" class="btn btn-primary record-submit create-exception" id="change-record"
                                    value="<?php AppUtility::t('Record Changes')?>">
                             <?php if ($gradebook == AppConstant::NUMERIC_ONE) { ?>
@@ -181,27 +181,26 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php } ?>
                         </div>
 
-                        <div class="col-md-12 padding-left-zero margin-top-five">
-                            <div class='checkbox override-hidden col-md-12 margin-top-ten padding-left-zero'>
-                                <label class="padding-left-zero">
+                        <div class="col-md-12 col-sm-12 padding-left-zero margin-top-five">
+                            <div class='checkbox override-hidden col-md-12 col-sm-12 margin-top-ten padding-left-zero'>
+                                <label class="padding-left-zero floatleft padding-top-three">
                                     <input type="checkbox" name="forceReGen">
                                     <span class='cr'><i class='cr-icon fa fa-check'></i></span>
                                 </label>
-
-                                <span class='margin-left-five'><?php AppUtility::t('Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.')?></span>
+                                <span class='col-md-10 col-sm-10 padding-left-five'><?php AppUtility::t('Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.')?></span>
                             </div>
-                            <div class='checkbox override-hidden col-md-12 margin-top-five padding-left-zero'>
-                                <label class="padding-left-zero">
+                            <div class='checkbox override-hidden col-md-12 col-sm-12 margin-top-five padding-left-zero padding-top-pt-five-em'>
+                                <label class="col-md-12 col-sm-12 padding-left-zero">
                                     <input type="checkbox" name="forceClear">
                                     <span class='cr'><i class='cr-icon fa fa-check'></i></span>
-                                    <span class='margin-left-five'>
+                                    <span class='col-md-10 col-sm-10 padding-left-five'>
                                         <?php AppUtility::t('Clear student\'s attempts? Students will')?>
                                         <b><?php AppUtility::t('not')?></b>
                                         <?php AppUtility::t('keep any scores earned, and must rework all problems.')?>
                                     </span>
                                 </label>
                             </div>
-                            <div class='checkbox override-hidden col-md-12 margin-top-five padding-left-zero'>
+                            <div class='checkbox override-hidden col-md-12 col-sm-12 margin-top-five padding-left-zero padding-top-pt-five-em'>
                                 <label class="padding-left-zero">
                                     <input type="checkbox" name="eatLatePass">
                                     <span class='cr margin-top-eight'><i class='cr-icon fa fa-check'></i></span>
@@ -213,7 +212,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </span>
                                 </label>
                             </div>
-                            <div class='checkbox override-hidden col-md-12 margin-top-five padding-left-zero'>
+                            <div class='checkbox override-hidden col-md-12 col-sm-12 margin-top-five padding-left-zero padding-top-pt-five-em'>
                                 <label class="padding-left-zero">
                                     <input type="checkbox" name="waiveReqScore">
                                     <span class='cr'><i class='cr-icon fa fa-check'></i></span>
@@ -222,7 +221,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </span>
                                 </label>
                             </div>
-                            <div class='checkbox override-hidden col-md-12 margin-top-five padding-left-zero'>
+                            <div class='checkbox override-hidden col-md-12 col-sm-12 margin-top-five padding-left-zero padding-top-pt-five-em'>
                                 <label class="padding-left-zero">
                                     <input type="checkbox" name="sendMsg">
                                     <span class='cr'><i class='cr-icon fa fa-check'></i></span>
@@ -232,10 +231,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
                     <?php if (sizeof((unserialize($studentDetails))) != 1) { ?>
-                        <div class="col-md-12">
+                        <div class="col-md-12 col-sm-12">
                             <span><p><h4><?php AppUtility::t('Students Selected')?></h4></span>
                             <ul>
-                            <span class="col-md-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
+                            <span class="col-md-12 col-sm-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
                                     <?php echo "<li>" . ucfirst($studentDetail['LastName']) . "," . ucfirst($studentDetail['FirstName']) . " (" . ($studentDetail['SID']) . ")</li>" ?>
                                 <?php } ?>
                             </span>

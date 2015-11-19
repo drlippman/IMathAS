@@ -542,4 +542,18 @@ class ForumPosts extends BaseImasForumPosts
             ->where(['IN','threadid',$limthreads])->groupBy('threadid');
         return $query->createCommand()->queryAll();
     }
+
+    public static function getDataByJoin($subject, $forumId, $groupsetid, $isteacher, $groupid)
+    {
+        $query = new Query();
+        $query->select('ift.id')
+            ->from('imas_forum_posts AS ifp')
+            ->join('INNER JOIN', 'imas_forum_threads AS ift', 'ifp.threadid=ift.id AND ifp.parent=0')
+            ->where(['ifp.subject' => $subject])->andWhere(['ift.forumid' => $forumId]);
+
+        if ($groupsetid >0 && !$isteacher) {
+            $query->andWhere(['ift.stugroupid' => $groupid]);
+        }
+        return $query->createCommand()->queryAll();
+    }
 }

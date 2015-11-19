@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php echo $form->field($model, 'locked')->checkbox(); ?>
             <?php echo $form->field($model, 'hidefromcourselist')->checkbox(); ?>
         </div>
-        <div class="col-sm-offset-2 padding-left-twenty password_checkbox" style="">
+        <div class="col-sm-offset-2 div-change-student-info change-student-information-checkbox">
             <?php echo $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
         </div>
         <div class="change-password-content">

@@ -23,6 +23,11 @@
         padding-left: 0px;
         padding-top: 0.5em;
     }
+    .mobile-gradebook-student-detail-dropdown {
+        padding-left: 0px;
+        padding-top: 1.5em;
+        padding-bottom: 1.5em;
+    }
 }
 
 /* Smartphones (portrait) */
@@ -55,6 +60,11 @@
     .mobile-add-wiki-time-picker {
         padding-left: 0px;
         padding-top: 0.5em;
+    }
+    .mobile-gradebook-student-detail-dropdown {
+        padding-left: 0px;
+        padding-top: 1.5em;
+        padding-bottom: 1.5em;
     }
 }
 /*iPhone 6 Portrait*/
@@ -100,6 +110,11 @@
     .mobile-add-wiki-time-picker {
         padding-left: 0px;
         padding-top: 0.5em;
+    }
+    .mobile-gradebook-student-detail-dropdown {
+        padding-left: 0px;
+        padding-top: 1.5em;
+        padding-bottom: 1.5em;
     }
 }
 

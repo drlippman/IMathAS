@@ -844,7 +844,7 @@ div.multiselitem {
     margin-left: 43px;
 }
 .padding-right-ten {
-    margin-right: 10px;
+    padding-right: 10px !important;
 }
 .margin-bottom-ten {
     margin-bottom: 10px;
@@ -1507,4 +1507,10 @@ margin-left: 1em;
 }
 .padding-top-one-pt-two {
  padding-top: 1.2em !important;
+}
+.padding-right-one-em {
+    padding-right: 1em;
+}
+.padding-top-three {
+    padding-top: 3px;
 }

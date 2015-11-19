@@ -699,6 +699,12 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
         return $query->createCommand()->bindValues([':cid' => $cid,':aid' => $aid])->queryAll();
     }
+
+    public static function getDataWithUserIdAssessment($userId,$assessmentId)
+    {
+        return self::find()->select(['seeds,attempts,questions'])->where(['userid' => $userId])->andWhere(['assessmentid' => $assessmentId])->one();
+
+    }
 }
 
 
