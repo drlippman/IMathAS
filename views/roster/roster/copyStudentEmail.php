@@ -24,13 +24,13 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);?>
 </div>
-<div class="tab-content shadowBox"">
+<div class="tab-content shadowBox col-md-12 col-sm-12 padding-left-zero padding-right-zero">
 <?php
 if($gradebook != AppConstant::NUMERIC_ONE) {
  echo $this->render("_toolbarRoster", ['course' => $course]);
 }
 ?>
-<div class="copy-div">
-    <textarea class="form-control copy-text" cols="40" rows="20"><?php echo trim($studentData) ?></textarea>
+<div class="copy-div col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
+    <textarea class="form-control max-width-hundred-per" cols="40" rows="20"><?php echo trim($studentData) ?></textarea>
 </div>
 </div>

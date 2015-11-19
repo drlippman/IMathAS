@@ -289,3 +289,9 @@ transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 .show-after-time-picker .bootstrap-timepicker {
     width:100%;
 }
+.max-width-six-hundread-ten {
+    max-width: 610px;
+}
+.max-width-three-hundread {
+    max-width: 300px;
+}

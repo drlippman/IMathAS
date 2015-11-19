@@ -28,6 +28,9 @@
         padding-top: 1.5em;
         padding-bottom: 1.5em;
     }
+    .mobile-text-area-max-width {
+        max-width: 444px !important;
+    }
 }
 
 /* Smartphones (portrait) */
@@ -65,6 +68,9 @@
         padding-left: 0px;
         padding-top: 1.5em;
         padding-bottom: 1.5em;
+    }
+    .mobile-text-area-max-width {
+        max-width: 444px !important;
     }
 }
 /*iPhone 6 Portrait*/
@@ -115,6 +121,9 @@
         padding-left: 0px;
         padding-top: 1.5em;
         padding-bottom: 1.5em;
+    }
+    .mobile-text-area-max-width {
+        max-width: 444px !important;
     }
 }
 
