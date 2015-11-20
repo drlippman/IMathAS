@@ -1,5 +1,26 @@
 $(document).ready(function () {
     $('.course-table').DataTable();
+
+    $('.course-section').DataTable(
+        {
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [2,3] } ],
+            "bPaginate": false
+        }
+    );
+    $('.diagnostics-section').DataTable(
+        {
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [1,2,3] } ],
+            "bPaginate": false
+        }
+    );
+
+    $('.user-section').DataTable(
+        {
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [3,4,5] } ],
+            "bPaginate": false
+        }
+    );
+
 });
 
 

@@ -19,14 +19,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
     <br>
-    <div class="align-copy-course">
+    <div class="align-copy-course col-md-10 col-sm-10 word-wrap-break-word">
         <?php if($questionSetData)
         {
             foreach($questionSetData as $row)
             {
                 echo implode('@',$row).'<br/>';
             }
-        }else{
+        } else{
             echo AppUtility::t('No External Reference Available');
         }?>
     </div>

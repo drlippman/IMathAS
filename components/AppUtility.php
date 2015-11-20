@@ -2820,14 +2820,14 @@ class AppUtility extends Component
 
     public static function printPostsGadget($page_newpostlist = null, $page_coursenames = null, $postthreads = null) {
 
-        echo '<div class="block">';
+        echo '<div class="block margin-right-fifteen">';
         echo "<span class=\"floatright\"><a href=\"form?action=forumwidgetsettings\">"; ?>
-        <img style="vertical-align:top" src=<?php echo AppUtility::getAssetURL()?>img/gears.png>
+        <img class="small-icon" style="vertical-align:top" src=<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png>
 
        <?php echo "</a></span><h3>", _('New forum posts'), '</h3></div>';
-        echo '<div class="blockitems">';
+        echo '<div class="blockitems margin-right-fifteen">';
         if (count($page_newpostlist)==0) {
-            echo '<p>', _('No new posts'), '</p>';
+            echo '<p class="padding-left-fifteen">', _('No new posts'), '</p>';
             echo '</div>';
             return;
         }
@@ -2840,10 +2840,10 @@ class AppUtility extends Component
 
         echo '<table class="gb" id="newpostlist"><thead>
         <tr>
-            <th style="text-align: left">', _('Thread'), '</th>
-            <th style="text-align: left">', _('Started By'), '</th>
-            <th style="text-align: left">', _('Course'), '</th>
-            <th style="text-align: left">', _('Last Post'), '</th>
+            <th class="text-align-center">', _('Thread'), '</th>
+            <th class="text-align-center">', _('Started By'), '</th>
+            <th class="text-align-center">', _('Course'), '</th>
+            <th class="text-align-center">', _('Last Post'), '</th>
         </tr></thead>';
         echo '<tbody>';
         foreach ($page_newpostlist as $line) {
@@ -2862,17 +2862,17 @@ class AppUtility extends Component
             } else if ($n>1) {
                 $subject = "Re<sup>$n</sup>: ".$subject;
             }
-      echo "<td> "; ?>
+      echo "<td class='word-break-break-all'> "; ?>
             <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='.$line['courseid'].'&forumid='.$line['id'].'&threadid='.$line['threadid'])?>">
            <?php echo $subject;
             echo '</a></td>';
             if ($threaddata[$line['threadid']]['isanon']==1) {
-                echo '<td>', _('Anonymous'), '</td>';
+                echo '<td class="word-break-break-all">', _('Anonymous'), '</td>';
             } else {
-                echo '<td>'.$threaddata[$line['threadid']]['LastName'].', '.$threaddata[$line['threadid']]['FirstName'].'</td>';
+                echo '<td class="word-break-break-all">'.$threaddata[$line['threadid']]['LastName'].', '.$threaddata[$line['threadid']]['FirstName'].'</td>';
             }
-            echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
-            echo '<td>'.AppUtility::tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';
+            echo '<td class="word-break-break-all">'.$page_coursenames[$line['courseid']].'</td>';
+            echo '<td class="word-break-break-all">'.AppUtility::tzdate("D n/j/y, g:i a",$line['lastposttime']).'</td>';
             echo '</tr>';
         }
         echo '</tbody></table>';
@@ -2882,10 +2882,10 @@ class AppUtility extends Component
     }
 
     public static function printMessagesGadget($page_newmessagelist = null, $page_coursenames = null) {
-        echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
-        echo '<div class="blockitems">';
+        echo '<div class="block margin-right-fifteen"><h3>', _('New messages'), '</h3></div>';
+        echo '<div class="blockitems margin-right-fifteen">';
         if (count($page_newmessagelist)==0) {
-            echo '<p>', _('No new messages'), '</p>';
+            echo '<p class="padding-left-fifteen">', _('No new messages'), '</p>';
             echo '</div>';
             return;
         }
@@ -3062,8 +3062,8 @@ class AppUtility extends Component
             return;
         }
         global $myRights,$newMsgCnt,$newPostCnt;
-        echo '<div class="block"><h3>'.$title.'</h3></div>';
-        echo '<div class="blockitems"><ul class="nomark courselist">';
+        echo '<div class="block margin-left-fifteen"><h3>'.$title.'</h3></div>';
+        echo '<div class="blockitems margin-left-fifteen"><ul class="nomark courselist">';
         for ($i=0; $i<count($data); $i++) {
             $courseStudent = Course::getByCourseAndUser($data[$i]['id']);
             $lockId = $courseStudent['lockaid'];
@@ -3071,7 +3071,7 @@ class AppUtility extends Component
             if ($type=='take') {
                 echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
             } ?>
-            <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
+            <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
             <?php echo $data[$i]['name'].'</a>';
             if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {
                 echo ' <span style="color:green;">', _('Hidden'), '</span>';
@@ -3109,5 +3109,9 @@ class AppUtility extends Component
     public static function prepd($v) {
     $v = str_replace('\\"','"',$v);
     return htmlentities($v, ENT_COMPAT | ENT_HTML401,"UTF-8", false );
+    }
+
+    public static function truncate($str, $width) {
+        return strtok(wordwrap($str, $width, "...\n",true), "\n");
     }
 }

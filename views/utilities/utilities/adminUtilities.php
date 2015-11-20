@@ -86,7 +86,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 foreach($queryForCourse as $key=>$data)
                                 {
-
                                     if($key == $user['id'])
                                     {
                                         foreach($data as $d)

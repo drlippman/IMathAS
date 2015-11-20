@@ -1039,6 +1039,7 @@ class SiteController extends AppController
         $groupId = AppConstant::NUMERIC_ZERO;
         switch($action) {
             case "chguserinfo":
+                $pageTitle = 'Modify User Profile';
                 $line = User::getById($userId);
                 if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
                     $r = Groups::getName($groupId);
@@ -1050,6 +1051,7 @@ class SiteController extends AppController
                 }
                 break;
             case "forumwidgetsettings":
+                $pageTitle = 'Forum Widget Settings';
                 $result = User::getUserHideOnPostInfo($user->id);
                 $hideList = explode(',',($result['hideonpostswidget']));
 
@@ -1058,7 +1060,8 @@ class SiteController extends AppController
                 $coursesTaking = Student::getStudentByUserId($userId);
                 break;
         }
-        $responseData = array('action' => $action, 'line' => $line, 'myRights' => $myRights, 'groupId' => $groupId, 'groupResult' => $r, 'lName' => $lName, 'tzname' => $tzname, 'userId' => $userId, 'hideList' => $hideList, 'coursesTaking' => $coursesTaking, 'coursesTeaching' => $coursesTeaching, 'coursesTutoring' => $coursesTutoring);
+        $this->includeJS(['jquery.min.js','question/addquestions.js', 'tablesorter.js', 'general.js']);
+        $responseData = array('action' => $action, 'line' => $line, 'myRights' => $myRights, 'groupId' => $groupId, 'groupResult' => $r, 'lName' => $lName, 'tzname' => $tzname, 'userId' => $userId, 'hideList' => $hideList, 'coursesTaking' => $coursesTaking, 'coursesTeaching' => $coursesTeaching, 'coursesTutoring' => $coursesTutoring, 'pageTitle' => $pageTitle);
         return $this->renderWithData('form',$responseData);
     }
 

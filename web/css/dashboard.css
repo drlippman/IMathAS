@@ -102,7 +102,7 @@ table.gb thead th{
 
 }
 .user-select {
-width: 10.5% !important;
+width: auto !important;
 height: 34px !important;
 }
 .all-user-select {

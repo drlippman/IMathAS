@@ -2,7 +2,7 @@
 use app\components\AppConstant;
 use app\components\AppUtility;
 if ($gb == '') {
-$this->title = 'Modify User Profile';
+$this->title = $pageTitle;
 }
 $imasroot = AppConstant::UPLOAD_DIRECTORY;
 $pics = AppConstant::UPLOAD_DIRECTORY . $userId . '.jpg';
@@ -304,47 +304,150 @@ $urlmode = AppUtility::urlMode();
     <?php break;
 
     case "forumwidgetsettings":
-        echo '<div id="headerforms" class="pagetitle"><h2>Forum Widget Settings</h2></div>';
         echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
         echo "<form method=post action=\"action?action=forumwidgetsettings$gb\">\n";
         $allcourses = array();
 
         $result = $coursesTeaching;
         if (count($result) > 0) {
-            echo '<p><b>Courses you\'re teaching:</b> Check: <a href="#" onclick="$(\'.teaching\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.teaching\').prop(\'checked\',false);return false;">None</a>';
-            foreach($result as $key => $row){
-                $allcourses[] = $row['id'];
-                echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row['id'].'" ';
-                if (!in_array($row['id'],$hideList)) {echo 'checked="checked"';}
-                echo '/> '.$row['name'];
-            }
-            echo '</p>';
-        }
-        $result = $coursesTutoring;
-        if (count($result) > 0) {
-            echo '<p><b>Courses you\'re tutoring:</b> Check: <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.tutoring\').prop(\'checked\',false);return false;">None</a>';
+            echo '<p><b>Courses you\'re teaching:</b>'; ?>
+
+            <table cellpadding="5" id="myTable" class="potential-question-table" style="clear:both; position:relative;width: 100%">
+            <thead>
+            <tr><th class="questionId">
+                    <div class="checkbox override-hidden">
+                        <label style="padding-left:0px">
+                            <input type="checkbox" name="header-checked"  value="">
+                                    <span class="cr">
+                                        <i class="cr-icon fa fa-check"></i>
+                                    </span>
+                        </label>
+                    </div>
+                </th>
+                <th class="text-align-center"><?php AppUtility::t('Courses') ?></th>
+            </tr>
+            </thead>
+                        <tbody id="potential-question-information-table">
+
+                        <?php
             foreach($result as $key => $row) {
-                $allcourses[] = $row['id'];
-                echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.$row['id'].'" ';
-                if (!in_array($row['id'],$hideList)) {echo 'checked="checked"';}
-                echo '/> '.$row['name'];
-            }
+                        $alt = AppConstant::NUMERIC_ZERO;
+                        for ($i = AppConstant::NUMERIC_ZERO; $i < count($row); $i++) {
+                            if ($alt == AppConstant::NUMERIC_ZERO) {
+                                echo "			<tr class=even>";
+                                $alt = AppConstant::NUMERIC_ONE;
+                            } else {
+                                echo "			<tr class=odd>";
+                                $alt = AppConstant::NUMERIC_ZERO;
+                            }
+                        }    ?>
+                <tr><td class="word-break-all-width" style="width: 40%">
+                    <input type=checkbox name='checked[]' value='<?php echo $row['id'] ?>'
+                           >
+                    <?php
+                                    echo $row['name']; ?>
+                </td>
+                </tr>
+<?php }
             echo '</p>';
-        }
-        $result = $coursesTaking;
+        } ?>
+                </tbody>
+                </table>
+
+<?php        $result = $coursesTutoring;
         if (count($result) > 0) {
-            echo '<p><b>Courses you\'re taking:</b> Check: <a href="#" onclick="$(\'.taking\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.taking\').prop(\'checked\',false);return false;">None</a>';
-            foreach($result as $key => $row){
-                $allcourses[] = $row['id'];
-                echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.$row['id'].'" ';
-                if (!in_array($row['id'],$hideList)) {echo 'checked="checked"';}
-                echo '/> '.$row['name'];
+            echo '<p><b>Courses you\'re tutoring:</b>'; ?>
+
+    <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
+                    <thead>
+                    <tr><th class="questionId">
+                            <div class="checkbox override-hidden">
+                                <label style="padding-left:0px">
+                                    <input type="checkbox" name="header-checked"  value="">
+                                    <span class="cr">
+                                        <i class="cr-icon fa fa-check"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </th>
+                        <th class="text-align-center"><?php AppUtility::t('Courses') ?></th>
+                        </tr>
+                        </thead>
+                        <tbody id="potential-question-information-table">
+                        <?php
+
+                        foreach($result as $key => $row) {
+                            $alt = AppConstant::NUMERIC_ZERO;
+                            for ($i = AppConstant::NUMERIC_ZERO; $i < count($row); $i++) {
+                                if ($alt == AppConstant::NUMERIC_ZERO) {
+                                    echo "			<tr class=even>";
+                                    $alt = AppConstant::NUMERIC_ONE;
+                                } else {
+                                    echo "			<tr class=odd>";
+                                    $alt = AppConstant::NUMERIC_ZERO;
+                                }
+                            }    ?>
+                            <tr><td class="word-break-all-width" style="width: 40%">
+                                    <input type=checkbox name='checked[]' value='<?php echo $row['id'] ?>'
+                                        >
+                                    <?php
+                                    echo $row['name']; ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
+<?php
+            echo '</p>';
+        } ?>
+        </tbody>
+        </table>
+     <?php   $result = $coursesTaking;
+        if (count($result) > 0) {
+            echo '<p><b>Courses you\'re taking:</b>'; ?>
+<table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
+    <thead>
+    <tr><th class="questionId">
+            <div class="checkbox override-hidden">
+                <label style="padding-left:0px">
+                    <input type="checkbox" name="header-checked"  value="">
+                                    <span class="cr">
+                                        <i class="cr-icon fa fa-check"></i>
+                                    </span>
+                </label>
+            </div>
+        </th>
+        <th class="text-align-center"><?php AppUtility::t('Courses') ?></th>
+    </tr>
+    </thead>
+    <tbody id="potential-question-information-table">
+
+    <?php
+    foreach($result as $key => $row) {
+        $alt = AppConstant::NUMERIC_ZERO;
+        for ($i = AppConstant::NUMERIC_ZERO; $i < count($row); $i++) {
+            if ($alt == AppConstant::NUMERIC_ZERO) {
+                echo "			<tr class=even>";
+                $alt = AppConstant::NUMERIC_ONE;
+            } else {
+                echo "			<tr class=odd>";
+                $alt = AppConstant::NUMERIC_ZERO;
             }
+        }    ?>
+        <tr><td class="word-break-all-width" style="width: 40%">
+                <input type=checkbox name='checked[]' value='<?php echo $row['id'] ?>'
+                    >
+                <?php
+                echo $row['name']; ?>
+            </td>
+        </tr>
+    <?php }
             echo '</p>';
         }
-        echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>';
-        echo '<input type="submit" value="Save Changes"/>';
-        echo '</form>';
+        echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>'; ?>
+        <br class="form"><div class="header-btn floatleft">
+            <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Changes' ?></button>
+        </div><br class="form"><br/>
+       <?php echo '</form>';
         break;
 } ?>
 </div>

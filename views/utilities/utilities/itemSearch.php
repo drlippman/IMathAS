@@ -25,7 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
         if($body == AppConstant::NUMERIC_ONE)
         {
             echo $message;
-
         }
         else
         {

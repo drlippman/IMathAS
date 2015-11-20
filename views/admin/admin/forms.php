@@ -27,24 +27,24 @@ if (isset($params['cid'])) {
 switch ($action) {
     case "addnewcourse":
         echo '<br>';
-        echo '<div class="col-md-10"><h2>' . AppUtility::t('Your course has been created!', false) . '</h2></div>';
-        echo '<div class="col-md-10">' . AppUtility::t('For students to enroll in this course, you will need to provide them two things', false) . '</div><ol>';
-        echo '<div class=col-md-10><li>' . AppUtility::t('The course ID:', false) . '<b>' . $cid . '</b></li></div>';
+        echo '<div class="col-md-10 col-sm-10"><h2>' . AppUtility::t('Your course has been created!', false) . '</h2></div>';
+        echo '<div class="col-md-10 col-sm-10">' . AppUtility::t('For students to enroll in this course, you will need to provide them two things', false) . '</div><ol>';
+        echo '<div class="col-md-10 col-sm-10"><li>' . AppUtility::t('The course ID:', false) . '<b>' . $cid . '</b></li></div>';
         if (trim($params['ekey']) == '') {
-            echo '<div class="col-md-10"><li>' . AppUtility::t('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key,', false);
+            echo '<div class="col-md-10 col-sm-10"><li>' . AppUtility::t('Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key,', false);
             echo '<a href="forms?action=modify&id=' . $cid . '">' . AppUtility::t('modify your course settings', false) . '</a></li>';
         } else {
-            echo '<div class=col-md-10><li>' . AppUtility::t('The enrollment key:', false) . '<b>' . $params['ekey'] . '</b></li></div>';
+            echo '<div class="col-md-10 col-sm-10"><li>' . AppUtility::t('The enrollment key:', false) . '<b>' . $params['ekey'] . '</b></li></div>';
         }
         echo '</ol></p><BR class=form><br>';
-        echo '<div class="col-md-10">' . AppUtility::t('If you forget these later, you can find them by viewing your course settings.', false) . '</div><BR class=form><br>';
-        echo '<div class=col-md-10><a href=' . AppUtility::getURLFromHome('course', 'course/course?cid=' . $cid) . '>' . AppUtility::t('Enter the Course', false) . '</a></div>';
+        echo '<div class="col-md-10 col-sm-10">' . AppUtility::t('If you forget these later, you can find them by viewing your course settings.', false) . '</div><BR class=form><br>';
+        echo '<div class="col-md-10 col-sm-10"><a href=' . AppUtility::getURLFromHome('course', 'course/course?cid=' . $cid) . '>' . AppUtility::t('Enter the Course', false) . '</a></div>';
         break;
     case "delete":
-        echo '<div id="headerforms" class="pagetitle col-md-10"><h2>' . AppUtility::t('Delete Course', false) . '</h2></div>';
+        echo '<div id="headerforms" class="pagetitle col-md-10 col-sm-10"><h2>' . AppUtility::t('Delete Course', false) . '</h2></div>';
         echo '<div>';
-        echo "<div class='col-md-10'>" . AppUtility::t('Are you sure you want to delete the course', false) . "<b>$name</b>?</div><br>\n";
-        echo "<div class='col-md-10'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=delete&id={$params['id']}'\">\n";
+        echo "<div class='col-md-10 col-sm-10'>" . AppUtility::t('Are you sure you want to delete the course', false) . "<b>$name</b>?</div><br>\n";
+        echo "<div class='col-md-10 col-sm-10'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=delete&id={$params['id']}'\">\n";
         echo "</div>";
         break;
     case "deladmin":
@@ -80,9 +80,9 @@ switch ($action) {
 
             }
             ?>
-             <div class="col-md-2 col-sm-2"><img class="help-img margin-left-zero" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>Set User rights to:</div>
+             <div class="col-md-2 col-sm-2"><img class="help-img margin-left-zero" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>Set User rights to</div>
 
-            <?php  echo "<div class='col-md-4 padding-left-zero'><input type=radio name=\"newrights\" value=\"5\" ";
+            <?php  echo "<div class='col-md-4 col-sm-4 padding-left-zero'><input type=radio name=\"newrights\" value=\"5\" ";
             if ($oldRights == 5) {echo "CHECKED";}
             echo "> Guest User <BR>\n";
             echo "<input type=radio name=\"newrights\" value=\"10\" ";
@@ -107,8 +107,8 @@ switch ($action) {
             }
 
             if ($myRights == 100) {
-                echo "<div class='col-md-2 col-sm-2'>Assign to group: </div>";
-                echo "<div class='col-md-6 padding-left-zero'><select name=\"group\" class='form-control' id=\"group\">";
+                echo "<div class='col-md-2 col-sm-2'>Assign to group </div>";
+                echo "<div class='col-md-6 col-sm-6 padding-left-zero'><select name=\"group\" class='form-control' id=\"group\" style='width: auto'>";
                 echo "<option value=0>Default</option>\n";
 
                 foreach($resultGroup as $key => $row) {
@@ -116,12 +116,20 @@ switch ($action) {
                     if ($oldGroup==$row['id']) {
                         echo "selected=1";
                     }
-                    echo ">{$row['name']}</option>\n";
+                   $name = AppUtility::truncate($row['name'], 30);
+                    echo ">{$name}</option>\n";
                 }
                 echo "</select></div><br class=form /><br/>";
             }
-            echo "<br/><div class=submit><input type=submit value=Save></div></form><br/>";
-            break;
+//            echo "<br/><div class=submit><input type=submit value=Save></div></form><br/>";
+            ?>
+            <div class="header-btn floatleft padding-left-fifteen">
+                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save' ?></button>
+            </div><br class="form">
+
+            <?php
+            echo '</form><br/>';
+    break;
     case "modify":
     case "addcourse":
         if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
@@ -177,7 +185,7 @@ switch ($action) {
               </div>';
         if ($params['action'] == "modify") {
             echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
-                        <div class="col-md-3 padding-top-five">' . AppUtility::t('Lock for assessment', false) . '</div>
+                        <div class="col-md-3 col-sm-4 padding-top-five">' . AppUtility::t('Lock for assessment', false) . '</div>
                         <div class="col-md-4 col-sm-4">
                             <select class="form-control" name="lockaid">';
             echo '<option value="0" ';
@@ -463,7 +471,7 @@ switch ($action) {
                    <input name="userfile" type="file"/>
               </span>
                 </div>
-                <div class="col-sm-6 padding-left-zero padding-top-twenty">
+                <div class="col-md-6 col-sm-6 padding-left-zero padding-top-twenty">
                     <button class="btn btn-primary page-settings" type="submit" value="Submit">
                         <i class="fa fa-share header-right-btn"></i>
                         <?php AppUtility::t('Submit') ?>
@@ -497,7 +505,7 @@ switch ($action) {
                 <span class='floatleft margin-left-ten'>
                     <input name="userfile" type="file"/>
                 </span>
-                <div class="col-sm-12 padding-left-zero padding-top-twenty">
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-top-twenty">
                     <button class="btn btn-primary page-settings" type="submit" value="Submit">
                         <i class="fa fa-share header-right-btn"></i>
                         <?php echo 'Submit' ?>
@@ -533,7 +541,7 @@ switch ($action) {
                 <span class='floatleft margin-left-ten'>
                     <input name="userfile" type="file"/>
                 </span>
-                <div class="col-sm-12 padding-left-zero padding-top-twenty">
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-top-twenty">
                     <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
                 </div>
                 </div>
@@ -547,16 +555,16 @@ switch ($action) {
         }
         echo '<div id="headerforms" class="pagetitle">';
         echo '<div>';
-        echo "<div class='col-md-10'><h3>" . AppUtility::t('Transfer Course Ownership', false) . "</h3></div>\n";
+        echo "<div class='col-md-10 col-sm-10'><h3>" . AppUtility::t('Transfer Course Ownership', false) . "</h3></div>\n";
         echo '</div>';
         echo "<form method=post action=\"actions?action=transfer&id={$params['cid']}\">\n";
-        echo "<div class='col-md-3'>" . AppUtility::t('Transfer course ownership to', false) . "</div>
-         <div class='col-md-4'><select name=newowner class='form-control'>\n";
+        echo "<div class='col-md-3 col-sm-4'>" . AppUtility::t('Transfer course ownership to', false) . "</div>
+         <div class='col-md-4 col-sm-4'><select name=newowner class='form-control'>\n";
         foreach ($queryUser as $key => $row) {
             echo "<option value=\"$row[id]\">$row[LastName], $row[FirstName]</option>\n";
         }
         echo "</select></div>\n";
-        echo "<div class='col-md-10'><input type=submit value=\"Transfer\">\n";
+        echo "<div class='col-md-10 col-sm-10'><input type=submit value=\"Transfer\">\n";
         echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div>\n";
         echo "</div>";
         echo "</form>\n";
@@ -595,7 +603,7 @@ switch ($action) {
                     </span>
                   </span>
                     </div>
-                    <div class="col-sm-6 padding-left-zero padding-top-twenty">
+                    <div class="col-md-6 col-sm-6 padding-left-zero padding-top-twenty">
                         <button class="btn btn-primary page-settings" type="submit" value="Submit">
                             <i class="fa fa-share header-right-btn"></i>
                             <?php AppUtility::t('Delete') ?>
@@ -711,7 +719,7 @@ switch ($action) {
                                 echo "</select>"; ?>
                         </div>
                     </div>
-                <div class="col-sm-2 padding-top-twenty padding-left-three col-sm-offset-2">
+                <div class="col-md-2 col-sm-2 padding-top-twenty padding-left-three col-sm-offset-2">
                     <input class="margin-left-minus-five" type=submit value="<?php AppUtility::t('Add LTI Credentials') ?>">
                 </div>
                 </div>
@@ -731,7 +739,7 @@ switch ($action) {
                         <?php AppUtility::t('Modify LTI Domain Credentials') ?>
                     </h3>
                 </div>
-                <span class="col-md-3 padding-left-zero margin-top-ten">
+                <span class="col-md-3 col-sm-4 padding-left-zero margin-top-ten">
                     <?php AppUtility::t('Modify LTI key/secret') ?>
                 </span>
 
@@ -882,7 +890,7 @@ switch ($action) {
         <?php break;
     case "removediag":
         echo '<div class=""><br>';
-        echo "<div class='col-md-10'>" . AppUtility::t('Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.', false) . "</div><br>\n";
+        echo "<div class='col-md-10 col-sm-10'>" . AppUtility::t('Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.', false) . "</div><br>\n";
         echo "<br> <div class='col-md-6 col-sm-6 padding-left-zero'><div class='col-md-2 col-sm-2'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\"></div>\n";
         echo "<div class='col-md-2 col-sm-2 padding-left-zero'><input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
         echo '</div>';

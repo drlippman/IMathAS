@@ -424,8 +424,8 @@ div.additembox span {
 .newnote {
     color: #f00;
 }
-div#leftcolumn {float: left; width: 25%; min-width: 200px;}
-div#rightcolumn {float: right; width: 74%; min-width: 250px;}
+div#leftcolumn {float: left; width: 30%; min-width: 230px;}
+div#rightcolumn {float: right; width: 68%; min-width: 200px;}
 
 @media (max-width:805px) {
     div#leftcolumn, div#rightcolumn  {
@@ -1508,9 +1508,20 @@ margin-left: 1em;
 .padding-top-one-pt-two {
  padding-top: 1.2em !important;
 }
+
 .padding-right-one-em {
     padding-right: 1em;
 }
 .padding-top-three {
     padding-top: 3px;
 }
+
+.word-wrap-break-word
+{
+    word-wrap: break-word;
+}
+
+.text-align-center{
+    text-align: center;
+}
+

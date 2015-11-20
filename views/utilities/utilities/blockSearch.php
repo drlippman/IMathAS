@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
             {
                 if (count($det)>0){
                     ?>
-                    <?php echo '<a target="_blank" href="#">'.$det[1].'</a> in'.$singleBlock['name'].'<br/>';?>
+                    <?php echo '<a target="_blank" href="#">'.$det[1].'</a>' ?> &nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/> <?php echo 'in'.$singleBlock['name'].'<br/>';?>
                 <?php }
             }
             echo '</p>';

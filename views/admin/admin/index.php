@@ -24,12 +24,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
     <br>
 
-    <div class="col-md-12"><b><?php AppUtility::t('Hello'); ?><?php echo $userName ?></b></div>
-    <div class="col-md-12 margin-left-five"><h3><?php AppUtility::t('Courses'); ?></h3></div>
+    <div class="col-md-12 col-sm-12 padding-left-twenty"><b><?php AppUtility::t('Hello '); ?><?php echo $userName ?></b></div>
+    <div class="col-md-12 col-sm-12 margin-left-five"><h3><?php AppUtility::t('Courses'); ?></h3></div>
 
     <div class='item margin-padding-admin-table padding-bottom margin-twenty'>
 
-        <table class="display course-table table table-bordered table-striped table-hover data-table">
+        <table class="display course-section table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
                 <th style="max-width: 400px"><?php AppUtility::t('Name'); ?></th>
@@ -109,9 +109,9 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
             </tbody>
         </table>
-        <div class="col-md-12 padding-left-zero">
-        <div class="col-md-2 pull-left padding-left-zero display-inline-block">
-            <a class="btn btn-primary margin-left-twenty"
+        <div class="col-md-12 col-sm-12 padding-left-zero">
+        <div class="col-md-2 col-sm-3 pull-left padding-left-zero display-inline-block">
+            <a class="btn btn-primary margin-left-fifteen"
                href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=addcourse') ?>"><?php AppUtility::t('Add New Course'); ?> </a>
         </div>
         <?php
@@ -119,11 +119,10 @@ $this->params['breadcrumbs'][] = $this->title;
         if ($showcourses > AppConstant::NUMERIC_ZERO) {
             echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='index?showcourses=0'\" />";
         }
-        echo "<div class='col-md-2 display-inline-block padding-left-zero'>";
+        echo "<div class='col-md-2 col-sm-2 display-inline-block padding-left-zero'>";
         echo "Show courses of</div>" ;
-//        echo $a = substr($page_teacherSelectVal,0,4);
-       echo "<div class='col-md-5 padding-left-zero display-inline-block'>";AppUtility::writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
-    </div>
+       echo "<div class='col-md-5 col-sm-6 padding-left-zero display-inline-block'>";writeHtmlSelect("seluid", $page_teacherSelectVal, $page_teacherSelectLabel, $showcourses, "Select a user..", AppConstant::NUMERIC_ZERO, "onchange=\"showcourses()\"");?>
+            </div>
         </div>
     <?php
     }
@@ -140,7 +139,7 @@ if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteache
 <?php
 } else if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
     ?>
-    <div class='cp item margin-left-twenty padding-bottom'>
+    <div class='cp item margin-left-twenty padding-bottom margin-twenty'>
         <span class=column>
             <a href="<?php echo AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=admin') ?>"><?php AppUtility::t('Manage Question Set'); ?></a><BR>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/export-question-set?cid=admin') ?>"><?php AppUtility::t('Export Question Set'); ?></a><BR>
@@ -154,17 +153,17 @@ if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteache
         <?php
         if ($myRights == AppConstant::ADMIN_RIGHT) {
             ?>
-            <span class=column>
+        <span class=column>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=listgroups') ?>"><?php AppUtility::t('Edit Groups'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=deloldusers') ?>"><?php AppUtility::t('Delete Old Users'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/import-student?cid=admin') ?>"><?php AppUtility::t('Import Students from File'); ?></a>
         </span>
-            <span class="column">
+        <span class="column">
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importmacros') ?>"><?php AppUtility::t('Install Macro File'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importqimages') ?>"><?php AppUtility::t('Install Question Images'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importcoursefiles') ?>"><?php AppUtility::t('Install Course Files'); ?></a><br/>
         </span>
-            <span class="column">
+        <span class="column">
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=listltidomaincred') ?>"><?php AppUtility::t('LTI Provider Creds'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=admin') ?>"><?php AppUtility::t('External Tools'); ?></a><br/>
             <a href="<?php echo AppUtility::getURLFromHome('utilities', 'utilities/admin-utilities') ?>"><?php AppUtility::t('Admin Utilities'); ?></a><br/>
@@ -178,17 +177,17 @@ if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteache
 }
 if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
     ?>
-    <div class="col-md-12 margin-left-five"><h3><?php AppUtility::t('Diagnostics'); ?></h3></div>
+    <div class="col-md-12 col-sm-12 margin-left-five"><h3><?php AppUtility::t('Diagnostics'); ?></h3></div>
 
-    <div class='item margin-padding-admin-table padding-bottom'>
-        <table class="display course-table table table-bordered table-striped table-hover data-table">
+    <div class='item margin-padding-admin-table padding-bottom margin-twenty'>
+        <table class="display diagnostics-section table table-bordered table-striped table-hover data-table">
             <thead>
-            <tr>
-                <th><?php AppUtility::t('Name'); ?></th>
-                <th STYLE="text-align: center"><?php AppUtility::t('Available'); ?></th>
-                <th STYLE="text-align: center"><?php AppUtility::t('Public'); ?></th>
-                <th style="text-align: center"><?php AppUtility::t('Modify'); ?></th>
-            </tr>
+                <tr>
+                    <th><?php AppUtility::t('Name'); ?></th>
+                    <th STYLE="text-align: center"><?php AppUtility::t('Available'); ?></th>
+                    <th STYLE="text-align: center"><?php AppUtility::t('Public'); ?></th>
+                    <th style="text-align: center"><?php AppUtility::t('Modify'); ?></th>
+                </tr>
             </thead>
             <tbody>
             <?php
@@ -237,7 +236,7 @@ if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
             </tbody>
         </table>
 
-        <a class="btn btn-primary margin-left-twenty"
+        <a class="btn btn-primary margin-left-fifteen"
            href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics') ?>">
             <?php AppUtility::t('Add New Diagnostic'); ?>
         </a>
@@ -246,10 +245,10 @@ if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
 }
 if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
 ?>
-<div class="col-md-12 margin-left-five"><h3><?php echo $page_userBlockTitle ?></h3></div>
+<div class="col-md-12 col-sm-12 margin-left-five"><h3><?php echo $page_userBlockTitle ?></h3></div>
 
-<div class='item margin-padding-admin-table padding-bottom'>
-    <table class="display course-table table table-bordered table-striped table-hover data-table">
+<div class='item margin-padding-admin-table padding-bottom margin-twenty'>
+    <table class="display user-section table table-bordered table-striped table-hover data-table">
         <thead>
         <tr>
             <th><?php AppUtility::t('Name'); ?></th>
@@ -279,7 +278,7 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
             <td><?php echo $page_userDataLastAccess[$i] ?></td>
 
             <td class=c>
-                <ul class="nav roster-menu-bar-nav sub-menu col-md-12">
+                <ul class="nav roster-menu-bar-nav sub-menu col-md-12 col-sm-12">
                     <li class="dropdown">
                         <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                            href="#"><?php AppUtility::t('Settings'); ?>
@@ -310,14 +309,12 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
 
         </tbody>
     </table>
-<!--    <a class="btn btn-primary margin-left-twenty"-->
-<!--       href="--><?php //echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?><!--">-->
-<!--        --><?php //AppUtility::t('Add New User'); ?>
-<!--    </a>-->
-    <input type=button value="Add New User" onclick="window.location='forms?action=newadmin'">
+
+    <input class="btn btn-primary margin-left-fifteen" type=button value="Add New User" onclick="window.location='forms?action=newadmin'">
+
     <?php
     }
-    if ($myRights == AppConstant::ADMIN_RIGHT) {
+     if ($myRights == AppConstant::ADMIN_RIGHT) {
         writeHtmlSelect("selgrpid", $page_userSelectVal, $page_userSelectLabel, $showusers, null, null, "onchange=showgroupusers()");
     }
     ?>
@@ -331,6 +328,7 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
             echo "<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
         }
         for ($i = AppConstant::NUMERIC_ZERO; $i < count($valList); $i++) {
+            $labelList[$i] = AppUtility::truncate($labelList[$i], 30);
             if ((isset($selectedVal)) && ($valList[$i] == $selectedVal)) {
                 echo "<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
             } else {
@@ -339,7 +337,6 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
         }
         echo "</select>\n";
     }
-
     ?>
 
 </div>

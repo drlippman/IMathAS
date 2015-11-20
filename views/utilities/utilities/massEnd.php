@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-$this->title = 'MassEnd';
+$this->title = 'Send Mass Message';
 
 $this->params['breadcrumbs'][] = $this->title;
 ?>
