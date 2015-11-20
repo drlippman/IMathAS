@@ -2298,16 +2298,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= getcolormark($colorbox);
 		if ($colorbox!='') { $out .= '</div>';}
 		$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
-		$out .= "<script type=\"javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
+        $out .= "<script type=\"text/javascript\">var canvases = new Array();var drawla = new Array(); canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
 
-		$la = str_replace(array('(',')'),array('[',']'),$la);
+
+        $la = str_replace(array('(',')'),array('[',']'),$la);
 		$la = explode(';;',$la);
 		if ($la[0]!='') {
 			$la[0] = '['.str_replace(';','],[',$la[0]).']';
 		}
 		$la = '[['.implode('],[',$la).']]';
-
-		$out .= "drawla[$qn] = $la;</script>";
+        $out .= "</script>";
+        $out .= "<script type=\"text/javascript\"> drawla[$qn] = $la;</script>";
 		$tip = _('Enter your answer by drawing on the graph.');
 		if (isset($answers)) {
 			$saarr = array();

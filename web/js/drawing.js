@@ -10,8 +10,8 @@ var tplines = new Array();
 var tptypes = new Array();
 var ineqlines = new Array();
 var ineqtypes = new Array();
-var canvases = new Array();
-var drawla = new Array();
+//var canvases = new Array();
+//var drawla = new Array();
 var curLine = null;
 var drawstyle = [];
 var drawlocky = [];
@@ -1386,7 +1386,7 @@ function initCanvases(k) {
 	} catch(e) { }
 	for (var i in canvases) {
         k = i;
-		if (typeof(k)=='undefined' || k==i) {
+		if ((typeof(k)=='undefined' || k==i) && i != 'unique') {
 			if (drawla[i]!=null && drawla[i].length>2) {
 				lines[canvases[i][0]] = drawla[i][0];
 				dots[canvases[i][0]] = drawla[i][1];
@@ -1409,10 +1409,9 @@ function initCanvases(k) {
 					}
 				}
 			}
-			addTarget(canvases[i][0],'canvas'+canvases[i][0],'openmath/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+			addTarget(canvases[i][0],'canvas'+canvases[i][0],'../../../filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 		}
 	}
-	
 }
 
 if (typeof(initstack)!='undefined') {
@@ -1549,7 +1548,6 @@ function initnormslider(id) {
 	document.getElementById("slid1"+id).style.left = (p1*60+250-6)+"px";
 	document.getElementById("slid2"+id).style.left = (p2*60+250-6)+"px";
 	document.getElementById("shaderegions"+id).selectedIndex = type;
-	//alert(document.getElementById("shaderegions").selectedIndex +","+ type + ","+p1+","+p2);
 	normslider.curslider.type = document.getElementById("shaderegions"+id).value;
 	chgnormtype(id);
 	

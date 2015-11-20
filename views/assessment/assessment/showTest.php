@@ -13,10 +13,6 @@ $this->title = $testsettings['name'];
     </script>
 <script type="javascript" src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
 <script type="javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>
-
-<?php //AppUtility::includeJS('confirmsubmit.js') ?>
-<?php //AppUtility::includeJS('AMhelpers.js') ?>
-<?php //AppUtility::includeJS('drawing.js') ?>
 <style type="text/css">span.MathJax { font-size: 105%;}</style>
 <?php
 if ($pwfail) {
@@ -33,10 +29,7 @@ if (isset($sessiondata['actas'])) {
     } else {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $testsettings['courseid']]]);
     }
-
-
 }
-
 ?>
 <div class="title-container">
     <div class="row">
