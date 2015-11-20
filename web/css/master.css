@@ -644,3 +644,6 @@ div.vidsegblock
 .padding-left-one-em{
     padding-left: 1em;
 }
+.padding-left-three-per {
+    padding-left: 3% !important;
+}

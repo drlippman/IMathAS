@@ -238,6 +238,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
             </form>
         </div>
+        <?php $urlmode = \app\components\AppUtility::urlMode();?>
         <script type="text/javascript">
             function movefile(from) {
                 var to = document.getElementById('ms-' + from).value;

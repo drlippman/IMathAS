@@ -276,6 +276,7 @@ select > option{
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 20px;
+    min-height: 365px;
 }
 .title-middle{
     text-transform: capitalize;
@@ -290,9 +291,7 @@ select > option{
 }
 .title-option
 {
-
     margin-left: 50px;
-    margin-top: 50px;
 }
 .align-option
 {
@@ -340,7 +339,7 @@ select > option{
 #move-thread{
 
     padding-top: 10px;
-
+    padding-bottom: 10px;
 }
 .student-enroll{
     padding-top: 10px;
@@ -517,4 +516,7 @@ table.search-forum thead td {
 
 table.search-forum tr.tagged {
     background-color: #dff;
+}
+.post-reply-message-textarea table,.post-reply-message-textarea iframe {
+    max-width: 100% !important;
 }

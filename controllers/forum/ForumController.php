@@ -233,6 +233,7 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $threadArray = array();
         $NewPostCounts = Thread::findNewPostCnt($courseId, $user);
+
         foreach ($NewPostCounts as $newPost) {
             $threads = ThreadForm::thread($newPost['forumid']);
             $forumName = Forums::getForumName($newPost['forumid']);

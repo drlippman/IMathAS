@@ -3,6 +3,7 @@
 if ($isgroup) {
     $addr .= '&grp='.$groupid;
 }
+$urlmode = \app\components\AppUtility::urlMode();
 $addr2 = $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\').'/viewwiki.php?revert=ask&cid='.$cid.'&id='.$id.$framed;
 if ($isgroup) {
     $addr2 .= '&grp='.$groupid;

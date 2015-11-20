@@ -374,6 +374,7 @@ switch ($action) {
             <input class="form-control width-sixty-four-per display-inline-block" name="ltisecret" type="text" value="' . $ltisecret . '" maxlength="10"/> ';
             echo '<button class="margin-left-ten" type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">' . _('Show LTI key and URL') . '</button>';
             echo '<span id="ltiurl" style="display:none;">';
+            $urlmode = \app\components\AppUtility::urlMode();
             if (isset($params['cid'])) {
                 echo '<br/>URL: ' . $urlmode . $_SERVER['HTTP_HOST'] . AppUtility::getHomeURL() . 'bltilaunch.php<br/>';
                 echo 'Key: placein_' . $params['cid'] . '_0 (to allow students to login directly to ' . $installname . ') or<br/>';

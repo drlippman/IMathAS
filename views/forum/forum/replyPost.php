@@ -6,12 +6,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <form id="add-thread" enctype="multipart/form-data" action="<?php AppUtility::getURLFromHome('forum','forum/reply-post')?>" method="post">
 <div class="item-detail-header">
-    <?php if($currentUser['rights'] > 10) {
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id]]);
-    } elseif($currentUser['rights'] == 10){
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
-    }
-    ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -38,16 +33,19 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox">
         <p></p>
         <br>
-        <div class="col-sm-12 padding-top">
-            <div class="col-sm-1"><?php echo AppUtility::t('Subject')?></div>
-            <div class="col-sm-11"><input name="Subject" class="text-box subject" type="text" size="123" readonly value="Re: <?php echo $reply[0]['subject'] ?>">
+        <div class="col-sm-12 col-md-12 padding-top">
+            <div class="col-sm-1 col-md-1"><?php echo AppUtility::t('Subject')?></div>
+            <div class="col-sm-11 col-md-11">
+                <input name="Subject" class="form-control min-width-hundred-per text-box subject" type="text"  readonly value="Re: <?php echo $reply[0]['subject'] ?>">
             </div>
         </div>
 
-        <div class="col-sm-12 padding-top" style="padding-bottom: 20px">
-            <div class="col-sm-1"><?php echo AppUtility::t('Message')?></div>
-            <?php echo "<div class='left col-sm-11'><div class= 'editor'>
-        <textarea id='post-reply' name='post-reply' style='width: 70%;' rows='12' cols='20'></textarea></div></div><br>"; ?>
+        <div class="col-sm-12 col-md-12 padding-top" style="padding-bottom: 20px">
+            <div class="col-sm-1 col-md-1 "><?php echo AppUtility::t('Message')?></div>
+            <?php echo "<div class='max-width-hundred-per left col-md-11 col-sm-11'>
+        <div class= 'editor post-reply-message-textarea'>
+        <textarea id='post-reply' name='post-reply' style='width: 70%;' rows='12' cols='20'></textarea>
+        </div></div><br>"; ?>
         </div>
     <div style="margin-left: 10.7%">
     <?php if($reply[0]['forumType'] == 1)
@@ -56,12 +54,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <br><button class="add-more">Add More Files</button><br>
     <?php }?>
     </div>
-    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 padding-left-twenty-eight">
+    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 col-md-6 col-md-offset-1 padding-left-twenty-eight">
         <a href="#" id="reply-btn" class="btn btn-primary1 btn-color"><i class="fa fa-reply"></i>&nbsp;Post Reply</a>
     </div>
-        <div  class="col-sm-12 replyTo padding-top">
+        <div  class="col-sm-12 col-md-12 replyTo padding-top">
             <div class=""><?php echo AppUtility::t('Replying To'); ?></div>
-            <div class="block col-sm-12">
+            <div class="block col-sm-12 col-md-12">
                 <span class="leftbtns">
                 </span>
                 <span class="right">
@@ -69,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <b  style="font-family: "Times New Roman", Times, serif"><?php echo $reply[0]['subject']?></b>
                 <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;&nbsp;&nbsp;<?php echo $reply[0]['userName']?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
             </div>
-            <div class="blockitems col-sm-12" id="item1">
+            <div class="blockitems col-sm-12 col-md-12" id="item1">
                 <h5><?php echo $reply[0]['message']?></h5></div>
         </div>
 </div>

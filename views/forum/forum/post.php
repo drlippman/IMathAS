@@ -43,17 +43,20 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <input type="hidden" id="user-id" value="<?php echo $currentUser['id'] ?>">
 <?php $postBeforeView = (($forumData['settings'] & AppConstant::SIXTEEN) == AppConstant::SIXTEEN);
 ?>
+
 <div class="tab-content shadowBox padding-top-one">
     <?php if(!$atLeastOneThread && $postBeforeView && !$canViewAll ){?>
      <p><?php AppUtility::t('This post is blocked. In this forum, you must post your own thread before you can read those posted by others.')?></p>
         <a class="pull-right" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid=' . $course->id . '&forum=' . $forumId);?>"><?php AppUtility::t('Back to Forum Topics')?></a>
         <?php }else {?>
         <div id="postlabel" class="padding-post-label">
-            <div id="post">
-                <h4><strong><?php AppUtility::t('Forum')?>:</strong>&nbsp;&nbsp;<?php echo $postdata[0]['forumName'] ?></h4><br>
-                <h4><strong><?php AppUtility::t('Post')?>:</strong>&nbsp;&nbsp;<?php echo $postdata[0]['subject'] ?></h4>
+<!--            <div id="post">-->
+                <div class="post col-sm-12 col-md-12 midwrapper">
+                <h4 class="word-break-break-all"><strong><?php AppUtility::t('Forum')?>:</strong>&nbsp;&nbsp;<?php echo $postdata[0]['forumName'] ?></h4><br>
+                <h4 class="word-break-break-all"><strong><?php AppUtility::t('Post')?>:</strong>&nbsp;&nbsp;<?php echo $postdata[0]['subject'] ?></h4>
             </div>
         </div>
+
     <div class="mainbody padding-main-body">
         <div class="headerwrapper">
             <div id="navlistcont">
@@ -61,7 +64,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                 <div class="clear"></div>
             </div>
         </div>
-        <div class="midwrapper">
+        <div class="col-sm-12 col-md-12 midwrapper">
             <?php
             $a = AppConstant::NUMERIC_ZERO;
             foreach ($allThreadIds as $key => $threadFromAllThreadArray) {
@@ -106,21 +109,23 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         <?php if ($data['level'] != AppConstant::NUMERIC_ZERO && $data['level'] > $currentLevel)
         {
         $cnt++;?>
-        <div class="forumgrp" id="block<?php echo $index - AppConstant::NUMERIC_ONE ?>">
+        <div  class="padding-left-three-per col-sm-12 col-md-12 padding-left-zero padding-right-zero" id="block<?php echo $index - AppConstant::NUMERIC_ONE ?>">
         <?php } ?>
             <?php $imageUrl = $data['userId'] . '' . ".jpg"; ?>
-            <div class=block id="<?php echo $data['id'] ?>"><span class="leftbtns">
-                    <?php if ($data['hasImg'] == AppConstant::NUMERIC_ONE){ ?>
+            <div class="col-sm-12 col-md-12 padding-left-zero padding-right-zero block" id="<?php echo $data['id'] ?>">
+            <span class="leftbtns col-sm-1 col-md-1">
+                <?php if ($data['hasImg'] == AppConstant::NUMERIC_ONE){ ?>
                     <img class="circular-profile-image" id="img<?php echo $imgCount ?>"
                          src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl ?>"
-                         onclick=changeProfileImage(this,<?php echo $data['id'] ?>);> </span>
+                         onclick=changeProfileImage(this,<?php echo $data['id'] ?>);>
                 <?php
                 } else {
                     ?>
                     <img class="circular-profile-image" id="img"
-                         src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/></span>
+                         src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/>
                 <?php } ?>
-                <span class=right>
+            </span>
+                <span class="right col-sm-5 col-md-4 padding-left-zero">
                           <?php if ($data['userRights'] >= AppConstant::STUDENT_RIGHT && $data['postType'] != AppConstant::NUMERIC_TWO) {
                               if ($currentUser['rights'] > AppConstant::STUDENT_RIGHT) {
                                   ?>
@@ -168,6 +173,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                     <input type=button class="hide-button" id="buti<?php echo $index ?>" value="Hide"
                            onClick="toggleitem(<?php echo $index ?>)">
                             </span>
+                <span class="col-sm-6 col-md-7 word-break-break-all">
                 <b><?php echo $data['subject'] ?></b><br/><?php AppUtility::t('Posted by')?>: <a
                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $data['userId'] . '&new=1') ?>"><?php echo $data['name'] ?></a>
                     <?php if($currentUser['rights'] > AppConstant::STUDENT_RIGHT && $data['userRights'] == AppConstant::NUMERIC_TEN){ ?>
@@ -196,8 +202,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                     <span class="pointer" id="likeCnt<?php echo $data['id'] ?>"
                           onclick=countPopup(<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)><label><?php echo $data['likeCnt'] ?></label></span>
                 <?php } ?>
-            </div>
-            <div class="blockitems" id="item<?php echo $index ?>">
+        </span>
+        </div>
+            <div class="col-sm-12 col-md-12 padding-left-zero padding-right-zero blockitems" id="item<?php echo $index ?>">
                 <?php if($data['fileType'])
                 {
                     if($data['files'])

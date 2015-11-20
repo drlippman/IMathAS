@@ -277,6 +277,7 @@ if ($overwriteBody==1) {
             }
         }
     }
+    $urlmode = AppUtility::urlMode();
     if ($isfinal) {
         $licurl = $urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/course/showlicense.php?id='.implode('-',$qn);
         echo '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';

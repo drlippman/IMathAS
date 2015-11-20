@@ -1508,7 +1508,6 @@ margin-left: 1em;
 .padding-top-one-pt-two {
  padding-top: 1.2em !important;
 }
-
 .padding-right-one-em {
     padding-right: 1em;
 }
@@ -1524,4 +1523,9 @@ margin-left: 1em;
 .text-align-center{
     text-align: center;
 }
-
+.padding-top-six {
+ padding-top: 6px;
+}
+.width-ninety-per {
+    width: 90px;
+}

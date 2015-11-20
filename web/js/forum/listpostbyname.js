@@ -60,7 +60,7 @@ function collapseall()
     {
         var node = document.getElementById('item' + i);
         var buti = document.getElementById('butn' + i);
-        node.className = 'blockitems';
+        node.className = 'blockitems col-sm-12 col-md-12';
         buti.value = '-';
     }
     document.getElementById("expand").value = 'Collapse All';
@@ -112,7 +112,7 @@ function toggleshow(bnum) {
         node.className = 'hidden';
         butn.value = '+';
     } else {
-        node.className = 'blockitems';
+        node.className = 'blockitems col-sm-12 col-md-12';
         butn.value = '-';
     }
 }
@@ -120,7 +120,7 @@ function toggleshowall() {
     for (var i=0; i<bcnt; i++) {
         var node = document.getElementById('m'+i);
         var butn = document.getElementById('butn'+i);
-        node.className = 'blockitems';
+        node.className = 'blockitems col-sm-12 col-md-12';
         butn.value = '-';
     }
     document.getElementById("toggleall").value = 'Collapse All';

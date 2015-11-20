@@ -8,11 +8,9 @@ $this->title = AppUtility::t('List Post By Name',false );
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php if($userRights == 100 || $userRights == 20) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id]]);
-    } elseif($userRights == 10){
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
-    }?>
+    <?php
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]);
+      ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -30,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <?php
-echo '<div class="tab-content shadowBox ">';
+echo '<div class="tab-content shadowBox col-sm-12 col-md-12">';
 echo '<div id="headerpostsbyname" class="margin-left-twenty pagetitle">';
 echo "<h2>Posts by Name - $forumname</h2>\n";
 echo '</div>';
@@ -67,7 +65,7 @@ $urlmode = AppUtility::urlMode();?>
             if ($laststu!=-1) {
                 echo '</div>';
             }
-            echo "<b>{$line['LastName']}, {$line['FirstName']}</b>";
+            echo "<div class='col-sm-12 col-md-12'><b>{$line['LastName']}, {$line['FirstName']}</b>";
             if ($line['hasuserimg']==1)
             {
                 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
@@ -79,53 +77,61 @@ $urlmode = AppUtility::urlMode();?>
             }else {
                 ?><img class="circular-profile-image Align-link-post padding-five" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/> <?php
             }
-            echo '<div class="forumgrp">';
+            echo '</div>';
+            echo '<div class="col-sm-12 col-md-12 padding-left-three-per">';
             $laststu = $line['userid'];
         }
-        echo '<div class="block">';
-        if ($line['parent']!=0) {
-            echo '<span style="color:green;">';
+        echo '<div class="col-sm-12 col-md-12 padding-left-zero block">';
+        echo '<span class="col-sm-12 col-md-12">';
+        if ($line['parent']!=0)
+        {
+            echo '<span class="col-sm-8 col-md-9 padding-left-zero" style="color:green;">';
+        }else{
+            echo '<span class="col-sm-8 col-md-9 padding-left-zero">';
         }
 
-        echo '<span class="right">';
-        if ($haspoints) {
-            if ($caneditscore) {
-                echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
-                if (isset($scores[$line['id']])) {
-                    echo $scores[$line['id']];
-                }
-                echo "\"/> Pts ";
-                if ($rubric != 0) {
-                    echo printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
-                }
-            } else if (($line['ownerid']==$userId || $canviewscore) && isset($scores[$line['id']])) {
-                echo "<span class=red>{$scores[$line['id']]} pts</span> ";
+        echo "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
+        echo '<b class="word-break-break-all">'.$line['subject'].'</b>';
+    if ($haspoints) {
+        if ($caneditscore) {
+            echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+            if (isset($scores[$line['id']])) {
+                echo $scores[$line['id']];
             }
-        } ?>
-        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
+            echo "\"/> Pts ";
+            if ($rubric != 0) {
+                echo printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
+            }
+        } else if (($line['ownerid']==$userId || $canviewscore) && isset($scores[$line['id']])) {
+            echo "<span class=red>{$scores[$line['id']]} pts</span> ";
+        }
+    }
+        $dt = AppUtility::tzdate("F j, Y, g:i a",$line['postdate']);
+        echo '<span class=" " style="color:black;"><br>';
+        echo 'Posted: '.$dt;
+        echo '</span>';
+        if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
+            echo " <span style=\"color:red;\">New</span>\n";
+        }
+            echo '</span>';
+
+        echo '<span class="col-sm-4 col-md-3 padding-left-zero padding-top-six right">';?>
+
+        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/posts?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
         <?php if ($isteacher || ($line['ownerid']==$userId && $allowmod)) { ?>
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$course->id.'&forumId='.$forumId.'&threadId='.$line['id'] ) ?> ">Modify</a>
     <?php }
         if ($isteacher || ($allowdel && $line['ownerid']==$userId)) {
-//        echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={}\">Remove</a> \n";
             ?><a href="#" name="tabs" data-var="<?php echo $line['id']?>" class="mark-remove" >Remove</a> <?php
         }
         if ($line['posttype']!=2 && $userRights > 5 && $allowreply) { ?>
-            <!--        /forum/forum/?courseid=477&threadId=80923&forumid=19893&id=80929&listbypost=1-->
             <a href="<?php echo AppUtility::getURLFromHome('forum','forum/reply-post?courseid='.$course->id.'&forumid='.$forumId.'&threadId='.$line['threadid'].'&listbypost=1&id='.$line['id'])?>">Reply</a>
         <?php }
         echo '</span>';
-        echo "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
-        echo '<b>'.$line['subject'].'</b>';
-        if ($line['parent']!=0) {
-            echo '</span>';
-        }
-        $dt = AppUtility::tzdate("F j, Y, g:i a",$line['postdate']);
-        echo ', Posted: '.$dt;
-        if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
-            echo " <span style=\"color:red;\">New</span>\n";
-        }
+
+        echo '</span>';
         echo '</div>';
+        echo '<div class="col-sm-12 col-md-12 padding-left-zero padding-right-zero">';
         echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
 
         if ($haspoints) {
@@ -143,6 +149,7 @@ $urlmode = AppUtility::urlMode();?>
                 echo '</div>';
             }
         }
+        echo '</div>';
         echo '</div>';
         $cnt++;
     }
@@ -165,6 +172,7 @@ $urlmode = AppUtility::urlMode();?>
         $out .= "<img border=0 src='../../img/assess.png' alt=\"rubric\"></a>";
         return $out;
     }
+
     function printrubrics($rubricarray) {
 
         $out = '<script type="text/javascript">';

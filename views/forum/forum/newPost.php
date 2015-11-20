@@ -12,6 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
     }?>
 </div>
+
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
@@ -19,17 +20,28 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
+
 <div class="tab-content shadowBox ">
     <br><p></p>
     <div class="align-new-post-table">
-     <?php if($threadArray){?>
-        <?php echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'.'Forum'.'</th><th>'.'Topic'.'</th><th>'.'Started By'.'<th>'.'Last Post Date'.'</th></th>';?>
+        <div class="overflow-x-auto col-sm-12">
+        <?php if($threadArray){?>
+        <?php echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><tr>
+        <th class="width-twenty-seven-per text-align-center ">'.'Forum'.'</th>
+        <th class="width-twenty-seven-per text-align-center">'.'Topic'.'</th>
+        <th class="width-twenty-seven-per text-align-center">'.'Started By'.'</th>
+        <th class="width-nineteen-per text-align-center">'.'Last Post Date'.'</th>';?>
         <?php
         foreach($threadArray as $data)
         {
             if(isset($data['subject']))
             {
-                echo '</thead><tr><td><a href="search-forum?cid='.$course->id.'">'.$data['forumName'].'</a></td><td><a href="post?courseid='.$course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata'].'">'.$data['subject'].'</a></td><td>'.$data['name'].'</td></td><td>'.$data['postdate'].'</td></tr>';
+                echo '</thead><tr>
+                <td class="text-align-center word-break-break-all"><a href="search-forum?cid='.$course->id.'">'.$data['forumName'].'</a></td>
+                <td class="text-align-center word-break-break-all"><a href="post?courseid='.$course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata'].'">'.$data['subject'].'</a></td>
+                <td class="text-align-center">'.$data['name'].'</td>
+                <td class="text-align-center">'.$data['postdate'].'</td>
+                </tr>';
             }
         }
         echo '</tbody></table>';
@@ -41,4 +53,5 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <?php }?>
     </div>
-<div>
+    </div>
+</div>

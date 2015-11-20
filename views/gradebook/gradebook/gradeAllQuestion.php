@@ -7,7 +7,7 @@ use app\components\filehandler;
 $aname = $assessmentData['name'];$defpoints = $assessmentData['defpoints'];
 $isgroup = $assessmentData['isgroup']; $groupsetid = $assessmentData['groupsetid']; $deffbtext = $assessmentData['deffeedbacktext'];
 $points = $questionData['points'];
-
+$urlmode = AppUtility::urlMode();
 $qcontrol = $questionData['control'];
 $rubric = $questionData['rubric'];
 $qtype = $questionData['qtype'];

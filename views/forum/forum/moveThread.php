@@ -8,9 +8,10 @@ $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
+
 <form id="myForm" method="post" action="move-thread?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -68,7 +69,7 @@ $now = $currentTime;
             </div>
             <div class="buttons-div">
                 <input type=submit class="btn btn-primary search-button align-btn" id="move-button" value="<?php echo AppUtility::t('Move')?>">
-                <a class="btn btn-primary search-button align-btn" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forum='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
+                <a class="btn btn-primary search-button align-btn margin-left-fifteen" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forum='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
             </div>
 
         </div>
