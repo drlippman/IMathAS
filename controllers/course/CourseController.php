@@ -114,8 +114,9 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $this->layout = 'master';
         $cid = $this->getParamVal('cid');
+        $course = Course::getById($cid);
         $this->includeJS(['course/addremovecourse.js']);
-        $returnData = array('cid' => $cid);
+        $returnData = array('cid' => $cid, 'course' => $course);
         return $this->renderWithData('addRemoveCourse', $returnData);
     }
 

@@ -30,9 +30,9 @@ function displayTeacher(teacher,count)
         var lastName = capitalizeFirstLetter(teacher.LastName);
         var teacherHtml = "";
         if(count == 1){
-            teacherHtml = "<tr><td> </td><td id='convertToUpper'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'></a></td></tr>";
+            teacherHtml = "<tr><td> </td><td id='convertToUpper' class='word-break-break-all'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'></a></td></tr>";
         }else{
-            teacherHtml = "<tr><td><input type='checkbox' name='teacher' value='"+teacher.id+"' class='addRemoveTeacherCheckbox removeCheckbox removeTeacherCheckbox-"+teacher.id+"' > </td> <td id='convertToUpper'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'>Remove As Teacher</a></td></tr>";
+            teacherHtml = "<tr><td><input type='checkbox' name='teacher' value='"+teacher.id+"' class='addRemoveTeacherCheckbox removeCheckbox removeTeacherCheckbox-"+teacher.id+"' > </td> <td id='convertToUpper' class='word-break-break-all'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'>Remove As Teacher</a></td></tr>";
         }
 
 
@@ -44,25 +44,24 @@ function displayNonTeacher(nonTeacher)
         var firstName = capitalizeFirstLetter(nonTeacher.FirstName);
         var lastName = capitalizeFirstLetter(nonTeacher.LastName);
         var nonTeacherHtml = "";
-        nonTeacherHtml = "<tr><td><input type='checkbox' name='nonTeacher' value='"+nonTeacher.id+"' class= 'addRemoveTeacherCheckbox addCheckbox addTeacherCheckbox-"+nonTeacher.id+"'> </td> <td id='convertToUpper'>"+firstName+' '+lastName+"</td><td><a href='' onclick='addTeacher("+nonTeacher.id+")' class='addRemoveTeacher addTeacherLink addTeacher-"+nonTeacher.id+"'>Add as Teacher</a></td></tr>";
+        nonTeacherHtml = "<tr><td><input type='checkbox' name='nonTeacher' value='"+nonTeacher.id+"' class= 'addRemoveTeacherCheckbox addCheckbox addTeacherCheckbox-"+nonTeacher.id+"'> </td> <td id='convertToUpper' class='word-break-break-all'>"+firstName+' '+lastName+"</td><td><a href='' onclick='addTeacher("+nonTeacher.id+")' class='addRemoveTeacher addTeacherLink addTeacher-"+nonTeacher.id+"'>Add as Teacher</a></td></tr>";
         $('#nonTeach').append(nonTeacherHtml);
-        }
+    }
 
 function addTeacher(userId)
     {
         var cid = $(".course-id").val();
         jQuerySubmit('add-teacher-ajax',{cid:cid, userId:userId },'addTeacherSuccess');
-}
+    }
 
 function addTeacherSuccess(response)
     {
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-        window.location = "add-remove-course?cid="+cid;
+            window.location = "add-remove-course?cid="+cid;
         }
-}
-
+    }
 
 function removeTeacher(userId)
     {
