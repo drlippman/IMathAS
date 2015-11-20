@@ -3093,14 +3093,14 @@ class AppUtility extends Component
         }
         echo '</ul>';
         if ($type == 'take') { ?>
-            <div class="center"><a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br>
+            <div class="center"><a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll In a New Class</a><br>
 <!--            <a  id="unhidelink" class="course-taking small" href="--><?php //echo AppUtility::getURLFromHome('site', 'unhide-from-course-list') ?><!--">Unhide hidden courses</a>-->
             <?php echo '<br><a id="unhidelink" '.($stuHasHiddenCourses?'':'style="display:none"').' class="small" href="site/unhide-from-course-list">Unhide hidden courses</a>';
             echo '</div>';
         } else if ($type=='teach' && $myRights > 39) { ?>
             <div class="center">
                 <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index') ?>">Admin
-                    Page</a>
+                    Page</a><br/><br/>
             </div>
       <?php  }
         echo '</div>';

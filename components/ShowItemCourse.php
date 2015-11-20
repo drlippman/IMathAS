@@ -858,16 +858,19 @@ class ShowItemCourse extends Component
                             </ul>
                         </div>
 
-                    <?php } else if (($line['allowlate']%AppConstant::NUMERIC_TEN == AppConstant::NUMERIC_ONE || $line['allowlate']%AppConstant::NUMERIC_TEN-1>$latepasscnt) && $latePasses > AppConstant::NUMERIC_ZERO) {
-                        echo " <a href=\"#\">", _('Use LatePass'), "</a>";
-                        if ($canundolatepass) {
-                            echo " | <a href=\"#\">", _('Un-use LatePass'), "</a>";
-                        }
+                    <?php } else if (($line['allowlate']%AppConstant::NUMERIC_TEN == AppConstant::NUMERIC_ONE || $line['allowlate']%AppConstant::NUMERIC_TEN-1>$latepasscnt) && $latePasses > AppConstant::NUMERIC_ZERO) { ?>
+<!--//                        echo " <a href=\"#\">", _('Use LatePass'), "</a>";-->
+                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $line['id'].'&cid=' .$courseId. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $line['id']?>"> Use Late Pass</a>
+<?php                        if ($canundolatepass) { ?>
+<!--                            echo " | <a href=\"#\">", _('Un-use LatePass'), "</a>";-->
+                            <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $line['id'].'&cid=' .$courseId. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $line['id']?>">Un-use LatePass</a>
+                      <?php  }
                     } else if ($line['allowlate'] > AppConstant::NUMERIC_ZERO && ($sessionData['stuview'])) {
                         echo _(' LatePass Allowed');
-                    } else if ($line['allowlate'] > AppConstant::NUMERIC_ZERO && $canundolatepass) {
-                        echo " <a href=\"#\">", _('Un-use LatePass'), "</a>";
-                    }
+                    } else if ($line['allowlate'] > AppConstant::NUMERIC_ZERO && $canundolatepass) { ?>
+<!--                        echo " <a href=\"#\">", _('Un-use LatePass'), "</a>";-->
+                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $line['id'].'&cid=' .$courseId. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $line['id']?>">Un-use LatePass</a>
+                 <?php   }
                     echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
                 } else if($line['avail'] == AppConstant::NUMERIC_ONE && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
@@ -888,9 +891,10 @@ class ShowItemCourse extends Component
                     if ($line['reviewdate'] != AppConstant::ALWAYS_TIME) {
                         echo " ", _('until'), " $reviewdate \n";
                     }
-                    if ($line['allowlate'] > AppConstant::NUMERIC_TEN && ($now - $line['enddate'])<$latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO && !in_array($typeid,$viewedAssess) && $latePasses > AppConstant::NUMERIC_ZERO && !($sessionData['stuview'])) {
-                        echo " <a href=\"#\">", _('Use LatePass'), "</a>";
-                    }
+                    if ($line['allowlate'] > AppConstant::NUMERIC_TEN && ($now - $line['enddate'])<$latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO && !in_array($typeid,$viewedAssess) && $latePasses > AppConstant::NUMERIC_ZERO && !($sessionData['stuview'])) { ?>
+<!--//                        echo " <a href=\"#\">", _('Use LatePass'), "</a>";-->
+                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $line['id'].'&cid=' .$courseId. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $line['id']?>"> Use Late Pass</a>
+                    <?php }
                     if ($canEdit) {
                         echo '<span class="instronly">';
                         if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
