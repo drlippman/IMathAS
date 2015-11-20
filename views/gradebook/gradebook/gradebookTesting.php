@@ -5,7 +5,7 @@ use app\components\AppConstant;
 $this->title = AppUtility::t('Diagnostic Grade Book', false); ?>
 
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class = "row">
@@ -227,7 +227,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
                     if ($gbt[$i][0][0]=='Averages') { ?>
                         <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$j][7]);?>">
                     <?php } else { ?>
-                        <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7])?>">
+                        <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7])?> ">
                     <?php }
                 }
                 if (isset($gbt[$i][1][$j][0])) {

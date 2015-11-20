@@ -771,7 +771,7 @@ function showquestioncontactlinks($qn) {
 		if ($out != '') {
 			$out .= "<br/>";
 		}
-		$out .= "<a target=\"_blank\" href=\"$imasroot"."forum/forum/add-new-thread?cid={$testsettings['courseid']}&forumid={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">". _('Post this question to forum'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot"."forum/forum/modify-post?courseId={$testsettings['courseid']}&forumId={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}\">". _('Post this question to forum'). "</a>";
 	}
 	return $out;
 }

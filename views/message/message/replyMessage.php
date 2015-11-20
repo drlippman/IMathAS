@@ -6,7 +6,7 @@ $this->title = AppUtility::t(' Reply Message',false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -36,11 +36,11 @@ $this->params['breadcrumbs'][] = $this->title;
 } else {
     $message = '';
 }?>
-<div class="tab-content shadowBox">
-    <div class="inner-reply-msg-content padding-top-thirty inner-reply-height">
-        <div class="drop-down padding-top col-sm-12">
-            <div class="col-sm-1"><?php echo AppUtility::t('To');?></div>
-            <div class="col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;
+<div class="tab-content shadowBox col-md-12 col-sm-12 padding-left-zero padding-right-zero">
+    <div class="inner-reply-msg-content padding-top-thirty col-md-12 col-sm-12">
+        <div class="drop-down padding-top col-sm-12 col-md-12">
+            <div class="col-md-1 col-sm-1"><?php echo AppUtility::t('To');?></div>
+            <div class="col-md-11 col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;
 
                 <?php if($userRights['rights'] == AppConstant::ADMIN_RIGHT) { ?>
                 <span class="text-deco-none padding-right-fifteen">
@@ -53,24 +53,32 @@ $this->params['breadcrumbs'][] = $this->title;
                <?php echo AppUtility::t('Last Login:'." ".date("F j, Y, g:i a",$fromUser->lastaccess));?>
             </div>
         </div>
-        <div class="col-sm-12 padding-top">
-            <div class="col-sm-1"><?php echo AppUtility::t('Subject');?></div>
-            <div class="col-sm-8"><input class="textbox subject" type="text" value="Re: <?php echo $messages->title ?>">
+        <div class="col-md-12 col-sm-12 padding-top">
+            <div class="col-md-1 col-sm-1">
+                <?php echo AppUtility::t('Subject');?>
+            </div>
+            <div class="col-md-11 col-sm-11">
+                <input class="textbox subject form-control" type="text" value="Re: <?php echo $messages->title ?>">
             </div>
         </div>
-        <div class="col-sm-12 padding-top">
-            <div class="col-sm-1"><?php echo AppUtility::t('Message');?></div>
-            <?php echo "<div class='left col-sm-11'><div class= 'editor'>
-        <textarea id='message' name='message' style='width: 100%;' rows='12' cols='15'>$message</textarea></div></div><br>"; ?>
+        <div class="col-md-12 col-sm-12 padding-top">
+            <div class="col-md-1 col-sm-1"><?php echo AppUtility::t('Message');?></div>
+            <div class='left col-md-11 col-sm-11'>
+                <div class='editor reply-message-textarea'>
+                    <textarea class="col-md-12 col-sm-12 max-width-hundred-per" id='message' name='message' rows='12' cols='15'>
+                        <?php echo $message ?>
+                    </textarea>
+                </div>
+            </div>
         </div>
-        <div class="checkbox override-hidden col-sm-12">
-            <label class="col-sm-6 margin-left-message">
+        <div class="checkbox override-hidden col-md-12 col-sm-12">
+            <label class="col-md-6 col-sm-6 margin-left-message">
                 <input type="checkbox" class="header-checked" name="header-checked" value="1">
                 <span class="cr"><i class="cr-icon fa fa-check"></i></span>
                 <?php echo AppUtility::t('Mark original message unread');?>
             </label>
         </div>
-    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty-five padding-bottom-thirty">
+    <div class="header-btn hide-hover col-md-6 col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty-five padding-bottom-thirty">
         <a href="#" id="msg-btn" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
     </div>
     </div>

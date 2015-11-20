@@ -171,10 +171,6 @@ button.btn.btn-primary1.btn-color{
 {
     background-color: #f8f8f8;
     width: auto;
-    height: 600px;
-    margin-right: 20px;
-    margin-left: 20px;
-    margin-bottom: 20px;
 }
 .margin-left-message
 {
@@ -230,4 +226,13 @@ margin-right: 30px;
 .text-deco-none a:hover {
     text-decoration: none;
     color: #ffffff;
+}
+.reply-message-textarea iframe, .send-message-textarea iframe {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+.reply-message-textarea table,.send-message-textarea table {
+    width: 100% !important;
+    width: 100% !important;
+;
 }

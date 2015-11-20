@@ -11,7 +11,7 @@ if ($params['gbitem'] == 'new') {
 }
 ?>
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 <form id="mainform" method=post action="add-grades?stu=<?php echo $params['stu']; ?>&cid=<?php echo $course->id ?>&gbmode=<?php echo $params['gbmode'] ?>&gbitem=<?php echo $params['gbitem'] ?>&grades=<?php echo $params['grades'] ?>" onsubmit="return valform();">
     <div class="title-container">

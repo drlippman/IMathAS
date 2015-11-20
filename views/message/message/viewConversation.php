@@ -13,7 +13,7 @@ AppUtility::includeJS('general.js'); ?>
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
 <?php AppUtility::includeJS('ASCIIsvg_min.js');?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -22,15 +22,15 @@ AppUtility::includeJS('general.js'); ?>
         </div>
     </div>
 </div>
-<div class="item-detail-content">
+<div class="item-detail-content padding-top-two-em">
     <?php if($userRights->rights == 100 || $userRights->rights == 20) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
     } elseif($userRights->rights == 10){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
-<div class="tab-content shadowBox">
-    <div class=mainbody>
+<div class="tab-content shadowBox col-md-12 col-sm-12 padding-top-bottom-one-pt-five-em">
+    <div class="mainbody col-md-12 col-sm-12">
         <div class="headerwrapper">
             <div id="navlistcont">
                 <ul id="navlist"></ul>
@@ -38,7 +38,7 @@ AppUtility::includeJS('general.js'); ?>
             </div>
         </div>
 
-        <div class="midwrapper">
+        <div class="col-md-12 col-sm-12">
             <?php $sent = $messageId;
             if ($sent != AppConstant::NUMERIC_ONE) {
                 ?>

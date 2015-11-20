@@ -242,7 +242,7 @@ global $AS, $AMT, $imasroot;
 	function printfilter($str) {
 		global $imasroot;
 		$str = preg_replace('/<canvas.*?\'(\w+\.png)\'.*?\/script>/','<div><img src="'.AppUtility::getBasePath().'/filter/graph/imgs/$1"/></div>',$str);
-		$str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
+        $str = preg_replace('/<script.*?\/script>/','',$str);  //strip scripts
 		$str = preg_replace('/<input[^>]*Preview[^>]*>/','',$str); //strip preview buttons
 		if (isset($_POST['hidetxtboxes'])) {
 			$str = preg_replace('/<input[^>]*text[^>]*>/','',$str);

@@ -7,7 +7,7 @@ $this->title = AppUtility::t(' Send New Message',false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
 <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
 <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox col-md-12 col-sm-12 padding-left-zero padding-right-zero">
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => [],
@@ -37,18 +37,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'labelOptions' => [],
         ],
     ]); ?>
-    <div class="inner-reply-msg-content">
-        <div class="">
-            <div class="drop-down col-sm-12 padding-top">
-                <span class="col-sm-1"><?php echo AppUtility::t('To')?></span>
+    <div class="inner-reply-msg-content col-md-12 col-sm-12 padding-left-zero padding-right-zero padding-top-bottom-one-pt-five-em">
+            <div class="drop-down col-md-12 col-sm-12 padding-top">
+                <span class="col-md-1 col-sm-1"><?php echo AppUtility::t('To')?></span>
                 <?php if($newTo)
                 {?>
                         <input type="hidden" id="newTo" value="1">
                         <input type="hidden" id="newUserId" value="<?php echo $loginid?>">
-                        <span class="col-sm-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
+                        <span class="col-md-4 col-sm-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
             <?php }else
                     {?>
-                    <span class="col-sm-4">
+                    <span class="col-md-4 col-sm-4">
                     <select name="seluid" class="dropdown form-control" id="seluid">
                         <option value="0">Select a recipient</option>
                         <?php foreach ($users as $user) { ?>
@@ -60,20 +59,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 </span>
             </div>
 
-            <div class="col-sm-12 padding-top">
-                <span class="col-sm-1"><?php echo AppUtility::t('Subject')?></span>
-                <span class="col-sm-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
+            <div class="col-md-12 col-sm-12 padding-top">
+                <span class="col-md-1 col-sm-1"><?php echo AppUtility::t('Subject')?></span>
+                <span class="col-md-4 col-sm-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
             </div>
 
-            <div class="col-sm-12 padding-top">
-                <span class="col-sm-1"><?php echo AppUtility::t('Message')?></span>
-                <?php echo "<span class='left col-sm-11'><div class= 'editor'>
-            <textarea id='message' name='message' style='width: 70%;' rows='12' cols='15'>";
-                echo "</textarea></div></span><br>"; ?>
+            <div class="col-md-12 col-sm-12 padding-top">
+                <span class="col-md-1 col-sm-1"><?php echo AppUtility::t('Message')?></span>
+                <?php echo "<span class='left col-md-11 col-sm-11'>
+                    <div class='editor col-md-12 col-sm-12 padding-left-zero send-message-textarea'>
+                <textarea id='message' name='message' rows='12' cols='15'>";
+                echo "</textarea>
+                </div></span><br>"; ?>
             </div>
-            <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty">
+            <div class="header-btn hide-hover col-md-6 col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty">
                 <a href="#"id="mess" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
             </div>
-        </div>
     </div>
 </div>

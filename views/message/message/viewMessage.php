@@ -20,10 +20,10 @@ $now = $currentTime;
 
 <?php } ?>
     <div class="item-detail-header">
-            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 
     </div>
-    <div class = "title-container">
+    <div class="title-container padding-bottom-two-em">
         <div class="row">
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page page-title-back-arrow"><?php echo $this->title ?></div>
@@ -38,17 +38,17 @@ $now = $currentTime;
      <div class="view-message-inner-contents min-height-three-hundred-five view-message-margin">
          <div class="row">
 
-                 <div class=" col-sm-6 message-title">
+                 <div class="col-md-6 col-sm-6 message-title">
                      <h4 class="margin-top-zero"><b><?php echo $messages->title ?></b></h4>
                   </div>
-                 <div class="pull right col-sm-6 message-title ">
+                 <div class="pull right col-md-6 col-sm-6 message-title ">
                      <?php echo date('M d, o g:i a', $messages->senddate) ?>
                  </div>
          </div>
          <div class="second-level-div row">
-             <div class="col-sm-2 padding-top-five">
-                 <span>From: <?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName) ?></span>
-             </div>
+                 <span class="padding-top-five padding-left-one-em padding-right-pt-five-em">
+                     From: <?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName) ?>
+                 </span>
              <?php if($userRights['rights'] == AppConstant::ADMIN_RIGHT) { ?>
                  <span class="text-deco-none padding-right-fifteen">
                     <a class="btn1 reply-button" href="#"><?php echo AppUtility::t('email');?></a>
@@ -58,14 +58,14 @@ $now = $currentTime;
                  <span>
              <?php } ?>
          </div>
-        <div class="col-md-12 message-body word-break-break-all">
+        <div class="col-md-12 col-sm-12 message-body word-break-break-all">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
              {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">['.AppUtility::t('Show trimmed content', false).']</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
                    } ?>
            <?php echo $messages->message ?>
          </div>
 
-         <div class="reply message-body col-md-12 padding-left-zero">
+         <div class="reply message-body col-md-12 col-sm-12 padding-left-zero">
              <?php $sent = $messageId;?>
              <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
                     <span class="padding-left-fifteen padding-right-fifteen text-deco-none">

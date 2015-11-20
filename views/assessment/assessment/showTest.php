@@ -22,11 +22,11 @@ $this->title = $testsettings['name'];
 if ($pwfail) {
     if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
         $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../course/course/course?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?stu='.$studentid.'cid=' . $testsettings['courseid']]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?stu='.$studentid.'cid=' . $testsettings['courseid']]]);
     }
 }
 if (isset($sessiondata['actas'])) {
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename'], AppUtility::t('Gradebook Detail',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?stu='.$studentid.'cid=' . $testsettings['courseid'], AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook-view-assessment-details?cid=' . $testsettings['courseid'].'&asid='.$testid.'&uid='.$sessiondata['actas']]]);
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $sessiondata['coursename'], AppUtility::t('Gradebook Detail',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?stu='.$studentid.'cid=' . $testsettings['courseid'], AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook-view-assessment-details?cid=' . $testsettings['courseid'].'&asid='.$testid.'&uid='.$sessiondata['actas']]]);
 } else {
    echo '<span class="color-white floatright">'.$userfullname.'</span>';
     if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype'] == 0) {

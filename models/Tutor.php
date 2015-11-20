@@ -48,7 +48,7 @@ class Tutor extends BaseImasTutors
         return static::findAll(['userid' => $userId]);
     }
 
-    Public static function findTutorsToList($courseId,$isteacher,$section)
+    public static function findTutorsToList($courseId,$isteacher=false,$section=false)
     {
         $query = new Query();
         $query->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])

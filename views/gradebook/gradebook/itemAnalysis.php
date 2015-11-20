@@ -7,7 +7,7 @@ $this->title = 'Item Analysis';?>
 
     <?php
     if($student == AppConstant::NUMERIC_ZERO) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id], 'page_title' => $this->title]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id], 'page_title' => $this->title]);
     }else if ($student== AppConstant::NUMERIC_NEGATIVE_ONE) {
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Gradebook','Averages'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?stu='.$student.'&cid='.$course->id], 'page_title' => $this->title]);
     } else if ($from=='isolate') {
