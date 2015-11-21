@@ -1169,11 +1169,12 @@ class AssessmentController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $sessionId = $this->getSessionId();
+        $sessiondata = $this->getSessionData($sessionId);;
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $userfullname = $user['FirstName'].' '.$user['LastName'];
         global $temp, $CFG, $questions, $seeds,$showansduring, $testsettings,$qi,$rawscores,$timesontask,$isdiag, $courseId, $attempts,$scores,$bestscores,$noindivscores,$showeachscore,$reattempting,$bestrawscores,$firstrawscores,$bestattempts,$bestseeds,$bestlastanswers,$lastanswers,$bestquestions;
         $myrights = $user['rights'];
-        $sessiondata = $this->getSessionData($sessionId);;
+
         if (!isset($CFG['TE']['navicons'])) {
             $CFG['TE']['navicons'] = array(
                 'untried'=>'te_blue_arrow.png',
@@ -4341,6 +4342,155 @@ class AssessmentController extends AppController
 
         $response = array('scoredView' => $scoredView, 'testSettings' => $testSettings, 'isTeacher' => $isTeacher, 'scoredType' => $scoredType, 'testId' => $testId, 'cid' => $courseId, 'temp' => $temp);
         return $this->renderWithData('showPrintTest',$response);
+    }
+
+    public function actionLatePass()
+    {
+        $this->guestUserHandler();
+        $assessmentId = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
+        $undo = $this->getParamVal('undo');
+        $confirm = $this->getParamVal('confirm');
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+
+        $result = Course::getByLatePasshrs($courseId);
+        $hours = $result[0]['latepasshrs'];
+        $now = time();
+        $viewedAssess = array();
+        $contentTrack = ContentTrack::getByTypeId($courseId, $userId);
+        foreach($contentTrack as $key => $row){
+            $viewedAssess[] = $row['typeid'];
+        }
+
+        if (isset($undo)) {
+            echo "<div>Un-use LatePass</div>";
+            $resultExp = Exceptions::getByUIdAndAssId($userId,$assessmentId);
+            if (count($resultExp) == AppConstant::NUMERIC_ZERO)
+            {
+                echo '<p>Invasssssssssslid</p>';
+            } else {
+                $row = $resultExp;
+                if ($row['islatepass'] == AppConstant::NUMERIC_ZERO)
+                {
+                    echo '<p>Invalid</p>';
+                }
+                else {
+                    $now = time();
+                    $endDateData = Assessments::getEndDateById($assessmentId);
+                    $endDate = $endDateData[0]['enddate'];
+                    /*
+                     * if it's past original due date and latepass is for less than latepasshrs past now, too late
+                     */
+                    if ($now > $endDate && $row['enddate'] < $now + $hours * 60 * 60) {
+                        echo '<p>Too late to un-use this LatePass</p>';
+                    } else {
+                        if ($now < $endDate) {
+                            /*
+                             * before enddate, return all latepasses
+                             */
+                            $n = $row['islatepass'];
+                            Exceptions::deleteByUserIdAndAssId($userId, $assessmentId);
+                        } else {
+                            /*
+                             * figure how many are unused
+                             */
+                            $n = floor(($row['enddate'] - $now)/($hours*60*60));
+                            $newEnd = $row['enddate'] - $n*$hours*60*60;
+                            if ($row['islatepass'] > $n) {
+                                Exceptions::updateData($n, $newEnd, $userId, $assessmentId);
+                            } else {
+                                Exceptions::deleteByUserIdAndAssId($userId, $assessmentId);
+                                $n = $row['islatepass'];
+                            }
+                        }
+                        echo "<p>Returning $n LatePass".($n > AppConstant::NUMERIC_ONE?"es":"")."</p>";
+                        Student::updateLatePass($n, $userId, $courseId);
+                    }
+                }
+            }
+            if (!$sessionData['ltiitemtype'] || $sessionData['ltiitemtype']!=0) { ?>
+<!--                echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";-->
+                <a href="<?php AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId)?>"><?php echo 'Continue'?></a>
+            <?php  } else { ?>
+<!--                echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";-->
+                <a href="<?php AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid='.$courseId.'&id'.$sessionData['ltiitemid'])?>"><?php echo 'Continue'?></a>
+          <?php  }
+        } else if (isset($confirm)) {
+            $addTime = $hours*60*60;
+            $result = Assessments::getDateAndAllowById($assessmentId);
+
+            $allowLate = $result['allowlate'];
+            $enddate = $result['enddate'];
+            $startdate = $result['startdate'];
+
+            $result = Exceptions::getEndDateById($userId, $assessmentId);
+
+            $hasException = false;
+            if ($result == AppConstant::NUMERIC_ZERO) {
+                $usedLatepasses = AppConstant::NUMERIC_ZERO;
+                $thised = $enddate;
+            } else {
+                $r = $result;
+                $usedlatepasses = round(($r['enddate'] - $enddate)/($hours*3600));
+                $hasException = true;
+                $thised = $r['enddate'];
+            }
+
+            if (($allowLate % AppConstant::NUMERIC_TEN == AppConstant::NUMERIC_ONE || $allowLate%10-1 > $usedLatepasses) && ($now < $thised || ($allowLate > 10 && ($now - $thised) < $hours*3600 && !in_array($assessmentId, $viewedAssess))))
+            {
+                $result = Student::updateLatePassById($userId,$courseId);
+
+                if ($result > AppConstant::NUMERIC_ZERO)
+                {
+                    if ($hasException) {
+                        /*
+                         * already have exception
+                         */
+                        Exceptions::updateIsLatePass($addTime,$userId, $assessmentId);
+                    } else {
+                        $enddate = $enddate + $addTime;
+                        $insertData = new Exceptions();
+                        $insertData->insertByUserData($userId, $assessmentId, $startdate, $enddate);
+                    }
+                }
+            }
+            $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
+        } else {
+            echo "Redeem LatePass</div>\n";
+
+            $result = Student::getLatePassById($userId, $courseId);
+            $numLatepass = $result[0]['latepass'];
+
+            $result = Assessments::getDateAndAllowById($assessmentId);
+            list($allowlate,$enddate,$startdate) = $result;
+
+            $result = Exceptions::getEndDateById($userId, $assessmentId);
+            $hasException = false;
+            if ($result == AppConstant::NUMERIC_ZERO)
+            {
+                $usedLatepasses = AppConstant::NUMERIC_ZERO;
+                $thised = $enddate;
+            } else {
+                $r = $result;
+                $usedLatepasses = round(($r['enddate'] - $enddate)/($hours*3600));
+                $hasException = true;
+                $thised = $r['enddate'];
+            }
+
+            if ($numLatepass == AppConstant::NUMERIC_ZERO)
+            {
+                echo "<p>You have no late passes remaining.</p>";
+            }
+            else if (($allowlate % 10 == AppConstant::NUMERIC_ONE || $allowlate %10-1 > $usedLatepasses) && ($now < $thised || ($allowlate > 10 && ($now - $thised) < $hours*3600 && !in_array($assessmentId,$viewedAssess))))
+            {
+
+            } else {
+                echo "<p>You are not allowed to use additional latepasses on this assessment.</p>";
+            }
+        }
     }
 }
 
