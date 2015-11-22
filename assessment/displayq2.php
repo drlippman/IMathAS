@@ -4504,9 +4504,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$A = ($x3p * ($y2p - $y1p) + $x2p * ($y1p - $y3p) + $x1p * ($y3p - $y2p)) / $denom;
 						$B = ($x3p*$x3p * ($y1p - $y2p) + $x2p*$x2p * ($y3p - $y1p) + $x1p*$x1p * ($y2p - $y3p)) / $denom;
 						$C = ($x2p * $x3p * ($x2p - $x3p) * $y1p + $x3p * $x1p * ($x3p - $x1p) * $y2p + $x1p * $x2p * ($x1p - $x2p) * $y3p) / $denom;
+						$xv = -$B/(2*$A);
+						$yv = $C-$B*$B/(4*$A);
+						//TODO:  adjust 20px to be based on drawing window and grid
+						//   maybe ~1 grid units?
 						$xt = -$B/(2*$A)+20;
-						//use vertex and y value at x of vertex + 20 pixels
-						$ansparabs[$key] = array(-$B/(2*$A),$C-$B*$B/(4*$A),$A*$xt*$xt+$B*$xt+$C);
+						$yatxt = $A*$xt*$xt+$B*$xt+$C;
+						if (abs($yatxt - $yv)<20) {
+							$xatyt = sign($A)*sqrt(abs(20/$A))+$xv;
+							$ansparabs[$key] = array('x', $xv, $yv, $xatyt);
+						} else {
+							//use vertex and y value at x of vertex + 20 pixels
+							$ansparabs[$key] = array('y', $xv, $yv, $yatxt);
+						}
+						//**finish me!!
 					}
 				}
 			}
@@ -4545,13 +4556,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else if ($pts[0]==5.4) {
 						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'v');	
 					} else if ($pts[0]==6) {
-						//parab
+						//parab  
+						//for y at x+20, y=a(x-h)^2+k is y=a*20^2+k
+						//for x at y+-20, y=a(x-h)^2+k
+						//                20 = a(x-h)^2
+						//                abs(20/a) = (x-h)^2
 						if ($pts[4]==$pts[2]) {
 							$lines[] = array('y',0,$pts[4]);
 						} else if ($pts[3]!=$pts[1]) {
 							$a = ($pts[4]-$pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
 							$y = $pts[2]+$a*400;
-							$parabs[] = array($pts[1],$pts[2],$y);
+							$x = $pts[1]+sign($a)*sqrt(abs(20/$a));
+							$parabs[] = array($pts[1],$pts[2],$y,$x);
 						}
 					} else if ($pts[0]==6.5) {//sqrt
 						$flip = ($pts[3] < $pts[1])?-1:1;
@@ -4799,14 +4815,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($ansparabs as $key=>$ansparab) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($parabs); $i++) {
-					if (abs($ansparab[0]-$parabs[$i][0])>$defpttol*$reltolerance) {
+					if (abs($ansparab[1]-$parabs[$i][0])>$defpttol*$reltolerance) {
 						continue;
 					}
-					if (abs($ansparab[1]-$parabs[$i][1])>$defpttol*$reltolerance) {
+					if (abs($ansparab[2]-$parabs[$i][1])>$defpttol*$reltolerance) {
 						continue;
 					}
-					if (abs($ansparab[2]-$parabs[$i][2])>$defpttol*$reltolerance) {
-						continue;
+					if ($ansparab[0]=='x') { //compare x at yv+-20
+						if (abs($ansparab[3]-$parabs[$i][3])>$defpttol*$reltolerance) {
+							continue;
+						}
+					} else { //compare y at xv+20
+						if (abs($ansparab[3]-$parabs[$i][2])>$defpttol*$reltolerance) {
+							continue;
+						}
 					}
 					$scores[$key] = 1;
 					break;
