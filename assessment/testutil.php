@@ -76,6 +76,7 @@ function getquestioninfo($qns,$testsettings) {
 		}
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
+		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0); 
 		unset($line['qtype']);
 		unset($line['control']);
 		$out[$line['id']] = $line;
@@ -704,11 +705,11 @@ function canimproveany() {
 //basic show question, for
 function basicshowq($qn,$seqinactive=false,$colors=array()) {
 	global $showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores;
-	$qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
+	$qshowansduring = (($showansduring && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showansduring']);
 	$qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J');
-	
 	if (canimprove($qn)) {
-		if ($qshowansduring && $attempts[$qn]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
+		if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $attempts[$qn]>=$testsettings['showans']) ||
+		    ($qi[$questions[$qn]]['showansduring'] && $attempts[$qn]>=$qi[$questions[$qn]]['showans'])) {$showa = true;} else {$showa=false;}
 	} else {
 		$showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);	
 	}

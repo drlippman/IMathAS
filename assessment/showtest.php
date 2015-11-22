@@ -623,7 +623,7 @@
 	
 	$allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
-	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
+	$showansduring = is_numeric($testsettings['showans']);
 	$showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
 	$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
 	$reviewatend = ($testsettings['testtype']=="EndReview");
@@ -1577,7 +1577,8 @@ if (!isset($_POST['embedpostback'])) {
 					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
 						echo " and correct answer";
 						$showcorrectnow = true;
-					} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+					} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
+						   ($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn])) {
 						echo " and correct answer";
 						$showcorrectnow = true;
 					} else {
@@ -1714,7 +1715,9 @@ if (!isset($_POST['embedpostback'])) {
 						} else {
 							$colors = array();
 						}
-						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+						$qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || 
+							($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']) ||
+							($qi[$questions[$next]]['showansduring'] && $attempts[$next]>=$qi[$questions[$next]]['showans']));
 						if ($qshowans) {
 							displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
 						} else {
@@ -1995,7 +1998,8 @@ if (!isset($_POST['embedpostback'])) {
 						if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
 							$msg .= " and correct answer";
 							$showcorrectnow = true;
-						} else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+						} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
+							($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn])) {
 							$msg .= " and correct answer";
 							$showcorrectnow = true;
 						} else {
@@ -2361,7 +2365,8 @@ if (!isset($_POST['embedpostback'])) {
 				} else {
 					if (($showansafterlast && $qi[$questions[$i]]['showans']=='0') || $qi[$questions[$i]]['showans']=='F' || $qi[$questions[$i]]['showans']=='J') {
 						$showcorrectnow = true;
-					} else if ($showansduring && $qi[$questions[$i]]['showans']=='0' && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) {
+					} else if (($showansduring && $qi[$questions[$i]]['showans']=='0' && $testsettings['showans']==$attempts[$i]) ||
+						  ($qi[$questions[$i]]['showansduring'] && $qi[$questions[$i]]['showans']==$attempts[$qn])){
 						$showcorrectnow = true;
 					} else {
 						$showcorrectnow = false;

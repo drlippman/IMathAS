@@ -199,6 +199,14 @@ Leave items blank to use the assessment's default values<br/>
      <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>
      <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
      <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>>Show answer after last attempt</option>
+     <option value="1" <?php if ($line['showans']=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
+     <option value="2" <?php if ($line['showans']=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
+     <option value="3" <?php if ($line['showans']=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
+     <option value="4" <?php if ($line['showans']=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
+     <option value="5" <?php if ($line['showans']=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
+     <option value="6" <?php if ($line['showans']=="6") {echo "SELECTED";} ?>>After 6 attempts</option>
+     <option value="7" <?php if ($line['showans']=="7") {echo "SELECTED";} ?>>After 7 attempts</option>
+				
     </select></span><br class="form"/>
 
 <span class=form>Show hints and video/text buttons?</span><span class=formright>
