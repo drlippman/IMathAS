@@ -1528,3 +1528,13 @@ margin-left: 1em;
 .width-ninety-per {
     width: 90px;
 }
+.padding-top-bottom-two-em {
+    padding-top: 2em !important;
+    padding-bottom: 2em !important;
+}
+.padding-left-two-pt-three-em {
+    padding-left: 2.3em;
+}
+.padding-left-two-pt-two-em {
+    padding-left: 2.2em;
+}
