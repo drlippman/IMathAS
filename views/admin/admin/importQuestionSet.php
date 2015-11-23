@@ -63,11 +63,11 @@ $parents = $parentsData;
                             <?php echo $page_fileHiddenInput; ?>
                             <?php echo $qData['libdesc'];
                             echo $page_existingMsg;?>
-                            <h3><?php AppUtility::t('Select Questions to import'); ?></h3>
+                            <div class="col-md-12 col-sm-12 padding-left-zero"><h3><?php AppUtility::t('Select Questions to import'); ?></h3></div>
 
-                            <p>
-                                <?php AppUtility::t('Set Question Use Rights to'); ?><select name=userights
-                                                                                             class="form-control-import-question">
+                            <div class="col-md-12 padding-left-zero">
+                                <div class="col-md-2 col-sm-3 padding-left-zero"><?php AppUtility::t('Set Question Use Rights to'); ?></div>
+                                <div class="col-md-4 col-sm-4 padding-left-zero"><select name=userights class="form-control-import-question">
                                     <option value="0"><?php AppUtility::t('Private'); ?></option>
                                     <option value="2"
                                             SELECTED><?php AppUtility::t('Allow use, use as template, no modifications'); ?></option>
@@ -75,27 +75,36 @@ $parents = $parentsData;
                                         value="3"><?php AppUtility::t('Allow use by all and modifications by group'); ?></option>
                                     <option
                                         value="4"><?php AppUtility::t('Allow use and modifications by all'); ?></option>
-                                </select>
-                            </p>
+                                </select></div>
+                            </div><br class="form"><br/>
 
-                            <p>
-                                <?php AppUtility::t('Assign to library:'); ?> <span
-                                    id="libnames"><?php AppUtility::t('Unassigned'); ?></span>
+                            <div class="col-md-12 col-sm-12 padding-left-zero">
+                                <div class="col-sm-2 col-md-2 padding-left-zero"><?php AppUtility::t('Assign to library'); ?></div> <div
+                                    id="libnames" class="col-md-1 col-sm-1 padding-left-zero"><?php AppUtility::t('Unassigned'); ?></div>
                                 <input type=hidden name="libs" id="libs" value="0">
-                                <input type=button value="<?php AppUtility::t('Select Libraries'); ?>" onClick="libselect()"><br>
-                                <?php AppUtility::t('Check:'); ?> <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php AppUtility::t('All'); ?></a>
-                                <a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php AppUtility::t('None'); ?></a>
-                            </p>
+                                <div class="col-md-1 col-sm-1 padding-left-zero"><input type=button value="<?php AppUtility::t('Select Libraries'); ?>" onClick="libselect()"></div><br>
+<!--                                --><?php //AppUtility::t('Check:'); ?><!-- <a href="#" onclick="return chkAllNone('qform','checked[]',true)">--><?php //AppUtility::t('All'); ?><!--</a>-->
+<!--                                <a href="#" onclick="return chkAllNone('qform','checked[]',false)">--><?php //AppUtility::t('None'); ?><!--</a>-->
+                            </div><br/>
 
-                            <table cellpadding=5 class=gb>
+                            <br/><br class="form"><table id="myTable" class="potential-question-table gb" style="clear:both; position:relative;width: 100%">
                                 <thead>
                                 <tr>
-                                    <th></th>
-                                    <th><?php AppUtility::t('Description'); ?></th>
-                                    <th><?php AppUtility::t('Type'); ?></th>
+                                    <th class="questionId">
+                                        <div class="checkbox override-hidden floatleft">
+                                            <label style="padding-left:0px">
+                                                <input type="checkbox" name="header-checked"  value="">
+                                                <span class="cr">
+                                                    <i class="cr-icon fa fa-check"></i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th style="text-align: left"><?php AppUtility::t('Description') ?></th>
+                                    <th style="text-align: left"><?php AppUtility::t('Type') ?></th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="potential-question-information-table">
                                 <?php
                                 $alt = AppConstant::NUMERIC_ZERO;
                                 for ($i = AppConstant::NUMERIC_ZERO; $i < (count($qData) - AppConstant::NUMERIC_ONE); $i++) {
@@ -107,18 +116,20 @@ $parents = $parentsData;
                                         $alt = AppConstant::NUMERIC_ZERO;
                                     }
                                     ?>
-                                    <td>
-                                        <input type=checkbox name='checked[]' value='<?php echo $i ?>' checked=checked>
-                                    </td>
-                                    <td><?php echo $qData[$i]['description'] ?></td>
-                                    <td><?php echo $qData[$i]['qtype'] ?></td>
+                                    <tr>
+                                        <td>
+                                            <input type=checkbox name='checked[]' value='<?php echo $i ?>'>
+    <!--                                        checked=checked-->
+                                        </td>
+                                        <td><?php echo $qData[$i]['description'] ?></td>
+                                        <td><?php echo $qData[$i]['qtype'] ?></td>
                                     </tr>
                                 <?php
                                 }
                                 ?>
                                 </tbody>
                             </table><BR>
-                            <input type=submit name="process" value="<?php AppUtility::t('Import Questions'); ?>">
+                            <input type=submit name="process" value="<?php AppUtility::t('Import Questions'); ?>"><br/><br class="form">
                         <?php } ?>
                     <?php } ?>
                 </form>

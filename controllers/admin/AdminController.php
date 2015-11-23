@@ -2948,9 +2948,11 @@ class AdminController extends AppController
                     array_shift($newLibs);
                 }
                 $checked = $params['checked'];
+
                 $rights = $params['userights'];
                 foreach ($checked as $qn)
                 {
+
                     if (is_numeric($qData[$qn]['uqid']))
                     {
                         $lookup[] = $qData[$qn]['uqid'];
@@ -3075,7 +3077,6 @@ class AdminController extends AppController
                         {
                             if (!(isset($doNotAddLi[$lib]) && $doNotAddLi[$lib] == $qSetId))
                             {
-
                                 $insert = new LibraryItems();
                                 $insert->insertData($lib,$qSetId,$user);
                                 $newLi++;
@@ -3161,6 +3162,7 @@ class AdminController extends AppController
                 {
                     foreach ($qData as $qnd)
                     {
+
                         if(is_array($qnd))
                         {
                             if (is_numeric($qnd['uqid']))
@@ -3173,12 +3175,13 @@ class AdminController extends AppController
                 if($lookup)
                 {
                     $questionSetData = QuestionSet::getDataForImportQSet($lookup);
+
                 }
                 if($questionSetData)
                 {
                     $existing = true;
-                    $page_existingMsg = "<p>This file contains questions with uniqueids that already exist on this system.  With these questions, do you want to:<br/>\n";
-                    $page_existingMsg .= "<input type=radio name=merge value='1' CHECKED>Update existing questions<br><input type=radio name=merge value='0'>Add as new question<br><input type=radio name=merge value='-1'>Keep existing question</p>\n";
+                    $page_existingMsg = "<br/><div class='col-md-12 col-sm-12 padding-left-zero'>This file contains questions with uniqueids that already exist on this system.  With these questions, do you want to:<br/>\n";
+                    $page_existingMsg .= "<input type=radio name=merge value='1' CHECKED><span class='padding-left-five'>Update existing questions</span><br><input type=radio name=merge value='0'><span class='padding-left-five'>Add as new question</span><br><input type=radio name=merge value='-1'><span class='padding-left-five'>Keep existing question</span></div>\n";
                 }
                 else
                 {
@@ -3188,9 +3191,9 @@ class AdminController extends AppController
                 if (isset($qData['pack']))
                 {
                     $importLibLink = AppUtility::getURLFromHome('admin','admin/import-lib?cid='.$courseId);
-                    $page_fileNoticeMsg .=  "<p>This file contains a library structure as well as questions.  Continue to use this form ";
+                    $page_fileNoticeMsg .=  "<div class='col-md-10 col-sm-10 padding-left-zero'>This file contains a library structure as well as questions.  Continue to use this form ";
                     $page_fileNoticeMsg .=  "if you with to import individual questions.<br />  Use the <a href='.$importLibLink'>Import Libraries</a> ";
-                    $page_fileNoticeMsg .=  "page to import the libraries with structure</p>\n";
+                    $page_fileNoticeMsg .=  "page to import the libraries with structure.</div><br/><br class='form'>\n";
                 }
             }
             else
@@ -3199,7 +3202,7 @@ class AdminController extends AppController
             }
         }
         $this->layout = 'master';
-        $this->includeJS(['importQuestionSet.js']);
+        $this->includeJS(['importQuestionSet.js','question/addquestions.js']);
         $responseData = array('overwriteBody' => $overwriteBody,'body' =>$body,'params' => $params,'courseId' => $courseId,'newQ' => $newQ,'updateQ' => $updateQ,'newLi' => $newLi,
             'page_fileNoticeMsg' => $page_fileNoticeMsg,'page_fileErrorMsg' => $page_fileErrorMsg,'page_fileHiddenInput' => $page_fileHiddenInput,'qData' => $qData,'page_existingMsg' => $page_existingMsg,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin);
         return $this->renderWithData('importQuestionSet',$responseData);

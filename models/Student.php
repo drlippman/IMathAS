@@ -539,7 +539,7 @@ class Student extends BaseImasStudents
     {
         $latepass = Student::find()->where(['courseid' => $courseId])->andWhere(['userid' => $userId])->andWhere(['>','latepass',AppConstant::NUMERIC_ZERO])->one();
         $latepass->latepass = $latepass->latepass - 1;
-        $latepass->save();
+        return $latepass->save();
     }
 
     public static function getLatePassById($userId, $courseId)

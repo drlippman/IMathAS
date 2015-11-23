@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
     <br>
-    <div class="align-copy-course col-md-10 col-sm-10 word-wrap-break-word">
+    <div class="align-copy-course col-md-10 col-sm-10 word-wrap-break-word word-break-break-all">
         <?php if($questionSetData)
         {
             foreach($questionSetData as $row)
@@ -29,5 +29,6 @@ $this->params['breadcrumbs'][] = $this->title;
         } else{
             echo AppUtility::t('No External Reference Available');
         }?>
+        <br/>
     </div>
 </div>

@@ -33,8 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
     if ($overwriteBody==1)
     {
         echo $message;
-    }else
-    {
+    } else {
         if(!isset($loadToOthers))
         {
 
@@ -230,7 +229,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             $lastTeacher = $line['userid'];
                                 }
                                 ?>
-                                <li>
+                                <li class="word-break-break-all">
                                     <span class=dd>-</span>
                                     <?php
                                     echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
@@ -302,7 +301,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             for ($i=0;$i<count($page_mineList['val']);$i++) {
                                 ?>
 
-                                <li><span class=dd>-</span>
+                                <li class="word-wrap-break-word"><span class=dd>-</span>
                                     <input type=radio name=ctc value="<?php echo $page_mineList['val'][$i] ?>"><?php echo $page_mineList['label'][$i] . "\n" ?>
                                 </li>
                             <?php
@@ -344,7 +343,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $lastTeacher = $line['userid'];
                                     }
                                     ?>
-                                    <li>
+                                    <li class="word-break-break-all">
                                         <span class=dd>-</span>
                                         <?php
                                         echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
@@ -395,7 +394,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     foreach($courseTemplateResults as $row)
                                                     {
                                                         ?>
-                                                        <li>
+                                                        <li class="word-break-break-all">
                                                             <span class=dd>-</span>
                                                             <?php
                                                             echo '<input type="radio" name="ctc" value="'.$row['id'].'" '.(($row['copyrights']<2)?'class="copyr"':'').'>';
@@ -427,7 +426,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                             <?php
                                                             foreach($groupTemplateResults as $row) {
                                                                 ?>
-                                                                <li>
+                                                                <li class="word-break-break-all">
                                                                     <span class=dd>-</span>
                                                                     <input type=radio name=ctc value="<?php echo $row['id'] ?>">
                                                                     <?php echo $row['name'] ?>

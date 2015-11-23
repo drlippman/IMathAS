@@ -17,8 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--Course name-->
 <div class="title-container">
     <div class="row">
-        <div class="col-sm-12">
-            <div class=" col-sm-10" style="right: 30px;">
+        <div class="col-md-12 col-sm-12">
+            <div class="col-md-10 col-sm-10" style="right: 30px;">
                 <div class="vertical-align title-page"><?php echo AppUtility::t($pagetitle) ?><a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=managequestionset' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
             </div>
         </div>
@@ -54,9 +54,9 @@ $this->params['breadcrumbs'][] = $this->title;
             }
 
             if (todo == 'del'){
-                var html ='<div><p>Are you SURE you want to delete this question from the Question Set?</p></div>';
-                html +='<div><p> This will make it unavailable to all users.</p></div>';
-                html +='<div><p>If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
+                var html ='<div><p><?php AppUtility::t('Are you SURE you want to delete this question from the Question Set?')?></p></div>';
+                html +='<div><p><?php AppUtility::t('This will make it unavailable to all users.')?></p></div>';
+                html +='<div><p><?php AppUtility::t('If it is currently being used in an assessment, it will mess up that assessment.')?></p></div>';
                 $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                     modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                     width: 'auto', resizable: false,
@@ -100,13 +100,13 @@ $this->params['breadcrumbs'][] = $this->title;
     if (isset($transfer)) {
     ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>&transfer=<?php echo $transfer ?>">
-            <div class="col-md-12 padding-left-thirty padding-top-five"><div class="col-md-12 padding-left-zero">
-                <span class="floatleft select-text-margin">Transfer to</span>
-<div class="col-md-3 floatleft">
+            <div class="col-md-12 col-sm-12 padding-left-thirty padding-top-five"><div class="col-sm-12 col-md-12 padding-left-zero">
+                <span class="floatleft select-text-margin"><?php AppUtility::t('Transfer to')?></span>
+<div class="col-md-3 col-sm-3 floatleft">
     <?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
 </div>
                 </div>
-            <div class="col-md-12 padding-top-fifteen padding-left-zero padding-left-one">
+            <div class="col-md-12 col-sm-12 padding-top-fifteen padding-left-zero padding-left-one">
                 <input type=submit value="Transfer">
                 <input type=button value="Nevermind" class="margin-left-fifteen secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
@@ -120,19 +120,19 @@ $this->params['breadcrumbs'][] = $this->title;
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=chglib value="true">
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
-            <div class="col-md-12 padding-left-thirty">
-            <div class="col-sm-12 padding-left-zero">What do you want to do with these questions?</div>
-            <div class="col-sm-12 padding-left-zero margin-top-ten"><input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/><span class="margin-left-five">Add to libraries, keeping any existing library assignments</span></div>
-            <div class="col-sm-12 padding-left-zero margin-top-five"><input type=radio name="action" value="1" onclick="chglibtoggle(this)"/><span class="margin-left-five">Add to libraries, removing existing library assignments</span></div>
-            <div class="col-sm-12 padding-left-zero margin-top-five"><input type=radio name="action" value="2" onclick="chglibtoggle(this)"/><span class="margin-left-five">Remove library assignments</span></div>
-            <div class="col-sm-12 padding-left-zero margin-top-five" id="chglibhelp" style="font-weight: bold;">
-                <span>Select libraries to add these questions to.</span>
+            <div class="col-md-12 col-sm-12 padding-left-thirty">
+            <div class="col-sm-12 col-sm-12 padding-left-zero"><?php AppUtility::t('What do you want to do with these questions?')?></div>
+            <div class="col-sm-12 col-sm-12 padding-left-zero margin-top-ten"><input type=radio name="action" value="0" onclick="chglibtoggle(this)" checked="checked"/><span class="margin-left-five">Add to libraries, keeping any existing library assignments</span></div>
+            <div class="col-sm-12 col-sm-12 padding-left-zero margin-top-five"><input type=radio name="action" value="1" onclick="chglibtoggle(this)"/><span class="margin-left-five">Add to libraries, removing existing library assignments</span></div>
+            <div class="col-sm-12 col-sm-12 padding-left-zero margin-top-five"><input type=radio name="action" value="2" onclick="chglibtoggle(this)"/><span class="margin-left-five">Remove library assignments</span></div>
+            <div class="col-sm-12 col-sm-12 padding-left-zero margin-top-five" id="chglibhelp" style="font-weight: bold;">
+                <span><?php AppUtility::t('Select libraries to add these questions to.')?></span>
             </div>
 
             <?php $libtreeshowchecks = false; include("questionLibraries.php"); ?>
 
 
-            <div class="col-sm-12 padding-left-zero margin-top-ten margin-bottom-fifteen">
+            <div class="col-sm-12 col-md-12 padding-left-zero margin-top-ten margin-bottom-fifteen">
                 <input type=submit value="Make Changes">
                 <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
@@ -144,21 +144,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=template value="true">
-
-            <p>
-                This page will create new copies of these questions.  It is recommended that you place these new copies in a
-                different library that the questions are currently are in, so you can distinguish the new versions from the originals.
-            </p>
-            <p>Select the library into which to put the new copies:</p>
+            <div class="col-md-12 col-sm-12">
+                <?php AppUtility::t('This page will create new copies of these questions.  It is recommended that you place these new copies in a
+                different library that the questions are currently are in, so you can distinguish the new versions from the originals.')?>
+            </div>
+            <div class="col-md-12 col-sm-12"><?php AppUtility::t('Select the library into which to put the new copies:')?></div>
 
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
 
             <?php include("libtree.php"); ?>
 
-            <p>
+            <div class="col-md-12 col-sm-12">
                 <input type=submit value="Template Questions">
                 <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-            </p>
+            </div>
         </form>
     <?php
     } else if (isset($params['license'])) {
@@ -168,54 +167,54 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type=hidden name="license" value="true">
 
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
-                <div class="col-sm-12 manage-qset-cng-licen">
-                    <div class="padding-twenty col-sm-12 margin-bottom-ten text-background-color background-text-padding">
-                        <div class="col-sm-12 padding-left-zero">This will allow you to change the license or attribution on questions, if you have the rights to change them</div>
-                        <div class="col-sm-12 padding-left-zero">Note:  Be cautious when changing licenses or attribution on questions.  Some important things to note
+                <div class="col-md-12 col-sm-12 manage-qset-cng-licen">
+                    <div class="padding-twenty col-md-12 col-sm-12 margin-bottom-ten text-background-color background-text-padding">
+                        <div class="col-sm-12 col-md-12 padding-left-zero"><?php AppUtility::t('This will allow you to change the license or attribution on questions, if you have the rights to change them')?></div>
+                        <div class="col-sm-12 col-md-12 padding-left-zero"><?php AppUtility::t('Note:  Be cautious when changing licenses or attribution on questions.  Some important things to note')?>
                             <ul>
-                                <li>If questions are currently copyrighted or contain copyrighted content, you CAN NOT change the license
-                                    unless you have removed all copyrighted material from the question.</li>
-                                <li>If questions are licensed under the IMathAS Community License or a Creative Commons license, you CAN NOT
-                                    change the license unless you are the creator of the questions and all questions it was previously derived from.</li>
-                                <li>If the question currently has additional attribution listed, you CAN NOT remove that attribution unless
-                                    you have removed from the question all parts that require the attribution.</li>
+                                <li><?php AppUtility::t('If questions are currently copyrighted or contain copyrighted content, you CAN NOT change the license
+                                    unless you have removed all copyrighted material from the question.')?></li>
+                                <li><?php AppUtility::t('If questions are licensed under the IMathAS Community License or a Creative Commons license, you CAN NOT
+                                    change the license unless you are the creator of the questions and all questions it was previously derived from.')?></li>
+                                <li><?php AppUtility::t('If the question currently has additional attribution listed, you CAN NOT remove that attribution unless
+                                    you have removed from the question all parts that require the attribution.') ?></li>
                             </ul>
                         </div>
                     </div>
                     <div style="color:red;">
-                        In short, you should only be changing license if the questions are your original works, not built on top of existing
-                        community work.
+                        <?php AppUtility::t('In short, you should only be changing license if the questions are your original works, not built on top of existing
+                        community work.') ?>
                     </div>
-                    <div class="margin-top-fifteen col-sm-12 padding-left-zero">
-                        <span class="col-sm-2 padding-left-zero select-text-margin">License:</span>
-                        <span class="display-inline-block col-sm-6 padding-left-zero">
+                    <div class="margin-top-fifteen col-md-12 col-sm-12 padding-left-zero">
+                        <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin"><?php AppUtility::t('License:')?></span>
+                        <span class="display-inline-block col-md-6 col-sm-6 padding-left-zero">
                             <select class="form-control" name="sellicense">
-                                <option value="-1">Do not change license</option>
-                                <option value="0">Copyrighted</option>
-                                <option value="1">IMathAS / WAMAP / MyOpenMath Community License</option>
-                                <option value="2">Public Domain</option>
-                                <option value="3">Creative Commons Attribution-NonCommercial-ShareAlike</option>
-                                <option value="4">Creative Commons Attribution-ShareAlike</option>
+                                <option value="-1"><?php AppUtility::t('Do not change license')?></option>
+                                <option value="0"><?php AppUtility::t('Copyrighted')?></option>
+                                <option value="1"><?php AppUtility::t('IMathAS / WAMAP / MyOpenMath Community License') ?></option>
+                                <option value="2"><?php AppUtility::t('Public Domain') ?></option>
+                                <option value="3"><?php AppUtility::t('Creative Commons Attribution-NonCommercial-ShareAlike') ?></option>
+                                <option value="4"><?php AppUtility::t('Creative Commons Attribution-ShareAlike') ?></option>
                             </select>
                         </span>
                     </div>
-                    <div class="margin-top-fifteen col-sm-12 padding-left-zero">
-                        <span class="col-sm-2 padding-left-zero select-text-margin">Other Attribution</span>
-                        <span class="display-inline-block col-sm-6 padding-left-zero">
+                    <div class="margin-top-fifteen col-md-12 col-sm-12 padding-left-zero">
+                        <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin"><?php AppUtility::t('Other Attribution') ?></span>
+                        <span class="display-inline-block col-md-6 col-sm-6 padding-left-zero">
                             <select class="form-control" name="otherattribtype">
-                                <option value="-1">Do not change attribution</option>
-                                <option value="0">Replace existing attribution</option>
-                                <option value="1">Append to existing attribution</option>
+                                <option value="-1"><?php AppUtility::t('Do not change attribution') ?></option>
+                                <option value="0"><?php AppUtility::t('Replace existing attribution') ?></option>
+                                <option value="1"><?php AppUtility::t('Append to existing attribution') ?></option>
                             </select>
                         </span>
                     </div>
-                    <div class="margin-top-fifteen col-sm-12 padding-left-zero">
-                        <span class="col-sm-2 padding-left-zero select-text-margin">Additional Attribution</span>
-                        <span class="col-sm-6 padding-left-zero">
+                    <div class="margin-top-fifteen col-md-12 col-sm-12 padding-left-zero">
+                        <span class="col-md-2 col-sm-2 padding-left-zero select-text-margin">Additional Attribution</span>
+                        <span class="col-md-6 col-sm-6 padding-left-zero">
                             <input class="form-control display-inline-block" type="text" size="80" name="addattr" />
                         </span>
                     </div>
-                    <div class="col-sm-6 margin-top-fifteen padding-left-zero">
+                    <div class="col-md-6 col-sm-6 margin-top-fifteen padding-left-zero">
                         <input type=submit value="Change License / Attribution">
                         <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
                     </div>
@@ -226,18 +225,18 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name="chgrights" value="true">
-            <div class="col-md-12 padding-left-thirty">
+            <div class="col-md-12 col-md-12 padding-left-thirty">
             <div>
-                This will allow you to change the use rights of the selected questions, if you can change those rights.
+                <?php AppUtility::t('This will allow you to change the use rights of the selected questions, if you can change those rights.') ?>
             </div>
             <div class="margin-top-fifteen">
-                <span>Select the new rights for these questions</span>
+                <span><?php AppUtility::t('Select the new rights for these questions') ?></span>
                 <span class="display-inline-block margin-left-fifteen">
                     <select class="form-control" name="newrights">
-                        <option value="0">Private</option>
-                        <option value="2" selected="selected">Allow use, use as template, no modifications</option>
-                        <option value="3">Allow use by all and modifications by group</option>
-                        <option value="4">Allow use and modifications by all</option>
+                        <option value="0"><?php AppUtility::t('Private') ?></option>
+                        <option value="2" selected="selected"><?php AppUtility::t('Allow use, use as template, no modifications') ?></option>
+                        <option value="3"><?php AppUtility::t('Allow use by all and modifications by group') ?></option>
+                        <option value="4"><?php AppUtility::t('Allow use and modifications by all') ?></option>
                     </select>
                 </span>
             </div>
@@ -252,8 +251,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     } else if (isset($params['remove'])) {
         ?>
-        <div>Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
-        to all users.  If any are currently being used in an assessment, it will mess up that assessment.</div>
+        <div><?php AppUtility::t('Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
+        to all users.  If any are currently being used in an assessment, it will mess up that assessment.')?></div>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>&confirmed=true">
             <input type=hidden name=remove value="<?php echo $rlist ?>">
             <div class="margin-top-fifteen">
@@ -266,12 +265,12 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=transfer value="<?php echo $tlist ?>">
-            <div class="col-md-12 padding-left-thirty">
-            <div class="col-md-12 padding-left-zero select-text-margin"> <span class="floatleft">Transfer question ownership to</span>
+            <div class="col-md-12 col-sm-12 padding-left-thirty">
+            <div class="col-md-12 col-sm-12 padding-left-zero select-text-margin"> <span class="floatleft">Transfer question ownership to</span>
 
-                <span class="display-inline-block width-twenty-four-per margin-left-fifteen col-md-4"><?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?></span>
+                <span class="display-inline-block width-twenty-four-per margin-left-fifteen col-md-4 col-sm-4"><?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?></span>
             </div>
-            <div class="col-md-12 padding-top-fifteen padding-left-zero">
+            <div class="col-md-12 col-sm-12 padding-top-fifteen padding-left-zero">
                 <input type=submit value="Transfer">
                 <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
@@ -280,22 +279,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     } else { //DEFAULT DISPLAY
 
-        echo "<div class='col-sm-12 padding-left-right-thirty'>".$page_adminMsg."</div>";?>
+        echo "<div class='col-md-12 col-sm-12 padding-left-right-thirty'>".$page_adminMsg."</div>";?>
 
-        <div class='col-sm-12 padding-left-right-thirty'>
+        <div class='col-md-12 col-sm-12 padding-left-right-thirty'>
             <?php echo"<form method=post action=\"manage-question-set?cid=$cid\">\n";
-                echo "<div class='col-sm-12 margin-top-fifteen padding-right-zero padding-left-zero margin-bottom-twenty'>
-                        <div class='col-sm-10 select-text-margin padding-left-right-zero'>
+                echo "<div class='col-md-12 col-sm-12 margin-top-fifteen padding-right-zero padding-left-zero margin-bottom-twenty'>
+                        <div class='col-md-10 col-sm-10 select-text-margin padding-left-right-zero'>
                             <span>In Libraries</span>
                             <span id=\"libnames\">$lnames</span>
                             <input type=hidden name=\"libs\" id=\"libs\"  value=\"$searchlibs\">
                         </div>";
-                        echo '<div class="col-sm-2 padding-right-zero">
+                        echo '<div class="col-md-2 col-sm-2 padding-right-zero">
                                     <input class="floatright" type="button" value="Select Libraries" onClick="GB_show(\'Library Select\',\'library-tree?cid='.$cid.'&libtree=popup&libs=\'+curlibs,500,500)" />
                               </div></div>';
 
-            echo "<div class='col-sm-12 padding-left-right-zero'>
-                        <div class='col-sm-3 floatleft display-inline-block padding-left-zero padding-bottom-fifteen'>Search
+            echo "<div class='col-md-12 col-sm-12 padding-left-right-zero'>
+                        <div class='col-md-3 col-sm-3 floatleft display-inline-block padding-left-zero padding-bottom-fifteen'>Search
                             <input id='manage-question-set-search' class='margin-left-five form-control width-sixty-four-per display-inline-block' type=text size=15 name=search value=\"$search\">
                         </div>"; ?>
             <?php if ($isadmin){ ?>
@@ -368,7 +367,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </form>
             </div>
 
-        <div class='col-sm-12 manage-ques-set-table padding-left-right-thirty'>
+        <div class='col-md-12 col-sm-12 manage-ques-set-table padding-left-right-thirty'>
         <?php  echo "<form id=\"selform\" method=post action=\"manage-question-set?cid=$cid\">\n";?>
             <input class="display-none" type="submit" name="chglib" id="chglibButton">
             <input class="display-none" type="submit" name="license" id="licenseButton">
@@ -376,11 +375,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type="hidden" name="manage_ques_some_name">
             <input class="display-none" type="submit" name="transfer" id="transferButton">
     <?php if (!$isadmin && !$isgrpadmin) {
-            echo "<div class='col-sm-12 padding-bottom-fifteen padding-left-right-zero'> (Delete and Transfer only applies to your questions)</div>";
+            echo "<div class='col-md-12 col-sm-12 padding-bottom-fifteen padding-left-right-zero'> (Delete and Transfer only applies to your questions)</div>";
         } else if ($isgrpadmin) {
-            echo "<div class='col-sm-12 padding-bottom-fifteen padding-left-right-zero'>(Delete and Transfer only apply to group's questions)</div>";
+            echo "<div class='col-md-12 col-sm-12 padding-bottom-fifteen padding-left-right-zero'>(Delete and Transfer only apply to group's questions)</div>";
         }
-        echo "<div class='overflow-x-auto width-hundread-per table-float-left'><table class='col-sm-12 manage-question-table table table-bordered table-striped data-table' id=myTable><thead>\n";
+        echo "<div class='overflow-x-auto width-hundread-per table-float-left'><table class='col-md-12 col-sm-12 manage-question-table table table-bordered table-striped data-table' id=myTable><thead>\n";
         echo "<tr>
                    <th class='text-align-center'>
                    <div class='checkbox override-hidden padding-left-twenty-five'>
