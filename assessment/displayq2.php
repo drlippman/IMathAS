@@ -500,7 +500,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	echo "</div>\n";
 	
-	if ($doshowans && isset($showanswer) && !is_array($showanswer) && strpos($toevalqtxt,'$showanswerloc')===false) {  //single showanswer defined
+	if ($doshowans && !is_array($showanswerloc) && strpos($toevalqtxt,'$showanswerloc')===false) {  //single showanswer defined
 		/*if ($nosabutton) {
 			echo filter("<div>" . _('Answer:') . " $showanswer </div>\n");	
 		} else {
@@ -5917,6 +5917,7 @@ function rawscoretocolor($sc,$aw) {
 
 function normalizemathunicode($str) {
 	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷'), array('(',')','oo','U','/','<=','>=','/'), $str);
+	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;	
 }
 
