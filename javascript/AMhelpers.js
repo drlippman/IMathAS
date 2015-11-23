@@ -8,6 +8,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
+	str = str.replace(/\bOO\b/i,"oo");
 	return str;
 }
 
