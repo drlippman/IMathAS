@@ -54,7 +54,7 @@ switch ($action) {
         }
         echo "<p>Are you sure you want to delete this user?</p>\n";
         echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=deladmin&id=$getId'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></p>\n";
         break;
         break;
     case "chgpwd":
@@ -80,7 +80,8 @@ switch ($action) {
 
             }
             ?>
-             <div class="col-md-2 col-sm-2"><img class="help-img margin-left-zero" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>Set User rights to</div>
+             <div class="col-md-2 col-sm-2 padding-left-zero"><a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'help.php?section=rights' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
+                 <?php AppUtility::t('Set User rights to')?></div>
 
             <?php  echo "<div class='col-md-4 col-sm-4 padding-left-zero'><input type=radio name=\"newrights\" value=\"5\" ";
             if ($oldRights == 5) {echo "CHECKED";}

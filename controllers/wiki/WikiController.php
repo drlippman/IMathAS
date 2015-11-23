@@ -484,7 +484,7 @@ class WikiController extends AppController
         else {
             $defaultValues = array(
                 'pageTitle' => 'Create Wiki',
-                'saveTitle' => AppConstant::New_Item,
+                'saveTitle' => 'Create Wiki',
                 'title' => "Enter title here",
                 'description' => "Enter wiki description here (displays on course page)",
                 'sDate' => date("m/d/Y"),
