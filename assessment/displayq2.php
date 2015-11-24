@@ -697,7 +697,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$stuanswers[$qnidx+1] = implode('|',$tmp);
 		}
 	}
-	
+
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
@@ -1117,7 +1117,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		
+
 		//trim out unshuffled showans
 		$la = explode('$!$',$la);
 		$la = $la[0];
@@ -1126,7 +1126,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
 			shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
-		} else if ($noshuffle == "all") {
+		} else if ($noshuffle == "all" || count($questions)==1) {
 			$randkeys = array_keys($questions);
 		} else {
 			$randkeys = array_rand($questions,count($questions));
@@ -2971,7 +2971,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randqkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
 			shuffle($randqkeys);
 			array_push($randqkeys,count($questions)-1);
-		} else if ($noshuffle == "all") {
+		} else if ($noshuffle == "all" || count($questions)==1) {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
@@ -5489,7 +5489,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$anstypes = explode(',',$anstypes);
 		}
 		$la = array();
-		
 		foreach ($anstypes as $i=>$anst) {
 			$qnt = 1000*($qn+1)+$i;
 			if (isset($_POST["tc$qnt"])) {
@@ -5498,14 +5497,29 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else {
 					$la[$i] = $_POST["tc$qnt"];
 				}
-			} else if (isset($_SESSION['choicemap'][$qnt]) && isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
-				$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
+			} else if (isset($_SESSION['choicemap'][$qnt])) {
+				if (is_array($_POST["qn$qnt"])) { //multans
+					$origmala = array();
+					$mappedpost = array();
+					foreach ($_SESSION['choicemap'][$qnt] as $k=>$v) {
+						if (isset($_POST["qn$qnt"][$k])) {
+							$origmala[$k] = $_POST["qn$qnt"][$k];
+							$mappedpost[$k] = $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"][$k]];
+						} else {
+							$origmala[$k] = "";
+						}
+					}
+					$la[$i] = implode('|',$origmala) . '$!$' . implode('|', $mappedpost);
+				} else if (isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
+					$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
+				}
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}
 			$la[$i] = str_replace('&','',$la[$i]);
 			$la[$i] = preg_replace('/#+/','#',$la[$i]);
 		}
+
 		$GLOBALS['partlastanswer'] = implode('&',$la);
 		if (isset($abstolerance)) {
 			$tol = '|'.$abstolerance;
