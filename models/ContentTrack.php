@@ -130,28 +130,28 @@ class ContentTrack extends BaseImasContentTrack
     {
         $temp = 'linkedsum,linkedlink,linkedintext,linkedvviacal';
         $tempArray[] = explode(',',$temp);
-        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['typeid' => $typeId])->all();
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray[0]])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForAssessment($courseId,$typeId)
     {
         $temp = 'assessintro,assessum,assess';
         $tempArray[] = explode(',',$temp);
-        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['typeid' => $typeId])->all();
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray[0]])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForWiki($courseId,$typeId)
     {
         $temp = 'wiki,wikiintext';
         $tempArray[] = explode(',',$temp);
-        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['typeid' => $typeId])->all();
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray[0]])->andWhere(['typeid' => $typeId])->all();
     }
 
     public function getDataForForum($courseId,$typeId)
     {
         $temp = 'forumpost,forumreply';
         $tempArray[] = explode(',',$temp);
-        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray])->andWhere(['info' => $typeId])->all();
+        return self::find()->select('userid,type,info')->where(['courseid' => $courseId])->andWhere(['IN', 'type', $tempArray[0]])->andWhere(['info' => $typeId])->all();
     }
 
     public static function getStatsData($courseId)

@@ -284,7 +284,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if ($nosabutton) {
 			$showanswerloc .= filter(_('Answer:') . " $showanswer\n");
 		} else {
-			$showanswerloc .= "<input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
+			$showanswerloc .= "<br/><input class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx\").className=\"shown\"; rendermathnode(document.getElementById(\"ans$qnidx\"));' />";
 			$showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
 		}
 		$showanswerloc .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
@@ -297,18 +297,18 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 
                 if ($nosabutton) {
-					$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
+					$showanswerloc[$iidx] .= "<br/><span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$shanspt[$iidx]}</span>\n");
 				} else {
-					$showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+					$showanswerloc[$iidx] .= "<br/><input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\"". _('Show Answer'). "\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />"; //AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 					$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$shanspt[$iidx]}</span>\n");
 				}
 			} else if ($doshowans && isset($showanswer) && is_array($showanswer)) { //use part specific showanswer
 
                 if (isset($showanswer[$iidx])) {
 					if ($nosabutton) {
-						$showanswerloc[$iidx] .= "<span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
+						$showanswerloc[$iidx] .= "<br/><span id=\"showansbtn$qnidx-$iidx\">".filter(_('Answer:') . " {$showanswer[$iidx]}</span>\n");
 					} else {
-						$showanswerloc[$iidx] .= "<input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
+						$showanswerloc[$iidx] .= "<br/><input id=\"showansbtn$qnidx-$iidx\" class=\"sabtn\" type=button value=\""._('Show Answer')."\" onClick='javascript:document.getElementById(\"ans$qnidx-$iidx\").className=\"shown\";' />";// AMprocessNode(document.getElementById(\"ans$qnidx-$iidx\"));'>";
 						$showanswerloc[$iidx] .= filter(" <span id=\"ans$qnidx-$iidx\" class=\"hidden\">{$showanswer[$iidx]}</span>\n");
 					}
 				}
@@ -439,7 +439,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if ($nosabutton) {
             $temp .= filter("<div><p>" . _('Detailed Solution').'</p>'. $evaledsoln .'</div>');
 		} else {
-            $temp .= "<div><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:$(\"#soln$qnidx\").removeClass(\"hidden\"); rendermathnode(document.getElementById(\"soln$qnidx\"));' />";
+            $temp .= "<div><br/><input class=\"sabtn\" type=button value=\""._('Show Detailed Solution')."\" onClick='javascript:$(\"#soln$qnidx\").removeClass(\"hidden\"); rendermathnode(document.getElementById(\"soln$qnidx\"));' />";
             $temp .= filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
 		}
 	}
@@ -803,7 +803,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$shorttip .= sprintf(_(', with at least %d significant figures'), $reqsigfigs);
 			}
 		}
-		$out .= "$leftb<input ";
+		$out .= "$leftb<br/><input ";
 		$addlclass = '';
 		if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
 		else if ($displayformat=='hidden') { $out .= 'style="position: absolute; visibility: hidden; left: -5000px;" ';}
@@ -825,7 +825,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeebasicdd('qn$qn',0)\" onblur=\"hideebasice();hideebasicedd();\" ";
 		}
 
-		$out .= "class=\"graph-ques text form-control width-nineteen-per display-inline-block $colorbox$addlclass\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
+		$out .= "class=\"graph-ques stats$colorbox$addlclass\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />$rightb";
 		$out .= getcolormark($colorbox);
 		if ($displayformat=='hidden') { $out .= '<script type="text/javascript">imasprevans['.$qstr.'] = "'.$la.'";</script>';}
 		if (isset($answer)) {
@@ -1257,7 +1257,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$leftb = '';
 			$rightb = '';
 		}
-		$out .= "$leftb<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
+		$out .= "$leftb<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 
 		$ansformats = explode(',',$answerformat);
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
@@ -1295,7 +1295,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />\n";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
 		$out .= "<script type=\"javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
@@ -1345,9 +1345,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
 		} else {
-			$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
+			$out .= "<br><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= getcolormark($colorbox);
-			$out .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
+			$out .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> ";
 			$tip = _('Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))');
 		}
@@ -1394,13 +1394,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "</table>\n";
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$out .= getcolormark($colorbox);
-			if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
+			if (!isset($hidepreview)) {$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
 			$preview .= "<span id=p$qn></span>\n";
 			$out .= "<script type=\"javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
 			$tip .= formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
 			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
-			$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
+			$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= getcolormark($colorbox);
 			$out .= "<input type=button value=\"" . _('Preview') . "\" onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
@@ -1441,7 +1441,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else {
 			$shorttip = _('Enter an algebraic expression');
 		}
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\" ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1464,7 +1464,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
 			$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
 		}
-		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
+		if (!isset($hidepreview)) {$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
 		$preview .= "<span id=p$qn></span>\n";
 
 		if (!isset($variables)) { $variables = "x";}
@@ -1545,7 +1545,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$tip .= _('Enter DNE for Does Not Exist');
 
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1598,7 +1598,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$tip .= formathint('each value',$ansformats,'calcntuple');
 
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1617,7 +1617,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"ntuplecalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"ntuplecalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"javascript\">ntupletoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
@@ -1645,7 +1645,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		$tip .= _('Enter DNE for Does Not Exist');
 
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1682,7 +1682,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$tip .= formathint('each value',$ansformats,'calccomplex');
 
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -1701,7 +1701,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"complexcalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"complexcalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">complextoproc[$qn] = 1;</script>\n";
@@ -1743,7 +1743,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= '</select>';
 			$out .= getcolormark($colorbox);
 		} else {
-			$out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
+			$out .= "<br/><input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
 
 			if ($showtips==2) { //eqntips: work in progress
 				if ($multi==0) {
@@ -1768,7 +1768,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 
 			if ($displayformat == 'usepreview') {
-				$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+				$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 				$preview .= "<span id=p$qn></span> ";
 			} else if ($displayformat == 'typeahead') {
 				if (!is_array($questions)) {
@@ -1916,7 +1916,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		} else if ($answerformat=='normalcurve') {
 			$out .= _('Enter an interval corresponding to the region to be shaded');
 		}
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
 			$out .= 'style="position:absolute;visibility:hidden;" ';
 		}
@@ -2002,7 +2002,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
 		}
 
-		$out .= "<input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
+		$out .= "<br/><input class=\"text form-control width-nineteen-per display-inline-block $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
 			if ($multi==0) {
 				$qnref = "$qn-0";
@@ -2021,7 +2021,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= getcolormark($colorbox);
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class='btn padding-left-fifteen' value=\"" . _('Preview') . "\" onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"javascript\">intcalctoproc[$qn] = 1 ; calcformat[$qn] = '$answerformat';</script>\n";

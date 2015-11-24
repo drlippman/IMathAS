@@ -2010,7 +2010,7 @@ class AssessmentController extends AppController
                 if ($testsettings['msgtoinstr']==1) {
                     $query = Message::getMsgIds($userid, $courseId);
                     $msgcnt = count($query['id']);
-                    $temp .= "<a href=\"/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('".'This will discard any unsaved work.'. "');\">".'Messages'. " ";
+                    $temp .= "<a href=\"/msgs/msglist?cid=$cid\" onclick=\"return confirm('".'This will discard any unsaved work.'. "');\">".'Messages'. " ";
                     if ($msgcnt>0) {
                         $temp .= '<span style="color:red;">('.$msgcnt.' new)</span>';
                     }
@@ -2023,7 +2023,7 @@ class AssessmentController extends AppController
                     $latepasscnt = round(($exceptionduedate - $testsettings['enddate'])/(3600*$latepasshrs));
                 }
                 if (($testsettings['allowlate']%10==1 || $testsettings['allowlate']%10-1>$latepasscnt) && $sessiondata['latepasses']>0 && !$isreview) {
-                    $temp .= "<a href=\"/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('".'This will discard any unsaved work.'. "');\">".'Redeem LatePass'. "</a> ";
+                    $temp .= "<a href=\"/course/redeemlatepass?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('".'This will discard any unsaved work.'. "');\">".'Redeem LatePass'. "</a> ";
                 }
                 if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas) {
                     $query = Course::getLatePassHrs($testsettings['courseid']);
@@ -2034,13 +2034,13 @@ class AssessmentController extends AppController
                         $viewedassess[] = $row['typeid'];
                     }
                     if ((time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
-                        $temp .= "<a href=\"/course/redeemlatepass.php?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('".'This will discard any unsaved work.'. "');\">".'Redeem LatePass'. "</a> ";
+                        $temp .= "<a href=\"/course/redeemlatepass?cid=$cid&aid={$testsettings['id']}\" onclick=\"return confirm('".'This will discard any unsaved work.'. "');\">".'Redeem LatePass'. "</a> ";
                     }
                 }
 
                 if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
                     if ($showans!='N') {
-                        $temp .= '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">'.'View your scored assessment'. '</a></p>';
+                        $temp .= '<p><a href="../course/gb-viewasid?cid='.$cid.'&asid='.$testid.'">'.'View your scored assessment'. '</a></p>';
                     }
                 }
                 $temp .= '</span>';
@@ -3428,7 +3428,7 @@ class AssessmentController extends AppController
     function leavetestmsg($sessiondata) {
         global $isdiag, $diagid, $isltilimited, $testsettings,$temp;
         if ($isdiag) {
-            $temp .= "<a href=\"../diag/index.php?id=$diagid\">".'Exit Assessment'. "</a></p>\n";
+            $temp .= "<a href=\"../diag/index?id=$diagid\">".'Exit Assessment'. "</a></p>\n";
         } else if ($isltilimited || $sessiondata['intreereader']) {
 
         } else {
@@ -4122,7 +4122,7 @@ class AssessmentController extends AppController
             if ($line['userid'] != $userId) {
                 $userObj = new User();
                 $row = $userObj->getFirstLastName($line['userid']);
-                $userFullName = $row['LastName']." ".$row['FirstName'];
+                $userFullName = $row['FirstName']." ".$row['LastName'];
             }
             $userId= $line['userid'];
         }
@@ -4141,7 +4141,7 @@ class AssessmentController extends AppController
                     } else {
                         if (!$isTeacher) {
                             $temp .= "Assessment is closed";
-                            $temp .= "<br/><a href=\"../course/course.php?cid={$testSettings['courseid']}\">Return to course page</a>";
+                            $temp .= "<br/><a href=\"../course/course?cid={$testSettings['courseid']}\">Return to course page</a>";
                             exit;
                         }
                     }
@@ -4152,7 +4152,7 @@ class AssessmentController extends AppController
                 } else {
                     if (!$isTeacher) {
                         $temp .= "Assessment is closed";
-                        $temp .=  "<br/><a href=\"../course/course.php?cid={$testSettings['courseid']}\">Return to course page</a>";
+                        $temp .=  "<br/><a href=\"../course/course?cid={$testSettings['courseid']}\">Return to course page</a>";
                         exit;
                     }
                 }
@@ -4171,7 +4171,7 @@ class AssessmentController extends AppController
         $showeachscore = ($testSettings['testtype']=="Practice" || $testSettings['testtype']=="AsGo" || $testSettings['testtype']=="Homework");
         $showansduring = (($testSettings['testtype']=="Practice" || $testSettings['testtype']=="Homework") && $testSettings['showans']!='N');
         $GLOBALS['useeditor']='reviewifneeded';
-        $temp .= "<div class=breadcrumb>Print Ready Version</div>";
+        $temp .= "<div class=breadcrumb style='color: black'>Print Ready Version</div>";
 
         $endtext = '';  $intropieces = array();
 
@@ -4412,10 +4412,8 @@ class AssessmentController extends AppController
                 }
             }
             if (!$sessionData['ltiitemtype'] || $sessionData['ltiitemtype']!=0) { ?>
-<!--                echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";-->
                 <a href="<?php AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId)?>"><?php echo 'Continue'?></a>
             <?php  } else { ?>
-<!--                echo "<p><a href=\"../assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}\">Continue</a></p>";-->
                 <a href="<?php AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid='.$courseId.'&id'.$sessionData['ltiitemid'])?>"><?php echo 'Continue'?></a>
           <?php  }
         } else if (isset($confirm)) {

@@ -1542,7 +1542,8 @@ class InstructorController extends AppController
             } else if ($sType == 'L') {
                 $query = new ContentTrack();
                 $queryResult = $query->getDataForLink($courseId,$typeId);
-                $q2 = LinkedText::getByName($typeId);
+                $linkObj = new LinkedText();
+                $q2 = $linkObj->getByName($typeId);
             } else if ($sType == 'A') {
                 $query = new ContentTrack();
                 $queryResult = $query->getDataForAssessment($courseId,$typeId);

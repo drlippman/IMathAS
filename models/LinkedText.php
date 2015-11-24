@@ -202,7 +202,11 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getByName($typeId)
     {
-        return self::find()->select(['imas_linkedtext.title AS name'])->where(['imas_linkedtext.id' => $typeId])->one();
+        $query = new Query();
+        $query->select('title as name')
+            ->from('imas_linkedtext')
+            ->where(['id' => $typeId]);
+        return $query->createCommand()->queryOne();
     }
 
     public static function getLinkDataByIdAndCourseID($id,$courseId)

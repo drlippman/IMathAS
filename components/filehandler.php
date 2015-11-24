@@ -158,20 +158,23 @@ public static function storeuploadedcoursefile($id,$key,$sec="public-read") {
 		}
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/Uploads/files/';
-			$keydir = dirname($key); 
+            $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/web/Uploads/';
+            $keydir = dirname($key);
 			$dir = $base.dirname($key);
 			$fn = basename($key);
+
 			if (!is_dir($dir)) {
 				filehandler::mkdir_recursive($dir);
 			} 
 			$t=0; $tfn = $fn;
+
 			while(file_exists($dir.'/'.$fn)){
 				$fn = substr($tfn,0,strpos($tfn,"."))."_$t".strstr($tfn,".");
-				$t++;
+					$t++;
 			}
+
 			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
-				return $keydir.'/'.$fn;
+					return $keydir.'/'.$fn;
 			} else {
 				return false;
 			}

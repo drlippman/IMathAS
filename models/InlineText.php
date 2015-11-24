@@ -120,7 +120,7 @@ class InlineText extends BaseImasInlinetext
 
     public static function getFileOrder($id)
     {
-        return self::find()->select('fileorder')->where(['id' => $id])->one();
+        return self::find()->select('fileorder')->where(['id' => $id])->one()->toArray();
     }
 
     public static function getByCourseIdAll($courseId)

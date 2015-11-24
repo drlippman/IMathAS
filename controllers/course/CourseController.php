@@ -383,8 +383,7 @@ class CourseController extends AppController
             $page_formActionTag .= "&tb=$filter";
 
             $calTag = $params['caltag'];
-            if ($params['title'] != null || $params['text'] != null || $params['sdate'] != null)
-            { //if the form has been submitted
+            if ($params['title'] != null || $params['text'] != null || $params['sdate'] != null) { //if the form has been submitted
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {
                     if ($params['sdatetype'] == '0')
                     {
@@ -398,8 +397,7 @@ class CourseController extends AppController
                         $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                     }
                     $oncal = $params['oncal'];
-                } else if ($params['avail'] == AppConstant::NUMERIC_TWO)
-                {
+                } else if ($params['avail'] == AppConstant::NUMERIC_TWO) {
                     if ($params['altoncal'] == AppConstant::NUMERIC_ZERO)
                     {
                         $startDate = AppConstant::NUMERIC_ZERO;
@@ -425,7 +423,6 @@ class CourseController extends AppController
                 }
 
                 $params['title'] =  htmlentities(stripslashes($params['title']));
-
                 $params['text'] =  stripslashes($_POST['text']);
                 $outcomes = array();
                 if (isset($params['outcomes'])) {
@@ -438,7 +435,6 @@ class CourseController extends AppController
                 $outcomes = implode(',', $outcomes);
 
                 $filestoremove = array();
-
                 if (isset($params['id'])) {  //already have id; update
                     $tempArray = array();
                     $tempArray['startdate'] = $startDate;
@@ -473,8 +469,6 @@ class CourseController extends AppController
                     }
                     $newtextid = $params['id'];
                 } else { //add new
-
-
                     $tempArray = array();
                     $tempArray['cid'] = $cid;
                     $tempArray['startdate'] = $startDate;
@@ -523,9 +517,11 @@ class CourseController extends AppController
                         $body = "<p>File type is not allowed</p>";
                     } else {
                         if (($filename = filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)) !== false) {
+
                             if (trim($params['newfiledescr'])=='') {
                                 $params['newfiledescr'] = $filename;
                             }
+
                             $addedfileOne = new InstrFiles();
                             $addedfile = $addedfileOne->saveFile($params,$filename, $newtextid);
                             $params['id'] = $newtextid;
@@ -536,12 +532,13 @@ class CourseController extends AppController
                     }
                 }
             }
-            if (isset($addedfile) || count($filestoremove) > 0 || isset($params['movefile'])) {
+            if (($addedfile) || count($filestoremove) > 0 || isset($params['movefile'])) {
                 $fileorder = InlineText::getFileOrder($params['id']);
 
                 if ($fileorder['fileorder'] == '') {
                     $fileorder = array();
                 }
+
                 if (isset($addedfile)) {
                     $fileorder[] = $addedfile;
                 }
@@ -563,6 +560,7 @@ class CourseController extends AppController
                 $fileorder = implode(',',$fileorder);
                  InlineText::setFileOrder($params['id'],$fileorder);
             }
+
             if ($params['submitbtn'] == 'Submit') {
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$cid));
             }
@@ -586,6 +584,7 @@ class CourseController extends AppController
                 } else {
                     $gradeoutcomes = array();
                 }
+
                 $savetitle = "Save Changes";
                 $pageTitle = 'Modify Inline Text';
             } else {
@@ -652,8 +651,7 @@ class CourseController extends AppController
             $row = $result;
             if ($row['outcomes']=='') {
                 $outcomearr = array();
-            } else
-            {
+            } else {
                 $outcomearr = unserialize($row['outcomes']);
             }
             $outcomes = array();

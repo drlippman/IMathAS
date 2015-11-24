@@ -13,10 +13,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php if ($inlineId){ ?>
 <form enctype="multipart/form-data" method=post
-      action="modify-inline-text?cid=<?php echo $course->id ?>&modifyFid=<?php echo $inlineId; ?>&block=<?php echo $block ?>">
+      action="modify-inline-text?cid=<?php echo $course->id ?>&id=<?php echo $inlineId; ?>">
     <?php }else{ ?>
     <form enctype="multipart/form-data" method=post
-          action="modify-inline-text?cid=<?php echo $course->id ?>&block=<?php echo $block ?>">
+          action="modify-inline-text?cid=<?php echo $course->id ?>&block2=<?php echo $block ?>">
         <?php } ?>
         <div class="item-detail-header">
             <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="tab-content shadowBox non-nav-tab-item col-md-12 col-sm-12">
-            <form enctype="multipart/form-data" method=post action="modify-inline-text?block=0&cid=130&folder=&tb=t">
+            <form>
                 <input type="hidden" value="<?php echo $filter ?>" name="tb">
 
                 <div class="name-of-item">
@@ -68,22 +68,22 @@ $this->params['breadcrumbs'][] = $this->title;
                     foreach ($page_FileLinks as $k => $arr) {
                         AppUtility::generatemoveselect($page_fileorderCount, $k);
                         ?>
-                        <a href="<?php echo filehandler::getcoursefileurl($arr['link']); ?>" target="_blank"> View </a>
-                        <input class="form-control" type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
-                        Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>
+                        <a href="<?php echo filehandler::getcoursefileurl($arr['link']); ?>" target="_blank"> <?php AppUtility::t('View')?> </a>
+                        <input class="form-control-1" type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
+                        <?php AppUtility::t('Delete?')?> <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>
                     <?php
                     }
                 }
                 ?>
                 <div class='col-md-10 col-sm-9 padding-left-zero'>
                     <div class="col-md-12 col-sm-12 padding-left-zero">
-                        <span class="floatleft">New file<sup>*</sup></span>
+                        <span class="floatleft"><?php AppUtility::t('New file') ?><sup>*</sup></span>
                         <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
                         <span class="col-md-3 col-sm-3"><input type="file" name="userfile"/></span>
                     </div>
 
                     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
-                        <span class="floatleft padding-top-pt-five-em">Description</span>
+                        <span class="floatleft padding-top-pt-five-em"><?php AppUtility::t('Description') ?></span>
                         <span class="col-md-4 col-sm-4"><input class="form-control" type="text" name="newfiledescr"/></span>
                     </div>
                     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
@@ -146,7 +146,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ]);
                                     echo '</div>';?>
                                     <?php
-                                    echo '<label class="end pull-left non-bold col-md-1 col-sm-1"> at </label>';
+                                    echo '<label class="end pull-left non-bold col-md-1 col-sm-1">'; AppUtility::t('at');  echo'</label>';
                                     echo '<div class="padding-left-zero col-md-4 col-sm-6">';
 
                                     echo TimePicker::widget([
@@ -218,7 +218,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </div>
 
                                     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-pt-five-em">
-                                        <span class="floatleft">With tag</span>
+                                        <span class="floatleft"><?php AppUtility::t('With tag')?></span>
                                         <span class="col-md-1 col-sm-2 padding-left-one-em"><input class="form-control" name="calTag" type=text size=1 value="<?php echo $line['caltag']; ?>"/></span>
                                     </div>
                                 </div>
@@ -226,7 +226,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
                             <?php if (count($outcome) > 0) { ?>
-                                <span class="col-md-2 col-sm-3 padding-top-pt-five-em">Associate Outcomes</span>
+                                <span class="col-md-2 col-sm-3 padding-top-pt-five-em"><?php AppUtility::t('Associate Outcomes')?></span>
                                 <span class="col-md-8 col-sm-8 padding-left-zero">
                                     <?php AssessmentUtility::writeHtmlMultiSelect('outcomes', $outcome, $outcomenames, $gradeoutcomes, 'Select an outcome...'); ?>
                                 </span>

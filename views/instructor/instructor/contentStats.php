@@ -19,7 +19,7 @@ if ($overWriteBody) {
     echo $body;
 }  else {
     echo '<div id="headermoddataset" class="pagetitle">';
-    echo "<div class='col-md-12'><h2>Stats: $itemName</h2></div><BR class=form>\n";
+    echo "<div class='col-md-12 col-sm-12'><h2>Stats: $itemName</h2></div><BR class=form>\n";
     echo '</div>';
 
     $idents = array_keys($descrips);
@@ -29,11 +29,18 @@ if ($overWriteBody) {
     }
 
     foreach ($idents as $ident) {
-        echo '<div class="col-md-10"><h4>'.$descrips[$ident].'</h4></div>';
-        echo '<table class="gb col-md-10"><thead>';
-        echo '<tr><th colspan="2">Viewed</th><th>Not Viewed</th></tr>';
-        echo '<tr><th>Name</th><th style="padding-right:1em">Views</th>';
-        echo '<th>Name</th></tr></thead><tbody>';
+        echo '<div class="col-md-10 col-sm-10"><h4>'.$descrips[$ident].'</h4></div>';
+        echo '<table class="gb col-md-10 col-sm-10"><thead>';
+        echo '<tr>
+                <th colspan="2" class="text-align-center">Viewed</th>
+                <th class="text-align-center">Not Viewed</th>
+              </tr>';
+        echo '<tr>
+                <th class="text-align-left padding-left-fifteen">Name</th>
+                <th class="text-align-left">Views</th>';
+        echo   '<th class="text-align-left padding-left-fifteen">Name</th>
+            </tr>
+          </thead><tbody>';
 
         $didview = array();
         $notview = array();
@@ -52,7 +59,7 @@ if ($overWriteBody) {
             if (!isset($didview[$i])) {
                 echo '<td></td><td style="border-right:1px solid"></td>';
             } else {
-                echo '<td>'.$didview[$i][0].'</td>';
+                echo '<td class="padding-left-fifteen">'.$didview[$i][0].'</td>';
                 echo '<td style="border-right:1px solid">'.$didview[$i][1].'</td>';
             }
             if (!isset($notview[$i])) {

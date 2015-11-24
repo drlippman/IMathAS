@@ -645,7 +645,6 @@ class AppUtility extends Component
 
     public static function printTest($teacherid, $isteacher, $assessmentSessionId, $user, $course)
     {
-
         global $allowedmacros, $mathfuncs, $questions, $seeds, $responseString;
         $allowedmacros = array();
         $mathfuncs = array("sin", "cos", "tan", "sinh", "cosh", "tanh", "arcsin", "arccos", "arctan", "arcsinh", "arccosh", "sqrt", "ceil", "floor", "round", "log", "ln", "abs", "max", "min", "count");
@@ -738,7 +737,7 @@ class AppUtility extends Component
                     } else {
                         if (!$isteacher) {
                             $responseString .= "Assessment is closed";
-                            $responseString .= "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+                            $responseString .= "<br/><a href=\"../course/course?cid={$testsettings['courseid']}\">Return to course page</a>";
                             return $responseString;
                         }
                     }
@@ -749,7 +748,7 @@ class AppUtility extends Component
                 } else {
                     if (!$isteacher) {
                         $responseString .= "Assessment is closed";
-                        $responseString .= "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+                        $responseString .= "<br/><a href=\"../course/course?cid={$testsettings['courseid']}\">Return to course page</a>";
                         return $responseString;
                     }
                 }
@@ -918,6 +917,7 @@ class AppUtility extends Component
                 $responseString .= '</div>';
 
             } else {
+
                 displayq($i, $qsetid, $seeds[$i], $showa, ($testsettings['showhints'] == AppConstant::NUMERIC_ONE), $attempts[$i]);
             }
             $responseString .= "<hr />";
