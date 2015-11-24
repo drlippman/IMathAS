@@ -14,12 +14,13 @@ $this->title = AppUtility::t('View Scores',false);?>
         </div>
     </div>
 </div>
-<?php
-echo '<div class="tab-content shadowBox non-nav-tab-item">';
- ?>
-    <div class="item-analysis">
-    <br><div class="cpmid"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id .'&amp;aid='.$assessmentId );?> ">View Item Analysis</a></div>
-    <div id="headerisolateassessgrade" class="pagetitle"><h2>
+<div class="tab-content shadowBox non-nav-tab-item col-md-12 col-sm-12 padding-left-zero padding-right-zero">
+
+    <div class="col-md-12 col-sm-12 item-analysis-background-color padding-top-bottom-one-em padding-left-two-em">
+        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id .'&amp;aid='.$assessmentId );?> ">View Item Analysis</a>
+    </div>
+    <div class="col-md-12 col-sm-12 padding-left-two-em padding-right-two-em">
+    <div id="headerisolateassessgrade" class="col-md-12 col-sm-12 padding-left-zero"><h2>
  <?php   echo "Grades for $name</h2></div>"; ?>
     <p><?php echo $totalpossible;echo ' '; AppUtility::t('points possible')?></p>
     <table id=myTable class=table table-bordered table-striped table-hover data-table>
@@ -28,13 +29,13 @@ echo '<div class="tab-content shadowBox non-nav-tab-item">';
              <th><?php AppUtility::t('Name')?></th>
              <?php if ($hassection)
              { ?>
-             <th><?php AppUtility::t('Section')?></th>
+             <th><?php AppUtility::t('Section') ?></th>
              <?php }  ?>
-             <th><?AppUtility::t('Grade')?></th>
+             <th><?php AppUtility::t('Grade')?></th>
              <th>%</th>
              <th><?php AppUtility::t('Last Change')?></th>
-             <th><?php AppUtility::t('Time Spent (In Questions)')?></th>
-             <th><?php AppUtility::t('Feedback')?></th>
+             <th><?php AppUtility::t('Time Spent (In Questions)') ?></th>
+             <th><?php AppUtility::t('Feedback') ?></th>
          </tr>
          </thead>
         <tbody>
@@ -82,12 +83,7 @@ echo '<div class="tab-content shadowBox non-nav-tab-item">';
              <td></td>
              <td></td>
              <td></td>
-             <td><a href="#" >-</a></td>
-             <td>-</td>
-             <td></td>
-             <td></td>
-             <td></td>
-        <? } else
+        <?php } else
          {
                 if (isset($exceptions[$line['userid']])) {
                     $thisenddate = $exceptions[$line['userid']][0];

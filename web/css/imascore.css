@@ -1538,3 +1538,13 @@ margin-left: 1em;
 .padding-left-two-pt-two-em {
     padding-left: 2.2em;
 }
+.item-analysis-background-color {
+    background-color: #eee;
+}
+.padding-top-bottom-one-em {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+.padding-right-seven {
+    padding-right: 7px;
+}

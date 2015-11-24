@@ -25,28 +25,29 @@ $this->title = AppUtility::t('Diagnostic Grade Book', false); ?>
       <div class="inner-content-gradebook">
          <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
         <form method=post action="gradebook?cid=<?php echo $course->id?>">
-         <div class="col-md-12">
-            <div class="pull-left padding-left-zero select-text-margin col-md-3">
-             <span class="col-md-12">  <?php echo "Meanings:   NC-no credit"; ?> </span>
-            </div>
-          <div class="col-md-9 pull-right">
-            <span class="col-md-5"> Students starting in:
-                 <select id="timetoggle" class="form-control-gradebook" onchange="chgtimefilter()">
-                     <option value="1" <?php AssessmentUtility::writeHtmlSelected($timefilter,1); ?> >last 1 hour</option>
-                     <option value="2"  <?php  AssessmentUtility::writeHtmlSelected($timefilter,2); ?> >last 2 hours</option>
-                     <option value="4"  <?php AssessmentUtility::writeHtmlSelected($timefilter,4); ?>>last 4 hours</option>
-                     <option value="24"  <?php AssessmentUtility::writeHtmlSelected($timefilter,24); ?>>last day</option>
-                     <option value="168"  <?php AssessmentUtility::writeHtmlSelected($timefilter,168); ?>>last week</option>
-                     <option value="720"  <?php AssessmentUtility::writeHtmlSelected($timefilter,720); ?>>last month</option>
-                     <option value="8760" <?php  AssessmentUtility::writeHtmlSelected($timefilter,8760); ?>>last year</option>
-                 </select>
-            </span>
-            <span class=" pull-right">
-             Last name: <input type=text id="lnfilter" value="<?php echo $lnfilter ?>" />
-             <input type=button value="Filter by name" onclick="chglnfilter()" />
-            </span>
-          </div>
-         </div> <br> <br>
+         <div class="col-md-12 col-sm-12">
+                <span class="floatleft select-text-margin">
+                     <?php echo "Meanings: NC-no credit";?>
+                </span>
+                <div class="col-md-9 col-sm-12 pull-right padding-left-zero padding-right-zero">
+                    <span class="col-md-5 col-sm-5 padding-left-zero padding-right-zero"> Students starting in
+                         <select id="timetoggle" class="form-control-gradebook" onchange="chgtimefilter()">
+                             <option value="1" <?php AssessmentUtility::writeHtmlSelected($timefilter,1); ?> >last 1 hour</option>
+                             <option value="2"  <?php  AssessmentUtility::writeHtmlSelected($timefilter,2); ?> >last 2 hours</option>
+                             <option value="4"  <?php AssessmentUtility::writeHtmlSelected($timefilter,4); ?>>last 4 hours</option>
+                             <option value="24"  <?php AssessmentUtility::writeHtmlSelected($timefilter,24); ?>>last day</option>
+                             <option value="168"  <?php AssessmentUtility::writeHtmlSelected($timefilter,168); ?>>last week</option>
+                             <option value="720"  <?php AssessmentUtility::writeHtmlSelected($timefilter,720); ?>>last month</option>
+                             <option value="8760" <?php  AssessmentUtility::writeHtmlSelected($timefilter,8760); ?>>last year</option>
+                         </select>
+                    </span>
+                    <span class="col-md-7 col-sm-7 padding-left-zero padding-right-seven">
+                     <span>Last name</span>
+                     <input class="form-control width-fifty-per display-inline-block" type=text id="lnfilter" value="<?php echo $lnfilter ?>" />
+                     <input class="floatright" type=button value="Filter by name" onclick="chglnfilter()" />
+                    </span>
+              </div>
+         </div>
             <?php $gbt = gbinstrdisp($gradebookData,$studentsDistinctSection,$course); ?>
         </form>
       </div>
@@ -63,9 +64,9 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
     $hidenc = 1;
     $cid = $course->id;
     $gbt = $gradebookData['gradebook']; ?>
-<div style="position: relative;">
-<div id="tbl-container" style="width: 100%;overflow-x: scroll">
-     <table class= table table-bordered table-striped table-hover data-table id= ><thead><tr>
+<div id="tbl-container" class="col-md-12 col-sm-12">
+     <table class="table table-bordered table-striped table-hover data-table">
+         <thead class="diagnostic-gradebook-table"><tr>
     <?php $n=0;
     for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
         if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
@@ -225,9 +226,11 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             } else if ($gbt[0][1][$j][6]==1) { //offline
                 if ($isteacher) {
                     if ($gbt[$i][0][0]=='Averages') { ?>
-                        <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$j][7]);?>">
+                        <br>
+                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$j][7]); ?>" >
                     <?php } else { ?>
-                        <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7])?> ">
+                        <br>
+                                 <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7]);?>" >
                     <?php }
                 }
                 if (isset($gbt[$i][1][$j][0])) {
@@ -238,9 +241,9 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
                 } else {
                     echo '-';
                 }
-                if ($isteacher) {
-                    echo '</a>';
-                }
+                if ($isteacher) { ?>
+                    </a>
+                <?php }
                 if ($gbt[$i][1][$j][1]==1) {
                     echo '<sup>*</sup>';
                 }
@@ -257,11 +260,10 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             echo '</td>';
         }
 
-    }
-    ?></tbody></table>
-    </div>
-    </div>
+    } ?>
 
+    </tbody></table>
+    </div>
     <?php
     if ($n>0) {
         $sarr = array_fill(0,$n-1,"'N'");

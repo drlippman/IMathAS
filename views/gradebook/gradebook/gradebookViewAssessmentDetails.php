@@ -542,7 +542,7 @@ for ($i = 0; $i < count($questions); $i++) {
     } else if ($scores[$i] == -1) {
         echo 'class="notanswered col-md-12 col-sm-12"';
     } else {
-        echo 'class="iswrong question-form-control col-md-12 col-sm-12 padding-left-right-thirty" ';
+        echo 'class="iswrong question-form-control col-md-12 col-sm-12" ';
     }
     $totalpossible += $pts[$questions[$i]];
 

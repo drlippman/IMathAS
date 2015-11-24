@@ -23,7 +23,7 @@ $this->title = 'Item Analysis';?>
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
+<div class="tab-content shadowBox non-nav-tab-item col-md-12 col-sm-12 padding-left-zero padding-right-zero">
     <?php
 if (!$isTeacher) {
    echo '<br><div class="text">';
@@ -46,11 +46,10 @@ if (!$isTeacher) {
 
     //echo "&gt; Item Analysis";
     ?>
-    <br>
-    <div class="cpmid item-analysis">
+    <div class="col-md-12 col-sm-12 item-analysis-background-color padding-top-bottom-one-em padding-left-two-em">
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/isolate-assessment-grade?cid=' . $courseId . '&amp;aid=' . $assessmentId) ?>"><?php AppUtility::t('View Score List');?></a>
     </div>
-     <div id="headergb-itemanalysis" class="pagetitle item-analysis"><h2><?php AppUtility::t('Item Analysis')?>:
+     <div id="headergb-itemanalysis" class="col-md-12 col-sm-12 padding-left-two-em"><h2><?php AppUtility::t('Item Analysis')?>:
     <?php $defaultPoints = $assessmentData['defpoints'];
     $defaultOutcome = $assessmentData['defoutcome'];
     $showHints = $assessmentData['showhints'];
@@ -190,8 +189,11 @@ if (!$isTeacher) {
                      <td class="pointer" onclick="GB_show('Most Time','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=time'); ?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><?php echo $averageTotal .'('.$averageTotalAssessment.')';?></td>
                     <?php if ($showHints == AppConstant::NUMERIC_ONE)
                 {
-                        if ($showExtraRef[$qid]) { ?>
-                             <td class="pointer c" onclick="GB_show('Got Help','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=help') ?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>');return false;"><?php echo round(AppConstant::NUMERIC_HUNDREAD * $vidcnt[$qid]   ($questionCount[$qid] - $questionInComplete[$qid])).'%'; ?></td>
+                        if ($showExtraRef[$qid]) {
+                            ?>
+                            <td class="pointer c" onclick="GB_show('Got Help','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis-detail?cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&type=help') ?>','<?php AppConstant::FIVE_HUNDRED ?>','<?php AppConstant::FIVE_HUNDRED ?>'); return false;">
+                                <?php echo round(AppConstant::NUMERIC_HUNDREAD * $vidcnt[$qid]/($questionCount[$qid] - $questionInComplete[$qid])).'%' ; ?>
+                            </td>
                         <?php } else { ?>
                             <td class="c"><?php AppUtility::t('N/A')?></td>
                         <?php }
@@ -219,7 +221,7 @@ if (!$isTeacher) {
      <?php AppUtility::t('Note: Average Attempts, Regens, and Time only counts those who attempted the problem')?><br/>
      <?php AppUtility::t('All averages only include those who have started the assessment')?></p>
 <?php
-    if ($numberOfQuestions > AppConstant::NUMERIC_ZERO)
+    if (count($numberOfQuestions) > AppConstant::NUMERIC_ZERO)
     {
         CategoryScoresUtility::catscores($qs, $averageScore, $defaultPoints, $defaultOutcome, $cid);
     } ?>
@@ -228,7 +230,7 @@ if (!$isTeacher) {
         <?php AppUtility::t('Summary of assessment results')?></a> (<?php AppUtility::t('only meaningful for non-randomized questions')?>)<br/>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/assessment-export?cid=' . $course->id . '&aid=' . $assessmentId); ?>">
         <?php AppUtility::t('Export student answer details')?></a></div>
-<? echo '</div><br>';
+<?php echo '</div><br>';
 }
 echo '</div>';
 function getpts($sc) {

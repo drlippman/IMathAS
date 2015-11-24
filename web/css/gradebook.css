@@ -295,3 +295,8 @@ transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 .max-width-three-hundread {
     max-width: 300px;
 }
+.diagnostic-gradebook-table {
+    order-bottom: 2px solid #00f;
+    background-color: #eef;
+    color: #000000;
+}
