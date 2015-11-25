@@ -2765,6 +2765,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								if ($anans!=0) {
 									$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
 								}
+								$epsilon = (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12));
 								if (strpos($givenans,'E')!==false) {  //handle computer-style scientific notation
 									preg_match('/^-?[1-9]\.?(\d*)E/', $givenans, $matches);
 									$gasigfig = 1+strlen($matches[1]);
@@ -2774,7 +2775,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 										if ($gasigfig < $reqsigfigs) {continue;}
 										if ($reqsigfigoffset>0 && $gasigfig-$reqsigfigs>$reqsigfigoffset) {continue;}
 									}
-									if (abs($anans-$givenans)< pow(10,$v)/2+1E-12) {$correct += 1; $foundloc = $j; break 2;}
+									if (abs($anans-$givenans)< pow(10,$v)/2+$epsilon) {$correct += 1; $foundloc = $j; break 2;}
 								} else {
 									if (!$exactsigfig) {
 										//this line will reject 0.25 if the answer is 0.250 with 3 sigfigs
@@ -2782,7 +2783,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 										if ($gadploc===false) {$gadploc = strlen($givenans);}
 										if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { continue; } //not enough decimal places
 										if ($anans != 0 && $reqsigfigoffset>0 && $v<0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {continue;} //too many sigfigs
-										if (abs($anans-$givenans)< pow(10,$v)/2+1E-12) {$correct += 1; $foundloc = $j; break 2;}
+										if (abs($anans-$givenans)< pow(10,$v)/2+$epsilon) {$correct += 1; $foundloc = $j; break 2;}
 									} else {
 										if (ltrim(prettysigfig($anans,$reqsigfigs,''),'0')===ltrim($givenans,'0')) {
 											$correct += 1; $foundloc = $j; break 2;
