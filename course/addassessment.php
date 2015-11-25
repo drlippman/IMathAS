@@ -841,6 +841,11 @@ if ($overwriteBody==1) {
 					<option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
 					<option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
 					<option value="A" <?php if ($showans=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
+					<option value="1" <?php if ($showans=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
+					<option value="2" <?php if ($showans=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
+					<option value="3" <?php if ($showans=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
+					<option value="4" <?php if ($showans=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
+					<option value="5" <?php if ($showans=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
 				</select>
 				</span>
 			</span><br class=form>

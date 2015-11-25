@@ -333,7 +333,7 @@ function fileBrowserCallBack(field_name, url, type, win) {
 		file : connector,
 		title : 'File Manager',
 		width : 350,  
-		height : 450,
+		height : 430,
 		resizable : "yes",
 		inline : "yes",  
 		close_previous : "no"

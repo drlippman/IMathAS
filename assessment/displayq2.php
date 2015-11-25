@@ -328,7 +328,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$showanswerloc .= filter(" <span id=\"ans$qnidx\" class=\"hidden\">$showanswer </span>\n");
 		}
 		$showanswerloc .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
-	} else {
+	} else if ($doshowans) {
 		$showanswerloc = array();
 		foreach($entryTips as $iidx=>$entryTip) {
 			$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
@@ -350,7 +350,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				}
 			}
 			$showanswerloc[$iidx] .= (isset($showanswerstyle) && $showanswerstyle=='inline')?'</span>':'</div>';
-			
+		}
+		if (!is_array($answerbox) && count($showanswerloc)==1) { //not a multipart question
+			$showanswerloc = $showanswerloc[0];
 		}
 	}
 	
@@ -377,6 +379,19 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		} else {
 			$evaledqtext = str_replace('[AB]', $answerbox, $evaledqtext);
 			$toevalqtxt .= '$answerbox';
+		}
+	}
+	if (strpos($evaledqtext,'[SAB')!==false) {
+		if (is_array($showanswerloc)) {
+			foreach($showanswerloc as $iidx=>$saloc) {
+				if (strpos($evaledqtext,'[SAB'.$iidx.']')!==false) {
+					$evaledqtext = str_replace('[SAB'.$iidx.']', $saloc, $evaledqtext);
+					$toevalqtxt .= '$showanswerloc['.$iidx.']';  //to prevent autoadd
+				}
+			}
+		} else {
+			$evaledqtext = str_replace('[SAB]', $showanswerloc, $evaledqtext);
+			$toevalqtxt .= '$showanswerloc';
 		}
 	}
 	if ($returnqtxt) {
@@ -485,7 +500,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	echo "</div>\n";
 	
-	if ($doshowans && isset($showanswer) && !is_array($showanswer) && strpos($toevalqtxt,'$showanswerloc')===false) {  //single showanswer defined
+	if ($doshowans && !is_array($showanswerloc) && strpos($toevalqtxt,'$showanswerloc')===false) {  //single showanswer defined
 		/*if ($nosabutton) {
 			echo filter("<div>" . _('Answer:') . " $showanswer </div>\n");	
 		} else {
@@ -682,7 +697,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$stuanswers[$qnidx+1] = implode('|',$tmp);
 		}
 	}
-	
+
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
@@ -1102,7 +1117,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
-		
+
 		//trim out unshuffled showans
 		$la = explode('$!$',$la);
 		$la = $la[0];
@@ -1111,7 +1126,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
 			shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
-		} else if ($noshuffle == "all") {
+		} else if ($noshuffle == "all" || count($questions)==1) {
 			$randkeys = array_keys($questions);
 		} else {
 			$randkeys = array_rand($questions,count($questions));
@@ -1957,6 +1972,28 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
 				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" ';
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
+				
+				$la = preg_replace_callback('/<a[^>]*href="(.*)?"[^>]*>(.*?)<\/a>/', function ($m) {
+					global $gradededessayexpandocnt;
+					if (!isset($gradededessayexpandocnt)) {
+						$gradededessayexpandocnt = 0;
+					}
+					if (strpos($m[0],'target=')===false) {
+						$ret = '<a target="_blank" '.substr($m[0], 2);
+					} else {
+						$ret = $m[0];
+					}
+					$url = $m[1];
+					$extension = substr($url,strrpos($url,'.')+1,3);
+					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
+						$ret .= " <span class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayimg$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
+						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" src=\"$url\" />";
+					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
+						$ret .= " <span class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
+						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+					}
+					return $ret;
+				   }, $la);
 			}
 				
 			$out .= filter($la);
@@ -2935,7 +2972,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randqkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
 			shuffle($randqkeys);
 			array_push($randqkeys,count($questions)-1);
-		} else if ($noshuffle == "all") {
+		} else if ($noshuffle == "all" || count($questions)==1) {
 			$randqkeys = array_keys($questions);
 		} else {
 			$randqkeys = array_rand($questions,count($questions));
@@ -4468,9 +4505,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$A = ($x3p * ($y2p - $y1p) + $x2p * ($y1p - $y3p) + $x1p * ($y3p - $y2p)) / $denom;
 						$B = ($x3p*$x3p * ($y1p - $y2p) + $x2p*$x2p * ($y3p - $y1p) + $x1p*$x1p * ($y2p - $y3p)) / $denom;
 						$C = ($x2p * $x3p * ($x2p - $x3p) * $y1p + $x3p * $x1p * ($x3p - $x1p) * $y2p + $x1p * $x2p * ($x1p - $x2p) * $y3p) / $denom;
+						$xv = -$B/(2*$A);
+						$yv = $C-$B*$B/(4*$A);
+						//TODO:  adjust 20px to be based on drawing window and grid
+						//   maybe ~1 grid units?
 						$xt = -$B/(2*$A)+20;
-						//use vertex and y value at x of vertex + 20 pixels
-						$ansparabs[$key] = array(-$B/(2*$A),$C-$B*$B/(4*$A),$A*$xt*$xt+$B*$xt+$C);
+						$yatxt = $A*$xt*$xt+$B*$xt+$C;
+						if (abs($yatxt - $yv)<20) {
+							$xatyt = sign($A)*sqrt(abs(20/$A))+$xv;
+							$ansparabs[$key] = array('x', $xv, $yv, $xatyt);
+						} else {
+							//use vertex and y value at x of vertex + 20 pixels
+							$ansparabs[$key] = array('y', $xv, $yv, $yatxt);
+						}
+						//**finish me!!
 					}
 				}
 			}
@@ -4509,13 +4557,18 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else if ($pts[0]==5.4) {
 						$vecs[] = array($pts[1],$pts[2],$pts[3],$pts[4],'v');	
 					} else if ($pts[0]==6) {
-						//parab
+						//parab  
+						//for y at x+20, y=a(x-h)^2+k is y=a*20^2+k
+						//for x at y+-20, y=a(x-h)^2+k
+						//                20 = a(x-h)^2
+						//                abs(20/a) = (x-h)^2
 						if ($pts[4]==$pts[2]) {
 							$lines[] = array('y',0,$pts[4]);
 						} else if ($pts[3]!=$pts[1]) {
 							$a = ($pts[4]-$pts[2])/(($pts[3]-$pts[1])*($pts[3]-$pts[1]));
 							$y = $pts[2]+$a*400;
-							$parabs[] = array($pts[1],$pts[2],$y);
+							$x = $pts[1]+sign($a)*sqrt(abs(20/$a));
+							$parabs[] = array($pts[1],$pts[2],$y,$x);
 						}
 					} else if ($pts[0]==6.5) {//sqrt
 						$flip = ($pts[3] < $pts[1])?-1:1;
@@ -4763,14 +4816,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			foreach ($ansparabs as $key=>$ansparab) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($parabs); $i++) {
-					if (abs($ansparab[0]-$parabs[$i][0])>$defpttol*$reltolerance) {
+					if (abs($ansparab[1]-$parabs[$i][0])>$defpttol*$reltolerance) {
 						continue;
 					}
-					if (abs($ansparab[1]-$parabs[$i][1])>$defpttol*$reltolerance) {
+					if (abs($ansparab[2]-$parabs[$i][1])>$defpttol*$reltolerance) {
 						continue;
 					}
-					if (abs($ansparab[2]-$parabs[$i][2])>$defpttol*$reltolerance) {
-						continue;
+					if ($ansparab[0]=='x') { //compare x at yv+-20
+						if (abs($ansparab[3]-$parabs[$i][3])>$defpttol*$reltolerance) {
+							continue;
+						}
+					} else { //compare y at xv+20
+						if (abs($ansparab[3]-$parabs[$i][2])>$defpttol*$reltolerance) {
+							continue;
+						}
 					}
 					$scores[$key] = 1;
 					break;
@@ -5431,7 +5490,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$anstypes = explode(',',$anstypes);
 		}
 		$la = array();
-		
 		foreach ($anstypes as $i=>$anst) {
 			$qnt = 1000*($qn+1)+$i;
 			if (isset($_POST["tc$qnt"])) {
@@ -5440,14 +5498,29 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else {
 					$la[$i] = $_POST["tc$qnt"];
 				}
-			} else if (isset($_SESSION['choicemap'][$qnt]) && isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
-				$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
+			} else if (isset($_SESSION['choicemap'][$qnt])) {
+				if (is_array($_POST["qn$qnt"])) { //multans
+					$origmala = array();
+					$mappedpost = array();
+					foreach ($_SESSION['choicemap'][$qnt] as $k=>$v) {
+						if (isset($_POST["qn$qnt"][$k])) {
+							$origmala[$k] = $_POST["qn$qnt"][$k];
+							$mappedpost[$k] = $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"][$k]];
+						} else {
+							$origmala[$k] = "";
+						}
+					}
+					$la[$i] = implode('|',$origmala) . '$!$' . implode('|', $mappedpost);
+				} else if (isset($_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]])) {
+					$la[$i] = $_POST["qn$qnt"] . '$!$' . $_SESSION['choicemap'][$qnt][$_POST["qn$qnt"]];
+				}
 			} else {
 				$la[$i] = $_POST["qn$qnt"];
 			}
 			$la[$i] = str_replace('&','',$la[$i]);
 			$la[$i] = preg_replace('/#+/','#',$la[$i]);
 		}
+
 		$GLOBALS['partlastanswer'] = implode('&',$la);
 		if (isset($abstolerance)) {
 			$tol = '|'.$abstolerance;
@@ -5859,6 +5932,7 @@ function rawscoretocolor($sc,$aw) {
 
 function normalizemathunicode($str) {
 	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷'), array('(',')','oo','U','/','<=','>=','/'), $str);
+	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;	
 }
 
