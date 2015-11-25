@@ -1585,7 +1585,7 @@ class AdminController extends AppController
             $diagByTime = DiagOneTime::getByDiag($diag);
             foreach($diagByTime as $key => $row)
              {
-                $row['time'] =  $this->tzdate("F j, Y",$row['time']);
+                $row['time'] = AppUtility::tzdate("F j, Y",$row['time']);
                 if ($row['goodfor'] == AppConstant::NUMERIC_ZERO) {
                     $row['goodfor'] = "One-time";
                 } else if ($row['goodfor'] > 1000000000) {
