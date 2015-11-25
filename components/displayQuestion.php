@@ -293,7 +293,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$showanswerloc = array();
 		foreach($entryTips as $iidx=>$entryTip) {
 
-					$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div>';
+					$showanswerloc[$iidx] = (isset($showanswerstyle) && $showanswerstyle=='inline')?'<span>':'<div class="col-md-12 col-sm-12 padding-left-zero">';
 			if ($doshowans && (!isset($showanswer) || (is_array($showanswer) && !isset($showanswer[$iidx]))) && $shanspt[$iidx]!=='') {
 
                 if ($nosabutton) {
@@ -348,7 +348,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$temp .= "<div class=inactive>";
         $temp .= filter($evaledqtext);
 	} else {
-        $temp .= "<div id='question' class='question show-test-questions col-md-12 padding-top-bottom-fifteen'><div>\n";
+        $temp .= "<div id='question' class='question show-test-questions col-md-12 col-sm-12 padding-top-bottom-fifteen'><div>\n";
         $temp .= filter($evaledqtext);
         $temp .= "</div>\n";
 	}
@@ -418,7 +418,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$temp .= '</p></div>';
 	}
 
-    $temp .= "<div>";
+    $temp .= "<div class='col-md-12 col-sm-12 padding-left-zero padding-top-two-em'>";
 
 	foreach($entryTips as $iidx=>$entryTip) {
 		if ((!isset($hidetips) || (is_array($hidetips) && !isset($hidetips[$iidx])))&& !$seqinactive && $showtips>0) {
@@ -427,7 +427,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
             $temp .= ">".AppUtility::t('Box',false). " ".($iidx+1).": <span id=\"tips$qnidx-$iidx\">".filter($entryTip)."</span></p>";
 		}
 		if ($doshowans && strpos($toevalqtxt,'$showanswerloc')===false && is_array($showanswerloc) && isset($showanswerloc[$iidx])) {
-            $temp .= '<div>'.$showanswerloc[$iidx].'</div>';
+            $temp .= '<div class="col-md-12 col-sm-12 padding-left-zero padding-bottom-one-em">'.$showanswerloc[$iidx].'</div>';
 		}
 	}
     $temp .= "</div>\n";

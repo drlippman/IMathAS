@@ -4765,7 +4765,9 @@ class GradebookController extends AppController
     public  function actionGradeAllQuestion()
     {
         $params = $this->getRequestParams();
+        $this->layout = 'master';
         $cid = $params['cid'];
+        $course = Course::getById($cid);
         $stu = $params['stu'];
         $gbmode = $params['gbmode'];
         $aid = $params['aid'];
@@ -4926,7 +4928,7 @@ class GradebookController extends AppController
             }
         }
         $assessmentSessionData = AssessmentSession::getDataWithUserDataFilterByPage($aid,$cid,$page);
-        $responseData = array('cnt' => $cnt,'qid' => $qid,'qsetid' => $qsetid,'cid' => $cid,'aid' => $aid,'stu' => $stu,'ver' => $ver,'gbmode' => $gbmode,'questionData' => $questionData,
+        $responseData = array('course' => $course,'cnt' => $cnt,'qid' => $qid,'qsetid' => $qsetid,'cid' => $cid,'aid' => $aid,'stu' => $stu,'ver' => $ver,'gbmode' => $gbmode,'questionData' => $questionData,
             'assessmentSessionData' => $assessmentSessionData,'stulist' => $stulist,'assessmentData' => $assessmentData,'page' => $page,'rubricFinalData' => $rubricFinalData);
         return $this->renderWithData('gradeAllQuestion',$responseData);
     }

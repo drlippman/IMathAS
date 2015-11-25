@@ -3,8 +3,8 @@
 use app\components\AppUtility;
 
 use app\components\filehandler;
-
 $aname = $assessmentData['name'];$defpoints = $assessmentData['defpoints'];
+$this->title = AppUtility::t('Grading a Question', false);
 $isgroup = $assessmentData['isgroup']; $groupsetid = $assessmentData['groupsetid']; $deffbtext = $assessmentData['deffeedbacktext'];
 $points = $questionData['points'];
 $urlmode = AppUtility::urlMode();
@@ -27,23 +27,44 @@ if ($points==9999) {
 
 	$sessiondata['coursetheme'] = $coursetheme;
 
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;}</style>\n";
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
-	echo "&gt; Grading a Question</div>";
-	echo "<div id=\"headergradeallq\" class=\"pagetitle\"><h2>Grading a Question in $aname</h2></div>";
-	echo "<p><b>Warning</b>: This page may not work correctly if the question selected is part of a group of questions</p>";
-	echo '<div class="cpmid">';
-	if ($page==-1)
-    { ?>
-         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-all-question?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&page=0') ?>">Grade one student at a time</a> (Do not use for group assignments)
-    <?php } else { ?>
-         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-all-question?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&page=-1')?>">Grade all students at once</a>
-    <?php }
-	echo '</div>';
-	echo "<p>Note: Feedback is for whole assessment, not the individual question.</p>";
-	echo '
+//	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;}</style>\n";
+//	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+//	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+//	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
+//	echo "&gt; Grading a Question</div>";
+?>
+
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course['name'],AppUtility::t('Gradebook', false),AppUtility::t('Item Analysis', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index',AppUtility::getHomeURL() . 'course/course/course?cid='.$cid, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid='.$cid, AppUtility::getHomeURL() . 'gradebook/gradebook/item-analysis?cid='.$cid.'&asid=average&aid='.$aid]]); ?>
+</div>
+<div class = "title-container padding-bottom-two-em">
+    <div class="row">
+        <div class="pull-left">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-content shadowBox col-md-12 col-sm-12 padding-top-bottom-one-pt-five-em">
+
+    <div class="col-md-12 col-sm-12">
+        <?php echo 'Grading a Question in'.$aname?>
+    </div>
+    <p class="col-md-12 col-sm-12">
+        <b>Warning</b>
+        This page may not work correctly if the question selected is part of a group of questions
+    </p>
+	<div class="col-md-12 col-sm-12">
+        <?php if ($page==-1) { ?>
+             <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-all-question?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&page=0') ?>">Grade one student at a time</a> (Do not use for group assignments)
+        <?php } else { ?>
+             <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-all-question?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$cid.'&aid='.$aid.'&qid='.$qid.'&page=-1')?>">Grade all students at once</a>
+        <?php } ?>
+	</div>
+	<p class="col-md-12 col-sm-12">Note: Feedback is for whole assessment, not the individual question.</p>
+
+    <?php
+    echo '
 	<script type="text/javascript">
 	function hidecorrect() {
 		var butn = $("#hctoggle");
@@ -138,25 +159,39 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 
 	if (count($rubricFinalData)>0) {
 		echo printrubrics(array($rubricFinalData));
-	}
-	if ($page==-1)
-	{
-		echo '<button type=button id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
-		echo '<button type=button id="nztoggle" onclick="hidenonzero()">'._('Hide Nonzero Score Questions').'</button>';
-		echo ' <button type=button id="hnatoggle" onclick="hideNA()">'._('Hide Unanswered Questions').'</button>';
-		echo ' <button type="button" id="preprint" onclick="preprint()">'._('Prepare for Printing (Slow)').'</button>';
-		echo ' <button type="button" id="showanstoggle" onclick="showallans()">'._('Show All Answers').'</button>';
-	}
-	echo ' <input type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />';
-	if ($deffbtext != '')
-	{
-		echo ' <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />';
-	}
-	echo "<form id=\"mainform\" method=post action=\"grade-all-question?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=$page&update=true\">\n";
+	} ?>
+<div class="col-md-12 col-sm-12">
+<?php	if ($page==-1) { ?>
+        <span class="padding-right-one-em padding-bottom-one-em">
+            <button type="button" id="hctoggle" onclick="hidecorrect()" >Hide Questions with Perfect Scores </button>
+        </span>
+        <span class="padding-right-one-em">
+        <button type="button" id="nztoggle" onclick="hidenonzero()">Hide Nonzero Score Questions</button>
+        </span>
+        <span class="padding-right-one-em">
+        <button type="button" id="hnatoggle" onclick="hideNA()"> Hide Unanswered Questions</button>
+        </span>
+        <span class="padding-right-one-em">
+        <button type="button" id="preprint" onclick="preprint()">Prepare for Printing (Slow)</button>
+        </span>
+        <span class="padding-right-one-em">
+        <button type="button" id="showanstoggle" onclick="showallans()">Show All Answers</button>
+        </span>
+	<?php } ?>
+<span class="padding-right-one-em">
+<input class="margin-top-ten" type="button" id="clrfeedback" value="Clear all feedback" onclick="clearfeedback()" />
+</span>
+<?php	if ($deffbtext != '') { ?>
+    <span class="padding-right-one-em">
+    <input type="button" id="clrfeedback" value="Clear default feedback" onclick="cleardeffeedback()" />
+    </span>
+<?php	}
+echo '</div>';
+echo "<form id=\"mainform\" method=post action=\"grade-all-question?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&page=$page&update=true\">\n";
 	if ($isgroup>0) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
 	}
-	echo "<p>";
+	echo "<p class='col-md-12 col-sm-12'>";
 	if ($ver=='graded') {
 		echo "<b>Showing Graded Attempts.</b>  ";
         echo "<a href=\"grade-all-question?stu=$stu&gbmode=$gbmode&cid=$cid&aid=$aid&qid=$qid&ver=last\">Show Last Attempts</a>";
@@ -196,6 +231,7 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 			}
 			$s3asid = $asid;
 		}
+		global $questions;
 		if (strpos($line['questions'],';')===false) {
 			$questions = explode(",",$line['questions']);
 			$bestquestions = $questions;
@@ -225,9 +261,9 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 			if ($groupdup) {
 				echo '<div class="groupdup">';
 			}
-			echo "<p><span class=\"person\"><b>".$line['LastName'].', '.$line['FirstName'].'</b></span>';
+			echo "<p class='col-md-12 col-sm-12'><span class=\"person\"><b>".$line['LastName'].', '.$line['FirstName'].'</b></span>';
 			if ($page != -1) {
-				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
+				echo '.  Jump to <select class="form-control display-inline-block width-twenty-per" id="stusel" onchange="jumptostu()">';
 				foreach ($stulist as $i=>$st) {
 					echo '<option value="'.$i.'" ';
 					if ($i==$page) {echo 'selected="selected"';}
@@ -244,13 +280,13 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 					echo ' (empty)</h4>';
 				}
 			}
-			echo "<div ";
+			echo "<div class='col-md-12 col-sm-12' ";
 			if (getpts($scores[$loc])==$points) {
 				echo 'class="iscorrect"';
 			} else if ($scores[$loc]>0) {
 				echo 'class="isnonzero"';
 			} else if ($scores[$loc]==-1) {
-				echo 'class="notanswered"';
+				echo 'class="notanswered col-md-12 col-sm-12"';
 			} else {
 				echo 'class="iswrong"';
 			}
@@ -259,20 +295,7 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 			$teacherreview = $line['userid'];
 
 			if ($qtype=='multipart') {
-				/*if (($p = strpos($qcontrol,'answeights'))!==false) {
-					$p = strpos($qcontrol,"\n",$p);
-					$answeights = getansweights($loc,substr($qcontrol,0,$p));
-				} else {
-					preg_match('/anstypes(.*)/',$qcontrol,$match);
-					$n = substr_count($match[1],',')+1;
-					if ($n>1) {
-						$answeights = array_fill(0,$n-1,round(1/$n,3));
-						$answeights[] = 1-array_sum($answeights);
-					} else {
-						$answeights = array(1);
-					}
-				}
-				*/
+
 				$answeights = getansweights($loc,$qcontrol);
 				for ($i=0; $i<count($answeights)-1; $i++) {
 					$answeights[$i] = round($answeights[$i]*$points,2);
@@ -293,7 +316,9 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
             echo $temp;
 			echo '</div>';
 
-			echo "<div class=review>";
+			echo "
+			<div class='col-md-12 col-sm-12'>
+			<div class='review col-md-12 col-sm-12'>";
 			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
 			if (!$groupdup) {
 				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
@@ -307,7 +332,7 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
-				echo "<input type=text size=4 id=\"ud-{$line['id']}-$loc\" name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
+				echo "<input class='form-control display-inline-block width-ten-per' type=text size=4 id=\"ud-{$line['id']}-$loc\" name=\"ud-{$line['id']}-$loc\" value=\"$pt\">";
 				if ($rubric != 0) {
 					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc","feedback-{$line['id']}",($loc+1));
 				}
@@ -319,7 +344,7 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 					if ($prts[$j]==-1) {
 						$prts[$j] = 'N/A';
 					}
-					echo "<input type=text size=2 id=\"ud-{$line['id']}-$loc-$j\" name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\">";
+					echo "<input class='kkkkkkkkk' type=text size=2 id=\"ud-{$line['id']}-$loc-$j\" name=\"ud-{$line['id']}-$loc-$j\" value=\"{$prts[$j]}\">";
 					if ($rubric != 0) {
 						echo printrubriclink($rubric,$answeights[$j],"ud-{$line['id']}-$loc-$j","feedback-{$line['id']}",($loc+1).' pt '.($j+1));
 					}
@@ -413,10 +438,13 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 					}
 				}
 			}
-			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
+			echo "<div class='col-md-12 col-sm-12 padding-left-zero'>
+			<span class='floatleft padding-right-five padding-top-five'>Feedback</span> <textarea class='max-width-ninety-per width-auto form-control display-inline-block' cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>
+			</div>
+			";
 			echo '<br/>Question #'.($loc+1);
 			echo ". <a target=\"_blank\" href=\"#\">Use in Msg</a>";
-			echo "</div>\n";
+			echo "</div></div>\n";
 			if ($groupdup)
 			{
 				echo '</div>';
@@ -424,9 +452,12 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 			$cnt++;
 		}
 	}
-	echo "<input type=\"submit\" value=\"Save Changes\"/> ";
+	echo "<div class='col-md-4 col-sm-6'>
+	<input type=\"submit\" value=\"Save Changes\"/>
+	</div> ";
 	} ?>
 	 </form>
+    </div>
 	<?php echo '<p>&nbsp;</p>';
 	function getpts($sc) {
 		if (strpos($sc,'~')===false) {
@@ -457,6 +488,7 @@ $(".sabtn").replaceWith("<span>Answer: </span>");
 			return array($pts,$sc);
 		}
 	}
+
 function getansweights($qi,$code) {
 	global $seeds,$questions;
 	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
