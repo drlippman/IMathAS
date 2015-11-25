@@ -147,7 +147,6 @@ if ($type=="img") {
 </head>
 <body>
 <?php
-$files = getuserfiles($userid,$type=="img");
 if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 	echo '<div class="td_main">';
 	echo 'Inserting...';
@@ -163,6 +162,7 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 	*/
 }
 if (isset($_REQUEST['showfiles'])) {
+	$files = getuserfiles($userid,$type=="img");
 	echo '<div class="td_main">';
 	foreach ($files as $k=>$v) {
 		echo "<div><a href='#' onClick='delete_file(\"" . basename($v['name']) . "\", this)'>";
