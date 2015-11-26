@@ -444,6 +444,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
     $temp .= "</div>\n";
+
 	if ($qdata['qtype']=="multipart" ) {
 		return $anstypes;
 	} else {

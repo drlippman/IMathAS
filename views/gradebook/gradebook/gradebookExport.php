@@ -36,27 +36,27 @@ $this->title = 'Gradebook Export';
             <form method=post action="gradebook-export?cid=<?php echo $course->id ?>&stu=<?php echo $stu ?>&gbmode=<?php echo $gbmode ?>&<?php echo $para ?>" class="nolimit">
 
                <?php if (isset($params['export'])) { ?>
-                <div class="col-md-12 gradebook-export-file-header">
+                <div class="col-md-12 col-sm-12 gradebook-export-file-header">
                     <a class="padding-left-fifteen" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid=' . $course->id); ?> ">
                         Return to gradebook
                     </a>
                 </div>
                 <?php } ?>
 
-                <div class="col-md-12 gradebook-export-file-padding">
+                <div class="col-md-12 col-sm-12 gradebook-export-file-padding">
                 <?php if ($params['emailgb'] == "ask") {
                     echo "
-                    <div class='col-md-12 padding-left-zero padding-bottom-twenty padding-top-five'>
-                        <div class=\"col-md-3 select-text-margin\">Email Gradebook To</div>
-                        <div class=\"col-md-3 padding-left-zero\">
+                    <div class='col-md-12 col-sm-12 padding-left-zero padding-bottom-twenty padding-top-five'>
+                        <div class=\"col-md-3 col-sm-4 select-text-margin\">Email Gradebook To</div>
+                        <div class=\"col-md-3 col-sm-3 padding-left-zero\">
                                 <input class='form-control' type=text name=\"email\" size=\"30\"/>
                         </div>
                     </div>";
                 } ?>
                 <?php echo '
-                        <div class="padding-left-zero col-md-12">
-                        <div class="col-md-3">Locked students?</div>
-                        <div class="col-md-3 padding-left-three">
+                        <div class="padding-left-zero col-sm-12 col-md-12">
+                        <div class="col-md-3 col-sm-4">Locked students?</div>
+                        <div class="col-md-3 col-sm-3 padding-left-three">
                             <span>
                                 <input type="radio" name="locked" value="hide" checked="checked">
                                 <span class="padding-left-five">Hide</span>
@@ -67,9 +67,9 @@ $this->title = 'Gradebook Export';
                             </span>
                         </div>
                     </div>
-                    <div class="padding-left-zero col-md-12 padding-top-twenty">
-                        <div class="col-md-3">Separate header line for points possible?</div>
-                        <div class="col-md-3 padding-left-three">
+                    <div class="padding-left-zero col-sm-12 col-md-12 padding-top-twenty">
+                        <div class="col-md-3 col-sm-4">Separate header line for points possible?</div>
+                        <div class="col-md-3 col-sm-3 padding-left-three">
                            <span>
                                 <input type="radio" name="pointsln" value="0" checked="checked">
                                 <span class="padding-left-five">No</span>
@@ -80,26 +80,26 @@ $this->title = 'Gradebook Export';
                             </span>
                         </div>
                     </div>
-                    <div class="padding-left-zero col-md-12 padding-top-twenty">
-                        <div class="col-md-3">Assessment comments:</div>
-                        <div class="col-md-4 padding-left-three">
-                            <span class="col-md-12 padding-left-zero">
+                    <div class="padding-left-zero col-md-12 col-sm-12 padding-top-twenty">
+                        <div class="col-md-3 col-sm-4 ">Assessment comments:</div>
+                        <div class="col-md-4 col-sm-5 padding-left-three">
+                            <span class="col-md-12 col-sm-12 padding-left-zero">
                                 <input type="radio" name="commentloc" value="-1" checked="checked">
                                 <span class="padding-left-five">Don\'t include comments</span>
                             </span>
-                            <span class="col-md-12 padding-left-zero padding-top-ten">
+                            <span class="col-md-12 col-sm-12 padding-left-zero padding-top-ten">
                                 <input type="radio" name="commentloc" value="1">
                                 <span class="padding-left-five">Separate set of columns at the end</span>
                             </span>
-                            <span class="col-md-12 padding-left-zero padding-top-ten">
+                            <span class="col-md-12 col-sm-12 padding-left-zero padding-top-ten">
                                 <input type="radio" name="commentloc" value="0">
                                 <span class="padding-left-five">After each score column</span>
                             </span>
                         </div>
                     </div>
-                    <div class="padding-left-zero col-md-12 padding-top-twenty">
-                        <div class="col-md-3">Include last login date?</div>
-                        <div class="col-md-3 padding-left-three">
+                    <div class="padding-left-zero col-md-12 col-sm-12 padding-top-twenty">
+                        <div class="col-md-3 col-sm-4">Include last login date?</div>
+                        <div class="col-md-3 col-sm-3 padding-left-three">
                             <span class="">
                                 <input type="radio" name="lastlogin" value="0" checked="checked">
                                 <span class="padding-left-five">No</span>
@@ -110,9 +110,9 @@ $this->title = 'Gradebook Export';
                             </span>
                         </div>
                     </div>
-                    <div class="padding-left-zero col-md-12 padding-top-twenty">
-                        <div class="col-md-3">Include total number of logins?</div>
-                        <div class="col-md-3 padding-left-three">
+                    <div class="padding-left-zero col-md-12 col-sm-12 padding-top-twenty">
+                        <div class="col-md-3 col-sm-4">Include total number of logins?</div>
+                        <div class="col-md-3 col-sm-3 padding-left-three">
                             <span class="">
                                 <input type="radio" name="logincnt" value="0" checked="checked">
                                 <span class="padding-left-five">No</span>
@@ -124,7 +124,7 @@ $this->title = 'Gradebook Export';
                         </div>
                     </div>';
                     if (isset($params['export'])) { ?>
-                    <div class="padding-left-zero col-md-offset-3 col-md-9 padding-top-twenty">
+                    <div class="padding-left-zero col-md-offset-3 col-md-9 col-sm-9 col-sm-offset-4 padding-top-twenty">
                        <span class="">
                            <input type=submit name="submit" value="Download Gradebook as CSV" />
                        </span>
@@ -134,7 +134,7 @@ $this->title = 'Gradebook Export';
                     </div>
 
                      <?php echo '
-                     <div class="col-md-12 padding-top-twenty">
+                     <div class="col-md-12 col-sm-12 padding-top-twenty">
                         When you click the
                         <b>Download Gradebook</b>
                         button, your browser will probably ask if you want to save or
@@ -144,12 +144,12 @@ $this->title = 'Gradebook Export';
                         or whatever program your computer has set to open .csv spreadsheet files
                      </div>
 
-                    <div class="col-md-12 padding-top-twenty">A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</div>
+                    <div class="col-md-12 col-sm-12 padding-top-twenty">A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</div>
 
-                    <div class="col-md-12 padding-top-twenty">Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</div>
+                    <div class="col-md-12 col-sm-12 padding-top-twenty">Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</div>
                 ';
                 } else {
-                    echo '<div class="padding-left-zero col-md-offset-3 col-md-9 padding-top-twenty padding-bottom-five">
+                    echo '<div class="padding-left-zero col-md-offset-3 col-md-9 col-sm-9 col-sm-offset-4 padding-top-twenty padding-bottom-five">
                             <input type=submit value="Email Gradebook" />
                           </div>';
                 }
@@ -1040,4 +1040,5 @@ $this->title = 'Gradebook Export';
             }
             echo "</tbody></table>";
         }
+
         ?>

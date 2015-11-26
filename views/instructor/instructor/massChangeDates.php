@@ -25,6 +25,7 @@ $imasroot1 = AppUtility::getURLFromHome('instructor', 'instructor/mass-change-da
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]); ?>
 </div>
+
 <div class="tab-content shadowBox">
 <?php
 if ($overwriteBody == 1) {
@@ -47,11 +48,11 @@ if ($overwriteBody == 1) {
     var filteraddr = \"$imasroot\";";
 
     echo "var orderaddr = \"$imasroot1\";</script>";  ?>
-<div class="col-md-12">
-    <div class="col-md-6">
-        <?php echo '<div class="col-md-3">Order by</div>
-        <div class="col-md-6">
-         <select id="orderby" class="form-control col-md-4" onchange="chgorderby()">';
+<div class="col-md-12 col-sm-12 padding-top-one-em">
+    <div class="col-md-4 col-sm-4 padding-left-zero">
+        <?php echo '<div class="col-md-4 col-sm-4 padding-left-zero">Order by</div>
+        <div class="col-md-8 col-sm-8 padding-left-zero">
+         <select id="orderby" class="form-control col-sm-4 col-md-4" onchange="chgorderby()">';
         echo '<option value="0" ';
         if ($orderby == 0) {
             echo 'selected="selected"';
@@ -76,10 +77,10 @@ if ($overwriteBody == 1) {
         echo '</select> </div>';
         ?>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 col-sm-6 padding-left-zero">
         <?php
-        echo '<div class="col-md-3">Filter by type</div>
-        <div class="col-md-6">
+        echo '<div class="col-md-3 col-sm-4 ">Filter by type</div>
+        <div class="col-md-6 col-sm-6 ">
         <select id="filter" class="form-control col-md-4" onchange="filteritems()">';
         echo '<option value="all" ';
         if ($filter=='all') {echo 'selected="selected"';}
@@ -107,58 +108,55 @@ if ($overwriteBody == 1) {
 </div>
 
 <?php
-    echo "<p class='col-md-12'><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
-    echo "<div class='col-md-12'>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
+    echo "<div class='col-md-12 col-sm-12 padding-top-one-em padding-bottom-one-em'><p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p></div>";
+    echo "<div class='col-md-12 col-sm-12'>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
     echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
     echo "If you click the checkboxes on the left, you can limit the update to those items. ";
     echo "Click the <img src=\"$imasroot2/img/swap.gif\"> icon in each cell to swap from ";
     echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</div>";
-    echo "<form id=\"qform\">";
+    echo "<form id=\"qform\">";?>
 
-    echo '<div class="col-md-12">
-    <div class="col-md-4">
-    <div class="col-md-2">Check</div>
-    <a href="#" class="col-md-1" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a>
-    <a href="#"  class="col-md-1" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a></div> ';?>
-    <div class="col-md-8">
+     <div class="col-md-12 col-sm-12 padding-top-one-em padding-bottom-one-em">
 <?php
     echo 'Change selected items
-    <select id="swaptype" onchange="chgswaptype(this)">
+    <div class="display-inline-block padding-right-one-em padding-left-one-em">
+    <select id="swaptype" class="form-control " onchange="chgswaptype(this)">
         <option value="s">Start Date</option>
         <option value="e">End Date</option>
         <option value="r">Review Date</option>
         <option value="a">Show</option>
-    </select>';
-    echo ' to <select id="swapselected">
+    </select></div>';
+    echo ' to <div class="display-inline-block padding-right-one-em padding-left-one-em">
+    <select id="swapselected" class="form-control">
         <option value="always">Always</option>
         <option value="dates">Dates</option>
-    </select>';
+    </select></div>';
     echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
     echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></div>';
-
+    echo '<div style="overflow-x: scroll" class="col-sm-12 col-md-12  ">';
     if ($picicons) {
-        echo '<table class=gb>
+        echo '<table  class=gb>
         <thead>
         <tr><th></th>
-            <th class="col-md-1">Name</th>
-            <th class="col-md-1">Show</th>
-            <th class="col-md-3">Start Date</th>
-            <th class="col-md-3">End Date</th>
-            <th class="col-md-3">Review Date</th>
-            <th class="col-md-2">Send Date Chg / Copy Down List</th>
+            <th class=" ">Name</th>
+            <th class=" ">Show</th>
+            <th class=" ">Start Date</th>
+            <th class=" ">End Date</th>
+            <th class=" ">Review Date</th>
+            <th class=" ">Send Date Chg / Copy Down List</th>
         </thead>
         <tbody>';
     } else {
         echo '<table class=gb>
         <thead>
-        <tr><th></th>
-            <th class="col-md-1">Name</th>
-            <th class="col-md-1">Type</th>
-            <th>Show</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Review Date</th>
-            <th>Send Date Chg / Copy Down List</th>
+        <tr><th class=" "></th>
+            <th class=" ">Name</th>
+            <th class=" ">Type</th>
+            <th class=" ">Show</th>
+            <th class=" ">Start Date</th>
+            <th class=" ">End Date</th>
+            <th class=" ">Review Date</th>
+            <th class=" ">Send Date Chg / Copy Down List</th>
         </thead><tbody>';
     }
 
@@ -223,9 +221,9 @@ if ($overwriteBody == 1) {
             echo "<span id=\"sspan0$cnt\" class=\"hide\">Always</span>";
         }
         if ($startdates[$i]==0) {
-            echo "<span id=\"sspan1$cnt\" class=\"hide\">";
+            echo "<span id=\"sspan1$cnt\" style='width: 200px'  class=\"hide\">";
         } else {
-            echo "<span id=\"sspan1$cnt\" class=\"show\">";
+            echo "<span id=\"sspan1$cnt\" style='width: 200px;' class=\"show\">";
         }
         if ($startdates[$i]==0) {
             $startdates[$i] = time();
@@ -237,7 +235,7 @@ if ($overwriteBody == 1) {
         }
         echo "<input type=hidden size=10 onblur=\"ob(this)\"/>";
         echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
-                                        echo '<div class = "col-md-10 time-input"">';
+                                        echo '<div class = "col-sm-10  time-input"">';
                                         echo DatePicker::widget([
                                             'name' => 'sdate'.$cnt,
                                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -253,7 +251,7 @@ if ($overwriteBody == 1) {
 //        echo "<input type=hidden size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 
                                         echo '<label class="end pull-left non-bold"> at </label>';
-                                        echo '<div class="col-md-12 padding-top">';
+                                        echo '<div class="col-sm-12  padding-top">';
                                         echo TimePicker::widget([
                                             'name' => 'postTime',
                                             'id' => 'stime'.$cnt,
@@ -279,9 +277,9 @@ if ($overwriteBody == 1) {
             echo "<span id=\"espan0$cnt\" class=\"hide\">Always</span>";
         }
         if ($enddates[$i]==2000000000) {
-            echo "<span id=\"espan1$cnt\" class=\"hide\">";
+            echo "<span id=\"espan1$cnt\" style='width: 200px' class=\"hide\">";
         } else {
-            echo "<span id=\"espan1$cnt\" class=\"show\">";
+            echo "<span id=\"espan1$cnt\" style='width: 200px' class=\"show\">";
         }
 
         if ($enddates[$i]==2000000000) {
@@ -401,7 +399,7 @@ if ($overwriteBody == 1) {
         echo "</tr>";
         $cnt++;
     }
-    echo '</tbody></table>';
+    echo '</tbody></table></div>';
     echo '</form>';
     echo "<form id=\"realform\" method=post action=\"mass-change-dates?cid=$courseId\" onsubmit=\"prepforsubmit(this)\">";
     echo "<input type=hidden id=\"chgcnt\" name=\"chgcnt\" value=\"$cnt\" />";
@@ -411,3 +409,12 @@ if ($overwriteBody == 1) {
 ?>
 </div>
 
+
+
+
+
+<?php
+//         <div class="col-md-4">
+//             Check
+//             <a href="#" class=" " onclick="return chkAllNone(\'qform\',\'all\',true)">All</a>
+//             <a href="#"  class=" " onclick="return chkAllNone(\'qform\',\'all\',false)">None</a></div> ?>

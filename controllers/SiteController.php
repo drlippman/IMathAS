@@ -630,6 +630,7 @@ class SiteController extends AppController
          *  Group Admin
          *  Admin
          */
+        $this->layout = "master";
         $id = $this->getParamVal('id');
         $code = $this->getParamVal('code');
         $model = new ResetPasswordForm();

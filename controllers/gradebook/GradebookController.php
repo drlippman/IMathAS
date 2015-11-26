@@ -3904,7 +3904,7 @@ class GradebookController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
-//        $this->layout = 'master';
+        $this->layout = 'master';
         if($teacher){
             $isTeacher = true;
         }
@@ -4296,8 +4296,10 @@ class GradebookController extends AppController
                 }
             }
         }
-        $this->includeCSS(['mathtest.css','gradebook.css']);
-        $this->includeJS(["general.js"]);
+//        $this->includeCSS(['mathtest.css','gradebook.css']);
+//        $this->includeJS(["general.js"]);
+        $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js','confirmsubmit.js','drawing.js']);
+        $this->includeCSS(['mathtest.css','gradebook.css','mathquill.css']);
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $responseData = array('course' => $course,'qsids' => $qsids,'qsdata' => $qsdata,'assessment' => $assessment,'qdata' => $qdata,'isTeacher' => $isTeacher,'isTutor' => $isTutor);
         return $this->renderWithData('itemResults',$responseData);
@@ -4390,7 +4392,7 @@ class GradebookController extends AppController
             $totalData = $this->gbtable($currentUser['id'], $course['id'], $stu);
 
         }
-        $this->includeCSS('imascore.css','modern.css');
+        $this->includeCSS(['imascore.css','modern.css','gradebook.css']);
         $responseData = array('studentData' => $studentData,'currentUser' => $currentUser,'totalData' => $totalData,'gbmode' => $gbmode,'stu' => $stu,'params' => $params,'isteacher' => $isTeacher,'course' => $course);
         return $this->renderWithData('gradebookExport',$responseData);
     }

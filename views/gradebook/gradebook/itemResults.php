@@ -60,14 +60,35 @@ $this->title = 'Item Result'; ?>
 
         $questions = array_keys($qdata);
 
-        foreach ($itemarr as $k => $q) {
-            echo '<div  class="item-result-border">';
-            echo '<p><span  class="right-side">(Question ID ' . $qsids[$q] . ')</span><b>' . $qsdata[$qsids[$q]][2] . '</b></p>';
+//        foreach ($itemarr as $k => $q) {
+//            echo '<div  class="item-result-border">';
+//            echo '<p><span  class="right-side">(Question ID ' . $qsids[$q] . ')</span><b>' . $qsdata[$qsids[$q]][2] . '</b></p>';
+//            echo '<br class="clear"/>';
+//            echo '<div class="item-result-answer">';
+//            showresults($q, $qsdata[$qsids[$q]][0], $qdata, $qsids, $qsdata, $scorebarwidth);
+//            echo '</div>';
+//            echo '<div class="item-result-question">';
+//            displayq($k,$qsids[$q],0,0,0,0);
+//            echo '</div>';
+//            echo '<br class="clear"/>';
+//            echo '</div>';
+//        }
+
+        foreach ($itemarr as $k=>$q) {
+            echo '<div style="border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;">';
+            echo '<p><span style="float:right">(Question ID '.$qsids[$q].')</span><b>'.$qsdata[$qsids[$q]][2].'</b></p>';
             echo '<br class="clear"/>';
-            echo '<div class="item-result-answer">';
+            echo '<div style="float:left;width:35%;">';
+//            showresults($q,$qsdata[$qsids[$q]][0]);
             showresults($q, $qsdata[$qsids[$q]][0], $qdata, $qsids, $qsdata, $scorebarwidth);
             echo '</div>';
-            echo '<div class="item-result-question">';
+            echo '<div style="float:left;width:60%;margin-left:10px;">';
+            $temp = array();
+            global $temp;
+//            $qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
+
+            $qtype = displayq($k,$qsids[$q],0,0,0,0);
+            echo $temp;
             echo '</div>';
             echo '<br class="clear"/>';
             echo '</div>';
@@ -82,6 +103,7 @@ $this->title = 'Item Result'; ?>
             if (isset($choices) && !isset($questions)) {
                 $questions =& $choices;
             }
+
             if ($qtype == 'multipart') {
                 if (!is_array($anstypes)) {
                     $anstypes = explode(',', $anstypes);

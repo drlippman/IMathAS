@@ -28,10 +28,6 @@ if ($params['sendtype'] == 'msg') {
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings" type="button" onclick="submitForm()" id="addNewThread" value="Submit">
-                <i class="fa fa-share header-right-btn"></i><?php echo $saveButton; ?></button>
-        </div>
     </div>
 </div>
 <?php
@@ -70,26 +66,37 @@ if (isset($_GET['quoteq'])) {
   <div class="tab-content shadowBox non-nav-tab-item padding-top-thirty padding-bottom-thirty">
         <input type="hidden" name="sendto" value="<?php echo $params['sendto'] ?>"/>
         <input type="hidden" name="sendtype" value="<?php echo $params['sendtype']; ?>"/>
-      <div class="col-sm-12">
-         <span class='col-sm-1'><?php AppUtility::t('To')?></span>
-        <span class='col-sm-4'>
+      <div class="col-sm-12 col-md-12">
+         <span class='col-sm-1 col-md-1'><?php AppUtility::t('To')?></span>
+        <span class='col-sm-6 col-md-8'>
             <?php echo $to ?>
             </span>
             </div>
       <br><br>
-      <div class="col-sm-12">
-      <span class="col-sm-1"><?php AppUtility::t('Subject')?> </span>
-         <span class="col-sm-4"> <input type=text size=50 class="form-control subject" name=subject id=subject value="<?php echo $title ?>"><br/></span>
+      <div class="col-sm-12 col-md-12">
+      <span class="col-sm-1 col-md-1"><?php AppUtility::t('Subject')?> </span>
+         <span class="col-sm-6 col-md-4"> <input type=text size=50 class="form-control subject" name=subject id=subject value="<?php echo $title ?>"><br/></span>
           </div>
       <br><br>
-      <div class="col-sm-12">
-          <span class="col-sm-1">
+      <div class="col-sm-12 col-md-12">
+          <span class="col-sm-1 col-md-1">
          <?php AppUtility::t('Message') ?>
               </span>
-          <span class="col-sm-11"><div class=editor><textarea  id=message name=message style="width: 100%;" rows=12 cols=20></span>
+          <span class="col-sm-11 col-md-11">
+              <div class=" editor msg-editor">
+                  <textarea  id=message name=message style="width: 100%;" rows=12 cols=20>
+
                   <?php echo htmlentities($message); ?>
          </textarea>
       </div>
+              </span>
       </div>
+
+    <div class="col-sm-6 col-md-6 padding-top-one-em">
+        <div class="col-sm-6 col-md-6 col-sm-offset-2 col-md-offset-2 ">
+           <button class="btn btn-primary   page-settings" type="button" onclick="submitForm()" id="addNewThread" value="Submit">
+            <i class="fa fa-share header-right-btn"></i><?php echo $saveButton; ?></button>
+        </div>
+    </div>
 </div>
     </form>

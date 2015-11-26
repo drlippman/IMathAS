@@ -17,26 +17,26 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
             </div>
         </div>
     </div>
-    <div class="tab-content shadowBox margin-top-fourty padding-top-fifteen padding-bottom-ten">
-        <div class="change-assessment">
+    <div class="tab-content shadowBox margin-top-fourty padding-one-em">
+        <div >
             <?php
             if ($overWriteBody == AppConstant::NUMERIC_ONE) {
                 echo "<br><div> <h4 class='assessment-body'>$body </h4><br></div>";
             }else { ?>
-            <p><?php AppUtility::t('This form will allow you to change the assessment settings for several or all assessments at once.'); ?></p>
-            <p><b><?php AppUtility::t('Be aware');?></b> <?php AppUtility::t('that changing default points or penalty after an assessment has been
+             <?php AppUtility::t('This form will allow you to change the assessment settings for several or all assessments at once.'); ?>
+            <div class="padding-top-one-em padding-bottom-one-em"><b><?php AppUtility::t('Be aware');?></b> <?php AppUtility::t('that changing default points or penalty after an assessment has been
                 taken will not change the scores of students who have already completed the assessment.')?><br/>
-                <?php AppUtility::t('This page will')?> <i><?php AppUtility::t('always')?></i> <?php AppUtility::t('show the system default settings; it does not show the current settings for your assessments.')?></p>
-            <h3 class="margin-top-ten"><?php AppUtility::t('Assessments to Change') ?></h3>
-            <div class="col-md-12">
-                <div class="pull-left margin-top-five">
+                <?php AppUtility::t('This page will')?> <i><?php AppUtility::t('always')?></i> <?php AppUtility::t('show the system default settings; it does not show the current settings for your assessments.')?></div>
+            <h3 class="margin-top-zero margin-bottom-zero" ><?php AppUtility::t('Assessments to Change') ?></h3>
+            <div class="col-md-12 col-sm-12 padding-top-one-em">
+                <div class="padding-left-zero margin-top-five col-sm-6 col-md-4">
                     Check <a href="#"
                               onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a>
                     <a href="#"
                        onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
                     Check by gradebook category:
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 col-sm-5 padding-left-zero">
                     <?php
                     AssessmentUtility::writeHtmlSelect("selbygbcat", $gbcatsId, $gbcatsLabel, null, "Select...", -1, ' onchange="chkgbcat(this.value);" id="selbygbcat" ');
                     ?>
@@ -81,190 +81,125 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                 </ul>
             </div>
         </div>
-        <div class="change-assessment">
-            <div class="margin-top-fifteen"><?php AppUtility::t('Assessment Options') ?></div>
+        <div class="col-md-12 col-sm-12">
+            <div class="padding-bottom-one-em"><h3><?php AppUtility::t('Assessment Options') ?></h3></div>
             <table class="table table-bordered table-striped table-hover data-table" id="opttable">
                 <thead>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <th><?php AppUtility::t('Change?') ?></th>
-                        </div>
-                        <div class="col-md-4">
-                            <th class="text-align"><?php AppUtility::t('Option') ?></th>
-                        </div>
-                        <div class="col-md-6">
-                            <th class="text-align"><?php AppUtility::t('Setting') ?></th>
-                        </div>
-                    </div>
+                            <th class="col-sm-1 col-md-1"><?php AppUtility::t('Change?') ?></th>
+                            <th class="col-sm-4 col-md-4 text-align"><?php AppUtility::t('Option') ?></th>
+                            <th class="text-align col-sm-7 col-md-7"><?php AppUtility::t('Setting') ?></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgsummary" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4 ">
-                            <td class="text-align"><?php AppUtility::t('Summary') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from:') ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty assessment-copy-from clear-both">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgsummary" class="chgbox"/></td>
+                            <td class="text-align col-sm-4 col-md-4"><?php AppUtility::t('Summary') ?></td>
+                            <td class="col-sm-7 col-md-7">
+                                <div class="col-sm-4 col-md-2 padding-left-zero">
+                                    <?php AppUtility::t('Copy from') ?>
+                                </div>
+                                <div class="col-sm-8 col-md-9 padding-left-zero">
                                     <?php
                                     AssessmentUtility::writeHtmlSelect("summary", $page_assessSelect['val'], $page_assessSelect['label']);
                                     ?>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgintro" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Instructions') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from:') ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty assessment-copy-from clear-both">
+                            <td><input type="checkbox" name="chgintro" class="chgbox col-sm-1 col-md-1"/></td>
+                            <td class="col-sm-4 col-md-4 text-align"><?php AppUtility::t('Instructions') ?></td>
+                    <td class="col-sm-7 col-md-7">
+                        <div class="col-sm-4 col-md-2 padding-left-zero"><?php AppUtility::t('Copy from') ?></div>
+                                <div class="col-sm-8 col-md-9 padding-left-zero">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("intro", $page_assessSelect['val'], $page_assessSelect['label']);
                                 ?>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdates" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Dates and Times') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from:') ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty assessment-copy-from clear-both">
+                            <td><input type="checkbox" name="chgdates" class="chgbox col-sm-1 col-md-1"/></td>
+                            <td class="text-align col-sm-4 col-md-4"><?php AppUtility::t('Dates and Times') ?></td>
+                    <td class="col-sm-7 col-md-7">
+                        <div class="col-sm-4 col-md-2 padding-left-zero"><?php AppUtility::t('Copy from') ?></div>
+                                <div class="col-sm-8 col-md-9 padding-left-zero">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("dates", $page_assessSelect['val'], $page_assessSelect['label']);
                                 ?>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgavail" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Show'); ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <input type=radio name="avail" value="0"/><span class="margin-left-five"><?php AppUtility::t('Hide') ?></span>
-                                <input class="margin-left-fifty" type=radio name="avail" value="1"
+                            <td><input type="checkbox" name="chgavail" class="col-sm-1 col-md-1 chgbox"/></td>
+                            <td class="text-align col-sm-4 col-md-4"><?php AppUtility::t('Show'); ?></td>
+                            <td class="col-sm-7 col-md-7">
+                                <input type=radio name="avail" value="0"/><span class="margin-left-five"><?php AppUtility::t('Hide') ?></span>&nbsp;
+                                <input class="" type=radio name="avail" value="1"
                                        checked="checked"/><span class="margin-left-five"><?php AppUtility::t('Show by Dates') ?></span>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcopyendmsg"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"
+                            <td class="col-md-1 col-sm-1" style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcopyendmsg"/></td>
+                            <td class="col-md-4 col-sm-4 text-align"
                                 style="border-bottom: 1px solid #000"><?php AppUtility::t('End of Assessment Messages') ?>
                             </td>
-                        </div>
-                        <div class="col-md-6">
-                            <td style="border-bottom: 1px solid #000">
-                                <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from') ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty-five assessment-copy-from clear-both">
+                            <td class="col-md-7 col-sm-7" style="border-bottom: 1px solid #000">
+                                <div class="col-sm-4 col-md-2 padding-left-zero"><?php AppUtility::t('Copy from') ?></div>
+                                <div class="col-sm-8 col-md-9 padding-left-zero">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("copyendmsg", $page_assessSelect['val'], $page_assessSelect['label']);
                                 ?>
                                 </div>
-                                <br/><i
-                                    style="font-size: 75%"><?php AppUtility::t('Use option near the bottom to define new messages') ?></i>
+                                <div class="col-sm-8 col-md-9 padding-left-zero">
+                                 <i style="font-size: 75%"><?php AppUtility::t('Use option near the bottom to define new messages') ?></i>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdocopyopt" class="chgbox"
+                            <td><input type="checkbox" name="chgdocopyopt" class="col-md-1 col-sm-1 chgbox"
                                        onClick="copyfromtoggle(this.form,this.checked)"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Copy remaining options') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from'); ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty-five assessment-copy-from clear-both">
+                            <td class="col-md-4 col-sm-4 text-align"><?php AppUtility::t('Copy remaining options') ?></td>
+                            <td class="col-md-7 col-sm-7">
+                                <div class="col-sm-4 col-md-2 padding-left-zero"><?php AppUtility::t('Copy from'); ?></div>
+                                <div class="col-sm-8 col-md-9 padding-left-zero">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("copyopt", $page_assessSelect['val'], $page_assessSelect['label']);
                                 ?>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Require Password (blank for none)') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input class="form-control" type=text name="assmpassword" value="" autocomplete="off"></td>
-                        </div>
-                    </div>
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgpassword" class="chgbox"/></td>
+                            <td class="col-sm-4 col-md-4 text-align"><?php AppUtility::t('Require Password (blank for none)') ?></td>
+                            <td class="col-sm-7 col-md-7 ">
+                                <div class="col-md-11 col-sm-12 padding-left-zero">
+                                <input class=" form-control" type=text name="assmpassword" value="" autocomplete="off">
+                                </div>
+                            </td>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Time Limit (minutes, 0 for no time limit)') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input class="form-control width-ten-per display-inline-block" type=text size=4 name="timelimit" value="0"/>
-                                <input class="margin-left-thirty" type="checkbox"
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
+                            <td class="col-sm-4 col-md-4 text-align"><?php AppUtility::t('Time Limit (minutes, 0 for no time limit)') ?></td>
+                            <td class="col-sm-7 col-md-7">
+                                <div class="col-sm-3 col-md-2 padding-left-zero">
+                                <input class="form-control display-inline-block" type=text size=4 name="timelimit" value="0"/>
+                                </div>
+                                <div class="padding-top-five">
+                                <input class="margin-left-fifteen" type="checkbox"
                                        name="timelimitkickout"/>
                                 <span class="margin-left-five">
                                     <?php AppUtility::t('Kick student out at timelimit') ?>
                                 </span>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Display method') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <select name="displaymethod" class="form-control">
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td>
+                            <td class="text-align col-sm-4 col-md-4"><?php AppUtility::t('Display method') ?></td>
+                            <td class="col-sm-7 col-md-7">
+                                <div class="col-md-11 col-sm-12 padding-left-zero">
+                                <select name="displaymethod" class="  form-control">
                                     <option
                                         value="AllAtOnce" <?php AssessmentUtility::writeHtmlSelected($line['displaymethod'], "AllAtOnce", 0) ?>>
                                         <?php AppUtility::t('Full test at once') ?>
@@ -286,60 +221,44 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                         <?php AppUtility::t('Embedded') ?>
                                     </option>
                                 </select>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdefpoints" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Default points per problem') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input class="form-control width-ten-per display-inline-block" type=text size=4 name=defpoints value="<?php echo $line['defpoints']; ?>"></td>
-                        </div>
-                    </div>
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgdefpoints" class="chgbox"/></td>
+                            <td class="col-sm-4 col-md-4 text-align"><?php AppUtility::t('Default points per problem') ?></td>
+                            <td class="col-sm-7 col-md-7">
+                                <div class="col-sm-3 col-md-2 padding-left-zero">
+                                <input class="form-control display-inline-block" type=text size=4 name=defpoints value="<?php echo $line['defpoints']; ?>"></div></td>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdefattempts" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align">Default attempts per problem (0 for unlimited):</td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <input class="floatleft form-control width-ten-per display-inline-block" type=text size=4 name=defattempts value="<?php echo $line['defattempts']; ?>">
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgdefattempts" class="chgbox"/></td>
+                            <td class="col-sm-4 col-md-4 text-align">Default attempts per problem (0 for unlimited):</td>
+                            <td class="col-sm-7 col-md-7"><div class="col-sm-3 col-md-2 padding-left-zero">
+                                <input class="floatleft form-control display-inline-block" type=text size=4 name=defattempts value="<?php echo $line['defattempts']; ?>"> </div>
  					<span id="showreattdiffver" class="<?php if ($testtype != "Practice" && $testtype != "Homework") {
                         echo "show";
                     } else {
                         echo "hidden";
-                    } ?> floatleft margin-left-thirty margin-top-seven">
- 					<input type=checkbox
+                    } ?> floatleft  margin-top-seven">
+ 					<input type=checkbox class="margin-left-fifteen"
                            name="reattemptsdiffver" <?php AssessmentUtility::writeHtmlChecked($line['shuffle'] & 8, 8); ?> />
  					<span class="margin-left-five"><?php AppUtility::t('Reattempts different versions')?></span>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Default penalty');?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input class="col-md-1 form-control width-ten-per display-inline-block" type=text size=4 name=defpenalty style="margin-bottom: 4px"
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
+                            <td class="text-align col-sm-4 col-md-4"><?php AppUtility::t('Default penalty');?></td>
+                            <td class="col-sm-7 col-md-7 padding-left-zero">
+                                <div class="col-sm-3 col-md-2">
+                                <input class="form-control display-inline-block" type=text name=defpenalty style="margin-bottom: 4px"
                                        value="<?php echo $line['defpenalty']; ?>" <?php if ($taken) {
                                     echo 'disabled=disabled';
-                                } ?>><span class="floatleft margin-top-seven margin-left-five">%</span>
-                                <select class="col-md-5 form-control display-inline-block width-fifty-per margin-left-thirty" name="skippenalty" <?php if ($taken) {
+                                } ?>>
+                                <span class="  floatleft margin-top-seven ">%</span>
+                                </div>
+                                    <div class="col-sm-9 col-md-10">
+                                <select class="form-control display-inline-block  " name="skippenalty" <?php if ($taken) {
                                     echo 'disabled=disabled';
                                 } ?>>
                                     <option value="0" <?php if ($skippenalty == 0) {
@@ -375,27 +294,22 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                     } ?>><?php AppUtility::t('on last possible attempt only');?>
                                     </option>
                                 </select>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgfeedback" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align">
-                                <div>
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgfeedback" class="chgbox"/></td>
+                            <td class="col-sm-4 col-md-4 text-align">
+                                <div class="padding-bottom-one-em">
                                     <?php AppUtility::t('Feedback method');?>
                                 </div>
-                                <div class="margin-top-twenty-two">
-                                    <?php AppUtility::t('Show Answers');?></td>
-                                </div>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <select class="form-control" id="deffeedback" name="deffeedback" onChange="chgfb()">
+                                <div class=" ">
+                                    <?php AppUtility::t('Show Answers');?>
+                            </div>
+                            </td>
+                            <td class="col-sm-7 col-md-7">
+                                <div class="col-md-11 col-sm-12 padding-left-zero padding-bottom-one-em">
+                                <select class="form-control  " id="deffeedback" name="deffeedback" onChange="chgfb()">
                                     <option value="NoScores" <?php if ($testtype == "NoScores") {
                                         echo "SELECTED";
                                     } ?>><?php AppUtility::t('No scores shown (use with 1 attempt per problem)');?>
@@ -425,12 +339,14 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                     } ?>><?php AppUtility::t("Homework: Show score on each question as it's submitted & allow similar question to replace missed question")?>
                                     </option>
                                 </select>
+                                    </div>
 					<span id="showanspracspan" class="<?php if ($testtype == "Practice" || $testtype == "Homework") {
                         echo "show";
                     } else {
                         echo "hidden";
                     } ?> margin-top-ten">
-					<select class="form-control" name="showansprac">
+                        <div class="col-md-11 col-sm-12 padding-left-zero">
+					<select class="form-control  " name="showansprac">
                         <option value="V" <?php if ($showans == "V") {
                             echo "SELECTED";
                         } ?>><?php AppUtility::t("Never, but allow students to review their own answers") ?>
@@ -472,13 +388,15 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                         } ?>><?php AppUtility::t("After 5 attempts") ?>
                         </option>
                     </select>
+                            </div>
 					</span>
 					<span id="showansspan" class="<?php if ($testtype != "Practice" && $testtype != "Homework") {
                         echo "show";
                     } else {
                         echo "hidden";
                     } ?> margin-top-ten">
-					<select class="form-control" name="showans">
+                        <div class="col-md-11 col-sm-12 padding-left-zero">
+					<select class="  form-control" name="showans">
                         <option value="V" <?php if ($showans == "V") {
                             echo "SELECTED";
                         } ?>><?php AppUtility::t('Never, but allow students to review their own answers') ?>
@@ -500,22 +418,16 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                         } ?>><?php AppUtility::t('After due date (in gradebook)') ?>
                         </option>
                     </select>
+                            </div>
 					</span>
                             </td>
-                        </div>
-                    </div>
                 </tr>
 
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Use equation helper')?>?</td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
+                            <td class="col-md-4 col-sm-4 text-align"><?php AppUtility::t('Use equation helper')?>?</td>
+                            <td class="col-md-7 col-sm-7">
+                                <div class="col-md-11 col-sm-12 padding-left-zero">
                                 <select class="form-control" name="eqnhelper">
                                     <option
                                         value="0" <?php AssessmentUtility::writeHtmlSelected($line['eqnhelper'], 0) ?>>
@@ -545,70 +457,42 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                         <?php AppUtility::t('MathQuill, advanced form')?>
                                     </option>
                                 </select>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chghints" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Show hints and video/text buttons when available')?>?</td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chghints" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Show hints and video/text buttons when available')?>?</td>
+                            <td class="col-md-7 col-sm-7">
                                 <input type="checkbox"
                                        name="showhints" <?php AssessmentUtility::writeHtmlChecked($line['showhints'], 1); ?>>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgmsgtoinstr" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Show "Message instructor about this question" links');?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgmsgtoinstr" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Show "Message instructor about this question" links');?></td>
+                            <td class="col-md-7 col-sm-7">
                                 <input type="checkbox"
                                        name="msgtoinstr" <?php AssessmentUtility::writeHtmlChecked($line['msgtoinstr'], 1); ?>/>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgposttoforum" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Show "Post this question to forum" links');?>?</td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <input type="checkbox"
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgposttoforum" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Show "Post this question to forum" links');?>?</td>
+                            <td class="col-md-7 col-sm-7">
+                                <span class="pull-left"><input type="checkbox"
                                        name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($line['posttoforum'], 0, true); ?>
-                                       style="margin-bottom: 4px"/> <span class="margin-left-five"> <?php AppUtility::t('To forum');?></span><div class="display-inline-block margin-left-eighteen width-fifty-per"> <?php AssessmentUtility::writeHtmlSelect("posttoforum", $page_forumSelect['val'], $page_forumSelect['label'], $line['posttoforum']); ?></div>
+                                       style="margin-bottom: 4px"/> <span class="margin-left-five"> <?php AppUtility::t('To forum');?></span>
+                                </span>
+                                <div class="display-inline-block margin-left-one-per col-md-9 col-sm-12"> <?php AssessmentUtility::writeHtmlSelect("posttoforum", $page_forumSelect['val'], $page_forumSelect['label'], $line['posttoforum']); ?></div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgshowtips" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Show answer entry tips')?>?</td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <select name="showtips" class="form-control">
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" name="chgshowtips" class="chgbox"/></td>
+                            <td class="col-sm-4 col-md-4 text-align"><?php AppUtility::t('Show answer entry tips')?>?</td>
+                            <td class="col-sm-7 col-md-7">
+                                <div class="col-md-11 col-sm-12 padding-left-zero">
+                                <select name="showtips" class="  form-control">
                                     <option
                                         value="0" <?php AssessmentUtility::writeHtmlSelected($line['showtips'], 0) ?>><?php AppUtility::t('No')?>
                                     </option>
@@ -628,118 +512,70 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                         <?php AppUtility::t('Yes, under answerbox') ?>
                                     </option>
                                 </select>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" style="margin-bottom: 4px" name="chgallowlate" class="chgbox"/>
+                <tr class=" ">
+                            <td class="col-sm-1 col-md-1"><input type="checkbox" style="margin-bottom: 4px" name="chgallowlate" class="chgbox"/>
                             </td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align">
+                            <td class="text-align col-sm-4 col-md-4">
                                <?php AppUtility::t('Allow use of LatePasses?') ?>
                             </td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <span class="floatleft display-inline-block width-twenty-per">
+                            <td class="col-sm-7 col-md-7">
+                                <span class="  display-inline-block col-md-3 col-sm-6 padding-left-zero">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("allowlate", $page_allowlateSelect['val'], $page_allowlateSelect['label'], 1);
                                 ?>
                                 </span>
-                                <label class="floatleft margin-left-thirty margin-top-eight">
+                                <label class="col-sm-12 col-md-9 padding-left-zero padding-top-five">
                                     <input type="checkbox" name="latepassafterdue">
                                     <span class="margin-left-five"> <?php AppUtility::t('Allow LatePasses after due date, within 1 LatePass period') ?></span>
                                 </label>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Make hard to print?:') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Make hard to print?:') ?></td>
+                            <td class="col-md-7 col-sm-7">
                                 <input type="radio" value="0"
                                        name="noprint" <?php AssessmentUtility::writeHtmlChecked($line['noprint'], 0); ?>/>
                                 <span class="margin-left-five"><?php AppUtility::t('No');?></span>
-                                <input class="margin-left-thirty" type="radio" value="1"
+                                <input class="" type="radio" value="1"
                                        name="noprint" <?php AssessmentUtility::writeHtmlChecked($line['noprint'], 1); ?>/>
                                 <span class="margin-left-five"><?php AppUtility::t('Yes');?></span>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Shuffle item order') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Shuffle item order') ?></td>
+                            <td class="col-md-7 col-sm-7">
 				<span class=formright><input type="checkbox"
                                              name="shuffle" <?php AssessmentUtility::writeHtmlChecked($line['shuffle'] & 1, 1); ?>>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Gradebook category') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <?php
-                                AssessmentUtility::writeHtmlSelect("gbcat", $gbcatsId, $gbcatsLabel, null, null, null, " id=gbcat");
-                                ?>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chggbcat" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Gradebook category') ?></td>
+                            <td class="col-md-7 col-sm-7">
+                                <div class="col-md-11 col-sm-12 padding-left-zero"><?php AssessmentUtility::writeHtmlSelect("gbcat", $gbcatsId, $gbcatsLabel, null, null, null, " id=gbcat"); ?></div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgtutoredit" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Tutor Access') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <?php
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgtutoredit" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Tutor Access') ?></td>
+                            <td class="col-md-7 col-sm-7">
+                                <div class="col-md-11 col-sm-12 padding-left-zero"> <?php
                                 $pageTutorSelect['label'] = array("No access", "View Scores", "View and Edit Scores");
                                 $pageTutorSelect['val'] = array(2, 0, 1);
                                 AssessmentUtility::writeHtmlSelect("tutoredit", $pageTutorSelect['val'], $pageTutorSelect['label'], $line['tutoredit']);
                                 ?>
+                                    </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align" style="border-bottom: 1px solid #000">Count</td>
-                        </div>
-                        <div class="col-md-6">
-                            <td style="border-bottom: 1px solid #000">
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1" style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4" style="border-bottom: 1px solid #000">Count</td>
+                            <td style="border-bottom: 1px solid #000" class="col-md-7 col-sm-7">
                                 <div>
                                     <input name="cntingb" value="1" checked="checked" type="radio">
                                     <?php AppUtility::t('Count in Gradebook') ?>
@@ -757,131 +593,78 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                     <?php AppUtility::t('Count as Extra Credit') ?>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Calendar icon') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <?php AppUtility::t('Active') ?> <input class="margin-left-five form-control width-ten-per display-inline-block" name="caltagact" type=text size=1
-                                                                         value="<?php echo $line['caltag']; ?>"/>&nbsp;,
-                               <span class="margin-left-ten"> <?php AppUtility::t('Review') ?></span> <input class="margin-left-five form-control width-ten-per display-inline-block" name="caltagrev" type=text size=1
-                                                                         value="<?php echo $line['calrtag']; ?>"/>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Calendar icon') ?></td>
+                            <td class="col-md-7 col-sm-7">
+                                <span>
+                                    <span class="pull-left padding-top-five"><?php AppUtility::t('Active') ?></span>
+                                    <div class="col-sm-3 col-md-2 padding-left-zero">
+                                        <input class="margin-left-five form-control display-inline-block" name="caltagact" type=text size=1 value="<?php echo $line['caltag']; ?>"/>
+
+                                    </div>
+                                    <span class="floatleft">,</span>
+                                </span>
+                               <span><span class="margin-left-ten pull-left padding-top-five"> <?php AppUtility::t('Review') ?></span> <div class="col-sm-3 col-md-2 padding-left-zero"><input class="margin-left-five form-control display-inline-block" name="caltagrev" type=text size=1
+                                                                         value="<?php echo $line['calrtag']; ?>"/></div></span>
                             </td>
-                        </div>
-                    </div>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgminscore" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Minimum score to receive credit') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <input class="form-control width-ten-per display-inline-block" type=text size=4 name=minscore value="<?php echo $line['minscore']; ?>">
-                                <input class="margin-left-thirty" type="radio" name="minscoretype" value="0" checked="checked">
-                                <span class="margin-left-five"><?php AppUtility::t('Points') ?></span>
-                                <input class="margin-left-thirty" type="radio" name="minscoretype" value="1">
-                                <span class="class="margin-left-five""><?php AppUtility::t('Percent') ?></span>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgminscore" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Minimum score to receive credit') ?></td>
+                            <td class="col-md-7 col-sm-7">
+                                <div class="col-sm-3 col-md-2 padding-left-zero">
+                                    <input class="form-control display-inline-block" type=text size=4 name=minscore value="<?php echo $line['minscore']; ?>"></div>
+                                <div class="padding-top-five">
+                                <input class="margin-left-fifteen" type="radio" name="minscoretype" value="0" checked="checked">
+                                <span class="margin-left-five "><?php AppUtility::t('Points') ?></span>
+                                <input class="" type="radio" name="minscoretype" value="1">
+                                <span class="class="margin-left-five""><?php AppUtility::t('Percent') ?></span></div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgdeffb" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Default Feedback Text') ?></td>
-                        </div>
-                        <div class="</div>6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgdeffb" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Default Feedback Text') ?></td>
+                            <td class="col-md-7 col-sm-7">
                                 <div class="floatleft margin-top-five"><span><?php AppUtility::t('Use?') ?></span>
                                     <input class="margin-left-five" type="checkbox" name="usedeffb">
                                 </div>
-                                <div class="margin-left-thirty display-inline width-fifty-per floatleft width-eighty-per">
-                                    <span class="floatleft margin-top-five"><?php AppUtility::t('Text') ?></span>
-                                    <input class="display-inline-block margin-left-five form-control width-eighty-per" type="text" size="60" name="deffb" value="<?php AppUtility::t('This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items.') ?>"/>
+                                <div class="margin-left-fifteen   floatleft width-eighty-per">
+                                    <div class="floatleft margin-top-five padding-right-five"><?php AppUtility::t('Text') ?></div>
+                                    <div class="col-md-11 col-sm-12 padding-left-zero">
+                                    <input class="display-inline-block  form-control  " type="text" size="60" name="deffb" value="<?php AppUtility::t('This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items.') ?>"/>
+                                        </div>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Clear "show based on another assessment" settings.') ?></td>
-                        </div>
-                        <div class="col-md-6">
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Clear "show based on another assessment" settings.') ?></td>
                             <td></td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgsameseed" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('All items same random seed') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input type="checkbox" name="sameseed"></td>
-                        </div>
-                    </div>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgsameseed" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('All items same random seed') ?></td>
+                            <td class="col-md-7 col-sm-7"><input type="checkbox" name="sameseed"></td>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgsamever" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('All students same version of questions') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input type="checkbox" name="samever"></td>
-                        </div>
-                    </div>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgsamever" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('All students same version of questions') ?></td>
+                            <td class="col-md-7 col-sm-7"><input type="checkbox" name="samever"></td>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Penalty for questions done while in exception/LatePass') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
-                                <input class="form-control width-ten-per display-inline-block" type=text size=4 name="exceptionpenalty"
-                                       value="<?php echo $line['exceptionpenalty']; ?>"><span class="margin-left-five"> %</span>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Penalty for questions done while in exception/LatePass') ?></td>
+                            <td class="col-md-7 col-sm-7">
+                             <div class="col-sm-3 col-md-2 padding-left-zero">   <input class="form-control display-inline-block" type=text size=4 name="exceptionpenalty"
+                                       value="<?php echo $line['exceptionpenalty']; ?>"></div>
+                                <div class="padding-top-five"> %</div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgshowqcat" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Show question categories') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgshowqcat" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Show question categories') ?></td>
+                            <td class="col-md-7 col-sm-7">
                                 <div class="">
                                     <input name="showqcat" value="0" checked="checked" type="radio">
                                     <span class="margin-left-five"><?php AppUtility::t('No ') ?></span>
@@ -895,55 +678,29 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                     <span class="margin-left-five"><?php AppUtility::t('In navigation bar (Skip-Around only)') ?></span>
                                 </div>
                             </td>
-                        </div>
-                    </div>
                 </tr>
-                <tr class="coptr">
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td><input type="checkbox" name="chgistutorial" class="chgbox"/></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Display for tutorial-style questions') ?></td>
-                        </div>
-                        <div class="col-md-6">
-                            <td>
+                <tr class=" ">
+                            <td class="col-md-1 col-sm-1"><input type="checkbox" name="chgistutorial" class="chgbox"/></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Display for tutorial-style questions') ?></td>
+                            <td class="col-md-7 col-sm-7">
                                 <input type="checkbox" name="istutorial"/>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td style="border-top: 1px solid #000"></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"
+                            <td class="col-md-1 col-sm-1" style="border-top: 1px solid #000"></td>
+                            <td class="text-align col-md-4 col-sm-4"
                                 style="border-top: 1px solid #000"><?php AppUtility::t('Define end of assessment messages?') ?>
                             </td>
-                        </div>
-                        <div class="col-md-6">
-                            <td style="border-top: 1px solid #000">
+                            <td class="col-md-7 col-sm-7" style="border-top: 1px solid #000">
                                 <input type="checkbox" name="chgendmsg" class="chgbox"/>
                                 <span class="margin-left-five"><?php AppUtility::t('You will be taken to a page to change these after you hit submit') ?></span>
                             </td>
-                        </div>
-                    </div>
                 </tr>
                 <tr>
-                    <div class="col-md-12">
-                        <div class="col-md-2">
-                            <td></td>
-                        </div>
-                        <div class="col-md-4">
-                            <td class="text-align"><?php AppUtility::t('Remove per-question settings (points, attempts, etc.) for all questions in these assessments?') ?>
+                            <td class="col-md-1 col-sm-1"></td>
+                            <td class="text-align col-md-4 col-sm-4"><?php AppUtility::t('Remove per-question settings (points, attempts, etc.) for all questions in these assessments?') ?>
                             </td>
-                        </div>
-                        <div class="col-md-6">
-                            <td><input type="checkbox" name="removeperq" class="chgbox"/></td>
-                        </div>
-                    </div>
+                            <td class="col-md-7 col-sm-7"><input type="checkbox" name="removeperq" class="chgbox"/></td>
                 </tr>
                 </tbody>
             </table>

@@ -16,10 +16,12 @@ class AssessmentUtility extends Component
             echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
         }
         for ($i = AppConstant::NUMERIC_ZERO; $i < count($valList); $i++) {
+            $labelList[$i] = substr($labelList[$i],0,25);
             echo "<option value='" . $valList[$i] . "'";
             if ((isset($selectedVal)) && ($valList[$i] == $selectedVal)) {
                 echo " selected";
             }
+
             echo ">$labelList[$i]</option>\n";
         }
         echo "</select>\n";

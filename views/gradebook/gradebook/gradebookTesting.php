@@ -278,8 +278,8 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
     }
 
 } ?>
-<!--    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>-->
-<!--    <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>-->
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>
     <script>
     $(document).ready(function () {
         var table = $('.myTable').DataTable( {
@@ -290,7 +290,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             "ordering":false,
             paging: false
         });
-//        new $.fn.dataTable.FixedColumns(table);
+        new $.fn.dataTable.FixedColumns(table);
     });
 
 </script>

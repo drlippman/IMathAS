@@ -22,10 +22,10 @@ $urlmode = AppUtility::urlMode();
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
-<div class="roster-upper-content col-md-12">
-    <div class="page-title col-md-8 pull-left">
+<div class="roster-upper-content col-md-12 col-sm-12 padding-right-thirty">
+    <div class="page-title col-md-7 col-sm-6 pull-left">
     </div>
-    <div class="with-selected col-md-2 pull-left">
+    <div class="with-selected col-md-2 col-sm-3 pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><i class="fa fa-user ic"></i>&nbsp;<?php AppUtility::t('Pictures'); ?>
@@ -41,7 +41,7 @@ $urlmode = AppUtility::urlMode();
             </li>
         </ul>
     </div>
-    <div class="with-selected col-md-2 pull-left padding-left-right-zero">
+    <div class="with-selected col-md-3 col-sm-3 pull-left padding-left-right-zero">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
@@ -148,11 +148,11 @@ $urlmode = AppUtility::urlMode();
                 $lastaccess = ($line['lastaccess']>0) ? AppUtility::tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
             }
 
-            $hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
-            $hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
-            if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
+            $hasSectionData = ($hassection) ? "<td class='word-break-break-all'>{$line['section']}</td>" : "";
+            $hasCodeData = ($hascode) ? "<td class='word-break-break-all'>{$line['code']}</td>" : "";
+            if ($alt==0) {echo "			<tr class='word-break-break-all even'>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
             ?>
-				<td class="sorting_1">
+				<td class="sorting_1 word-break-break-all">
                     <div class='checkbox override-hidden'>
                         <label>
                              <input type='checkbox' name='student-information-check' value="<?php echo $line['userid']?>" >
@@ -161,7 +161,7 @@ $urlmode = AppUtility::urlMode();
                     </div>
                 </td>
 				 <?php if ($isImageColumnPresent == 1) { ?>
-				<td>
+				<td class="word-break-break-all">
             <?php
             if ($line['hasuserimg']==1)
             {
@@ -180,19 +180,19 @@ $urlmode = AppUtility::urlMode();
             echo $hasSectionData;
             echo $hasCodeData;
             if ($line['locked']>0) {
-                echo '<td><span class="greystrike">'.$line['LastName'].'</span></td>';
-                echo '<td><span class="greystrike">'.$line['FirstName'].'</span></td>';
+                echo '<td class="word-break-break-all"><span class="greystrike">'.$line['LastName'].'</span></td>';
+                echo '<td class="word-break-break-all"><span class="greystrike">'.$line['FirstName'].'</span></td>';
             } else {
-                echo '<td>'.$line['LastName'].'</td><td>'.$line['FirstName'].'</td>';
+                echo '<td class="word-break-break-all">'.$line['LastName'].'</td><td class="word-break-break-all">'.$line['FirstName'].'</td>';
             }
             ?>
-				<td><a href="mailto:<?php echo $line['email'] ?>"><?php echo $line['email'] ?></a></td>
-				<td><?php echo $line['SID'] ?></td>
-				<td><a href="login-log?cid=<?php echo $course->id ?>&uid=<?php echo $line['userid'] ?>" class="lal"><?php echo $lastaccess ?></a></td>
-            <td>
-            <div class='btn-group settings width-eighty-per'>
-                 <a class='btn btn-primary dropdown-toggle width-hundread-per' data-toggle='dropdown' href='#'>
-                     <span class='padding-right-fifteen'><i class='fa fa-cog fa-fw'></i> Settings</span><span class='fa fa-caret-down'></span>
+				<td class="word-break-break-all"><a href="mailto:<?php echo $line['email'] ?>"><?php echo $line['email'] ?></a></td>
+				<td class="word-break-break-all"><?php echo $line['SID'] ?></td>
+				<td class="word-break-break-all"><a href="login-log?cid=<?php echo $course->id ?>&uid=<?php echo $line['userid'] ?>" class="lal"><?php echo $lastaccess ?></a></td>
+            <td class="word-break-break-all">
+            <div class='btn-group settings width-eighty-per col-sm-12 col-md-12 padding-left-zero padding-right-zero'>
+                 <a class='btn btn-primary dropdown-toggle width-hundread-per col-sm-12 col-md-12' data-toggle='dropdown' href='#'>
+                     <span class=' col-sm-10 col-md-10 padding-left-zero'><i class='fa fa-cog fa-fw'></i> Settings</span><span class=' padding-top-five fa fa-caret-down'></span>
                      </a>
                  <ul class='dropdown-menu roster-table roster-table-dropdown'>
                      <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?from=listusers&cid='.$course->id.'&studentId='.$line['userid'])?>">

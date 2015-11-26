@@ -4,120 +4,122 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 
-//use app\widgets\FileInput;
 $this->title = 'Show imported students details';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Import student', 'url' => ['/roster/roster/import-student?cid='.$course->id]];
-$this->params['breadcrumbs'][] = $this->title;
-
 ?>
-<input type="hidden" id="course-id" value="<?php echo $course->id?>" xmlns="http://www.w3.org/1999/html">
-<div class="import-student">
-    <fieldset>
-
-<h3><strong>New students Record</strong> </h3>
-        <table id="user-table displayUser"  class="display-user-table table table-bordered table-striped table-hover data-table" bPaginate="false">
-            <thead>
-            <tr>
-                <th>Username</th>
-                <th>FirstName</th>
-                <th>LastName</th>
-                <th>Email</th>
-
-                <?php if ($isCodePresent == true) {
-                    ?>
-                    <th>Code</th>
-                <?php
-                }
-                if ($isSectionPresent == true) {
-                    ?>
-                    <th>Section</th>
-                <?php } ?>
-            </tr>
-            </thead>
-            <tbody class="user-table-body" >
-            <?php
-
-            if (isset($uniqueStudents)) {
-                foreach ($uniqueStudents as $singleRecord)
-                {
-                    ?>
-                    <tr>
-                        <td><?php echo $singleRecord[0] ?></td>
-                        <td><?php echo $singleRecord[1] ?></td>
-                        <td><?php echo $singleRecord[2] ?></td>
-                        <td><?php echo $singleRecord[3] ?></td>
-                        <?php if ($isCodePresent == 1) {
-                            ?>
-                            <th><?php echo $singleRecord[4] ?></th>
-                        <?php
-                        }
-                        if ($isSectionPresent == 1) {
-                            ?>
-                            <th><?php echo $singleRecord[5] ?></th>
-                        <?php } ?>
-                    </tr>
-
-                <?php   $index++; } ?>
-            <?php }?>
-
-            </tbody>
-        </table>
-
-        <span class="pull-left "><h3><strong>Duplicate students Records</strong></h3> </span><span class="pull-left show-import-student-duplicate-table "><strong>(These students will not be saved)</strong></span>
-        <table class="display-user-table table table-bordered table-striped table-hover data-table" bPaginate="false">
-            <thead>
-            <tr>
-                <th>Username</th>
-                <th>FirstName</th>
-                <th>LastName</th>
-                <th>Email</th>
-
-                <?php if ($isCodePresent == true) {
-                    ?>
-                    <th>Code</th>
-                <?php
-                }
-                if ($isSectionPresent == true) {
-                    ?>
-                    <th>Section</th>
-                <?php } ?>
-            </tr>
-            </thead>
-            <tbody class="user-table-body" >
-            <?php
-            if (isset($duplicateStudents)) {
-                foreach ($duplicateStudents as $singleRecord) {
-
-                    ?>
-                    <tr>
-                        <td><?php echo $singleRecord[0] ?></td>
-                        <td><?php echo $singleRecord[1] ?></td>
-                        <td><?php echo $singleRecord[2] ?></td>
-                        <td><?php echo $singleRecord[3] ?></td>
-                        <?php if ($isCodePresent == 1) {
-                            ?>
-                            <th><?php echo $singleRecord[4] ?></th>
-                        <?php
-                        }
-                        if ($isSectionPresent == 1) {
-                            ?>
-                            <th><?php echo $singleRecord[5] ?></th>
-                        <?php } ?>
-                    </tr>
-            <?php } }?>
-
-            </tbody>
-        </table>
-    </fieldset>
-    <div class="form-group">
-        <div class="roster-submit">
-
-            <input type="button" onclick="saveStudentData()" value="Submit" class ="btn btn-primary">
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$courseId)  ?>">Back</a>
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name,'Roster','Import student'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'roster/roster/student-roster?cid=' . $course->id,AppUtility::getHomeURL() . 'roster/roster/import-student?cid=' . $course->id], 'page_title' => $this->title]); ?>
+</div>
+<div class="title-container">
+    <div class="row">
+        <div class="pull-left ">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
     </div>
+</div>
+<input type="hidden" id="course-id" value="<?php echo $course->id?>" xmlns="http://www.w3.org/1999/html">
+<div class="tab-content shadowBox non-nav-tab-item   col-sm-12 col-md-12">
+    <div class="import-student col-sm-12 col-md-12">
+    <h3><strong>New students Record</strong> </h3>
+            <table id="user-table displayUser"  class="display-user-table table table-bordered table-striped table-hover data-table" bPaginate="false">
+                <thead>
+                <tr>
+                    <th >Username</th>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Email</th>
+
+                    <?php if ($isCodePresent == true) {
+                        ?>
+                        <th>Code</th>
+                    <?php
+                    }
+                    if ($isSectionPresent == true) {
+                        ?>
+                        <th>Section</th>
+                    <?php } ?>
+                </tr>
+                </thead>
+                <tbody class="user-table-body" >
+                <?php
+
+                if (isset($uniqueStudents)) {
+                    foreach ($uniqueStudents as $singleRecord)
+                    {
+                        ?>
+                        <tr>
+                            <td class="word-break-break-all"><?php echo $singleRecord[0] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord[1] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord[2] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord[3] ?></td>
+                            <?php if ($isCodePresent == 1) {
+                                ?>
+                                <th class="word-break-break-all"><?php echo $singleRecord[4] ?></th>
+                            <?php
+                            }
+                            if ($isSectionPresent == 1) {
+                                ?>
+                                <th class="word-break-break-all"><?php echo $singleRecord[5] ?></th>
+                            <?php } ?>
+                        </tr>
+
+                    <?php   $index++; } ?>
+                <?php }?>
+
+                </tbody>
+            </table>
+
+            <span class="pull-left "><h3><strong>Duplicate students Records</strong></h3> </span><span class="pull-left show-import-student-duplicate-table "><strong>(These students will not be saved)</strong></span>
+            <table class="display-user-table table table-bordered table-striped table-hover data-table" bPaginate="false">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Email</th>
+
+                    <?php if ($isCodePresent == true) {
+                        ?>
+                        <th>Code</th>
+                    <?php
+                    }
+                    if ($isSectionPresent == true) {
+                        ?>
+                        <th>Section</th>
+                    <?php } ?>
+                </tr>
+                </thead>
+                <tbody class="user-table-body" >
+                <?php
+                if (isset($duplicateStudents)) {
+                    foreach ($duplicateStudents as $singleRecord) {
+
+                        ?>
+                        <tr>
+                            <td class="word-break-break-all"><?php echo $singleRecord[0] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord[1] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord[2] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord[3] ?></td>
+                            <?php if ($isCodePresent == 1) {
+                                ?>
+                                <th class="word-break-break-all"><?php echo $singleRecord[4] ?></th>
+                            <?php
+                            }
+                            if ($isSectionPresent == 1) {
+                                ?>
+                                <th class="word-break-break-all"><?php echo $singleRecord[5] ?></th>
+                            <?php } ?>
+                        </tr>
+                <?php } }?>
+
+                </tbody>
+            </table>
+        <div class="form-group col-sm-12 col-md-12 padding-bottom-one-em padding-top-one-em">
+            <div class="roster-submit col-sm-12 col-md-12 padding-left-zero">
+                <span class="padding-right-one-em"><input type="button" onclick="saveStudentData()" value="Submit" class ="btn btn-primary"></span>
+                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$courseId)  ?>"><i class="fa fa-share header-right-btn"></i>Back</a>
+            </div>
+        </div>
+      </div>
 </div>
 <script type="application/javascript">
     $(document).ready(function(){

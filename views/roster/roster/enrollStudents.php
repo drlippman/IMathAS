@@ -22,23 +22,23 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
 <div class="inner-content">
+<div class=" text-gray-background padding-one-em">
     <?php $form = ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class = \"col-md-3\">{input}</div>\n<div class = \"col-md-7 col-md-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-md-3'],
+                'template' => "{label}\n<div class = \"col-md-3 col-sm-4\">{input}</div>\n<div class = \"col-md-7 col-md-offset-2 col-sm-7 col-sm-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-md-3 col-sm-4'],
             ],
         ]
     ) ?>
-    <div>
+    <div >
         <h4><?php echo AppUtility::t('Select students to enroll') ?> </h4>
-        <?php echo AppUtility::t('Check') ?>: <a id="checkAll" class="check-all"
+       <div class="padding-top-fifteen"> <?php echo AppUtility::t('Check') ?>: <a id="checkAll" class="check-all"
                                                  href="#"><?php echo AppUtility::t('All') ?></a> /
         <a id="checkNone" class="un-check-all" href="#"><?php echo AppUtility::t('None') ?></a>
-        <br><br>
 
-        <div id="list">
+        <div id="list" class="padding-bottom-one-em">
             <?php
             foreach ($data as $value) {
                 echo "<tr><div class='checkbox student-enroll override-hidden'><label class='checkbox-size'><td>";
@@ -50,18 +50,18 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             ?>
         </div>
-        <br><br>
         <?php echo $form->field($model, 'section') ?>
+    </div>
     </div>
     <div class="form-group">
         <div class="col-md-offset-0 col-md-10 ">
-            <br>
-            <?php echo Html::submitButton(AppUtility::t('Enroll These Students', false), ['class' => 'btn btn-primary', 'id' => 'change-button', 'name' => 'enroll-students']) ?>
+           <span class="padding-right-fifteen"> <?php echo Html::submitButton(AppUtility::t('Enroll These Students', false), ['class' => 'btn btn-primary', 'id' => 'change-button', 'name' => 'enroll-students']) ?> </span>
             <a class="btn btn-primary back-button"
-               href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $cid) ?>"><?php echo AppUtility::t('Back ') ?></a>
+               href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $cid) ?>"><i class="fa fa-share header-right-btn"></i><?php echo AppUtility::t('Back ') ?></a>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
+</div>
 </div>
 </div>
 

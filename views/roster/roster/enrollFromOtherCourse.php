@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
 
 <div class="inner-content">
+<div class="padding-one-em text-gray-background">
     <?php $form =ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
@@ -59,5 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <?php ActiveForm::end(); ?>
+</div>
 </div>
 </div>

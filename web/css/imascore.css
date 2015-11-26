@@ -1554,3 +1554,29 @@ margin-left: 1em;
 .max-width-ninety-per {
     max-width: 90% !important;
 }
+.list-style-type
+{
+    list-style-type: none;
+}
+.padding-one-em {
+    padding-left: 1em;
+    padding-bottom: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+}
+.width-sixty-nine-per{
+    width: 69%;
+}
+.margin-left-one-per{
+    margin-left: 1%;
+}
+.width-thirty-per{
+    width: 30%;
+}
+.padding-left-seven-per{
+    padding-left: 7%;
+}
+.msg-editor table,.msg-editor iframe{
+    max-width: 100%;
+    width: 100%;
+}

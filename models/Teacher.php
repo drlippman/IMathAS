@@ -34,7 +34,10 @@ class Teacher extends BaseImasTeachers
 
     public static function getTeacherByUserId($userid)
     {
-        return static::findAll(['userid' => $userid]);
+        $query = new Query();
+        $query->select('ic.id,ic.name')->from('imas_courses AS ic')->join('INNER JOIN','imas_teachers','imas_teachers.courseid=ic.id')
+            ->where('imas_teachers.userid = :userid')->orderBy('ic.name');
+        return $query->createCommand()->bindValue('userid',$userid)->queryAll();
     }
 
     public static function getTeachersById($cid)

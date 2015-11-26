@@ -353,18 +353,9 @@ class RosterController extends AppController
         $model = new EnrollFromOtherCourseForm();
         $course = Course::getById($courseId);
         $teacherId = $this->getUserId();
-        $list = Teacher::getTeacherByUserId($teacherId);
-        $courseDetails = array();
-        if ($list) {
-            foreach ($list as $teacher) {
-                if ($teacher->course->id != $courseId) {
-                    $tempArray = array("id" => $teacher->course->id,
-                        "name" => ucfirst($teacher->course->name));
-                    array_push($courseDetails, $tempArray);
-                }
-            }
-        }
-        if ($this->isPost()) {
+        $courseDetails = Teacher::getTeacherByUserId($teacherId);
+        if ($this->isPost())
+        {
             $params = $this->getRequestParams();
             $selectedCourseId = isset($params['name']) ? $params['name'] : null;
             if ($selectedCourseId) {
@@ -765,6 +756,7 @@ class RosterController extends AppController
         $studentInformation = $this->getRequestParams();
         $isCodePresent = false;
         $isSectionPresent = false;
+        $this->layout = "master";
         $newStudents = array();
         $existingStudent = array();
         $existingStudentUsernameArray = array();

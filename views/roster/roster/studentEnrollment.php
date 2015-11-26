@@ -3,7 +3,6 @@ use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 $this->title = AppUtility::t('Enroll an Existing user', false);
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="item-detail-header">
@@ -22,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <div class="tab-content shadowBox"">
+
     <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
     <div class="inner-content col-md-12 col-sm-12">
         <?php $form =ActiveForm::begin(
@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ]
         ) ?>
+        <div class="text-gray-background padding-one-em">
         <?php echo $form->field($model, 'usernameToEnroll')->textInput(array('placeholder' => AppUtility::t('username', false))); ?>
         <?php echo $form->field($model, 'section')->textInput(array('placeholder' => AppUtility::t('Section', false))); ?>
         <?php echo $form->field($model, 'code')->textInput(array('placeholder' => AppUtility::t('Code', false))); ?>
@@ -40,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-offset-2 col-md-1 col-sm-offset-3 col-sm-2 padding-right-zero">
                 <?php echo Html::submitButton(AppUtility::t('Enroll', false), ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
             </div>
+        </div>
         </div>
         <?php ActiveForm::end(); ?>
     </div>
