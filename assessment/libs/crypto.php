@@ -1,6 +1,10 @@
 <?php
 //Cryptography functions, Nov 2, 2012
 
+//IMPORTANT NOTE to anyone who might be looking at this file outside the context of IMathAS:
+// These functions were designed as learning demo functions, and are NOT cryptographically secure.
+// Do NOT use these functions in any application needing secure cryptography
+
 global $allowedmacros;
 array_push($allowedmacros,"randfiveletterword","shiftcipher","transcipher","randmilphrase","chunktext","modularexponent","cryptorsakeys","randsubmap","subcipher");
 
@@ -208,7 +212,7 @@ function modularexponent($base,$exponent,$modulus) {
 function cryptorsakeys($p,$q) {
 	$n = $p*$q;
 	$phi = ($p-1)*($q-1);
-	$e = 3;
+	$e = 3;  //this is obviously an insecure value for e, but makes the numbers more reasonable for learning
 	while (gcd($e,$phi)!=1 && $e<$phi) {$e++;}
 	if ($e>=$phi) {echo 'e bigger than phi - fail'; return;}
 	
