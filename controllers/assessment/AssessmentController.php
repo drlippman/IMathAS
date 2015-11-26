@@ -3965,7 +3965,7 @@ class AssessmentController extends AppController
         $temp  .= '</div>';
     }
 
-    public function actionShowSolution(){
+    public function actionShowSolution() {
         $id = intval($this->getParamVal('id'));
         $sig = $this->getParamVal('sig');
         $t = intval($this->getParamVal('t'));

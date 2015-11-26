@@ -36,9 +36,7 @@ padding-left: 15px !important;
 }
 
 .end-assesment-shadowbox {
-    padding: 15px;
-    padding-top: 23px;
-    padding-bottom: 18px;
+    padding:2em !important;
 }
 .margin-bottom-twenty-five {
 margin-bottom: 25px;
@@ -131,4 +129,8 @@ table td {
 }
 .modify-group-table .dataTables_paginate .pagination {
     float: right;
+}
+.assessment-message-textarea table, .assessment-message-textarea iframe {
+    width: auto;
+    max-width: 100% !important;
 }

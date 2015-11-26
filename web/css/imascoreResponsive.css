@@ -40,6 +40,15 @@
     .mobile-padding-right-zero {
         padding-right: 0px;
     }
+    .mobile-padding-left-zero {
+        padding-left: 0px;
+    }
+    .mobile-float-right {
+        float: right;
+    }
+    .mobile-padding-top-one-em {
+        padding-top: 1em;
+    }
 }
 
 /* Smartphones (portrait) */
@@ -89,6 +98,15 @@
     }
     .mobile-padding-right-zero {
         padding-right: 0px;
+    }
+    .mobile-padding-left-zero {
+        padding-left: 0px;
+    }
+    .mobile-float-right {
+        float: right;
+    }
+    .mobile-padding-top-one-em {
+        padding-top: 1em;
     }
 }
 /*iPhone 6 Portrait*/
@@ -151,6 +169,15 @@
     }
     .mobile-padding-right-zero {
         padding-right: 0px;
+    }
+    .mobile-padding-left-zero {
+        padding-left: 0px;
+    }
+    .mobile-float-right {
+        float: right;
+    }
+    .mobile-padding-top-one-em {
+        padding-top: 1em;
     }
 }
 

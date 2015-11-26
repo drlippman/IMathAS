@@ -31,9 +31,9 @@
     padding-right: 6px;
 }
 .second-level-message-navigation{
-    height: 70px;
-    padding-top: 8px;
-    background-color: #F8f8f8;
+    background-color: #f8f8f8;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 .flag-alignment{
@@ -234,5 +234,4 @@ margin-right: 30px;
 .reply-message-textarea table,.send-message-textarea table {
     width: 100% !important;
     width: 100% !important;
-;
 }

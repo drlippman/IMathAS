@@ -197,20 +197,12 @@ class Message extends BaseImasMsgs
         return $data;
     }
 
-    public static function getUsersToDisplayMessage($uid){
-
-        $query = new Query();
-        $query->select(['imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.msgto,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread'])
-            ->from('imas_msgs')
-            ->join(
-                'INNER JOIN',
-                'imas_users',
-                'imas_users.id=imas_msgs.msgto'
-            )
-            ->where('imas_msgs.msgfrom= :uid')->andWhere(['=',('imas_msgs.isread' & 4) ,0])->orderBy(['imas_msgs.id' => AppConstant::DESCENDING]);
-        $command = $query->createCommand()
-            ->bindValue('uid',$uid);
-        $data = $command->queryAll();
+    public static function getUsersToDisplayMessage($uid) {
+        $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.msgto,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread
+        FROM imas_msgs,imas_users WHERE imas_users.id=imas_msgs.msgto
+        AND imas_msgs.msgfrom= :uid AND (imas_msgs.isread&4)=0 ORDER BY imas_msgs.id DESC");
+        $query->bindValue('uid',$uid);
+        $data = $query->queryAll();
         return $data;
     }
 

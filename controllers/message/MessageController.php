@@ -45,6 +45,8 @@ class MessageController extends AppController
         $this->setSessionData('postCount',$countPost);
         $isNewMessage = $this->getParamVal('newmsg');
         $isImportant = $this->getParamVal('show');
+        $messages = Message::getUsersToDisplayMessage($user->id);
+        AppUtility::dump($messages);
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
@@ -176,7 +178,7 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights);
             $this->includeCSS(['dataTables.bootstrap.css',"message.css"]);
-            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js']);
+            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'message/sentMessage.js']);
             return $this->renderWithData('sentMessage', $responseData);
         }
     }

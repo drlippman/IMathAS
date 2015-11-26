@@ -8,7 +8,6 @@ $(document).ready(function () {
     jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
 
 
-
     $('.with-selected-dropdown').click(function(){
 
         var with_selected = $('.with-selected :selected').val();
