@@ -20,7 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 if ($overwriteBody == 1) {
     echo $body;
 } if (!isset($_REQUEST['versions'])) {
-
     echo '<div class="print-test-header"><a class="margin-left-thirty" href="print-test?cid='.$cid.'&amp;aid='.$aid.'">Generate for in-browser printing </a>';
     echo '| <a href="print-layout-bare?cid='.$cid.'&amp;aid='.$aid.'"> Generate for cut-and-paste</a></div>';
     echo "<h2>"._('Generate Word Version')."</h2>";

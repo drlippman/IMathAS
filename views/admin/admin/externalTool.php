@@ -97,7 +97,7 @@ if (isset($params['id'])) {
         <br class="form"/><br/>
         <?php
         if ($isAdmin) {
-            echo '<div class="col-md-2  col-sm-2">Scope of tool</div>
+            echo '<div class="col-md-2  col-sm-2">'; AppUtility::t('Scope of tool'); echo'</div>
             <div class="col-md-8  col-sm-8">';
             echo '<input type="radio" name="scope" value="0" ' . (($grp == AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> System-wide<br/>';
             echo '<input type="radio" name="scope" value="1" ' . (($grp > AppConstant::NUMERIC_ZERO) ? 'checked="checked"' : '') . '> Group';
@@ -124,13 +124,14 @@ if (isset($params['id'])) {
             echo '<p><b>Course Tools</b></p>';
         }
         $str .= '</b></p>';
+
             if($resultFirst)
             {
                 if (count($resultFirst) == AppConstant::NUMERIC_ZERO) {
                     echo '<span class="col-md-12 col-sm-12 padding-left-zero">'.AppUtility::t('No tools',false).'</span>';
                 }
-            }
-         else { ?>
+              else {
+                ?>
         <table class="display course-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
@@ -142,10 +143,13 @@ if (isset($params['id'])) {
             </thead>
             <tbody>
             <tr>
-            <?php foreach ($resultFirst as $key => $row) { ?>
+            <?php
+
+             foreach ($resultFirst as $key => $row) { ?>
                 <td>
                <?php echo  $row['nm'];
-                if ($isAdmin) {
+
+               if ($isAdmin) {
                     if ($row['name'] == null) {
                         echo ' (System-wide)';
                     } else {
@@ -166,7 +170,8 @@ if (isset($params['id'])) {
                  <a onclick=deleteExternalTool(<?php echo $ExternalToolId ?>) href='#'> <?php AppUtility::t('Delete');?> </a>
                     </td></tr>
             <?php }
-        }?>
+        }
+    }?>
             </tbody>
             </table>
         <?php

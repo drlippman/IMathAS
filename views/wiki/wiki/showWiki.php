@@ -20,10 +20,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 <div class="tab-content shadowBox non-nav-tab-item">
-    <div id="wikiName" class="padding-top padding-left">
+
         <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
         <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
-    </div>
 <?php
 if (isset($isTeacher) && $groupId >0 && !isset($curGroupName)) {
     $grpnote = $groupNote;
@@ -47,7 +46,6 @@ if (isset($delAll) && $isTeacher) {
     echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
 
 } else if ($snapshot) {
-
     echo "<p>Current Version Code.  <a href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id).">Back</a></p>";
     echo '<div class="editor" style="font-family:courier; padding: 10px;">';
     echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",htmlentities($text));
@@ -61,18 +59,18 @@ if (isset($delAll) && $isTeacher) {
         echo "<p>Group: $curgroupname</p>";
     }
     if ($isTeacher) {
-        echo '<div class="cpmid">';
+        echo '<div class="col-md-12 col-sm-12 print-test-header margin-left-zero padding-top-fifteen">';
         if ($isgroup) {
             $grpnote = "For this group's wiki: ";
         }?>
 
-        <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page Contents</button> |
-        <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page History</button> |
+        <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page Contents</button>
+        <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page History</button>
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id.'&grp='.$groupId.'&snapshot=true'.$framed)?>">Current Version Snapshot</a></div>
     <?php }
     ?>
 
-    <p><span id="revisioninfo" class="padding-left">Revision <?php echo $numRevisions; ?>
+    <br><br class="form"><p><span id="revisioninfo" class="padding-left">Revision <?php echo $numRevisions; ?>
             <?php if ($numRevisions > 0) {
                 echo ".  Last edited by $lastEditedBy on $lastEditTime.";
             }
@@ -87,8 +85,8 @@ if (isset($delAll) && $isTeacher) {
         if ($numRevisions > 1) {
             $last = $numRevisions - 1;
             echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision"/></span>';
-            echo '<div class="padding-left"><span id="revcontrol" style="display:none;">Revision history:
-            <a href="#" id="first" onclick="jumpto(1)">'; AppUtility::t('First'); echo'</a>
+            echo '<div class="padding-left"><span id="revcontrol" style="display:none;">'; AppUtility::t('Revision history');
+            echo'<a href="#" id="first" onclick="jumpto(1)">'; AppUtility::t('First'); echo'</a>
             <a id="older" href="#" onclick="seehistory(1); return false;">'; AppUtility::t('Older'); echo'</a> ';
             echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">'; AppUtility::t('Newer'); echo'</a>
             <a href="#" class="grayout" id="last" onclick="jumpto(0)">'; AppUtility::t('Last'); echo'</a>
@@ -102,14 +100,14 @@ if (isset($delAll) && $isTeacher) {
     <div class="editor" style="margin-right: 20px; margin-left: 20px">
         <span>
             <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
-               class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a></span>
+               class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a></span><br/><br class="form">
         <?php if(!empty($wikiRevisionData)){
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
-                <textarea id='wikicontent' name='wikicontent' style='width: 100%'>
+                <div class="col-md-12 col-sm-12 padding-left-zero"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%'>
                     <?php $text = $singleWikiRevision->revision;
                     echo $text;?>
 
-                </textarea>
+                </textarea></div>
             <?php }?>
         <?php }?>
     </div>

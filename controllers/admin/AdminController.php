@@ -575,8 +575,7 @@ class AdminController extends AppController
            }
            $ltfrom = str_replace('&amp;','&',$ltfrom);
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
-       }  else if (isset($delete) && $delete =='true')
-       {
+       }  else if (isset($delete) && $delete =='true') {
            $id = intval($params['id']);
            if ($id > AppConstant::NUMERIC_ZERO)
            {
