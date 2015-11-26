@@ -46,7 +46,6 @@ class MessageController extends AppController
         $isNewMessage = $this->getParamVal('newmsg');
         $isImportant = $this->getParamVal('show');
         $messages = Message::getUsersToDisplayMessage($user->id);
-        AppUtility::dump($messages);
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
