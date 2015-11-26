@@ -53,24 +53,24 @@ $parents = $parentsData;
                             ?>
                             <?php echo $page_fileHiddenInput; ?>
                             <p><?php AppUtility::t('This page will import entire questions libraries with heirarchy structure. To import specific questions into existing libraries, use the'); ?>
-                                <a href="import.php?cid=<?php echo $cid ?>"><?php AppUtility::t('Question Import'); ?></a><?php AppUtility::t('page'); ?>
+                                <a href="import.php?cid=<?php echo $cid ?>"><?php AppUtility::t('Question Import '); ?></a><?php AppUtility::t('page'); ?>
                             </p>
                             <?php echo $packName; ?>
                             <h3><?php AppUtility::t('Select Libraries to import'); ?></h3>
                             <p><?php AppUtility::t("Note: If a parent library is not selected, NONE of the children libraries will be added, regardless of whether they're checked or not"); ?>
                             </p>
-                            <p>
-                                <?php AppUtility::t('Set Question Use Rights to:'); ?>
-                                <select class="form-control-import" name=qrights>
+                            <div class="col-md-12 col-sm-12 padding-left-zero">
+                                <div class="col-md-3 col-sm-3 padding-left-zero"><?php AppUtility::t('Set Question Use Rights to'); ?></div>
+                                <div class="col-md-4 col-sm-4 padding-left-zero"><select class="form-control" name=qrights>
                                     <option value="0"><?php AppUtility::t('Private'); ?></option>
                                     <option value="2"
                                             SELECTED><?php AppUtility::t('Allow use, use as template, no modifications'); ?></option>
                                     <option value="3"><?php AppUtility::t('Allow use and modifications'); ?></option>
-                                </select>
-                            </p>
-                            <p>
-                                <?php AppUtility::t('Set Library Use Rights to:'); ?>
-                                <select class="form-control-import" name="librights">
+                                </select></div>
+                            </div><br class="form"><br/>
+                            <div class="col-md-12 col-sm-12 padding-left-zero">
+                                <div class="col-md-3 col-sm-3 padding-left-zero"><?php AppUtility::t('Set Library Use Rights to'); ?></div>
+                                <div class="col-md-4 col-sm-4 padding-left-zero"><select class="form-control" name="librights">
                                     <option value="0"><?php AppUtility::t('Private'); ?></option>
                                     <option
                                         value="1"><?php AppUtility::t('Closed to group, private to others'); ?></option>
@@ -82,24 +82,24 @@ $parents = $parentsData;
                                             value="5"><?php AppUtility::t('Open to group, closed to others'); ?></option>
                                         <option value="8"><?php AppUtility::t('Open to all'); ?></option>
                                     <?php } ?>
-                                </select>
-                            </p>
+                                </select></div>
+                            </div><br class="form"><br/>
 
-                            <p><?php AppUtility::t('Parent library:'); ?>
+                            <div class="col-md-12 col-sm-12 padding-left-zero"><?php AppUtility::t('Parent library'); ?>
                                 <span id="libnames"><?php AppUtility::t('Root'); ?></span>
                                 <input type=hidden name="parent" id="parent" value="0">
                                 <input type=button value="Select Parent" onClick="libselect()">
-                            </p>
+                            </div><br class="form">
 
-                            <p><?php AppUtility::t('If a library or question already exists on this system, do you want to:'); ?>
+                            <p><?php AppUtility::t('If a library or question already exists on this system, do you want to'); ?>
                             <br/>
-                            <input type=radio name=merge value="1" CHECKED><?php AppUtility::t('Update existing'); ?>
-                            <br><input type=radio name=merge value="0"><?php AppUtility::t('import as new'); ?>
-                            <br><input type=radio name=merge value="-1"><?php AppUtility::t('Keep existing'); ?><br>
+                            <input type=radio name=merge value="1" CHECKED><span class="padding-left-five"><?php AppUtility::t('Update existing'); ?></span>
+                            <br><input type=radio name=merge value="0"><span class="padding-left-five"><?php AppUtility::t('import as new'); ?></span>
+                            <br><input type=radio name=merge value="-1"><span class="padding-left-five"><?php AppUtility::t('Keep existing'); ?></span><br>
                             <?php if ($myRights == AppConstant::ADMIN_RIGHT) {
-                                echo '<input type=radio name=merge value="2">' . AppUtility::t('Force update', false);
+                                echo '<input type=radio name=merge value="2"><span class="padding-left-five">' . AppUtility::t('Force update', false); echo'</span>';
                             }?>
-                            <br/>
+                            <br/><br/>
                             <?php AppUtility::t('Note that updating existing libraries will not place those imported libraries in the parent selected above.'); ?>
                             </p><?php AppUtility::t('Base'); ?>
                             <ul class=base>

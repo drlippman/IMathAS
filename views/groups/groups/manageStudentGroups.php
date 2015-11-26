@@ -221,7 +221,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '<table><tbody><tr>';
                         foreach ($page_groupSets as $gs)
                         {
-                            echo "<div class='col-sm-12 col-md-12'><td class='col-sm-8 col-md-8'><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td><td class='small col-sm-4 col-md-4'></div>";
+                            echo "<div class='col-sm-12 col-md-12'><td class='col-sm-8 col-md-8 word-break-break-all'><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td><td class='small col-sm-4 col-md-4'></div>";
                             echo "<a href='manage-student-groups?cid=$course->id&renameGrpSet={$gs['id']}'>Rename</a> | ";
                             echo "<a href='manage-student-groups?cid=$course->id&copyGrpSet={$gs['id']}'>Copy</a> | ";
                             $deleteGrpSet = $gs['id'];

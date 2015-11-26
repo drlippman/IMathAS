@@ -1892,6 +1892,8 @@ class AppUtility extends Component
 
     public static function t($key, $echo = true)
     {
+//        $language = self::getLanguage();
+//        $val = Yii::t('yii_'.$language, $key);
         $val = Yii::t('yii', $key);
         if ($echo) {
             echo $val;
@@ -1899,6 +1901,14 @@ class AppUtility extends Component
             return $val;
         }
     }
+
+    private static function getLanguage(){
+        /*
+         * http contact : session
+         */
+    }
+
+
 
     public static function hl_tidy($t, $w, $p)
     {
@@ -2287,11 +2297,11 @@ class AppUtility extends Component
             list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
         }
 
-        echo "<div class='col-md-12 q'>";
+        echo "<br/><div class='col-md-12 col-sm-12 q'>";
         if ($isfinal) {
             echo "<div class=\"trq$qn\">\n";
         } else {
-            echo "<div class='m col-md-12' id=\"trq$qn\">\n";
+            echo "<div class='m col-md-12 col-sm-12' id=\"trq$qn\">\n";
         }
         if ($showpts) {
             echo ($qn+1).'. ('.$pts.' pts) ';
@@ -2310,11 +2320,7 @@ class AppUtility extends Component
             } else {  //one question only
                 echo printfilter(filter("<div>$answerbox</div>\n"));
             }
-
-
         }
-
-
         echo "</div>";//end m div
 
         echo "&nbsp;";

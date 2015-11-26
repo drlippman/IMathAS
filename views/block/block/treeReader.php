@@ -88,6 +88,6 @@ function updateTRunans(aid, status) {
 		document.getElementById("aimg"+aid).src = urlbase+"/img/q_emptybox.gif";
 	}
 }
-addLoadEvent(resizeiframe);
+//addLoadEvent(resizeiframe);
 
 </script>

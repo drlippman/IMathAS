@@ -32,7 +32,7 @@ class WikiController extends AppController
         $this->layout = 'master';
         $userId = $userData->id;
         $wikiId = $this->getParamVal('wikiId');
-        $courseId = intval($this->getParamVal('cid'));
+        $courseId = intval($this->getParamVal('courseId'));
         $course = Course::getById($courseId);
         $subject = $this->getRequestParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
@@ -428,6 +428,7 @@ class WikiController extends AppController
         $courseId = $this->getParamVal('cid');
         $wikiId = $this->getParamVal('id');
         $course = Course::getById($courseId);
+
         $wiki = Wiki::getById($wikiId);
         $block  = $this->getParamVal('block');
         $groupNames = StuGroupSet::getByCourseId($courseId);

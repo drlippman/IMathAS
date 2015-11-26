@@ -3,12 +3,14 @@ use app\components\AppUtility;
 $this->title = $course->name;
 use serhatozles\htmlawed\htmLawed;
 require_once("../filter/filter.php");
-
+$this->title = $wiki->name;
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
     <style type="text/css">
         a.grayout {color: #ccc; cursor: default;}  del {color: #f99; text-decoration:none;} ins {color: #6f6; text-decoration:none;} .wikicontent {padding: 10px;}</style>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
     <div class = "title-container">
         <div class="row">
@@ -19,7 +21,6 @@ require_once("../filter/filter.php");
     </div>
 <div class="tab-content shadowBox non-nav-tab-item">
     <div id="wikiName" class="padding-top padding-left">
-        <h2><?php echo $wiki->name; ?></h2>
         <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
         <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
     </div>
@@ -87,13 +88,13 @@ if (isset($delAll) && $isTeacher) {
             $last = $numRevisions - 1;
             echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision"/></span>';
             echo '<div class="padding-left"><span id="revcontrol" style="display:none;">Revision history:
-            <a href="#" id="first" onclick="jumpto(1)">First</a>
-            <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
-            echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a>
-            <a href="#" class="grayout" id="last" onclick="jumpto(0)">Last</a>
+            <a href="#" id="first" onclick="jumpto(1)">'; AppUtility::t('First'); echo'</a>
+            <a id="older" href="#" onclick="seehistory(1); return false;">'; AppUtility::t('Older'); echo'</a> ';
+            echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">'; AppUtility::t('Newer'); echo'</a>
+            <a href="#" class="grayout" id="last" onclick="jumpto(0)">'; AppUtility::t('Last'); echo'</a>
             <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
             if ($isTeacher) { ?>
-                <a id="revrevert" style="display:none;" href="#"> Revert to this revision</a>
+                <a id="revrevert" style="display:none;" href="#"><?php AppUtility::t('Revert to this revision')?></a>
            <?php }
             echo '</div>';
         }
@@ -101,7 +102,7 @@ if (isset($delAll) && $isTeacher) {
     <div class="editor" style="margin-right: 20px; margin-left: 20px">
         <span>
             <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
-               class="btn btn-primary btn-sm">Edit this page</a></span>
+               class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a></span>
         <?php if(!empty($wikiRevisionData)){
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
                 <textarea id='wikicontent' name='wikicontent' style='width: 100%'>
@@ -112,10 +113,6 @@ if (isset($delAll) && $isTeacher) {
             <?php }?>
         <?php }?>
     </div>
-    <br>
-    <br>
-    <br>
-    <br>
     </div>
     <script>
     var original = null;

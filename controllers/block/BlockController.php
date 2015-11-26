@@ -491,7 +491,7 @@ class BlockController extends AppController
         }
         $printList = $this->printlist($items);
 
-        $this->includeCSS(['libtree.css', 'treeReader.css']);
+        $this->includeCSS(['libtree.css']);
         $this->includeJS(['general.js']);
         $responseData = array('course' => $course, 'printList' => $printList, 'openitem' => $openitem, 'foundfirstitem' => $foundfirstitem, 'foundopenitem' => $foundopenitem, 'item'=> $items, 'blockName' => $blockName, 'backlink' => $backlink);
         return $this->renderWithData('treeReader', $responseData);
@@ -538,10 +538,10 @@ class BlockController extends AppController
                     }
                     if ($viewall || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
                         if ($openitem=='' && $foundfirstitem=='') {
-                            $foundfirstitem = 'assessment/assessment/show-assessment?cid='.$courseId.'&id='.$typeid; $isopen = true;
+                            $foundfirstitem = 'assessment/assessment/show-test?cid='.$courseId.'&id='.$typeid; $isopen = true;
                         }
                         if ($itemtype.$typeid===$openitem) {
-                            $foundopenitem = 'assessment/assessment/show-assessment?cid='.$courseId.'&id='.$typeid; $isopen = true;
+                            $foundopenitem = 'assessment/assessment/show-test?cid='.$courseId.'&id='.$typeid; $isopen = true;
                         }
                         $out .= '<li>';
 

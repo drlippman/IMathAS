@@ -1580,16 +1580,17 @@ class ShowItemCourse extends Component
                         <?php }
                     }
                     echo "<div class=title> ";
-                    if ($isPublic) {
-                        echo "<b><a href=\"#\">{$line['name']}</a></b>\n";
-                    } else {
+                    if ($isPublic) { ?>
+                         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
+                   <?php } else {
                         if (($isStudent) && !($sessionData['stuview'])) {
                             $rec = "data-base=\"wiki-$typeid\"";
                         } else {
                             $rec = '';
-                        }
-                        echo "<b><a href=\"#\" $rec>{$line['name']}</a></b>\n";
-                        if ($hasnew) {
+                        } ?>
+<!--                        echo "<b><a href=\"#\" $rec>{$line['name']}</a></b>\n";-->
+                        <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
+                      <?php  if ($hasnew) {
                             echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
                         }
                     }
@@ -1642,8 +1643,10 @@ class ShowItemCourse extends Component
                         <img alt="assess" class="floatleft item-icon-alignment"
                              src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                    <?php }
-                    echo "<div class=title><i> <b><a href=\"#\">{$line['name']}</a></b></i> ";
-                    if ($hasnew) {
+                    echo "<div class=title><i> <b>"; ?>
+<!--                    <a href=\"#\">{$line['name']}</a></b></i> ";-->
+                    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
+                    <?php if ($hasnew) {
                         echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
                     }
                     echo '<span class="instrdates">';

@@ -544,8 +544,7 @@ class AdminController extends AppController
                     */
                    $external = new ExternalTools();
                    $external->saveExternalTool($courseId,$groupId,$params, $isTeacher, $isGrpAdmin, $isAdmin, $privacy);
-               } else
-               {
+               } else {
                    /**
                     * Update external tool
                     */
