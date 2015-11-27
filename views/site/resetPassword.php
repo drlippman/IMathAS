@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
 
 $this->title = 'Reset Password';
 $this->params['breadcrumbs'][] = $this->title;
@@ -25,14 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
 
     <div class="text-gray-background padding-one-em">
-        <p class="padding-bottom-thirty">Please select a new password</p>
+        <p class="padding-bottom-thirty"><?php AppUtility::t('Please select a new password')?></p>
 
-        <?= $form->field($model, 'newPassword')->passwordInput() ?>
-    <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
+        <?php echo $form->field($model, 'newPassword')->passwordInput() ?>
+    <?php echo $form->field($model, 'confirmPassword')->passwordInput() ?>
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-8 col-sm-offset-3 col-sm-8 display_field">
-            <?= Html::submitButton('Submit', ['id' =>'reset-password-submit','class' => 'btn btn-primary', 'name' => 'resetpassword-button']) ?>
+            <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
         </div>
     </div>
     </div>

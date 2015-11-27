@@ -167,7 +167,7 @@ switch ($action) {
               </div>";
         echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
                     <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Available?', false) . '</div>
-                    <div class="col-md-4 col-sm-6 padding-left-zero">';
+                    <div class="col-md-4 col-sm-7 padding-left-zero">';
         echo '<div class="col-md-12 col-sm-12">';
         echo '<input type="checkbox" name="stuavail" value="1" ';
         if (($avail & 1) == AppConstant::NUMERIC_ZERO) {
@@ -214,8 +214,7 @@ switch ($action) {
                     </div>
                     <div class='col-md-9 col-sm-9'>";
             echo '<span class="floatleft non-bold select-text-margin">' . AppUtility::t('Start', false) . '</span>';
-
-            echo '<div class ="col-md-4 col-sm-4 time-input default-start-timepicker margin-left-five margin-right-minus-twenty">';
+            echo '<div class ="col-md-4 col-sm-5 time-input default-start-timepicker margin-left-five margin-right-minus-twenty">';
             echo TimePicker::widget([
                 'name' => 'defstime',
                 'value' => $defstimedisp,
@@ -225,7 +224,7 @@ switch ($action) {
             ]);
             echo '</div>';
             echo '<label class="floatleft non-bold select-text-margin padding-right-five">End</label>';
-            echo '<div class="col-md-4 col-sm-4 default-end-timepicker">';
+            echo '<div class="col-md-4 col-sm-5 default-end-timepicker">';
             echo TimePicker::widget([
                 'name' => 'deftime',
                 'value' => $deftimedisp,

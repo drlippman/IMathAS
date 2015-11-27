@@ -20,9 +20,9 @@ $this->title = $wikiName;
 }
 if ($inConflict) {
     ?>
-    <p><span style="color:#f00;">Conflict</span>.  Someone else has already submitted a revision to this page since you opened it.
+    <div class="col-md-12 col-sm-12"><span style="color:#f00;"><?php AppUtility::t('Conflict')?></span>.<?php AppUtility::t('Someone else has already submitted a revision to this page since you opened it.
         Your submission is displayed here, and the recently submitted revision has been loaded into the editor so you can reapply your
-        changes to the current version of the page</p>
+        changes to the current version of the page')?></div>
 
     <div class="editor wikicontent"><?php echo $wikicontent; ?></div>
 <?php
@@ -37,8 +37,13 @@ if (isset($lastEditedBy)) {
     <div class="editor">
         <textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">
             <?php echo htmlentities($revisionText);?></textarea>
-    </div>
+    </div><br/>
 
-    <div class=submit><input type=submit value="<?php echo _("Save Revision");?>"></div>
+<!--    <div class=submit>-->
+<!--        <input type=submit value="--><?php //echo _("Save Revision");?><!--">-->
+<!--    </div>-->
+    <div class="header-btn floatleft">
+        <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Revision' ?></button>
+    </div>
 </form>
 
