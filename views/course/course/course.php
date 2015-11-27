@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title; ?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
     </div>
-    <div class = "title-container">
+    <div class = "title-container padding-bottom-two-em">
         <div class="row">
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
@@ -65,15 +65,15 @@ $this->params['breadcrumbs'][] = $this->title; ?>
     <?php }?>
 <?php if($teacherId){
     ?>
-    <div class="row course-copy-export">
-        <div class="col-md-2 course-top-menu">
+    <div class="row course-copy-export col-md-12 col-sm-12 padding-left-right-zero">
+        <div class="col-md-2 col-sm-2 course-top-menu">
             <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('Copy Items');?></a>
         </div>
-        <div class="col-md-2 course-top-menu">
+        <div class="col-md-1 col-sm-1 course-top-menu padding-left-zero">
             <a href="#"><?php AppUtility::t('Export');?></a>
         </div>
 
-        <ul class="nav roster-menu-bar-nav sub-menu col-md-2">
+        <ul class="nav sub-menu col-md-2 col-sm-3">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>
                     <span class="caret right-aligned"></span></a>
@@ -97,7 +97,7 @@ $this->params['breadcrumbs'][] = $this->title; ?>
                 </ul>
             </li>
         </ul>
-        <div class='btn-group settings'>
+        <div class='btn-group settings col-md-2 col-sm-3 padding-left-zero padding-top-three'>
             <a class='btn btn-primary setting-btn last'
                href="#"><i class="fa fa-eye"></i>
 

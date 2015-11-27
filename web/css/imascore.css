@@ -586,7 +586,7 @@ a.attach {
 }
 
 div.multiselitem {
-    background-color: #eee;
+    /*background-color: #eee;*/
     margin-bottom: 2px;
 }
 .videoembedbtn {
@@ -1526,7 +1526,7 @@ margin-left: 1em;
  padding-top: 6px;
 }
 .width-ninety-per {
-    width: 90px;
+    width: 90%;
 }
 .padding-top-bottom-two-em {
     padding-top: 2em !important;

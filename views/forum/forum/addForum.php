@@ -25,8 +25,8 @@ $this->title = $pageTitle;
 
     <div class="tab-content shadowBox non-nav-tab-item col-md-12 col-sm-12">
         <div class="name-of-item">
-            <div class="col-md-2 col-sm-2 padding-right-zero"><?php AppUtility::t('Name of Forum')?></div>
-            <div class="col-md-10 col-sm-10">
+            <div class="col-md-2 col-sm-3 padding-right-zero"><?php AppUtility::t('Name of Forum')?></div>
+            <div class="col-md-10 col-sm-9">
                 <?php $title = AppUtility::t('Enter forum name here', false);
                 if ($forumData) {
                 $title = $forumData['name'];
@@ -37,10 +37,10 @@ $this->title = $pageTitle;
             <BR class=form>
 
         <div class="editor-summary col-md-12 col-sm-12 padding-left-zero padding-right-zero">
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-2 col-sm-3">
                 <?php AppUtility::t('Description')?>
             </div>
-            <div class="col-md-10 col-sm-10 padding-left-zero padding-right-zero">
+            <div class="col-md-10 col-sm-9 padding-left-zero padding-right-zero">
                 <div class="col-md-12 col-sm-12 editor add-forum-summary-textarea">
                     <?php  $description = 'Enter forum description here';
                              if ($forumData) {
@@ -53,9 +53,9 @@ $this->title = $pageTitle;
         </div>
             <!--Show-->
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Visibility')?></div>
-            <div class="col-md-10 col-sm-10">
-                <div class="col-md-3 col-sm-3 padding-left-zero">
+            <div class="col-md-2 col-sm-3"><?php AppUtility::t('Visibility')?></div>
+            <div class="col-md-10 col-sm-9">
+                <div class="col-md-3 col-sm-3 padding-left-right-zero">
                     <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['avail'],AppConstant::NUMERIC_ONE);?> onclick="toggleGBdetail1(true)"/>
                     <span class='padding-left-pt-five-em'>
                         <?php AppUtility::t('Show by Dates')?>
@@ -78,8 +78,8 @@ $this->title = $pageTitle;
                 <!--Show by dates-->
         <div class="col-md-12 col-sm-12 padding-left-zero" id="datediv" <?php if ($defaultValue['avail']!= AppConstant::NUMERIC_ONE) { echo 'style="display:none;"';}?>>
             <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em padding-right-zero">
-                <div class="col-md-2 col-sm-2 padding-top-pt-five-em padding-right-zero"><?php AppUtility::t('Available After')?></div>
-                <div class="col-md-10 col-sm-10">
+                <div class="col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero"><?php AppUtility::t('Available After')?></div>
+                <div class="col-md-10 col-sm-9">
                     <div class="col-md-3 col-sm-5 padding-left-zero padding-right-zero padding-top-pt-five-em">
                         <input type=radio name="available-after" class="pull-left" value="0" <?php if($defaultValue['startDate'] == 0 ){ echo "checked=1"; }?>/>
                         <span class="padding-left-pt-eight-em">
@@ -91,7 +91,7 @@ $this->title = $pageTitle;
                         <label class="non-bold floatleft padding-top-pt-five-em">
                             <input type=radio name="available-after" class="pull-left" value="1" <?php if($defaultValue['startDate'] == 1 ){ echo "checked=1"; }?>/>
                         </label>
-                        <div class = "time-input pull-left col-md-10 col-sm-10 padding-right-zero add-forum-date-font">
+                        <div class = "time-input pull-left col-md-10 col-sm-9 padding-right-zero add-forum-date-font">
                         <?php echo DatePicker::widget([
                             'name' => 'sdate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -120,10 +120,10 @@ $this->title = $pageTitle;
                 </div>
             </div>
             <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-                <div class="col-md-2 col-sm-2 padding-top-pt-five-em padding-right-zero">
+                <div class="col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero">
                     <?php AppUtility::t('Available Until')?>
                 </div>
-                <div class="col-md-10 col-sm-10 padding-right-zero">
+                <div class="col-md-10 col-sm-9 padding-right-zero">
                     <div class="col-md-3 col-sm-5 padding-left-zero padding-right-zero padding-top-pt-five-em">
                         <input type=radio name="available-until" class="pull-left" value="2000000000"  <?php if($defaultValue['endDate'] == AppConstant::ALWAYS_TIME ){ echo "checked=1"; }?>/>
                         <span class="pull-left padding-left padding-left-pt-five-em">
@@ -165,7 +165,7 @@ $this->title = $pageTitle;
             </div>
         </div>
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="col-md-2 col-sm-2 padding-top-pt-five-em padding-right-zero">
+            <div class="col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero">
                 <?php AppUtility::t('Group forum?')?>
             </div>
             <div class="col-md-3 col-sm-4">
@@ -176,7 +176,7 @@ $this->title = $pageTitle;
                 }        ?>
             </div>
         </div>
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-10">
             <div class="floatleft">
                 <input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowAnonymous']) { echo "checked=1";}?> >
             </div>
@@ -185,7 +185,7 @@ $this->title = $pageTitle;
             </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
             <div class="floatleft">
                 <input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowModify']) { echo "checked=1";}?>><br>
             </div>
@@ -194,7 +194,7 @@ $this->title = $pageTitle;
             </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
             <div class="floatleft">
                 <input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowDelete']) { echo "checked=1";}?>><br>
             </div>
@@ -203,7 +203,7 @@ $this->title = $pageTitle;
             </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
             <div class="floatleft">
                 <input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowLikes']) { echo "checked=1";}?>><br>
             </div>
@@ -214,8 +214,8 @@ $this->title = $pageTitle;
 
 
         <div class="padding-top-one-em col-md-12 col-sm-12 padding-left-zero">
-            <div class="col-md-2 col-sm-2 padding-right-zero"><?php AppUtility::t('Viewing before posting')?></div>
-            <div class="col-md-10 col-sm-10 padding-left-one-pt-two-em">
+            <div class="col-md-2 col-sm-3 padding-right-zero"><?php AppUtility::t('Viewing before posting')?></div>
+            <div class="col-md-10 col-sm-9 padding-left-one-pt-two-em">
                 <input class="floatleft" type="checkbox" name="viewing-before-posting" value="16"<?php if ($defaultValue['viewAfterPost']) { echo "checked=1";}?>>
                 <label class="col-sm-11 col-md-11 padding-left non-bold padding-left-pt-six-em">
                     <?php AppUtility::t('Prevent students from viewing posts until they have created a thread.You will likely also want to disable modifying posts')?>
@@ -223,7 +223,7 @@ $this->title = $pageTitle;
             </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
             <div class="floatleft">
                 <input type="checkbox" name="Get-email-notify-of-new-posts" value="1"<?php if ($defaultValue['hasSubScrip']) { echo "checked=1";}?>><br>
             </div>
@@ -233,7 +233,7 @@ $this->title = $pageTitle;
          </div>
 
         <div class="padding-top-one-em col-md-12 col-sm-12 padding-left-zero">
-            <div class="col-md-2 col-sm-2 padding-right-zero">
+            <div class="col-md-2 col-sm-3 padding-right-zero">
                 <?php AppUtility::t('Default display')?>
             </div>
             <div class="col-md-3 col-sm-4">
@@ -245,10 +245,10 @@ $this->title = $pageTitle;
         </div>
 
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="col-md-2 col-sm-2 padding-right-zero">
+            <div class="col-md-2 col-sm-3 padding-right-zero">
                 <?php AppUtility::t('Sort threads by')?>
             </div>
-            <div class="col-md-10 col-sm-10 padding-left-zero">
+            <div class="col-md-10 col-sm-9 padding-left-zero">
                 <span class="col-md-12 col-sm-12">
                     <input type=radio name="sort-thread" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],0);?> >
                     <span class="padding-left">
@@ -265,10 +265,10 @@ $this->title = $pageTitle;
         </div>
 
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-2 col-sm-3">
                 <?php AppUtility::t('Students can create new threads')?>
             </div>
-            <div class="col-md-10 col-sm-10">
+            <div class="col-md-10 col-sm-9">
                 <span class="col-md-12 col-sm-12 padding-left-zero">
                     <input type=radio name="post" value="2000000000" <?php if ($defaultValue['postBy']==2000000000) { echo "checked=1";}?>>
                     <span class="padding-left"><?php AppUtility::t('Always')?></span>
@@ -297,7 +297,7 @@ $this->title = $pageTitle;
                         ]); ?>
                     </div>
                     <label class="end pull-left non-bold padding-top-pt-five-em"> at </label>
-                    <div class=" col-md-6 col-sm-6">
+                    <div class=" col-md-6 col-sm-5 padding-right-zero">
                         <?php   echo TimePicker::widget([
                                 'name' => 'postTime',
                                 'value' =>  $defaultValue['postByTime'],
@@ -311,10 +311,10 @@ $this->title = $pageTitle;
             </div>
         </div>
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-2 col-sm-3">
                 <?php AppUtility::t('Students can reply to posts')?>
             </div>
-            <div class="col-md-10 col-sm-10">
+            <div class="col-md-10 col-sm-9">
                 <span class="col-md-12 col-sm-12 padding-left-zero">
                     <input type=radio name="reply" value="2000000000" <?php if ($defaultValue['replyBy']==2000000000) { echo "checked=1";}?>>
                     <span class="padding-left"><?php AppUtility::t('Always')?></span>
@@ -340,7 +340,7 @@ $this->title = $pageTitle;
                         ]); ?>
                     </div>
                     <label class="end pull-left non-bold padding-top-pt-five-em"> at </label>
-                    <div class=" col-md-6 col-sm-6">
+                    <div class=" col-md-6 col-sm-5 padding-right-zero">
                         <?php echo TimePicker::widget([
                             'name' => 'replyByTime',
                             'value' => $defaultValue['replyByTime'],
@@ -355,11 +355,11 @@ $this->title = $pageTitle;
         </div>
 
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="padding-top-pt-five-em col-md-2 col-sm-2">
+            <div class="padding-top-pt-five-em col-md-2 col-sm-3">
                 <?php AppUtility::t('Calendar icon')?>
             </div>
-            <div class="col-md-10 col-sm-10 padding-left-zero">
-                <label class="col-md-5 col-sm-5 non-bold">
+            <div class="col-md-10 col-sm-9 padding-left-zero">
+                <label class="col-md-5 col-sm-6 non-bold">
                     <span class="floatleft padding-top-pt-five-em">
                         <?php AppUtility::t('New Threads')?>
                     </span>
@@ -378,10 +378,10 @@ $this->title = $pageTitle;
             </div>
         </div>
      <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-        <div class="col-md-2 col-sm-2">
+        <div class="col-md-2 col-sm-3">
             <?php AppUtility::t('Count in gradebook?')?>
         </div>
-        <div class="col-md-10 col-sm-10 padding-left-zero">
+        <div class="col-md-10 col-sm-9 padding-left-zero">
             <span class="col-md-12 col-sm-12">
                 <input type=radio name="count-in-gradebook" value="0" <?php if ($defaultValue['cntInGb'] == 0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>
                 <span class="padding-left"><?php AppUtility::t('No')?></span>
@@ -402,14 +402,18 @@ $this->title = $pageTitle;
      </div>
 
                     <div id="gbdetail" <?php if ($defaultValue['cntInGb']==0 && $defaultValue['points']==0) { echo 'style="display:none;"';}?>><br>
-
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Points:')?></div>
-                        <div class="col-md-10 col-sm-10">
-                            <input type="text" name="points" value="<?php echo $defaultValue['points'];?>" size="3"> <?php AppUtility::t('Points:')?>
-                    </div><br class=form>
+                    <div class="col-md-12 col-sm-12 padding-left-right-zero padding-top-one-em padding-bottom-one-em">
+                        <div class="col-md-2 col-sm-3"><?php AppUtility::t('Points')?></div>
+                        <div class="col-md-10 col-sm-9 padding-left-zero">
+                            <span class="col-md-2 col-sm-2">
+                                <input class="form-control" type="text" name="points" value="<?php echo $defaultValue['points'];?>" size="3">
+                            </span>
+                            <?php AppUtility::t('Points')?>
+                        </div>
+                    </div>
 
                     <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Gradebook Category')?></div>
+                        <div class="col-md-2 col-sm-3"><?php AppUtility::t('Gradebook Category')?></div>
                         <div class="col-md-4 col-sm-4">
                              <?php AssessmentUtility::writeHtmlSelect("gradebook-category",$gbcatsId,$gbcatsLabel,$defaultValue['gbCat'],"Default",0); ?>
                         </div>
@@ -418,27 +422,30 @@ $this->title = $pageTitle;
                     </div><br class="form"/>
 
                     <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Tutor Access:')?></div>
+                        <div class="col-md-2 col-sm-3"><?php AppUtility::t('Tutor Access:')?></div>
                         <div class="col-md-4 col-sm-4">
                             <?php AssessmentUtility::writeHtmlSelect("tutor-edit",$page_tutorSelect['val'],$page_tutorSelect['label'],$defaultValue['tutorEdit']); ?>
                         </div>
                     </div><br class=form>
                     <div class="item-alignment">
-                        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Use Scoring Rubric')?></div>
+                        <div class="col-md-2 col-sm-3"><?php AppUtility::t('Use Scoring Rubric')?></div>
                         <div class="col-md-4 col-sm-4">
                                 <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$defaultValue['rubric']); ?>
+                                <div class="col-md-12 col-sm-12 padding-left-right-zero padding-top-one-em">
                                 <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&id=new&from=addf&fid'.$modifyForumId) ?>">
-                                <?php AppUtility::t('Add new rubric')?></a> |
-                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&nomanage=&from=addf&fid='.$modifyForumId) ?>"><?php AppUtility::t('Edit rubrics')?></a>
+                                <?php AppUtility::t('Add new rubric')?>
+                                </a> |
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&nomanage=&from=addf&fid='.$modifyForumId) ?>">
+                                    <?php AppUtility::t('Edit rubrics')?>
+                                </a>
+                                </div>
                           </div>
                           <br class=form>
                     </div>
                         <?php if ($defaultValue['isOutcomes'] != null) { ?>
                     <div class="item-alignment">
-                        <br>
-
-                        <div class="col-md-2"><?php AppUtility::t('Associate Outcomes:')?></div>
-                        <div class="col-md-10 col-sm-10">
+                        <div class="col-md-2 col-sm-3"><?php AppUtility::t('Associate Outcomes:')?></div>
+                        <div class="col-md-10 col-sm-9 padding-left-zero">
                         <?php
 
                         if($defaultValue['outcomes'] != " "){
@@ -453,10 +460,10 @@ $this->title = $pageTitle;
                         <?php } ?>
                         </div>
     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-        <div class="col-md-2 col-sm-2">
+        <div class="col-md-2 col-sm-3">
             <?php AppUtility::t('Forum Type')?>
         </div>
-        <div class="col-md-10 col-sm-10 padding-left-zero">
+        <div class="col-md-10 col-sm-9 padding-left-zero">
             <span class="col-md-12 col-sm-12">
                 <input type=radio name="forum-type" value="0" <?php if ($defaultValue['forumType']==0) { echo 'checked=1';}?>/>
                 <span class="padding-left"><?php AppUtility::t('Regular forum')?></span>
@@ -468,10 +475,10 @@ $this->title = $pageTitle;
         </div>
     </div>
     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-        <div class="col-md-2 col-sm-2">
+        <div class="col-md-2 col-sm-3">
             <?php AppUtility::t('Categorize posts?')?>
         </div>
-         <div class="col-md-10 col-sm-10">
+         <div class="col-md-10 col-sm-9">
              <input type=checkbox name="categorize-posts" value="1" <?php if ($defaultValue['tagList'] != '') {echo "checked=1";} ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/>
              <span id="tagholder" style="display:<?php echo ($defaultValue['tagList'] == '') ? "none" : "inline"; ?>">
                  <span class="padding-left"><?php AppUtility::t('Enter in format CategoryDescription:category,category,category')?></span>
@@ -480,7 +487,7 @@ $this->title = $pageTitle;
          </div>
 
    </div>
-    <div class="header-btn col-md-offset-2 col-sm-offset-2 col-md-6 col-sm-6 padding-top-ten padding-bottom-thirty">
+    <div class="header-btn col-md-offset-2 col-sm-offset-3 col-md-6 col-sm-6 padding-top-ten padding-bottom-thirty">
         <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
     </div>
     </form>

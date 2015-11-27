@@ -512,7 +512,11 @@ function addmultiselect(el,n) {
 	var val = jQuery('#'+n).val();
 	var txt = jQuery('#'+n+' option[value='+val+']').prop('disabled',true).html();
 	if (val != 'null') {
-		p.append('<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span><input type="hidden" name="'+n+'[]" value="'+val+'"/>'+txt+'</div>');
+		p.append('<div class="multiselitem col-md-12 col-sm-12">' +
+            '<span class="floatleft padding-right-pt-five-em">' +
+            '<a href="#" onclick="removemultiselect(this);return false;">Remove</a>' +
+            '</span>' +
+            '<input type="hidden" name="'+n+'[]" value="'+val+'"/>'+txt+'</div>');
 	}
 	jQuery('#'+n).val('null');
 }

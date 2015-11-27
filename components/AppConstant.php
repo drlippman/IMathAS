@@ -276,4 +276,6 @@ class AppConstant
     const NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ZERO = 605800;
     const NUMERIC_SIX_ZERO_FIVE_EIGHT_ZERO_ONE = 605801;
     const NUMERIC_ONE_TWO_ONE_ONE_SIX_ZERO_ZERO = 1211600;
+    const Written_Example = 'Written Example';
+    const Similar_Problem = 'of a similar problem';
 }

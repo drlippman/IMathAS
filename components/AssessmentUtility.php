@@ -57,10 +57,11 @@ class AssessmentUtility extends Component
             }
         }
         echo '</select></div>
-        <div class="col-md-6 col-sm-6"><input type="button" value="Add Another" onclick="addmultiselect(this,\'' . $name . '\')"/></div>';
+        <input type="button" value="Add Another" onclick="addmultiselect(this,\'' . $name . '\')"/>';
         if (count($selectedVals) > AppConstant::NUMERIC_ZERO) {
             foreach ($selectedVals as $v) {
-                echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';
+                echo '<div class="multiselitem col-md-12 col-sm-12 padding-top-pt-five-em">
+                <span class="floatleft padding-right-one-em"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';
                 echo '<input type="hidden" name="' . $name . '[]" value="' . $v . '"/>' . (is_array($valList[0]) ? $labelList[$v] : $val[$v]);
                 echo '</div>';
             }

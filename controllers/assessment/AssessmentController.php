@@ -3966,12 +3966,13 @@ class AssessmentController extends AppController
     }
 
     public function actionShowSolution() {
+        $this->layout = 'master';
         $id = intval($this->getParamVal('id'));
         $sig = $this->getParamVal('sig');
         $t = intval($this->getParamVal('t'));
         global $sessiondata;
         $flexwidth = true;
-        $temp = '<p><b style="font-size:110%">'.AppUtility::t('Written Example').'</b> '._('of a similar problem').'</p>';
+        $temp = '<p><b style="font-size:110%">'.AppConstant::Written_Example.'</b> '.AppConstant::Similar_Problem.'</p>';
         if ($sig != md5($id.$sessiondata['secsalt'])) {
             $temp .= AppUtility::t("invalid signature - not authorized to view the solution for this problem");
         }

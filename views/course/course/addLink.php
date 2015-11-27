@@ -410,9 +410,9 @@ $this->title = $defaultValues['saveTitle'];
         </div>
     </div>
     <?php if (count($pageOutcomesList) > 0) { ?>
-    <div class="col-md-12 col-sm-12 padding-left-zero">
+    <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
         <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Associate Outcomes') ?></div>
-        <div class="col-md-8 padding-left-eighteen">
+        <div class="col-md-8 col-sm-8 padding-left-eighteen">
             <?php
             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $defaultValues['gradeoutcomes'], 'Select an outcome...'); ?>
         </div>

@@ -233,7 +233,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php } ?>
                         </div>
 
-                            <div class="col-md-6 col-sm-6 padding-top-one-em padding-bottom-two-em">
+                            <div class="col-md-6 col-md-offset-2 col-sm-6 col-sm-offset-3 padding-top-one-em padding-bottom-two-em">
                                 <button type=submit name="submitbtn" value="Submit"><?php echo $savetitle ?></button>
                             </div>
             </form>

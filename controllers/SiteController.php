@@ -149,8 +149,6 @@ class SiteController extends AppController
          *  Group Admin
          *  Admin
          */
-        $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $diagId = $this->getParamVal('id');
         $params = $this->getRequestParams();
