@@ -15,15 +15,15 @@ $msgTotal = array_sum($newMsgCnt);
     <div class="headerwrapper"></div>
     <div class="midwrapper">
         <div class="pagetitle col-md-12 col-sm-12" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?></h2></div>
-        <br/>
-        <br/>
-        <br/>
-        <div class="col-md-12 col-sm-12 padding-left-fifteen"><h6><?php if ($myRights == AppConstant::ADMIN_RIGHT && count($brokenCnt) > 0) {
+
+        <div class="col-md-12 col-sm-12 padding-left-fifteen"><h6 class="padding-left-fifteen"><?php if ($myRights == AppConstant::ADMIN_RIGHT && count($brokenCnt) > 0) {
                 echo '<span class="red">'.array_sum($brokenCnt).'</span> questions, '.(array_sum($brokenCnt)-$brokenCnt[0]).' public, reported broken systemwide';
                 } ?>
             </h6>
         </div>
-
+        <br/>
+        <br/>
+        <br/>
         <?php
 if($from == 'msg')
 {
