@@ -3068,8 +3068,8 @@ class AppUtility extends Component
             return;
         }
         global $myRights,$newMsgCnt,$newPostCnt;
-        echo '<div class="block margin-left-fifteen"><h3>'.$title.'</h3></div>';
-        echo '<div class="blockitems margin-left-fifteen"><ul class="nomark courselist">';
+        echo '<div class="block margin-left-fifteen margin-right-fifteen"><h3>'.$title.'</h3></div>';
+        echo '<div class="blockitems margin-left-fifteen margin-right-fifteen"><ul class="nomark courselist">';
         for ($i=0; $i<count($data); $i++) {
             $courseStudent = Course::getByCourseAndUser($data[$i]['id']);
             $lockId = $courseStudent['lockaid'];
