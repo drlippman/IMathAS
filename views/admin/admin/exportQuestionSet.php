@@ -48,19 +48,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $curBreadcrumb; ?>
         <div id="headerexport" class="pagetitle"><h2></h2></div>
         <form id="pform" method=post action="export-question-set?cid=<?php echo $cid ?>">
-            <br/>
 
-            <div class="col-md-12"><h3><?php AppUtility::t('Questions Marked for Export') ?></h3></div>
+            <div class="col-md-12 col-sm-12"><h3><?php AppUtility::t('Questions Marked for Export') ?></h3></div>
             <?php
             if (count($checked) == AppConstant::NUMERIC_ZERO) {
-                echo "<div class='col-md-12'>".AppUtility::t('No Questions currently marked for export',false)."</div>\n";
+                echo "<div class='col-md-12 col-sm-12'>".AppUtility::t('No Questions currently marked for export',false)."</div>\n";
             } else {
                 ?>
 <!--                --><?php //AppUtility::t('Check') ?>
 <!--                <a href="#" onclick="return chkAllNone('pform','pchecked[]',true)">--><?php //AppUtility::t('All') ?><!--</a>-->
 <!--                <a href="#" onclick="return chkAllNone('pform','pchecked[]',false)">--><?php //AppUtility::t('None') ?><!--</a>-->
 
-
+        <div class="item margin-padding-admin-table padding-bottom margin-twenty">
+            <div class="margin-twenty margin-left-twenty">
                 <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
                     <thead>
                     <tr><th class="questionId">
@@ -101,49 +101,54 @@ $this->params['breadcrumbs'][] = $this->title;
                     ?>
                     </tbody>
                 </table>
-
+                </div>
+            </div>
             <?php
             }
 
             if (isset($_POST['finalize'])) {
             ?>
-            <div class="col-md-12"><h3><?php AppUtility::t('Export Settings') ?></h3></div>
-            <div class=col-md-2><?php AppUtility::t('Library Description') ?></div>
+            <div class="col-md-12 col-sm-12"><h3><?php AppUtility::t('Export Settings') ?></h3></div>
+            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Library Description') ?></div>
             <div class="col-md-6 col-sm-6">
                 <textarea name="libdescription" class="form-control text-area-alignment" rows=4 cols=60></textarea>
             </div>
             <br class=form><br/>
 
-            <div class=col-md-2><?php AppUtility::t('Library Name') ?></div>
-            <div class=col-md-6><input type=text class="form-control" name="libname" size="40"/></div>
+            <div class="col-md-2 col-sm-2"><?php AppUtility::t('Library Name') ?></div>
+            <div class="col-md-6 col-sm-6"><input type=text class="form-control" name="libname" size="40"/></div>
             <br class=form><br/>
 
-            <div class=submit><input name="export" type=submit value="Export"></div><br class=form>
+<!--            <div class=submit><input name="export" type=submit value="Export"></div><br class=form>-->
+                <div class="header-btn floatleft padding-bottom-one-em padding-left-fifteen">
+                    <button class="btn btn-primary page-settings submit" type="submit" name="export" value="Export"><i class="fa fa-share header-right-btn"></i><?php echo 'Export' ?></button>
+                </div>
         </form>
     <?php
     } else {
     ?>
 
-        <div class="col-md-12"><h3><?php AppUtility::t('Potential Questions') ?></h3></div>
-        <div class="col-md-12"><?php AppUtility::t('In Libraries') ?><span id="libnames"
+        <div class="col-md-12 col-sm-12"><h3><?php AppUtility::t('Potential Questions') ?></h3></div>
+        <div class="col-md-12 col-sm-12"><?php AppUtility::t('In Libraries') ?><span id="libnames"
                                                                            class="padding-left-fifteen"><?php echo $lnames ?></span>
             <input type=hidden name="libs" id="libs" value="<?php echo $searchlibs ?>">
             <input type=button value="Select Libraries" onClick="libselect()"></div><br class=form><br class=form>
-        <div class="col-md-12"><?php AppUtility::t('Search') ?>
+        <div class="col-md-12 col-sm-12 padding-bottom-one-em"><?php AppUtility::t('Search') ?>
             <span class="padding-left-fifteen">
                 <input type=text size=15 class="form-control-1" name=search value="<?php echo $search ?>"></span>
             <input type=submit value="Update and Search">
-            <input type=submit name="finalize" value="Finalize"><BR></div>
+            <input type=submit name="finalize" value="Finalize"></div>
     <?php
     if ($page_hasSearchResults == AppConstant::NUMERIC_ZERO) {
-        echo "<div class='col-md-12'>".AppUtility::t('No Questions matched search',false)."</div>\n";
+        echo "<div class='col-md-12 col-sm-12'>".AppUtility::t('No Questions matched search',false)."</div>\n";
     } else {
     ?>
 <!--    --><?php //AppUtility::t('Check') ?>
 <!--        <a href="#" onclick="return chkAllNone('pform','nchecked[]',true)">--><?php //AppUtility::t('All') ?><!--</a>-->
 <!--        <a href="#" onclick="return chkAllNone('pform','nchecked[]',false)">--><?php //AppUtility::t('None') ?><!--</a>-->
-
-        <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
+        <div class="item margin-padding-admin-table padding-bottom margin-twenty">
+            <div class="margin-twenty margin-left-twenty">
+        <table cellpadding="5" id="myTable" class="potential-question-table" style="clear:both; position:relative;width: 100%; m">
             <thead>
             <tr><th class="questionId">
                     <div class="checkbox override-hidden">
@@ -179,10 +184,12 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             ?>
             </tbody>
-        </table>
+        </table></div></div>
     <?php
     }
-        echo "<div class='col-md-12'>".AppUtility::t(' Note: Export of questions with static image files is not yet supported.')."</div>";
+        echo "<div class='col-md-12 col-sm-12 padding-left-fifteen padding-bottom-one-em'>";
+                AppUtility::t(' Note: Export of questions with static image files is not yet supported.');
+                echo"<div>";
     }
         echo "</form>";
     }

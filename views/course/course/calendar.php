@@ -20,10 +20,10 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
 <div class="item-detail-content">
     <?php
-    if($user->rights == 100 || $user->rights == 20) {
-        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
-    } elseif($user->rights == 10){
-        echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'calendar']);
+    if($user->rights >= AppConstant::STUDENT_RIGHT) {
+//        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
+     echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]);
+
     }?>
     <div class="tab-content col-md-12">
         <div class="col-md-12 padding-alignment calendar-container">

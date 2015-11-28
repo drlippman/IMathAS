@@ -701,6 +701,7 @@ class SiteController extends AppController
             $userLayoutData = User::getUserHomeLayoutInfo($user->id);
             $homeLayout = $userLayoutData['homelayout'];
             $hideOnPostsWidget = $userLayoutData['hideonpostswidget'];
+            $from = $this->getParamVal('from');
             $pagelayout = explode('|',$homeLayout);
             if ($hideOnPostsWidget != '') {
                 $hideOnPostsWidget = explode(',',$hideOnPostsWidget);
@@ -731,14 +732,15 @@ class SiteController extends AppController
             $postcheckcids = array();
             $postcheckstucids = array();
             $page_coursenames = array();
-            $page_newpostlist = array();
-
+//            $page_newpostlist = array();
+            global $page_newmessagelist,$page_newpostlist;
             /**
              * check for new message in courses being taken
              */
             $newMsgCnt = array();
             if ($showMessagesGadget) {
-                $page_newmessagelist = array();
+//                $page_newmessagelist = array();
+
                 $result = Message::getNewMessageData($user->id);
                 foreach($result as $key => $line) {
                     if (!($newMsgCnt[$line['courseid']])) {
@@ -889,7 +891,7 @@ class SiteController extends AppController
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
-                $responseData = array('homeLayout' => $homeLayout, 'hideOnPostsWidget' => $hideOnPostsWidget, 'newMsgCnt' => $newMsgCnt, 'brokenCnt' => $brokenCnt, 'user' => $user, 'myRights' => $myRights, 'twoColumn' => $twoColumn, 'pagelayout' => $pagelayout, 'page_newmessagelist' => $page_newmessagelist, 'page_coursenames' => $page_coursenames, 'page_newpostlist' => $page_newpostlist, 'postThreads' => $postThreads, 'showNewMsgNote' => $showNewMsgNote, 'showNewPostNote' => $showNewPostNote, 'stuHasHiddenCourses' => $stuHasHiddenCourses, 'courses' => $courses, 'newPostCnt' => $newPostCnt, 'page_teacherCourseData' => $page_teacherCourseData, 'page_tutorCourseData' => $page_tutorCourseData, 'page_studentCourseData' => $page_studentCourseData);
+                $responseData = array('homeLayout' => $homeLayout,'from' => $from,'hideOnPostsWidget' => $hideOnPostsWidget, 'newMsgCnt' => $newMsgCnt, 'brokenCnt' => $brokenCnt, 'user' => $user, 'myRights' => $myRights, 'twoColumn' => $twoColumn, 'pagelayout' => $pagelayout, 'page_newmessagelist' => $page_newmessagelist, 'page_coursenames' => $page_coursenames, 'page_newpostlist' => $page_newpostlist, 'postThreads' => $postThreads, 'showNewMsgNote' => $showNewMsgNote, 'showNewPostNote' => $showNewPostNote, 'stuHasHiddenCourses' => $stuHasHiddenCourses, 'courses' => $courses, 'newPostCnt' => $newPostCnt, 'page_teacherCourseData' => $page_teacherCourseData, 'page_tutorCourseData' => $page_tutorCourseData, 'page_studentCourseData' => $page_studentCourseData);
                 return $this->renderWithData('dashboard', $responseData);
             }
         }
@@ -1195,4 +1197,131 @@ class SiteController extends AppController
             return $this->redirect('dashboard');
         }
     }
+
+    public function actionForum()
+    {
+        global $homeLayout,  $hideOnPostsWidget, $newMsgCnt,  $brokenCnt,  $user, $myRights,  $twoColumn,  $pagelayout,  $page_newmessagelist, $page_coursenames,  $page_newpostlist,  $postThreads,
+               $showNewMsgNote, $showNewPostNote,$courses, $newPostCnt;
+        $this->layout = 'master';
+        $user = $this->getAuthenticatedUser();
+        $myRights = $user['rights'];
+        $courses = Course::getByName($user->id);
+        $userLayoutData = User::getUserHomeLayoutInfo($user->id);
+        $homeLayout = $userLayoutData['homelayout'];
+        $hideOnPostsWidget = $userLayoutData['hideonpostswidget'];
+        $pagelayout = explode('|',$homeLayout);
+        if ($hideOnPostsWidget != '') {
+            $hideOnPostsWidget = explode(',',$hideOnPostsWidget);
+        } else {
+            $hideOnPostsWidget = array();
+        }
+
+        foreach($pagelayout as $k=>$v) {
+            if ($v=='') {
+                $pagelayout[$k] = array();
+            } else {
+                $pagelayout[$k] = explode(',',$v);
+            }
+        }
+        $showNewMsgNote = in_array(0,$pagelayout[3]);
+
+        $showNewPostNote = in_array(1,$pagelayout[3]);
+
+        $showMessagesGadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
+        $showPostsGadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
+
+        $twoColumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
+        /**
+         * check for new posts in courses being taken
+         */
+
+        $newpostscnt = array();
+        $postcheckcids = array();
+        $postcheckstucids = array();
+        $page_coursenames = array();
+        $page_newpostlist = array();
+
+        /**
+         * check for new message in courses being taken
+         */
+        $newMsgCnt = array();
+        if ($showMessagesGadget) {
+            $page_newmessagelist = array();
+            $result = Message::getNewMessageData($user->id);
+            foreach($result as $key => $line) {
+                if (!($newMsgCnt[$line['courseid']])) {
+                    $newMsgCnt[$line['courseid']] = 1;
+                } else {
+                    $newMsgCnt[$line['courseid']]++;
+                }
+                $page_newmessagelist[] = $line;
+            }
+        } else {
+            /**
+             * check for new messages
+             */
+            $result = Message::getUserById($user->id);
+            foreach($result as $key => $row){
+                $newMsgCnt[$row['courseid']] = $row['COUNT(id)'];
+            }
+        }
+        /**
+         * get new posts
+         * check for new posts in courses being taught.
+         */
+        $postcidlist = $postcheckcids;
+        $postThreads = array();
+
+        if ($showPostsGadget && count($postcheckcids) > AppConstant::NUMERIC_ZERO) {
+            $newPost = ForumThread::getNewPost($postcidlist, $user->id);
+            foreach($newPost as $key => $line) {
+                if (!isset($newPostCnt[$line['courseid']])) {
+                    $newPostCnt[$line['courseid']] = 1;
+                } else {
+                    $newPostCnt[$line['courseid']]++;
+                }
+                if ($newPostCnt[$line['courseid']]<10) {
+                    $page_newpostlist[] = $line;
+                    $postThreads[] = $line['threadid'];
+                }
+            }
+        } else if (count($postcheckcids)>0) {
+            $result = ForumThread::getPostData($postcidlist, $user->id);
+            foreach($result as $key => $row)
+            {
+                $newPostCnt[$row['courseid']] = $row['COUNT(imas_forum_threads.id)'];
+            }
+        }
+        /**
+         *
+         * check for new posts in courses being taken
+         */
+        $poststucidlist = $postcheckstucids;
+        $now = time();
+
+        if ($showPostsGadget && count($postcheckstucids) > AppConstant::NUMERIC_ZERO) {
+            $result = ForumThread::getNewPostData($poststucidlist, $now, $user->id);
+            foreach($result as $key => $line) {
+                if (!isset($newPostCnt[$line['courseid']])) {
+                    $newPostCnt[$line['courseid']] = AppConstant::NUMERIC_ONE;
+                } else {
+                    $newPostCnt[$line['courseid']]++;
+                }
+                if ($newPostCnt[$line['courseid']] < 10) {
+                    $page_newpostlist[] = $line;
+                    $postThreads[] = $line['threadid'];
+                }
+            }
+        } else if (count($postcheckstucids) > 0) {
+            $r2 = ForumThread::getPostThread($poststucidlist, $now, $user->id);
+            foreach($r2 as $key => $row) {
+                $newPostCnt[$row['courseid']] = $row['COUNT(imas_forum_threads.id)'];
+            }
+        }
+
+        $responseData = array('homeLayout' => $homeLayout, 'hideOnPostsWidget' => $hideOnPostsWidget, 'newMsgCnt' => $newMsgCnt,'user' => $user, 'myRights' => $myRights, 'twoColumn' => $twoColumn, 'pagelayout' => $pagelayout, 'page_newmessagelist' => $page_newmessagelist, 'page_coursenames' => $page_coursenames, 'page_newpostlist' => $page_newpostlist, 'postThreads' => $postThreads, 'showNewMsgNote' => $showNewMsgNote, 'showNewPostNote' => $showNewPostNote, 'stuHasHiddenCourses' => $stuHasHiddenCourses, 'courses' => $courses, 'newPostCnt' => $newPostCnt, 'page_teacherCourseData' => $page_teacherCourseData, 'page_tutorCourseData' => $page_tutorCourseData, 'page_studentCourseData' => $page_studentCourseData);
+        return $this->renderWithData('forum', $responseData);
+    }
+
+
 }

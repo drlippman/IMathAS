@@ -901,6 +901,8 @@ class AppController extends Controller
             return true;
         } else if (($user['rights'] >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'add-remove-course'))) {
             return true;
+        } elseif(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'calendar')){
+            return true;
         } else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());

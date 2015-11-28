@@ -23,11 +23,24 @@ AppAsset::register($this);
     <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo AppConstant::VERSION_NUMBER ?>' rel='stylesheet' type='text/css'>
     <link href='<?php echo AppUtility::getHomeURL(); ?>css/imascoreResponsive.css?<?php echo AppConstant::VERSION_NUMBER ?>' rel='stylesheet' type='text/css'>
 </head>
-<?php $courseId = Yii::$app->session->get('courseId'); ?>
-<?php $messageCount = Yii::$app->session->get('messageCount');
-      $postCount = Yii::$app->session->get('postCount');
-      $totalCount = $messageCount + $postCount;
-      $user = Yii::$app->session->get('user');
+<?php
+global $newMsgCnt, $newPostCnt, $data;
+global $page_newmessagelist,$page_newpostlist;
+$courseId = Yii::$app->session->get('courseId');
+$actionPath = Yii::$app->controller->action->id;
+
+$messageCount = Yii::$app->session->get('messageCount');
+$postCount = Yii::$app->session->get('postCount');
+$totalCount = $messageCount + $postCount;
+
+if($actionPath == 'dashboard')
+{
+    $messageCount = count($page_newmessagelist);
+    $postCount = count($page_newpostlist);
+    $totalCount =  $messageCount + $postCount;
+}
+
+ $user = Yii::$app->session->get('user');
 ?>
 <body>
 <?php $this->beginBody() ?>

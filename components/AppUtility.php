@@ -3087,10 +3087,10 @@ class AppUtility extends Component
             }
             if ($showNewMsgNote && isset($newMsgCnt[$data[$i]['id']]) && $newMsgCnt[$data[$i]['id']]>0) {
 
-                echo ' <a class="newnote" href="msgs/msg-list?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$data[$i]['id']]), '</a>';
+//                echo ' <a class="newnote" href="msgs/msg-list?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$data[$i]['id']]), '</a>';
             }
             if ($showNewPostNote && isset($newPostCnt[$data[$i]['id']]) && $newPostCnt[$data[$i]['id']]>0) {
-                echo ' <a class="newnote" href="../forum/forum/new-post?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newPostCnt[$data[$i]['id']]), '</a>';
+//                echo ' <a class="newnote" href="../forum/forum/new-post?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newPostCnt[$data[$i]['id']]), '</a>';
             ?>
             <?php }
             echo '</li>';

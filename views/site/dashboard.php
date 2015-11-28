@@ -20,7 +20,17 @@ $msgTotal = array_sum($newMsgCnt);
                 } ?>
         </h6></div>
 
-        <?php for ($i=0; $i<3; $i++) {
+<!--        --><?php
+if($from == 'msg')
+{
+    AppUtility::printMessagesGadget($page_newmessagelist, $page_coursenames);
+}elseif($from == 'forum')
+{
+    AppUtility::printPostsGadget($page_newpostlist, $page_coursenames, $postThreads);
+}else{
+
+
+for ($i=0; $i<3; $i++) {
         if ($i==0) {
         echo '<div id="homefullwidth">';
             }
@@ -31,6 +41,7 @@ $msgTotal = array_sum($newMsgCnt);
                 echo '<div id="rightcolumn">';
                     }
                     }
+
                     for ($j=0; $j<count($pagelayout[$i]); $j++) {
                     switch ($pagelayout[$i][$j]) {
                     case 0:
@@ -51,11 +62,12 @@ $msgTotal = array_sum($newMsgCnt);
                         AppUtility::printPostsGadget($page_newpostlist, $page_coursenames, $postThreads);
                     break;
                     }
-                    }
+                }
                     if ($i==2 || $twoColumn) {
                     echo '</div>';
                     }
-                } ?>
+                }
+        } ?>
         <div class="col-md-12 col-sm-12" id="homefullwidth">
 
         </div>

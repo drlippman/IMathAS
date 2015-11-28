@@ -1082,15 +1082,19 @@ class CourseController extends AppController
         $userId = $user['id'];
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $courseId = $this->getParamVal('cid');
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $countPost = $this->getNotificationDataForum($courseId,$user);
+        $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $this->setSessionData('courseId',$courseId);
         $teacherId = $this->isTeacher($userId, $courseId);
         $isStudent = $this->isStudent($userId, $courseId);
         $stuView = $this->getParamVal('stuview');
         $params = $this->getRequestParams();
         $this->checkSession($params);
-        $sessionId = $this->getSessionId();
-        $sessionData = $this->getSessionData($sessionId);
-        $this->setSessionData('courseId',$courseId);
+
         $teacherData = Teacher::getByUserId($userId,$courseId);
         $courseStudent = Course::getByCourseAndUser($courseId);
         $lockaid = $courseStudent['lockaid']; //ysql_result($result,0,2);

@@ -43,7 +43,7 @@ if (isset($lastEditedBy)) {
 <!--        <input type=submit value="--><?php //echo _("Save Revision");?><!--">-->
 <!--    </div>-->
     <div class="header-btn floatleft">
-        <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Revision' ?></button>
+        <button class="btn btn-primary page-settings submit" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Revision' ?></button>
     </div>
 </form>
 
