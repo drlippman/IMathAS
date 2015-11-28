@@ -311,11 +311,12 @@ $urlmode = AppUtility::urlMode();
         $result = $coursesTeaching;
         if (count($result) > 0) {
             echo '<p><b>Courses you\'re teaching:</b>'; ?>
-
+<div class="item margin-padding-admin-table padding-bottom margin-left-zero">
+    <div class="margin-twenty margin-left-twenty">
             <table cellpadding="5" id="myTable" class="potential-question-table" style="clear:both; position:relative;width: 100%">
             <thead>
             <tr><th class="questionId">
-                    <div class="checkbox override-hidden">
+                    <div class="checkbox override-hidden" style="padding-left:0px">
                         <label style="padding-left:0px">
                             <input type="checkbox" name="header-checked"  value="">
                                     <span class="cr">
@@ -324,7 +325,7 @@ $urlmode = AppUtility::urlMode();
                         </label>
                     </div>
                 </th>
-                <th class="text-align-center"><?php AppUtility::t('Courses') ?></th>
+                <th style="padding-left:0px"><?php AppUtility::t('Courses') ?></th>
             </tr>
             </thead>
                         <tbody id="potential-question-information-table">
@@ -352,12 +353,13 @@ $urlmode = AppUtility::urlMode();
             echo '</p>';
         } ?>
                 </tbody>
-                </table>
+                </table></div></div>
 
 <?php        $result = $coursesTutoring;
         if (count($result) > 0) {
             echo '<p><b>Courses you\'re tutoring:</b>'; ?>
-
+<div class="item margin-padding-admin-table padding-bottom margin-left-zero">
+    <div class="margin-twenty margin-left-twenty">
     <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
                     <thead>
                     <tr><th class="questionId">
@@ -370,7 +372,7 @@ $urlmode = AppUtility::urlMode();
                                 </label>
                             </div>
                         </th>
-                        <th class="text-align-center"><?php AppUtility::t('Courses') ?></th>
+                        <th style="padding-left:0px"><?php AppUtility::t('Courses') ?></th>
                         </tr>
                         </thead>
                         <tbody id="potential-question-information-table">
@@ -400,10 +402,12 @@ $urlmode = AppUtility::urlMode();
             echo '</p>';
         } ?>
         </tbody>
-        </table>
+        </table></div></div>
      <?php   $result = $coursesTaking;
         if (count($result) > 0) {
             echo '<p><b>Courses you\'re taking:</b>'; ?>
+<div class="item margin-padding-admin-table padding-bottom margin-left-zero">
+    <div class="margin-twenty margin-left-twenty">
 <table cellpadding="5" id="myTable" class="potential-question-table " style="clear:both; position:relative;width: 100%">
     <thead>
     <tr><th class="questionId">
@@ -443,6 +447,9 @@ $urlmode = AppUtility::urlMode();
     <?php }
             echo '</p>';
         }
+     ?>
+    </tbody>
+</table></div></div>
         echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>'; ?>
         <br class="form"><div class="header-btn floatleft">
             <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Changes' ?></button>

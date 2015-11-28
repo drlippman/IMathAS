@@ -40,7 +40,7 @@ if($actionPath == 'dashboard')
     $totalCount =  $messageCount + $postCount;
 }
 
- $user = Yii::$app->session->get('user');
+// $user = Yii::$app->session->get('user');
 ?>
 <body>
 <?php $this->beginBody() ?>

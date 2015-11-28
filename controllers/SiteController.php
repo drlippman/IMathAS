@@ -702,6 +702,7 @@ class SiteController extends AppController
             $homeLayout = $userLayoutData['homelayout'];
             $hideOnPostsWidget = $userLayoutData['hideonpostswidget'];
             $from = $this->getParamVal('from');
+//            $this->setSessionData('user',$user);
             $pagelayout = explode('|',$homeLayout);
             if ($hideOnPostsWidget != '') {
                 $hideOnPostsWidget = explode(',',$hideOnPostsWidget);

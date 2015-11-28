@@ -2826,12 +2826,12 @@ class AppUtility extends Component
 
     public static function printPostsGadget($page_newpostlist = null, $page_coursenames = null, $postthreads = null) {
 
-        echo '<div class="block margin-right-fifteen">';
+        echo '<div class="block margin-right-fifteen margin-left-fifteen">';
         echo "<span class=\"floatright\"><a href=\"form?action=forumwidgetsettings\">"; ?>
         <img class="small-icon" style="vertical-align:top" src=<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png>
 
        <?php echo "</a></span><h3>", _('New forum posts'), '</h3></div>';
-        echo '<div class="blockitems margin-right-fifteen">';
+        echo '<div class="blockitems margin-right-fifteen margin-left-fifteen">';
         if (count($page_newpostlist)==0) {
             echo '<p class="padding-left-fifteen">', _('No new posts'), '</p>';
             echo '</div>';
@@ -2888,8 +2888,9 @@ class AppUtility extends Component
     }
 
     public static function printMessagesGadget($page_newmessagelist = null, $page_coursenames = null) {
-        echo '<div class="block margin-right-fifteen"><h3>', _('New messages'), '</h3></div>';
-        echo '<div class="blockitems margin-right-fifteen">';
+
+        echo '<div class="block margin-right-fifteen margin-left-fifteen"><h3>', _('New messages'), '</h3></div>';
+        echo '<div class="blockitems margin-right-fifteen margin-left-fifteen">';
         if (count($page_newmessagelist)==0) {
             echo '<p class="padding-left-fifteen">', _('No new messages'), '</p>';
             echo '</div>';
