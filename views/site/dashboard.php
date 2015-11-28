@@ -15,12 +15,16 @@ $msgTotal = array_sum($newMsgCnt);
     <div class="headerwrapper"></div>
     <div class="midwrapper">
         <div class="pagetitle col-md-12 col-sm-12" id="headerhome"><h2>Welcome to IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?></h2></div>
-        <div class="col-md-12 col-sm-12"><h6><?php if ($myRights == AppConstant::ADMIN_RIGHT && count($brokenCnt) > 0) {
+        <br/>
+        <br/>
+        <br/>
+        <div class="col-md-12 col-sm-12 padding-left-fifteen"><h6><?php if ($myRights == AppConstant::ADMIN_RIGHT && count($brokenCnt) > 0) {
                 echo '<span class="red">'.array_sum($brokenCnt).'</span> questions, '.(array_sum($brokenCnt)-$brokenCnt[0]).' public, reported broken systemwide';
                 } ?>
-        </h6></div>
+            </h6>
+        </div>
 
-<!--        --><?php
+        <?php
 if($from == 'msg')
 {
     AppUtility::printMessagesGadget($page_newmessagelist, $page_coursenames);
@@ -28,8 +32,6 @@ if($from == 'msg')
 {
     AppUtility::printPostsGadget($page_newpostlist, $page_coursenames, $postThreads);
 }else{
-
-
 for ($i=0; $i<3; $i++) {
         if ($i==0) {
         echo '<div id="homefullwidth">';
@@ -68,9 +70,6 @@ for ($i=0; $i<3; $i++) {
                     }
                 }
         } ?>
-        <div class="col-md-12 col-sm-12" id="homefullwidth">
-
-        </div>
         <div class="clear"></div>
     </div>
 </div>
