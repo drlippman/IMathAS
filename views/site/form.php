@@ -20,7 +20,9 @@ $urlmode = AppUtility::urlMode();
     </div>
 </div>
 <div class="col-md-12 col-sm-12 tab-content shadowBox non-nav-tab-item">
-<?php switch ($action) {
+<?php
+
+switch ($action) {
     case "newuser":
         break;
 
@@ -308,52 +310,18 @@ $urlmode = AppUtility::urlMode();
         echo "<form method=post action=\"action?action=forumwidgetsettings$gb\">\n";
         $allcourses = array();
 
-        $result = $coursesTeaching;
-        if (count($result) > 0) {
-            echo '<p><b>Courses you\'re teaching:</b>'; ?>
-<div class="item margin-padding-admin-table padding-bottom margin-left-zero">
-    <div class="margin-twenty margin-left-twenty">
-            <table cellpadding="5" id="myTable" class="potential-question-table" style="clear:both; position:relative;width: 100%">
-            <thead>
-            <tr><th class="questionId">
-                    <div class="checkbox override-hidden" style="padding-left:0px">
-                        <label style="padding-left:0px">
-                            <input type="checkbox" name="header-checked"  value="">
-                                    <span class="cr">
-                                        <i class="cr-icon fa fa-check"></i>
-                                    </span>
-                        </label>
-                    </div>
-                </th>
-                <th style="padding-left:0px"><?php AppUtility::t('Courses') ?></th>
-            </tr>
-            </thead>
-                        <tbody id="potential-question-information-table">
+$result = $coursesTeaching;
 
-                        <?php
-            foreach($result as $key => $row) {
-                        $alt = AppConstant::NUMERIC_ZERO;
-                        for ($i = AppConstant::NUMERIC_ZERO; $i < count($row); $i++) {
-                            if ($alt == AppConstant::NUMERIC_ZERO) {
-                                echo "			<tr class=even>";
-                                $alt = AppConstant::NUMERIC_ONE;
-                            } else {
-                                echo "			<tr class=odd>";
-                                $alt = AppConstant::NUMERIC_ZERO;
-                            }
-                        }    ?>
-                <tr><td class="word-break-all-width" style="width: 40%">
-                    <input type=checkbox name='checked[]' value='<?php echo $row['id'] ?>'
-                           >
-                    <?php
-                                    echo $row['name']; ?>
-                </td>
-                </tr>
-<?php }
-            echo '</p>';
-        } ?>
-                </tbody>
-                </table></div></div>
+if (count($result) > 0) {
+echo '<p><b>Courses you\'re teaching:</b> Check: <a href="#" onclick="$(\'.teaching\').prop(\'checked\',true);return false;">All</a> <a href="#" onclick="$(\'.teaching\').prop(\'checked\',false);return false;">None</a>';
+    foreach($result as $key => $row){
+    $allcourses[] = $row['id'];
+    echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row['id'].'" ';
+    if (!in_array($row['id'],$hideList)) {echo 'checked="checked"';}
+    echo '/> '.$row['name'];
+    }
+    echo '</p>';
+}?>
 
 <?php        $result = $coursesTutoring;
         if (count($result) > 0) {
@@ -402,7 +370,7 @@ $urlmode = AppUtility::urlMode();
             echo '</p>';
         } ?>
         </tbody>
-        </table></div></div>
+        </table></div>
      <?php   $result = $coursesTaking;
         if (count($result) > 0) {
             echo '<p><b>Courses you\'re taking:</b>'; ?>
@@ -449,12 +417,15 @@ $urlmode = AppUtility::urlMode();
         }
      ?>
     </tbody>
-</table></div></div>
-        echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>'; ?>
-        <br class="form"><div class="header-btn floatleft">
+</table>
+        <?php echo '<input type="hidden" name="allcourses" value="'.implode(',',$allcourses).'"/>'; ?>
+        <div class="header-btn floatleft padding-bottom-one-em">
             <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Changes' ?></button>
-        </div><br class="form"><br/>
+        </div>
        <?php echo '</form>';
         break;
-} ?>
-</div>
+?>
+
+    </div>
+    <?php } ?>
+    </div></div></div>

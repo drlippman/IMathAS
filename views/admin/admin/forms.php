@@ -64,7 +64,7 @@ switch ($action) {
     case "newadmin":
             echo "<form method=post action=\"actions?action=$getAction";
             if ($getAction == "chgrights") { echo "&id=$getId"; }
-            echo "\"><br>";
+            echo "\">";
             if ($getAction == "newadmin") {
                 echo "<div class='col-md-2 col-sm-2'>New User username</div>  <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
                 echo "<div class='col-md-2 col-sm-2'>First Name</div> <input class='form form-control-1' type=text size=40 name=firstname><BR class=form>\n";
@@ -124,7 +124,7 @@ switch ($action) {
             }
 //            echo "<br/><div class=submit><input type=submit value=Save></div></form><br/>";
             ?>
-            <div class="header-btn floatleft padding-left-fifteen">
+    <div class="header-btn col-md-6 col-sm-6 col-sm-offset-2 col-md-offset-2 padding-bottom-ten padding-left-zero">
                 <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save' ?></button>
             </div><br class="form">
 
@@ -150,7 +150,7 @@ switch ($action) {
         echo "\">";
         echo "<div class='col-md-12 col-sm-12 padding-left-zero padding-top-ten padding-bottom-twenty-five'>
                     <div class='col-md-12 col-sm-12 margin-top-fifteen'>
-                        <div class='col-md-3 col-sm-3'>Course ID</div>
+                        <div class='col-md-3 col-sm-3'>"; AppUtility::t('Course ID'); echo"</div>
                         <div class='col-md-4 col-sm-6'>$courseid</div>
                     </div>";
         echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
@@ -241,7 +241,7 @@ switch ($action) {
             echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                     <div class='col-md-3 col-sm-3'>" . AppUtility::t('Allow other instructors to copy course items', false) . "
                     </div>
-                    <div class='col-md-6 col-sm-8 padding-left-zero'>
+                    <div class='col-md-8 col-sm-9 padding-left-zero'>
                         <div class='col-md-12 col-sm-12'>";
             echo '<input type=radio name="copyrights" value="0" ';
             if ($copyrights == AppConstant::NUMERIC_ZERO) {
@@ -272,7 +272,7 @@ switch ($action) {
 
                 <div class='col-md-3 col-sm-3'>" . AppUtility::t('Message System', false) . "</div>
 
-                <div class='col-md-5 col-sm-7 padding-left-zero'>";
+                <div class='col-md-8 col-sm-9 padding-left-zero'>";
             echo '<div class="col-md-12 col-sm-12">
                     <input type=radio name="msgset" value="0" ';
             if ($msgset == AppConstant::NUMERIC_ZERO) {
@@ -358,7 +358,7 @@ switch ($action) {
             echo '
             <div class="col-md-12 col-sm-12 margin-top-fifteen">
                 <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Auto-assign LatePasses on course enroll', false) . '</div>
-                <div class="col-md-5 col-sm-3 display-flex">';
+                <div class="col-md-5 col-sm-6 display-flex">';
             echo '<input class="width-seventy-eight-per form-control" type="text" size="3" name="deflatepass" value="' . $deflatepass . '"/>
                     <span class="margin-left-ten select-text-margin">' . AppUtility::t('LatePasses', false) . '<span>
                 </div>
