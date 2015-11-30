@@ -278,9 +278,12 @@ class AppConstant
     const NUMERIC_ONE_TWO_ONE_ONE_SIX_ZERO_ZERO = 1211600;
     const Written_Example = 'Written Example';
     const Similar_Problem = 'of a similar problem';
+    const MDY = 'm/d/Y';
+    const GIA = "g:i a";
+    const DATE_TIME = 'D m/d/Y g:i a';
 
-// create a map with current constant being the key and the value being the value
-// start calling the method below
+    // create a map with current constant being the key and the value being the value
+    // start calling the method below
     public static function getConstantVal($key, $lang='en'){
         return $key;
     }

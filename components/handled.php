@@ -39,7 +39,7 @@ $imasroot  = AppUtility::getHomeURL();
         var imasroot = '<?php echo \app\components\AppUtility::getHomeURL(); ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
     </script>
     <?php  ?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js?ver=<?php echo AppConstant::VERSION_NUMBER?>" type="text/javascript"></script>
+<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js?ver=--><?php //echo AppConstant::VERSION_NUMBER?><!--" type="text/javascript"></script>-->
     <?php
 
     if (isset($sessiondata['coursetheme'])) {

@@ -167,7 +167,7 @@ switch ($action) {
               </div>";
         echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
                     <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Available?', false) . '</div>
-                    <div class="col-md-4 col-sm-7 padding-left-zero">';
+                    <div class="col-md-5 col-sm-8 padding-left-zero">';
         echo '<div class="col-md-12 col-sm-12">';
         echo '<input type="checkbox" name="stuavail" value="1" ';
         if (($avail & 1) == AppConstant::NUMERIC_ZERO) {
@@ -180,7 +180,7 @@ switch ($action) {
         if (($avail & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_ZERO) {
             echo 'checked="checked"';
         }
-        echo '/><span class="padding-left-ten">' . AppUtility::t('Show on instructors\' home page', false) . '</span>
+        echo '/><span class="padding-left-ten">' . AppUtility::t('Show on instructor\'s home page', false) . '</span>
                         </div>
                     </div>
               </div>';
@@ -214,7 +214,7 @@ switch ($action) {
                     </div>
                     <div class='col-md-9 col-sm-9'>";
             echo '<span class="floatleft non-bold select-text-margin">' . AppUtility::t('Start', false) . '</span>';
-            echo '<div class ="col-md-4 col-sm-5 time-input default-start-timepicker margin-left-five margin-right-minus-twenty">';
+            echo '<div class ="col-md-4 col-sm-5 time-input default-start-timepicker padding-right-zero">';
             echo TimePicker::widget([
                 'name' => 'defstime',
                 'value' => $defstimedisp,
@@ -224,7 +224,7 @@ switch ($action) {
             ]);
             echo '</div>';
             echo '<label class="floatleft non-bold select-text-margin padding-right-five">End</label>';
-            echo '<div class="col-md-4 col-sm-5 default-end-timepicker">';
+            echo '<div class="col-md-4 col-sm-5 default-end-timepicker padding-right-zero">';
             echo TimePicker::widget([
                 'name' => 'deftime',
                 'value' => $deftimedisp,
@@ -358,9 +358,9 @@ switch ($action) {
             echo '
             <div class="col-md-12 col-sm-12 margin-top-fifteen">
                 <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Auto-assign LatePasses on course enroll', false) . '</div>
-                <div class="col-md-5 col-sm-6 display-flex">';
-            echo '<input class="width-seventy-eight-per form-control" type="text" size="3" name="deflatepass" value="' . $deflatepass . '"/>
-                    <span class="margin-left-ten select-text-margin">' . AppUtility::t('LatePasses', false) . '<span>
+                <div class="col-md-9 col-sm-9 display-flex">';
+            echo '<input class="width-seventy-eight-per form-control-1" type="text" size="3" name="deflatepass" value="' . $deflatepass . '"/>
+                    <span class="margin-left-ten select-text-margin padding-left-zero">' . AppUtility::t('LatePasses', false) . '<span>
                 </div>
             </div>';
         }

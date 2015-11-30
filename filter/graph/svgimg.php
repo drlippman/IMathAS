@@ -1,7 +1,5 @@
 <?php
 ////	$dbsetup = true; //to prevent database connection
-////	require("../../config.php");
-//
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
 	 } else {
@@ -29,6 +27,6 @@
 			$AS->processShortScript($_GET['sscr']);
 			$AS->outputimage($imgdir.$fn.'.png');
 		}
-	}\app\components\AppUtility::dump(header("Location: $urlmode$host$uri/$imgdir$fn.png"));
+	}
 	header("Location: $urlmode$host$uri/$imgdir$fn.png");
 ?>
