@@ -298,3 +298,14 @@ padding-right: 2.5em !important;
 .mod-tutorial-question-textarea iframe {
     max-width: 100%;
 }
+.mod-tutorial-question-table-text-box {
+    width: 60% !important;
+    display: inline-block !important;
+    float: left !important;
+}
+
+.mod-tutorial-question-table-button {
+float: left !important;
+padding-left: 2em !important;
+width: 20% !important;
+}

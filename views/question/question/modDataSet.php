@@ -28,7 +28,7 @@ $urlmode = AppUtility::urlMode();
 <div class="item-detail-content margin-top-fourty">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
-<div class="tab-content shadowBox padding-bottom-thirty">
+<div class="tab-content shadowBox padding-bottom-thirty col-md-12 col-sm-12 padding-left-right-zero">
     <br>
     <div class="shadow-content modify-data-shadow-box">
     <?php
@@ -148,17 +148,17 @@ $urlmode = AppUtility::urlMode();
     ?>">
     <input type="hidden" name="hasimg" value="<?php echo $line['hasimg'];?>"/>
     <div class="col-md-12 col-sm-12 padding-top-twenty">
-       <div class="col-md-2 col-sm-2"><?php AppUtility::t('Description')?>  </div>
-        <div class="col-md-10 col-sm-10"><textarea class="form-control max-width-hundred-per" cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea></div>
+       <div class="col-md-2 col-sm-3"><?php AppUtility::t('Description')?>  </div>
+        <div class="col-md-10 col-sm-9"><textarea class="form-control max-width-hundred-per" cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea></div>
     </div>
     <div class="col-md-12 col-sm-12 padding-top-twenty">
-        <div class="col-md-2 col-sm-2"><?php AppUtility::t('Author')?></div>
-        <div class="col-md-10 col-sm-10"><?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>"></div>
+        <div class="col-md-2 col-sm-3"><?php AppUtility::t('Author')?></div>
+        <div class="col-md-10 col-sm-9"><?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>"></div>
     </div>
     <div class="col-md-12 col-sm-12 padding-top-twenty">
         <?php
         if (!isset($line['ownerid']) || isset($params['template']) || $line['ownerid']==$userId || ($line['userights']==3 && $line['groupid']==$groupId) || $isAdmin || ($isGrpAdmin && $line['groupid']==$groupId)) {
-            echo '<div class="col-md-2 col-sm-2 select-text-margin">Use Rights</div> <div class="col-md-10 col-sm-10"><select class="width-sixty-per form-control" name="userights" id="userights">';
+            echo '<div class="col-md-2 col-sm-3 select-text-margin">Use Rights</div> <div class="col-md-10 col-sm-9"><select class="width-sixty-per form-control" name="userights" id="userights">';
             echo "<option value=\"2\" ";
         if ($line['userights']==AppConstant::NUMERIC_TWO) {echo "SELECTED";}
             echo ">Allow use by all</option>\n";
@@ -175,7 +175,7 @@ $urlmode = AppUtility::urlMode();
     </div>
     <div class="col-md-12 col-sm-12 padding-top-twenty">
             <?php
-            echo '<div class="col-md-2 col-sm-2 select-text-margin">License</div> <div class="col-md-10 col-sm-10"><select class="width-sixty-per form-control" name="license" id="license" onchange="checklicense()">';
+            echo '<div class="col-md-2 col-sm-3 select-text-margin">License</div> <div class="col-md-10 col-sm-9"><select class="width-sixty-per form-control" name="license" id="license" onchange="checklicense()">';
             echo '<option value="0" '.($line['license']==AppConstant::NUMERIC_ZERO?'selected':'').'>Copyrighted</option>';
             echo '<option value="3" '.($line['license']==AppConstant::NUMERIC_THREE?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
             echo '<option value="3" '.($line['license']==AppConstant::NUMERIC_FOUR?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
@@ -193,8 +193,8 @@ $urlmode = AppUtility::urlMode();
             } else {
                 echo '<br/><span id="addattrspan">';
             }
-            echo '<div class="col-md-2 col-sm-2 select-text-margin">Additional Attribution</div>
-            <div class="col-md-10 col-sm-10">
+            echo '<div class="col-md-2 col-sm-3 select-text-margin">Additional Attribution</div>
+            <div class="col-md-10 col-sm-9">
             <input class="form-control width-sixty-per" type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>
             </div>';
             if ($line['otherattribution']!='') {
@@ -210,7 +210,7 @@ $urlmode = AppUtility::urlMode();
 
         </script>
         <div class="col-md-12 col-sm-12 padding-top-twenty">
-           <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('My library assignments')?> </div>
+           <div class="col-md-2 col-sm-3 select-text-margin"><?php AppUtility::t('My library assignments')?> </div>
             <div class="col-md-6 col-sm-6 padding-left-zero">
                 <div class="col-md-3 col-sm-3 select-text-margin"><span id="libnames"><?php echo $lnames;?></span></div>
                 <input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
@@ -220,7 +220,7 @@ $urlmode = AppUtility::urlMode();
            </div>
         </div>
         <div class="col-md-12 col-sm-12 padding-top-twenty">
-           <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Question type')?> </div> <div class="col-md-10 col-sm-10"> <select class="width-sixty-per form-control" name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
+           <div class="col-md-2 col-sm-3 select-text-margin"><?php AppUtility::t('Question type')?> </div> <div class="col-md-10 col-sm-9"> <select class="width-sixty-per form-control" name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
                 <option value="calccomplex" <?php if ($line['qtype']=="calccomplex") {echo "SELECTED";} ?>><?php AppUtility::t('Calculated Complex') ?></option>
                 <option value="calcinterval" <?php if ($line['qtype']=="calcinterval") {echo "SELECTED";} ?>><?php AppUtility::t('Calculated Interval') ?></option>
                 <option value="calcmatrix" <?php if ($line['qtype']=="calcmatrix") {echo "SELECTED";} ?>><?php AppUtility::t('Calculated Matrix') ?></option>
@@ -244,7 +244,7 @@ $urlmode = AppUtility::urlMode();
             </select></div>
         </div>
         <div class="col-md-12 col-sm-12 padding-top-twenty">
-            <div class="col-md-2 col-sm-2">
+            <div class="col-md-2 col-sm-3">
             <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL();?>question/question/help?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a>
            </div>
            <div class="col-md-3 col-sm-3">
@@ -252,40 +252,46 @@ $urlmode = AppUtility::urlMode();
            </div>
         </div>
         <div class="col-md-12 col-sm-12 padding-top-twenty">
-            <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Switch to')?></div>
-            <div class="col-md-10 col-sm-10">
+            <div class="col-md-2 col-sm-3 select-text-margin"><?php AppUtility::t('Switch to')?></div>
+            <div class="col-md-10 col-sm-9">
                 <input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($line['qcontrol']!='' || $line['answer']!='') echo "DISABLED"; ?>/>
                     <?php if (!isset($params['id'])) {
-                    echo ' <a href="mod-tutorial-question?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
+                    echo ' <a class="padding-left-one-em" href="mod-tutorial-question?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
                     }?>
             </div>
         </div>
         <div class="col-md-12 col-sm-12">
         <div id=ccbox class="col-md-12 col-sm-12 padding-top-twenty">
-              <div class="floatleft select-text-margin"><?php AppUtility::t('Common Control')?>
+              <div class="col-md-2 col-sm-3 select-text-margin padding-left-zero">
+                  <?php AppUtility::t('Common Control')?>
                   <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
               </div>
-              <div class="floatleft padding-left-fourty-one">  <input type=submit value="Save">
-                     <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
+              <div class="col-md-6 col-sm-6 padding-left-pt-four-em">
+                  <input type=submit value="Save">
+                  <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
               </div>
         </div></br>
-        <div class="col-md-10 col-sm-10 col-md-offset-2 padding-top-twenty">
+        <div class="col-md-10 col-sm-9 col-md-offset-2 col-sm-offset-3 padding-top-twenty">
             <textarea class="max-width-hundred-per form-control" cols=60 rows=<?php if ($twobx) {echo min(35,max(20,substr_count($line['control'],"\n")+1));} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
         </div>
         </div>
         <div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
                 <div class="col-md-12 col-sm-12 margin-left-sixteen padding-top-twenty">
-                   <div class="floatleft select-text-margin"> <?php AppUtility::t('Question Control')?> <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span></div>
-                   <div class="floatleft margin-left-thirty-eight"> <input type=submit value="Save">
+                   <div class="col-md-2 col-sm-3 select-text-margin padding-left-zero"> <?php AppUtility::t('Question Control')?> <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span></div>
+                   <div class="col-md-6 col-sm-6 padding-left-zero"> <input type=submit value="Save">
                     <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
                    </div>
                 </div>
-            <div class="col-md-10 col-sm-10 col-md-offset-2 padding-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qcontrol'];?></textarea> </div>
+            <div class="col-md-10 col-sm-9 col-md-offset-2 col-sm-offset-3 padding-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qcontrol'];?></textarea> </div>
         </div>
         <div id='qtbox' class="col-md-12 col-sm-12 padding-top-twenty">
            <div class="col-md-12 col-sm-12">
-               <div class="floatleft select-text-margin"><?php AppUtility::t('Question Text') ?> <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span></div>
-               <div class="floatleft margin-left-five-pt-six-per"><input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
+               <div class="col-md-2 col-sm-3 select-text-margin padding-left-zero">
+                   <?php AppUtility::t('Question Text') ?>
+                   <span class=pointer onclick="incboxsize('qtext')">[+]</span>
+                   <span class=pointer onclick="decboxsize('qtext')">[-]</span>
+               </div>
+               <div class="col-md-8 col-sm-8 padding-left-pt-four-em"><input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
                     <input class="margin-left-fifteen" type=submit value="Save">
                     <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
                </div>
@@ -293,17 +299,20 @@ $urlmode = AppUtility::urlMode();
         </div></br>
 
         <div class="col-md-12 col-sm-12 padding-top-twenty">
-           <div class="col-md-10 col-sm-10 col-md-offset-2"> <textarea class="max-width-hundred-per form-control" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea></div>
+           <div class="col-md-10 col-sm-9 col-md-offset-2 col-sm-offset-3"> <textarea class="max-width-hundred-per form-control" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea></div>
         </div>
         <div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
             <div class="col-md-12 col-sm-12 margin-left-sixteen padding-top-twenty">
-                <div class="floatleft select-text-margin"><?php AppUtility::t('Answer')?> <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span></div>
-                <div class="floatleft margin-left-eight-pt-five-per">
+                <div class="col-md-2 col-sm-3 select-text-margin padding-left-zero">
+                    <?php AppUtility::t('Answer')?> <span class=pointer onclick="incboxsize('answer')">[+]</span>
+                    <span class=pointer onclick="decboxsize('answer')">[-]</span>
+                </div>
+                <div class="floatleft col-md-6 col-sm-6 padding-left-zero">
                     <input type=submit value="Save">
                     <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
                 </div>
             </div>
-            <div class="col-md-10 col-sm-10 col-md-offset-2 padding-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea></div>
+            <div class="col-md-10 col-sm-9 col-md-offset-2 col-sm-offset-3 padding-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea></div>
         </div>
 
         <?php
@@ -315,10 +324,10 @@ $urlmode = AppUtility::urlMode();
         }
         ?>
     <div class="col-md-12 col-sm-12 padding-top-twenty">
-       <div class="floatleft select-text-margin"><?php AppUtility::t('Detailed Solution')?>
+       <div class="col-md-2 col-sm-3 select-text-margin padding-left-zero"><?php AppUtility::t('Detailed Solution')?>
          <span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span>
        </div>
-       <div class="floatleft padding-left-fourty-one">
+       <div class="col-md-6 col-sm-8">
             <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
             <input class="margin-left-fifteen" type=submit value="Save">
             <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
@@ -326,7 +335,7 @@ $urlmode = AppUtility::urlMode();
     </div>
     <br>
     <div class="col-md-12 col-sm-12">
-        <div class="col-md-10 col-sm-10 col-md-offset-2 right-ten padding-top-twenty">
+        <div class="col-md-10 col-sm-9 col-md-offset-2 col-sm-offset-3 padding-top-twenty">
             <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
                    onclick="$('#userandnote').toggle()">
             <?php AppUtility::t('Uses random variables from the question.')?>
@@ -343,18 +352,18 @@ $urlmode = AppUtility::urlMode();
 <div id=imgbox class="col-md-12 col-sm-12">
     <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
    <div class="col-md-12 col-sm-12 padding-top-twenty right-ten display-inline-block">
-       <div class="col-md-2 col-sm-2 right-five display-inline-block"><?php AppUtility::t('Image file')?></div>
+       <div class="col-md-2 col-sm-3 right-five display-inline-block"><?php AppUtility::t('Image file')?></div>
        <div class="col-md-3 col-sm-3 display-inline-block"> <input class="image-file-input" type="file" name="imgfile"/></div>
    </div>
     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-fifteen">
-        <span class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Assign to variable')?></span>
-        <div class="col-md-10 col-sm-10 display-inline">
+        <span class="col-md-2 col-sm-3 select-text-margin"><?php AppUtility::t('Assign to variable')?></span>
+        <div class="col-md-10 col-sm-9 display-inline">
                 <input class="form-control display-inline-block width-sixty-one-per" type="text" name="newimgvar" size="6"/>
         </div>
     </div>
     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-fifteen">
-        <div class="col-md-2 col-sm-2 select-text-margin display-inline-block"><?php AppUtility::t('Description')?></div>
-        <div class="col-md-10 col-sm-10 display-inline">
+        <div class="col-md-2 col-sm-3 select-text-margin display-inline-block"><?php AppUtility::t('Description')?></div>
+        <div class="col-md-10 col-sm-9 display-inline">
             <input class="form-control width-sixty-one-per display-inline-block" type="text" size="20" name="newimgalt" value=""/>
         </div>
     </div>
@@ -388,7 +397,7 @@ $urlmode = AppUtility::urlMode();
     }
     ?>
     <div class="col-md-12 col-sm-12 right-ten padding-top-twenty">
-        <div class="col-md-2 col-sm-2 right-five select-text-margin display-inline-block floatleft"><?php AppUtility::t('Help button')?></div>
+        <div class="col-md-2 col-sm-3 right-five select-text-margin display-inline-block floatleft"><?php AppUtility::t('Help button')?></div>
         <div class="col-md-4 col-sm-4 padding-left-zero display-inline-block floatleft">
             <div class="col-md-2 col-sm-2 select-text-margin display-inline-block padding-left-thirteen"><?php AppUtility::t('Type')?></div>
             <div class="col-md-10 col-sm-10 display-inline-block"><select class="form-control" name="helptype">
@@ -416,24 +425,34 @@ $urlmode = AppUtility::urlMode();
         echo '</div></div>';
     }
     if ($myRights==100) {
-        echo '<div class="col-md-12 col-sm-12 padding-top-fifteen display-inline-block"><div class="floatleft select-text-margin display-inline-block">Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
+        echo '<div class="col-md-offset-2 col-md-10 col-sm-9 col-sm-offset-3 padding-top-fifteen display-inline-block">
+        <div class="col-ms-12 col-sm-12 select-text-margin display-inline-block padding-left-zero">Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
         if ($line['replaceby']!=0) {
             echo 'checked="checked"';
         }
-        echo '/> </div> <div class="floatleft margin-left-thirty-eight display-inline-block">Suggested replacement ID<input class="form-control suggested-replace-id" type="text" size="5" name="replaceby" value="';
+        echo '/> </div>
+         <div class="col-md-12 col-sm-12  padding-left-zero padding-top-one-em">
+        <div class="display-inline-block col-md-5 col-sm-12 padding-left-zero">
+        <span class="floatleft select-text-margin">Suggested replacement ID</span>
+        <span class="padding-left-one-em"><input class="form-control suggested-replace-id" type="text" size="5" name="replaceby" value="';
         if ($line['replaceby']>0) {
             echo $line['replaceby'];
         }
-        echo '"/></div>  <div class="floatleft margin-left-thirty-eight select-text-margin display-inline-block"> Do not use this unless you know what you\'re doing</div></div>';
+        echo '"/></span>
+        </div>
+        <div class="col-md-7 col-sm-12 select-text-margin display-inline-block padding-left-right-zero"> Do not use this unless you know what you\'re doing</div></div>
+        </div>';
     }
     if ($line['deleted']==1 && ($myRights==100 || $ownerid==$userId)) {
         echo '<p>This question is currently marked as deleted. <label><input type="checkbox" name="undelete"> Un-delete question</p>';
     }
     ?>
 </div>
-<div class="col-md-12 col-sm-12 save-question margin-left-fifteen padding-top-twenty display-inline-block">
-    <input type=submit value="Save">
-    <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
+<div class="col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-10 padding-top-twenty display-inline-block">
+    <div class="col-md-12 col-md-12 padding-left-ten">
+        <input type=submit value="Save">
+        <input class="margin-left-fifteen" type=submit name=test value="Save and Test Question">
+    </div>
 </div>
     </form>
     </div>

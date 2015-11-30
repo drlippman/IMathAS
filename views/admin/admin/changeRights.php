@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
             AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
             AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
             AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
-        <?php echo $form->field($model, 'groupid')->dropDownList(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
+        <?php echo $form->field($model, 'groupid')->dropDownLcist(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
         <div class="form-group">
             <div class="col-md-offset-2">
                 <?php echo Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>

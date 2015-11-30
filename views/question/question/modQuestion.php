@@ -1,4 +1,4 @@
-<?php
+\<?php
 use app\components\AppUtility;
 use yii\helpers\Html;
 use app\components\AppConstant;

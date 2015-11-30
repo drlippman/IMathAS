@@ -23,11 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
  </div>
 <?php
-    echo '<div class="tab-content shadowBox non-nav-tab-item">';
-    echo "<form class='margin-thirty categorize-question-form' method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
+    echo '<div class="tab-content shadowBox non-nav-tab-item col-md-12 col-sm-12 padding-top-two-em">';
+    echo "<form method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
 
     echo '<table class="margin-top-twenty width-hundread-per categorize-question-table"><thead><tr>
-    <th class="text-align-left">
+    <th class="text-align-left padding-left-one-pt-eight-em">
         <div class="checkbox override-hidden">
             <label>
                 <input type="checkbox" name="categorize-question-header-checked" value="">
@@ -108,7 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     echo "</tbody></table>\n";
     if (count($outcomes)>0) {
-        echo '<p>Apply outcome to selected: <select class="form-control width-twenty-per display-inline-block" id="masssel">';
+        echo '<p class="col-md-12 col-sm-12">Apply outcome to selected: <select class="form-control width-twenty-per display-inline-block" id="masssel">';
         $ingrp = false;
         $issel = false;
         foreach ($outcomes as $oc) {
@@ -125,11 +125,11 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
     }
-    echo "<p class='col-sm-12'>".AppUtility::t('Select first listed library for all uncategorized questions',false)."<input class='margin-left-ten' type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
-    echo "<p class='col-sm-12'>".AppUtility::t('Add new category to lists',false)."<input class='form-control display-inline-block width-fourty-per margin-left-ten' type=type id=\"newcat\" size=40> ";
+    echo "<p class='col-md-12 col-sm-12'>".AppUtility::t('Select first listed library for all uncategorized questions',false)."<input class='margin-left-ten' type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+    echo "<p class='col-md-12 col-sm-12'>".AppUtility::t('Add new category to lists',false)."<input class='form-control display-inline-block width-fourty-per margin-left-ten' type=type id=\"newcat\" size=40> ";
     echo "<input class='margin-left-ten' type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-    echo '<p class="col-sm-12"><input type=submit value="Record Categorizations"> <span class="margin-left-ten">'.AppUtility::t('and return to the course page.',false).'</span></p>'; ?>
-    <div class="col-md-4 padding-top-twenty-five padding-bottom-thirty">
+    echo '<p class="col-md-12 col-sm-12"><input type=submit value="Record Categorizations"> <span class="margin-left-ten">'.AppUtility::t('and return to the course page.',false).'</span></p>'; ?>
+    <div class="col-md-4 col-sm-4 padding-top-twenty-five padding-bottom-thirty">
         <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/>
     </div>
 <?php echo "</form>\n";

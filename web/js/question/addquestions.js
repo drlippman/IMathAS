@@ -60,7 +60,7 @@ function moveitem(from) {
 
 function previewq(formn,loc,qn,docheck,onlychk) {
     var previewqaddr = document.getElementById("address").value;
-   var addr = previewqaddr+'&qsetid='+qn;alert(addr);
+   var addr = previewqaddr+'&qsetid='+qn;
    if (formn!=null) {
 	    addr +='&formn='+formn;
    }
@@ -159,6 +159,7 @@ function setlibnames(libn) {
 
 $("#add-question").click(function() {
     $("input[name=some_name]").attr("name", "add");
+    $("input[name=add-question-name]").attr("name", "add-question-grid-ui");
     document.forms["selq"].submit()
 });
 $("#add-question-default").click(function() {
