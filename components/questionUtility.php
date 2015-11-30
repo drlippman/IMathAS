@@ -1,14 +1,22 @@
 <?php
+namespace app\components;
+
 use app\models\Questions;
 use app\models\Assessments;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\QuestionSet;
-use app\controllers\AppController; ?>
+use Yii;
+use yii\base\Component;
+use app\controllers\AppController;
+class  questionUtility extends Component
+{
 
-<!--<div class="tab-content shadowBox margin-top-fourty">-->
-<?php if (!(isset($teacherId))) {
-    echo "This page cannot be accessed directly";
+    public static function addQuestion($params, $teacherId,$assessmentId,$courseId)
+    {
+
+if (!(isset($teacherId))) {
+   $addQuestionData = "This page cannot be accessed directly";
 }
 if ($params['process']== true) {
     if (isset($params['add'])) {
@@ -143,20 +151,20 @@ if ($params['process']== true) {
         Assessments::setItemOrder($itemOrder, $assessmentId);
     }
 } else {
-?>
-<div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
-<p>For more advanced settings, modify the settings for individual questions after adding.
-    <?php
+
+$addQuestionData .= '<div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
+<p>For more advanced settings, modify the settings for individual questions after adding.';
+
     if (isset($params['checked'])) { //modifying existing
-        echo "<form method=post action=\"add-questions?modqs=true&process=true&cid=$courseId&aid=$assessmentId\">";
+        $addQuestionData .= "<form method=post action=\"add-questions?modqs=true&process=true&cid=$courseId&aid=$assessmentId\">";
     } else {
-        echo "<form method=post action=\"add-questions?addset=true&process=true&cid=$courseId&aid=$assessmentId\">";
+        $addQuestionData .= "<form method=post action=\"add-questions?addset=true&process=true&cid=$courseId&aid=$assessmentId\">";
     }
-    ?>
-    Leave items blank to use the assessment's default values<br/>
+
+    $addQuestionData .= "Leave items blank to use the assessment's default values<br/>
 <table class=gb>
-    <thead><tr>
-        <?php
+    <thead><tr> ";
+
         if (isset($params['checked'])) { //modifying existing questions
 
             $qids = array();
@@ -205,8 +213,8 @@ if ($params['process']== true) {
                 $qRows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
                 $qRows[$row['id']] .= '</tr>';
             }
-            echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
-            echo "<tbody>";
+            $addQuestionData .= "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
+            $addQuestionData .= "<tbody>";
 
             $query = Assessments::getByAssessmentId($assessmentId);
             $itemOrder = explode(',', $query['itemorder']);
@@ -218,23 +226,23 @@ if ($params['process']== true) {
                     }
                     foreach ($subs as $sub) {
                         if (isset($qRows[$sub])) {
-                            echo $qRows[$sub];
+                            $addQuestionData .= $qRows[$sub];
                         }
                     }
                 } else if (isset($qRows[$item])) {
-                    echo $qRows[$item];
+                    $addQuestionData .= $qRows[$item];
                 }
             }
 
-            echo '</tbody></table>';
-            echo '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
-            echo '<input type=hidden name="mod" value="true" />';
+            $addQuestionData .= '</tbody></table>';
+            $addQuestionData .= '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
+            $addQuestionData .= '<input type=hidden name="mod" value="true" />';
 
-            echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
+            $addQuestionData .= '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
 
         } else { //adding new questions
-            echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
-            echo "<tbody>";
+            $addQuestionData .= "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
+            $addQuestionData .= "<tbody>";
             $query = QuestionSet::getQuestionSetData($params['nchecked']);
             foreach ($query as $row) {
                 if ($row['qtype']=='multipart') {
@@ -243,7 +251,7 @@ if ($params['process']== true) {
                 } else {
                     $n = 1;
                 }
-                echo '<tr><td>'.$row['description'].'</td>';
+                $addQuestionData .= '<tr><td>'.$row['description'].'</td>';
                 if ($row['extref']!='') {
                     $extRef = explode('~~',$row['extref']);
                     $hasVideo = false;  $hasOther = false;
@@ -256,33 +264,36 @@ if ($params['process']== true) {
                     }
                     $pageQuestionTable[$i]['extref'] = '';
                     if ($hasVideo) {
-                        echo "<td><img src=".AppUtility::getHomeURL().'img/video_tiny.png'."></td>";
+                        $addQuestionData .= "<td><img src=".AppUtility::getHomeURL().'img/video_tiny.png'."></td>";
                     }
                     if ($hasOther) {
-                        echo "<td><img src=".AppUtility::getHomeURL().'img/html_tiny.png'."/></td>";
+                        $addQuestionData .= "<td><img src=".AppUtility::getHomeURL().'img/html_tiny.png'."/></td>";
                     }
                 } else {
-                    echo '<td></td>';
+                    $addQuestionData .= '<td></td>';
                 }
-                echo "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"\" />";
-                echo '<input type="hidden" name="qparts'.$row['id'].'" value="'.$n.'"/></td>';
-                echo "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"\" /></td>";
-                echo "<td><select name=\"showhints{$row['id']}\">";
-                echo '<option value="0" selected="selected">Use Default</option>';
-                echo '<option value="1">No</option>';
-                echo '<option value="2">Yes</option></select></td>';
-                echo "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"1\" /></td>";
-                echo '</tr>';
+                $addQuestionData .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"\" />";
+                $addQuestionData .= '<input type="hidden" name="qparts'.$row['id'].'" value="'.$n.'"/></td>';
+                $addQuestionData .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"\" /></td>";
+                $addQuestionData .= "<td><select name=\"showhints{$row['id']}\">";
+                $addQuestionData .= '<option value="0" selected="selected">Use Default</option>';
+                $addQuestionData .= '<option value="1">No</option>';
+                $addQuestionData .= '<option value="2">Yes</option></select></td>';
+                $addQuestionData .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"1\" /></td>";
+                $addQuestionData .= '</tr>';
             }
-            echo '</tbody></table>';
-            echo '<input type=hidden name="qsetids" value="'.implode(',',$params['nchecked']).'" />';
-            echo '<input type=hidden name="add" value="true" />';
+            $addQuestionData .= '</tbody></table>';
+            $addQuestionData .= '<input type=hidden name="qsetids" value="'.implode(',',$params['nchecked']).'" />';
+            $addQuestionData .= '<input type=hidden name="add" value="true" />';
 
-            echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';
-            echo '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
-            echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
+            $addQuestionData .= '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';
+            $addQuestionData .= '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
+            $addQuestionData .= '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
         }
-        echo '</form>';
+        $addQuestionData .= '</form>';
         }
-        ?>
-<!--</div>-->
+
+        return $addQuestionData;
+    }
+}
+?>

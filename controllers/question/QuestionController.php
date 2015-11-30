@@ -5,6 +5,7 @@ namespace app\controllers\question;
 
 use app\components\AppUtility;
 use app\components\filehandler;
+use app\components\questionUtility;
 use app\controllers\AppController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
@@ -36,6 +37,7 @@ class QuestionController extends AppController
 
     public function actionAddQuestions()
     {
+//        AppUtility::dump($this->getRequestParams());
         $user = $this->getAuthenticatedUser();
         $groupId = $user['groupid'];
         $userId = $user['id'];
@@ -86,14 +88,19 @@ class QuestionController extends AppController
             }
             if (($teacherId) && isset($params['addset'])) {
                 if (!isset($params['nchecked']) && !isset($params['qsetids'])) {
+
                     $this->setErrorFlash(AppConstant::NO_QUESTION_SELECTED);
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                 } else if (isset($params['add'])) {
-                    include("../views/question/question/modQuestionGrid.php");
+//                    include("../views/question/question/modQuestionGrid.php");
+//                    $renderData = array('params' => $params, 'teacherId' => $teacherId, 'assessmentId' => $assessmentId,'courseId' => $courseId);
+//                    return $this->renderWithData('addQuestions', $renderData);
+                    $addQuestionData = questionUtility::addQuestion($params, $teacherId,$assessmentId,$courseId);
                     if (isset($params['process'])) {
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                     }
-                } else {
+
+                } else {AppUtility::dump('3');
                     $checked = $params['nchecked'];
                     foreach ($checked as $questionSetId) {
                         $questionData = array(
@@ -145,7 +152,7 @@ class QuestionController extends AppController
                     $this->setErrorFlash(AppConstant::NO_QUESTION_SELECTED);
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                 } else {
-                    include("../views/question/question/modQuestionGrid.php");
+                    $addQuestionData = questionUtility::addQuestion($params, $teacherId,$assessmentId,$courseId);
                     if (isset($params['process'])) {
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                     }
@@ -788,7 +795,7 @@ class QuestionController extends AppController
         }
         $this->includeCSS(['question/question.css', 'course/course.css', 'roster/roster.css']);
         $this->includeJS(['jquery.min.js', 'question/addquestions.js', 'tablesorter.js', 'general.js', 'question/junkflag.js', 'question/addqsort.js']);
-        $responseArray = $this->addQuestionRenderData($course, $assessmentId, $params, $overwriteBody, $body, $defPoints, $searchLibs, $beenTaken, $pageAssessmentName, $itemOrder, $sessionData, $jsArray, $displayMethod, $lNames, $search, $searchAll, $searchMine, $newOnly, $noSearchResults, $pageLibRowHeader, $pageUseAvgTimes, $pageLibsToUse, $alt, $lNamesArray, $pageLibQIds, $pageQuestionTable, $qid, $pageAssessmentQuestions, $pageAssessmentList, $address);
+        $responseArray = $this->addQuestionRenderData($course, $assessmentId, $params, $overwriteBody, $body, $defPoints, $searchLibs, $beenTaken, $pageAssessmentName, $itemOrder, $sessionData, $jsArray, $displayMethod, $lNames, $search, $searchAll, $searchMine, $newOnly, $noSearchResults, $pageLibRowHeader, $pageUseAvgTimes, $pageLibsToUse, $alt, $lNamesArray, $pageLibQIds, $pageQuestionTable, $qid, $pageAssessmentQuestions, $pageAssessmentList, $address,$addQuestionData);
         return $this->renderWithData('addQuestions', $responseArray);
     }
 
@@ -844,7 +851,7 @@ class QuestionController extends AppController
      * @param $address
      * @return array
      */
-    public function addQuestionRenderData($course, $assessmentId, $params, $overwriteBody, $body, $defPoints, $searchLibs, $beenTaken, $pageAssessmentName, $itemOrder, $sessionData, $jsArray, $displayMethod, $lNames, $search, $searchAll, $searchMine, $newOnly, $noSearchResults, $pageLibRowHeader, $pageUseAvgTimes, $pageLibsToUse, $alt, $lNamesArray, $pageLibQIds, $pageQuestionTable, $qid, $pageAssessmentQuestions, $pageAssessmentList, $address)
+    public function addQuestionRenderData($course, $assessmentId, $params, $overwriteBody, $body, $defPoints, $searchLibs, $beenTaken, $pageAssessmentName, $itemOrder, $sessionData, $jsArray, $displayMethod, $lNames, $search, $searchAll, $searchMine, $newOnly, $noSearchResults, $pageLibRowHeader, $pageUseAvgTimes, $pageLibsToUse, $alt, $lNamesArray, $pageLibQIds, $pageQuestionTable, $qid, $pageAssessmentQuestions, $pageAssessmentList, $address, $addQuestionData)
     {
         $responseArray = array('course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body,
             'defpoints' => $defPoints, 'searchlibs' => $searchLibs, 'beentaken' => $beenTaken, 'pageAssessmentName' => $pageAssessmentName,
@@ -852,7 +859,7 @@ class QuestionController extends AppController
             'search' => $search, 'searchall' => $searchAll, 'searchmine' => $searchMine, 'newonly' => $newOnly, 'noSearchResults' => $noSearchResults,
             'pageLibRowHeader' => $pageLibRowHeader, 'pageUseavgtimes' => $pageUseAvgTimes, 'pageLibstouse' => $pageLibsToUse, 'altr' => $alt,
             'lnamesarr' => $lNamesArray, 'pageLibqids' => $pageLibQIds, 'pageQuestionTable' => $pageQuestionTable, 'qid' => $qid,
-            'pageAssessmentQuestions' => $pageAssessmentQuestions, 'pageAssessmentList' => $pageAssessmentList, 'address' => $address);
+            'pageAssessmentQuestions' => $pageAssessmentQuestions, 'pageAssessmentList' => $pageAssessmentList, 'address' => $address,'addQuestionData' => $addQuestionData);
         return $responseArray;
     }
 

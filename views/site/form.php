@@ -66,7 +66,7 @@ $urlmode = AppUtility::urlMode();
         <?php } ?>
 
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
-            <div class="col-md-2 col-sm-3 padding-top-pt-five-em">
+            <div class="col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero">
                 <label for="dochgpw"><?php AppUtility::t('Change Password?'); ?></label>
             </div>
             <div class="col-md-2 col-sm-2 col-xs-2">
@@ -122,7 +122,7 @@ $urlmode = AppUtility::urlMode();
                 <label for="stupic"><?php AppUtility::t('Picture'); ?></label>
             </div>
             <div class="col-md-8 col-sm-8 padding-left-zero">
-               <div class="col-md-3 col-sm-4">
+               <div class="col-md-4 col-sm-5 padding-bottom-one-em">
                    <?php if ($line['hasuserimg'] == 1) {
                         if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                             echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\"/>
@@ -140,7 +140,7 @@ $urlmode = AppUtility::urlMode();
                         echo "No Pic ";
                     } ?>
                </div>
-               <div class="col-md-4 col-sm-6">
+               <div class="col-md-12 col-sm-12">
                    <input type="file" name="stupic">
                </div>
             </div>
@@ -267,7 +267,7 @@ $urlmode = AppUtility::urlMode();
                     <div class='col-md-8 col-sm-10'>Use default question library for all templated questions?</div>
                 </div>
             </div>
-            <div class='col-md-12 col-sm-12 padding-top-one-em'>
+            <div class='col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-9 padding-top-one-em'>
                 Default question library is used for all local (assessment-only) copies of questions created when you
                 edit a question (that's not yours) in an assessment.  You can elect to have all templated questions
                 be assigned to this library.
@@ -275,16 +275,16 @@ $urlmode = AppUtility::urlMode();
 
         <?php } if ($tzname != '') { ?>
             <div class="col-md-4 col-sm-4 font-size-twenty-one padding-top-one-em">Timezone</div>
-            <div class="col-md-12 col-sm-12 padding-top-one-em">
+            <div class="col-md-offset-2 col-md-10 col-sm-9 col-sm-offset-3 padding-top-one-em">
                 <?php AppUtility::t('Due Dates and other times are being shown to you correct for the'); ?>
                 <b> <?php echo $tzname ?> </b><?php AppUtility::t('timezone.'); ?>
             </div>
-            <div class="col-md-12 col-sm-12 padding-top-one-em">
+            <div class="col-md-offset-2 col-md-10 col-sm-9 col-sm-offset-3 padding-top-one-em">
                 You may change the timezone the dates display based on if you would like. This change will only last until you close your browser or log out.
             </div>
-            <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
-                <span class="col-md-2 col-sm-3">Set timezone to</span>
-                <span class="col-md-2 col-sm-3 padding-left-zero">
+            <div class="col-md-12 col-sm-12 padding-top-two-em">
+                <span class="col-md-2 col-sm-3 padding-left-zero">Set timezone to</span>
+                <span class="col-md-2 col-sm-3 padding-left-five">
                     <select class="form-control margin-left-zero" name="settimezone" id="settimezone">
                     <?php $timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
                     foreach ($timezones as $tz) {
@@ -294,7 +294,7 @@ $urlmode = AppUtility::urlMode();
                </span>
             </div>
         <?php } ?>
-        <div class="col-md-2 col-sm-2 padding-top-one-em padding-bottom-two-em">
+        <div class="col-md-offset-2 col-sm-offset-3 col-md-2 col-sm-2 padding-top-one-em padding-bottom-two-em">
             <input type=submit value='Update Info'>
         </div>
 <!--        <p>-->

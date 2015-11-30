@@ -1580,3 +1580,9 @@ margin-left: 1em;
     max-width: 100%;
     width: 100%;
 }
+.padding-left-one-pt-eight-em {
+    padding-left: 1.8em;
+}
+.padding-left-pt-four-em {
+    padding-left: 0.4em;
+}

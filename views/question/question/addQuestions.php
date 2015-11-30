@@ -6,13 +6,14 @@ $this->title = AppUtility::t('Add Question', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!--Get current time-->
+
 <input type="hidden" class="" value="<?php echo $courseId = $course->id?>">
 <?php $imasroot = AppUtility::getHomeURL().'img';?>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $courseId]]); ?>
 </div>
 <!--Course name-->
-<div class="title-container">
+<div class="title-container padding-bottom-two-em">
     <div class="row">
         <div class="col-sm-12 padding-right-zero">
             <div class=" col-sm-7" style="right: 30px;">
@@ -29,7 +30,14 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox margin-top-fourty">
+
+
+<?php if(isset($params['add-question-grid-ui']) || $params['modqs']) { ?>
+    <div class="tab-content shadowBox padding-left-right-twenty padding-top-bottom-two-em">
+  <?php  echo $addQuestionData; ?>
+    </div>
+<?php } else { ?>
+    <div class="tab-content shadowBox">
     <?php if ($overwriteBody == AppConstant::NUMERIC_ONE) {
            echo $body; ?>
     <script>
@@ -212,6 +220,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="col-md-6 right-fifteen display-inline-block padding-left-zero"><h3 class="margin-top-seven">Potential Questions</h3></div>
                             <div class="col-md-2 right-float left-fifteen margin-bottom-fifteen padding-right-zero width-two-hundred">
                                 <input type="hidden" name="some_name">
+                                <input type="hidden" name="add-question-name">
                                 <div class="with-selected">
                                     <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
                                         <li class="dropdown">
@@ -521,3 +530,5 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php } ?>
     </div>
 </div>
+
+<?php } ?>
