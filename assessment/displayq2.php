@@ -595,8 +595,20 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	unset($stuanswers[$thisq]);  //unset old stuanswer for this question
 	
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
-		for ($kidx=0;$kidx<count($_POST);$kidx++) {
-			$partnum = ($qnidx+1)*1000 + $kidx;
+		$postpartstoprocess = array();
+		foreach ($_POST as $postk=>$postv) {
+			$prefix = substr($postk,0,2);
+			if ($prefix=='tc' || $prefix=='qn') {
+				$partnum = intval(substr($postk,2,4));
+				$kidx = round($partnum - 1000*floor($partnum/1000));
+				$postpartstoprocess[$partnum] = array(floor($partnum/1000)-1, $kidx);
+			}
+		}
+		foreach ($postpartstoprocess as $partnum=>$partbits) {
+			$qnidx = $partbits[0];
+			$kidx = $partbits[1];
+		//for ($kidx=0;$kidx<$qptcnt;$kidx++) {
+		//	$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["tc$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["tc$partnum"]);
 				if ($_POST["qn$partnum"]==='') {
