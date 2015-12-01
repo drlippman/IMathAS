@@ -3118,8 +3118,9 @@ class AppUtility extends Component
         echo '</ul>';
         if ($type == 'take') { ?>
             <div class="center">
-            <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br>
+            <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br><br/>
             <a  id="unhidelink" class="course-taking small" href="<?php echo AppUtility::getURLFromHome('site', 'unhide-from-course-list') ?>">Unhide hidden courses</a>
+
             <?php
             if($isCourseHidden){
                 ?>

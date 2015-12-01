@@ -186,7 +186,7 @@ switch ($action) {
               </div>';
         if ($params['action'] == "modify") {
             echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">
-                        <div class="col-md-3 col-sm-4 padding-top-five">' . AppUtility::t('Lock for assessment', false) . '</div>
+                        <div class="col-md-3 col-sm-3 padding-top-five">' . AppUtility::t('Lock for assessment', false) . '</div>
                         <div class="col-md-4 col-sm-4">
                             <select class="form-control" name="lockaid">';
             echo '<option value="0" ';
@@ -196,11 +196,12 @@ switch ($action) {
             echo '>No lock</option>';
             if ($assessment) {
                 foreach ($assessment as $key => $row) {
+                    $rowName = AppUtility::truncate($row['name'], 30);
                     echo "<option value=\"{$row['id']}\" ";
                     if ($lockaid == $row['id']) {
                         echo 'selected="1"';
                     }
-                    echo ">{$row['name']}</option>";
+                    echo ">{$rowName}</option>";
                 }
             }
             echo '</select>
@@ -370,7 +371,7 @@ switch ($action) {
             <div class="col-md-3 col-sm-3">' . AppUtility::t('LTI access secret (max 10 chars; blank to not use)', false) . '</div>';
             echo '
 
-            <div class="col-md-6 col-sm-6">
+            <div class="col-md-6 col-sm-9">
             <input class="form-control width-sixty-four-per display-inline-block" name="ltisecret" type="text" value="' . $ltisecret . '" maxlength="10"/> ';
             echo '<button class="margin-left-ten" type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">' . _('Show LTI key and URL') . '</button>';
             echo '<span id="ltiurl" style="display:none;">';
