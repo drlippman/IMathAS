@@ -3067,11 +3067,13 @@ class AppUtility extends Component
 
     public static function printCourses($data,$title,$type=null, $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null) {
         global $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses, $isStudent;
+        $isCourseHidden = false;
         if (count($data) == 0 && $type == 'tutor') {
             return;
         }
         global $myRights,$newMsgCnt,$newPostCnt,$user;
         $userId = $user['id'];
+        $students = Student::getByUserId($userId);
         echo '<div class="block margin-left-fifteen margin-right-fifteen"><h3>'.$title.'</h3></div>';
         echo '<div class="blockitems margin-left-fifteen margin-right-fifteen"><ul class="nomark courselist">';
         for ($i=0; $i<count($data); $i++) {
@@ -3084,9 +3086,9 @@ class AppUtility extends Component
             $lockId = $courseStudent['lockaid'];
             $locked = Student::getStudentData($userId, $data[$i]['id']);
             echo '<li>';
-            if ($type=='take') {
-                echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
-            }
+            if ($type=='take') { ?>
+                <span class="delx" onclick="return hidefromcourselist(<?php echo $data[$i]['id'] ?>,this);" title="Hide from course list">x</span>
+           <?php }
             if ($isStudent && ($lockId > 0)) {
                 ?>
                 <a class="word-wrap-break-word" href="#" onclick="locked()">
@@ -3103,18 +3105,30 @@ class AppUtility extends Component
             if (isset($data[$i]['lockaid']) && $data[$i]['lockaid'] > 0) {
                 echo ' <span style="color:green;">', _('Lockdown'), '</span>';
             }
-
             echo '</li>';
+        }
+        foreach($students as $key=>$studentData){
+            if($studentData->hidefromcourselist){
+                $isCourseHidden = true;
+            }
         }
         if ($type == 'teach' && $myRights > 39 && count($data)==0) {
             echo '<li>', _('To add a course, head to the Admin Page'), '</li>';
         }
         echo '</ul>';
         if ($type == 'take') { ?>
-            <div class="center"><a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll In a New Class</a><br>
-<!--            <a  id="unhidelink" class="course-taking small" href="--><?php //echo AppUtility::getURLFromHome('site', 'unhide-from-course-list') ?><!--">Unhide hidden courses</a>-->
-            <?php echo '<br><a id="unhidelink" '.($stuHasHiddenCourses?'':'style="display:none"').' class="small" href="site/unhide-from-course-list">Unhide hidden courses</a>';
-            echo '</div>';
+            <div class="center">
+            <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br>
+            <a  id="unhidelink" class="course-taking small" href="<?php echo AppUtility::getURLFromHome('site', 'unhide-from-course-list') ?>">Unhide hidden courses</a>
+            <?php
+            if($isCourseHidden){
+                ?>
+                <input type="hidden" class="hidden-course" value="<?php echo $isCourseHidden ?>">
+            <?php
+            }
+            ?>
+
+        <?php echo '</div>';
         } else if ($type=='teach' && $myRights > 39) { ?>
             <div class="center">
                 <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index') ?>">Admin

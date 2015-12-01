@@ -109,7 +109,9 @@ class Teacher extends BaseImasTeachers
     public static function getDataByUserId($userId)
     {
         $query = new Query();
-        $query->select('ic.id,ic.name')->from('imas_courses AS ic')->join('INNER JOIN','imas_teachers AS it','ic.id=it.courseid')
+        $query->select('ic.id,ic.name')
+            ->from('imas_courses AS ic')
+            ->join('INNER JOIN','imas_teachers AS it','ic.id=it.courseid')
             ->where('it.userid = :userid')->orderBy('ic.name');
         $command = $query->createCommand();
         return $command->bindValue(':userid',$userId)->queryAll();

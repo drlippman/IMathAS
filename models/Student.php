@@ -612,5 +612,10 @@ class Student extends BaseImasStudents
         }
         return $query->createCommand()->bindValue(':courseId',$courseId)->queryAll();
     }
+
+    public static function getByUserIdOne($id)
+    {
+        return static::findOne(['userid' => $id]);
+    }
 }
 
