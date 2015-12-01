@@ -123,7 +123,7 @@ $now = $currentTime;
 
                     echo "</div>
                     <div class=blockitems>";
-        //            echo filter($row['imas_forum_posts.message']); ?>
+                    echo filter($row['message']); ?>
                      <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
                      </div>
 

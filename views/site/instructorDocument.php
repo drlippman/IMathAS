@@ -2,14 +2,21 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 
-$this->title = AppUtility::t('Instructor documents',false);
-$this->params['breadcrumbs'][] = ['label' => 'About Us', 'url' => ['/site/about']];
-//$this->params['breadcrumbs'][] = $this->title;
+$this->title = AppUtility::t('Documentation',false);
 ?>
-<div class="site-about">
-    <h1 style="color: #ffffff"><?php echo $this->title; ?></h1>
+
+<div class="item-detail-header">
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL()], 'page_title' => $this->title]); ?>
 </div>
-<div class="tab-content shadowBox padding-left-thirty padding-top-twenty">
+
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox padding-one-em scroll-x" >
 <h2><?php AppUtility::t('Guides')?></h2>
 <h4><?php AppUtility::t('Use Guides')?></h4>
 <ul>

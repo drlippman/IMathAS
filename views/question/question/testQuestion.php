@@ -11,10 +11,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--Get current time-->
 <input type="hidden" class="" value="<?php echo $courseId = $course->id?>">
 <?php $imasroot = AppUtility::getHomeURL();?>
-<div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $courseId]]); ?>
-</div>
-<!--Course name-->
 
 <div class = "title-container">
     <div class="row">
@@ -159,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>
                         </div>";
         echo "</div></form>";
-        echo "<div class='col-sm-12 background-color-gery word-break-break-all'>";
+        echo "<div class='col-sm-12 background-color-gery word-break-break-all padding-bottom-one-em'>";
         echo '<code id="qhtml" style="display:none">';
         $message = displayq(0,$params['qsetid'],$seed,false,false,0,true);
         $message = printfilter(forcefiltergraph($message));

@@ -87,18 +87,13 @@ class QuestionController extends AppController
             }
             if (($teacherId) && isset($params['addset'])) {
                 if (!isset($params['nchecked']) && !isset($params['qsetids'])) {
-
                     $this->setErrorFlash(AppConstant::NO_QUESTION_SELECTED);
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                 } else if (isset($params['add'])) {
-//                    include("../views/question/question/modQuestionGrid.php");
-//                    $renderData = array('params' => $params, 'teacherId' => $teacherId, 'assessmentId' => $assessmentId,'courseId' => $courseId);
-//                    return $this->renderWithData('addQuestions', $renderData);
                     $addQuestionData = questionUtility::addQuestion($params, $teacherId,$assessmentId,$courseId);
                     if (isset($params['process'])) {
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                     }
-
                 } else {
                     $checked = $params['nchecked'];
                     foreach ($checked as $questionSetId) {
@@ -643,11 +638,11 @@ class QuestionController extends AppController
                                 }
                                 $pageQuestionTable[$i]['add'] = "<a style='background-color: #008E71;  width: 85%;' class='btn btn-primary add-btn-question' href=" . AppUtility::getURLFromHome('question', 'question/mod-question?qsetid=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId) . "><i class='fa fa-plus'></i>&nbsp; Add</a>";
 
-//                                if ($line['userights'] > AppConstant::NUMERIC_THREE || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['ownerid'] == $userId) {
-//                                    $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&frompot=1') . "><i class='fa fa-fw'></i> Edit</a>";
-//                                } else {
+                                if ($line['userights'] > AppConstant::NUMERIC_THREE || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['ownerid'] == $userId) {
+                                    $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&frompot=1') . "><i class='fa fa-fw'></i> Edit</a>";
+                                } else {
                                     $pageQuestionTable[$i]['src'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/view-source?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId) . "><i class='fa fa-fw'></i> View</a>";
-//                                }
+                                }
 
                                 $pageQuestionTable[$i]['templ'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/mod-data-set?id=' . $line['id'] . '&aid=' . $assessmentId . '&cid=' . $courseId . '&template=' . true) . "><i class='fa fa-archive'></i> Template</a>";
                                 $ln++;

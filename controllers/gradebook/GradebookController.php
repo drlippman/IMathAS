@@ -4439,6 +4439,7 @@ class GradebookController extends AppController
 
     public function actionEditToolScore()
     {
+
         $isTutor = false;
         $isTeacher = false;
         $params = $this->getRequestParams();
@@ -4447,6 +4448,7 @@ class GradebookController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $isTutor = $this->isTutor($currentUser['id'],$courseId);
         $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+        $this->layout = 'master';
         $lid = intval($params['lid']);
         $linkData = LinkedText::getLinkDataByIdAndCourseID($lid,$courseId);
         if (!$linkData)
@@ -4454,6 +4456,7 @@ class GradebookController extends AppController
             $this->setWarningFlash('invalid item');
             return $this->goBack();
         }
+
         $name = $linkData['title'];
         $text = $linkData['text'];
         $points = $linkData['points'];
@@ -4504,6 +4507,7 @@ class GradebookController extends AppController
                 }
             }
         }
+
         ///regular submit
         if (isset($params['score']))
         {
@@ -4520,6 +4524,7 @@ class GradebookController extends AppController
                 }
             }
         }
+
         if (isset($params['newscore']))
         {
             foreach($params['newscore'] as $k=>$sc)
@@ -4552,6 +4557,7 @@ class GradebookController extends AppController
                 }
             }
         }
+
         if (isset($params['score']) || isset($params['newscore']) || isset($params['name']))
         {
             $this->redirect('gradebook?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid']);
@@ -4581,6 +4587,7 @@ class GradebookController extends AppController
         } else {
             $sortOrder = "name";
         }
+
         $tutorData = Tutor::getByUserId($currentUser['id'],$courseId);
         $tutorSection = trim($tutorData['section']);
         $externalToolData = Grades::getExternalToolData($lid,$params['uid']);
@@ -4589,7 +4596,8 @@ class GradebookController extends AppController
         {
             $this->includeJS(['tablesorter.js']);
         }
-        $this->includeJS(['gradebook/addgrades.js']);
+        $this->includeJS(['gradebook/manageaddgrades.js','gradebook/addgrades.js' ]);
+
         $responseData = array('studentData' => $studentData,'course' => $course,'externalToolData' => $externalToolData,'linkData' => $linkData,'params' => $params,'hassection' => $hasSection);
         return $this->renderWithData('editToolScore',$responseData);
     }

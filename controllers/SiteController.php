@@ -66,8 +66,10 @@ class SiteController extends AppController
 
     public function actions()
     {
+        $this->layout = 'master';
         return [
             'error' => [
+
                 'class' => 'yii\web\ErrorAction',
             ],
             'captcha' => [

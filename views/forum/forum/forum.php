@@ -126,7 +126,7 @@ if (count($taginfo)==0) {
         } else if ($searchtype == 'thread') { ?>
             <!--    doing a search of thread subjects-->
             <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty">
-                <?php echo '<table class="search-forum "><thead>';
+                <?php echo '<table class="search-forum table table-bordered table-striped table-hover data-table"><thead>';
                 echo '<tr><th class="width-twelve-five-per">Topic</th><th class="width-fourty-five-per">Forum</th><th>Replies</th><th>Views</th><th class="width-twelve-per">Last Post Date</th></tr></thead><tbody>';
                 foreach ($threaddata as $line) {
                     if (isset($postcount[$line['id']])) {
@@ -290,7 +290,7 @@ if (count($taginfo)==0) {
 //        }
                 ?>
         <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty myScrollTable">
-                    <table class=search-forum>
+                    <table class="search-forum table table-bordered table-striped table-hover data-table">
                         <thead>
                         <tr><th class="width-sixty-per">Forum Name</th><th class="width-three-per">Threads</th><th class="width-three-per">Posts</th><th class="width-twenty-four-per">Last Post Date</th></tr>
                         </thead>

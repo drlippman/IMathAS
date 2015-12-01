@@ -17,30 +17,32 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php AppUtility::t('Modify Question Settings') ?></div>
             </div>
-            <div class="pull-left header-btn">
-                <div class="submit floatright"><input type="submit" value="Save Settings"></div>
-            </div>
         </div>
     </div>
-    <div class="tab-content shadowBox margin-top-fourty">
-    <div class="col-md-12 mod-question-form">
+    <div class="tab-content shadowBox  padding-one-em">
+    <div class="col-md-12 col-sm-12 mod-question-form">
         <?php
         if ($overwriteBody==1) {
         echo $body;
         } else {
         ?>
         <?php echo $pageBeenTakenMsg; ?>
-        <div class="col-md-12 text-label"><div class="col-md-6"><h4>Leave items blank to use the assessment's default values</h4></div></div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Points for this problem:</div><div class="col-md-4"> <input type=text size=4 name=points class="form-control" value="<?php echo $line['points'];?>"></div>
+        <div class="col-md-12 col-sm-12 text-label">
+                <h4>Leave items blank to use the assessment's default values</h4>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Attempts allowed for this problem &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (0 for unlimited):</div><div class="col-md-4"> <input type=text class="form-control" size=4 name=attempts value="<?php echo $line['attempts'];?>"></div>
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5">Points for this problem</div><div class="col-md-4 col-sm-6"> <input type=text size=4 name=points class="form-control" value="<?php echo $line['points'];?>"></div>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Default penalty:</div>
-            <div class="col-md-1"><input type=text class="form-control" size=4 name=penalty value="<?php echo $line['penalty'];?>"></div><span class="pull-left">%</span>
-            <div class="col-md-3">
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5 ">Attempts allowed for this problem   (0 for unlimited):</div>
+            <div class="col-md-4 col-sm-6"> <input type=text class="form-control" size=4 name=attempts value="<?php echo $line['attempts'];?>"></div>
+        </div>
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5 ">Default penalty</div>
+            <div class="col-md-1 col-sm-1 padding-right-zero">
+                <input type=text class="form-control" size=4 name=penalty value="<?php echo $line['penalty'];?>">
+            </div><span class="pull-left padding-top-five padding-left-two">%</span>
+            <div class="col-md-3 col-sm-5">
                 <select name="skippenalty" class="form-control modify-question-drop-down" <?php if ($taken) {echo 'disabled=disabled';}?>>
                     <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
                     <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -53,8 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </select>
             </div>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">New version on reattempt?</div><div class="col-md-4">
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5">New version on reattempt?</div><div class="col-md-4 col-sm-6">
                 <select name="regen" class="form-control">
                     <option value="0" <?php if (($line['regen']%3)==0) { echo 'selected="1"';}?>>Use Default</option>
                     <option value="1" <?php if (($line['regen']%3)==1) { echo 'selected="1"';}?>>Yes, new version on reattempt</option>
@@ -62,17 +64,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 </select>
             </div>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Allow &quot;Try similar problem&quot;?</div>
-            <div class="col-md-4">
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5 ">Allow &quot;Try similar problem&quot;?</div>
+            <div class="col-md-4 col-sm-6 ">
                 <select name="allowregen" class="form-control">
                     <option value="0" <?php if ($line['regen']<3) { echo 'selected="1"';}?>>Use Default</option>
                     <option value="1" <?php if ($line['regen']>=3) { echo 'selected="1"';}?>>No</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Show Answers</div><div class="col-md-4">
+        <div class="col-md-12 text-label col-sm-12">
+            <div class="col-md-3 col-sm-5">Show Answers</div><div class="col-md-4 col-sm-6">
                 <select name="showans" class="form-control">
                     <option value="0" <?php if ($line['showans']==='0') { echo 'selected="1"';}?>>Use Default</option>
                     <option value="N" <?php if ($line['showans']==='N') { echo 'selected="1"';}?>>Never during assessment</option>
@@ -80,9 +82,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 </select>
             </div>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Show hints and video/text buttons?</div>
-            <div class="col-md-4">
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5">Show hints and video/text buttons?</div>
+            <div class="col-md-4 col-sm-6">
                 <select name="showhints" class="form-control">
                     <option value="0" <?php if ($line['showhints']==0) { echo 'selected="1"';}?>>Use Default</option>
                     <option value="1" <?php if ($line['showhints']==1) { echo 'selected="1"';}?>>No</option>
@@ -90,30 +92,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 </select>
             </div>
         </div>
-        <div class="col-md-12 text-label">
-            <div class="col-md-3">Use Scoring Rubric</div>
-            <div class="col-md-2">
+        <div class="col-md-12 col-sm-12 text-label">
+            <div class="col-md-3 col-sm-5">Use Scoring Rubric</div>
+            <div class="col-md-4 col-sm-6 padding-bottom-one-em">
                 <?php
                 AppUtility::writeHtmlSelect('rubric',$rubricVals,$rubricNames,$line['rubric']);
                 ?>
-                </div><div class="modify-question-drop-down">
+                </div>
+            <div class="modify-question-drop-down col-md-4 col-sm-offset-5 col-md-offset-3 col-sm-4">
                 <?php
                 echo " <a href=".AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$courseId.'&id=new&from=modq&aid='.$assessmentId.'&qid='.$params['id']).">Add new rubric</a> ";
                 echo "| <a href=".AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$courseId.'from=modq&aid='.$assessmentId,'&qid='.$params['id']).">Edit rubrics</a> ";
                 ?>
             </div>
         </div>
-        <div class="col-md-12 text-label">
+        <div class="col-md-12 text-label col-sm-12">
             <?php
             if (isset($params['qsetid'])) { //adding new question
-                echo "<div class=col-md-3>Number of copies of question to add:</div><div class=col-md-4><input type=text class=form-control size=4 name=copies value=\"1\"/></div>";
+                echo "<div class='col-md-3 col-sm-5'>Number of copies of question to add:</div><div class='col-md-4 col-sm-6'><input type=text class=form-control size=4 name=copies value=\"1\"/></div>";
             } else if (!$beentaken) {
-                echo "<div class=col-md-3>Number, if any, of additional copies to add to assessment:</div><div class=col-md-4><input type=text class=form-control size=4 name=copies value=\"0\"/></div>";
+                echo "<div class='col-sm-5 col-md-3'>Number, if any, of additional copies to add to assessment</div><div class='col-md-4 col-sm-6'><input type=text class=form-control size=4 name=copies value=\"0\"/></div>";
             } ?>
         </div>
             <?php
             if ($beentaken) {
-                echo '<div class="col-md-12 text-label">';
+                echo '<div class="col-md-12 text-label col-sm-12">';
                 echo '<div class="form"><a href="#" onclick="$(this).hide();$(\'#advanced\').show();return false">Advanced</a></div>';
                 echo '<div id="advanced" style="display:none;">';
                 echo '<span class="form">Replace this question with question ID: <br/>';
@@ -122,6 +125,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo '</div>';
                 echo '</div>';
             } ?>
+
+            <div class=" btn header-btn col-md-12 ">
+                <div class="    col-md-5 col-sm-offset-10 col-md-offset-5 col-sm-5">
+                    <input type="submit" value="Save Settings">
+                </div>
+            </div>
         <?php } ?>
         </div>
     </div>

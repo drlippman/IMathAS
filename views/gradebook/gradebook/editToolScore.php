@@ -22,37 +22,66 @@ if (isset($params['clear']) && $isteacher)
         exit;
     }
 }
-echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$params['cid']}\">$coursename</a> ";
-echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+$this->title = AppUtility::t('External Tool Grades', false);
+?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,AppUtility::t('Gradebook', false)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id, AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid='.$course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox padding-one-em">
+<?php
+//echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$params['cid']}\">$coursename</a> ";
+//echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 if ($params['stu'] > AppConstant::NUMERIC_ZERO) {
     echo "&gt; <a href=\"gradebook.php?stu={$params['stu']}&cid=$cid\">Student Detail</a> ";
 } else if ($params['stu']==-1) {
     echo "&gt; <a href=\"gradebook.php?stu={$params['stu']}&cid=$cid\">Averages</a> ";
 }
-echo "&gt; External Tool Grades</div>";
-echo "<div id=\"headerexttoolgrades\" class=\"pagetitle\"><h2>Modify External Tool Grades</h2></div>";
+//echo "&gt; External Tool Grades</div>";
+//echo "<div id=\"headerexttoolgrades\" class=\"pagetitle\"><h2>Modify External Tool Grades</h2></div>";
 echo '<h3>'.$name.'</h3>'; ?>
  <form id="mainform" method=post action="edit-tool-score?stu=<?php echo $params['stu']?>&gbmode=<?php echo $params['gbmode']?>&cid=<?php echo $course-> id?>&lid=<?php echo $lid?>&uid=<?php echo $params['uid']?>">
- <div id="gradeboxes">
+ <div id="gradeboxes ">
  <input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)">
 <?php
 if ($params['uid']=='all') { ?>
-     <br/>
-    <span class=form><?php AppUtility::t('Add/Replace to all grades')?>:</span>
-    <span class=formright><input type=text size=3 id="toallgrade" onblur="this.value = doonblur(this.value);"/>
-        <input type=button value="Add" onClick="sendtoall(0,0);"/>
-        <input type=button value="Multiply" onclick="sendtoall(0,1)"/>
-        <input type=button value="Replace" onclick="sendtoall(0,2)"/>
-    </span><br class="form"/>
-     <span class=form><?php AppUtility::t('Add/Replace to all feedback')?>:</span>
-     <span class=formright><input type=text size=40 id="toallfeedback"/>
-      <input type=button value="Append" onClick="sendtoall(1,0);"/>
-         <input type=button value="Prepend" onclick="sendtoall(1,1)"/>
-         <input type=button value="Replace" onclick="sendtoall(1,2)"/>
-     </span><br class="form"/>
+    <div class="col-sm-12 col-md-12 padding-top-one-em padding-bottom-one-em">
+        <div class="col-sm-12 col-md-12 padding-top-one-em">
+     <span class="col-sm-4 col-md-3" >
+        <?php AppUtility::t('Add/Replace to all grades')?>
+    </span>
+    <span class="col-sm-8 col-md-8 padding-left-zero">
+        <span class="col-sm-3 col-md-2"><input type=text   class="form-control" id="toallgrade" onblur="this.value = doonblur(this.value);"/></span>
+        <span class="col-sm-3 col-md-2"><input type=button class="btn btn-primary width-hundread-per" value="Add" onClick="sendtoall(0,0);"/></span>
+        <span class="col-sm-3 col-md-2"><input type=button class="width-hundread-per btn btn-primary" value="Multiply" onclick="sendtoall(0,1)"/></span>
+        <span class="col-sm-3 col-md-2"><input type=button class="width-hundread-per btn btn-primary" value="Replace" onclick="sendtoall(0,2)"/></span>
+    </span>
+    </div>
+        <div class="col-sm-12 col-md-12 padding-top-one-em">
+     <span class="col-sm-4 col-md-3 padding-top-one-em floatleft" >
+         <?php AppUtility::t('Add/Replace to all feedback')?>
+     </span>
+         <span class="col-sm-8 col-md-8 padding-left-zero">
+        <span class="col-sm-3 col-md-2"> <input type=text class="form-control" id="toallfeedback"/></span>
+         <span class="col-sm-3 col-md-2"><input type=button class="btn btn-primary width-hundread-per" value="Append" onClick="sendtoall(1,0);"/></span>
+         <span class="col-sm-3 col-md-2"><input type=button class="btn btn-primary width-hundread-per" value="Prepend" onclick="sendtoall(1,1)"/></span>
+         <span class="col-sm-3 col-md-2"><input type=button class="btn btn-primary width-hundread-per" value="Replace" onclick="sendtoall(1,2)"/></span>
+     </span>
+    </div>
+        </div>
 <?php }
-echo '<div class="clear"></div>'; ?>
- <table id=myTable><thead><tr><th><?php AppUtility::t('Name')?></th>
+  ?>
+ <div class="col-sm-12 col-md-12">
+     <table id=myTable>
+         <thead>
+         <tr>
+             <th><?php AppUtility::t('Name')?></th>
 <?php if ($hassection)
 { ?>
      <th><?php AppUtility::t('Section')?></th>
@@ -90,11 +119,15 @@ foreach ($studentData as $row) {
     echo "</tr>";
 }
 echo "</tbody></table>";
-if ($hassection) {
-    echo "<script type='javascript'> initSortTable('myTable',Array('S','S',false,false),false);</script>";
-}
-?>
-<div class=submit><input type=submit value="Submit"></div></div>
-</form>
 
+?>
+<div class="col-md-12 col-sm-12">
+    <div class="col-md-6 col-sm-6 col-md-offset-3 col-sm-offset-4">
+        <input type=submit value="Submit">
+        </div>
+</div>
+ </div>
+ </div>
+</form>
+</div>
 

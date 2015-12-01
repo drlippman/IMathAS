@@ -4,7 +4,6 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
 $this->title = 'Enroll in a course';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home'], 'link_url' => [AppUtility::getHomeURL() . 'site/index'], 'page_title' => $this->title]); ?>
@@ -16,13 +15,13 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
-<div class="site-login">
+<div class="tab-content shadowBox non-nav-tab-item padding-two-em">
+    <div class="site-login text-gray-background padding-one-em">
     <?php $form = ActiveForm::begin([
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-md-3 col-sm-5\">{input}</div>\n<div class=\"col-md-7 col-sm-9 col-md-offset-2\">{error}</div>",
-            'labelOptions' => ['class' => 'col-md-2 col-sm-4 padding-left-fifteen'],
+            'template' => "{label}\n<div class=\"col-md-4 col-sm-6\">{input}</div>\n<div class=\"col-md-7 col-sm-9 col-md-offset-2\">{error}</div>",
+            'labelOptions' => ['class' => 'col-md-2 col-sm-4  '],
         ],
     ]); ?>
     <br>
@@ -30,11 +29,14 @@ $this->params['breadcrumbs'][] = $this->title;
    <div class="padding-left-fifteen"><?php echo $form->field($model, 'courseId') ?></div>
    <div class="padding-left-fifteen"><?php echo $form->field($model, 'enrollmentKey') ?></div>
 
-    <div class="header-btn col-md-6 col-sm-6 col-sm-offset-4 col-md-offset-2 padding-bottom-ten">
-        <button class="btn btn-primary page-settings" type="submit" name="login-button" value="AddSave"><i class="fa fa-share header-right-btn"></i><?php echo 'Sign Up' ?></button>
-        <a class="btn btn-primary back-button margin-left-fifteen" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a>
-    </div>
-
+        <div class="form-group col-md-12 " >
+          <div class="col-md-2 col-sm-3 col-md-offset-2 col-sm-offset-4 padding-left-twenty-five">
+              <?php echo Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?>
+          </div>
+          <div class="col-md-3 col-sm-3">
+              <a class="btn btn-primary back-button" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>"><i class="fa fa-share header-right-btn"></i>Back</a>
+          </div>
+        </div>
     <?php ActiveForm::end(); ?>
 </div>
 </div>

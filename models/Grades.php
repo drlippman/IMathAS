@@ -168,11 +168,11 @@ class Grades extends BaseImasGrades
         $query	->select(['userid','score','feedback'])
             ->from('imas_grades')
             ->where(['gradetype' => 'exttool'])
-            ->andWhere('gradetypeid=:gbitemId');
+            ->andWhere(['gradetypeid' => $gbitemId]);
         if($grades != 'all'){
-            $query->andWhere('userid=:grades');
+            $query->andWhere(['userid' => $grades]);
         }
-        $command = $query->createCommand()->bindValues(['gbitemId' => $gbitemId, 'grades' => $grades]);
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }

@@ -138,13 +138,15 @@ $urlmode = AppUtility::urlMode();?>
             if ($caneditscore && $ownerid[$child] != $userId)
             {
                 echo '<hr/>';
-                echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
+                echo '<div class="padding-bottom-one-em">';
+                echo "<span class='padding-bottom-one-em'>Private Feedback: </span><textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
                 if ($feedback[$line['id']]!==null) {
                     echo $feedback[$line['id']];
                 }
                 echo "</textarea>";
+                echo "</div>";
             } else if (($ownerid[$child]==$userId || $canviewscore) && $feedback[$line['id']]!=null) {
-                echo '<div class="signup">Private Feedback: ';
+                echo '<div class="padding-bottom-one-em signup">Private Feedback: ';
                 echo $feedback[$line['id']];
                 echo '</div>';
             }

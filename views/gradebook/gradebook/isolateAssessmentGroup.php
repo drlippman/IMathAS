@@ -2,7 +2,7 @@
 use app\components\AppUtility;
 $this->title = 'View Group Scores';
 ?>
-<?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
+<?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
@@ -49,7 +49,7 @@ foreach ($questions as $r) {
         }
     }
 }
-echo '<div class="tab-content shadowBox">';
+echo '<div class="tab-content shadowBox padding-one-em">';
 echo '<div id="headerisolateassessgrade" class="pagetitle"><h2>';
 echo "Group grades for $name</h2></div>";
 echo "<p>$totalpossible points possible</p>";
@@ -82,7 +82,7 @@ foreach ($groupnames as $gid=>$gname) {
         echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
     }
     $lc++;
-    echo "<td>$gname</td>";
+    echo "<td class='word-break-break-all'>$gname</td>";
     if (!isset($scoredata[$gid])) {
         echo "<td>-</td><td>-</td><td></td>";
         continue;
@@ -99,9 +99,9 @@ foreach ($groupnames as $gid=>$gname) {
     $timeused = $line['endtime']-$line['starttime'];
 
     if ($line['id']==null) { ?>
-         <td><a href="<?php echo  AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid=new&uid='.$line['userid'].'&from=gisolate&aid='.$aid);?> ">-</a></td><td>-</td><td></td>
+         <td class='word-break-break-all'><a href="<?php echo  AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid=new&uid='.$line['userid'].'&from=gisolate&aid='.$aid);?> ">-</a></td><td>-</td><td></td>
     <?php } else { ?>
-         <td><a href="<?php echo  AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid='.$line['id'].'&uid='.$line['userid'].'&from=gisolate&aid='.$aid)?> ">
+         <td class='word-break-break-all'><a href="<?php echo  AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid='.$line['id'].'&uid='.$line['userid'].'&from=gisolate&aid='.$aid)?> ">
         <?php //if ($total<$minscore) {
         if (($minscore<10000 && $total<$minscore) || ($minscore>10000 && $total<($minscore-10000)/100*$totalpossible)) {
             echo "{$total}&nbsp;(NC)";
@@ -119,17 +119,17 @@ foreach ($groupnames as $gid=>$gname) {
 
         echo "</a></td>";
         if ($totalpossible>0) {
-            echo '<td>'.round(100*($total)/$totalpossible,1).'%</td>';
+            echo '<td class="word-break-break-all">'.round(100*($total)/$totalpossible,1).'%</td>';
         } else {
             echo '<td></td>';
         }
-        echo "<td>{$line['feedback']}</td>";
+        echo "<td class='word-break-break-all'>{$line['feedback']}</td>";
     }
     echo "</tr>";
 }
         }
-echo '<tr><td>Average</td>'; ?>
- <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id.'&aid='.$aid.'&from=gisolate');?>">
+echo '<tr><td class="word-break-break-all">Average</td>'; ?>
+ <td class='word-break-break-all'><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id.'&aid='.$aid.'&from=gisolate');?>">
 <?php if ($n>0) {
     echo round($tot/$n,1);
 } else {
@@ -140,10 +140,10 @@ if ($totalpossible > 0 ) {
 } else {
     $pct = '';
 }
-echo "</a></td><td>$pct</td></tr>";
+echo "</a></td><td class='word-break-break-all'>$pct</td></tr>";
 echo "</tbody></table>";
 echo '</div>';
-echo "<script type='javascript'> initSortTable('myTable',Array('S','N','N'),true);</script>";
+//echo "<script type='javascript'> initSortTable('myTable',Array('S','N','N'),true);</script>";
 
 
 function getpts($sc) {

@@ -333,12 +333,12 @@ if ($data['catFilter'] > -2) {
                  <li>
                      <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]' ) ?></a>
                  </li>
-                <?php if ($gradebook[0][1][$i][10] == true)
-                { ?>
+<!--                --><?php //if ($gradebook[0][1][$i][10] == true)
+//                { ?>
                      <li>
                          <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7])?>"><?php AppUtility::t('[By Group]' )?></a>
                      </li>
-                <?php }
+<!--                --><?php //}
             } else { ?>
                  <li>
                      <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>"><?php AppUtility::t('[Isolate]')?></a>

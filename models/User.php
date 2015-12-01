@@ -728,24 +728,24 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getDataForExternalTool($UserId,$courseId,$isTutor,$tutorSection,$hasSection,$sortOrder)
     {
-        $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
-        if ($UserId != 'all')
-        {
-            $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:UserId AND imas_students.courseid=:courseId";
+            $query  = new Query();
+        $query->select('imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked')
+            ->from('imas_users')
+            ->join('INNER JOIN','imas_students','imas_users.id=imas_students.userid');
+        if ($UserId!='all') {
+            $query->where('imas_students.courseid=:courseid',['courseid' => $courseId])->andWhere('imas_users.id =:usersId',[':usersId' => $UserId]);
         } else {
-            $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseId";
+            $query->where('imas_students.courseid=:courseid',['courseid' => $courseId]);
         }
-        if ($isTutor && isset($tutorSection) && $tutorSection!='') {
-            $query .= " AND imas_students.section=:tutorSection";
+        if ($isTutor && isset($tutorsection) && $tutorsection!='') {
+            $query->andWhere('imas_students.section = :section',[':section' => $tutorsection]);
         }
-
-        if ($hasSection && $sortOrder == "sec") {
-            $query .= " ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
+        if ($hasSection && $sortOrder=="sec") {
+            $query->orderBy('imas_students.section,imas_users.LastName,imas_users.FirstName');
         } else {
-            $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
+            $query->orderBy('imas_users.LastName,imas_users.FirstName');
         }
-        $command = \Yii::$app->db->createCommand($query)->bindValues(['UserId' => $UserId, 'courseId' => $courseId, 'tutorSection' => $tutorSection]);
-        $data = $command->queryAll();
+        $data = $query->createCommand()->queryAll();
         return $data;
     }
 

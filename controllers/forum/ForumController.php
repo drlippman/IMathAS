@@ -1235,73 +1235,6 @@ class ForumController extends AppController
         }
         return $this->successResponse();
     }
-
-    /*
-     * Controller Action To Search All Post In A Forum
-     */
-//    public function actionGetSearchPostAjax()
-//    {
-//        $this->guestUserHandler();
-//        $params = $this->getRequestParams();
-//        $courseId = $params['courseid'];
-//        $now = time();
-//        $forum = Forums::getByCourseId($courseId);
-//        $search = $params['search'];
-//        $checkBoxVal = $params['value'];
-//        $sort = AppConstant::DESCENDING;
-//        $orderBy = 'postdate';
-//        $query = ForumForm::byAllpost($search, $sort, $orderBy);
-//        if ($query) {
-//            $searchPost = array();
-//            foreach ($forum as $forumId) {
-//                foreach ($query as $data) {
-//                    if ($forumId['id'] == $data['forumid']) {
-//                        if ($this->getAuthenticatedUser()->rights == AppConstant::NUMERIC_TEN) {
-//                            if ($forumId['enddate'] > $now) {
-//                                $username = User::getById($data['userid']);
-//                                $postdate = Thread::getById($data['threadid']);
-//                                $forumName = Forums::getById($data['forumid']);
-//                                $tempArray = array
-//                                (
-//                                    'forumIdData' => $data['forumid'],
-//                                    'threadId' => $data['threadid'],
-//                                    'subject' => $data['subject'],
-//                                    'views' => $data['views'],
-//                                    'forumName' => ucfirst($forumName->name),
-//                                    'postdate' => AppController::customizeDate($postdate->lastposttime),
-//                                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-//                                    'message' => $data['message'],
-//                                );
-//                                array_push($searchPost, $tempArray);
-//                            }
-//                        } else {
-//                            $username = User::getById($data['userid']);
-//                            $postdate = Thread::getById($data['threadid']);
-//                            $forumName = Forums::getById($data['forumid']);
-//                            $tempArray = array
-//                            (
-//                                'forumIdData' => $data['forumid'],
-//                                'threadId' => $data['threadid'],
-//                                'subject' => $data['subject'],
-//                                'views' => $data['views'],
-//                                'forumName' => ucfirst($forumName->name),
-//                                'postdate' => AppController::customizeDate($postdate->lastposttime),
-//                                'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-//                                'message' => $data['message'],
-//                            );
-//                            array_push($searchPost, $tempArray);
-//                        }
-//                    }
-//                }
-//            }
-//            $this->includeJS(['forum/forum.js', 'forum/thread.js']);
-//            $responseData = array('data' => $searchPost, 'checkvalue' => $checkBoxVal, 'search' => $search);
-//            return $this->successResponse($responseData);
-//        } else {
-//            return $this->terminateResponse('No data');
-//        }
-//    }
-
     /*
      * Controller Action To Search Post Of That Forum
      */
@@ -1473,7 +1406,7 @@ class ForumController extends AppController
             $status = AppConstant::NUMERIC_ONE;
             $responseData = array('posts' => $posts,'pointspos' => $pointspos,'rubricData' => $rubricData,'forumname' => $forumname,'rubricDataRow' => $rubricDataRow,
                 'rubric' => $rubric,'scores' => $scores,'haspoints' => $haspoints,'caneditscore' => $caneditscore,'page' => $page,'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status,
-                'allowmod' => $allowmod,'allowdel' => $allowdel,'allowreply' => $allowreply,'userRights' => $userRights, 'canviewscore' => $canviewscore,'isteacher' => $isteacher,'currentUserId' => $userId);
+                'allowmod' => $allowmod,'allowdel' => $allowdel,'allowreply' => $allowreply,'userRights' => $userRights, 'canviewscore' => $canviewscore,'isteacher' => $isteacher,'userId' => $userId);
             return $this->renderWithData('listPostByName', $responseData);
         }
     }

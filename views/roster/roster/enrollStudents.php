@@ -57,7 +57,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-offset-0 col-md-10 ">
            <span class="padding-right-fifteen"> <?php echo Html::submitButton(AppUtility::t('Enroll These Students', false), ['class' => 'btn btn-primary', 'id' => 'change-button', 'name' => 'enroll-students']) ?> </span>
             <a class="btn btn-primary back-button"
-               href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $cid) ?>"><i class="fa fa-share header-right-btn"></i><?php echo AppUtility::t('Back ') ?></a>
+               href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $cid) ?>">
+                <i class="fa fa-share header-right-btn"></i><?php echo AppUtility::t('Back ') ?></a>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
