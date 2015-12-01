@@ -37,7 +37,6 @@ class QuestionController extends AppController
 
     public function actionAddQuestions()
     {
-//        AppUtility::dump($this->getRequestParams());
         $user = $this->getAuthenticatedUser();
         $groupId = $user['groupid'];
         $userId = $user['id'];
@@ -100,7 +99,7 @@ class QuestionController extends AppController
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId));
                     }
 
-                } else {AppUtility::dump('3');
+                } else {
                     $checked = $params['nchecked'];
                     foreach ($checked as $questionSetId) {
                         $questionData = array(
@@ -2333,7 +2332,7 @@ class QuestionController extends AppController
         }
         $this->includeCSS(['default.css', 'handheld.css', 'print.css']);
         $renderData = array('sessionData' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $noLogo, 'numq' => $numQuestion,
-            'printTwice' => $printTwice, ' course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
+            'printTwice' => $printTwice, 'course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
             'qn' => $qn, 'courseId' => $courseId, 'questions' => $questions, 'points' => $points, 'seeds' => $seeds);
         return $this->renderWithData('printLayoutBare', $renderData);
     }
@@ -4180,4 +4179,10 @@ class QuestionController extends AppController
             return array($temp,$showanswer);
         }
     }
+    public function actionAddQuestionHelp()
+    {
+        $this->layout = 'master';
+        return $this->render('addQuestionHelp');
+    }
+
 }

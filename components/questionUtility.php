@@ -15,10 +15,10 @@ class  questionUtility extends Component
     public static function addQuestion($params, $teacherId,$assessmentId,$courseId)
     {
 
-if (!(isset($teacherId))) {
-   $addQuestionData = "This page cannot be accessed directly";
-}
-if ($params['process']== true) {
+    if (!(isset($teacherId))) {
+        $addQuestionData = "This page cannot be accessed directly";
+    }
+    if ($params['process']== true) {
     if (isset($params['add'])) {
         /*
          * adding new questions
@@ -161,9 +161,9 @@ $addQuestionData .= '<div id="headermodquestiongrid" class="pagetitle"><h2>Modif
         $addQuestionData .= "<form method=post action=\"add-questions?addset=true&process=true&cid=$courseId&aid=$assessmentId\">";
     }
 
-    $addQuestionData .= "Leave items blank to use the assessment's default values<br/>
-<table class=gb>
-    <thead><tr> ";
+    $addQuestionData .= "<span class='col-md-12 col-sm-12 padding-left-zero padding-bottom-one-em'>Leave items blank to use the assessment's default values</span>
+<table class='table table-striped table-hover data-table dataTable'>
+    <thead><tr>";
 
         if (isset($params['checked'])) { //modifying existing questions
 
@@ -204,13 +204,13 @@ $addQuestionData .= '<div id="headermodquestiongrid" class="pagetitle"><h2>Modif
                     }
                 }
                 $qRows[$row['id']] .= '</td>';
-                $qRows[$row['id']] .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"{$row['points']}\" /></td>";
-                $qRows[$row['id']] .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
-                $qRows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
+                $qRows[$row['id']] .= "<td><input class='form-control' type=text size=4 name=\"points{$row['id']}\" value=\"{$row['points']}\" /></td>";
+                $qRows[$row['id']] .= "<td><input class='form-control' type=text size=4 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
+                $qRows[$row['id']] .= "<td><select class='form-control' name=\"showhints{$row['id']}\">";
                 $qRows[$row['id']] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
                 $qRows[$row['id']] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
                 $qRows[$row['id']] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
-                $qRows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
+                $qRows[$row['id']] .= "<td><input class='form-control' type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
                 $qRows[$row['id']] .= '</tr>';
             }
             $addQuestionData .= "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
@@ -238,7 +238,9 @@ $addQuestionData .= '<div id="headermodquestiongrid" class="pagetitle"><h2>Modif
             $addQuestionData .= '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
             $addQuestionData .= '<input type=hidden name="mod" value="true" />';
 
-            $addQuestionData .= '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
+            $addQuestionData .= '<div class="col-md-offset-3 col-md-2 col-sm-3 col-sm-offset-3 padding-left-pt-five-em padding-top-one-em">
+            <input type="submit" value="'._('Save Settings').'">
+            </div>';
 
         } else { //adding new questions
             $addQuestionData .= "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
@@ -272,23 +274,32 @@ $addQuestionData .= '<div id="headermodquestiongrid" class="pagetitle"><h2>Modif
                 } else {
                     $addQuestionData .= '<td></td>';
                 }
-                $addQuestionData .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"\" />";
+                $addQuestionData .= "<td><input class='form-control' type=text size=4 name=\"points{$row['id']}\" value=\"\" />";
                 $addQuestionData .= '<input type="hidden" name="qparts'.$row['id'].'" value="'.$n.'"/></td>';
-                $addQuestionData .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"\" /></td>";
-                $addQuestionData .= "<td><select name=\"showhints{$row['id']}\">";
+                $addQuestionData .= "<td><input class='form-control' type=text size=4 name=\"attempts{$row['id']}\" value=\"\" /></td>";
+                $addQuestionData .= "<td><select class='form-control' name=\"showhints{$row['id']}\">";
                 $addQuestionData .= '<option value="0" selected="selected">Use Default</option>';
                 $addQuestionData .= '<option value="1">No</option>';
                 $addQuestionData .= '<option value="2">Yes</option></select></td>';
-                $addQuestionData .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"1\" /></td>";
+                $addQuestionData .= "<td><input  class='form-control' type=text size=4 name=\"copies{$row['id']}\" value=\"1\" /></td>";
                 $addQuestionData .= '</tr>';
             }
             $addQuestionData .= '</tbody></table>';
             $addQuestionData .= '<input type=hidden name="qsetids" value="'.implode(',',$params['nchecked']).'" />';
             $addQuestionData .= '<input type=hidden name="add" value="true" />';
 
-            $addQuestionData .= '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';
-            $addQuestionData .= '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
-            $addQuestionData .= '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
+            $addQuestionData .= '<div class="col-md-offset-3 col-sm-offset-3 col-md-9 col-sm-9 padding-bottom-ten">
+            <div class="col-md-12 col-sm-12 padding-left-twenty-five"><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</div>
+            </div>';
+            $addQuestionData .= '<div class="col-md-offset-3 col-sm-offset-3 col-md-9 col-sm-9 padding-bottom-ten">
+            <div class="col-md-12 col-sm-12 padding-left-twenty-five">
+            <input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</div>
+            </div>';
+            $addQuestionData .= '<div class="col-md-offset-3 col-sm-offset-3 col-md-9 col-sm-9">
+            <div class="col-md-3 col-sm-3 padding-left-twenty-five">
+            <input type="submit" value="'._('Add Questions').'">
+            </div>
+            </div>';
         }
         $addQuestionData .= '</form>';
         }

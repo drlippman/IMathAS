@@ -17,7 +17,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-sm-12 padding-right-zero">
             <div class=" col-sm-7" style="right: 30px;">
-                <div class="vertical-align title-page">Add/Remove Questions<a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=addingquestionstoanassessment' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
+                <div class="vertical-align title-page">Add/Remove Questions
+                    <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'question/question/add-question-help' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i>
+                    </a>
+                </div>
             </div>
             <div class="col-sm-5 padding-right-zero" style="">
                 <div class="floatright">

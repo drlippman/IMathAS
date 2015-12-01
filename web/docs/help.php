@@ -2,7 +2,6 @@
 <head>
 <?php
 	$dbsetup = true; //prevents connection to database
-//	include("config.php");
 $installname = 'OpenMath';
 ?>
 <title><?php echo $installname;?> Help</title>
@@ -25,7 +24,6 @@ span.icon {
 	font-weight: bolder;
 }
 h1,h2,h3 {
-	margin-top: 1.5em;
 	margin-bottom: .5em;
 }
 h1 {
@@ -54,7 +52,7 @@ h2,h3,h4 {
 	$ndiv = 0;
 	$nul = 0;
 	$inbody = false;
-	$handle = fopen("help.html", "r");
+	$handle = fopen("../web/docs/help.html", "r");
 	
 	if ($handle) {
 		while (!feof($handle)) {
