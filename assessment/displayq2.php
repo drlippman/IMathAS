@@ -599,7 +599,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		foreach ($_POST as $postk=>$postv) {
 			$prefix = substr($postk,0,2);
 			if ($prefix=='tc' || $prefix=='qn') {
-				$partnum = intval(substr($postk,2,4));
+				$partnum = intval(substr($postk,2));
+				if (($p=strpos($partnum,'-'))!==false) {
+					$partnum = substr($partnum,0,$p);	
+				}
 				$kidx = round($partnum - 1000*floor($partnum/1000));
 				$postpartstoprocess[$partnum] = array(floor($partnum/1000)-1, $kidx);
 			}
@@ -607,7 +610,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		foreach ($postpartstoprocess as $partnum=>$partbits) {
 			$qnidx = $partbits[0];
 			$kidx = $partbits[1];
-		//for ($kidx=0;$kidx<$qptcnt;$kidx++) {
+	        
+		//for ($kidx=0;$kidx<count($_POST);$kidx++) {
 		//	$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["tc$partnum"])) {
 				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["tc$partnum"]);
