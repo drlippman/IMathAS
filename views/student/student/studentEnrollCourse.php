@@ -30,11 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
    <div class="padding-left-fifteen"><?php echo $form->field($model, 'courseId') ?></div>
    <div class="padding-left-fifteen"><?php echo $form->field($model, 'enrollmentKey') ?></div>
 
-
-        <div class="form-group col-md-6" style="text-align: center">
-          <div class="col-md-3 col-sm-3">  <?php echo Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?></div>
-          <div class="col-md-3 col-sm-3"> <a class="btn btn-primary back-button" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a></div>
-        </div>
+    <div class="header-btn col-md-6 col-sm-6 col-sm-offset-4 col-md-offset-2 padding-bottom-ten">
+        <button class="btn btn-primary page-settings" type="submit" name="login-button" value="AddSave"><i class="fa fa-share header-right-btn"></i><?php echo 'Sign Up' ?></button>
+        <a class="btn btn-primary back-button margin-left-fifteen" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a>
+    </div>
 
     <?php ActiveForm::end(); ?>
 </div>

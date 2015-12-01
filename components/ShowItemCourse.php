@@ -678,7 +678,6 @@ class ShowItemCourse extends Component
                 }
                 $typeid = $line['typeid'];
                 $line = Assessments::getAssessmentDataById($typeid);
-//                AppUtility::dump($line);
 
                 /*
                  * do time limit mult

@@ -10,8 +10,11 @@ $this->params['breadcrumbs'][] = $this->title; ?>
 <input type="hidden" class="home-path-course" value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
 <input type="hidden" class="web-path" value="<?php echo AppUtility::getHomeURL() ?>">
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
-<?php if (($teacherId && (!$backLink))) {?>
 
+
+<?php
+
+if (($teacherId && (!$backLink))) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
     </div>
@@ -253,26 +256,6 @@ if ($overwriteBody == 1) {
         /**
          * Modal pop up for locked course.
          */
-        function locked()
-        {
-                alert('hey');
-                var html = '<div><p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p></div>';
-                var cancelUrl = $(this).attr('href');
-                e.preventDefault();
-                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                    width: 'auto', resizable: false,
-                    closeText: "hide",
-                    buttons: {
-                        "Ok": function () {
-                            $(this).dialog('destroy').remove();
-                            return false;
-                        }
-                    },
-                    close: function (event, ui) {
-                        $(this).remove();
-                    }
-                });
-        }
+
 
     </script>

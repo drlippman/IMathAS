@@ -3,6 +3,7 @@
 namespace app\components;
 
 use app\controllers\AppController;
+use app\controllers\course\CourseController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Exceptions;
@@ -16,6 +17,7 @@ use app\models\Questions;
 use app\models\Course;
 use app\models\QuestionSet;
 use app\models\Sessions;
+use app\models\Student;
 use app\models\User;
 use app\models\Wiki;
 use Yii;
@@ -3068,32 +3070,40 @@ class AppUtility extends Component
         if (count($data) == 0 && $type == 'tutor') {
             return;
         }
-        global $myRights,$newMsgCnt,$newPostCnt;
+        global $myRights,$newMsgCnt,$newPostCnt,$user;
+        $userId = $user['id'];
         echo '<div class="block margin-left-fifteen margin-right-fifteen"><h3>'.$title.'</h3></div>';
         echo '<div class="blockitems margin-left-fifteen margin-right-fifteen"><ul class="nomark courselist">';
         for ($i=0; $i<count($data); $i++) {
             $courseStudent = Course::getByCourseAndUser($data[$i]['id']);
+            $isStudent = false;
+            $student = Student::getByCourseId($data[$i]['id'], $userId);
+            if ($student) {
+                $isStudent = true;
+            }
             $lockId = $courseStudent['lockaid'];
+            $locked = Student::getStudentData($userId, $data[$i]['id']);
             echo '<li>';
             if ($type=='take') {
                 echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
-            } ?>
-            <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
+            }
+            if ($isStudent && ($lockId > 0)) {
+                ?>
+                <a class="word-wrap-break-word" href="#" onclick="locked()">
             <?php echo $data[$i]['name'].'</a>';
+            } elseif($locked['locked'] > 0){ ?>
+                <a class="word-wrap-break-word" href="#" onclick="studLocked()">
+                <?php echo $data[$i]['name'].'</a>';
+            }else {?>
+            <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
+            <?php echo $data[$i]['name'].'</a>'; }
             if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {
                 echo ' <span style="color:green;">', _('Hidden'), '</span>';
             }
             if (isset($data[$i]['lockaid']) && $data[$i]['lockaid'] > 0) {
                 echo ' <span style="color:green;">', _('Lockdown'), '</span>';
             }
-            if ($showNewMsgNote && isset($newMsgCnt[$data[$i]['id']]) && $newMsgCnt[$data[$i]['id']]>0) {
 
-//                echo ' <a class="newnote" href="msgs/msg-list?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newMsgCnt[$data[$i]['id']]), '</a>';
-            }
-            if ($showNewPostNote && isset($newPostCnt[$data[$i]['id']]) && $newPostCnt[$data[$i]['id']]>0) {
-//                echo ' <a class="newnote" href="../forum/forum/new-post?cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newPostCnt[$data[$i]['id']]), '</a>';
-            ?>
-            <?php }
             echo '</li>';
         }
         if ($type == 'teach' && $myRights > 39 && count($data)==0) {

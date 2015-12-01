@@ -349,4 +349,45 @@ function playliststart(id,vidk,el) {
 	}
 }
 
+function studLocked()
+{
+    var html = '<div><p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p></div>';
+    var cancelUrl = $(this).attr('href');
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Ok": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+}
+
+function locked()
+{
+    var name = 'Assessment';
+    var html = '<div><p>This course is currently locked for an assessment.</p>';
+//    html += "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test'>"+name+"</a></div>";
+    var cancelUrl = $(this).attr('href');
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Ok": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+}
 

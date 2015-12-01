@@ -891,7 +891,7 @@ class SiteController extends AppController
             if ($user) {
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
-                $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
+                $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js", "course.js"]);
                 $responseData = array('homeLayout' => $homeLayout,'from' => $from,'hideOnPostsWidget' => $hideOnPostsWidget, 'newMsgCnt' => $newMsgCnt, 'brokenCnt' => $brokenCnt, 'user' => $user, 'myRights' => $myRights, 'twoColumn' => $twoColumn, 'pagelayout' => $pagelayout, 'page_newmessagelist' => $page_newmessagelist, 'page_coursenames' => $page_coursenames, 'page_newpostlist' => $page_newpostlist, 'postThreads' => $postThreads, 'showNewMsgNote' => $showNewMsgNote, 'showNewPostNote' => $showNewPostNote, 'stuHasHiddenCourses' => $stuHasHiddenCourses, 'courses' => $courses, 'newPostCnt' => $newPostCnt, 'page_teacherCourseData' => $page_teacherCourseData, 'page_tutorCourseData' => $page_tutorCourseData, 'page_studentCourseData' => $page_studentCourseData);
                 return $this->renderWithData('dashboard', $responseData);
             }
