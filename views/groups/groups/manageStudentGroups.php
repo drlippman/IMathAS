@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            <div class="vertical-align title-page word-wrap-break-word"><?php echo $this->title ?></div>
         </div>
     </div>
 </div>
@@ -120,7 +120,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php }elseif(isset($removeAll)){?>
         <?php }elseif(isset($grpSetId)){?>
         <input type="hidden" id="grpSetId"  value="<?php echo $grpSetId;?>">
-        <h3>Managing groups in set <?php echo $grpSetName?></h3>
+        <div class="word-break-all-width"><h3>Managing groups in set <?php echo $grpSetName?></h3></div>
         <div id="myTable">
             <p><button type="button" onclick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addGrp=true')?>'">Add New Group</button>
                 <?php if(array_sum($hasUserImg)){
