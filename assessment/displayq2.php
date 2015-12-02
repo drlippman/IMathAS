@@ -593,36 +593,34 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	}
 	$thisq = $qnidx+1;
 	unset($stuanswers[$thisq]);  //unset old stuanswer for this question
-	
+
 	if ($qdata['qtype']=="multipart" || $qdata['qtype']=='conditional') {
 		$postpartstoprocess = array();
 		foreach ($_POST as $postk=>$postv) {
 			$prefix = substr($postk,0,2);
 			if ($prefix=='tc' || $prefix=='qn') {
 				$partnum = intval(substr($postk,2));
-				if (($p=strpos($partnum,'-'))!==false) {
-					$partnum = substr($partnum,0,$p);	
+				if (floor($partnum/1000)==$thisq) {
+					$kidx = round($partnum - 1000*floor($partnum/1000));
+					$postpartstoprocess[$partnum] = $kidx;
 				}
-				$kidx = round($partnum - 1000*floor($partnum/1000));
-				$postpartstoprocess[$partnum] = array(floor($partnum/1000)-1, $kidx);
 			}
 		}
-		foreach ($postpartstoprocess as $partnum=>$partbits) {
-			$qnidx = $partbits[0];
-			$kidx = $partbits[1];
+
+		foreach ($postpartstoprocess as $partnum=>$kidx) {
 	        
 		//for ($kidx=0;$kidx<count($_POST);$kidx++) {
 		//	$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["tc$partnum"])) {
-				$stuanswers[$qnidx+1][$kidx] = stripslashes($_POST["tc$partnum"]);
+				$stuanswers[$thisq][$kidx] = stripslashes($_POST["tc$partnum"]);
 				if ($_POST["qn$partnum"]==='') {
-					$stuanswersval[$qnidx+1][$kidx] = null;
-					$stuanswers[$qnidx+1][$kidx] = null;
+					$stuanswersval[$thisq][$kidx] = null;
+					$stuanswers[$thisq][$kidx] = null;
 				} else if (is_numeric($_POST["qn$partnum"])) {
-					$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
+					$stuanswersval[$thisq][$kidx] = floatval($_POST["qn$partnum"]);
 				} else if (substr($_POST["qn$partnum"],0,2)=='[(') { //calcmatrix
 					$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]));	
-					$stuanswersval[$qnidx+1][$kidx] = str_replace(',','|',$stuav);
+					$stuanswersval[$thisq][$kidx] = str_replace(',','|',$stuav);
 				}
 			} else if (isset($_POST["qn$partnum"])) {
 				if (isset($_POST["qn$partnum-0"])) { //calcmatrix with matrixsize
@@ -632,27 +630,27 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 						$tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
 						$spc++;
 					}
-					$stuanswers[$qnidx+1][$kidx] = implode('|',$tmp);
+					$stuanswers[$thisq][$kidx] = implode('|',$tmp);
 					$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]));
-					$stuanswersval[$qnidx+1][$kidx] = str_replace(',','|',$stuav);
+					$stuanswersval[$thisq][$kidx] = str_replace(',','|',$stuav);
 				} else {
-					$stuanswers[$qnidx+1][$kidx] = stripslashes_deep($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
+					$stuanswers[$thisq][$kidx] = stripslashes_deep($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
 					if ($_POST["qn$partnum"]==='') {
-						$stuanswersval[$qnidx+1][$kidx] = null;
-						$stuanswers[$qnidx+1][$kidx] = null;
+						$stuanswersval[$thisq][$kidx] = null;
+						$stuanswers[$thisq][$kidx] = null;
 					} else if (is_numeric($_POST["qn$partnum"])) {
-						$stuanswersval[$qnidx+1][$kidx] = floatval($_POST["qn$partnum"]);
+						$stuanswersval[$thisq][$kidx] = floatval($_POST["qn$partnum"]);
 					}
 					if (isset($_SESSION['choicemap'][$partnum])) {
-						if (is_array($stuanswers[$qnidx+1][$kidx])) { //multans
-							foreach ($stuanswers[$qnidx+1][$kidx] as $k=>$v) {
-								$stuanswers[$qnidx+1][$kidx][$k] = $_SESSION['choicemap'][$partnum][$v];	
+						if (is_array($stuanswers[$thisq][$kidx])) { //multans
+							foreach ($stuanswers[$thisq][$kidx] as $k=>$v) {
+								$stuanswers[$thisq][$kidx][$k] = $_SESSION['choicemap'][$partnum][$v];	
 							}
-							$stuanswers[$qnidx+1][$kidx] = implode('|',$stuanswers[$qnidx+1][$kidx]);
+							$stuanswers[$thisq][$kidx] = implode('|',$stuanswers[$thisq][$kidx]);
 						} else {
-							$stuanswers[$qnidx+1][$kidx] = $_SESSION['choicemap'][$partnum][$stuanswers[$qnidx+1][$kidx]];
-							if ($stuanswers[$qnidx+1][$kidx]===null) {
-								$stuanswers[$qnidx+1][$kidx] = 'NA';
+							$stuanswers[$thisq][$kidx] = $_SESSION['choicemap'][$partnum][$stuanswers[$thisq][$kidx]];
+							if ($stuanswers[$thisq][$kidx]===null) {
+								$stuanswers[$thisq][$kidx] = 'NA';
 							}
 						}	
 					}
@@ -664,17 +662,17 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 					$tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
 					$spc++;
 				}
-				$stuanswers[$qnidx+1][$kidx] = implode('|',$tmp);
+				$stuanswers[$thisq][$kidx] = implode('|',$tmp);
 			}
 		}
 	} else {
 		if (isset($_POST["tc$qnidx"])) {
-			$stuanswers[$qnidx+1] = stripslashes($_POST["tc$qnidx"]);
+			$stuanswers[$thisq] = stripslashes($_POST["tc$qnidx"]);
 			if (is_numeric($_POST["qn$qnidx"])) {
-				$stuanswersval[$qnidx+1] = floatval($_POST["qn$qnidx"]);
+				$stuanswersval[$thisq] = floatval($_POST["qn$qnidx"]);
 			} else if (substr($_POST["qn$qnidx"],0,2)=='[(') { //calcmatrix
 				$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]));	
-				$stuanswersval[$qnidx+1] = str_replace(',','|',$stuav);
+				$stuanswersval[$thisq] = str_replace(',','|',$stuav);
 			}
 		} else if (isset($_POST["qn$qnidx"])) {
 			if (isset($_POST["qn$qnidx-0"])) { //calcmatrix with matrixsize
@@ -684,22 +682,22 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 					$tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
 					$spc++;
 				}
-				$stuanswers[$qnidx+1] = implode('|',$tmp);
+				$stuanswers[$thisq] = implode('|',$tmp);
 				$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]));
-				$stuanswersval[$qnidx+1] = str_replace(',','|',$stuav);
+				$stuanswersval[$thisq] = str_replace(',','|',$stuav);
 			} else {
-				$stuanswers[$qnidx+1] = stripslashes_deep($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
+				$stuanswers[$thisq] = stripslashes_deep($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
 				if (is_numeric($_POST["qn$qnidx"])) {
-					$stuanswersval[$qnidx+1] = floatval($_POST["qn$qnidx"]);
+					$stuanswersval[$thisq] = floatval($_POST["qn$qnidx"]);
 				}
 				if (isset($_SESSION['choicemap'][$qnidx])) {
-					if (is_array($stuanswers[$qnidx+1])) { //multans
-						foreach ($stuanswers[$qnidx+1] as $k=>$v) {
-							$stuanswers[$qnidx+1][$k] = $_SESSION['choicemap'][$qnidx][$v];	
+					if (is_array($stuanswers[$thisq])) { //multans
+						foreach ($stuanswers[$thisq] as $k=>$v) {
+							$stuanswers[$thisq][$k] = $_SESSION['choicemap'][$qnidx][$v];	
 						}
-						$stuanswers[$qnidx+1] = implode('|',$stuanswers[$qnidx+1]);
+						$stuanswers[$thisq] = implode('|',$stuanswers[$thisq]);
 					} else {
-						$stuanswers[$qnidx+1] = $_SESSION['choicemap'][$qnidx][$stuanswers[$qnidx+1]];	
+						$stuanswers[$thisq] = $_SESSION['choicemap'][$qnidx][$stuanswers[$thisq]];	
 					}	
 				}
 			}
@@ -710,7 +708,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
 				$spc++;
 			}
-			$stuanswers[$qnidx+1] = implode('|',$tmp);
+			$stuanswers[$thisq] = implode('|',$tmp);
 		}
 	}
 
