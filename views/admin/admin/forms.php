@@ -715,7 +715,7 @@ switch ($action) {
                                 <div style="max-width: 300px">
                                 <?php
                                 foreach ($groupsName as $group) {
-                                    echo '<option value="' . $group['id'] . '" >' . $group['name'] . '</option>';
+                                    echo '<option value="' . $group['id'] . '" >' . AppUtility::truncate($group['name'], 50) . '</option>';
                                 }
                                 echo '</div>';
                                 echo "</select>"; ?>
