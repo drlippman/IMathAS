@@ -122,8 +122,20 @@ class SiteController extends AppController
             {
                 Yii::$app->session->set('tzoffset', $params['tzoffset']);
                 Yii::$app->session->set('tzname', $params['tzname']);
-                $this->checkSession($params);
-                return $this->redirect('dashboard');
+                $sessionStatus = $this->checkSession($params);
+
+                if($sessionStatus['status'] === true){
+                    return $this->redirect('dashboard');
+                }
+                else{
+                    if ($this->getAuthenticatedUser()) {
+                        $sessionId = Yii::$app->session->getId();
+                        Sessions::deleteBySessionId($sessionId);
+                        Yii::$app->user->logout();
+                    }
+                    $this->setErrorFlash($sessionStatus['message']);
+                }
+
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_USERNAME_PASSWORD);
             }

@@ -369,8 +369,7 @@ class AppController extends Controller
                 $userId = $haveSession['id'];
                 $groupId = $haveSession['groupid'];
                 if ($haveSession['rights'] == AppConstant::NUMERIC_ZERO) {
-                    echo 'You have not yet confirmed your registration.  You must respond to the email that was sent to you by MyOpenMath.';
-                    exit;
+                    return array('status'=> false, 'message'=>"You have not yet confirmed your registration.  You must respond to the email that was sent to you by MyOpenMath.");
                 }
                 $sessionData['useragent'] = $_SERVER['HTTP_USER_AGENT'];
                 $sessionData['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -622,6 +621,7 @@ class AppController extends Controller
         if (!isset($courseName)) {
             $courseName = "Course Page";
         }
+        return array('status'=>true, 'message'=>"");
     }
 
     function writesessiondata($sessionData, $sessionId)
