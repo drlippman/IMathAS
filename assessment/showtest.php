@@ -575,13 +575,13 @@
 		$seeds = explode(",",$line['reviewseeds']);
 		
 		if (strpos($line['reviewscores'],';')===false) {
-			$reviewscores = explode(",",$line['reviewscores']);
+			$scores = explode(",",$line['reviewscores']);
 			$noraw = true;
-			$reviewrawscores = $reviewscores;
+			$rawscores = $scores;
 		} else {
 			$sp = explode(';',$line['reviewscores']);
-			$reviewscores = explode(',', $sp[0]);
-			$reviewrawscores = explode(',', $sp[1]);
+			$scores = explode(',', $sp[0]);
+			$rawscores = explode(',', $sp[1]);
 			$noraw = false;
 		}
 		
