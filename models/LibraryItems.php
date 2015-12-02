@@ -341,9 +341,9 @@ class LibraryItems extends BaseImasLibraryItems
         $query ->select(['imas_library_items.ownerid', 'imas_users.groupid'])
             ->from('imas_library_items, imas_users')
             ->where('imas_library_items.ownerid=imas_users.id');
-        $query->andWhere(['imas_library_items.libid'=> ':lib']);
-        $query->andWhere(['imas_library_items.qsetid' => ':qsetid']);
-        $command = $query->createCommand()->bindValues([':lib' => $lib, ':qsetid' => $qsetid]);
+        $query->andWhere('imas_library_items.libid=:lib', [':lib' => $lib]);
+        $query->andWhere('imas_library_items.qsetid=:qsetid', [':qsetid' => $qsetid]);
+        $command = $query->createCommand();
         $data = $command->queryOne();
         return $data;
     }

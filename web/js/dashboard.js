@@ -10,7 +10,6 @@ $(document).ready(function(){
 
 function hidefromcourselist(courseid, el){
     var allMessage = {courseId: courseid};
-
     var html = '<div><p>Are you SURE you want to hide this course from your course list?</p></div>';
     var cancelUrl = $(this).attr('href');
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
