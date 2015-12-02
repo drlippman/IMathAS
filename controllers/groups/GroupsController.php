@@ -452,9 +452,11 @@ class GroupsController extends AppController
         $query = User::userDataForGroups($remove);
         $stuNameToBeRemoved = $query[0]['LastName'].','.$query[0]['FirstName'];
         $query = Stugroups::getById($grpId);
-        $Stu_GrpName = $query['name'];
+        $StuGrpName = $query['name'];
+        $Stu_GrpName = AppUtility::truncate($StuGrpName,30);
         $query = StuGroupSet::getByGrpSetId($grpSetId);
-        $Stu_GrpSetName = $query['name'];
+        $StuGrpSetName = $query['name'];
+        $Stu_GrpSetName = AppUtility::truncate($StuGrpSetName, 30);
         $responseData = array('stuNameToBeRemoved' => $stuNameToBeRemoved,'Stu_GrpName' => $Stu_GrpName,'cid' => $cid,'grpSetId' => $grpSetId,'remove' => $remove,'Stu_GrpSetName' => $Stu_GrpSetName,'grpId' => $grpId);
         return $this->successResponse($responseData);
     }
@@ -467,9 +469,11 @@ class GroupsController extends AppController
         $cid = $params['cid'];
         $grpSetId = $params['grpId'];
         $query = Stugroups::getById($deleteGrp);
-        $currGrpNameToDlt = $query['name'];
+        $currGrpNameToDelete = $query['name'];
+        $currGrpNameToDlt = AppUtility::truncate($currGrpNameToDelete,30);
         $query = StuGroupSet::getByGrpSetId($grpSetId);
-        $currGrpSetNameToDlt = $query['name'];
+        $currGrpSetNameToDelete = $query['name'];
+        $currGrpSetNameToDlt = AppUtility::truncate($currGrpSetNameToDelete,30);
         $responseData = array('currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'cid' => $cid,'grpSetId' => $grpSetId,'deleteGrp' => $deleteGrp);
         return $this->successResponse($responseData);
     }

@@ -132,13 +132,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo '<p>No student groups have been created yet</p>';
             }foreach($page_Grp as $grpId=>$grpName)
             {
-                echo "<br><b>Group: $grpName</b>&nbsp;&nbsp;";
+                echo "<br><b>Group:</b>
+                 <div class='word-break-all-width'>$grpName&nbsp;&nbsp;</div>";
                 echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
                 echo "[<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>Delete</a>]";
-                if (count($page_GrpMembers[$grpId]) > 0)
-                {
-                    echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]";
-                }
+                echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]";
                 echo '<ul>';
                 if (count($page_GrpMembers[$grpId]) == 0)
                 {
@@ -175,7 +173,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo "<option value='--new--'>New Group</option>";
                 foreach ($page_Grp as $grpId=>$grpName)
                 {
-                    echo "<option value=$grpId>$grpName</option>";
+                    $groupName = AppUtility::truncate($grpName, 20);
+                    echo "<option value=$grpId>$groupName</option>";
                 }
                 echo '</select>';
                 echo '<ul class="nomark stu-list">';
