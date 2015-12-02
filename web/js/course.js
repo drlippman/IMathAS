@@ -373,7 +373,7 @@ function locked()
 {
     var name = 'Assessment';
     var html = '<div><p>This course is currently locked for an assessment.</p>';
-//    html += "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test'>"+name+"</a></div>";
+//    html += "<a class=''style='color: #0000ff;font-size: 16px' href='../assessment/assessment/show-test'>"+name+"</a></div>";
     var cancelUrl = $(this).attr('href');
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,

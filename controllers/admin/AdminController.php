@@ -776,6 +776,12 @@ class AdminController extends AppController
             }
                 break;
             case "chgteachers":
+                $courseChangeTeacher = Course::getById($params['id']);
+                $CourseName = $courseChangeTeacher['name'];
+                $currentTeacher = User::getUserTeacherData($params['id']);
+                $potentialUserLessThanAdmin = User::getPotentialTeacherLessThanAdmin($groupId);
+                $potentialUser = User::getPotentialTeacher();
+
                  break;
             case "importmacros":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
@@ -857,7 +863,7 @@ class AdminController extends AppController
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
             'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
             'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser, 'getAction' => $getAction, 'getId' => $getId, 'line' => $line, 'resultGroup' => $resultGroup,
-        'pageTitle' => $pageTitle);
+        'pageTitle' => $pageTitle, 'CourseName' => $CourseName, 'currentTeacher' => $currentTeacher, 'potentialUserLessThanAdmin' => $potentialUserLessThanAdmin, 'potentialUser' => $potentialUser, 'courseChangeTeacher' => $courseChangeTeacher);
         return $this->renderWithData('forms',$responseData);
     }
 

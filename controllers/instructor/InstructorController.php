@@ -58,8 +58,9 @@ class InstructorController extends AppController
     public function beforeAction($action)
     {
         $user = $this->getAuthenticatedUser();
+        $actionPath = Yii::$app->controller->action->id;
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($user,$courseId);
+        return $this->accessForTeacher($user,$courseId, $actionPath);
     }
 
     /**

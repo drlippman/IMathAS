@@ -441,6 +441,43 @@ switch ($action) {
         <?php echo "</div>";
         break;
     case "chgteachers":
+        echo '<div id="headerforms" class="pagetitle">';
+		echo "<h2>{$CourseName}</h2>\n";
+		echo '</div>';
+
+        echo "<h4>Current Teachers:</h4>\n";
+        $num = count($currentTeacher);
+
+        echo '<form method="post" action="actions?action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
+        echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
+        echo "<table cellpadding=5>\n";
+        $onlyOne = ($num == 1);
+
+            	foreach($courseChangeTeacher as $key=> $line) {
+
+                    if ($onlyOne) {
+                        echo '<tr><td></td>';
+                    } else {
+                        echo '<tr><td><input type="checkbox" name="tid[]" value="'.$line['id'].'"/></td>';
+                    }
+
+                    echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+                    if ($onlyOne) {
+                        echo "<td></td></tr>";
+                    } else {
+                        echo "<td><A href=\"actions?action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
+                    }
+                    $used[$line['userid']] = true;
+                }
+        echo "</table></form>\n";
+
+        echo "<h4>Potential Teachers:</h4>\n";
+        if($myRights < AppConstant::ADMIN_RIGHT)
+        {
+            $potentialUserLessThanAdmin;
+        } elseif($myRights == AppConstant::ADMIN_RIGHT){
+            $potentialUser;
+        }
         break;
     case "importmacros":
         ?>

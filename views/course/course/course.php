@@ -11,7 +11,6 @@ $this->params['breadcrumbs'][] = $this->title; ?>
 <input type="hidden" class="web-path" value="<?php echo AppUtility::getHomeURL() ?>">
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 
-
 <?php
 
 if (($teacherId && (!$backLink))) {?>

@@ -13,6 +13,7 @@ use app\models\Wiki;
 use app\models\WikiRevision;
 use app\models\WikiView;
 use \yii\base\Component;
+use app\components\Calendar;
 
 class ShowItemCourse extends Component
 {
@@ -645,29 +646,20 @@ class ShowItemCourse extends Component
                 echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
             }
             if ($line['itemtype'] == "Calendar") {
+                global $currentTime;
                 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 if ($isPublic) { continue;}
 //                echo "<div class=item>\n";1 calender
                 ShowItemCourse::beginitem($canEdit); ?>
-                <div class="col-lg-12 padding-alignment calendar-container">
-                    <div class='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
-                        <input type="hidden" class="current-time" value="<?php echo $currentTime ?>">
 
-                        <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
-                        <input type="hidden" class="calender-course-id" value="<?php echo $courseId ?>">
-                    </div>
-                    <div class="calendar-day-details-right-side pull-left col-lg-3">
-                        <div class="day-detail-border">
-                            <b>Day Details:</b>
-                        </div>
-                        <div class="calendar-day-details"></div>
-                    </div>
-                </div>
-            <?php   if ($canEdit) {
-//                  Calendar::showCalendar();
-               }
-//                showcalendar("course");
-//                enditem($canEdit);//
+            <?php   if ($canEdit) { ?>
+                    <a href="#" >Delete</a> |
+                    <a href="#">Manage Events</a>
+              <?php } ?>
+
+                <?php
+                Calendar::showCalendar($currentTime);
+                ShowItemCourse::enditem($canEdit);
                 echo "</div>";
             } else if ($line['itemtype'] == "Assessment") {
                 /**
