@@ -80,6 +80,7 @@ $msgTotal = array_sum($newMsgCnt);
         <br/>
         <br/>
         <br/>
+        <br/>
 
         <?php
 if($from == 'msg')
