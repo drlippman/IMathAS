@@ -237,6 +237,10 @@
 							t.nodeToAM(AMtags[i]);
 						}
 					}
+					AMimgs = ed.dom.select('img.AMimg');
+					for (var i=0; i<AMimgs.length; i++) {
+						t.imgwrap(ed, AMimgs[i]);
+					}
 				}
 			});
 			
@@ -250,6 +254,7 @@
 				cm.setDisabled('charmap', p!=null);
 				cm.setDisabled('sub', p!=null);
 				cm.setDisabled('sup', p!=null);
+				
 				if (p != null) {
 					if (t.lastAMnode == p) {
 						doprocessnode = false;
@@ -330,9 +335,9 @@
 		
 		math2ascii : function(el) {
 			var myAM = el.innerHTML;
-	
+
 			if (myAM.indexOf("`") == -1) {
-				if (el.title!='') { //myAM.indexOf('math')==-1 && myAM.indexOf('img')==-1 && 
+				if (el.title!='' && el.title.indexOf('math')==-1 && el.title.indexOf('img')==-1) { //myAM.indexOf('math')==-1 && myAM.indexOf('img')==-1 &&
 					myAM = el.title;  //if cut-and-paste, grab eqn from title if there
 				} else if (myAM.indexOf('title')==-1) {
 					myAM = myAM.replace(/.+alt=\"(.*?)\".+/g,"$1");
@@ -345,7 +350,6 @@
 					myAM = myAM.replace(/.+title=([^>]*?)\s.*>.*/g,"$1");
 					myAM = myAM.replace(/.+title=(.*?)>.*/g,"$1");
 				}
-				
 				//myAM = myAM.replace(/&gt;/g,">");
 				//myAM = myAM.replace(/&lt;/g,"<");
 				myAM = myAM.replace(/>/g,"&gt;");
@@ -360,6 +364,7 @@
 				  var str = outnode.innerHTML.replace(/\`/g,"");
 				  str.replace(/\"/,"&quot;");
 				  var newAM = document.createElement("span");
+				  newAM.className = "AM";
 				  newAM.appendChild(AMTparseMath(str));
 				  
 				  outnode.innerHTML = newAM.innerHTML;    
@@ -374,6 +379,17 @@
 			  }
 			
 		}, 
+		
+		imgwrap : function(ed, imgnode) {
+			p = ed.dom.getParent(imgnode,this.testAMclass);
+			if (p==null) {
+				var newAM = document.createElement("span");
+				newAM.className = "AM";
+				var rimgnode = imgnode.parentNode.replaceChild(newAM, imgnode);
+				newAM.appendChild(rimgnode);
+				p = newAM;
+			}
+		},
 		
 		lastAMnode : null,
 		loaded : false,

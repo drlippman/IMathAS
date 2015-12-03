@@ -856,6 +856,7 @@ function AMparseMath(str) {
   }
   node.src = AMTcgiloc + '?' + texstring;
   node.style.verticalAlign = "middle";
+  node.className = "AMimg";
   if (config.showasciiformulaonhover)                      //fixed by djhsu so newline
     node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
  
