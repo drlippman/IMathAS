@@ -81,8 +81,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function findByEmail($email)
     {
-        $user = static::findOne(['email' => $email]);
-        return $user;
+        return User::find()->where(['email' => $email])->asArray()->all();
     }
 
     public static function findAllUser($sortBy, $order)

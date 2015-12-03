@@ -593,18 +593,22 @@ class SiteController extends AppController
         if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $toEmail = $param['ForgotUsernameForm']['email'];
-            $user = User::findByEmail($toEmail);
-            if ($user) {
+            $users = User::findByEmail($toEmail);
+            if (!empty($users) && is_array($users)) {
+                //Todo: Add install name in email.
                 $message = "<p>Welcome to OpenMath</p> ";
-                $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName).",<br>";
+                $message .= "<p>Hi,<br></p>";
                 $message .= "<p>We received a request to get the username associated with this e-mail address ".$user->email.". If you have made this request, please see the Username associated with this email listed below.</p> ";
-                $message .= "<p>Username: <b>".$user->SID."</b></br></p>";
+                foreach($users as $singleUser){
+                    $lastLogin = ($singleUser['lastaccess'] == 0 ) ? "Never" : date("n/j/y g:ia",$singleUser['lastaccess']) ;
+                    $message .= "<p>Username: <b>".$singleUser['SID']."</b>  Last logged in: ".$lastLogin."</br></p>";
+                }
                 $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<br>This is an automated message from OpenMath.  Do not respond to this email</p><br>";
                 $message .= "<p>Best Regards,<br>OpenMath Team</p></p>";
                 AppUtility::sendMail(AppConstant::FORGOT_USER_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotUsernameForm();
-                $this->setSuccessFlash('Username sent to your registered email.');
+                $this->setSuccessFlash(count($users).' usernames match this email address and were emailed.');
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_EMAIL);
             }

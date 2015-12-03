@@ -44,13 +44,13 @@ $config = [
             'class' => 'yii\swiftmailer\Mailer',
             'useFileTransport' => false,
             'messageConfig' => [
-                'from' => 'radheyradhey.98765@gmail.com' // sender address goes here
+                'from' => 'admin@openmath.com' // sender address goes here
             ],
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.gmail.com',
-                'username' => 'radheyradhey.98765@gmail.com',
-                'password' => 'tudip123456',
+                'host' => 'smtp.mandrillapp.com',
+                'username' => 'sumit_joshi@tudip.com',
+                'password' => 'AysLNToZhKaLeWBSYShpAQ',
                 'port' => '587',
                 'encryption' => 'tls',
             ],
