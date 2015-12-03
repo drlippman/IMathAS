@@ -913,9 +913,10 @@ switch ($action) {
         <div class="col-md-12 col-sm-12 rename-group-padding">
             <?php $gpname = $groupsName['name']; ?>
             <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id'] ?>>
-                <div id="headerforms" class="pagetitle">
+                <div id="headerforms" class="pagetitle padding-left-zero">
                     <h2>
-                        <?php AppUtility::t('Rename Instructor Group') ?></h2>
+                        <?php AppUtility::t('Rename Instructor Group') ?>
+                    </h2>
                 </div>
                 <?php AppUtility::t('Group name:', false) ?> <input
                     class="form-control width-thirty-three-per margin-top-thirty subject" type=text size=50 name=gpname

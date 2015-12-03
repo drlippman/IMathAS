@@ -45,8 +45,8 @@ $this->title = AppUtility::t("Blocks to change", false);
         <table class="table table-bordered table-striped table-hover data-table " id="opttable">
     <thead>
     <tr>
-        <th class="col-sm-1 col-md-1 padding-left-zero"><?php AppUtility::t('Change?')?></th>
-        <th class="col-sm-4 col-md-3"><?php AppUtility::t('Option')?></th>
+        <th class="col-sm-1 col-md-1"><?php AppUtility::t('Change?')?></th>
+        <th class="col-sm-4 col-md-4"><?php AppUtility::t('Option')?></th>
         <th class="col-sm-7 col-md-7"><?php AppUtility::t('Setting')?></th>
     </tr>
     </thead>

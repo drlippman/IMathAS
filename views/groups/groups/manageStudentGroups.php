@@ -132,7 +132,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo '<p>No student groups have been created yet</p>';
             }foreach($page_Grp as $grpId=>$grpName)
             {
-                echo "<br><b>Group:</b>
+                echo "<br><b>Group</b>
                  <div class='word-break-all-width'>$grpName&nbsp;&nbsp;</div>";
                 echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
                 echo "[<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>Delete</a>]";

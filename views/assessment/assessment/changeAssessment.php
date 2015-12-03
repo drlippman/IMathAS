@@ -13,7 +13,8 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
     <div class="title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
+                <div class="vertical-align title-page"><?php echo $this->title ?>
+                    <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=assessments' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
             </div>
         </div>
     </div>

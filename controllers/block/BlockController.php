@@ -35,7 +35,7 @@ class BlockController extends AppController
         $user = $this->getAuthenticatedUser();
         $userId = $user['id'];
         $this->layout = 'master';
-        $courseId = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $courseName = $course['name'];
         $blockData = unserialize($course['itemorder']);
