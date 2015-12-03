@@ -684,12 +684,13 @@ class SiteController extends AppController
          *  Group Admin
          *  Admin
          */
-        if ($this->getAuthenticatedUser()) {
+
+        if ($this->getAuthenticatedUser()){
             $sessionId = Yii::$app->session->getId();
             Sessions::deleteBySessionId($sessionId);
             Yii::$app->user->logout();
-            return $this->redirect(AppUtility::getURLFromHome('site', 'login'));
         }
+        return $this->redirect(AppUtility::getURLFromHome('site', 'login'));
     }
 
     public function actionDashboard()
