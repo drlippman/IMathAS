@@ -1191,12 +1191,11 @@ class SiteController extends AppController
                     if (isset($CFG['GEN']['newpasswords'])) {
                         $md5pw = password_hash($params['newpw1'], PASSWORD_DEFAULT);
                     } else {
-                        $md5pw =md5($params['newpw1']);
+                        $md5pw =  AppUtility::passwordHash($params['newpw1']);
                     }
                     User::updateUserPassword($userId, $md5pw);
                 } else {
-                    echo "Password change failed.  <a href=\"form?action=chguserinfo\">Try Again</a>\n";
-                    exit;
+                    $this->setErrorFlash("Password change failed. Try Again.");
                 }
             }
             if ($params['settimezone']) {
