@@ -668,14 +668,14 @@ class AdminController extends AppController
                     $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
-                 break;
+                break;
             case "chgpwd":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
                     $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
-                 break;
+                break;
             case "chgrights":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
@@ -683,97 +683,97 @@ class AdminController extends AppController
                     return $this->redirect($this->goHome());
                 }
             case "newadmin":
-            if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
-            {
-                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-                return $this->redirect($this->goHome());
-            }
-            if ($getAction == "newadmin") {
-                $oldGroup = 0;
-                $oldRights = 10;
-            } else {
-                $line = User::getDataById($getId);
-            }
-            if ($myRights == AppConstant::ADMIN_RIGHT) {
-                $resultGroup = Groups::getIdNameByName();
-            }
+                if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
+                {
+                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
+                if ($getAction == "newadmin") {
+                    $oldGroup = 0;
+                    $oldRights = 10;
+                } else {
+                    $line = User::getDataById($getId);
+                }
+                if ($myRights == AppConstant::ADMIN_RIGHT) {
+                    $resultGroup = Groups::getIdNameByName();
+                }
                 break;
             case "addnewcourse":
                 break;
             case "modify":
             case "addcourse":
-            $pageTitle = 'Course Settings';
-            if ($params['action']=='modify')
-            {
-                $line = Course::getById($params['cid']);
-                $courseid = $line['id'];
-                $name = $line['name'];
-                $ekey = $line['enrollkey'];
-                $hideicons = $line['hideicons'];
-                $picicons = $line['picicons'];
-                $allowunenroll = $line['allowunenroll'];
-                $copyrights = $line['copyrights'];
-                $msgset = $line['msgset']%5;
-                $msgmonitor = (floor($line['msgset']/5))&1;
-                $msgQtoInstr = (floor($line['msgset']/5))&2;
-                $toolset = $line['toolset'];
-                $cploc = $line['cploc'];
-                $theme = $line['theme'];
-                $topbar = explode('|',$line['topbar']);
-                $topbar[0] = explode(',',$topbar[0]);
-                $topbar[1] = explode(',',$topbar[1]);
-                if ($topbar[0][0] == null) {unset($topbar[0][0]);}
-                if ($topbar[1][0] == null) {unset($topbar[1][0]);}
-                if (!isset($topbar[2])) {$topbar[2] = 0;}
-                $avail = $line['available'];
-                $lockaid = $line['lockaid'];
-                $ltisecret = $line['ltisecret'];
-                $chatset = $line['chatset'];
-                $showlatepass = $line['showlatepass'];
-                $istemplate = $line['istemplate'];
-                $deflatepass = $line['deflatepass'];
-                $deftime = $line['deftime'];
-                $assessment = Assessments::getByName($courseid);
-            } else
-            {
-                $courseid ="Will be assigned when the course is created";
-                $name = "Enter course name here";
-                $ekey = "Enter enrollment key here";
-                $hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
-                $picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
-                $allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
-                //0 no un, 1 allow un;  0 allow enroll, 2 no enroll
-                $copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
-                $msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
-                $toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
-                $msgmonitor = (floor($msgset/5))&1;
-                $msgQtoInstr = (floor($msgset/5))&2;
-                $msgset = $msgset%5;
-                $cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
-                $topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
-                $chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
-                $showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
-                $istemplate = 0;
-                $avail = 0;
-                $lockaid = 0;
-                $deftime = isset($CFG['CPS']['deftime'])?$CFG['CPS']['deftime'][0]:600;
-                $deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
-                $ltisecret = "";
-            }
-            $defetime = $deftime%10000;
-            $hr = floor($defetime/60)%12;
-            $min = $defetime%60;
-            $am = ($defetime<12*60)?'am':'pm';
-            $deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-            if ($deftime>10000) {
-                $defstime = floor($deftime/10000);
-                $hr = floor($defstime/60)%12;
-                $min = $defstime%60;
-                $am = ($defstime<12*60)?'am':'pm';
-                $defstimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-            } else {
-                $defstimedisp = $deftimedisp;
-            }
+                $pageTitle = 'Course Settings';
+                if ($params['action']=='modify')
+                {
+                    $line = Course::getById($params['cid']);
+                    $courseid = $line['id'];
+                    $name = $line['name'];
+                    $ekey = $line['enrollkey'];
+                    $hideicons = $line['hideicons'];
+                    $picicons = $line['picicons'];
+                    $allowunenroll = $line['allowunenroll'];
+                    $copyrights = $line['copyrights'];
+                    $msgset = $line['msgset']%5;
+                    $msgmonitor = (floor($line['msgset']/5))&1;
+                    $msgQtoInstr = (floor($line['msgset']/5))&2;
+                    $toolset = $line['toolset'];
+                    $cploc = $line['cploc'];
+                    $theme = $line['theme'];
+                    $topbar = explode('|',$line['topbar']);
+                    $topbar[0] = explode(',',$topbar[0]);
+                    $topbar[1] = explode(',',$topbar[1]);
+                    if ($topbar[0][0] == null) {unset($topbar[0][0]);}
+                    if ($topbar[1][0] == null) {unset($topbar[1][0]);}
+                    if (!isset($topbar[2])) {$topbar[2] = 0;}
+                    $avail = $line['available'];
+                    $lockaid = $line['lockaid'];
+                    $ltisecret = $line['ltisecret'];
+                    $chatset = $line['chatset'];
+                    $showlatepass = $line['showlatepass'];
+                    $istemplate = $line['istemplate'];
+                    $deflatepass = $line['deflatepass'];
+                    $deftime = $line['deftime'];
+                    $assessment = Assessments::getByName($courseid);
+                } else
+                {
+                    $courseid ="Will be assigned when the course is created";
+                    $name = "Enter course name here";
+                    $ekey = "Enter enrollment key here";
+                    $hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
+                    $picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
+                    $allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
+                    //0 no un, 1 allow un;  0 allow enroll, 2 no enroll
+                    $copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
+                    $msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
+                    $toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
+                    $msgmonitor = (floor($msgset/5))&1;
+                    $msgQtoInstr = (floor($msgset/5))&2;
+                    $msgset = $msgset%5;
+                    $cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
+                    $topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
+                    $chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
+                    $showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
+                    $istemplate = 0;
+                    $avail = 0;
+                    $lockaid = 0;
+                    $deftime = isset($CFG['CPS']['deftime'])?$CFG['CPS']['deftime'][0]:600;
+                    $deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
+                    $ltisecret = "";
+                }
+                $defetime = $deftime%10000;
+                $hr = floor($defetime/60)%12;
+                $min = $defetime%60;
+                $am = ($defetime<12*60)?'am':'pm';
+                $deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+                if ($deftime>10000) {
+                    $defstime = floor($deftime/10000);
+                    $hr = floor($defstime/60)%12;
+                    $min = $defstime%60;
+                    $am = ($defstime<12*60)?'am':'pm';
+                    $defstimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+                } else {
+                    $defstimedisp = $deftimedisp;
+                }
                 break;
             case "chgteachers":
                 $courseChangeTeacher = Course::getById($params['id']);
@@ -998,7 +998,7 @@ class AdminController extends AppController
                 if (isset($CFG['GEN']['newpasswords'])) {
                     $md5pw = password_hash($params['password'], PASSWORD_DEFAULT);
                 } else {
-                    $md5pw =md5($params['password']);
+                    $md5pw = AppUtility::passwordHash($params['password']);
                 }
                 if ($myRights < 100) {
                     $newGroup = $groupid;
