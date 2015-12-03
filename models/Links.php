@@ -23,4 +23,9 @@ class Links extends BaseImasLinkedtext
             $linkData->delete();
         }
     }
+
+    public static function getPoints($id)
+    {
+        return Links::find()->select('text,title,points')->where(['id' => $id])->one();
+    }
 } 

@@ -236,7 +236,41 @@ class CourseController extends AppController
         $courseId = $this->getParamVal('cid');
         $id = $this->getParamVal('id');
         $course = Course::getById($courseId);
+        $isTeacher = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
+        $isStudent = $this->isStudent($user['id'], $courseId);
+        $isGuest = $this->isGuestUser();
+
         $link = Links::getById($id);
+        $text = $link['text'];
+        $title = $link['title'];
+        $target = $link['target'];
+        $titlesimp = strip_tags($title);
+
+
+        if (!isset($isTeacher) && !isset($isTutor) && !isset($isStudent) && !isset($isGuest)) {
+            return array('status'=> false, 'message'=>"You are not enrolled in this course. Please return to the Home Page and enroll");
+        }
+
+        if (!isset($id)) {
+            return array('status'=> false, 'message'=>"No item specified"); ?>
+
+       <?php }
+        if (substr($text,0,8)=='exttool:') {
+            $param = "cid={$courseId}&id=$id";
+            if ($target==0) {
+                $height = '500px';
+                $width = '95%';
+                $param .= '&target=iframe';
+                $text = '<iframe id="exttoolframe" src="'.AppUtility::getHomeURL().'/filter/basiclti/post.php?'.$param.'" height="'.$height.'" width="'.$width.'" ';
+                $text .= 'scrolling="auto" frameborder="1" transparency>   <p>Error</p> </iframe>';
+                $text .= '<script type="text/javascript">$(function() {$("#exttoolframe").css("height",$(window).height() - $(".midwrapper").position().top - ($(".midwrapper").height()-500) - ($("body").outerHeight(true) - $("body").innerHeight()));});</script>';
+            } else {
+                //redirect to post page
+                $param .= '&target=new';
+                header('Location: '.AppUtility::getHomeURL(). '/filter/basiclti/post.?'.$param);
+            }
+        }
         $this->includeCSS(['course/items.css']);
         $returnData = array('course' => $course, 'links' => $link, 'user' => $user);
         return $this->renderWithData('showLinkedText', $returnData);

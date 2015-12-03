@@ -187,4 +187,9 @@ class ExternalTools extends BaseImasExternalTools
     {
         return self::find()->select('name')->where(['id' => $id])->one();
     }
+
+    public static function getToolData($tool, $courseId, $groupId)
+    {
+        return Yii::$app->db->createCommand("SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$courseId' OR (courseid=0 AND (groupid='$groupId' OR groupid=0)))")->queryOne();
+    }
 }

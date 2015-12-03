@@ -162,17 +162,13 @@ class ShowItemCourse extends Component
                             } else {
                                 echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             }
-                            if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['folder']}\"></a></span>";
-                            } else {
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/folder.gif\"></a></span>";
-                            }
                             echo "<div class=title>";
                         }
                         if ($isPublic) {
                             echo "<a href=\"#\" $astyle><b>{$items[$i]['name']}</b></a> ";
                         } else {
-                            echo "<a href=\"#\" $astyle><b>{$items[$i]['name']}</b></a> ";
+                            echo "<a href=\"course?cid=$courseId&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
                         }
                         if (($items[$i]['newflag']) && $items[$i]['newflag']== AppConstant::NUMERIC_ONE) {
                             echo "<span style=\"color:red;\">", _('New'), "</span>";
@@ -234,11 +230,7 @@ class ShowItemCourse extends Component
                             } else {
                                 echo "<span class=left><a href=\"#\" border=0>";
                             }
-                            if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['foldertree']}\"></a></span>";
-                            } else {
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></a></span>";
-                            }
                             echo "<div class=title>";
                         }
                         if ($isPublic) {
@@ -419,11 +411,7 @@ class ShowItemCourse extends Component
                         echo ">";
                         if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
-                            if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['folder']}\"></a></span>";
-                            } else {
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/folder.gif\"></a></span>";
-                            }
                             echo "<div class=title>";
                         }
                         echo "<a href=\"course?cid=$courseId&folder=$parent-$bnum\" $astyle><b>";
@@ -481,11 +469,7 @@ class ShowItemCourse extends Component
                         echo ">";
                         if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "<span class=left><a href=\"#\" border=0>";
-                            if ($graphicalIcons) {
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/{$itemIcons['foldertree']}\"></a></span>";
-                            } else {
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></a></span>";
-                            }
                             echo "<div class=title>";
                         } ?>
                         <a href="<?php echo AppUtility::getURLFromHome('block','block/tree-reader?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><b><?php echo $items[$i]['name'];?></b></a>
@@ -755,7 +739,7 @@ class ShowItemCourse extends Component
                     ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 2 assessmene
                     if (($hideIcons&1) == AppConstant::NUMERIC_ZERO) {
                         if ($graphicalIcons) { ?>
-                            <img alt="assess" class="floatleft item-icon-alignment"src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
+                            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                         <?php } else {
                             echo "<div class= icon" . ShowItemCourse::makecolor2($line['startdate'],$line['enddate'],$now) . ";\">"; ?>
                              <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>

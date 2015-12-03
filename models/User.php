@@ -140,10 +140,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getById($id)
     {
-
          $data = User::findOne(['id' => $id]);
-
-        return $data;
+         return $data;
     }
 
     public static function getByIdAndCode($id, $code)
@@ -878,6 +876,21 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query->select('iu.LastName,iu.FirstName,iu.email,i_s.lastaccess,iu.hasuserimg')->from('imas_users AS iu')
             ->join('LEFT JOIN','imas_students AS i_s','iu.id=i_s.userid')->where('i_s.courseid=:fetchtCourseId')->andWhere('iu.id = :to');
         $command = $query->createCommand()->bindValues([':to'=>$to, ':fetchtCourseId' => $fetchtCourseId]);
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getUserTeacherData($courseId)
+    {
+        $query = new Query();
+        $query->select('imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid')
+            ->from('imas_users')
+            ->join('INNER JOIN',
+                'imas_teachers',
+                'imas_teachers.userid=imas_users.id'
+            )->where(['imas_teachers.courseid' => $courseId]);
+        $query->orderBy('imas_users.LastName');
+        $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
