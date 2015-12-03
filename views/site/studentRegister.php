@@ -47,16 +47,19 @@ $this->params['breadcrumbs'][] = $this->title;
         $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',
             ['template' => "<div class=\"col-md-offset-2 col-md-9 col-sm-offset-3 col-sm-9\">{input}</div>\n<div class=\"col-md-8 col-md-8\">{error}</div>",
             ])->checkboxList(['1' => 'Notify Me By Email When I Receive A New Message.']) ?>
-
+        <br>
        <div class="form-group margin-left-zero"> <span><?php echo "If you already know your course ID, you can enter it now. Otherwise, leave this blank and you can enroll later." ?></span></div>
-        <br><br>
+        <br>
         <?= $form->field($model, 'courseID') ?>
         <?= $form->field($model, 'EnrollmentKey') ?>
 
         <div class="form-group">
              <div class="col-md-offset-2 col-md-9 col-md-offset-2 col-md-9">
                 <?= Html::submitButton('Sign Up', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-                &nbsp; &nbsp;<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
+                &nbsp; &nbsp;
+                 <a href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">
+                     <?= Html::button('Back', ['id' => 'back-button','class' => 'btn btn-primary']) ?>
+                 </a>
             </div>
         </div>
         <?php ActiveForm::end(); ?>
