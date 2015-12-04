@@ -77,8 +77,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ?>
                 <div class='col-md-10 col-sm-9 padding-left-zero'>
                     <div class="col-md-12 col-sm-12 padding-left-zero">
-                        <span class="floatleft"><?php AppUtility::t('New file') ?><sup>*</sup></span>
                         <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
+                        <span class="floatleft"><?php AppUtility::t('New file') ?><sup>*</sup></span>
                         <span class="col-md-3 col-sm-3"><input type="file" name="userfile"/></span>
                     </div>
 

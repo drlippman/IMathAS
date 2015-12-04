@@ -551,7 +551,6 @@ class CourseController extends AppController
                         $body = "<p>File type is not allowed</p>";
                     } else {
                         if (($filename = filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)) !== false) {
-
                             if (trim($params['newfiledescr'])=='') {
                                 $params['newfiledescr'] = $filename;
                             }
@@ -584,6 +583,7 @@ class CourseController extends AppController
                         }
                     }
                 }
+
                 if (isset($params['movefile'])) {
                     $from = $params['movefile'];
                     $to = $params['movefileto'];
@@ -592,7 +592,7 @@ class CourseController extends AppController
                     array_splice($fileorder,$to-1,0,$itemtomove);
                 }
                 $fileorder = implode(',',$fileorder);
-                 InlineText::setFileOrder($params['id'],$fileorder);
+                InlineText::setFileOrder($params['id'],$fileorder);
             }
 
             if ($params['submitbtn'] == 'Submit') {

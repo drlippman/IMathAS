@@ -66,7 +66,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     {
                         foreach($queryForUser as $user)
                         {
-
                             echo '<p><b>'.$user['LastName'].', '.$user['FirstName'].'</b></p>';
                             echo '<form method="post" action="../../admin/admin/actions?action=resetpwd&id='.$user['id'].'">';
                             echo '<ul><li>Username: <a href="../../admin/admin/index?showcourses='.$user['id'].'">'.$user['SID'].'</a></li>';

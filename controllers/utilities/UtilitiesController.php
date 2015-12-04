@@ -59,7 +59,6 @@ class UtilitiesController extends AppController
         }
         if (isset($form))
         {
-
             /**
              * User lookup
              */
@@ -448,11 +447,12 @@ class UtilitiesController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $user = $this->getAuthenticatedUser();
-        if($user->rights < AppConstant::ADMIN_RIGHT)
-        {
+
+        if($user->rights < AppConstant::ADMIN_RIGHT) {
             $body = AppConstant::NUMERIC_ONE;
             $message = AppConstant::NO_AUTHORITY;
         }
+
         $this->includeCSS(['utilities.css']);
         $data = QuestionSet::getWrongLibFlag();
         return $this->renderWithData('listWrongLibFlag',['body ' => $body,'message' => $message,'data' => $data ]);

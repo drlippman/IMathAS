@@ -903,8 +903,8 @@ class AdminController extends AppController
                     return $this->redirect($this->goHome());
                 }
                 $sessionId = $this->getSessionId();
-                $be = $params['uid'];
-                Sessions::updateUId($be,$sessionId);
+                $emulateUserId = $params['uid'];
+                Sessions::updateUId($emulateUserId,$sessionId);
                 break;
             case "chgrights":
                 if ($myRights < AppConstant::ADMIN_RIGHT && $params['newrights'] > AppConstant::GROUP_ADMIN_RIGHT)
@@ -917,7 +917,6 @@ class AdminController extends AppController
                     $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
-
                 $group = $params['group'];
                 $newRights = $params['newrights'];
                 User::updateUserRight($myRights, $newRights, $group, $getId, $groupid);

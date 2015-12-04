@@ -19,14 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="item-detail-content"></div>
     <div class="tab-content shadowBox">
         <br>
-        <div class="align-copy-course">
+        <div class="align-copy-course word-wrap-break-word">
         <?php
         if($body == AppConstant::NUMERIC_ONE)
         {
             echo $message;
-
-        }else
-        {
+        }else {
             if($data)
             {
                 foreach($data as $row)
