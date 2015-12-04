@@ -29,7 +29,7 @@ function deleteGroup(groupId)
 
 function deleteLtiUser(ltiUserId)
 {
-    var html ='<div><p>Are you SURE you want to remove this Lti User?</p></div>';
+    var html ='<div><p>Are you SURE you want to remove this LTI User?</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
