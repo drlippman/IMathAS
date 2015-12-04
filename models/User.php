@@ -316,6 +316,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function getUserByRights($rightsZero, $rightsTwelve, $orderBy)
     {
         $user = User::find()->where(['rights' => $rightsZero])->orWhere(['rights' => $rightsTwelve])->orderBy($orderBy)->all();
+        AppUtility::dump($user);
         return $user;
     }
 

@@ -172,14 +172,13 @@ class AdminController extends AppController
         if ($myRights < AppConstant::ADMIN_RIGHT) {
             $page_userBlockTitle = AppConstant::NON_STUDENT;
             $userData = User::getUserByIdAndGroupId(AppConstant::STUDENT_RIGHT,$groupId,'LastName');
-        }
-        else {
+        } else {
             if ($showusers == -1) {
                 $page_userBlockTitle = AppConstant::PENDING_USERS;
                 $userData = User::getUserByRights(AppConstant::UNENROLL_VALUE,AppConstant::NUMERIC_TWELVE,'LastName');
             } else if (is_numeric($showusers)) {
                 $page_userBlockTitle = "Group Users";
-                $userData = User::getUserByIdAndGroupId(AppConstant::STUDENT_RIGHT,$groupId,'LastName');
+                $userData = User::getUserByIdAndGroupId(AppConstant::STUDENT_RIGHT,$showusers,'LastName');
             } else {
                 $page_userBlockTitle = "All Users - $showusers";
                 $userData = User::getUserByLastNameSubstring($showusers,'LastName');
