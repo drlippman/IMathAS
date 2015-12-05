@@ -117,81 +117,7 @@ class InstructorController extends AppController
     /**
      * To handle event on calendar.
      */
-    public function actionGetAssessmentDataAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $courseId = $params['cid'];
-        $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
-        $assessments = Assessments::getByCourseId($courseId);
-        $calendarItems = CalItem::getByCourseId($courseId);
-        $calendarLinkItems = Links::getByCourseId($courseId);
-        $calendarInlineTextItems = InlineText::getByCourseId($courseId);
-        /**
-         * Display assessment Modes:
-         * - Normal assessment
-         * - Review mode assessment
-         */
-        $assessmentArray = array();
-        foreach ($assessments as $assessment)
-        {
-            $assessmentArray[] = array(
-                'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
-                'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
-                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
-                'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
-                'name' => ucfirst($assessment['name']),
-                'startDateString' => $assessment['startdate'],
-                'endDateString' => $assessment['enddate'],
-                'reviewDateString' => $assessment['reviewdate'],
-                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
-                'assessmentId' => $assessment['id'],
-                'courseId' => $assessment['courseid']
-            );
-        }
-        $calendarArray = array();
-        foreach ($calendarItems as $calendarItem)
-        {
-            $calendarArray[] = array(
-                'courseId' => $calendarItem['courseid'],
-                'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
-                'title' => ucfirst($calendarItem['title']),
-                'tag' => ucfirst($calendarItem['tag'])
-            );
-        }
-        $calendarLinkArray = array();
-        foreach ($calendarLinkItems as $calendarLinkItem)
-        {
-            $calendarLinkArray[] = array(
-                'courseId' => $calendarLinkItem['courseid'],
-                'title' => ucfirst($calendarLinkItem['title']),
-                'startDate' => AppUtility::getFormattedDate($calendarLinkItem['startdate']),
-                'endDate' => AppUtility::getFormattedDate($calendarLinkItem['enddate']),
-                'dueTime' => AppUtility::getFormattedTime($calendarLinkItem['enddate']),
-                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
-                'startDateString' => $calendarLinkItem['startdate'],
-                'endDateString' => $calendarLinkItem['enddate'],
-                'linkedId' => $calendarLinkItem['id'],
-                'calTag' => ucfirst($calendarLinkItem['caltag'])
-            );
-        }
-        $calendarInlineTextArray = array();
-        foreach ($calendarInlineTextItems as $calendarInlineTextItem)
-        {
-            $calendarInlineTextArray[] = array(
-                'courseId' => $calendarInlineTextItem['courseid'],
-                'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
-                'dueTime' => AppUtility::getFormattedTime($calendarInlineTextItem['enddate']),
-                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
-                'startDateString' => $calendarInlineTextItem['startdate'],
-                'endDateString' => $calendarInlineTextItem['enddate'],
-                'calTag' => ucfirst($calendarInlineTextItem['caltag'])
-            );
-        }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
-        return $this->successResponse($responseData);
-    }
+
     /*
      * Manage Calendar Event
      */
@@ -244,7 +170,7 @@ class InstructorController extends AppController
             }
             if ($eventData['Submit']=='Save') {
                 if ($from=='indexPage') {
-                    return $this->redirect('index?cid='. $courseId);
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/course?cid='. $courseId));
                 } else {
                     return $this->redirect(AppUtility::getURLFromHome('course','course/calendar?cid='. $courseId));
                 }

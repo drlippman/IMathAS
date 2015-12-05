@@ -154,7 +154,7 @@ class AppUtility extends Component
         return false;
     }
 
-    public static function getFormattedDate($dateStr, $format = 'm-d-Y')
+    public static function getFormattedDate($dateStr, $format = 'Y-m-d')
     {
              return date($format, $dateStr);
     }

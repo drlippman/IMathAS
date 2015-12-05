@@ -636,13 +636,31 @@ class ShowItemCourse extends Component
 //                echo "<div class=item>\n";1 calender
                 ShowItemCourse::beginitem($canEdit); ?>
 
-            <?php   if ($canEdit) { ?>
-                    <a href="#" >Delete</a> |
-                    <a href="#">Manage Events</a>
+            <?php   if ($canEdit) {
+                    $typeid = $line['typeid'];
+                    ?>
+                    <a href="#" onclick="deleteItem('<?php echo $typeid ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $courseId ;?>')"><?php AppUtility::t('Delete')?></a> |
+                    <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $courseId); ?>">Manage Events</a>
               <?php } ?>
+                <div class="item" style="padding-bottom: 15px; padding-right: 15px">
+                    <div class="col-lg-12 padding-alignment calendar-container">
+                        <div class='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                            <input type="hidden" class="current-time" value="<?php echo $currentTime ?>">
+
+                            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                            <input type="hidden" class="calender-course-id" value="<?php echo $courseId ?>">
+                        </div>
+                        <div class="calendar-day-details-right-side pull-left col-lg-3">
+                            <div class="day-detail-border">
+                                <b>Day Details:</b>
+                            </div>
+                            <div class="calendar-day-details"></div>
+                        </div>
+                    </div>
+                </div>
 
                 <?php
-                Calendar::showCalendar($currentTime);
+                //Calendar::showCalendar($currentTime);
                 ShowItemCourse::enditem($canEdit);
                 echo "</div>";
             } else if ($line['itemtype'] == "Assessment") {
@@ -1670,12 +1688,12 @@ class ShowItemCourse extends Component
     { ?>
 
         <div class="row add-item" onclick="getAddItem('<?php echo $blk?>', '<?php echo $tb?>')">
-            <div class="col-md-1 plus-icon">
+            <div class="col-md-1 col-sm-1 plus-icon">
                 <input type="hidden" id="block" value="<?php echo $blk ?>">
                 <input type="hidden" id="tb-value" value="<?php echo $tb ?>">
                 <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png">
             </div>
-            <div class="col-md-2 add-item-text">
+            <div class="col-md-2 col-sm-2 add-item-text">
                 <p><?php AppUtility::t('Add An Item...');?></p>
             </div>
         </div>

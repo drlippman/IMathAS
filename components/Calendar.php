@@ -7,6 +7,7 @@ class Calendar extends Component
 {
     public static function showCalendar()
     {
+//        AppUtility::dump('hey');
         global $currentTime, $courseId;
         ?>
         <div class="item" style="padding-bottom: 15px; padding-right: 15px">

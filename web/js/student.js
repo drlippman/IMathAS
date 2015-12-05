@@ -181,115 +181,20 @@ function calendar() {
                 }
             });
         },
-        /**
-         * Onclick event
-         */
-        eventClick:  function(event, jsEvent, view) {
-            /**
-             * If assessment is in review mode, dialog pop up
-             */
-            if(event.reviewMode == true)
-            {
-                $(".calendar-day-details").empty();
-                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>";
-                var reviewMode= "<p style='margin-left:21px!important;'>This assessment is in review mode - no scores will be saved</p>";
-                var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                $(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+"."+reviewMode+"</div>");
-//                $("#demo").dialog({ modal: true, title: event.message, width:350,
-//                    buttons: {
-//                        "Ok": function() {
-//                            $(this).dialog('close');
-//                            return false;
-//                        }
-//                    }
-//                });
-            }
-            /**
-             * If assessment is not in review mode
-             */
-            else if(event.reviewMode == false)
-            {
-                $(".calendar-day-details").empty();
-                var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test'>"+event.title+"</a>";
-                var dateH = "Due " +event.startDat+" "+event.dueTime+"";
-                var assessmentLogo = "<p style='padding-right: 5px'><img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/></p>";
-                $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
-//                $("#demo").dialog({ modal: true, title: event.message, width:350,
-//                    buttons: {
-//                        "Ok": function() {
-//                            $(this).dialog('close');
-//                            return false;
-//                        }
-//                    }
-//                });
-            }
-            /**
-             * Managed event by admin pop up.
-             */
-            else if(event.calItem == true)
-            {
-                $(".calendar-day-details").empty();
-                var title = event.tagTitle;
-                var tag = event.title;
-                $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+tag+"<br>"+title+"</div>");
-//                $("#demo").dialog({ modal: true, title: event.message, width:350,
-//                    buttons: {
-//                        "Ok": function() {
-//                            $(this).dialog('close');
-//                            return false;
-//                        }
-//                    }
-//                });
-            }
-            else if(event.calLinkItem == true)
-            {
-                $(".calendar-day-details").empty();
-                var tag = event.title;
-                var title = "<a class='link'style='color: #0000ff' href='../../course/course/show-linked-text?cid="+event.courseId+"&id="+event.linkedId+" '>"+event.linkTitle+"</a>";
-                var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/html.png'/>";
-                $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br>"+title+"</div>");
-//                $("#demo").dialog({ modal: true, title: event.message, width:350,
-//                    buttons: {
-//                        "Ok": function() {
-//                            $(this).dialog('close');
-//                            return false;
-//                        }
-//                    }
-//                });
-            }
-            else if(event.calInlineTextItem == true)
-            {
-                $(".calendar-day-details").empty();
-                var tag = event.title;
-                $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+tag+"</div>");
-//                $("#demo").dialog({ modal: true, title: event.message, width:350,
-//                    buttons: {
-//                        "Ok": function() {
-//                            $(this).dialog('close');
-//                            return false;
-//                        }
-//                    }
-//                });
-            }
-
-
-        },
         dayClick: function(date, jsEvent, view) {
             var currentDate = getCurrentDate();
             var selectedDay = date.format();
             var formattedSelectedDay = formatDate(selectedDay);
             $(".calendar-day-details").empty();
             $.each(calendarEvents[0], function (index, selectedDate) {
-                if(selectedDate.start == selectedDay){
-//                    var title = "<a style='color: #0000ff;font-size: 16px' href='#'>"+selectedDate.title+"</a>";
+                if(selectedDate.start == selectedDay) {
                     if(currentDate == formattedSelectedDay){
                         var dateH = "Due " +selectedDate.dueTime+"";
-
                     }else{
                         var dateH = "Due " +selectedDate.start+" "+selectedDate.dueTime+"";
                     }
                     if(selectedDate.reviewMode == false){
-                        var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+selectedDate.title+"</a>";
+                        var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+selectedDate.title+"</a>";
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
                         $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                     }else if(selectedDate.calLinkItem == true){
@@ -318,7 +223,7 @@ function calendar() {
     });
 
 }
-function displayCalEvents(events){
+function displayCalEvents(events) {
     var now = getCurrentDate();
     $(".calendar-day-details").empty();
     $.each(events, function (index, dateEvent) {
@@ -326,7 +231,7 @@ function displayCalEvents(events){
         if(selectedDate == now ){
                 var dateH = "Due " +dateEvent.dueTime+"";
                 if(dateEvent.reviewMode == false){
-                    var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-assessment?id="+dateEvent.assessmentId+"&cid="+dateEvent.courseId+" '>"+dateEvent.title+"</a>";
+                    var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+dateEvent.assessmentId+"&cid="+dateEvent.courseId+" '>"+dateEvent.title+"</a>";
                     var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
                     $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 }else if(dateEvent.calLinkItem == true){

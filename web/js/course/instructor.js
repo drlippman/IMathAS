@@ -43,6 +43,8 @@ function getAddItem(blk,tb) {
 
     $('.add-item').on('click', function (evt)
     {
+        alert('hey');
+
         var courseId = $('.calender-course-id').val();
         var html = '<div class="">' +
             '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'&block='+blk+'&tb='+tb+'">' +

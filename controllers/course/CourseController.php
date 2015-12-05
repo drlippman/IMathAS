@@ -298,7 +298,7 @@ class CourseController extends AppController
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
-                'dueTime' => AppUtility::tzdate("g:i a", $assessment['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
                 'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
                 'name' => ucfirst($assessment['name']),
                 'startDateString' => $assessment['startdate'],
@@ -314,7 +314,7 @@ class CourseController extends AppController
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'dueTime' => AppUtility::parsetime($calendarItem['date']),
+                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
                 'title' => ucfirst($calendarItem['title']),
                 'tag' => ucfirst($calendarItem['tag'])
             );
@@ -364,9 +364,15 @@ class CourseController extends AppController
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
+        $line = Course::getCourseDataById($courseId);
+        $items = unserialize($line['itemorder']);
+        $line = Items::getByItem($items);
+        $typeid = $line['typeid'];
+        $parent = AppConstant::NUMERIC_ZERO;
+
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-        $responseData = array('course' => $course, 'user' => $user);
+        $responseData = array('course' => $course, 'user' => $user, 'items' => $items, 'typeid' => $typeid, 'parent' => $parent);
         return $this->render('calendar', $responseData);
     }
     /*
@@ -1114,6 +1120,7 @@ class CourseController extends AppController
         $this->layout = 'master';
         $myRights = $user['rights'];
         $userId = $user['id'];
+        $courseData = $this->getRequestParams();
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $courseId = $this->getParamVal('cid');
         $sessionId = $this->getSessionId();
@@ -1551,6 +1558,31 @@ class CourseController extends AppController
             } else {
                 $latePasses = AppConstant::NUMERIC_ZERO;
             }
+        }
+        if (isset($courseData['tb'])) {
+            $filter = $courseData['tb'];
+        } else {
+            $filter = 'b';
+        }
+        if(isset($courseData['block']) && isset($courseData['cid']) && !isset($courseData['from']) && !isset($courseData['remove'])){
+            $block = $courseData['block'];
+            $calender = 'Calendar';
+            $itemCalender = new Items();
+            $itemId = $itemCalender->create($courseId,$calender);
+            $items = unserialize($course['itemorder']);
+            $blockTree = explode('-',$block);
+            $sub =& $items;
+            for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+            }
+            if ($filter=='b') {
+                $sub[] = intval($itemId);
+            } else if ($filter=='t') {
+                array_unshift($sub,intval($itemId));
+            }
+            $itemOrder = serialize($items);
+            Course::setItemOrder($itemOrder, $courseId);
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id.'&folder=0'));
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js','course/addItem.js']);
