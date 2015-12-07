@@ -1175,7 +1175,7 @@ class AdminController extends AppController
                                 $safefn = $row['filename'];
                                 $r2 = InstrFiles::getIdName($safefn);
                                 if($r2) {
-                                    if (count($r2) == 1) {
+                                    if (count($r2) == AppConstant::NUMERIC_ONE) {
                                         filehandler::deletecoursefile($row['filename']);
                                     }
                                 }

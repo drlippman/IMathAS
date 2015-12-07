@@ -185,7 +185,7 @@ class ShowItemCourse extends Component
                                 <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
                                 <li><a class="modify"
-                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -254,7 +254,7 @@ class ShowItemCourse extends Component
                                 <li><a class="modify"
                                        href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><?php AppUtility::t('Edit Content'); ?></a></li>
                                 <li><a class="modify"
-                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -327,7 +327,7 @@ class ShowItemCourse extends Component
                                 <li><a class="modify"
                                        href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><?php AppUtility::t('Isolate'); ?></a></li>
                                 <li><a class="modify"
-                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -432,7 +432,7 @@ class ShowItemCourse extends Component
                                 <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
                                 <li><a class="modify"
-                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -492,7 +492,7 @@ class ShowItemCourse extends Component
                                 <li><a class="modify"
                                        href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><?php AppUtility::t('Edit Contents'); ?></a></li>
                                 <li><a class="modify"
-                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -565,7 +565,7 @@ class ShowItemCourse extends Component
                                 <li><a class="modify"
                                        href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><?php AppUtility::t('Isolate'); ?></a></li>
                                 <li><a class="modify"
-                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>

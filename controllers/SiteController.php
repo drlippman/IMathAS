@@ -972,7 +972,7 @@ class SiteController extends AppController
 
     public function actionDocumentation()
     {
-//        $this->layout = 'master';
+        $this->layout = 'master';
         return $this->renderWithData('document');
     }
 

@@ -45,16 +45,15 @@ h2,h3,h4 {
 	if (isset($_GET['section'])) {
 		echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.' Help</h2></div>';
 	}
-
-
 	$indiv = false;
 	$intoc = false;
 	$ndiv = 0;
 	$nul = 0;
 	$inbody = false;
-	$handle = fopen("../web/docs/help.html", "r");
-	
-	if ($handle) {
+
+    $handle = fopen("help.html", "r");
+
+	if($handle) {
 		while (!feof($handle)) {
 			$buffer = fgets($handle, 4096);
 			if (!$inbody) {
@@ -107,7 +106,7 @@ h2,h3,h4 {
 		}
 		fclose($handle);
 	} else {
-		echo "No handle";
+//		echo "No handle";
 	}
 	echo "</body></html>\n";
 ?>

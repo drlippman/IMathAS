@@ -282,6 +282,7 @@ class AppConstant
     const GIA = "g:i a";
     const DATE_TIME = 'D m/d/Y g:i a';
     const INCORRECT_ENROLLMENT_KEY = 'Incorrect Enrollment Key.';
+    const NOW_VALUE = 'now';
     // create a map with current constant being the key and the value being the value
     // start calling the method below
     public static function getConstantVal($key, $lang='en'){
