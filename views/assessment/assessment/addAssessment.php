@@ -301,8 +301,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-sm-12 margin-top-twenty padding-left-zero">
             <div class='col-sm-2 select-text-margin'><?php AppUtility::t('Feedback method')?></div>
-                    <div class='col-sm-10'>
-                        <select id="deffeedback" name="deffeedback" onChange="chgfb()" class="form-control width-fifty-per">
+                    <div class='col-md-10 col-sm-10'>
+                        <select id="deffeedback" name="deffeedback" onChange="chgfb()" class="form-control">
                             <option value="NoScores" <?php if ($testType=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
                             <option value="EndScore" <?php if ($testType=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
                             <option value="EachAtEnd" <?php if ($testType=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
@@ -317,7 +317,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-sm-12 margin-top-twenty padding-left-zero">
             <div class='col-sm-2 select-text-margin'><?php AppUtility::t('Show Answers')?></div>
-                    <div class='col-sm-10'>
+                    <div class='col-sm-8 col-sm-8'>
                         <span id="showanspracspan" class="<?php if ($testType=="Practice" || $testType=="Homework") {echo "show";} else {echo "hidden";} ?>">
                         <select name="showansprac" class="form-control width-fifty-per">
                             <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
@@ -516,12 +516,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-sm-12 padding-left-zero margin-top-twenty">
                 <div class='col-sm-2'><?php AppUtility::t('Show based on another assessment')?></div>
-                <div class='col-sm-10'>
+                <div class='col-md-10 col-sm-10'>
                        <div class="floatleft">
                         <span><?php AppUtility::t('Show only after a score of')?></span>
                         <input type=text class="margin-left-fifteen form-control width-fifty display-inline-block" size=4 name=reqscore value="<?php echo $assessmentData['reqscore'];?>">
                         </div>
-                        <div class="padding-left-thirty floatleft col-sm-6 assessment-pt-obtain-on">
+                        <div class="padding-left-thirty floatleft col-md-8 col-sm-8 assessment-pt-obtain-on">
                           <span class="margin-left-fifteen select-text-margin">
                             <?php AppUtility::t('points is obtained on')?>
                           </span>

@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/course/cou
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<form method=post action="create-block?courseId=<?php echo $courseId;
+<form method=post action="create-block?cid=<?php echo $courseId;
 if (isset($block)) {
     echo "&block=$block";
 }

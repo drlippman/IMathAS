@@ -35,7 +35,7 @@ class BlockController extends AppController
         $user = $this->getAuthenticatedUser();
         $userId = $user['id'];
         $this->layout = 'master';
-        $courseId = $this->getParamVal('courseId');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $courseName = $course['name'];
         $blockData = unserialize($course['itemorder']);
@@ -43,7 +43,7 @@ class BlockController extends AppController
         $block = $this->getParamVal('block');
         $modify = $this->getParamVal('modify');
         $teacherId = $this->isTeacher($userId, $courseId);
-//        $this->noValidRights($teacherId);
+        $this->noValidRights($teacherId);
         if(isset($toTb))
         {
             $toTb = $toTb;
@@ -130,7 +130,7 @@ class BlockController extends AppController
     public function actionCreateBlock()
     {
         $params = $this->getRequestParams();
-        $course = Course::getById($params['courseId']);
+        $course = Course::getById($params['cid']);
         $blockCnt = $course['blockcnt'];
         $toTb = $this->getParamVal('tb');
         $blockData = unserialize($course['itemorder']);
@@ -219,8 +219,8 @@ class BlockController extends AppController
             $blockCnt++;
         }
         $finalBlockItems =(serialize($blockData));
-        Course::UpdateItemOrder($finalBlockItems,$params['courseId'],$blockCnt);
-        $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$params['courseId']));
+        Course::UpdateItemOrder($finalBlockItems,$params['cid'],$blockCnt);
+        $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$params['cid']));
     }
 
     public function actionNewFlag()
