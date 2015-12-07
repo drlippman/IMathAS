@@ -393,6 +393,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 */
 //delete all assessment files for an assessmentid
 public static function deleteallaidfiles($aid) {
+
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3')
     {
@@ -508,9 +509,9 @@ public static function deletecoursefile($file) {
 		}
 	} else {
 
-        $base = AppConstant::UPLOAD_DIRECTORY;
-        if(file_exists($base)){
-            if (unlink($base."$file")) {
+        $filePath = AppConstant::UPLOAD_DIRECTORY.$file;
+        if(file_exists($filePath)){
+            if (unlink($filePath)) {
                 return true;
             } else {
                 return false;
