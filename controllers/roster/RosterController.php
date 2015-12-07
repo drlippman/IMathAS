@@ -1122,24 +1122,19 @@ class RosterController extends AppController
             $course = Course::getById($courseId);
             $assessments = Assessments::getByCourseId($courseId);
             $studentList = array();
-
             if($gradebook)
             {
-               array_push($studentList,$data['studentId']);
-                $data['student-data'] =  $data['studentId'];
-                $params['student-data'] =  $data['studentId'];
+                if(isset($data['studentId'])){
+                    array_push($studentList,$data['studentId']);
+                    $data['student-data'] =  $data['studentId'];
+                    $params['student-data'] =  $data['studentId'];
+                }
                 $assesschk = $_SESSION['assesschk'];
-            }else{
-                $studentList = array_unique(explode(',', $data['student-data']));
             }
+            $studentList = array_unique(explode(',', $data['student-data']));
             $studentArray = array();
             if ($this->isPost() || $data['student-data'] != "") {
                 $params = $this->getRequestParams();
-                if($gradebook)
-                {
-                     $params['student-data'] =  $data['studentId'];
-                     $params['section-data'] =  $data['section-data'];
-                }
                 $section = $params['section-data'];
                 $isActionForException = isset($params['isException']) ? $params['isException'] : AppConstant::NUMERIC_ZERO;
                 if (!$isActionForException) {
@@ -1154,7 +1149,6 @@ class RosterController extends AppController
 
                         return $this->redirect('student-roster?cid=' . $courseId);
                     }
-
                 } else {
                     $studentArray = unserialize($params['studentInformation']);
                     $courseId = $params['courseid'];
@@ -1256,10 +1250,8 @@ class RosterController extends AppController
             $this->includeJS(['roster/makeException.js']);
             $responseData = array('assessments' => $assessments,'assesschk' => $assesschk,'gradebook' => $gradebook, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latePassMsg' => $latePassMsg);
             if(count($studentArray) > AppConstant::NUMERIC_ZERO){
-
                 return $this->renderWithData('makeException', $responseData);
             } else {
-
                 $this->redirect(AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id));
             }
         } else {

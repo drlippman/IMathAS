@@ -190,8 +190,10 @@ function chgfilter(cat)
 
 function createStudentList(){
     var markArray = [];
-    $('.gradebook-table input[name = "checked"]:checked').each(function () {
-        markArray.push($(this).val());
+    $('.gradebook-table-body input[name = "checked"]:checked').each(function () {
+        if ($.inArray($(this).val(), markArray) == -1){
+            markArray.push($(this).val());
+        }
     });
     return markArray;
 }
