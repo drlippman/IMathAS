@@ -1115,7 +1115,7 @@ class RosterController extends AppController
         if ($this->getRequestParams()) {
             $data = $this->getRequestParams();
             $gradebook = AppConstant::NUMERIC_ZERO;
-            if(isset($data['gradebook'])){
+            if(isset($data['gradebook']) && $data['gradebook'] != 0){
                 $gradebook = AppConstant::NUMERIC_ONE;
             }
             $courseId = $this->getParamVal('cid');
