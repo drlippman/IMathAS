@@ -13,11 +13,10 @@ $now = $currentTime;
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
     <input type="hidden" class="msg-type" value="<?php echo $isNewMessage ?>">
+    <input type="hidden" class="msg-id" value="<?php echo $messages['id'] ?>">
     <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
-        <input type="hidden" class="msg-id" value="<?php echo $messages['id'] ?>">
 <!--        Condition for toolbar-->
     <?php } else {?>
-
 <?php } ?>
     <div class="item-detail-header">
             <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
