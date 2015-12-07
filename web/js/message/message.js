@@ -48,7 +48,7 @@ var courseInfo = [];
 function createTableHeader()
 {
     var html = " <table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
+    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
     html += "    </tr></thead><tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);
 }
@@ -133,18 +133,18 @@ function showMessageSuccess(response) {
 }
 
 function selectCheckBox(){
-//    $('.message-table input[name = "header-checked"]').live("click", function(){
-//        if($(this).prop("checked") == true){
-//            $('.message-table-body input:checkbox').each(function () {
-//                $(this).prop('checked', true);
-//            })
-//        }
-//        else if($(this).prop("checked") == false){
-//            $('.message-table-body input:checkbox').each(function () {
-//                $(this).prop('checked', false);
-//            })
-//        }
-//    });
+    $(document).on('click', '#message-header-checkbox', function() {
+        if($(this).prop("checked") == true){
+            $('.message-table-body input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('.message-table-body input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
+    });
 }
 
 function getCourseSuccess(response) {
@@ -176,22 +176,18 @@ function markAsUnread() {
         markArray.push($(this).val());
         $(this).prop('checked', false);
     });
+    $('input[name = "header-checked"]:checked').prop('checked', false);
     if( markArray.length !=0)
     {
         var readMsg = {checkedMsg: markArray};
-        jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
+        jQuerySubmit('mark-as-unread-ajax', readMsg, { });
     }
     else
     {
-
         var msg ="Select atleast one message to unread";
         CommonPopUp(msg);
-
     }
 
-}
-
-function markAsUnreadSuccess(response) {
 }
 
 function markAsRead() {
@@ -201,6 +197,7 @@ function markAsRead() {
         $(this).closest('tr').css('font-weight', 'normal');
         $(this).prop('checked', false);
     });
+    $('input[name = "header-checked"]:checked').prop('checked', false);
     if( markArray.length !=0){
         var readMsg = {checkedMsg: markArray};
         jQuerySubmit('mark-as-read-ajax', readMsg,{ });
@@ -323,7 +320,7 @@ function markAsDelete() {
                         $(this).closest('tr').remove();
                     });
                     $(this).dialog("close");
-
+                    $('input[name = "header-checked"]:checked').prop('checked', false);
                     var readMsg = {checkedMsg: markArray};
                     jQuerySubmit('mark-as-delete-ajax', readMsg,{ });
                     return true;
