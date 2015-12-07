@@ -160,14 +160,15 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getByTextAndId($courseId)
     {
-        $query = new Query();
-        $query ->select(['text','points','id'])
-            ->from('imas_linkedtext')
-            ->where('courseid:=courseId', [':courseId' => $courseId]);
-        $query->andWhere(['LIKE','text','file:%']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+//        $query = new Query();
+//        $query ->select(['text','points','id'])
+//            ->from('imas_linkedtext')
+//            ->where('courseid:=courseId', [':courseId' => $courseId]);
+//        $query->andWhere(['LIKE','text','file:%']);
+//        $command = $query->createCommand();
+//        $data = $command->queryAll();
+//        return $data;
+        return \Yii::$app->db->createCommand("SELECT text,points,id FROM imas_linkedtext WHERE courseid='{$courseId}' AND text LIKE 'file:%'")->queryAll();
     }
 
     public static function getByIdForFile($safetext)

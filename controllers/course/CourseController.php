@@ -573,11 +573,9 @@ class CourseController extends AppController
             }
             if (($addedfile) || count($filestoremove) > 0 || isset($params['movefile'])) {
                 $fileorder = InlineText::getFileOrder($params['id']);
-                AppUtility::dump($fileorder);
                 if ($fileorder['fileorder'] == '') {
                     $fileorder = array();
                 }
-//                AppUtility::dump($fileorder);
                 if (isset($addedfile)) {
                     $fileorder[] = $addedfile;
                 }

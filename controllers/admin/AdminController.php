@@ -1187,19 +1187,24 @@ class AdminController extends AppController
                     /**
                      * delete linked text files
                      */
+
                     $result = LinkedText::getByTextAndId($params['id']);
-                    foreach($result as $key => $row) {
-                        $safetext = $row['text'];
-                        $r2 = LinkedText::getByIdForFile($safetext);
-                        if (count($r2) == 1) {
-                            $filename = substr($row['text'],5);
-                            filehandler::deletecoursefile($filename);
-                        }
-                        if ($row['points'] > 0)
-                        {
-                            Grades::deleteById($row['id']);
+                    if($result)
+                    {
+                        foreach($result as $key => $row) {
+                            $safetext = $row['text'];
+                            $r2 = LinkedText::getByIdForFile($safetext);
+                            if (count($r2) == 1) {
+                                $filename = substr($row['text'],5);
+                                filehandler::deletecoursefile($filename);
+                            }
+                            if ($row['points'] > 0)
+                            {
+                                Grades::deleteById($row['id']);
+                            }
                         }
                     }
+
                    LinkedText::deleteByCourseId($params['id']);
                    Items::deleteByCourseId($params['id']);
                    Teacher::deleteByCourseId($params['id']);

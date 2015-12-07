@@ -508,7 +508,7 @@ public static function deletecoursefile($file) {
 		}
 	} else {
 
-        $base =AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY;
+        $base = AppConstant::UPLOAD_DIRECTORY;
         if(file_exists($base)){
             if (unlink($base."$file")) {
                 return true;
