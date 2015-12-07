@@ -30,24 +30,28 @@ class StudentController extends AppController
             $param = $param['StudentEnrollCourseForm'];
             $course = Course::getEnrollData($param['courseId']);
             if ($course) {
-                $teacher = Teacher::getByUserId($user->id, $param['courseId']);
-                $tutor = Tutor::getByUserId($user->id, $param['courseId']);
-                $alreadyEnroll = Student::getByCourseId($param['courseId'], $user->id);
-                if (!$teacher && !$tutor && !$alreadyEnroll) {
-                    $param['userid'] = $user->id;
-                    $param['courseid'] = $param['courseId'];
-                    $param = AppUtility::removeEmptyAttributes($param);
-                    $student = new Student();
-                    $student->create($param);
-                    $this->setSuccessFlash(AppConstant::ENROLL_SUCCESS . $course->name . ' successfully');
-                } else {
-                    $errorMessage = AppConstant::ALREADY_ENROLLED;
-                    if ($teacher) {
-                        $errorMessage = AppConstant::TEACHER_CANNOT_ENROLL_AS_STUDENT;
-                    } elseif ($tutor) {
-                        $errorMessage = AppConstant::TUTOR_CANNOT_ENROLL_AS_STUDENT;
+                if($param['enrollmentKey'] == $course['enrollkey']) {
+                    $teacher = Teacher::getByUserId($user->id, $param['courseId']);
+                    $tutor = Tutor::getByUserId($user->id, $param['courseId']);
+                    $alreadyEnroll = Student::getByCourseId($param['courseId'], $user->id);
+                    if (!$teacher && !$tutor && !$alreadyEnroll) {
+                        $param['userid'] = $user->id;
+                        $param['courseid'] = $param['courseId'];
+                        $param = AppUtility::removeEmptyAttributes($param);
+                        $student = new Student();
+                        $student->create($param);
+                        $this->setSuccessFlash(AppConstant::ENROLL_SUCCESS . $course->name . ' successfully');
+                    } else {
+                        $errorMessage = AppConstant::ALREADY_ENROLLED;
+                        if ($teacher) {
+                            $errorMessage = AppConstant::TEACHER_CANNOT_ENROLL_AS_STUDENT;
+                        } elseif ($tutor) {
+                            $errorMessage = AppConstant::TUTOR_CANNOT_ENROLL_AS_STUDENT;
+                        }
+                        $this->setErrorFlash($errorMessage);
                     }
-                    $this->setErrorFlash($errorMessage);
+                } else {
+                    $this->setErrorFlash(AppConstant::INCORRECT_ENROLLMENT_KEY);
                 }
             } elseif($course == null){
                 $this->setErrorFlash(AppConstant::COURSE_NOT_FOUND);
