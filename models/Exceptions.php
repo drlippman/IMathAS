@@ -180,7 +180,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function getItemData($userId)
     {
-        return self::find()->select('items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore')->from('imas_exceptions AS ex,imas_items as items,imas_assessments as i_a')
-            ->where(['ex.userid' => $userId])->andWhere('ex.assessmentid = i_a.id')->andWhere('items.typeid = i_a.id' and ['items.itemtype' => 'Assessment'])->all();
+        return \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=':userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ")->bindValue(':userId',$userId)
+            ->queryAll();
     }
 }
