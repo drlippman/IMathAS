@@ -3,11 +3,12 @@ use app\components\AssessmentUtility;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AppUtility;
+use \app\components\AppConstant;
 
 $this->title = $defaultBlockData['pageTitle'];
 $this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/course/course/course?cid=' . $courseId]];
 $this->params['breadcrumbs'][] = $this->title;
-?>
+//AppUtility::dump($defaultBlockData);?>
 
 <form method=post action="create-block?cid=<?php echo $courseId;
 if (isset($block)) {
@@ -25,10 +26,8 @@ if (isset($id)) {
     <div class="title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img"
-                                                                                      src="<?php echo AppUtility::getAssetURL() ?>img/helpIcon.png"
-                                                                                      alt="Help"
-                                                                                      onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+                <div class="vertical-align title-page"><?php echo $this->title ?>
+                    <a href="#" onclick="window.open('/math/web/docs/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
                 </div>
             </div>
         </div>
@@ -45,9 +44,9 @@ if (isset($id)) {
                 <div class="col-md-2 col-sm-3"><?php AppUtility::t('Visibility') ?></div>
                 <div class="col-md-10 col-sm-9">
                     <span class="col-md-3 col-sm-4 padding-left-zero">
-                        <input type=radio name="avail"
-                               value="1" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['avail'], 1); ?>
-                               onclick="document.getElementById('datediv').style.display='block';"/>
+                        <input type=radio name="avail" checked="checked"
+                               value="1" <?php AppUtility::writeHtmlChecked($defaultBlockData['avail'], AppConstant::NUMERIC_ONE);  ?>
+                               onclick="document.getElementById('datediv').style.display='block'; "/>
                         <span class="padding-left-pt-five-em"><?php AppUtility::t('Show by Dates') ?></span>
                     </span>
                     <span class="col-md-2 col-sm-3 padding-left-zero non-bold">
@@ -65,7 +64,7 @@ if (isset($id)) {
             </div>
 
             <!--Show by dates-->
-            <div id="datediv" style="display:<?php echo ($forum['avail'] == 1) ? "block" : "none"; ?>">
+            <div id="datediv" style="display:<?php echo ($defaultBlockData['avail'] == 1) ? "block" : "none"; ?>">
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-pt-five-em">
                     <div class="col-md-2 col-sm-3"><?php AppUtility::t('Available After') ?></div>
                     <div class="col-md-10 col-sm-9">
@@ -84,13 +83,13 @@ if (isset($id)) {
 
                         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-pt-five-em">
                             <label class="pull-left padding-top-pt-five-em">
-                                <input type=radio name="available-after" class="pull-left" value="sdate" <?php echo AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '0', 1) ?>/>
+                                <input type=radio name="available-after" class="pull-left" value="sdate" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '0', 1) ?>/>
                             </label>
                             <div class = "time-input pull-left col-md-3 col-sm-5">
                                 <?php    echo DatePicker::widget([
                                 'name' => 'sdate',
                                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                                'value' => date("m/d/Y"),
+                                'value' => $sdate,
                                 'removeButton' => false,
                                 'pluginOptions' => [
                                     'autoclose' => true,
@@ -116,7 +115,7 @@ if (isset($id)) {
                 <div class="col-md-2 col-sm-3"><?php AppUtility::t('Available Until') ?></div>
                 <div class="col-md-10 col-sm-9 padding-left-zero">
                     <label class='pull-left non-bold col-md-3 col-sm-5 padding-top-pt-five-em'>
-                        <input type=radio name="available-until" value="2000000000" <?php echo AssessmentUtility::writeHtmlChecked($defaultBlockData['endDate'], '2000000000', 0) ?>/>
+                        <input type=radio name="available-until" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['endDate'], '2000000000', 0) ?>/>
                         <span class="padding-left-pt-five-em"><?php AppUtility::t('Always after start date') ?></span>
                     </label>
                     <label class='pull-left non-bold padding-top-pt-five-em'>
@@ -149,7 +148,7 @@ if (isset($id)) {
             </div>
             <div class="col-md-12 col-sm-12 padding-top-one-pt-five-em padding-left-zero">
                 <div class="col-md-2 col-sm-3"><?php AppUtility::t('When available') ?></div>
-                <div class="col-md-10 col-sm-9">
+                <div class="col-md-10 col-sm-10">
                     <span class="col-md-12 col-sm-12 padding-left-zero">
                         <input type=radio name=availBeh
                                value="O" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'], 'O') ?> />

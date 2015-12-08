@@ -1267,8 +1267,9 @@ class RosterController extends AppController
             $exceptionList = array();
             foreach ($assessments as $singleAssessment) {
                 $query = Exceptions::getByAssessmentIdAndUserId($student['id'], $singleAssessment['id']);
+
                 if ($query) {
-                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a', $query->startdate) . ' - ' . date('m/d/y g:i a', $query->enddate), 'waiveReqScore' => $query->waivereqscore);
+                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => AppUtility::tzdate(AppConstant::DATE_TIME, $query->startdate) . ' - ' . AppUtility::tzdate(AppConstant::DATE_TIME, $query->enddate), 'waiveReqScore' => $query->waivereqscore);
                     array_push($exceptionList, $tempArray);
                 }
             }

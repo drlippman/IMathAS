@@ -115,6 +115,21 @@ class BlockController extends AppController
          'pageTitle' => AppConstant::ADD_BLOCK,
         );
         }
+        if ($startDate != 0) {
+            $sdate = AppUtility::tzdate("m/d/Y",$startDate);
+            $stime = AppUtility::tzdate("g:i a",$startDate);
+        } else {
+            $sdate = AppUtility::tzdate("m/d/Y",time());
+            $stime = AppUtility::tzdate("g:i a",time());
+        }
+        if ($endDate != 2000000000) {
+            $edate = AppUtility::tzdate("m/d/Y",$endDate);
+            $etime = AppUtility::tzdate("g:i a",$endDate);
+        } else {
+            $edate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
+            $etime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
+        }
+
         $page_sectionListVal = array("none");
         $page_sectionListLabel = array("No restriction");
         $sectionQuery = Student::findDistinctSection($courseId);
@@ -124,7 +139,8 @@ class BlockController extends AppController
             $page_sectionListLabel[] = 'Section '.$data->section;
         }
         $this->includeCSS(['course/items.css']);
-        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId,'courseName' => $courseName]);
+        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId,'courseName' => $courseName,
+        'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime]);
     }
 
     public function actionCreateBlock()

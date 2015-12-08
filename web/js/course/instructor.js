@@ -113,11 +113,11 @@ function deleteItem(id,type,block,courseId) {
                      $(this).dialog('destroy').remove();
                      return false;
                  },
-                 "confirm": function ()
+                 "Confirm": function ()
                  {
                      var sel = $("#post-type-radio-list input[type='radio']:checked");
                      var selected = sel.val();
-                     jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId,selected:selected},'responseSuccess');
+                     jQuerySubmit('delete-items-ajax', {id:id,itemType:type,block:block,courseId:courseId,selected:selected},'responseSuccess');
                      $(this).dialog('destroy').remove();
                      return true;
                  }
@@ -162,7 +162,7 @@ function deleteItem(id,type,block,courseId) {
                 },
                 "Confirm": function ()
                 {
-                    jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId},'responseSuccess');
+                    jQuerySubmit('delete-items-ajax',{id:id, itemType:type, block:block, courseId:courseId},'responseSuccess');
                     $(this).dialog('destroy').remove();
                     return true;
                 }
@@ -181,7 +181,6 @@ function deleteItem(id,type,block,courseId) {
 
 function responseSuccess(response)
 {
-    console.log(response);
     window.location.reload();
 }
 

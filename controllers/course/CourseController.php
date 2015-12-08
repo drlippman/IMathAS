@@ -1849,6 +1849,7 @@ class CourseController extends AppController
         $params = $this->getRequestParams();
         $user = $this->getAuthenticatedUser();
         $courseId = $params['courseId'];
+        $cid = $params['cid'];
         $block = $params['block'];
         $itemType = $params['itemType'];
         $itemId = $params['id'];
@@ -1911,11 +1912,32 @@ class CourseController extends AppController
                     $blockCnt='';
                     $blockId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
                     $sub =& $blockData;
+                    
                     if (count($blockTree)>AppConstant::NUMERIC_ONE)
                     {
                         for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++)
                         {
                             $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+                        }
+                    }
+                    if (is_array($sub[$blockId]))
+                    {
+                        $blockItems = $sub[$blockId]['items'];
+                        $obId = $sub[$blockId]['id'];
+                        if (count($blockItems)>AppConstant::NUMERIC_ZERO)
+                        {
+                            if(isset($params['selected']) && $params['selected'] == AppConstant::NUMERIC_ONE)
+                            {
+                                $this->deleteRecursive($blockItems);
+                                array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
+                            }else
+                            {
+                                array_splice($sub,$blockId,AppConstant::NUMERIC_ONE,$blockItems);
+                            }
+
+                        }else
+                        {
+                            array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
                         }
                     }
                     $itemList =(serialize($blockData));
@@ -1927,6 +1949,62 @@ class CourseController extends AppController
             return false;
         }
         return $this->successResponse();
+    }
+
+    public function deleteRecursive($itemArray) {
+        foreach($itemArray as $itemId) {
+            if (is_array($itemId)) {
+                $this->deleteRecursive($itemId['items']);
+            } else {
+                $this->deleteItemById($itemId);
+            }
+        }
+    }
+
+    public function deleteItemById($itemId)
+    {
+        $ItemType =Items::getByTypeId($itemId);
+        $user = $this->getAuthenticatedUser();
+        switch($ItemType['itemtype'])
+        {
+            case AppConstant::FORUM:
+                Forums::deleteForum($itemId);
+                ForumSubscriptions::deleteSubscriptionsEntry($itemId,$user['id']);
+                $postId = ForumPosts::getForumPostByFile($itemId);
+                $threadIdArray = ForumThread::findThreadCount($itemId);
+                foreach($threadIdArray as $singleThread){
+                    ForumView::deleteByForumIdThreadId($singleThread['id']);
+                }
+                ForumPosts::deleteForumPost($itemId);
+                Thread::deleteThreadByForumId($itemId);
+                break;
+            case AppConstant::ASSESSMENT:
+                AssessmentSession::deleteByAssessmentId($itemId);
+                Questions::deleteByAssessmentId($itemId);
+                Assessments::deleteAssessmentById($itemId);
+                break;
+            case AppConstant::CALENDAR:
+                Items::deleteByTypeIdName($itemId,$ItemType['itemtype']);
+                break;
+            case AppConstant::INLINE_TEXT:
+                InlineText::deleteInlineTextId($itemId);
+                InstrFiles::deleteById($itemId);
+                break;
+            case AppConstant::WIKI:
+                Wiki::deleteById($itemId);
+                WikiRevision::deleteByWikiId($itemId);
+                WikiView::deleteByWikiId($itemId);
+                break;
+            case AppConstant::LINK:
+                $linkData = Links::getById($itemId);
+                $points = $linkData['points'];
+                if($points > AppConstant::NUMERIC_ZERO){
+                    Grades::deleteByGradeTypeId($itemId);
+                }
+                Links::deleteById($itemId);
+                break;
+        }
+        Items::deleteByTypeIdName($itemId,$ItemType['itemtype']);
     }
 
     public function actionPublic()
