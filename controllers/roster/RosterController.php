@@ -61,6 +61,8 @@ class RosterController extends AppController
         $user = $this->getAuthenticatedUser();
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
         $isShowPic = $this->getParamVal('showpic');
@@ -71,7 +73,14 @@ class RosterController extends AppController
             $isImageColumnPresent = AppConstant::NUMERIC_ONE;
         }
         $params = $this->getRequestParams();
-        $secfilter = $params['secfilter'];
+        if (isset($params['secfilter'])) {
+            $secfilter = $_GET['secfilter'];
+            $sessionData[$courseId.'secfilter'] = $secfilter;
+        } else if (isset($sessionData[$courseId.'secfilter'])) {
+            $secfilter = $sessionData[$courseId.'secfilter'];
+        } else {
+            $secfilter = -1;
+        }
         $distinctSection = Student::getDistinctSection($courseId);
         if (count($distinctSection) > 0)
         {

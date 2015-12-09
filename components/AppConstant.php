@@ -283,6 +283,8 @@ class AppConstant
     const DATE_TIME = 'D m/d/Y g:i a';
     const INCORRECT_ENROLLMENT_KEY = 'Incorrect Enrollment Key.';
     const NOW_VALUE = 'now';
+    const CUSTOMIZE_DATE = 'F d, o g:i a';
+    const MESSAGE_CUSTOMIZE_DATE = 'M d, o g:i a';
     // create a map with current constant being the key and the value being the value
     // start calling the method below
     public static function getConstantVal($key, $lang='en'){

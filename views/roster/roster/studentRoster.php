@@ -20,7 +20,7 @@ $urlmode = AppUtility::urlMode();
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
 </div>
-<div class="tab-content shadowBox"">
+<div class="tab-content shadowBox">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
 <div class="roster-upper-content col-md-12 col-sm-12 padding-right-thirty">
     <div class="page-title col-md-7 col-sm-6 pull-left">

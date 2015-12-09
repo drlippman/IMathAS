@@ -41,7 +41,7 @@ $now = $currentTime;
                      <h4 class="margin-top-zero"><b><?php echo $messages->title ?></b></h4>
                   </div>
                  <div class="pull right col-md-6 col-sm-6 message-title ">
-                     <?php echo date('M d, o g:i a', $messages->senddate) ?>
+                     <?php echo AppUtility::tzdate(AppConstant::MESSAGE_CUSTOMIZE_DATE, $messages->senddate)?>
                  </div>
          </div>
          <div class="second-level-div row">

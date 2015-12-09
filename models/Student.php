@@ -583,7 +583,7 @@ class Student extends BaseImasStudents
     public static function getDistinctSection($courseId)
     {
         $query = new Query();
-        $query->select('DISTINCT(section)')->from('imas_students')->where('imas_students.courseid = :cid')->andWhere(['IS NOT','imas_students.section',NULL])
+        $query->select('DISTINCT(section)')->from('imas_students')->where('imas_students.courseid=:cid')->andWhere(['IS NOT','imas_students.section',NULL])
             ->orderBy('section');
         return $query->createCommand()->bindValue(':cid',$courseId)->queryAll();
     }

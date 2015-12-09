@@ -148,7 +148,7 @@ class MessageController extends AppController
                 }
                 $newArray = array();
                 foreach ($dateArray as $singleDate) {
-                    $singleDate['senddate'] = AppController::customizeDate($singleDate['senddate']);
+                    $singleDate['senddate'] = AppUtility::tzdate(AppConstant::CUSTOMIZE_DATE,$singleDate['senddate']);
                     $titleLevel = AppUtility::calculateLevel($singleDate['title']);
                     $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
@@ -196,7 +196,7 @@ class MessageController extends AppController
                 }
                 $newArray = array();
                 foreach ($dateArray as $singleDate) {
-                    $singleDate['senddate'] = AppController::customizeDate($singleDate['senddate']);
+                    $singleDate['senddate'] = AppUtility::tzdate(AppConstant::CUSTOMIZE_DATE,$singleDate['senddate']);
                     $titleLevel = AppUtility::calculateLevel($singleDate['title']);
                     $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
