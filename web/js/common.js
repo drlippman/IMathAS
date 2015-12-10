@@ -1,14 +1,14 @@
 initstack = new Array();
 window.onload = init;
-$(document).ready(function()
+jQuery(document).ready(function()
 {
-    $('.dataTables_filter').prop('type', 'text');
-    $("#flash-message").animate({opacity:0.5}, 5000).fadeOut();
+    jQuery('.dataTables_filter').prop('type', 'text');
+    jQuery("#flash-message").animate({opacity:0.5}, 5000).fadeOut();
 
 });
 
 function jQuerySubmit(url, data, successCallBack) {
-    $.post(
+    jQuery.post(
         url,
         data,
         eval(successCallBack)
@@ -16,7 +16,7 @@ function jQuerySubmit(url, data, successCallBack) {
 }
 
 function jQuerySubmitAjax(url, type, data, successCallBack, errorCallBack) {
-    $.ajax({
+    jQuery.ajax({
         url: url,
         type:type,
         data: data,
@@ -32,7 +32,7 @@ function jQuerySubmitAjax(url, type, data, successCallBack, errorCallBack) {
 
 function isElementExist(element)
 {
-    if ($(element).length){
+    if (jQuery(element).length){
         return true;
     }
     return false;
@@ -54,20 +54,20 @@ function init() {
 function CommonPopUp(message)
 {
     var html = '<div><p>'+message+'</p></div>';
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+    jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: '', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
             "Okay": function () {
-                $('#searchText').val(null);
+                jQuery('#searchText').val(null);
 
-                $(this).dialog('destroy').remove();
+                jQuery(this).dialog('destroy').remove();
                 return false;
             }
         },
         close: function (event, ui) {
-            $(this).remove();
+            jQuery(this).remove();
         },
         open: function(){
             jQuery('.ui-widget-overlay').bind('click',function(){
@@ -80,13 +80,13 @@ function CommonPopUp(message)
 }
 
 function createDataTable(classNameHandler){
-    bPaginate = $('.'+classNameHandler).attr('bPaginate');
+    bPaginate = jQuery('.'+classNameHandler).attr('bPaginate');
     if(bPaginate.length > 0){
-        bPaginate = $.parseJSON(bPaginate);
+        bPaginate = jQuery.parseJSON(bPaginate);
     }else{
         bPaginate = true;
     }
-    $('.'+classNameHandler).DataTable({"bPaginate": bPaginate});
+    jQuery('.'+classNameHandler).DataTable({"bPaginate": bPaginate});
 
 }
 
@@ -136,7 +136,7 @@ function inArray(needle, haystack) {
 function isKeyPresent(array,index){
 var count = 0;
     if(array != undefined){
-        $.each(array,function(key,element){
+        jQuery.each(array,function(key,element){
            if(key == index){
                count++;
            }
@@ -151,24 +151,24 @@ var count = 0;
 }
 function alertPopUp(message, e){
     var html = '<div><p>'+message+'</p></div>';
-    var cancelUrl = $(this).attr('href');
+    var cancelUrl = jQuery(this).attr('href');
     e.preventDefault();
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+    jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
             "Cancel": function () {
-                $(this).dialog('destroy').remove();
+                jQuery(this).dialog('destroy').remove();
                 return false;
             },
             "Confirm": function () {
-                $(this).dialog("close");
+                jQuery(this).dialog("close");
                 return true;
             }
         },
         close: function (event, ui) {
-            $(this).remove();
+            jQuery(this).remove();
         },
         open: function(){
             jQuery('.ui-widget-overlay').bind('click',function(){

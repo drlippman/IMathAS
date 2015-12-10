@@ -1,49 +1,49 @@
-$(document).ready(function () {
+jQuery(document).ready(function () {
     selectCheckBox();
     selectCheckBox1();
-    $('input[name = "header-checked"]:checked').prop('checked', false);
-    $('input[name = "potentialq-header-checked"]:checked').prop('checked', false);
-    $('input[name = "manage-question-header-checked"]:checked').prop('checked', false);
-    $('input[name = "header-checked1"]:checked').prop('checked', false);
+    jQuery('input[name = "header-checked"]:checked').prop('checked', false);
+    jQuery('input[name = "potentialq-header-checked"]:checked').prop('checked', false);
+    jQuery('input[name = "manage-question-header-checked"]:checked').prop('checked', false);
+    jQuery('input[name = "header-checked1"]:checked').prop('checked', false);
 });
 
 function selectCheckBox() {
 
-    $('.potential-question-table input[name = "header-checked"]').click(function(){
-        if($(this).prop("checked") == true){
-            $('#potential-question-information-table input:checkbox').each(function () {
-                $(this).prop('checked', true);
+    jQuery('.potential-question-table input[name = "header-checked"]').click(function(){
+        if(jQuery(this).prop("checked") == true){
+            jQuery('#potential-question-information-table input:checkbox').each(function () {
+                jQuery(this).prop('checked', true);
             })
         }
-        else if($(this).prop("checked") == false){
-            $('#potential-question-information-table input:checkbox').each(function () {
-                $(this).prop('checked', false);
+        else if(jQuery(this).prop("checked") == false){
+            jQuery('#potential-question-information-table input:checkbox').each(function () {
+                jQuery(this).prop('checked', false);
             })
         }
     });
-    $('#add-remove-ques-table input[name = "potentialq-header-checked"]').click(function(){
-        if($(this).prop("checked") == true){
-            $('#potential-question-assessment-information-table input:checkbox').each(function () {
-                $(this).prop('checked', true);
+    jQuery('#add-remove-ques-table input[name = "potentialq-header-checked"]').click(function(){
+        if(jQuery(this).prop("checked") == true){
+            jQuery('#potential-question-assessment-information-table input:checkbox').each(function () {
+                jQuery(this).prop('checked', true);
             })
         }
-        else if($(this).prop("checked") == false){
-            $('#potential-question-assessment-information-table input:checkbox').each(function () {
-                $(this).prop('checked', false);
+        else if(jQuery(this).prop("checked") == false){
+            jQuery('#potential-question-assessment-information-table input:checkbox').each(function () {
+                jQuery(this).prop('checked', false);
             })
         }
     });
 }
 function selectCheckBox1() {
-    $('#add-remove-ques-table input[id = "header-checked1"]').click(function(){
-        if($(this).prop("checked") == true){
-            $('#question-information-table input:checkbox').each(function () {
-                $(this).prop('checked', true);
+    jQuery('#add-remove-ques-table input[id = "header-checked1"]').click(function(){
+        if(jQuery(this).prop("checked") == true){
+            jQuery('#question-information-table input:checkbox').each(function () {
+                jQuery(this).prop('checked', true);
             })
         }
-        else if($(this).prop("checked") == false){
-            $('#question-information-table input:checkbox').each(function () {
-                $(this).prop('checked', false);
+        else if(jQuery(this).prop("checked") == false){
+            jQuery('#question-information-table input:checkbox').each(function () {
+                jQuery(this).prop('checked', false);
             })
         }
     });
@@ -157,12 +157,12 @@ function setlibnames(libn) {
 	document.getElementById("libnames").innerHTML = libn;
 }
 
-$("#add-question").click(function() {
-    $("input[name=some_name]").attr("name", "add");
-    $("input[name=add-question-name]").attr("name", "add-question-grid-ui");
+jQuery("#add-question").click(function() {
+    jQuery("input[name=some_name]").attr("name", "add");
+    jQuery("input[name=add-question-name]").attr("name", "add-question-grid-ui");
     document.forms["selq"].submit()
 });
-$("#add-question-default").click(function() {
-    $("input[name=some_name]").attr("name", "addquick");
+jQuery("#add-question-default").click(function() {
+    jQuery("input[name=some_name]").attr("name", "addquick");
     document.forms["selq"].submit()
 });

@@ -69,7 +69,7 @@ $user = Yii::$app->session->get('user');
 </html>
 <?php $this->endPage() ?>
 <script>
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
 
         setMinHeightToContainer();
 
@@ -78,9 +78,9 @@ $user = Yii::$app->session->get('user');
 
     function setMinHeightToContainer() {
 
-        var lowerContainer = $(".container-lower-white").height();
+        var lowerContainer = jQuery(".container-lower-white").height();
 
-        var windowLength = $(window).height();
+        var windowLength = jQuery(window).height();
 
         var heightMin = lowerContainer < windowLength ? windowLength - 60 : lowerContainer + 120;
 //        $(".master-wrap").css('min-height', heightMin+"px");

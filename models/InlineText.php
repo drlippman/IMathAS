@@ -142,11 +142,10 @@ class InlineText extends BaseImasInlinetext
 
     public static function getDataByCourseId($courseId)
     {
-//        return self::find()->select(['id','title','text','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
         $query = new Query();
         $query->select(['id','title','text','startdate','enddate','avail'])
             ->from('imas_inlinetext')
-            ->where(['courseid' => $courseId]);
+            ->where('courseid=:courseId',[':courseId' => $courseId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

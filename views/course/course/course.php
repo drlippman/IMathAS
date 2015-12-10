@@ -5,7 +5,7 @@ use app\components\AppConstant;
 
 $this->title = ucfirst($course->name);
 $this->params['breadcrumbs'][] = $this->title;
-$imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reorder?cid='.$course->id);?>
+$imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid='.$course->id);?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
 <input type="hidden" class="home-path-course" value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
@@ -102,8 +102,7 @@ if (($teacherId && (!$backLink))) {?>
         </ul>
         <div class='btn-group settings col-md-2 col-sm-3 padding-left-zero padding-top-three'>
             <a class='btn btn-primary setting-btn last'
-               href="#"><i class="fa fa-eye"></i>
-
+               href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&quickview=off&teachview=1');?>"><i class="fa fa-eye"></i>
                 <?php AppUtility::t('Instructor'); ?>
             </a>
             <a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'>
@@ -115,8 +114,7 @@ if (($teacherId && (!$backLink))) {?>
                         <?php AppUtility::t('Student'); ?>
                 </li>
                 <li>
-                    <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&quickView=on');?>">
-<!--                    <a href="#">-->
+                    <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&quickview=on');?>">
                         <?php AppUtility::t('Quick Rearrange'); ?>
                     </a>
                 </li>
@@ -129,7 +127,7 @@ if (($teacherId && (!$backLink))) {?>
     <input type="hidden" class="courseId" value="<?php echo $course->id?>">
 
 <?php if ($isTutor && isset($sessionData['ltiitemtype']) && $sessionData['ltiitemtype'] == 3) {
-    $placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
+    $placeinhead .= '<script type="text/javascript">jQuery(function(){jQuery(".instrdates").hide();});</script>';
 }
 
 if ($overwriteBody == 1) {
@@ -196,18 +194,14 @@ if ($overwriteBody == 1) {
     <?php
     }
     ShowItemCourse::makeTopMenu();
-//    echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curName</h2></div>\n";
     if (count($items) > 0) {
-
-        if ($quickView =='on' && ($teacherId)) {
+        if ($quickView =='on' && isset($teacherId)) {
             echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
             echo "<script>var AHAHsaveurl = '$imasRoot';";
             echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
             echo "</script>";
             echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
             echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
-            echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-            echo "<script src=\"$imasroot/javascript/nested1.js?v=070214\"></script>";
 
             echo '<ul id=qviewtree class=qview>';
             $quickViewFun = new AppUtility();
@@ -225,7 +219,7 @@ if ($overwriteBody == 1) {
             if ($folder == '0') {
                 echo '<p class="padding-left-fifteen"><b>Welcome to your course!</b></p>';
                 echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
-                echo 'link along the left side of the screen.</p><p class="padding-left-fifteen">If you want to build from scratch, use the "Add An Item" pulldown below to get started.</p><p>&nbsp;</p>';
+                echo 'link along the left side of the screen.</p><p class="padding-left-fifteen">If you want to build from scratch, use the "Add An Item" pull down below to get started.</p><p>&nbsp;</p>';
             }
             echo ShowItemCourse::generateAddItem($folder,'t');
         }

@@ -1,8 +1,8 @@
 /*
  * Item Ordering on assessment page
  */
-var homePath = $('.home-path-course').val();
-var webPath = $('.web-path').val();
+var homePath = jQuery('.home-path-course').val();
+var webPath = jQuery('.web-path').val();
 function moveitem(from,blk) {
     var to = document.getElementById(blk+'-'+from).value;
     if (to != from) {
@@ -12,9 +12,9 @@ function moveitem(from,blk) {
 }
 // Add new items
 function additem(blk,tb) {
-    var courseId = $('.calender-course-id').val();
-    var block= $('#block').val(blk);
-    var tbValue = $('#tb-value').val(tb);
+    var courseId = jQuery('.calender-course-id').val();
+    var block= jQuery('#block').val(blk);
+    var tbValue = jQuery('#tb-value').val(tb);
 
     var type = document.getElementById('addtype'+blk+'-'+tb).value;
     if (tb=='BB' || tb=='LB') { tb = 'b';}
@@ -40,9 +40,9 @@ function additem(blk,tb) {
 }
 function getAddItem(blk,tb) {
 
-    $('.add-item').on('click', function (evt)
+    jQuery('.add-item').on('click', function (evt)
     {
-        var courseId = $('.calender-course-id').val();
+        var courseId = jQuery('.calender-course-id').val();
         var html = '<div class="">' +
             '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'&block='+blk+'&tb='+tb+'">' +
             '<div class="assessment itemLink" >' +
@@ -81,11 +81,11 @@ function getAddItem(blk,tb) {
             '<div class="item-name-small block-name-alignment">Block</div>'+
             '</div></a>' +
             '</div>';
-        $('<div class="dialog-items close-box" id="dialog"></div>').appendTo('body').html(html).dialog({
+        jQuery('<div class="dialog-items close-box" id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true, width: '410px',height: '419px', title: 'Add an Item...',
             closeText: "show",
             close: function (event, ui) {
-                $(this).remove();
+                jQuery(this).remove();
             },
             open: function(){
                 jQuery('.ui-widget-overlay').bind('click',function(){
@@ -102,7 +102,7 @@ function deleteItem(id,type,block,courseId) {
          message+="<span id='post-type-radio-list'><input type='radio'  name='delete' value='0'>Move all items out of block</br>";
          message+="<input type='radio' checked='checked' name='delete' value='1'>Also Delete all items in block</br></span>";
          var html = '<div><p>'+message+'</p></div>';
-         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+         jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
              modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
              width: 'auto', resizable: false,
              closeText: "hide",
@@ -110,20 +110,20 @@ function deleteItem(id,type,block,courseId) {
              {
                  "Cancel": function ()
                  {
-                     $(this).dialog('destroy').remove();
+                     jQuery(this).dialog('destroy').remove();
                      return false;
                  },
                  "Confirm": function ()
                  {
-                     var sel = $("#post-type-radio-list input[type='radio']:checked");
+                     var sel = jQuery("#post-type-radio-list input[type='radio']:checked");
                      var selected = sel.val();
                      jQuerySubmit('delete-items-ajax', {id:id,itemType:type,block:block,courseId:courseId,selected:selected},'responseSuccess');
-                     $(this).dialog('destroy').remove();
+                     jQuery(this).dialog('destroy').remove();
                      return true;
                  }
              },
              close: function (event, ui) {
-                 $(this).remove();
+                 jQuery(this).remove();
              },
              open: function(){
                  jQuery('.ui-widget-overlay').bind('click',function(){
@@ -149,7 +149,7 @@ function deleteItem(id,type,block,courseId) {
              var message = "Are you SURE you want to delete Calendar?";
          }
         var html = '<div><p>'+message+'</p></div>';
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+         jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
@@ -157,18 +157,18 @@ function deleteItem(id,type,block,courseId) {
             {
                 "Cancel": function ()
                 {
-                    $(this).dialog('destroy').remove();
+                    jQuery(this).dialog('destroy').remove();
                     return false;
                 },
                 "Confirm": function ()
                 {
                     jQuerySubmit('delete-items-ajax',{id:id, itemType:type, block:block, courseId:courseId},'responseSuccess');
-                    $(this).dialog('destroy').remove();
+                    jQuery(this).dialog('destroy').remove();
                     return true;
                 }
             },
             close: function (event, ui) {
-                $(this).remove();
+                jQuery(this).remove();
             },
             open: function(){
                 jQuery('.ui-widget-overlay').bind('click',function(){
@@ -187,23 +187,23 @@ function responseSuccess(response)
 function copyItem(id,type,block,courseId) {
     var itemType = type;
     var html = '<div><p>Are you SURE you want to copy this '+ itemType+'?</p></div>';
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+    jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
             "Cancel": function () {
-                $(this).dialog('destroy').remove();
+                jQuery(this).dialog('destroy').remove();
                 return false;
             },
             "Confirm": function () {
                 jQuerySubmit('copy-items-ajax', {copyid: id, itemType: type, block: block, courseId: courseId},'copyResponseSuccess');
-                $(this).dialog('destroy').remove();
+                jQuery(this).dialog('destroy').remove();
                 return true;
             }
         },
         close: function (event, ui) {
-            $(this).remove();
+            jQuery(this).remove();
         },
         open: function(){
             jQuery('.ui-widget-overlay').bind('click',function(){

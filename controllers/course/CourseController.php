@@ -1583,7 +1583,7 @@ class CourseController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id.'&folder=0'));
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js','course/instructor.js','course/addItem.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js', 'mootools.js', 'nested1.js','course/instructor.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,
         'items' => $items, 'folder' => $folder, 'parent' => $parent, 'firstLoad' => $firstLoad, 'jsAddress1' => $jsAddress1, 'jsAddress2' => $jsAddress2, 'curName' => $curName, 'curBreadcrumb' => $curBreadcrumb, 'isStudent' => $isStudent, 'students' => $student, 'newPostsCnt' => $newPostsCnt, 'backLink' => $backLink, 'type' => $type, 'user' => $user, 'lockAId' => $lockAId);
         return $this->renderWithData('course', $responseData);
@@ -2231,6 +2231,135 @@ class CourseController extends AppController
 
         $responseData = array('titlesImp' => $titlesImp, 'text' => $text, 'fcid' => $fcid, 'courseId' => $courseId, 'from' => $from, 'breadcrumbbase' => $breadcrumbbase);
         return $this->renderWithData('showLinkedTextPublic', $responseData);
+    }
+
+    public function actionSaveQuickReorder()
+    {
+        global $items,$courseId,$newItems,$courseDetail,$openblocks,$previewShift;
+        $params = $this->getRequestParams();
+        $courseId = $this->getParamVal('cid');
+        $order = $_POST['order'];
+
+        $previewShift = -1;
+        foreach ($_POST as $id => $val)
+        {
+            if ($id=="order" || $id == 'eIdentity')
+            {
+                continue;
+            }
+            $type = $id{0};
+            $typeId = substr($id,1);
+
+            if ($type=="I") {
+                $query = new InlineText();
+                $query->updateName($val, $typeId);
+            } else if ($type=="L") {
+                $query = new LinkedText();
+                $query->updateName($val,$typeId);
+            } else if ($type=="A") {
+                $query = new Assessments();
+                $query->updateName($val, $typeId);
+            } else if ($type=="F") {
+                $query = new Forums();
+                $query->updateName($val, $typeId);
+            } else if ($type=="W") {
+                $query = new Wiki();
+                $query->updateName($val, $typeId);
+            } else if ($type=="B") {
+                $query = Course::getItemOrder($courseId);
+                $itemsforblock = unserialize($query[0]['itemorder']);
+                $blocktree = explode('-',$typeId);
+                $existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
+                $sub =& $itemsforblock;
+                if (count($blocktree)>1) {
+                    for ($i=1;$i<count($blocktree);$i++) {
+                        $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                    }
+                }
+                $sub[$existingid]['name'] = stripslashes($val);
+                $itemOrder =  serialize($itemsforblock);
+                $query = new Course();
+                $query->setItemOrder($itemOrder, $courseId);
+            }
+        }
+        $query = Course::getItemOrder($courseId);
+        $items = unserialize($query['itemorder']);
+
+        $newItems = array();
+        $newItems = $this->additems($order);
+        echo "OK";
+        $itemList =  serialize($newItems);
+
+        $query = new Course();
+        $query->setItemOrder($itemList, $courseId);
+
+        $openblocks = Array(0);
+        $prevloadedblocks = array(0);
+        if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
+        {
+            $openblocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
+            $firstload=false;
+        } else {
+            $firstload=true;
+        }
+        if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
+        {
+            $prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
+        }
+        $plblist = implode(',',$prevloadedblocks);
+        $oblist = implode(',',$openblocks);
+
+        $quickView = new AppUtility();
+        $quickView->quickview($newItems,$courseDetail=false,0);
+    }
+
+    public function additems($list) {
+        global $items;
+        $outarr = array();
+        $list = substr($list,1,-1);
+        $i = 0; $nd = 0; $last = 0;
+        $listarr = array();
+        while ($i<strlen($list)) {
+            if ($list[$i]=='[') {
+                $nd++;
+            } else if($list[$i]==']') {
+                $nd--;
+            } else if ($list[$i]==',' && $nd==0) {
+                $listarr[] = substr($list,$last,$i-$last);
+                $last = $i+1;
+            }
+            $i++;
+        }
+        $listarr[] = substr($list,$last);
+        foreach ($listarr as $it) {
+            if (strpos($it,'-')!==false) { //is block
+                $pos = strpos($it,':');
+                if ($pos===false) {
+                    $pts[0] = $it;
+                } else {
+                    $pts[0] = substr($it,0,$pos);
+                    $pts[1] = substr($it,$pos+1);
+                }
+                $blocktree = explode('-',$pts[0]);
+                $sub = $items;
+                for ($i=1;$i<count($blocktree)-1;$i++) {
+                    $sub = $sub[$blocktree[$i]-1]['items'];
+                }
+                $block = $sub[$blocktree[count($blocktree)-1]-1];
+
+                if ($pos===false) {
+                    $block['items'] = array();
+                } else {
+                    $subarr = $this->additems($pts[1]);
+                    $block['items'] = $subarr;
+                }
+                $outarr[] = $block;
+            } else { //regular item
+                $outarr[] = $it;
+            }
+
+        }
+        return $outarr;
     }
 
     function findinpublic($items,$id) {

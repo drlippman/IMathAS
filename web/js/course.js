@@ -1,4 +1,4 @@
-var path = $('.home-path').val();
+var path = jQuery('.home-path').val();
 function ahah(url, target) {
   document.getElementById(target).innerHTML = ' Fetching data... ';
   if (window.XMLHttpRequest) {
@@ -26,9 +26,9 @@ function ahahDone(url, target) {
 //      if (usingASCIISvg) {
 //	      setTimeout("drawPics()",100);
 //      }
-      $('#'+target+' a').each(setuptracklinks);
-      $('#'+target+' a[href*="youtu"]').each(setupvideoembeds);
-      $('#'+target+' a[href*="vimeo"]').each(setupvideoembeds);
+        jQuery('#'+target+' a').each(setuptracklinks);
+        jQuery('#'+target+' a[href*="youtu"]').each(setupvideoembeds);
+        jQuery('#'+target+' a[href*="vimeo"]').each(setupvideoembeds);
       
       var x = document.getElementById(target).getElementsByTagName("script"); 
       for(var i=0;i<x.length;i++) {
@@ -108,7 +108,7 @@ function showcalcontents(el) {
 		var mlink = document.getElementById("mcelink");
 		if (mlink!=null) {
 			var href = mlink.href;
-			href = href.replace(/^(.*?cid=\d+).*$/,"$1");
+			href = href.replace(/^(.*?cid=\d+).*jQuery/,"$1");
 			mlink.href = href+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
 		}
 	} 
@@ -251,7 +251,7 @@ var playlist = [];
 var curvid = [];
 var players = [];
 function playlistnextvid() {
-	var id = $(this).parents('.playlistbar').get(0).id.substr(11);
+	var id = jQuery(this).parents('.playlistbar').get(0).id.substr(11);
 	if (curvid[id] != null) {
 		var curvidk = curvid[id];
 		if (curvidk < playlist[id].length-1) {
@@ -260,7 +260,7 @@ function playlistnextvid() {
 	}
 }
 function playlistprevvid() {
-	var id = $(this).parents('.playlistbar').get(0).id.substr(11);
+	var id = jQuery(this).parents('.playlistbar').get(0).id.substr(11);
 	if (curvid[id] != null) {
 		var curvidk = curvid[id];
 		if (curvidk >0) {
@@ -269,9 +269,9 @@ function playlistprevvid() {
 	}
 }
 function playlisttogglelist() {
-	var id = $(this).parents('.playlistbar').get(0).id.substr(11);
-	var wrap = $('#playlistwrap'+id);
-	var bar = $('#playlistbar'+id);
+	var id = jQuery(this).parents('.playlistbar').get(0).id.substr(11);
+	var wrap = jQuery('#playlistwrap'+id);
+	var bar = jQuery('#playlistbar'+id);
 	if (wrap.find('.playlisttext').css('display')=='none') {
 		//show list	
 		wrap.find('.playlisttext').show();
@@ -287,10 +287,10 @@ function playlisttogglelist() {
 }
 function playliststart(id,vidk,el) {
 	if (el!==null) {
-		$(el).hide();
+        jQuery(el).hide();
 	}
-	var wrap = $('#playlistwrap'+id);
-	var bar = $('#playlistbar'+id);
+	var wrap = jQuery('#playlistwrap'+id);
+	var bar = jQuery('#playlistbar'+id);
 	var iframe = wrap.find('iframe');
 	var url = location.protocol+'//www.youtube.com/embed/'+playlist[id][vidk].vidid;
 	if (playlist[id][vidk].start>0) {
@@ -311,7 +311,7 @@ function playliststart(id,vidk,el) {
 	}
 	if (iframe.length == 0) { //not init.  Init it
 		wrap.find('.playlistvid').append(
-			$('<iframe/>', {
+            jQuery('<iframe/>', {
 				id: 'videoiframe'+id,
 				width: 640,
 				height: 400,
@@ -352,19 +352,19 @@ function playliststart(id,vidk,el) {
 function studLocked()
 {
     var html = '<div><p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p></div>';
-    var cancelUrl = $(this).attr('href');
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+    var cancelUrl = jQuery(this).attr('href');
+    jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
             "Ok": function () {
-                $(this).dialog('destroy').remove();
+                jQuery(this).dialog('destroy').remove();
                 return false;
             }
         },
         close: function (event, ui) {
-            $(this).remove();
+            jQuery(this).remove();
         }
     });
 }
@@ -374,19 +374,19 @@ function locked()
     var name = 'Assessment';
     var html = '<div><p>This course is currently locked for an assessment.</p>';
 //    html += "<a class=''style='color: #0000ff;font-size: 16px' href='../assessment/assessment/show-test'>"+name+"</a></div>";
-    var cancelUrl = $(this).attr('href');
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+    var cancelUrl = jQuery(this).attr('href');
+    jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
             "Ok": function () {
-                $(this).dialog('destroy').remove();
+                jQuery(this).dialog('destroy').remove();
                 return false;
             }
         },
         close: function (event, ui) {
-            $(this).remove();
+            jQuery(this).remove();
         }
     });
 }

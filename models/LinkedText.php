@@ -191,11 +191,10 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getDataByCourseId($courseId)
     {
-//        return self::find()->select(['id','title','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
         $query = new Query();
         $query->select(['id','title','startdate','enddate','avail'])
             ->from('imas_linkedtext')
-            ->where(['courseid' => $courseId]);
+            ->where('courseid=:courseId',[':courseId' => $courseId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

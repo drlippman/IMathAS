@@ -1,9 +1,5 @@
-// Version: 1.20
-// Date: 2007-01-25
-// Author: CrazyDave
-// Website: http://www.clanccc.co.uk/moo/nested.html
 var noblockcookie = false;
-var req = null;
+//var req = null;
 var Nested = new Class({
 	getOptions: function() {
 		return {
@@ -25,10 +21,10 @@ var Nested = new Class({
 	initialize: function(list, options) {
 		
 		this.setOptions(this.getOptions(), options);
-		if (!this.options.expandKey.match(/^(control|shift)$/)) {
+		if (!this.options.expandKey.match(/^(control|shift)jQuery/)) {
 			this.options.expandKey = 'shift';
 		}
-		this.list = $(list);
+		this.list = jQuery(list);
 		this.options.parentTag = this.list.nodeName;
 		this.bound = {};
 		this.bound.start = this.start.bindWithEvent(this);
@@ -42,7 +38,7 @@ var Nested = new Class({
 	},
 
 	start: function(event) {
-		var el = $(event.target);
+		var el = jQuery(event.target);
 		if (this.options.handleClass) {
 			while (el.nodeName != this.options.childTag && !el.hasClass(this.options.handleClass) && el != this.list) {
 				el = el.getParent();
@@ -53,7 +49,7 @@ var Nested = new Class({
 			el = el.parentNode;
 		}
 		if (el.nodeName != this.options.childTag) return true;
-		el = $(el);
+		el = jQuery(el);
 		if (this.options.lock == 'class' && !el.hasClass(this.options.lockClass)) return;
 		if (this.options.ghost) { // Create the ghost
 			this.ghost = el.clone().setStyles({
@@ -75,14 +71,14 @@ var Nested = new Class({
 		document.addEvent('mouseup', this.bound.end);
 		if (window.ie) { // IE fix to stop selection of text when dragging
 			this.bound.stop = this.stop.bindWithEvent(this);
-			$(document.body).addEvent('drag', this.bound.stop).addEvent('selectstart', this.bound.stop);
+            jQuery(document.body).addEvent('drag', this.bound.stop).addEvent('selectstart', this.bound.stop);
 		}
 		this.fireEvent('onStart', el);
 		event.stop();
 	},
 
 	collapse: function(event) {
-		var el = $(event.target);
+		var el = jQuery(event.target);
 		if (this.options.handleClass) {
 			while (el.nodeName != this.options.childTag && !el.hasClass(this.options.handleClass) && el != this.list) {
 				el = el.getParent();
@@ -93,7 +89,7 @@ var Nested = new Class({
 			el = el.parentNode;
 		}
 		if (el == this.list) return;
-		el = $(el);
+		el = jQuery(el);
 		if (!el.moved) {
 			var sub = $E(this.options.parentTag, el);
 			if (sub) {
@@ -217,7 +213,7 @@ var Nested = new Class({
 		last = dest.getParent().getLast();
 		while (((move == 'after' && last == dest) || last == el) && dest.getParent() != this.list && event.page.x < dest.getLeft()) {
 			move = 'after';
-			dest = $(dest.parentNode.parentNode);
+			dest = jQuery(dest.parentNode.parentNode);
 			last = dest.getParent().getLast();
 		}
 		
@@ -239,7 +235,7 @@ var Nested = new Class({
 					dest = new Element(this.options.parentTag).injectInside(dest);
 					dest.className = "qview";
 				}
-				$(el).inject(dest, move);
+                jQuery(el).inject(dest, move);
 				el.moved = true;
 				if (!prevParent.getFirst()) prevParent.remove();
 				if (!this.haschanged) {
@@ -277,7 +273,7 @@ var Nested = new Class({
 		this.list.removeEvent('mousedown', this.bound.end);
 		this.list.addEvent('mousedown', this.bound.start);
 		this.fireEvent('onComplete', el);
-		if (window.ie) $(document.body).removeEvent('drag', this.bound.stop).removeEvent('selectstart', this.bound.stop);
+		if (window.ie) jQuery(document.body).removeEvent('drag', this.bound.stop).removeEvent('selectstart', this.bound.stop);
 	}
 });
 
@@ -341,12 +337,11 @@ function submitChanges() {
   if (typeof req != 'undefined') {
       req.open("POST", url, true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	//req.setRequestHeader("Content-length", params.length);
-	//req.setRequestHeader("Connection", "close");
+	req.setRequestHeader("Content-length", params.length);
+	req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {NestedahahDone(url, target);};
 	req.send(params);
   }
-
 }  
 
 function quickviewexpandAll() {
@@ -360,7 +355,9 @@ function NestedahahDone(url, target)
 {
     if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK"
+        console.log(req.responseText);
 	    if (req.responseText.substring(0,2)=='OK') {
+
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    window.onbeforeunload = null;
@@ -369,6 +366,7 @@ function NestedahahDone(url, target)
             sortIt.haschanged = false;
 	    } else
         {
+            alert('hey');
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }
     } else {

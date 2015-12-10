@@ -2471,7 +2471,7 @@ class AppUtility extends Component
                  * */
                 $items[$i]['name'] = ($items[$i]['name']);
 
-                if ($items[$i]['startdate'] == 0) {
+                if ($items[$i]['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {
                     $startdate = AppUtility::formatdate($items[$i]['startdate']);
@@ -2573,17 +2573,17 @@ class AppUtility extends Component
                 $line['enddate'] = $iteminfo['Assessment'][$typeid]['enddate'];
                 $line['reviewdate'] = $iteminfo['Assessment'][$typeid]['reviewdate'];
                 $line['avail'] = $iteminfo['Assessment'][$typeid]['avail'];
-                if ($line['startdate']==0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {
                     $startdate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate']==2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $enddate = _('Always');
                 } else {
                     $enddate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($line['reviewdate']==2000000000) {
+                if ($line['reviewdate'] == AppConstant::ALWAYS_TIME) {
                     $reviewdate = _('Always');
                 } else {
                     $reviewdate = AppUtility::formatdate($line['reviewdate']);
@@ -2594,15 +2594,15 @@ class AppUtility extends Component
                     $icon = '<img alt="assessment" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['assess'].'" class="mida icon" /> ';
                 }
                 echo '<li id="'.$items[$i].'">'.$icon;
-                if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+                if ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate']<$now && $line['enddate']>$now) {
                     $show = sprintf(_('Available until %s'), $enddate);
                     echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
-                } else if ($line['avail']==1 && $line['startdate']<$now && $line['reviewdate']>$now) {
+                } else if ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate']<$now && $line['reviewdate']>$now) {
                     $show = sprintf(_('Review until %s'), $reviewdate);
                     echo '<b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
                 } else {
                     $show = sprintf(_('Available %1$s to %2$s'), $startdate, $enddate);
-                    if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
+                    if ($line['reviewdate'] > AppConstant::NUMERIC_ZERO && $line['enddate'] != AppConstant::ALWAYS_TIME) {
                         $show .= sprintf(_(', review until %s'), $reviewdate);
                     }
                     echo '<i><b><span id="A'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
@@ -2611,12 +2611,13 @@ class AppUtility extends Component
                     echo $show;
                 }
                 if ($showlinks) {
-                    echo '<span class="links">';
-                    echo " <a href=\"#\">", _('Questions'), "</a> | <a href=\"#\">", _('Settings'), "</a> | \n";
-                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
-                    echo " | <a href=\"#\">", _('Copy'), "</a>";
-                    echo " | <a href=\"#\">", _('Grades'), "</a>";
-                    echo '</span>';
+                    echo '<span class="links">';?>
+                    <a class="question" href="<?php echo AppUtility::getURLFromHome('question', 'question/add-questions?cid='.$courseId.'&aid='.$typeid); ?>"><?php AppUtility::t('Questions'); ?></a> |
+                    <a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$typeid . '&cid=' . $courseId . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a> |
+                    <a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a> |
+                    <a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a> |
+                    <a id="grades" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-analysis?cid='.$courseId.'&asid=average&aid='.$typeid); ?>"><?php AppUtility::t('Grades'); ?></a>
+                    <?php echo '</span>';
                 }
                 echo "</li>";
 
@@ -2634,20 +2635,20 @@ class AppUtility extends Component
                 if ($line['name'] == '##hidden##') {
                     $line['name'] = strip_tags($line['text']);
                 }
-                if ($line['startdate'] == 0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {
                     $startdate = AppUtility::formatdate($line['startdate']);
 
                 }
-                if ($line['enddate'] == 2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $enddate = _('Always');
                 } else {
                     $enddate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($items[$i]['avail']== 2) {
+                if ($items[$i]['avail']== AppConstant::NUMERIC_TWO) {
                     $color = '#0f0';
-                } else if ($items[$i]['avail'] == 0) {
+                } else if ($items[$i]['avail'] == AppConstant::NUMERIC_ZERO) {
                     $color = '#ccc';
                 }
                 if (!isset($CFG['CPS']['miniicons']['inline'])) {
@@ -2668,11 +2669,11 @@ class AppUtility extends Component
                     }
                 }
                 if ($showlinks) {
-                    echo '<span class="links">';
-                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
-                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
-                    echo " | <a href=\"#\">", _('Copy'), "</a>";
-                    echo '</span>';
+                    echo '<span class="links">';?>
+                    <a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?cid=' . $courseId . '&id=' . $typeid) ?>"><?php AppUtility::t('Modify'); ?></a> |
+                    <a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                    <a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                    <?php echo '</span>';
                 }
                 echo '</li>';
             } else if ($itemtypes[$items[$i]][0] == 'LinkedText')
@@ -2685,19 +2686,19 @@ class AppUtility extends Component
                     $line['startdate'] = $iteminfo['LinkedText'][$typeid]['startdate'];
                     $line['enddate'] = $iteminfo['LinkedText'][$typeid]['enddate'];
                     $line['avail'] = $iteminfo['LinkedText'][$typeid]['avail'];
-                if ($line['startdate'] == 0) {
+                if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {
                     $startdate = AppUtility::formatdate($line['startdate']);
                 }
-                if ($line['enddate'] == 2000000000) {
+                if ($line['enddate'] == AppConstant::ALWAYS_TIME) {
                     $enddate = _('Always');
                 } else {
                     $enddate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($items[$i]['avail']==2) {
+                if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO) {
                     $color = '#0f0';
-                } else if ($items[$i]['avail']==0) {
+                } else if ($items[$i]['avail'] == AppConstant::NUMERIC_ZERO) {
                     $color = '#ccc';
                 }
                 if (!isset($CFG['CPS']['miniicons']['linked'])) {
@@ -2718,11 +2719,11 @@ class AppUtility extends Component
                     }
                 }
                 if ($showlinks) {
-                    echo '<span class="links">';
-                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
-                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
-                    echo " | <a href=\"#\">", _('Copy'), "</a>";
-                    echo '</span>';
+                    echo '<span class="links">'; ?>
+                    <a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/add-link?cid=' . $courseId . '&id=' . $typeid); ?>"><?php AppUtility::t('Modify'); ?></a> |
+                    <a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a> |
+                    <a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                   <?php echo '</span>';
                 }
                 echo '</li>';
             } else if ($itemtypes[$items[$i]][0] == 'Forum')
@@ -2765,11 +2766,12 @@ class AppUtility extends Component
                     }
                 }
                 if ($showlinks) {
-                    echo '<span class="links">';
-                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
-                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
-                    echo " | <a href=\"#\">", _('Copy'), "</a>";
-                    echo '</span>';
+                    echo '<span class="links">'; ?>
+                    <a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $courseId.'&fromForum=1&id='.$typeid); ?>"><?php AppUtility::t('Modify'); ?></a> |
+                    <a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a> |
+                    <a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+
+                  <?php  echo '</span>';
                 }
                 echo '</li>';
             } else if ($itemtypes[$items[$i]][0] == 'Wiki')
@@ -2811,11 +2813,11 @@ class AppUtility extends Component
                     }
                 }
                 if ($showlinks) {
-                    echo '<span class="links">';
-                    echo " <a href=\"#\">", _('Modify'), "</a> | \n";
-                    echo "<a href=\"#\">", _('Delete'), "</a>\n";
-                    echo " | <a href=\"#\">", _('Copy'), "</a>";
-                    echo '</span>';
+                    echo '<span class="links">'; ?>
+                    <a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $typeid . '&cid=' . $courseId) ?>"><?php AppUtility::t('Modify'); ?></a>  |
+                    <a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a> |
+                    <a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                  <?php  echo '</span>';
                 }
                 echo '</li>';
             }

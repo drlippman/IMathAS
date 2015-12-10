@@ -836,14 +836,11 @@ class ShowItemCourse extends Component
                                 <li><a class="modify"
                                        href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$typeid . '&cid=' . $courseId . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a>
                                 </li>
-                                <li><a id="delete"
-                                       href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
-                                <li><a id="copy"
-                                       href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                 </li>
-                                <li><a id="grades"
-                                       href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-analysis?cid='.$courseId.'&asid=average&aid='.$typeid); ?>"><?php AppUtility::t('Grades'); ?></a>
+                                <li><a id="grades" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-analysis?cid='.$courseId.'&asid=average&aid='.$typeid); ?>"><?php AppUtility::t('Grades'); ?></a>
                                 </li>
 
                                 <?php if (isset($hasStats['a' . $typeid])) { ?>
@@ -1077,14 +1074,11 @@ class ShowItemCourse extends Component
                                    href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                    src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                                 <ul class="select1 dropdown-menu selected-options pull-right">
-                                    <li><a class="modify"
-                                           href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?cid=' . $courseId . '&id=' . $typeid) ?>"><?php AppUtility::t('Modify'); ?></a>
+                                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?cid=' . $courseId . '&id=' . $typeid) ?>"><?php AppUtility::t('Modify'); ?></a>
                                     </li>
-                                    <li><a id="delete"
-                                           href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                    <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                     </li>
-                                    <li><a id="copy"
-                                           href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                    <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::INLINE_TEXT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                     </li>
                                 </ul>
                             </div>
@@ -1307,14 +1301,11 @@ class ShowItemCourse extends Component
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
-                                <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('course', 'course/add-link?cid=' . $courseId . '&id=' . $typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/add-link?cid=' . $courseId . '&id=' . $typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
-                                <li><a id="delete"
-                                       href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
-                                <li><a id="copy"
-                                       href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                 </li>
                                 <?php
                                 if (isset($hasStats['l'.$typeid])) {
@@ -1351,14 +1342,11 @@ class ShowItemCourse extends Component
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
-                                <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('course', 'course/add-link?cid=' . $courseId . '&id=' . $typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/add-link?cid=' . $courseId . '&id=' . $typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
-                                <li><a id="delete"
-                                       href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
-                                <li><a id="copy"
-                                       href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                 </li>
                                 <?php
                                 if (isset($hasStats['l'.$typeid])) {
@@ -1434,14 +1422,11 @@ class ShowItemCourse extends Component
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
-                                <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $courseId.'&fromForum=1&id='.$typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $courseId.'&fromForum=1&id='.$typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
-                                <li><a id="delete"
-                                       href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
-                                <li><a id="copy"
-                                       href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                 </li>
                                 <?php if (isset($hasStats['f' . $typeid])) { ?>
                                     <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$courseId.'&type=F&id='.$typeid)?>"><?php AppUtility::t('Stats'); ?></a></li>
@@ -1481,14 +1466,11 @@ class ShowItemCourse extends Component
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
-                                <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $courseId.'&fromForum=1&id='.$typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?cid=' . $courseId.'&fromForum=1&id='.$typeid); ?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
-                                <li><a id="delete"
-                                       href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
-                                <li><a id="copy"
-                                       href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                 </li>
                                 <?php if (isset($hasStats['f' . $typeid])) { ?>
                                     <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$courseId.'&type=F&id='.$typeid)?>"><?php AppUtility::t('Stats'); ?></a></li>
@@ -1601,14 +1583,11 @@ class ShowItemCourse extends Component
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
-                                <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $typeid . '&cid=' . $courseId) ?>"><?php AppUtility::t('Modify'); ?></a>
+                                <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $typeid . '&cid=' . $courseId) ?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
-                                <li><a id="delete"
-                                       href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
+                                <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
-                                <li><a id="copy"
-                                       href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
+                                <li><a id="copy" href="javascript:copyItem('<?php echo $items[$i]; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Copy'); ?></a>
                                 </li>
                                 <?php
                                 if (isset($hasStats['w'.$typeid])) {
@@ -1782,25 +1761,24 @@ class ShowItemCourse extends Component
 
 
 public static function makeTopMenu() {
-
     global $teacherId,$courseId,$imasroot,$previewshift, $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useviewButtons,$newPostsCnt;
     if ($useviewButtons && (($teacherId) || $previewshift > -1)) {
         echo '<div id="viewbuttoncont">View: ';
-        echo "<a href=\"#\" ";
+        echo "<a href=\"course.php?cid=$courseId&quickview=off&teachview=1\" ";
         if ($previewshift == -1 && $quickView != 'on') {
             echo 'class="buttonactive buttoncurveleft"';
         } else {
             echo 'class="buttoninactive buttoncurveleft"';
         }
         echo '>', _('Instructor'), '</a>';
-        echo "<a href=\"#\" ";
+        echo "<a href=\"course.php?cid=$courseId&quickview=off&stuview=0\" ";
         if ($previewshift>-1 && $quickView != 'on') {
             echo 'class="buttonactive"';
         } else {
             echo 'class="buttoninactive"';
         }
         echo '>', _('Student'), '</a>';
-        echo "<a href=\"#\" ";
+        echo "<a href=\"course.php?cid=$courseId&quickview=on&teachview=1\" ";
         if ($previewshift==-1 && $quickView == 'on') {
             echo 'class="buttonactive buttoncurveright"';
         } else {
@@ -1821,7 +1799,7 @@ public static function makeTopMenu() {
         }
         echo '<div class="cpmid">';
         if (!$useviewButtons) {
-            echo _('Quick View.'), " <a href=\"#\">", _('Back to regular view'), "</a>. ";
+            echo _('Quick View.'), " <a href=\"course?cid=$courseId&quickview=off\">", _('Back to regular view'), "</a>. ";
         }
         if (isset($CFG['CPS']['miniicons'])) {
             echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';

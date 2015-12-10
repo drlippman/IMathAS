@@ -20,7 +20,7 @@ $cnt=0;
 </div>
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
 <input type="hidden" class="home-path"
-       value="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id) ?>">
+       value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
 <div class="col-lg-2 needed pull-left">
     <?php echo $this->render('_leftSideTeacher', ['course' => $course, 'messageList' => $messageList]); ?>
 </div>
