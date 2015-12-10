@@ -2171,6 +2171,7 @@ class CourseController extends AppController
 
     public function actionShowLinkedTextPublic()
     {
+        global $isPublic, $courseId;
         $user = $this->getAuthenticatedUser();
         $userId = $user['id'];
         $courseId = intval($this->getParamVal('cid'));
@@ -2200,7 +2201,9 @@ class CourseController extends AppController
 
         $itemId = Items::getByItemTypeAndId($id);
         $courseData = Course::getIdPublicly($courseId);
-        $items = unserialize($courseData);
+
+         $items = unserialize($courseData['itemorder']);
+
         $courseName = $courseData['name'];
         if ($fcid == 0) {
             $breadcrumbbase = "<a href=\"public?cid=$cid\">$courseName</a> &gt; ";
@@ -2209,8 +2212,8 @@ class CourseController extends AppController
         }
 
         if (!$this->findinpublic($items,$itemId)) {
-            echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
-            exit;
+            $this->setWarningFlash("This page does not appear to be publically accessible.  Please return to the Home Page and try logging in.\n");
+            return $this->redirect(Yii::$app->getHomeUrl());
         }
         $isPublic = true;
 
@@ -2229,15 +2232,19 @@ class CourseController extends AppController
     }
 
     function findinpublic($items,$id) {
-        foreach ($items as $k=>$item) {
-            if (is_array($item)) {
-                if ($item['public']==1) {
-                    if ($this->finditeminblock($item['items'],$id)) {
-                        return true;
+        if($items)
+        {
+            foreach ($items as $k=>$item) {
+                if (is_array($item)) {
+                    if ($item['public']==1) {
+                        if ($this->finditeminblock($item['items'],$id)) {
+                            return true;
+                        }
                     }
                 }
             }
         }
+
         return false;
     }
 

@@ -147,7 +147,14 @@ class Wiki extends BaseImasWikis
 
     public static function getDataByCourseId($courseId)
     {
-        return self::find()->select(['id','name','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
+//        return self::find()->select(['id','name','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
+        $query = new Query();
+        $query->select(['id','name','startdate','enddate','avail'])
+            ->from('imas_wikis')
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
     public function updateName($val, $typeId)

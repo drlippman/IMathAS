@@ -4,7 +4,8 @@ use \app\components\ShowItemCourse;
 use app\components\AppConstant;
 
 $this->title = ucfirst($course->name);
-$this->params['breadcrumbs'][] = $this->title; ?>
+$this->params['breadcrumbs'][] = $this->title;
+$imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reorder?cid='.$course->id);?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
 <input type="hidden" class="home-path-course" value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
@@ -114,8 +115,8 @@ if (($teacherId && (!$backLink))) {?>
                         <?php AppUtility::t('Student'); ?>
                 </li>
                 <li>
-<!--                    <a href="--><?php //echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id. '&quickview=on');?><!--">-->
-                    <a href="#">
+                    <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&quickView=on');?>">
+<!--                    <a href="#">-->
                         <?php AppUtility::t('Quick Rearrange'); ?>
                     </a>
                 </li>
@@ -197,20 +198,24 @@ if ($overwriteBody == 1) {
     ShowItemCourse::makeTopMenu();
 //    echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curName</h2></div>\n";
     if (count($items) > 0) {
+
         if ($quickView =='on' && ($teacherId)) {
             echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
-            echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
+            echo "<script>var AHAHsaveurl = '$imasRoot';";
             echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
             echo "</script>";
-            echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
-            echo "<script src=\"$imasroot/javascript/nested1.js?v=070214\"></script>";
             echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
             echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
+            echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
+            echo "<script src=\"$imasroot/javascript/nested1.js?v=070214\"></script>";
 
             echo '<ul id=qviewtree class=qview>';
+            $quickViewFun = new AppUtility();
+            $quickViewFun->quickview($items,0);
             echo '</ul>';
             echo '<p>&nbsp;</p>';
         } else {
+
             $showItem = new ShowItemCourse();
             $showItem->showItems($items,$folder);
         }

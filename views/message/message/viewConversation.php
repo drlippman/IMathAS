@@ -94,7 +94,7 @@ AppUtility::includeJS('general.js'); ?>
                 <input type=button class="btn btn-primary1 btn-color" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
                 </span>
                 <b><?php echo $message['title'] ?></b><br/><?php echo AppUtility::t('Posted by:');?><a
-                    href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>
+                    href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo AppUtility::tzdate(AppConstant::MESSAGE_CUSTOMIZE_DATE, $message['msgDate']) ?>
 
                 <span style="color:red;"><?php echo AppUtility::t('New');?></span>
             </div>

@@ -117,7 +117,7 @@ $urlmode = AppUtility::urlMode();?>
 
         echo '<span class="col-sm-4 col-md-3 padding-left-zero padding-top-six right">';?>
 
-        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/posts?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
+        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
         <?php if ($isteacher || ($line['ownerid']==$userId && $allowmod)) { ?>
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$course->id.'&forumId='.$forumId.'&threadId='.$line['id'] ) ?> ">Modify</a>
     <?php }

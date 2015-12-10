@@ -763,6 +763,8 @@ class AppController extends Controller
         $isOwner = Course::isOwner($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)) {
             return true;
+        } else if($user['rights'] < AppConstant::STUDENT_RIGHT && $actionPath = 'view-wiki-public'){
+            return true;
         }
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $studentId = $this->isStudent($user['id'], $courseId);
@@ -903,7 +905,9 @@ class AppController extends Controller
             return true;
         } elseif(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'calendar')){
             return true;
-        } else {
+        } elseif($user['rights'] < AppConstant::STUDENT_RIGHT && $actionPath == 'public' || $actionPath == 'show-linked-text-public'){
+            return true;
+        }else {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
         }

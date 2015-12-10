@@ -120,7 +120,11 @@ class InlineText extends BaseImasInlinetext
 
     public static function getFileOrder($id)
     {
-        return self::find()->select('fileorder')->where(['id' => $id])->one()->toArray();
+//        AppUtility::dump($id);
+//        $A = self::find()->select('fileorder')->where(['id' => $id])->one()->toArray();
+//        AppUtility::dump($A);
+        return \Yii::$app->db->createCommand("SELECT fileorder FROM imas_inlinetext WHERE id={$id}")->queryOne();
+//        AppUtility::dump($query);
     }
 
     public static function getByCourseIdAll($courseId)
@@ -138,7 +142,14 @@ class InlineText extends BaseImasInlinetext
 
     public static function getDataByCourseId($courseId)
     {
-        return self::find()->select(['id','title','text','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
+//        return self::find()->select(['id','title','text','startdate','enddate','avail'])->where(['courseid' => $courseId])->all();
+        $query = new Query();
+        $query->select(['id','title','text','startdate','enddate','avail'])
+            ->from('imas_inlinetext')
+            ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
     public function updateName($val, $inlineTextId)

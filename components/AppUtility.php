@@ -2400,7 +2400,7 @@ class AppUtility extends Component
         return $parent;
     }
 
-    public function quickview($items,$countCourseDetails,$parent,$showdates=false,$showlinks=true)
+    public function quickview($items,$parent,$showdates=false,$showlinks=true)
     {
         global $courseId,$openblocks,$previewShift,$CFG;
         if (!is_array($openblocks))
@@ -2546,7 +2546,7 @@ class AppUtility extends Component
                 if (count($items[$i]['items']) > 0)
                 {
                     echo '<ul class=qview '.$qviewstyle.'>';
-                    $this->quickview($items[$i]['items'],$countCourseDetails,$parent.'-'.$bnum,$showdats,$showlinks);
+                    $this->quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
                     echo '</ul>';
                 }
                 echo '</li>';

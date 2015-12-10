@@ -181,9 +181,9 @@ if ($started) {
                 </label>
                <div class = "col-md-3 col-sm-4 time-input">
                     <?php    echo DatePicker::widget([
-                        'name' => 'Calendar',
+                        'name' => 'rdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                        'value' => $defaultValue['rdatetype'],
+                        'value' => $rdate,
                         'removeButton' => false,
                         'pluginOptions' => [
                             'autoclose' => true,
@@ -193,8 +193,8 @@ if ($started) {
                 <label class="end floatleft non-bold padding-top-pt-five-em"> at </label>
                 <div class="pull-left col-md-4 col-sm-5">
                     <?php  echo TimePicker::widget([
-                        'name' => 'calendar_end_time',
-                        'value' => time(),
+                        'name' => 'rtime',
+                        'value' => $rtime,
                         'pluginOptions' => [
                             'showSeconds' => false,
                             'class' => 'time'

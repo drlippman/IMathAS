@@ -121,7 +121,14 @@ class ForumController extends AppController
         $itemorder = unserialize($course['itemorder']);
         global $addto;
         $itemsimporder = array();
-        $this->flattenitems($itemorder,$itemsimporder);
+
+        if($itemorder)
+        {
+            $this->flattenitems($itemorder,$itemsimporder);
+        } else{
+            $this->setErrorFlash("No items present.");
+        }
+
         $itemsassoc = array();
         $items = Items::getByCourseIdAndItenType($cid,'Forum');
         if(count($addto) > 0)

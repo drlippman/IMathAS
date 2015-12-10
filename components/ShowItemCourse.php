@@ -1,5 +1,6 @@
 <?php
 namespace app\components;
+use app\controllers\AppController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\ContentTrack;
@@ -20,7 +21,6 @@ class ShowItemCourse extends Component
     public function showItems($items,$parent,$inpublic=false) {
         global $teacherId,$isTutor,$isStudent,$courseId,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights;
         global $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,$studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess, $courseStudent;
-        $lockId = $courseStudent['lockaid'];
 
         $imasroot = AppUtility::getHomeURL();
         if (!($CFG['CPS']['itemicons'])) {
@@ -63,7 +63,6 @@ class ShowItemCourse extends Component
         if ($canEdit)
         {
             echo ShowItemCourse::generateAddItem($parent,'t');
-//            echo "<div style='margin-top: 20px'></div>";
         }
         for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++)
         {
@@ -80,11 +79,13 @@ class ShowItemCourse extends Component
                         continue;
                     }
                 }
+
                 if (($items[$i]['grouplimit']) && count($items[$i]['grouplimit']) > AppConstant::NUMERIC_ZERO && !$viewAll) {
                     if (!in_array('s-'.$studentInfo['section'],$items[$i]['grouplimit'])) {
                         continue;
                     }
                 }
+
                 $items[$i]['name'] = stripslashes($items[$i]['name']);
                 if ($canEdit) {
                     echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
@@ -158,7 +159,7 @@ class ShowItemCourse extends Component
 
                         if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             if ($isPublic) {
-                                echo "<span class=left><a href=\"#\" border=0>";
+                                echo "<span class=left><a href=\"public?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             } else {
                                 echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             }
@@ -166,7 +167,7 @@ class ShowItemCourse extends Component
                             echo "<div class=title>";
                         }
                         if ($isPublic) {
-                            echo "<a href=\"#\" $astyle><b>{$items[$i]['name']}</b></a> ";
+                            echo "<a href=\"public?cid=$courseId&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
                         } else {
                             echo "<a href=\"course?cid=$courseId&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
                         }
@@ -228,9 +229,10 @@ class ShowItemCourse extends Component
                         if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             if ($isPublic) {
                             } else {
-                                echo "<span class=left><a href=\"#\" border=0>";
-                            }
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></a></span>";
+                                echo "<span class=left>";?>
+                                <a href="<?php AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId. '&folder='.$parent-$bnum)?>" border="0"><img src="<?php AppUtility::getAssetURL()?>img/folder_tree.png"></a>
+                            <?php }
+                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></span>";
                             echo "<div class=title>";
                         }
                         if ($isPublic) {
@@ -633,7 +635,6 @@ class ShowItemCourse extends Component
                 global $currentTime;
                 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 if ($isPublic) { continue;}
-//                echo "<div class=item>\n";1 calender
                 ShowItemCourse::beginitem($canEdit); ?>
 
             <?php   if ($canEdit) {
@@ -660,7 +661,6 @@ class ShowItemCourse extends Component
                 </div>
 
                 <?php
-                //Calendar::showCalendar($currentTime);
                 ShowItemCourse::enditem($canEdit);
                 echo "</div>";
             } else if ($line['itemtype'] == "Assessment") {
@@ -1574,7 +1574,7 @@ class ShowItemCourse extends Component
                     }
                     echo "<div class=title> ";
                     if ($isPublic) { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
+                         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/view-wiki-public?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
                    <?php } else {
                         if (($isStudent) && !($sessionData['stuview'])) {
                             $rec = "data-base=\"wiki-$typeid\"";

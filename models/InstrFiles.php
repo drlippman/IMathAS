@@ -47,9 +47,6 @@ class InstrFiles extends BaseImasInstrFiles
 
     public static function getByIdForFile($fileName)
     {
-//        $query = "SELECT id FROM imas_instr_files WHERE filename='{$fileName}'";
-
-//        $query = \Yii::$app->db->createCommand($query)->queryAll();
         return InstrFiles::find()->select('id')->where(['filename' => $fileName])->all();
     }
 
