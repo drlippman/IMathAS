@@ -2,12 +2,12 @@
 use app\components\AppUtility;
 use \app\components\ShowItemCourse;
 
-$this->title = AppUtility::t('Public Course',false);
+$this->title = $pageTitle;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $cid], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home'], 'link_url' => [AppUtility::getHomeURL() . 'site/index'], 'page_title' => $this->title]); ?>
     </div>
 
     <div class ="title-container">
@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 <div class="tab-content shadowBox non-nav-tab-item col-md-12 col-sm-12">
 <?php
-$blockAddress = AppUtility::getURLFromHome('course', 'course/get-block-items-public?cid='.$course->id. '&folder=');?>
+$blockAddress = AppUtility::getURLFromHome('course', 'course/get-block-items-public?cid='.$cid. '&folder=');?>
 <script>
     var getbiaddr = '<?php echo $blockAddress;?>';
     var oblist = '<?php echo $oblist ?>';

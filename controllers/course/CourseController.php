@@ -2013,6 +2013,7 @@ class CourseController extends AppController
                $hideIcons,$graphicalIcons,$isPublic;
         $user = $this->getAuthenticatedUser();
         $userId = $user['id'];
+        $this->layout = 'master';
         $isPublic = true;
         $courseId = $this->getParamVal('cid');
         $folder = $this->getParamVal('folder');
@@ -2097,7 +2098,7 @@ class CourseController extends AppController
                 $curname = $courseName;
             }
         }
-        $responseData = array('curname' => $curname, 'curBreadcrumb' => $curBreadcrumb, 'items' => $items, 'blockIsPublic' => $blockIsPublic, 'oblist' => $oblist, 'plblist' => $plblist, 'cid' => $courseId);
+        $responseData = array('curname' => $curname, 'curBreadcrumb' => $curBreadcrumb, 'items' => $items, 'blockIsPublic' => $blockIsPublic, 'oblist' => $oblist, 'plblist' => $plblist, 'cid' => $courseId, 'pageTitle' => $pageTitle);
         return $this->renderWithData('public', $responseData);
     }
 
@@ -2173,6 +2174,7 @@ class CourseController extends AppController
     {
         global $isPublic, $courseId;
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $userId = $user['id'];
         $courseId = intval($this->getParamVal('cid'));
         $from = $this->getParamVal('from');
