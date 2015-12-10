@@ -163,11 +163,11 @@ class SiteController extends AppController
          *  Group Admin
          *  Admin
          */
-        $this->layout = 'master';
+        $this->layout = 'nonLoggedUser';
         $diagId = $this->getParamVal('id');
         $params = $this->getRequestParams();
         $imasroot = AppUtility::getHomeURL();
-        $installname = AppUtility::getHomeURL();
+        $installname = 'OpenMath';
         session_start();
         $sessionid = session_id();
 
@@ -224,8 +224,8 @@ class SiteController extends AppController
 
             if (trim($params['SID']) == '' || trim($params['firstname']) == '' || trim($params['lastname']) == '')
             {
-                echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"#\">", _('Try Again'), "</a>\n";
-                exit;
+                $this->setWarningFlash('Please enter your ID, first name, and last name');
+                return $this->redirect('diagnostics');
             }
             $result = Diags::getByDiagId($diagId);
             $entryformat = $result[0]['entryformat'];
@@ -252,7 +252,7 @@ class SiteController extends AppController
 
             if ($entrytype != 'E')
             {
-                if ($entrydig == 0)
+                if ($entrydig == AppConstant::NUMERIC_ZERO)
                 {
                     $pattern .= '+';
                 } else {
@@ -263,7 +263,7 @@ class SiteController extends AppController
             if (!preg_match($pattern, $params['SID']))
             {
                 echo "<html><body>", _('Your ID is not valid.  It should contain'), " ";
-                if ($entrydig > 0 && $entrytype != 'E') {
+                if ($entrydig > AppConstant::NUMERIC_ZERO && $entrytype != 'E') {
                     echo $entrydig.' ';
                 }
                 if ($entrytype=='C')
@@ -341,9 +341,8 @@ class SiteController extends AppController
                         if (count($result) > 0 && strtoupper(mysql_result($result,0,0))==strtoupper($params['passwd'])) {
 
                         } else {
-                            echo "<html><body>", _('Error, password incorrect or expired.'), "
-                            <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
-                            exit;
+                            $this->setWarningFlash('Error, password incorrect or expired.');
+                            return $this->redirect('diagnostics');
                         }
                     }
                 }
@@ -363,14 +362,13 @@ class SiteController extends AppController
                     $r2 = AssessmentSession::getByIdAndStartTime($userid, $paid);
                     if (count($r2) > 0) {
                         if (!$allowreentry) {
-                            echo _("You've already taken this diagnostic."), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
-                            exit;
+                            $this->setWarningFlash("You've already taken this diagnostic.");
+                            return $this->redirect('diagnostics');
                         } else {
                             $d = count($r2);
                             $now = time();
                             if ($now - $d[1] > 60*$line['reentrytime']) {
-                                echo _('Your window to complete this diagnostic has expired.'), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
-                                exit;
+                                $this->setWarningFlash("Your window to complete this diagnostic has expired.");
                             }
                         }
                     }

@@ -2013,7 +2013,7 @@ class CourseController extends AppController
                $hideIcons,$graphicalIcons,$isPublic;
         $user = $this->getAuthenticatedUser();
         $userId = $user['id'];
-        $this->layout = 'master';
+        $this->layout = 'nonLoggedUser';
         $isPublic = true;
         $courseId = $this->getParamVal('cid');
         $folder = $this->getParamVal('folder');
@@ -2174,7 +2174,7 @@ class CourseController extends AppController
     {
         global $isPublic, $courseId;
         $user = $this->getAuthenticatedUser();
-        $this->layout = 'master';
+        $this->layout = 'nonLoggedUser';
         $userId = $user['id'];
         $courseId = intval($this->getParamVal('cid'));
         $from = $this->getParamVal('from');

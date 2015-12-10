@@ -4,11 +4,9 @@ use app\components\AppUtility;
 $this->title = 'Diagnostics';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php if($params['id']) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => ['Home'], 'link_url' => [AppUtility::getHomeURL() . 'site/index'], 'page_title' => $this->title]); ?>
     </div>
-<?php } ?>
     <div class="title-container">
         <div class="row">
             <div class="pull-left page-heading">
@@ -26,7 +24,7 @@ if (!isset($params['id']))
     $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
     $pagetitle = "Diagnostics"; ?>
         <div class="col-md-3 col-sm-4 padding-top-two-em padding-left-two-em">
-            <img class="floatleft width-ninety-per" src="<?php echo $imasroot ?>/img/ruler.jpg" />
+            <img class="floatleft width-ninety-per" src="<?php echo $imasroot ?>img/ruler.jpg" />
         </div>
 		<div class="col-dm-6 col-sm-6 padding-top-two-em padding-left-zero">
             <div id="headerdiagindex" class="pagetitle">
