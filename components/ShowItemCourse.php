@@ -1259,7 +1259,7 @@ class ShowItemCourse extends Component
                     $icon = 'html';
                 }
                 if (($isStudent) && !($sessionData['stuview'])) {
-                    $rec = "data-base=\"linkedlink-$typeid\"";
+                    $rec = "data-base-site=\"linkedlink-$typeid\"";
                 } else {
                     $rec = '';
                 }

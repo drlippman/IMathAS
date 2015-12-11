@@ -33,7 +33,7 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 <div class="day-detail-border">
                     <b style="font-size: 18px"><?php AppUtility::t('Day Details')?></b>
                 </div>
-                <div class="calendar-day-details"></div>
+                <div class="calendar-day-details word-wrap-break-word"></div>
             </div>
         </div>
     </div>

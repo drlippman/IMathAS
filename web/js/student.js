@@ -210,7 +210,7 @@ function calendar() {
                         var title = selectedDate.tagTitle;
                         var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' style='outline: none' src=''/>";
                         var tag = selectedDate.title;
-                        jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br>"+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                        jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br>"+title+"<br><p style='padding-left: 36px'></p></div>");
                     } else if(selectedDate.reviewMode == true){
                         var dateH = "Review until <b>" +selectedDate.reviewDat+"</b>";
                         var reviewMode= "<p style='margin-left:35px!important;padding-top: 0'>This assessment is in review mode - no scores will be saved</p>";
@@ -247,7 +247,7 @@ function displayCalEvents(events) {
                     var title = dateEvent.tagTitle;
                     var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' style='outline: none' src=''/>";
                     var tag = dateEvent.title;
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<br><p style='padding-left: 36px'></p></div>");
                 } else if(dateEvent.reviewMode == true){
                     var dateH = "Review until <b>" +dateEvent.reviewDat+"</b>";
                     var reviewMode= "<p style='margin-left:35px!important;padding-top: 0'>This assessment is in review mode - no scores will be saved</p>";

@@ -1496,9 +1496,20 @@ class AdminController extends AppController
                 }
                 if ($params['id']=='new') {
                     $user = new User();
-                    $user->createLTIDomainCredentials($params);
+                    $resultLTI = $user->createLTIDomainCredentials($params);
+                    if($resultLTI->errors['SID'])
+                    {
+                        $this->setWarningFlash($resultLTI->errors['SID'][0]);
+                        return $this->redirect('forms?action=listltidomaincred');
+                    }
+
                 } else {
-                    User::updateLTIDomainCredentials($params);
+                    $resultUpdate = User::updateLTIDomainCredentials($params);
+                    if($resultUpdate->errors['SID'])
+                    {
+                        $this->setWarningFlash($resultUpdate->errors['SID'][0]);
+                        return $this->redirect('forms?action=listltidomaincred');
+                    }
                 }
                 break;
             case "delltidomaincred":

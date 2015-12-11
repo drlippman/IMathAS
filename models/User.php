@@ -531,6 +531,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user->rights = $params['createinstr'];
         $user->groupid = $params['groupid'];
         $user->save();
+        return $user;
     }
 
     public function createLTIDomainCredentials($params)
@@ -543,6 +544,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->rights = $params['createinstr'];
         $this->groupid = $params['groupid'];
         $this->save();
+        return $this;
+
     }
 
     public static function deleteUserById($id)
