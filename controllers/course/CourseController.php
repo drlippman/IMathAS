@@ -1172,7 +1172,7 @@ class CourseController extends AppController
         $courseNewFlag = $course['newflag'];
         $courseName = $course['name'];
         $parent = AppConstant::NUMERIC_ZERO;
-        $previewShift = -1;
+//        $previewShift = -1;
         $previewshift = $this->getParamVal('stuview');
         $useviewButtons = false;
         $student = Student::getByCId($courseId);

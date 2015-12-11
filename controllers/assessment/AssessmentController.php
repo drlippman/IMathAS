@@ -1134,6 +1134,8 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $sessiondata = $this->getSessionData($sessionId);;
         $teacherid = $this->isTeacher($user['id'], $courseId);
+        $studentid = $this->isStudent($user['id'], $courseId);
+        $tutorid = $this->isTutor($user['id'], $courseId);
         $userfullname = $user['FirstName'] . ' ' . $user['LastName'];
         global $temp, $CFG, $questions, $seeds, $showansduring, $testsettings, $qi, $rawscores, $timesontask, $isdiag, $courseId, $attempts, $scores, $bestscores, $noindivscores, $showeachscore, $reattempting, $bestrawscores, $firstrawscores, $bestattempts, $bestseeds, $bestlastanswers, $lastanswers, $bestquestions;
         $myrights = $user['rights'];
@@ -1160,7 +1162,7 @@ class AssessmentController extends AppController
         $getCid = $this->getParamVal('cid');
         $actas = false;
         $isreview = false;
-        if (isset($teacherid) && isset($getActas)) {
+        if (($teacherid) && ($getActas)) {
             $userid = $getActas;
             unset($teacherid);
             $actas = true;
@@ -1184,12 +1186,12 @@ class AssessmentController extends AppController
             $now = time();
             $assessmentclosed = false;
 
-            if ($adata['avail'] == 0 && !isset($teacherid) && !isset($tutorid)) {
+            if ($adata['avail'] == 0 && !($teacherid) && !($tutorid)) {
                 $assessmentclosed = true;
             }
 
             if (!$actas) {
-                if (isset($studentid)) {
+                if (($studentid)) {
                     $contentArray['userid'] = $userid;
                     $contentArray['courseid'] = $courseId;
                     $contentArray['type'] = 'assess';
@@ -1204,7 +1206,7 @@ class AssessmentController extends AppController
                         if ($now > $adata['startdate'] && $now < $adata['reviewdate']) {
                             $isreview = true;
                         } else {
-                            if (!isset($teacherid) && !isset($tutorid)) {
+                            if (!($teacherid) && !($tutorid)) {
                                 $assessmentclosed = true;
                             }
                         }
@@ -1219,7 +1221,7 @@ class AssessmentController extends AppController
                         if ($now > $adata['startdate'] && $now < $adata['reviewdate']) {
                             $isreview = true;
                         } else {
-                            if (!isset($teacherid) && !isset($tutorid)) {
+                            if (!($teacherid) && !($tutorid)) {
                                 $assessmentclosed = true;
                             }
                         }
@@ -1267,13 +1269,16 @@ class AssessmentController extends AppController
             /*
              * check for password
              */
-            $pwfail = false;
-            if (trim($adata['password']) != '' && !isset($teacherid) && !isset($tutorid)) { //has passwd
+//            $pwfail = false;
+
+            if (trim($adata['password']) != '' && !($teacherid) && !($tutorid)) { //has passwd
                 $pwfail = true;
                 if (isset($_POST['password'])) {
                     if (trim($_POST['password']) == trim($adata['password'])) {
                         $pwfail = false;
                     } else {
+//                        $this->setWarningFlash('Password incorrect.  Try again.');
+//                        return $this->redirect('show-test?cid='.$courseId.'&id='.$aid);
                         $out = '<p>' . _('Password incorrect.  Try again.') . '<p>';
                     }
                 }
@@ -1283,7 +1288,7 @@ class AssessmentController extends AppController
                     $temp .= '<p>' . "Password required for access" . '</p>';
                     $temp .= "<form method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?cid={$getCid}&amp;id={$getId}\">";
                     $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
-                    $temp .= '<input type=submit value="' . 'Submit' . '" />';
+                    $temp .= '<input type=submit class="btn btn-primary" value="' . 'Submit' . '" />';
                     $temp .= "</form>";
                     return $temp;
                 }
@@ -1291,7 +1296,7 @@ class AssessmentController extends AppController
             /*
              * get latepass info
              */
-            if (!isset($teacherid) && !isset($tutorid) && !$actas && !isset($sessiondata['stuview'])) {
+            if (!isset($teacherid) && !($tutorid) && !$actas && !($sessiondata['stuview'])) {
                 $query = Student::getLatePass($userid, $adata['courseid']);
                 $sessiondata['latepasses'] = $query['latepass'];
             } else {
@@ -3957,6 +3962,8 @@ class AssessmentController extends AppController
     {
         global $seeds, $questions, $temp;
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $userId = $user['id'];
         $sessionId = $this->getSessionId();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
@@ -3965,8 +3972,8 @@ class AssessmentController extends AppController
         $sessionData = $this->getSessionData($sessionId);
         $scored = $this->getParamVal('scored');
         $asId = $this->getParamVal('asid');
-        $isTeacher = (isset($isTeacher) || $sessionData['isteacher'] == true);
-        if (isset($teacherId) && isset($scored)) {
+        $isTeacher = (($teacherId) || $sessionData['isteacher'] == true);
+        if (isset($teacherId) && ($scored)) {
             $scoredType = $scored;
             $scoredView = true;
             $showColorMark = true;
@@ -4053,7 +4060,13 @@ class AssessmentController extends AppController
             $attempts = explode(",", $line['reviewattempts']);
             $lastanswers = explode("~", $line['reviewlastanswers']);
         }
-        $temp .= "<h4 style=\"float:right;\">Name: $userFullName </h4>\n";
+        $temp .= "<h4 style=\"float:right; \">Name: ";
+        if($isTeacher){
+        echo $userFullName;
+        }else{
+            $temp .= ucfirst($user['FirstName'])." ".$user['LastName'];
+        }
+        echo"</h4>\n";
         $temp .= "<h3>".$testSettings['name']."</h3>\n";
         $allowregen = ($testSettings['testtype'] == "Practice" || $testSettings['testtype']=="Homework");
         $showeachscore = ($testSettings['testtype']=="Practice" || $testSettings['testtype']=="AsGo" || $testSettings['testtype']=="Homework");
@@ -4084,7 +4097,7 @@ class AssessmentController extends AppController
             }
         }
         $temp .= '<div class=intro>' . $testsettings['intro'] . '</div>';
-        if ($isTeacher && !$scoredView) {
+        if (($isTeacher) && !$scoredView) {
             $temp .= '<p>' . _('Showing Current Versions') . '<br/><button type="button" class="btn" onclick="rendersa()">' . _("Show Answers") . '</button> <a href="show-print-test?cid=' . $courseId . '&asid=' . $testId . '&scored=best">' . _('Show Scored View') . '</a> <a href="show-print-test?cid=' . $courseId . '&asid=' . $testId . '&scored=last">' . _('Show Last Attempts') . '</a></p>';
         } else if ($isTeacher) {
             if ($scoredType == 'last') {
@@ -4093,6 +4106,7 @@ class AssessmentController extends AppController
                 $temp .= '<p>' . _('Showing Scored View') . ' <a href="show-print-test?cid=' . $courseId . '&asid=' . $testId . '&scored=last">' . _('Show Last Attempts') . '</a></p>';
             }
         }
+
         if ($testSettings['showans'] == 'N') {
             $lastanswers = array_fill(0, count($questions), '');
         }
@@ -4233,7 +4247,7 @@ class AssessmentController extends AppController
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
 
-        $result = Course::getByLatePasshrs($coursafaeId);
+        $result = Course::getByLatePasshrs($courseId);
         $hours = $result[0]['latepasshrs'];
         $now = time();
         $viewedAssess = array();

@@ -176,6 +176,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                 <span class="col-sm-6 col-md-7 word-break-break-all">
                 <b><?php echo $data['subject'] ?></b><br/><?php AppUtility::t('Posted by')?>: <a
                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $data['userId'] . '&new=1') ?>"><?php echo $data['name'] ?></a>
+
                     <?php if($currentUser['rights'] > AppConstant::STUDENT_RIGHT && $data['userRights'] == AppConstant::NUMERIC_TEN){ ?>
                             <sub><a href="#">[<?php AppUtility::t('GB')?>]</a></sub>
                     <?php } ?>

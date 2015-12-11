@@ -1764,21 +1764,21 @@ public static function makeTopMenu() {
     global $teacherId,$courseId,$imasroot,$previewshift, $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useviewButtons,$newPostsCnt;
     if ($useviewButtons && (($teacherId) || $previewshift > -1)) {
         echo '<div id="viewbuttoncont">View: ';
-        echo "<a href=\"course.php?cid=$courseId&quickview=off&teachview=1\" ";
+        echo "<a href=\"course?cid=$courseId&quickview=off&teachview=1\" ";
         if ($previewshift == -1 && $quickView != 'on') {
             echo 'class="buttonactive buttoncurveleft"';
         } else {
             echo 'class="buttoninactive buttoncurveleft"';
         }
         echo '>', _('Instructor'), '</a>';
-        echo "<a href=\"course.php?cid=$courseId&quickview=off&stuview=0\" ";
+        echo "<a href=\"course?cid=$courseId&quickview=off&stuview=0\" ";
         if ($previewshift>-1 && $quickView != 'on') {
             echo 'class="buttonactive"';
         } else {
             echo 'class="buttoninactive"';
         }
         echo '>', _('Student'), '</a>';
-        echo "<a href=\"course.php?cid=$courseId&quickview=on&teachview=1\" ";
+        echo "<a href=\"course?cid=$courseId&quickview=on&teachview=1\" ";
         if ($previewshift==-1 && $quickView == 'on') {
             echo 'class="buttonactive buttoncurveright"';
         } else {
@@ -1794,9 +1794,6 @@ public static function makeTopMenu() {
     }
 
     if (($teacherId) && $quickView == 'on') {
-        if ($useviewButtons) {
-            echo '<br class="clear"/>';
-        }
         echo '<div class="cpmid">';
         if (!$useviewButtons) {
             echo _('Quick View.'), " <a href=\"course?cid=$courseId&quickview=off\">", _('Back to regular view'), "</a>. ";
@@ -1819,7 +1816,7 @@ public static function makeTopMenu() {
     }
     if (($teacherId) && count($topBar[1]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) {
 
-    } else if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || ($previewshift > -1 && !$useviewButtons))) {
+    } else if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || ($previewshift > -1))) {
         echo '<div class=breadcrumb>';
         if ($topBar[2] == AppConstant::NUMERIC_ZERO) {
             if (in_array(0,$topBar[0]) && $msgSet < AppConstant::NUMERIC_FOUR) { //messages
@@ -1839,22 +1836,22 @@ public static function makeTopMenu() {
             }
             if ($previewshift>-1 && count($topBar[0]) > AppConstant::NUMERIC_ZERO) { echo '<br />';}
         }
-        if ($previewshift>-1 && !$useviewButtons) {
+        if ($previewshift>-1) {
             echo _('Showing student view. Show view:'), ' <select id="pshift" onchange="changeshift()">';
             echo '<option value="0" ';
-            if ($previewshift == AppConstant::NUMERIC_ZERO) {echo "selected=1";}
+            if ($previewshift==0) {echo "selected=1";}
             echo '>', _('Now'), '</option>';
             echo '<option value="3600" ';
-            if ($previewshift == AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO) {echo "selected=1";}
+            if ($previewshift==3600) {echo "selected=1";}
             echo '>', _('1 hour from now'), '</option>';
             echo '<option value="14400" ';
-            if ($previewshift == AppConstant::NUMERIC_ONE_FOUR_FOUR_ZERO_ZERO) {echo "selected=1";}
+            if ($previewshift==14400) {echo "selected=1";}
             echo '>', _('4 hours from now'), '</option>';
             echo '<option value="86400" ';
-            if ($previewshift == AppConstant::MAX_SESSION_TIME) {echo "selected=1";}
+            if ($previewshift==86400) {echo "selected=1";}
             echo '>', _('1 day from now'), '</option>';
             echo '<option value="604800" ';
-            if ($previewshift == AppConstant::WEEK_TIME) {echo "selected=1";}
+            if ($previewshift==604800) {echo "selected=1";}
             echo '>', _('1 week from now'), '</option>';
             echo '</select>';
             echo " <a href=\"course?cid=$courseId&teachview=1\">", _('Back to instructor view'), "</a>";

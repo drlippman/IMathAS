@@ -19,6 +19,9 @@ echo '         el[i].className = "shown";';
 echo '     }';
 echo '    }';
 echo '} </script>';
+?>
+<div class="tab-content shadowBox course-page-setting padding-right-twenty">
+    <?php echo $temp;
+    ?>
+    </div>
 
-
-echo $temp;

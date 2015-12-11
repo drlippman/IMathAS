@@ -110,6 +110,7 @@ if (($teacherId && (!$backLink))) {?>
             </a>
             <ul class='dropdown-menu'>
                 <li>
+<!--                    <a href="--><?php //echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&stuview=0');?><!--">-->
                     <a href="#">
                         <?php AppUtility::t('Student'); ?>
                 </li>
@@ -181,7 +182,7 @@ if ($overwriteBody == 1) {
 
     <?php
 
-    if ($previewShift > -1) {
+    if ($previewshift > -1) {
         ?>
         <script type="text/javascript">
             function changeshift() {
