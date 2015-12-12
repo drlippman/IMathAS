@@ -120,11 +120,12 @@ if ($isteacher || $istutor) {
 }
 echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 
+//Temporary fixed exception on click of null score commented the following code.
 
-if (!$assessmentData) {
-    echo "uh oh.  Bad assessment id";
-    exit;
-}
+//if (!$assessmentData) {
+//    echo "uh oh.  Bad assessment id";
+//    exit;
+//}
 $line = $assessmentData;
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype'] != 0) {

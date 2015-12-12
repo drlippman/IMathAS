@@ -3103,8 +3103,12 @@ class GradebookController extends AppController
             $from = 'gb';
             $now = time();
         }
-
-        $assessmentData = Assessments::getByCourseIdJoinWithSessionData($params['asid'], $currentUser['id'], $isteacher, $istutor);
+        if(isset($params['aid'])){
+            $assessmentId = $params['aid'];
+        } else {
+            $assessmentId = $params['asid'];
+        }
+        $assessmentData = Assessments::getByCourseIdJoinWithSessionData($assessmentId, $currentUser['id'], $isteacher, $istutor);
 
         if (!$isteacher && !$istutor) {
             $rv = new ContentTrack;
