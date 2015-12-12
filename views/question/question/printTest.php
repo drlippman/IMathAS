@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox print-test margin-top-fourty">
+<div class="tab-content shadowBox print-test">
 <?php
     if ($overwriteBody==1) {
     echo $body;
@@ -96,13 +96,13 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "<input type=hidden name=otherheader value=1>\n";
         echo "<input type=hidden name=otherheadertext value=\"{$params['otherheadertext']}\">\n";
         }
-        echo "<p><input class='continue-btn' type=submit value=\"Continue\"></p>\n";
-        echo "<h4>"; AppUtility::t('Final print settings'); echo"</h4>\n";
+
+        echo "<div class='col-md-12'><h4>"; AppUtility::t('Final print settings'); echo"</h4>\n";
         echo "<div class='margin-top-ten'>"; AppUtility::t('Number of different versions to print'); echo"<input class='form-control form-control-inline-textbox margin-left-ten' type=text name=versions value=\"1\"></div>\n";
         echo "<div style='width: 100%;height: 20px' class='margin-top-ten'><div class='floatleft'>"; AppUtility::t('Print answer keys?'); echo"</div> <div class='margin-left-ten floatleft'><input type=radio name=keys value=0></div><span class='margin-left-five floatleft'>"; AppUtility::t('No'); echo"</span> <div class='margin-left-ten floatleft'><input type=radio name=keys value=1 checked=1></div><span class='margin-left-five floatleft'>"; AppUtility::t('Yes'); echo"</span> <div class='margin-left-ten floatleft'><input type=radio name=keys value=2></div><span class='margin-left-five floatleft'>"; AppUtility::t('Yes, one per page'); echo"</span></div>\n";
         echo "<div class='margin-top-ten'>"; AppUtility::t('When you press Continue, your print-ready version of the test will display.  You may wish to go into the File menu of ";
             echo "your browser and select Page Setup to change the default headers and footers printed by your browser'); echo"</div>\n";
-
+        echo "<p><input type=submit value=\"Continue\"></p></div>";
     }
         }
 ?>

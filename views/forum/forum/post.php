@@ -182,7 +182,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                     <?php } ?>
                 <?php echo $data['postdate'] ?>
                 <?php
-                if (strtotime($data['postdate']) >= $data['lastView'] && $data['id'] != $data['threadId']) {
+
+                if ((strtotime($data['postdate']) > $data['lastView']) && ($data['id'] != $data['threadId'])) {
+
                     ?>
                     <span style="color:red;"><?php AppUtility::t('New')?></span>
                 <?php } ?>

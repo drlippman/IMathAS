@@ -12,7 +12,7 @@ if ($overwriteBody==1) {
     echo $body;
 } else {
     ?>
-    <div class="tab-content shadowBox col-md-12 col-sm-12">
+<!--    <div class="tab-content shadowBox col-md-12 col-sm-12">-->
     <style type="text/css">
         div.a,div.b {
             position: absolute;
@@ -80,8 +80,8 @@ if ($overwriteBody==1) {
         }
 
         div.cbutn {
-            float: left;
-            padding-left: 5px;
+            float: right;
+            /*padding-left: 5px;*/
         }
         body {
             padding: 0px;
@@ -195,7 +195,7 @@ if ($overwriteBody==1) {
         echo "<div id=intro>{$line['intro']}</div>\n";
         echo "</div>\n";
         if (!$isfinal) {
-            echo "<div class='cbutn padding-left-two-em'><a href=\"print-test?cid=$courseId&aid=$assessmentId\">Cancel</a></div>\n";
+            echo "<div class='cbutn col-md-4 col-sm-5'><a href=\"print-test?cid=$courseId&aid=$assessmentId\">Cancel</a></div>\n";
         }
         echo "</div>\n";
 
@@ -255,7 +255,7 @@ if ($overwriteBody==1) {
             echo "<input type=hidden name=otherheader value=1>\n";
             echo "<input type=hidden name=otherheadertext value=\"{$params['otherheadertext']}\">\n";
         }
-        echo "<div class='q col-md-12 col-sm-12'><div class='m'>&nbsp;</div><div class=cbutn><input type=submit value=\"Continue\"></div></div>\n";
+        echo "<div class='q col-md-12 col-sm-12'><div class='m'>&nbsp;</div><div class='cbutn col-md-4 col-sm-5'><input type=submit value=\"Continue\"></div></div>\n";
     } else if ($params['keys']>0) { //print answer keys
         for ($j=0; $j<$copies; $j++) {
             echo '<b>Key - Form ' . ($j+1) . "</b>\n";
@@ -384,7 +384,7 @@ function printq($qn,$qsetid,$seed,$pts,$isfinal) {
 
     echo "</div>";//end m div
     if (!$isfinal) {
-        echo "<div class='cbutn col-md-3 col-sm-4'>\n";
+        echo "<div class='cbutn col-md-4 col-sm-5 padding-left-zero'>\n";
         echo "<p class='col-md-12 col-sm-12'><input type=button value=\"+1\" onclick=\"incspace($qn,1)\"><input type=button value=\"+.5\" onclick=\"incspace($qn,.5)\"><input type=button value=\"+.25\" onclick=\"incspace($qn,.25)\"><input type=button value=\"+.1\" onclick=\"incspace($qn,.1)\"><br/>";
         echo "<input type=button value=\"-1\" onclick=\"incspace($qn,-1)\"><input type=button value=\"-.5\" onclick=\"incspace($qn,-.5)\"><input type=button value=\"-.25\" onclick=\"incspace($qn,-.25)\"><input type=button value=\"-.1\" onclick=\"incspace($qn,-.1)\"></p>";
         echo "</div>\n"; //end cbutn div
@@ -398,4 +398,4 @@ function printq($qn,$qsetid,$seed,$pts,$isfinal) {
     }
 }
 ?>
-        </div>
+<!--        </div>-->

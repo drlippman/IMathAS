@@ -4,8 +4,10 @@ $(document).ready(function ()
     selectCheckBox();
     studentLock();
     $('.student-data-table').DataTable({
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,6,7,8] } ],
         "bPaginate": false
     });
+
 
     $('input[name = "header-checked"]:checked').prop('checked', false);
 });

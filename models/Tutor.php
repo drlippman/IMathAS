@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasTutors;
 use yii\db\Query;
 
@@ -87,10 +88,11 @@ class Tutor extends BaseImasTutors
     public static function getTutorData($userId)
     {
         $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
-        $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=':userId'";
+        $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userId'";
         $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-        $command = \Yii::$app->db->createCommand($query)->bindValue('userId', $userId);
+        $command = \Yii::$app->db->createCommand($query);
         $data = $command->queryAll();
+
         return $data;
     }
 } 

@@ -52,7 +52,7 @@ class Course extends BaseImasCourses {
 
     public static function getById($cid)
     {
-        return static::findOne(['id' => $cid]);
+        return Course::findOne(['id' =>$cid]);
     }
     public static function getByIdandOwnerId($id, $ownerId)
     {

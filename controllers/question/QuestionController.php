@@ -2128,7 +2128,7 @@ class QuestionController extends AppController
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
-        $this->layout = 'master';
+//        $this->layout = 'master';
         $course = Course::getById($courseId);
         $teacherId = $this->isTeacher($user['id'], $courseId);
         /*

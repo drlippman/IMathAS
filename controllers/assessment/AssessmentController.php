@@ -4061,8 +4061,8 @@ class AssessmentController extends AppController
             $lastanswers = explode("~", $line['reviewlastanswers']);
         }
         $temp .= "<h4 style=\"float:right; \">Name: ";
-        if($isTeacher){
-        echo $userFullName;
+        if(isset($teacherId)){
+            $temp .= $userFullName;
         }else{
             $temp .= ucfirst($user['FirstName'])." ".$user['LastName'];
         }
