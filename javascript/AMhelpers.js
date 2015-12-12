@@ -39,7 +39,7 @@ function calculate(inputId,outputId,format) {
 		  if (str.match(/,/)) {
 		  	  err += _("Invalid use of a comma.");
 		  }
-		  if (format.indexOf('mixednumber')!=-1) {
+		  if (format.indexOf('mixed')!=-1) {
 		  	  str = str.replace(/_/,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
 			  str = str.replace(/(x|X|\u00D7)/,"xx");
@@ -51,7 +51,7 @@ function calculate(inputId,outputId,format) {
 		  try {
 			  var evalstr = str;
 			  evalstr = evalstr.replace(',','*NaN*'); //force eval error on lingering commas
-			  if (format.indexOf('allowmixed')!=-1 || format.indexOf('mixednumber')!=-1) {
+			  if (format.indexOf('mixed')!=-1) {
 				  evalstr = evalstr.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 			  }
 			  if (format.indexOf('scinot')!=-1) {
@@ -181,7 +181,7 @@ function intcalculate(inputId,outputId,format) {
 				  var err = "";
 				  res = NaN;
 				  err += singlevalsyntaxcheck(vals[j], format);
-				  if (format.indexOf('mixednumber')!=-1) {
+				  if (format.indexOf('mixed')!=-1) {
 					  vals[j] = vals[j].replace(/_/,' ');
 				  } else {
 					  vals[j] = vals[j].replace(/\s/g,'');
@@ -309,7 +309,7 @@ function ntuplecalc(inputId,outputId,format) {
 				    err += _("syntax incomplete")+". ";
 				}
 				err += singlevalsyntaxcheck(sub, format);
-				if (format.indexOf('mixednumber')!=-1) {
+				if (format.indexOf('mixed')!=-1) {
 					  sub = sub.replace(/_/,' ');
 				  } else {
 					  sub = sub.replace(/\s/g,'');
@@ -928,7 +928,7 @@ function doonsubmit(form,type2,skipconfirm) {
 				str = str.replace(/(x|X|\u00D7)/,"*");
 			}
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
-			if (calcformat[qn].indexOf('mixednumber')!=-1 || calcformat[qn].indexOf('allowmixed')!=-1) {
+			if (calcformat[qn].indexOf('mixed')!=-1) {
 				str = str.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 			}
 			if (str.match(/^\s*$/)) {
