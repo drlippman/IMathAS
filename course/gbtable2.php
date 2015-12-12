@@ -1413,7 +1413,7 @@ function gbtable() {
 				if (isset($cattotpastec[$ln][$cat])) { //add in EC
 					$cattotpast[$ln][$cat] += array_sum($cattotpastec[$ln][$cat]);
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+				if ($useweights==0 && $cats[$cat][5]>-1 && $catposspast[$cat]>0) {//use fixed pt value for cat
 					$cattotpast[$ln][$cat] = ($catposspast[$cat]==0)?0:round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
 				}
 				
@@ -1493,7 +1493,7 @@ function gbtable() {
 				if (isset($cattotcurec[$ln][$cat])) {
 					$cattotcur[$ln][$cat] += array_sum($cattotcurec[$ln][$cat]);
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+				if ($useweights==0 && $cats[$cat][5]>-1 && $catposscur[$cat]>0) {//use fixed pt value for cat
 					$cattotcur[$ln][$cat] = ($catposscur[$cat]==0)?0:round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
 				}
 				
@@ -1573,7 +1573,7 @@ function gbtable() {
 				if (isset($cattotfutureec[$ln][$cat])) {
 					$cattotfuture[$ln][$cat] += array_sum($cattotfutureec[$ln][$cat]);
 				}
-				if ($useweights==0 && $cats[$cat][5]>-1) {//use fixed pt value for cat
+				if ($useweights==0 && $cats[$cat][5]>-1 && $catpossfuture[$cat]>0) {//use fixed pt value for cat
 					$cattotfuture[$ln][$cat] = round($cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]),1);
 				}
 				
@@ -1607,11 +1607,12 @@ function gbtable() {
 				$catpossattemptedstu[$cat] = array_slice($catpossattemptedstu[$cat],$cats[$cat][4]);	
 			}
 			
-			if (isset($cattotattempted[$ln][$cat])) {  //attempted and attempted items
+			if (isset($cattotattempted[$ln][$cat])) {  //past and attempted items
 				$catitemcntattempted[$cat] = count($catpossattemptedstu[$cat]);
 				$catpossattemptedstu[$cat] = array_sum($catpossattemptedstu[$cat]);
 				//cats: name,scale,scaletype,chop,drop,weight
-				if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items
+				//if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items
+				if ($cats[$cat][7]==1) {
 					foreach($cattotattempted[$ln][$cat] as $col=>$v) {
 						if ($gb[0][1][$col][2] == 0) {
 							$cattotattempted[$ln][$cat][$col] = 0;
@@ -1619,30 +1620,34 @@ function gbtable() {
 							$cattotattempted[$ln][$cat][$col] = $v/$gb[0][1][$col][2];	//convert to percents
 						}
 					}
-					asort($cattotattempted[$ln][$cat],SORT_NUMERIC);
-				
-					if ($cats[$cat][4]<0) {  //doing keep n
-						$ntodrop = count($cattotattempted[$ln][$cat])+$cats[$cat][4];
-					} else {  //doing drop n
-						$ntodrop = $cats[$cat][4];// - ($catitemcntattempted[$cat]-count($cattotattempted[$ln][$cat]));
-					}
+					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items
+						asort($cattotattempted[$ln][$cat],SORT_NUMERIC);
 					
-					if ($ntodrop>0) {
-						$ndropcnt = 0;
-						foreach ($cattotattempted[$ln][$cat] as $col=>$v) {
-							$gb[$ln][1][$col][5] += 8; //mark as dropped
-							$ndropcnt++;
-							if ($ndropcnt==$ntodrop) { break;}
+						if ($cats[$cat][4]<0) {  //doing keep n
+							$ntodrop = count($cattotattempted[$ln][$cat])+$cats[$cat][4];
+						} else {  //doing drop n
+							$ntodrop = $cats[$cat][4];// - ($catitemcntattempted[$cat]-count($cattotattempted[$ln][$cat]));
 						}
+						
+						if ($ntodrop>0) {
+							$ndropcnt = 0;
+							foreach ($cattotattempted[$ln][$cat] as $col=>$v) {
+								$gb[$ln][1][$col][5] += 8; //mark as dropped
+								$ndropcnt++;
+								if ($ndropcnt==$ntodrop) { break;}
+							}
+						}
+						
+						while (count($cattotattempted[$ln][$cat])<$catitemcntattempted[$cat]) {
+							array_unshift($cattotattempted[$ln][$cat],0);
+						}
+						$cattotattempted[$ln][$cat] = array_slice($cattotattempted[$ln][$cat],$cats[$cat][4]);
+						//$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntattempted[$cat] - $cats[$cat][4]);
+						$tokeep = $catitemcntattempted[$cat];
+						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep),1);
+					} else {
+						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/count($cattotattempted[$ln][$cat]),2);
 					}
-					
-					while (count($cattotattempted[$ln][$cat])<$catitemcntattempted[$cat]) {
-						array_unshift($cattotattempted[$ln][$cat],0);
-					}
-					$cattotattempted[$ln][$cat] = array_slice($cattotattempted[$ln][$cat],$cats[$cat][4]);
-					//$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntattempted[$cat] - $cats[$cat][4]);
-					$tokeep = $catitemcntattempted[$cat];
-					$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*array_sum($cattotattempted[$ln][$cat])/($tokeep),1);
 				} else {
 					$cattotattempted[$ln][$cat] = array_sum($cattotattempted[$ln][$cat]);
 				}
