@@ -37,11 +37,11 @@ if (isset($_GET['form'])) {
 		
 		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID']) || !empty($_POST['email'])) {
 			if (!empty($_POST['SID'])) {
-				$query = "SELECT imas_users.*,imas_groups.name FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.SID='{$_POST['SID']}'";
+				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.SID='{$_POST['SID']}'";
 			} else if (!empty($_POST['email'])) {
-				$query = "SELECT imas_users.*,imas_groups.name FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.email='{$_POST['email']}'";
+				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.email='{$_POST['email']}'";
 			} else  {
-				$query = "SELECT imas_users.*,imas_groups.name FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
+				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
 				if (!empty($_POST['LastName'])) {
 					$query .= "imas_users.LastName='{$_POST['LastName']}' ";
 					if (!empty($_POST['FirstName'])) {
@@ -64,10 +64,16 @@ if (isset($_GET['form'])) {
 					echo '<li>ID: '.$row['id'].'</li>';
 					if ($row['name']!=null) {
 						echo '<li>Group: '.$row['name'].'</li>';
+						if ($row['parent']>0) {
+							$query = 'SELECT name FROM imas_groups WHERE id='.$row['parent'];
+							$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+							$r = mysql_fetch_row($res2);
+							echo '<li>Parent Group: '.$r[0].'</li>';
+						}
 					}
 					echo '<li>Email: '.$row['email'].'</li>';
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
-					echo '<li>Rights: '.$row['rights'].'</li>';
+					echo '<li>Rights: '.$row['rights'].' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.$row['id'].'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
 					$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
 					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());

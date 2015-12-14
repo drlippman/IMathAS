@@ -158,18 +158,26 @@ if ($myrights < 40) {
 	$page_userSelectVal[1] = 0;
 	$page_userSelectLabel[1] = "Default";
 	$i=2;
-	$query = "SELECT id,name from imas_groups ORDER BY name";
+	$query = "SELECT id,name,parent from imas_groups ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$groupdata = array();
 	while ($row = mysql_fetch_row($result)) {
-		$page_userSelectVal[$i] = $row[0];
-		$page_userSelectLabel[$i] = $row[1];
-		$i++;
+		$groupdata[$row[0]] = $row;
 	}
-	for ($let=ord("A");$let<=ord("Z");$let++) {
+	$j = 0;
+	foreach ($groupdata as $row) {
+		$page_userSelectVal[$j] = $row[0];
+		$page_userSelectLabel[$j] = $row[1];
+		if ($row[2]>0) {
+			$page_userSelectLabel[$j] .= ' ('.$groupdata[$row[2]][1].')';
+		}
+		$j++;
+	}
+	/*for ($let=ord("A");$let<=ord("Z");$let++) {
 		$page_userSelectVal[$i] = chr($let);
 		$page_userSelectLabel[$i] = chr($let);
 		$i++;
-	}
+	}*/
 	
 	
 } 
