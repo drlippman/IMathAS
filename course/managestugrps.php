@@ -346,14 +346,38 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		natsort($page_grps);
 		
+		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		if (mysql_num_rows($result)>1) {
+			$hassection = true;
+		} else {
+			$hassection = false;
+		}
+		if ($hassection) {
+			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$row = mysql_fetch_row($result);
+			$sectionsort = ($row[0]==0);
+		} else {
+			$sectionsort = false;
+		}
+		
 		//get all students
 		$stunames = array();
 		$hasuserimg = array();
-		$query = "SELECT iu.id,iu.FirstName,iu.LastName,iu.hasuserimg FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
+		$stulocked = array();
+		$query = "SELECT iu.id,iu.FirstName,iu.LastName,iu.hasuserimg,imas_students.section,imas_students.locked FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			$stunames[$row[0]] = $row[2].', '.$row[1];
+			if ($sectionsort) {
+				$stunames[$row[0]] = '<span class="small">(Section '.$row[4].')</span> '.$row[2].', '.$row[1];
+			} else if ($hassection) {
+				$stunames[$row[0]] = $row[2].', '.$row[1].' <span class="small">(Section '.$row[4].')</span>';
+			} else {
+				$stunames[$row[0]] = $row[2].', '.$row[1];
+			}
 			$hasuserimg[$row[0]] = $row[3];
+			$stulocked[$row[0]] = $row[5];
 		}
 		
 		//$page_grpmembers will be groupid=>array(  userid=>stuname )
@@ -550,7 +574,7 @@ if ($overwriteBody==1) {
 			echo "<b>Group: $grpname</b> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp=$grpid\">Rename</a> | ";
 			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp=$grpid\">Delete</a> | ";
-			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall=$grpid\">Remove all members</a>";
+			echo "<a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&removeall=$grpid&confirm=true\" onclick=\"return confirm('"._('Are you SURE you want to remove all students from this group?')."');\">Remove all members</a>";
 			echo '<ul>';
 			if (count($page_grpmembers[$grpid])==0) {
 				echo '<li>No group members</li>';
@@ -564,7 +588,12 @@ if ($overwriteBody==1) {
 							echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
 						}
 					}
-					echo "$name | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid\">Remove from group</a></li>";
+					if ($stulocked[$uid]) {
+						echo '<span class="greystrike">'.$name.'</span>';
+					} else {
+						echo $name;
+					}
+					echo " | <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&remove=$uid&grpid=$grpid&confirm=true\"  onclick=\"return confirm('"._('Are you SURE you want to remove this student from this group?')."');\">Remove from group</a></li>";
 				}
 			}
 			echo '</ul>';
@@ -584,7 +613,7 @@ if ($overwriteBody==1) {
 			echo '<input type="submit" value="Add"/>';
 			echo '<ul class="nomark">';
 			foreach ($page_ungrpstu as $uid=>$name) {
-				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" />";
+				echo "<li><input type=\"checkbox\" name=\"stutoadd[]\" value=\"$uid\" id=\"chk$uid\"/><label for=\"chk$uid\">";
 				if ($hasuserimg[$uid]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 						echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
@@ -592,7 +621,12 @@ if ($overwriteBody==1) {
 						echo "<img src=\"$imasroot/course/files/userimg_sm{$uid}.jpg\" style=\"display:none;\"  />";
 					}
 				}
-				echo "$name</li>";
+				if ($stulocked[$uid]) {
+					echo '<span class="greystrike">'.$name.'</span>';
+				} else {
+					echo $name;
+				}
+				echo "<label></li>";
 			}
 			echo '</ul>';
 			echo '</form>';
