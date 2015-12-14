@@ -709,7 +709,6 @@ class AppController extends Controller
 
     public function isTeacher($userId, $courseId)
     {
-        echo "<br>is-teacher";
         $isTeacher = false;
         $teacher = Teacher::getByUserId($userId, $courseId);
         $user = User::getById($userId);
