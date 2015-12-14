@@ -67,7 +67,8 @@ class CourseController extends AppController
     {
         $user = $this->getAuthenticatedUser();
         $actionPath = Yii::$app->controller->action->id;
-        $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
+        $params = $this->getRequestParams();
+        $courseId =   ($params['cid'] || $params['courseId']) ? ($params['cid'] ? $params['cid'] : $params['courseId'] ) : AppUtility::getDataFromSession('courseId');
         return $this->accessForCourseController($user,$courseId, $actionPath);
     }
 
@@ -1135,19 +1136,17 @@ class CourseController extends AppController
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $this->setSessionData('messageCount',$msgList);
-//        $this->setSessionData('user',$user);
         $this->setSessionData('postCount',$countPost);
+
         $this->setSessionData('courseId',$courseId);
         $teacherId = $this->isTeacher($userId, $courseId);
         $isStudent = $this->isStudent($userId, $courseId);
         $stuView = $this->getParamVal('stuview');
         $params = $this->getRequestParams();
         $this->checkSession($params);
-
         $teacherData = Teacher::getByUserId($userId,$courseId);
         $courseStudent = Course::getByCourseAndUser($courseId);
         $lockAId = $courseStudent['lockaid']; //ysql_result($result,0,2);
-
         $type = $this->getParamVal('type');
         if ($teacherData != null) {
             if ($myRights>AppConstant::STUDENT_RIGHT) {
@@ -1294,6 +1293,7 @@ class CourseController extends AppController
                 $overwriteBody = AppConstant::NUMERIC_ONE;
                 $body = _("Course does not exist.  <a href='#'>Return to main page</a>") . "</body></html>\n";
             }
+
             $allowUnEnroll = $line['allowunenroll'];
             $hideIcons = $line['hideicons'];
             $graphicalIcons = ($line['picicons']==1);
@@ -1313,6 +1313,7 @@ class CourseController extends AppController
             {
                 $topBar[2] = AppConstant::NUMERIC_ZERO;
             }
+
             if ($topBar[0][0] == null)
             {
                 unset($topBar[0][0]);
@@ -1370,6 +1371,7 @@ class CourseController extends AppController
             } else if (($sessionData['quickview'.$courseId])) {
                 $quickView = $sessionData['quickview'.$courseId];
             }
+
             if ($quickView == "on") {
                 $folder = '0';
             }
@@ -1399,6 +1401,7 @@ class CourseController extends AppController
                     $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
                 }
             }
+
             /*
              * update block start/end dates to show blocks containing items with exceptions
              */
@@ -1571,6 +1574,7 @@ class CourseController extends AppController
         } else {
             $filter = 'b';
         }
+
         if(isset($courseData['block']) && isset($courseData['cid']) && !isset($courseData['from']) && !isset($courseData['remove'])){
             $block = $courseData['block'];
             $calender = 'Calendar';
@@ -1591,6 +1595,7 @@ class CourseController extends AppController
             Course::setItemOrder($itemOrder, $courseId);
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id.'&folder=0'));
         }
+
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js', 'mootools.js', 'nested1.js','course/instructor.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,
@@ -1748,7 +1753,6 @@ class CourseController extends AppController
             {
                 echo '<script type="text/javascript">$(".instrdates").hide();</script>';
             }
-
             $this->includeJS(['course.js']);
         }
 

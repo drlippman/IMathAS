@@ -4,7 +4,7 @@ $(document).ready(function ()
     selectCheckBox();
     studentLock();
     $('.student-data-table').DataTable({
-        "aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,6,7,8] } ],
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,6] } ],
         "bPaginate": false
     });
 

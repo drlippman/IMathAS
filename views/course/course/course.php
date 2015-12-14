@@ -2,7 +2,6 @@
 use app\components\AppUtility;
 use \app\components\ShowItemCourse;
 use app\components\AppConstant;
-
 $this->title = ucfirst($course->name);
 $this->params['breadcrumbs'][] = $this->title;
 $imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid='.$course->id);?>
@@ -60,7 +59,8 @@ if (($teacherId && (!$backLink))) {?>
     </div>
 </div>
 
-<?php } ?>
+<?php }
+?>
 <?php if($user['rights'] == AppConstant::STUDENT_RIGHT){?>
 <div class="tab-content shadowBox course-page-setting student-course-setting">
     <?php } elseif($user['rights'] >= AppConstant::STUDENT_RIGHT) {?>
@@ -124,6 +124,7 @@ if (($teacherId && (!$backLink))) {?>
     </div>
     <div class="clear-both"></div>
 <?php }
+
 ?>
     <input type="hidden" class="courseId" value="<?php echo $course->id?>">
 
@@ -181,7 +182,6 @@ if ($overwriteBody == 1) {
     ?>
 
     <?php
-
     if ($previewshift > -1) {
         ?>
         <script type="text/javascript">
@@ -229,7 +229,6 @@ if ($overwriteBody == 1) {
     if (($backLink)) {
         echo $backLink;
     }
-
     if (($useLeftBar && ($teacherId)) || ($useLeftStuBar && !($teacherId))) {
         echo "</div>";
     } else if (!($nocoursenav)) {
@@ -248,13 +247,6 @@ if ($overwriteBody == 1) {
         echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;\n";
         echo "document.cookie = 'loadedblocks-$courseId=0';</script>\n";
     }
-}?></div>
+}
+?></div>
 
-
-    <script>
-        /**
-         * Modal pop up for locked course.
-         */
-
-
-    </script>

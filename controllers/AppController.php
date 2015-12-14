@@ -680,7 +680,7 @@ class AppController extends Controller
 
     public function setSessionData($key, $value)
     {
-        return Yii::$app->session->set($key, $value);
+        return \Yii::$app->session->set($key, $value);
     }
 
     public function getNotificationDataMessage($courseId, $user)
@@ -709,10 +709,11 @@ class AppController extends Controller
 
     public function isTeacher($userId, $courseId)
     {
+        echo "<br>is-teacher";
         $isTeacher = false;
         $teacher = Teacher::getByUserId($userId, $courseId);
         $user = User::getById($userId);
-        if ($teacher || $user['rights'] == AppConstant::ADMIN_RIGHT)
+        if ($teacher || $user['rights'] == AppConstant::ADMIN_RIGHT || $user['rights'] > 19)
         {
             $isTeacher = true;
         }
@@ -908,6 +909,7 @@ class AppController extends Controller
         } elseif($user['rights'] < AppConstant::STUDENT_RIGHT && $actionPath == 'public' || $actionPath == 'show-linked-text-public'){
             return true;
         }else {
+
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
         }
@@ -935,7 +937,7 @@ class AppController extends Controller
     {
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $isStudent = $this->isStudent($user['id'], $courseId);
-        if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($teacherId || $isStudent)) {
+        if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'index' || $actionPath == 'send-message' || $actionPath == 'confirm-message' || $actionPath == 'display-message-ajax' || $actionPath == 'sent-message' || $actionPath == 'display-sent-message-ajax' || $actionPath == 'get-course-ajax' || $actionPath == 'mark-as-unread-ajax' || $actionPath == 'mark-as-read-ajax' || $actionPath == 'get-user-ajax' || $actionPath == 'view-message' || $actionPath == 'mark-as-delete-ajax' || $actionPath == 'mark-sent-remove-ajax' || $actionPath == 'reply-message' || $actionPath == 'get-sent-course-ajax' || $actionPath == 'get-sent-user-ajax' || $actionPath == 'reply-message-ajax' || $actionPath == 'view-conversation' || $actionPath == 'mark-sent-unsend-ajax' || $actionPath == 'change-image-ajax') && ($teacherId || $isStudent)) {
             return true;
         } else if ($user['rights'] == AppConstant::GUEST_RIGHT) {
             return true;
@@ -947,7 +949,6 @@ class AppController extends Controller
 
     public function accessForSiteController($user,$actionPath,$courseId = null)
     {
-
         if (($user['rights'] > AppConstant::GUEST_RIGHT) && ($actionPath == 'unhide-from-course-list'
             || $actionPath == 'hide-from-course-list' || $actionPath == 'help-for-student-answer' || $actionPath == 'form' || $actionPath == 'action')) {
             return true;
