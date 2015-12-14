@@ -913,13 +913,13 @@ switch($_GET['action']) {
 		break;
 	case "modgroup":
 		if ($myrights <100) { echo "You don't have the authority for this action"; break;}
-		$query = "SELECT id FROM imas_groups WHERE name='{$_POST['gpname']}'";
+		$query = "SELECT id FROM imas_groups WHERE name='{$_POST['gpname']}' AND id<>'{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
 			echo "<html><body>Group name already exists.  <a href=\"forms.php?action=modgroup&id={$_GET['id']}\">Try again</a></body></html>\n";
 			exit;
 		}
-		$query = "UPDATE imas_groups SET name='{$_POST['gpname']}' WHERE id='{$_GET['id']}'";
+		$query = "UPDATE imas_groups SET name='{$_POST['gpname']}',parent='{$_POST['parentid']}' WHERE id='{$_GET['id']}'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		break;
 	case "delgroup":

@@ -781,11 +781,23 @@ switch($_GET['action']) {
 		break;
 	case "modgroup":
 		echo '<div id="headerforms" class="pagetitle"><h2>Rename Instructor Group</h2></div>';
-		$query = "SELECT name FROM imas_groups WHERE id='{$_GET['id']}'";
+		$query = "SELECT name,parent FROM imas_groups WHERE id='{$_GET['id']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gpname = mysql_result($result,0,0);
+		list($gpname,$parent) = mysql_fetch_row($result);
+		
 		echo "<form method=post action=\"actions.php?action=modgroup&id={$_GET['id']}\">\n";
 		echo "Group name: <input type=text size=50 name=gpname id=gpname value=\"$gpname\"><br/>\n";
+		echo 'Parent: <select name="parentid"><option value="0" ';
+		if ($parent==0) { echo ' selected="selected"';}
+		echo '>None</option>';
+		$query = "SELECT id,name FROM imas_groups ORDER BY name";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		while ($r = mysql_fetch_row($result)) {
+			echo '<option value="'.$r[0].'"';
+			if ($r[0]==$parent) { echo ' selected="selected"';}
+			echo '>'.$r[1].'</option>';
+		}
+		echo '</select><br/>';
 		echo "<input type=submit value=\"Update Group\">\n";
 		echo "</form>\n";
 		break;

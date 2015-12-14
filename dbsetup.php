@@ -626,7 +626,8 @@ echo 'imas_wiki_views created<br/>';
 $sql = 'CREATE TABLE `imas_groups` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `grouptype` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
-        . ' `name` VARCHAR(255) NOT NULL'
+        . ' `name` VARCHAR(255) NOT NULL,'
+        . ' `parent` INT(10) UNSIGNED NOT NULL DEFAULT \'0\''
         . ' )'
         . ' ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());	
