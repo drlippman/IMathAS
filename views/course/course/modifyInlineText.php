@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
       action="modify-inline-text?cid=<?php echo $course->id ?>&id=<?php echo $inlineId; ?>">
     <?php }else{ ?>
     <form enctype="multipart/form-data" method=post
-          action="modify-inline-text?cid=<?php echo $course->id ?>&block2=<?php echo $block ?>">
+          action="modify-inline-text?cid=<?php echo $course->id ?>&block=<?php echo $block ?>">
         <?php } ?>
         <div class="item-detail-header">
             <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
@@ -64,7 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-sm-12 col-sm-12 padding-top-two-em">
                 <div class='col-md-2 col-sm-3 padding-left-zero'><?php AppUtility::t('Attached Files') ?></div>
                 <?php
-                if (isset($inlineId)) {
+
+                if (isset($params['id'])) {
                     foreach ($page_FileLinks as $k => $arr) {
                         AppUtility::generatemoveselect($page_fileorderCount, $k);
                         ?>
@@ -242,7 +243,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <script type="text/javascript">
             function movefile(from) {
                 var to = document.getElementById('ms-' + from).value;
-                var address = "<?php echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addinlinetext.php?cid = $cid&block=$block&id=" . $_GET['id'] ?>";
+                var address = "<?php echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/modify-inline-text?cid = $cid&block=$block&id=" . $_GET['id'] ?>";
 
                 if (to != from) {
                     var toopen = address + '&movefile=' + from + '&movefileto=' + to;

@@ -15,7 +15,7 @@ class InstrFiles extends BaseImasInstrFiles
 
     public function saveFile($params,$filename, $inlineText)
     {
-        $this->description = isset($params['newfiledescr']) ? $params['newfiledescr'] : null;
+        $this->description = $params['newfiledescr'];
         $this->filename = $filename;
         $this->itemid =  $inlineText;
         $this->save();
@@ -34,7 +34,7 @@ class InstrFiles extends BaseImasInstrFiles
 
     public static function getFileName($itemId)
     {
-        return InstrFiles::find()->select('description,filename,id')->where(['itemid' => $itemId])->all();
+        return InstrFiles::find()->select('id,description,filename')->where(['itemid' => $itemId])->all();
     }
 
     public static function deleteByItemId($itemId)

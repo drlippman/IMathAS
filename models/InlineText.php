@@ -120,11 +120,7 @@ class InlineText extends BaseImasInlinetext
 
     public static function getFileOrder($id)
     {
-//        AppUtility::dump($id);
-//        $A = self::find()->select('fileorder')->where(['id' => $id])->one()->toArray();
-//        AppUtility::dump($A);
-        return \Yii::$app->db->createCommand("SELECT fileorder FROM imas_inlinetext WHERE id={$id}")->queryOne();
-//        AppUtility::dump($query);
+        return self::find()->select('fileorder')->where(['id' => $id])->one()->toArray();
     }
 
     public static function getByCourseIdAll($courseId)

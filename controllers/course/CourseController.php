@@ -463,7 +463,7 @@ class CourseController extends AppController
                 }
 
                 $params['title'] =  htmlentities(stripslashes($params['title']));
-                $params['text'] =  stripslashes($_POST['text']);
+                $params['text'] =  stripslashes($params['text']);
                 $outcomes = array();
                 if (isset($params['outcomes'])) {
                     foreach ($params['outcomes'] as $o) {
@@ -546,17 +546,21 @@ class CourseController extends AppController
                     $saveItemOrderIntoCourse = new Course();
                     $saveItemOrderIntoCourse->setItemOrder($itemOrder, $cid);
                 }
-                if ($_FILES['userfile']['name']!='') {
+                if ($_FILES['userfile']['name'] != '') {
                     $uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
                     $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
                     $filename = $userfilename;
+//                    print_r($filename); die;
+
                     $extension = strtolower(strrchr($userfilename,"."));
                     $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
                     if (in_array($extension,$badextensions)) {
                         $overWriteBody = 1;
                         $body = "<p>File type is not allowed</p>";
                     } else {
+//                        print_r(filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)); die;
                         if (($filename = filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)) !== false) {
+
                             if (trim($params['newfiledescr'])=='') {
                                 $params['newfiledescr'] = $filename;
                             }
@@ -571,12 +575,15 @@ class CourseController extends AppController
                     }
                 }
             }
-            if (($addedfile) || count($filestoremove) > 0 || isset($params['movefile'])) {
-                $fileorder = InlineText::getFileOrder($params['id']);
+            if (($addedfile) || count($filestoremove) > 0 || ($params['movefile'])) {
+                $resultFileOrder = InlineText::getFileOrder($params['id']);
+//                AppUtility::dump($resultFileOrder);
+                $fileorder = explode(',', $resultFileOrder['fileorder']);
+
                 if ($fileorder['fileorder'] == '') {
                     $fileorder = array();
                 }
-                if (isset($addedfile)) {
+                if (($addedfile)) {
                     $fileorder[] = $addedfile;
                 }
                 if (count($filestoremove) > 0) {
@@ -658,11 +665,13 @@ class CourseController extends AppController
             }
 
             if (isset($params['id'])) {
-                $result = InstrFiles::getFileName($inlineId);
+                $result = InstrFiles::getFileName($params['id']);
                 $page_fileorderCount = count($fileorder);
+//                AppUtility::dump($page_fileorderCount);
                 $i = 0;
                 $page_FileLinks = array();
                 if (count($result) > 0) {
+
                     foreach($result as $key => $row) {
                         $filedescr[$row['id']] = $row['description'];
                         $filenames[$row['id']] = rawurlencode($row['filename']);
@@ -701,7 +710,7 @@ class CourseController extends AppController
         }
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);
         $this->includeCSS(['course/items.css']);
-        $responseData = array('page_formActionTag' => $page_formActionTag, 'filter' => $filter,'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes, 'block' => $block);
+        $responseData = array('page_formActionTag' => $page_formActionTag, 'filter' => $filter,'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes, 'block' => $block, 'altoncal' => $altoncal);
         return $this->renderWithData('modifyInlineText', $responseData);
     }
 

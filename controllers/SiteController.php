@@ -227,12 +227,14 @@ class SiteController extends AppController
                 $this->setWarningFlash('Please enter your ID, first name, and last name');
                 return $this->redirect('diagnostics');
             }
+
             $result = Diags::getByDiagId($diagId);
-            $entryformat = $result[0]['entryformat'];
-            $sel1 = explode(',',$result[0]['sel1list']);
+            $entryformat = $result['entryformat'];
+            $sel1 = explode(',',$result['sel1list']);
             $entrytype = substr($entryformat,0,1); //$entryformat{0};
             $entrydig = substr($entryformat,1); //$entryformat{1};
             $entrynotunique = false;
+
             if ($entrytype == 'A' || $entrytype == 'B')
             {
                 $entrytype = chr(ord($entrytype) + 2);
@@ -279,8 +281,8 @@ class SiteController extends AppController
 
             if ($params['course'] == -1)
             {
-                echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
-                exit;
+                $this->setWarningFlash('Please select a ' .$line['sel1name']. ' and ' .$line['sel2name']);
+                return $this->redirect('diagnostics?id=' .$diagId);
             }
             $pws = array();
             $pws = explode(';',$line['pws']);
@@ -425,7 +427,7 @@ class SiteController extends AppController
             return $this->redirect('assessment', 'assessment/show-assessment?cid='.$pcid.'&id='.$paid);
         }
         $this->includeJS(['jstz_min.js']);
-        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname, 'sel1' => $sel1, 'noproctor' => $noproctor, 'pws' => $pws);
+        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname, 'sel1' => $sel1, 'noproctor' => $noproctor);
         return $this->renderWithData('diagnostics', $responseData);
     }
 
@@ -597,7 +599,7 @@ class SiteController extends AppController
                 //Todo: Add install name in email.
                 $message = "<p>Welcome to OpenMath</p> ";
                 $message .= "<p>Hi,<br></p>";
-                $message .= "<p>We received a request to get the username associated with this e-mail address ".$user->email.". If you have made this request, please see the Username associated with this email listed below.</p> ";
+                $message .= "<p>We received a request to get the username associated with this e-mail address ".$users->email.". If you have made this request, please see the Username associated with this email listed below.</p> ";
                 foreach($users as $singleUser){
                     $lastLogin = ($singleUser['lastaccess'] == 0 ) ? "Never" : date("n/j/y g:ia",$singleUser['lastaccess']) ;
                     $message .= "<p>Username: <b>".$singleUser['SID']."</b>  Last logged in: ".$lastLogin."</br></p>";
