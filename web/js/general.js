@@ -43,11 +43,12 @@ function basicahah(url, target, def) {
   if (def==null) { def =  ' Fetching data... ';}
   document.getElementById(target).innerHTML = def;
   var hasreq = false;
-  if (window.XMLHttpRequest) { 
+  if (window.XMLHttpRequest) {
     req = new XMLHttpRequest();
     hasreq = true;
-  } else if (window.ActiveXObject) { 
-    req = new ActiveXObject("Microsoft.XMLHTTP");
+  } else if (window.ActiveXObject) {
+
+      req = new ActiveXObject("Microsoft.XMLHTTP");
     hasreq = true;
   } 
   if (hasreq) { 

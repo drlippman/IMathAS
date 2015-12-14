@@ -49,7 +49,7 @@ $msgTotal = array_sum($newMsgCnt);
                             }
                             break;
                         case 1:
-                            AppUtility::printCourses($page_tutorCourseData,_('Courses you\'re tutoring'),'tutor', $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null);
+                                AppUtility::printCourses($page_tutorCourseData,_('Courses you\'re tutoring'),'tutor', $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null);
                             break;
                         case 2:
                             AppUtility::printCourses($page_studentCourseData,_('Courses you\'re taking'),'take', $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null);

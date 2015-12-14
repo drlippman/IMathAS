@@ -41,8 +41,8 @@ function ahahDone(url, target) {
 		      eval(x[i].text);
 	      }
       }
-    } else { 
-      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText; 
+    } else {
+      document.getElementById(target).innerHTML=" AHAH Error:\n"+ req.status + "\n" +req.statusText;
     } 
   } 
 }
@@ -88,160 +88,6 @@ function toggleblock(bnum,folder) {
       document.cookie = 'prevloadedblocks-'+cid+'='+plblist;
    }
    
-function showcalcontents(el) {
-	var html = '';
-	if (typeof el == 'number') {
-		var calwalk = new Date();
-		calwalk.setTime(el);
-		for (var j=0; j<28; j++) {
-			moday = (calwalk.getMonth()+1) + '-' + (calwalk.getDate());
-			if (caleventsarr[moday].data!=null) {
-				html += '<div style="background-color:#ddf;">'+caleventsarr[moday].date + '</div>';
-				html += showcalcontentsid(moday);
-			}
-			calwalk.setDate(calwalk.getDate()+1);
-		}
-		
-	} else if (caleventsarr[el.id]!=null) {
-		html += '<div style="background-color:#ddf;">'+caleventsarr[el.id].date + '</div>';
-		html += showcalcontentsid(el.id);
-		var mlink = document.getElementById("mcelink");
-		if (mlink!=null) {
-			var href = mlink.href;
-			href = href.replace(/^(.*?cid=\d+).*jQuery/,"$1");
-			mlink.href = href+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
-		}
-	} 
-	
-	document.getElementById('caleventslist').innerHTML = html;	
-	var alltd = document.getElementsByTagName("td");
-	for (var i=0;i<alltd.length;i++) {
-		alltd[i].style.backgroundColor = '#fff';
-	}
-	if (typeof el != 'number') {
-		el.style.backgroundColor = '#fdd';
-	}
-}
-
-function showcalcontentsid(elid) {
-	var html = '';
-	if (caleventsarr[elid].data!=null) {
-		html += '<ul class=qview style="margin-top: 2px;">';
-		for (var i=0; i<caleventsarr[elid].data.length; i++) {
-			if (caleventsarr[elid].data[i].type=='A') { 
-				html += '<li><span class="calitem" style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null && !caleventsarr[elid].data[i].hasOwnProperty('inactive')) { 
-					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
-					if (caleventsarr[elid].data[i].timelimit!=null) {
-						html += 'onclick="return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
-						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');return confirm(\'This assessment has a time limit. Click OK to start or continue working on the assessment.\')" ';
-					} else {
-						//html += 'onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';	
-					}
-					html += '>';
-					html += caleventsarr[elid].data[i].name + '</a>';
-				} else {
-					html += caleventsarr[elid].data[i].name;
-				}
-				html += ' Due '+caleventsarr[elid].data[i].time;
-				if (caleventsarr[elid].data[i].allowlate==1) {
-					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
-				}
-				if (caleventsarr[elid].data[i].undolate==1) {
-					html += ' <a href="redeemlatepass.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
-				}
-				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
-					html += ' <a href="addquestions.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Questions</a>';
-					html += ' <a href="gb-itemanalysis.php?asid=average&cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
-				}
-				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='AR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+';padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
-					//html += '<a onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';	
-					html += 'href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
-					html += caleventsarr[elid].data[i].name + '</a>';
-				} else {
-					html += caleventsarr[elid].data[i].name;
-				}
-				html += ' Review until '+caleventsarr[elid].data[i].time;
-				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addassessment.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Settings</a>';
-					html += ' <a href="isolateassessgrade.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
-				}
-				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='I') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].folder != null) {
-					html += '<a href="../course/course.php?cid='+cid+'&folder='+caleventsarr[elid].data[i].folder+'#inline'+caleventsarr[elid].data[i].id+'">';
-					html += caleventsarr[elid].data[i].name + '</a>';
-				} else {
-					html += caleventsarr[elid].data[i].name;
-				}
-				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addinlinetext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
-				}
-				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='L') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
-					
-					if (caleventsarr[elid].data[i].link=='') {
-						html += '<a onclick="recclick(\'linkedviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
-						html += 'href="../course/showlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
-					} else {
-						html += '<a onclick="recclick(\'linkedviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].link+'\');" ';
-						html += 'href="'+caleventsarr[elid].data[i].link+'">';
-					}
-					html += caleventsarr[elid].data[i].name + '</a>';
-				} else {
-					html += caleventsarr[elid].data[i].name;
-				}
-				
-				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addlinkedtext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
-				}
-				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
-					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
-					html += caleventsarr[elid].data[i].name + '</a>';
-				} else {
-					html += caleventsarr[elid].data[i].name;
-				}
-				html += ' New Threads Due '+caleventsarr[elid].data[i].time;
-				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
-				}
-				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				if (caleventsarr[elid].data[i].id!=null) { 
-					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
-					html += caleventsarr[elid].data[i].name + '</a>';
-				} else {
-					html += caleventsarr[elid].data[i].name;
-				}
-				html += ' Replies Due '+caleventsarr[elid].data[i].time;
-				if (caleventsarr[elid].data[i].editlink!=null) {
-					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
-				}
-				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='C') {
-				html += '<li><span class="calitem" style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
-				html += caleventsarr[elid].data[i].name;
-				html += '</li>';
-			} 
-		}
-		html += '</ul>';
-	}
-	return html;
-}
-//jQuery(document).ready(function($) {
-//	$(".caldl").attr("title",_("Bring this day to top"));
-//});
 
 function changecallength(el) {
 	window.location = calcallback + '&callength=' + el.value;
@@ -286,6 +132,8 @@ function playlisttogglelist() {
 	
 }
 function playliststart(id,vidk,el) {
+
+
 	if (el!==null) {
         jQuery(el).hide();
 	}
