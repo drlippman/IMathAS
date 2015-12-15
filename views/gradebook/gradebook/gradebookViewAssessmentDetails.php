@@ -129,26 +129,26 @@ echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 $line = $assessmentData;
 echo "<div class=breadcrumb>$breadcrumbbase ";
 if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype'] != 0) {
-    echo "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
+    echo "<a href=\"course?cid={$_GET['cid']}\">$coursename</a> &gt; ";
 
     if ($stu > 0) {
-        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-        echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
-        $backurl = "gradebook.php?stu=$stu&cid=$cid";
+        echo "<a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> ";
+        echo "&gt; <a href=\"gradebook?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
+        $backurl = "gradebook?stu=$stu&cid=$cid";
     } else if ($_GET['from'] == "isolate") {
-        echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-        echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";
-        $backurl = "isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}";
+        echo " <a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> ";
+        echo "&gt; <a href=\"isolate-assess-grade?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";
+        $backurl = "isolateassessgrade?cid=$cid&aid={$line['assessmentid']}";
     } else if ($_GET['from'] == "gisolate") {
-        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-        echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";
+        echo "<a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> ";
+        echo "&gt; <a href=\"isolate-assessby-group?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";
         $backurl = "isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}";
     } else if ($_GET['from'] == 'stugrp') {
-        echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
-        $backurl = "managestugrps.php?cid=$cid&aid={$line['assessmentid']}";
+        echo "<a href=\"manage-stu-grps?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
+        $backurl = "manage-stu-grps?cid=$cid&aid={$line['assessmentid']}";
     } else {
-        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
-        $backurl = "gradebook.php?stu=0&cid=$cid";
+        echo "<a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+        $backurl = "gradebook?stu=0&cid=$cid";
     }
 }
 echo "Detail</div>";

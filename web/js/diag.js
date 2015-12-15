@@ -1,10 +1,37 @@
 var cnt = new Array();
-
-function additem(inloc,outloc) {
-	var text = document.getElementById(inloc).value;
+function additemIpAddress(inloc,outloc)
+{
+    var text = document.getElementById(inloc).value;
     ValidateIPaddress(text);
     if(ValidateIPaddress(text) == true)
     {
+    document.getElementById(inloc).value = '';
+    var outn = document.getElementById(outloc);
+    var newn = document.createElement("tr");
+    var newid = outloc+'-'+cnt[outloc];
+    cnt[outloc] += 1;
+
+    newn.id = 'tr'+newid;
+    var newtd = document.createElement("td");
+    var html = "<input type=hidden name="+newid+" id="+newid+" value='"+text+"'>" + text;
+    newtd.innerHTML = html;
+    newn.appendChild(newtd);
+
+    html = "  <a href='#' onclick=\"return removeitem('"+newid+"','"+outloc+"')\">Remove</a>";
+    html += " <a href='#' onclick=\"return moveitemup('"+newid+"','"+outloc+"')\">Move up</a>";
+    html += " <a href='#' onclick=\"return moveitemdown('"+newid+"','"+outloc+"')\">Move down</a>";
+    newtd = document.createElement("td");
+    newtd.innerHTML = html;
+    newn.appendChild(newtd);
+    outn.appendChild(newn);
+    } else {
+        alert("Enter valid IP address.")
+    }
+}
+
+function additem(inloc,outloc) {
+	var text = document.getElementById(inloc).value;
+
         document.getElementById(inloc).value = '';
         var outn = document.getElementById(outloc);
         var newn = document.createElement("tr");
@@ -24,9 +51,7 @@ function additem(inloc,outloc) {
         newtd.innerHTML = html;
         newn.appendChild(newtd);
         outn.appendChild(newn);
-    } else {
-        alert("Enter valid IP address.")
-    }
+
 }
 function ValidateIPaddress(ipaddress)
 {
@@ -70,7 +95,7 @@ function moveitemdown(id,outloc) {
 	var cur = document.getElementById('tr'+id);
 	var next = cur.nextSibling;
 	if (next != null) {
-		outn.removeChild(cur);
+        outn.removeChild(cur);
 		if (next.nextSibling!=null) {
 			outn.insertBefore(cur,next.nextSibling);
 		} else {

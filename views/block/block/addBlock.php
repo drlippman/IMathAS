@@ -44,7 +44,7 @@ if (isset($id)) {
                 <div class="col-md-2 col-sm-3"><?php AppUtility::t('Visibility') ?></div>
                 <div class="col-md-10 col-sm-9">
                     <span class="col-md-3 col-sm-4 padding-left-zero">
-                        <input type=radio name="avail" checked="checked"
+                        <input type=radio name="avail"
                                value="1" <?php AppUtility::writeHtmlChecked($defaultBlockData['avail'], AppConstant::NUMERIC_ONE);  ?>
                                onclick="document.getElementById('datediv').style.display='block'; "/>
                         <span class="padding-left-pt-five-em"><?php AppUtility::t('Show by Dates') ?></span>

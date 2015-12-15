@@ -126,8 +126,10 @@ class ShowItemCourse extends Component
                 if (!($items[$i]['avail'])) { //backwards compat
                     $items[$i]['avail'] = AppConstant::NUMERIC_ONE;
                 }
+//                AppUtility::dump($items);
                 if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO || ($items[$i]['avail'] == AppConstant::NUMERIC_ONE && $items[$i]['startdate']<$now && $items[$i]['enddate'] > $now))
                 {
+
                     /*
                      * if "available"
                      */

@@ -3972,7 +3972,7 @@ class AssessmentController extends AppController
         $sessionData = $this->getSessionData($sessionId);
         $scored = $this->getParamVal('scored');
         $asId = $this->getParamVal('asid');
-        $isTeacher = (($teacherId) || $sessionData['isteacher'] == true);
+        $isTeacher = (isset($teacherId) || $sessionData['isteacher'] == true);
         if (isset($teacherId) && ($scored)) {
             $scoredType = $scored;
             $scoredView = true;

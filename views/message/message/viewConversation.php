@@ -23,11 +23,9 @@ AppUtility::includeJS('general.js'); ?>
     </div>
 </div>
 <div class="item-detail-content padding-top-two-em">
-    <?php if($userRights->rights == 100 || $userRights->rights == 20) {
-        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
-    } elseif($userRights->rights == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
-    }?>
+    <?php if($userRights->rights >= AppConstant::STUDENT_RIGHT) {
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);
+    } ?>
 </div>
 <div class="tab-content shadowBox col-md-12 col-sm-12 padding-top-bottom-one-pt-five-em">
     <div class="mainbody col-md-12 col-sm-12">

@@ -16,10 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php if($userRights->rights == 100 || $userRights->rights == 20) {
-        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
-    } elseif($userRights->rights == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+    <?php if($userRights->rights >= AppConstant::STUDENT_RIGHT) {
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);
     }?>
 </div>
 <input type="hidden" class="send-msg" value="<?php echo $messages->courseid ?>">

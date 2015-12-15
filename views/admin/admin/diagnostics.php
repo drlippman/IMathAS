@@ -221,21 +221,26 @@ echo '<form>';
     </div>
     <br/>
 
-    <div class="col-md-2 col-sm-3 padding-top-five"><?php AppUtility::t('Enter IP address')?></div>
-    <div class="col-md-8 col-sm-8"><input type=text id="ipin" class="form-control-1"
-                                 onkeypress="return onenter(event,'ipin','ipout')">
-        <input type=button value="Add" onclick="additem('ipin','ipout')"/>
+<!--    <div class="col-md-2 col-sm-3 padding-top-five">-->
+<!--        --><?php //AppUtility::t('Enter IP address')?><!--</div>-->
+    <div class="col-md-8 col-sm-8">
+<!--        <input type=text id="ipin" class="form-control-1 -->
+<!--        onkeypress="return onenter(event,'ipin','ipout')">-->
+        Enter IP address: <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
+        <input type=button value="Add" onclick="additemIpAddress('ipin','ipout')"/>
         <table>
             <tbody id="ipout">
             <?php
             if (trim($ips) != '') {
                 $ips = explode(',', $ips);
+
                 for ($i = AppConstant::NUMERIC_ZERO; $i < count($ips); $i++) {
                     ?>
                     <tr id="tripout-<?php echo $i ?>">
                         <td><input type=hidden id="ipout-<?php echo $i ?>" name="ipout-<?php echo $i ?>"
                                    value="<?php echo $ips[$i] ?>">
-                            <?php echo $ips[$i] ?></td>
+                            <?php
+                            echo $ips[$i] ?></td>
                         <td>
                             <a href='#' onclick="return removeitem('ipout-<?php echo $i ?>','ipout')">Remove</a>
                             <a href='#' onclick="return moveitemup('ipout-<?php echo $i ?>','ipout')">Move up</a>
@@ -249,14 +254,12 @@ echo '<form>';
             </tbody>
         </table>
         <?php
-        if($ips)
-        {
+
             if (is_array($ips)) {
-            echo "<script> cnt['ipout'] = count($ips);</script>";
+            echo "<script> cnt['ipout'] =" .count($ips).";</script>";
             } else {
                 echo "<script> cnt['ipout'] = 0;</script>";
             }
-        }
         ?>
     </div>
     <BR class=form><br>
@@ -264,7 +267,7 @@ echo '<form>';
     <br/>
 
     <div class="col-md-2 col-sm-2 padding-top-five"><?php AppUtility::t('')?>Enter Password</div>
-    <div class="col-md-8 col-sm-8"><input type=text id="pwin" class="form-control-1"
+    <div class="col-md-8 col-sm-8"><input type=password id="pwin" class="form-control-1"
                                  onkeypress="return onenter(event,'pwin','pwout')">
         <input type=button value="Add" onclick="additem('pwin','pwout')"/>
 
@@ -298,7 +301,7 @@ echo '<form>';
         if($pwsb)
         {
             if (is_array($pwsb)) {
-            echo "	<script> cnt['pwout'] = count($pwsb);</script>";
+            echo "<script> cnt['pwout'] = ".count($pwsb).";</script>";
             } else {
                 echo "	<script> cnt['pwout'] = 0;</script>";
             }
@@ -311,7 +314,7 @@ echo '<form>';
     <br/>
 
     <div class="col-md-2 col-sm-2 padding-top-five"><?php AppUtility::t('')?>Enter Password</div>
-    <div class="col-md-8 col-sm-8"><input type=text id="pwsin" class="form-control-1"
+    <div class="col-md-8 col-sm-8"><input type=password id="pwsin" class="form-control-1"
                                  onkeypress="return onenter(event,'pwsin','pwsout')">
         <input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
 
@@ -346,7 +349,7 @@ echo '<form>';
         if($pwss)
         {
             if (is_array($pwss)) {
-            echo "	<script> cnt['pwsout'] =  count($pwss) ;</script>";
+            echo "	<script> cnt['pwsout'] = ".count($pwss)." ;</script>";
             } else {
                 echo "	<script> cnt['pwsout'] = 0;</script>";
             }
@@ -401,7 +404,7 @@ echo '<form>';
         if($sl)
         {
             if (is_array($sl)) {
-            echo "<script> cnt['selout'] = count($sl);</script>";
+            echo "<script> cnt['selout'] = ".count($sl).";</script>";
             } else {
                 echo "<script> cnt['selout'] = 0;</script>";
             }
