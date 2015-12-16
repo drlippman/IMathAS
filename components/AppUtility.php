@@ -2918,7 +2918,7 @@ class AppUtility extends Component
                 $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
             }
             echo "<td>" ?>
-            <a href="<?php echo AppUtility::getURLFromHome('message','message/view-message?message=0&id='.$line['id'].'&cid='.$line['courseid'])?>">
+            <a href="<?php echo AppUtility::getURLFromHome('message','message/view-message?message=0&msgid='.$line['id'].'&cid='.$line['courseid'])?>">
 <!--            <a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";-->
             <?php echo $line['title'];
             echo '</a></td>';

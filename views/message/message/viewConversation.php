@@ -41,14 +41,14 @@ AppUtility::includeJS('general.js'); ?>
             if ($sent != AppConstant::NUMERIC_ONE) {
                 ?>
             <div class="align-buttons">
-                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'] . '&cid=' . $course->id); ?>">Back to Message</a>
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&msgid=' . $messages[0]['id'] . '&cid=' . $course->id); ?>">Back to Message</a>
              </div>
             <?php } ?>
             <?php $sent = $messageId;
             if ($sent == AppConstant::NUMERIC_ONE) {
                 ?>
             <div class="align-buttons">
-                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'] . '&cid=' . $course->id); ?>">Back to Message</a>
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&msgid=' . $messages[0]['id'] . '&cid=' . $course->id); ?>">Back to Message</a>
             </div>
             <?php } ?>
             <div class="align-buttons">

@@ -49,14 +49,41 @@ class MessageController extends AppController
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
+            if (!isset($_GET['page']) || $_GET['page']=='') {
+                $page = 1;
+            } else {
+                $page = $_GET['page'];
+            }
+            if ($page==-2) {
+                $limittotagged = 1;
+            } else {
+                $limittotagged = 0;
+            }
+            if (isset($_GET['filtercid'])) {
+                $filtercid = $_GET['filtercid'];
+            } else if ($courseId!='admin' && $courseId>0) {
+                $filtercid = $courseId;
+            } else {
+                $filtercid = 0;
+            }
+            if (isset($_GET['filteruid'])) {
+                $filteruid = intval($_GET['filteruid']);
+            } else {
+                $filteruid = 0;
+            }
+            $userData = User::getById($user['id']);
+            $threadsperpage = $userData['listperpage'];
+            $filterByCourse = Message::getCoursesForMessage($user['id']);
+            $filterByUserName = Message::getMessagesByUserName($user['id'], $filtercid);
+            $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged,$page,$threadsperpage);
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
-            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/message.js']);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id);
+            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/msg.js','message/message.js']);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page);
             return $this->renderWithData('messages', $responseData);
         }
     }
@@ -311,7 +338,7 @@ class MessageController extends AppController
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
-        $msgId = $this->getParamVal('id');
+        $msgId = $this->getParamVal('msgid');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId);
             Message::updateRead($msgId);
@@ -530,6 +557,30 @@ class MessageController extends AppController
             return $this->successResponse();
         } else {
             return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
+        }
+    }
+
+    public function actionSaveTagged()
+    {
+        $this->guestUserHandler();
+        $this->layout = 'master';
+        $threadid = $this->getParamVal('threadid');
+        $user = $this->getAuthenticatedUser();
+        if (!isset($threadid)) {
+             $this->setErrorFlash('Exit');
+            return $this->redirect('index');
+        }
+        $ischanged = false;
+        $saveTagged = Message::saveTagged($user['id'], $threadid);
+
+        if(count($saveTagged) > 0)
+        {
+            $ischanged = true;
+        }
+        if ($ischanged) {
+            echo "OK";
+        } else {
+            echo "Error";
         }
     }
 }

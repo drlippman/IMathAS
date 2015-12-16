@@ -528,5 +528,68 @@ class Message extends BaseImasMsgs
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getCoursesForMessage($userId)
+    {
+        $query = new Query();
+        $query	->select(['imas_courses.id', 'imas_courses.name'])
+            ->distinct()
+            ->from('imas_courses')
+            ->join(	'INNER JOIN',
+                'imas_msgs', 'imas_courses.id=imas_msgs.courseid')
+            ->where('imas_msgs.msgto= :userId',[':userId' => $userId]);
+        $query->orderBy('imas_courses.name');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getMessagesByUserName($userId, $filtercid)
+    {
+        $query  = new Query();
+        $query->select('imas_users.id, imas_users.LastName, imas_users.FirstName')
+            ->distinct()
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_msgs', 'imas_msgs.msgfrom=imas_users.id')
+            ->where('imas_msgs.msgto= :userId',[':userId' => $userId]);
+        if ($filtercid>AppConstant::NUMERIC_ZERO) {
+            $query->andWhere('imas_msgs.courseid = :courseId', [':courseId' => $filtercid]);
+        }
+        $query->orderBy('imas_users.LastName, imas_users.FirstName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function displayMessageById($userId, $filteruid, $filtercid, $limittotagged,$page,$threadsperpage)
+    {
+        $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
+        $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
+        $query .= "imas_msgs.msgto='$userId' AND (imas_msgs.isread&2)=0 ";
+        if ($filteruid>0) {
+            $query .= "AND imas_msgs.msgfrom='$filteruid' ";
+        }
+        if ($filtercid>0) {
+            $query .= "AND imas_msgs.courseid='$filtercid' ";
+        }
+        if ($limittotagged) {
+            $query .= "AND (imas_msgs.isread&8)=8 ";
+        }
+
+        $query .= "ORDER BY senddate DESC ";
+        $offset = ($page-1)*$threadsperpage;
+        if (!$limittotagged) {
+            $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
+        }
+        $data = Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function saveTagged($userId, $threadid)
+    {
+        $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto='$userId' AND id='$threadid'";
+        return Yii::$app->db->createCommand($query)->execute();
+    }
 }
 

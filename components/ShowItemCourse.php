@@ -126,7 +126,6 @@ class ShowItemCourse extends Component
                 if (!($items[$i]['avail'])) { //backwards compat
                     $items[$i]['avail'] = AppConstant::NUMERIC_ONE;
                 }
-//                AppUtility::dump($items);
                 if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO || ($items[$i]['avail'] == AppConstant::NUMERIC_ONE && $items[$i]['startdate']<$now && $items[$i]['enddate'] > $now))
                 {
 
@@ -1635,7 +1634,7 @@ class ShowItemCourse extends Component
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
                                 <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $typeid . '&courseId=' . $courseId) ?>"><?php AppUtility::t('Modify'); ?></a>
+                                       href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $typeid . '&cid=' . $courseId) ?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
                                 <li><a id="delete"
                                        href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>

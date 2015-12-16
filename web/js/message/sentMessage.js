@@ -66,7 +66,7 @@ function showMessage(messageData, status)
     if(status == 0){
         $.each(messageData, function(index, msg){
             html += "<tr class='message-checkbox-'" + msg.id + "><td><div class='checkbox override-hidden'><label><input type='checkbox' name='msg-check' value='"+msg.id+"' class='message-checkbox-"+msg.id+"' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
-            html += "<td><a href='view-message?message=1&id="+msg.id+"&cid="+cid+"'> "+msg.title+"</a></td>";
+            html += "<td><a href='view-message?message=1&msgid="+msg.id+"&cid="+cid+"'> "+msg.title+"</a></td>";
             html += "<td>"+msg.FirstName.substr(0,1).toUpperCase()+ msg.FirstName.substr(1)+" "+msg.LastName.substr(0,1).toUpperCase()+ msg.LastName.substr(1)+"</td>";
             if(msg.isread==0)
             {

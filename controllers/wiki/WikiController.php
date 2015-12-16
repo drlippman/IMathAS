@@ -518,8 +518,8 @@ class WikiController extends AppController
         if ($this->isPost()) {
             if ($wikiid) {
                 $link = new Wiki();
-                $link->updateChange($params);
-                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id));
+                $link->updateChange($params, $courseId);
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             } else{
                 if ($params['avail']== AppConstant::NUMERIC_ONE) {
                     if ($params['available-after'] == '0') {
@@ -572,7 +572,7 @@ class WikiController extends AppController
                 $itemorder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
-                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             }
         }
         $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
