@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 103;
+$latest = 104;
 
 
 @set_time_limit(0);
@@ -1604,6 +1604,53 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<104) {
+			$query = "ALTER TABLE  `imas_drillassess` ADD  `name` VARCHAR(254) NOT NULL;";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_drillassess` ADD  `summary` TEXT NOT NULL;";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = "ALTER TABLE  `imas_drillassess` ADD  `startdate` INT(10) UNSIGNED NOT NULL;";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_drillassess` ADD  `enddate` INT(10) UNSIGNED NOT NULL;";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_drillassess` ADD  `avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1';";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_drillassess` ADD  `caltag` VARCHAR(254) NOT NULL DEFAULT 'D';";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			  $query = "ALTER TABLE `imas_drillassess` ADD INDEX(`startdate`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			  $query = "ALTER TABLE `imas_drillassess` ADD INDEX(`enddate`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			  $query = "ALTER TABLE `imas_drillassess` ADD INDEX(`avail`);"; 
+			 $res = mysql_query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');

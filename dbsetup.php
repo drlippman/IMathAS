@@ -909,6 +909,10 @@ $sql = 'CREATE TABLE `imas_drillassess` (
 	`name` VARCHAR(254) NOT NULL, 
 	`summary` TEXT NOT NULL,
 	`courseid` INT( 10 ) UNSIGNED NOT NULL ,
+	`startdate` INT(10) UNSIGNED NOT NULL, 
+        `enddate` INT(10) UNSIGNED NOT NULL,
+	`avail` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'1\',
+	`caltag` VARCHAR(254) NOT NULL DEFAULT \'D\',
 	`itemdescr` TEXT NOT NULL ,
 	`itemids` TEXT NOT NULL ,
 	`scoretype` CHAR( 3 ) NOT NULL ,
@@ -916,7 +920,7 @@ $sql = 'CREATE TABLE `imas_drillassess` (
 	`n` SMALLINT( 5 ) UNSIGNED NOT NULL ,
 	`classbests` TEXT NOT NULL ,
 	`showtostu` TINYINT( 1 ) UNSIGNED NOT NULL ,
-	INDEX ( `courseid` )
+	INDEX ( `courseid` ), INDEX(`avail`), INDEX(`startdate`), INDEX(`enddate`)
 	) ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_drillassess created<br/>';

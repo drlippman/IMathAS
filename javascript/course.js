@@ -232,6 +232,19 @@ function showcalcontentsid(elid) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
+			} else if (caleventsarr[elid].data[i].type=='D') {
+				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				if (caleventsarr[elid].data[i].id != null) {
+					html += '<a href="../course/drillassess.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">';
+					html += caleventsarr[elid].data[i].name + '</a>';
+				} else {
+					html += caleventsarr[elid].data[i].name;
+				}
+				if (caleventsarr[elid].data[i].editlink!=null) {
+					html += ' <a href="adddrillassess.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">Modify</a>';
+					html += ' <a href="gb-viewdrill.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">Scores</a>';
+				}
+				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='C') {
 				html += '<li><span class="calitem" style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				html += caleventsarr[elid].data[i].name;

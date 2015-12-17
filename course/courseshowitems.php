@@ -29,7 +29,7 @@ function enditem($canedit) {
 	   if (!isset($CFG['CPS']['itemicons'])) {
 	   	   $itemicons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
 			'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
-			'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+			'drill'=>'drill.png','html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
 			'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
 			'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
 			'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png', 
@@ -1039,10 +1039,13 @@ function enditem($canedit) {
 					   echo '<span class="instrdates">';
 					   echo "<br/>$show ";
 					   echo '</span>';
+				   } else if ($line['enddate']!=2000000000) {
+					   echo "<br/>$show";
 				   }
+				   	   
 				   if ($canedit) {
 					   echo '<span class="instronly">';
-					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
@@ -1070,7 +1073,7 @@ function enditem($canedit) {
 				   echo '</span>';
 				   if ($canedit) {
 					  echo '<span class="instronly">';
-					   echo "<a href=\"adddrillassess.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+					   echo "<a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
@@ -1584,6 +1587,12 @@ function enditem($canedit) {
 		}
 		$html .= _('Wiki') . "</a> | ";
 		
+		$html .= "<a href=\"adddrillassess.php?block=$blk&tb=$tb&cid=$cid\">";
+		if (isset($CFG['CPS']['miniicons']['drill'])) {
+			$html .= "<img alt=\"drill\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['drill']}\"/> ";
+		}
+		$html .= _('Drill') . "</a> | ";
+		
 		$html .= "<a href=\"addblock.php?block=$blk&tb=$tb&cid=$cid\">";
 		if (isset($CFG['CPS']['miniicons']['folder'])) {
 			$html .= "<img alt=\"folder\" class=\"mida\" src=\"$imasroot/img/{$CFG['CPS']['miniicons']['folder']}\"/> ";
@@ -1611,6 +1620,7 @@ function enditem($canedit) {
 		$html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
 		$html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
 		$html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
+		$html .= "<option value=\"drillassess\">" . _('Add Drill') . "</option>\n";
 		$html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";
 		$html .= "<option value=\"calendar\">" . _('Add Calendar') . "</option>\n";
 		$html .= "</select><BR>\n";
@@ -1780,6 +1790,12 @@ function enditem($canedit) {
 	   while ($row = mysql_fetch_row($result)) {
 		   $id = array_shift($row);
 		   $iteminfo['Wiki'][$id] = $row;
+	   }
+	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid='$cid'";
+	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   while ($row = mysql_fetch_row($result)) {
+		   $id = array_shift($row);
+		   $iteminfo['Drill'][$id] = $row;
 	   }
 	   $now = time() + $previewshift;
 	   for ($i=0;$i<count($items); $i++) {
@@ -2111,6 +2127,54 @@ function enditem($canedit) {
 				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+				  echo '</span>';
+			   }
+			   echo '</li>';
+		   } else if ($itemtypes[$items[$i]][0] == 'Drill') {
+			   $typeid = $itemtypes[$items[$i]][1];
+			   list($line['name'],$line['startdate'],$line['enddate'],$line['avail']) = $iteminfo['Drill'][$typeid];
+			   if ($line['startdate']==0) {
+				   $startdate = _('Always');
+			   } else {
+				   $startdate = formatdate($line['startdate']);
+			   }
+			   if ($line['enddate']==2000000000) {
+				   $enddate = _('Always');
+			   } else {
+				   $enddate =formatdate($line['enddate']);
+			   }
+			   if ($line['avail']==2) {
+					$color = '#0f0';
+				} else if ($line['avail']==0) {
+				   $color = '#ccc';
+			   } else {
+					$color = makecolor2($line['startdate'],$line['enddate'],$now);
+				}
+		           if (!isset($CFG['CPS']['miniicons']['drill'])) {
+				$icon  = '<span class=icon style="background-color:'.$color.'">D</span>';
+			   } else {
+				$icon = '<img alt="wiki"  src="'.$imasroot.'/img/'.$CFG['CPS']['miniicons']['drill'].'" class="mida icon" /> ';
+			   }
+			   echo '<li id="'.$items[$i].'">'.$icon;
+			  if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
+				   //echo '<b>'.$line['name']. "</b>";
+				   echo '<b><span id="D'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
+				   if ($showdates) {
+					   printf(_(' showing until %s'), $enddate);
+				   }
+			   } else {
+				   echo '<i><b><span id="D'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";
+				   //echo '<i><b>'.$line['name']. "</b></i>";
+				   if ($showdates) {
+					   printf(_(' showing %1$s until %2$s'), $startdate, $enddate);
+				   }
+			   }
+			   if ($showlinks) {
+				   echo ' <span class="links">';
+				   echo "<a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
+				   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';

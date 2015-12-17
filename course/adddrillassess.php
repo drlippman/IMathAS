@@ -4,6 +4,7 @@
 
 require("../validate.php");
 require("../includes/htmlutil.php");
+require("../includes/parsedatetime.php");
 
 if (!isset($teacherid)) {
 	echo 'You are not authorized to view this page';
@@ -13,6 +14,12 @@ if (!isset($teacherid)) {
 $pagetitle = "Add/Modify Drill Assessment";
 $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
+if (isset($_GET['tb'])) {
+	$totb = $_GET['tb'];
+} else {
+	$totb = 'b';
+}
+$block = $_GET['block'];
 
 $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -27,12 +34,25 @@ if (mysql_num_rows($result)==0) {
 	$itemids = array();
 	$itemdescr = array();
 	$daid = 0;
+	$drillname = "Enter title here";
+	$drillsummary = "<p>Enter summary here (displays on course page)</p>";
+	$startdate = time();
+	$enddate = time() + 7*24*60*60;
+	$avail = 1;
+	$caltag = 'D';
 } else {
 	$dadata = mysql_fetch_array($result, MYSQL_ASSOC);
 	$n = $dadata['n'];
 	$showtype = $dadata['showtype'];
 	$scoretype = $dadata['scoretype'];
 	$showtostu = $dadata['showtostu'];
+	$startdate= $dadata['startdate'];
+	$enddate= $dadata['enddate'];
+	$avail= $dadata['avail'];
+	$drillname= $dadata['name'];
+	$drillsummary= $dadata['summary'];
+	$caltag = $dadata['caltag'];
+	
 	if ($dadata['itemids']=='') {
 		$itemids = array();
 	} else {
@@ -52,13 +72,39 @@ if (isset($_GET['clearatt'])) {
 	exit;
 }
 if (isset($_GET['record'])) {
-	$beentaken = isset($_POST['beentaken']);
+	if ($_POST['avail']==1) {
+		if ($_POST['sdatetype']=='0') {
+			$startdate = 0;
+		} else {
+			$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+		}
+		if ($_POST['edatetype']=='2000000000') {
+			$enddate = 2000000000;
+		} else {
+			$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+		}
+	} else {
+		$startdate = 0;
+		$enddate =  2000000000;
+	}
+	$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
+		
+	require_once("../includes/htmLawed.php");
+	$htmlawedconfig = array('elements'=>'*-script' );
+	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
+		$_POST['summary'] = '';
+	} else {
+		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+	}
 	
 	if (isset($_POST['descr'])) {
 		foreach ($_POST['descr'] as $k=>$v) {
 			$itemdescr[$k] = str_replace(',','',$v);
 		}
 	}
+	
+	$beentaken = isset($_POST['beentaken']);
+	
 	if (!$beentaken) {
 		$newitemids = array();
 		$newitemdescr = array();
@@ -114,10 +160,36 @@ if (isset($_GET['record'])) {
 	$descrlist = implode(',',$itemdescr);
 	$bestlist = implode(',',$classbests);
 	if ($daid==0) {
-		$query = "INSERT INTO imas_drillassess (courseid,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu) VALUES ";
-		$query .= "($cid,'$descrlist','$itemlist','$scoretype',$showtype,$n,'$bestlist',$showtostu)";
+		$query = "INSERT INTO imas_drillassess (courseid,name,summary,avail,startdate,enddate,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu) VALUES ";
+		$query .= "($cid,'{$_POST['title']}','{$_POST['summary']}','{$_POST['avail']}','$startdate','$enddate','$descrlist','$itemlist','$scoretype',$showtype,$n,'$bestlist',$showtostu)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$daid = mysql_insert_id();
+		
+		$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
+		$query .= "('$cid','Drill','$daid');";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		
+		$itemid = mysql_insert_id();
+					
+		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$line = mysql_fetch_array($result, MYSQL_ASSOC);
+		$items = unserialize($line['itemorder']);
+			
+		$blocktree = explode('-',$block);
+		$sub =& $items;
+		for ($i=1;$i<count($blocktree);$i++) {
+			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+		}
+		if ($totb=='b') {
+			$sub[] = $itemid;
+		} else if ($totb=='t') {
+			array_unshift($sub,$itemid);
+		}
+		$itemorder = addslashes(serialize($items));
+		
+		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	} else {
 		if ($beentaken) {
 			$query = "UPDATE imas_drillassess SET itemdescr='$descrlist',showtostu=$showtostu";
@@ -128,6 +200,7 @@ if (isset($_GET['record'])) {
 		if ($updatebests) {
 			$query .= ",classbests='$bestlist'";
 		}
+		$query .= ",name='{$_POST['title']}',summary='{$_POST['summary']}',avail='{$_POST['avail']}',caltag='{$_POST['caltag']}',startdate='$startdate',enddate='$enddate'";
 		$query .= " WHERE id=$daid";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		if (!$beentaken) {
@@ -181,8 +254,11 @@ if (isset($_GET['record'])) {
 		$safesearch = '';
 		writesessiondata();
 	}
-	
-	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+	if (isset($_POST['save']) && $_POST['save']=='Save') {
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
+	} else {
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/adddrillassess.php?cid=$cid&daid=$daid");
+	}
 	exit;
 }
 
@@ -195,6 +271,7 @@ if (mysql_num_rows($result)>0) {
 	$beentaken = false;
 }
 
+$useeditor = "summary";
 $placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
 		</script>";
@@ -421,7 +498,29 @@ if (!$beentaken) {
 
 }
 
+$hr = floor($coursedeftime/60)%12;
+$min = $coursedeftime%60;
+$am = ($coursedeftime<12*60)?'am':'pm';
+$deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+$hr = floor($coursedefstime/60)%12;
+$min = $coursedefstime%60;
+$am = ($coursedefstime<12*60)?'am':'pm';
+$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 
+if ($startdate!=0) {
+	$sdate = tzdate("m/d/Y",$startdate);
+	$stime = tzdate("g:i a",$startdate);
+} else {
+	$sdate = tzdate("m/d/Y",time());
+	$stime = $defstime; //tzdate("g:i a",time());
+}
+if ($enddate!=2000000000) {
+	$edate = tzdate("m/d/Y",$enddate);
+	$etime = tzdate("g:i a",$enddate);	
+} else {
+	$edate = tzdate("m/d/Y",time()+7*24*60*60);
+	$etime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
+}    
 
 
 ?>
@@ -463,12 +562,63 @@ function updateorder(el) {
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Add/Modify Drill Assessment</div>";
 echo "<h2>Add/Modify Drill Assessment</h2>";
 
+echo "<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=$cid&daid=$daid&block=$block&tb=$totb&record=true\">";
+?>
+		<span class=form>Title: </span>
+		<span class=formright><input type=text size=60 name="title" value="<?php echo str_replace('"','&quot;',$drillname);?>">
+		</span><BR class=form>
+		
+		Summary<BR>
+		<div class=editor>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($drillsummary);?></textarea>
+		</div>
+		<br/>
+		<span class=form>Show:</span>
+		<span class=formright>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($avail,0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($avail,1);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($avail,2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/>Show Always<br/>
+		</span><br class="form"/>
+		
+		<div id="datediv" style="display:<?php echo ($avail==1)?"block":"none"; ?>">
+		<span class=form>Available After:</span>
+		<span class=formright>
+			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/> 
+			Always until end date<br/>
+			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+			<a href="#" onClick="displayDatePicker('sdate', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
+			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
+		</span><BR class=form>
+		
+		<span class=form>Available Until:</span><span class=formright>
+			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> Always after start date<br/>
+			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
+			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
+			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a>
+			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
+		</span><BR class=form>
+		
+		<span class=form>Calendar Tag:</span>
+		<span class=formright>
+			<input name="caltag" type=text size=6 value="<?php echo $caltag;?>"/>
+		</span><BR class=form>
+		</div>
+		<span class=form></span>
+		<span class=formright>
+			<input type=submit name="save" value="Save"> now or continue below for Drill Options
+		</span><br class=form>
+
+<?php
+
 if ($beentaken) {
-	echo '<p>This drill has already been taken!  You will not be able to modify most settings unless you clear out existing attempts.';
-	echo " <a href=\"adddrillassess.php?cid=$cid&daid=$daid&clearatt=true\" onclick=\"return confirm('Are you SURE you want to clear out existing attempts?');\">Clear existing attempts</a></p>";
+	echo '<p>This drill has already been taken!  You will not be able to modify most settings unless you clear out existing attempts. ';
+	echo "<button type=button onclick=\"if (confirm('Are you SURE you want to clear out existing attempts?')) {window.location='adddrillassess.php?cid=$cid&daid=$daid&clearatt=true';}\">Clear Existing Attempts</button></p>\n";
+	//echo " <a href=\"adddrillassess.php?cid=$cid&daid=$daid&clearatt=true\" onclick=\"return confirm('Are you SURE you want to clear out existing attempts?');\">Clear existing attempts</a></p>";
 }
 
-echo "<form id=\"selform\" method=\"post\" action=\"adddrillassess.php?cid=$cid&daid=$daid&record=true\">";
 echo '<p><b>Drill type</b></p>';
 echo '<p>Scoring type:';
 $vals = array('nat','nct','ncc','nst','nsc','t');
@@ -639,13 +789,13 @@ if (!$beentaken) {
 echo '<input type="submit" value="Update"/>';
 */
 echo '</form>';
-if ($daid>0) {
+/*if ($daid>0) {
 	$url = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/drillassess.php?cid=$cid&amp;daid=$daid";
 	echo "<p>Link to drill assessment: <a href=\"$url\">$url</a></p>" ;
 	$url = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewdrill.php?cid=$cid&amp;daid=$daid";
 	echo "<p>Link to view results: <a href=\"$url\">$url</a></p>" ;
 	
-}
+}*/
 require('../footer.php');
 
 ?>

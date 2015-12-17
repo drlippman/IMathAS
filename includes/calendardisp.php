@@ -299,6 +299,34 @@ while ($row = mysql_fetch_row($result)) {
 	
 	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
 }
+
+if (isset($teacherid)) {
+	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE (enddate>$exlowertime AND enddate<$uppertime) AND avail=1 AND courseid='$cid' ORDER BY name";
+} else {
+	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE ";
+	$query .= "avail=1 AND (enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) ";
+	$query .= "AND courseid='$cid' ORDER BY name";
+}
+$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
+	
+	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+	
+	$colors = makecolor2($row[3],$row[2],$now);
+	if ($row[7]==2) {
+		$colors = "#0f0";
+	}
+	$json = "{type:\"D\", time:\"$time\", ";
+	if (isset($teacherid) || ($now<$row[2] && $now>$row[3]) || $row[5]==2) {
+		$json .= "id:\"$row[0]\", ";
+	}
+	$tag = htmlentities($row[4], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+	$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	
+	$byid['D'.$row[0]] = array($moday,$tag,$colors,$json);
+}
+
 $query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
@@ -398,6 +426,14 @@ foreach ($itemsimporder as $item) {
 			$tags[$k] = $byid['L'.$itemsassoc[$item][1]][1];
 			$colors[$k] = $byid['L'.$itemsassoc[$item][1]][2];
 			$assess[$moday][$k] = $byid['L'.$itemsassoc[$item][1]][3];
+			$k++;
+		}
+	} else if ($itemsassoc[$item][0]=='Drill') {
+		if (isset($byid['D'.$itemsassoc[$item][1]])) {
+			$moday = $byid['D'.$itemsassoc[$item][1]][0];
+			$tags[$k] = $byid['D'.$itemsassoc[$item][1]][1];
+			$colors[$k] = $byid['D'.$itemsassoc[$item][1]][2];
+			$assess[$moday][$k] = $byid['D'.$itemsassoc[$item][1]][3];
 			$k++;
 		}
 	}

@@ -43,7 +43,7 @@
  if (!isset($CFG['CPS']['miniicons'])) {
 	$CFG['CPS']['miniicons'] = array( 
 		 'assess'=>'assess_tiny.png',
-		 'drill'=>'assess_tiny.png',
+		 'drill'=>'drill_tiny.png',
 		 'inline'=>'inline_tiny.png',
 		 'linked'=>'html_tiny.png',
 		 'forum'=>'forum_tiny.png',

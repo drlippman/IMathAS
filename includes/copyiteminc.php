@@ -190,7 +190,18 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
-	} else if ($itemtype == "Assessment") {
+	} else if ($itemtype == "Drill") {
+		$query = "SELECT name,summary,startdate,enddate,avail,caltag,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu FROM imas_drillassess WHERE id='$typeid'";
+		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$row = mysql_fetch_row($result);
+		if ($sethidden) {$row[4] = 0;}
+		$row[0] .= stripslashes($_POST['append']);
+		$row = "'".implode("','",addslashes_deep($row))."'";
+		$query = "INSERT INTO imas_drillassess (courseid,name,summary,startdate,enddate,avail,caltag,itemdescr,itemids,scoretype,showtype,n,classbests,showtostu) ";
+		$query .= "VALUES ('$cid',$row)";
+		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$newtypeid = mysql_insert_id();
+	}else if ($itemtype == "Assessment") {
 		//$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle) ";
 		//$query .= "SELECT '$cid',name,summary,intro,startdate,enddate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle FROM imas_assessments WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
