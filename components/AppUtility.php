@@ -2686,6 +2686,7 @@ class AppUtility extends Component
                     $line['startdate'] = $iteminfo['LinkedText'][$typeid]['startdate'];
                     $line['enddate'] = $iteminfo['LinkedText'][$typeid]['enddate'];
                     $line['avail'] = $iteminfo['LinkedText'][$typeid]['avail'];
+
                 if ($line['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {

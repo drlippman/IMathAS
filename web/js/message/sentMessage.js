@@ -32,9 +32,9 @@ var selectedUserId = $('#user-sent-id').val();
 var selectedCourseId;
 function createTableHeader()
 {
-    var html = "<table id='message-table-show display-message-table' class='message-table-show display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>";
-    html += "<tbody class='message-table-body'></tbody></table>";
+    var html = "<div class='message-div'><table id='message-table-show display-message-table' class='display table table-bordered table-striped table-hover data-table'>";
+    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>";
+    html += "<tbody class='message-table-body'></tbody></table></div>";
     $('.message-div').append(html);
 }
 function showMessageSuccess(response)

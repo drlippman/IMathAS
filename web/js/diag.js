@@ -1,4 +1,10 @@
 var cnt = new Array();
+jQuery(document).ready(function(){
+    cnt['ipout'] = jQuery('.ip-out-count').val();
+    cnt['pwout'] = jQuery('.pwd-out-count').val();
+    cnt['pwsout'] = jQuery('.pws-out-count').val();
+});
+
 function additemIpAddress(inloc,outloc)
 {
     var text = document.getElementById(inloc).value;
@@ -30,14 +36,13 @@ function additemIpAddress(inloc,outloc)
 }
 
 function additem(inloc,outloc) {
-	var text = document.getElementById(inloc).value;
-
-        document.getElementById(inloc).value = '';
-        var outn = document.getElementById(outloc);
-        var newn = document.createElement("tr");
-        var newid = outloc+'-'+cnt[outloc];
-        cnt[outloc] += 1;
-
+    var text = document.getElementById(inloc).value;
+    document.getElementById(inloc).value = '';
+    var outn = document.getElementById(outloc);
+    var newn = document.createElement("tr");
+    var newid = outloc+'-'+cnt[outloc];
+    console.log(cnt);
+    cnt[outloc] += 1;
         newn.id = 'tr'+newid;
         var newtd = document.createElement("td");
         var html = "<input type=hidden name="+newid+" id="+newid+" value='"+text+"'>" + text;

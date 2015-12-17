@@ -235,6 +235,8 @@ echo '<form>';
                 $ips = explode(',', $ips);
 
                 for ($i = AppConstant::NUMERIC_ZERO; $i < count($ips); $i++) {
+                    AppUtility::dump($ips);
+
                     ?>
                     <tr id="tripout-<?php echo $i ?>">
                         <td><input type=hidden id="ipout-<?php echo $i ?>" name="ipout-<?php echo $i ?>"
@@ -255,11 +257,11 @@ echo '<form>';
         </table>
         <?php
 
-            if (is_array($ips)) {
-            echo "<script> cnt['ipout'] =" .count($ips).";</script>";
-            } else {
-                echo "<script> cnt['ipout'] = 0;</script>";
-            }
+            if (is_array($ips)) {?>
+                <input type="hidden" class='ip-out-count' value="<?php echo count($ips)?>">
+            <?php  } else { ?>
+               <input type="hidden" class='ip-out-count' value="<?php echo count($ips)?>">
+          <?php  }
         ?>
     </div>
     <BR class=form><br>
@@ -298,15 +300,11 @@ echo '<form>';
             </tbody>
         </table>
         <?php
-        if($pwsb)
-        {
-            if (is_array($pwsb)) {
-            echo "<script> cnt['pwout'] = ".count($pwsb).";</script>";
-            } else {
-                echo "	<script> cnt['pwout'] = 0;</script>";
-            }
-        }
-
+            if (is_array($pwsb)) {?>
+                <input type="hidden" class='pwd-out-count' value="<?php echo count($pwsb)?>">
+           <?php } else { ?>
+                <input type="hidden" class='pwd-out-count' value="<?php echo count($pwsb)?>">
+           <?php }
         ?>
     </div>
     <BR class=form><br>
@@ -346,14 +344,13 @@ echo '<form>';
         </table>
 
         <?php
-        if($pwss)
-        {
-            if (is_array($pwss)) {
-            echo "	<script> cnt['pwsout'] = ".count($pwss)." ;</script>";
-            } else {
-                echo "	<script> cnt['pwsout'] = 0;</script>";
-            }
-        }
+            if (is_array($pwss)) { ?>
+<!--            echo "	<script> cnt['pwsout'] = ".count($pwss)." ;</script>";-->
+                <input type="hidden" class='pws-out-count' value="<?php echo count($pwss)?>">
+           <?php } else { ?>
+                <input type="hidden" class='pws-out-count' value="<?php echo count($pwss)?>">
+<!--                echo "	<script> cnt['pwsout'] = 0;</script>";-->
+           <?php }
         ?>
     </div>
     <BR class=form><br>
