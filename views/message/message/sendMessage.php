@@ -19,9 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content">
     <?php if($userRights->rights == 100 || $userRights->rights == 20) {
-        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);
     } elseif($userRights->rights == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course]);
     }?>
 </div>
 <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">

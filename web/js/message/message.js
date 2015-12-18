@@ -14,7 +14,7 @@ $(document).ready(function () {
 //    jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
 //    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
 //    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
-//    selectCheckBox();
+    selectCheckBox();
 //    filterByCourse();
 
     $('.with-selected-dropdown').click(function(){
@@ -227,8 +227,6 @@ function userDisplay(userData) {
 }
 
 function markAsDelete() {
-
-
     var markArray = [];
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
         markArray.push($(this).val());
