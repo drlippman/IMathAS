@@ -15,16 +15,12 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 <input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL() ?>">
 
 <div>
-    <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
+    <?php if($userRights->rights >= AppConstant::STUDENT_RIGHT) { ?>
 
         <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
         <input type="hidden" class="send-userId" value="<?php echo $userId ?>">
         <input type="hidden" class="msg-type" value="<?php echo $isNewMessage ?>">
-    <?php } else {?>
-        <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-        <input type="hidden" class="send-userId" value="<?php echo $userId ?>">
-        <input type="hidden" class="msg-type" value="<?php echo $isNewMessage ?>">
-    <?php } ?>
+    <?php }  ?>
 </div>
 <input type="hidden" class="is-important" value="<?php echo $isImportant ?>">
 <div class="item-detail-header">
@@ -78,20 +74,21 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                         <select class="show-course form-control display-inline-block width-fifty-five-per width-one-thirty" id="filtercid" onclick="chgfilter()" >
                             <?php
                                     echo "<option value=\"0\" ";
-                                    if ($filtercid==0) {
+                                    if($filtercid==0) {
                                         echo "selected=1 ";
                                     }
                                     echo ">All courses</option>";
 
                                     foreach($filterByCourse as $key=>$row) {
                                         echo "<option value=\"{$row['id']}\" ";
-                                        if ($filtercid==$row['id']) {
+                                        if($filtercid==$row['id']) {
                                             echo 'selected=1';
                                         }
                                         echo " >{$row['name']}</option>";
                                     }
                                     echo "</select> ";
                                 ?>
+
                         </select>
                     </span>
                 </div>
@@ -102,19 +99,20 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                  <span class="floatleft">
                      <select class="show-users form-control width-one-thirty" id="filteruid" onclick="chgfilter()">
                          <option value="0" ';
-                        <?php if ($filteruid==0) {
+                        <?php if($filteruid==0) {
                          echo 'selected="selected" ';
                          }
                          echo '>All</option>';
 
                         foreach($filterByUserName as $key => $row) {
                          echo "<option value=\"{$row['id']}\" ";
-                         if ($filteruid==$row['id']) {
+                         if($filteruid==$row['id']) {
                          echo 'selected=1';
                          }
                          echo " >{$row['LastName']}, {$row['FirstName']}</option>";
                          } ?>
                      </select>
+
                  </span>
                  </div>
             </div>
@@ -128,67 +126,77 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             </thead>
             <tbody class="message-table-body">
             <?php
-            if (count($messageDisplay)==0) {
+            if(empty($messageDisplay)) {
                 echo "<tr><td></td><td>No messages</td><td></td></tr>";
-            }
-           foreach($messageDisplay as $key=>$line) {
-                if (trim($line['title'])=='') {
-                    $line['title'] = '[No Subject]';
-                }
-                $n   = 0;
-                while (strpos($line['title'],'Re: ')===0) {
-                    $line['title'] = substr($line['title'],4);
-                    $n++;
-                }
-                if ($n==1) {
-                    $line['title'] = 'Re: '.$line['title'];
-                } else if ($n>1) {
-                    $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
-                }
-                echo "<tr id=\"tr{$line['id']}\" ";
-                if (($line['isread']&8)==8) {
-                    echo 'class="tagged" ';
-                }
-                echo "><td><input type=checkbox name=\"msg-check\" id='Checkbox' class='message-checkbox' value=\"{$line['id']}\"/></td><td>";
-                echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
-                if (($line['isread']&1)==0) {
-                    echo "<b>{$line['title']}</b>";
-                } else {
-                    echo $line['title'];
-                }
-                echo "</a></td><td>";
-                if ($line['replied']==1) {
-                    echo "Yes";
-                }
-                if ($line['LastName']==null) {
-                    $line['LastName'] = "[Deleted]";
-                }
-                echo '</td><td>';
+            } else {
+                foreach($messageDisplay as $key=>$line) {
 
-                if ($line['hasuserimg']==1) {
-                    if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-                        echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
-                    } else {
-                        echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
+                    if($line)
+                    {
+                        if(trim($line['title'])=='') {
+                            $line['title'] = '[No Subject]';
+                        }
+
+                        $n   = 0;
+                        while (strpos($line['title'],'Re: ')===0) {
+                            $line['title'] = substr($line['title'],4);
+                            $n++;
+                        }
+
+
+                        if($n==1) {
+                            $line['title'] = 'Re: '.$line['title'];
+                        } else if ($n>1) {
+                            $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+                        }
+                        echo "<tr id=\"tr{$line['id']}\" ";
+                        if(($line['isread']&8)==8) {
+                            echo 'class="tagged" ';
+                        }
+                        echo "><td><input type=checkbox name=\"msg-check\" id='Checkbox' class='message-checkbox' value=\"{$line['id']}\"/></td><td>";
+                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
+                        if (($line['isread']&1)==0) {
+                            echo "<b>{$line['title']}</b>";
+                        } else {
+                            echo $line['title'];
+                        }
+                        echo "</a></td><td>";
+                        if ($line['replied']==1) {
+                            echo "Yes";
+                        }
+                        if($line['LastName']==null) {
+                            $line['LastName'] = "[Deleted]";
+                        }
+                        echo '</td><td>';
+
+                        if ($line['hasuserimg']==1) {
+                            if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+                                echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
+                            } else {
+                                echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
+                            }
+                        }
+
+                        echo "</td><td>";
+                        if (($line['isread']&8)==8) { ?>
+                            <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagfilled.gif onClick=toggletagged(<?php echo $line['id']?>); />
+                        <?php } else { ?>
+                            <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagempty.gif onClick=toggletagged(<?php echo $line['id']?>); />
+                        <?php }
+                        echo '</td>';
+                        echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+
+
+                        if ($line['name']==null) {
+                            $line['name'] = "[Deleted]";
+                        }
+                        echo "<td>{$line['name']}</td>";
+                        $senddate = AppUtility::tzdate("F j, Y, g:i a",$line['senddate']);
+                        echo "<td>$senddate</td></tr>";
+
                     }
+
                 }
-
-                echo "</td><td>";
-                if (($line['isread']&8)==8) { ?>
-                    <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagfilled.gif onClick=toggletagged(<?php echo $line['id']?>); />
-               <?php } else { ?>
-                    <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagempty.gif onClick=toggletagged(<?php echo $line['id']?>); />
-               <?php }
-                echo '</td>';
-                echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
-
-
-                if ($line['name']==null) {
-                    $line['name'] = "[Deleted]";
-                }
-                echo "<td>{$line['name']}</td>";
-                $senddate = AppUtility::tzdate("F j, Y, g:i a",$line['senddate']);
-                echo "<td>$senddate</td></tr>";
             }
             ?>
             </tbody>

@@ -45,8 +45,8 @@ class MessageController extends AppController
         $this->setSessionData('postCount',$countPost);
         $isNewMessage = $this->getParamVal('newmsg');
         $isImportant = $this->getParamVal('show');
-        $messages = Message::getUsersToDisplayMessage($user->id);
-        if ($this->getAuthenticatedUser()) {
+        $rights = $this->getAuthenticatedUser();
+        if ($rights) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
             if (!isset($_GET['page']) || $_GET['page']=='') {
@@ -76,16 +76,20 @@ class MessageController extends AppController
             $filterByCourse = Message::getCoursesForMessage($user['id']);
             $filterByUserName = Message::getMessagesByUserName($user['id'], $filtercid);
             $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged,$page,$threadsperpage);
+
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
-            $rights = $this->getAuthenticatedUser();
+
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
+
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/msg.js','message/message.js']);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page);
             return $this->renderWithData('messages', $responseData);
         }
+
+
     }
     /*
      * Send new message initial load

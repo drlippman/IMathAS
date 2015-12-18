@@ -11,11 +11,11 @@ $(document).ready(function () {
         $("#show-all-link").show();
     }
     var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow, showNewMsg: isNewMessage};
-    jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
-    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
-    selectCheckBox();
-    filterByCourse();
+//    jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
+//    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
+//    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
+//    selectCheckBox();
+//    filterByCourse();
 
     $('.with-selected-dropdown').click(function(){
 
