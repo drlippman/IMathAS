@@ -4,7 +4,6 @@ var imasroot = jQuery('.home-path').val();
 function togglecolor(threadid,tagged) {
 	var trchg = document.getElementById("tr"+threadid);
 	var imgchg = document.getElementById("tag"+threadid);
-    alert(imgchg);
 	if (tagged==1) {
 		trchg.className = "tagged";
 		imgchg.src = imasroot+"img/flagfilled.gif";
@@ -38,10 +37,10 @@ function submitTagged(thread,tagged) {
   } 
 }  
 
-function ahahDone(url, threadid, tagged) { 
-  if (req.readyState == 4) { // only if req is "loaded" 
-    if (req.status == 200) { // only if "OK" 
-	    if (req.responseText=='OK') {
+function ahahDone(url, threadid, tagged) {
+  if (req.readyState == 4) { // only if req is "loaded"
+    if (req.status == 200) { // only if "OK"
+	    if ($.trim(req.responseText=='OK')) {
 		    togglecolor(threadid, tagged);
 	    } else {
 		    alert(req.responseText);
