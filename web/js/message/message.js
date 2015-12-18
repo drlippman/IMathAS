@@ -64,7 +64,7 @@ function showMessageSuccess(response) {
     {
 
     }
-    showMessage(filteredArray, response.status);
+//    showMessage(filteredArray, response.status);
 }
 
 function selectCheckBox(){
@@ -86,22 +86,22 @@ function getCourseSuccess(response) {
     var result = JSON.parse(response);
     var course = result.data;
     if (result.status == 0) {
-        courseDisplay(course);
+//        courseDisplay(course);
         filterByCourse();
     }
 }
 
-function courseDisplay(courseData) {
-    var html = "";
-    $.each(courseData, function (index, courseData) {
-        if(courseData.courseId != cid){
-            html += "<option value = " + courseData.courseId + ">" + courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
-        }else{
-            html += "<option selected='selected' value = " + courseData.courseId + ">" +  courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
-        }
-    });
-    $(".show-course").append(html);
-}
+//function courseDisplay(courseData) {
+//    var html = "";
+//    $.each(courseData, function (index, courseData) {
+//        if(courseData.courseId != cid){
+//            html += "<option value = " + courseData.courseId + ">" + courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
+//        }else{
+//            html += "<option selected='selected' value = " + courseData.courseId + ">" +  courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
+//        }
+//    });
+//    $(".show-course").append(html);
+//}
 
 function markAsUnread() {
     var markArray = [];
