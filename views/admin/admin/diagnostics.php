@@ -221,12 +221,10 @@ echo '<form>';
     </div>
     <br/>
 
-<!--    <div class="col-md-2 col-sm-3 padding-top-five">-->
-<!--        --><?php //AppUtility::t('Enter IP address')?><!--</div>-->
+    <div class="col-md-2 col-sm-3 padding-top-five">
+        <?php AppUtility::t('Enter IP address')?></div>
     <div class="col-md-8 col-sm-8">
-<!--        <input type=text id="ipin" class="form-control-1 -->
-<!--        onkeypress="return onenter(event,'ipin','ipout')">-->
-        Enter IP address: <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
+        <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additemIpAddress('ipin','ipout')"/>
         <table>
             <tbody id="ipout">

@@ -67,6 +67,8 @@ function ValidateIPaddress(ipaddress)
     alert("You have entered an invalid IP address!")
     return (false)
 }
+
+
 function onenter(e,inloc,outloc) {
 	if (window.event) {
 		var key = window.event.keyCode;

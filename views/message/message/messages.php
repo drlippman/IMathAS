@@ -12,7 +12,7 @@ $now = $currentTime;
 $address = AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id.'&filtercid=');
 $imasroot = AppUtility::getHomeURL();
 $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$course->id);?>
-
+<input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL() ?>">
 
 <div>
     <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
@@ -174,11 +174,11 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                 }
 
                 echo "</td><td>";
-                if (($line['isread']&8)==8) {
-                    echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
-                } else {
-                    echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
-                }
+                if (($line['isread']&8)==8) { ?>
+                    <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagfilled.gif onClick=toggletagged(<?php echo $line['id']?>); />
+               <?php } else { ?>
+                    <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagempty.gif onClick=toggletagged(<?php echo $line['id']?>); />
+               <?php }
                 echo '</td>';
                 echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
 
@@ -204,7 +204,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
     }
 
-    var AHAHsaveurl = "<?php $saveTagged;?>"
+    var AHAHsaveurl = "<?php echo $saveTagged;?>"
 
 </script>
 <style type="text/css"> tr.tagged {background-color: #dff;}</style>

@@ -1,15 +1,16 @@
 //IMathAS (c) 2007 David Lippman
 //Flag toggles and pic rotation for message list
-
+var imasroot = jQuery('.home-path').val();
 function togglecolor(threadid,tagged) {
 	var trchg = document.getElementById("tr"+threadid);
 	var imgchg = document.getElementById("tag"+threadid);
+    alert(imgchg);
 	if (tagged==1) {
 		trchg.className = "tagged";
-		imgchg.src = imasroot+"/img/flagfilled.gif";
+		imgchg.src = imasroot+"img/flagfilled.gif";
 	} else {
 		trchg.className = "";
-		imgchg.src = imasroot+"/img/flagempty.gif";
+		imgchg.src = imasroot+"img/flagempty.gif";
 	}
 }
 
