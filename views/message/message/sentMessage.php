@@ -48,12 +48,13 @@ $now = $currentTime;
                     </select>
                 </span>
             </div>
+
             <div class="col-md-4 col-sm-4 padding-left-right-zero mobile-padding-top-one-em">
                 <span class="select-text-margin floatleft padding-left-one-em mobile-padding-left-zero">
                     <?php echo AppUtility::t('With Selected')?>
                 </span>
-                <span class="col-md-7 col-sm-7 padding-right-zero floatright padding-left-zero">
-                    <select class="form-control">
+                <span class="col-md-7 col-sm-7 padding-right-zero with-selected-dropdown floatright padding-left-zero">
+                    <select class="form-control with-selected">
                         <option value="0"><?php echo AppUtility::t('Select')?></option>
                         <option value="1" id="mark-sent-delete"><?php echo AppUtility::t('Remove From Sent Message List')?></option>
                         <option value="2" id="mark-unsend"><?php echo AppUtility::t('Unsend')?></option>
@@ -66,4 +67,3 @@ $now = $currentTime;
     <div class="message-div"></div>
 </div>
 
-<!--<script type="text/javascript" src="--><?php //echo AppUtility::getHomeURL()?><!--js/message/sentMessage.js" ></script>-->
