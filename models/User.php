@@ -581,17 +581,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getByUserRight($myRight, $groupId)
     {
-        $query = new Query();
-        $query->select(['id', 'FirstName', 'LastName'])
-            ->from('imas_users')
-            ->where(['>', 'rights', '19']);
+        $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
+
         if ($myRight < AppConstant::ADMIN_RIGHT) {
-            $query->andWhere('groupid', $groupId);
+            $query .= " AND groupid='$groupId'";
         }
-        $query->orderBy('LastName');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
+        $query .= " ORDER BY LastName";
+       return Yii::$app->db->createCommand($query)->queryAll();
     }
 
     public static function updateUserForPendingReq($id)
