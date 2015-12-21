@@ -1166,6 +1166,7 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $files = array();
         if ($this->isPostMethod()) {
+
             $params = $this->getRequestParams();
             $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = null;
@@ -1198,8 +1199,8 @@ class ForumController extends AppController
                     }
                     $j++;
                 }
-
             }
+
             $fileName = implode('@@', $files);
             $alwaysReplies = $params['always-replies'];
             if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
@@ -2182,5 +2183,169 @@ class ForumController extends AppController
             }
         }
 
+    }
+
+    public function actionGetThreadAjax()
+    {
+        $params = $this->getRequestParams();
+        $currentUser = $this->getAuthenticatedUser();
+        $isValue = $params['isValue'];
+        $forumId = $params['forumid'];
+        $hideLink = $params['hideLink'];
+        $threads = ThreadForm::thread($forumId);
+        $forumData = Forums::getById($forumId);
+        $threadArray = array();
+        $uniquesDataArray = array();
+        if (!empty($threads)) {
+            if ($isValue == AppConstant::NUMERIC_ONE) {
+                foreach ($threads as $thread) {
+                    $username = User::getById($thread['userid']);
+                    $uniquesData = ForumView::getByThreadId($thread['threadid']);
+                    $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
+                    $count = ForumView::uniqueCount($thread['threadid']);
+                    $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
+                    $isReplies = AppConstant::NUMERIC_ZERO;
+                    $threadReplies = ForumPosts::isThreadHaveReply($thread['id']);
+                    if($threadReplies)
+                    {
+                        $isReplies = AppConstant::NUMERIC_ONE;
+                    }
+                    $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
+                    if ($tagged[0]['tagged'] == AppConstant::NUMERIC_ONE) {
+                        $temparray = array
+                        (
+                            'parent' => $thread['parent'],
+                            'threadId' => $thread['threadid'],
+                            'forumiddata' => $thread['forumid'],
+                            'subject' => $thread['subject'],
+                            'views' => $views,
+                            'replyby' => $thread['replyby'],
+                            'postdate' => AppController::customizeDate($thread['postdate']),
+                            'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                            'tagged' => $tagged[0]['tagged'],
+                            'lastview' => AppController::customizeDate($lastView[0]['lastview']),
+                            'userright' => $currentUser['rights'],
+                            'postUserId' => $username->id,
+                            'currentUserId' => $currentUser['id'],
+                            'countArray' => $count,
+                            'posttype' => $thread['posttype'],
+                            'isReplies' => $isReplies,
+                            'isanon' => $thread['isanon'],
+                            'groupSetId' => $forumData['groupsetid'],
+                        );
+                        array_push($threadArray, $temparray);
+                        array_push($uniquesDataArray, $uniquesData);
+                    }
+                }
+            } else if ($isValue == AppConstant::NUMERIC_TWO || $isValue == AppConstant::NUMERIC_THREE) {
+                foreach ($threads as $thread) {
+                    $username = User::getById($thread['userid']);
+                    $uniquesData = ForumView::getByThreadId($thread['threadid']);
+                    $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
+                    $count = ForumView::uniqueCount($thread['threadid']);
+                    $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
+                    $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
+                    $isReplies = AppConstant::NUMERIC_ZERO;
+                    $threadReplies = ForumPosts::isThreadHaveReply($thread['id']);
+                    if($threadReplies)
+                    {
+                        $isReplies = AppConstant::NUMERIC_ONE;
+                    }
+                    if ($thread['postdate'] >= $lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id)
+                    {
+                        $temparray = array
+                        (
+                            'parent' => $thread['parent'],
+                            'threadId' => $thread['threadid'],
+                            'forumiddata' => $thread['forumid'],
+                            'subject' => $thread['subject'],
+                            'views' => $views,
+                            'replyby' => $thread['replyby'],
+                            'postdate' => AppController::customizeDate($thread['postdate']),
+                            'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                            'tagged' => $tagged[0]['tagged'],
+                            'lastview' => AppController::customizeDate($lastView[0]['lastview']),
+                            'userright' => $currentUser['rights'],
+                            'postUserId' => $username->id,
+                            'currentUserId' => $currentUser['id'],
+                            'countArray' => $count,
+                            'posttype' => $thread['posttype'],
+                            'isReplies' => $isReplies,
+                            'isanon' => $thread['isanon'],
+                            'groupSetId' => $forumData['groupsetid'],
+                        );
+                        if ($isValue == AppConstant::NUMERIC_THREE) {
+                            array_push($threadArray, $temparray);
+                            $ViewData = new ForumView();
+                            $ViewData->inserIntoTable($threadArray);
+                        } else {
+                            array_push($threadArray, $temparray);
+                        }
+                        array_push($uniquesDataArray, $uniquesData);
+                    }
+                }
+            } else {
+                foreach ($threads as $thread) {
+                    $username = User::getById($thread['userid']);
+                    $uniquesData = ForumView::getByThreadId($thread['threadid']);
+                    $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
+                    if($lastView){
+                        $lastView1 = AppController::customizeDate($lastView[0]['lastview']);
+                    }else{
+                        $lastView1 = AppConstant::NUMERIC_ZERO;
+                    }
+                    $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
+                    $count = ForumView::uniqueCount($thread['threadid']);
+                    $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
+                    $isReplies = AppConstant::NUMERIC_ZERO;
+                    $threadReplies = ForumPosts::isThreadHaveReply($thread['id']);
+                    if($threadReplies)
+                    {
+                        $isReplies = AppConstant::NUMERIC_ONE;
+                    }
+                    $temparray = array
+                    (
+                        'parent' => $thread['parent'],
+                        'threadId' => $thread['threadid'],
+                        'forumiddata' => $thread['forumid'],
+                        'subject' => $thread['subject'],
+                        'views' => $views,
+                        'replyby' => $thread['replyby'],
+                        'postdate' => AppController::customizeDate($thread['postdate']),
+                        'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                        'tagged' => $tagged[0]['tagged'],
+                        'userright' => $currentUser['rights'],
+                        'lastview' => $lastView1,
+                        'postUserId' => $username->id,
+                        'currentUserId' => $currentUser['id'],
+                        'countArray' => $count,
+                        'posttype' => $thread['posttype'],
+                        'isReplies' => $isReplies,
+                        'isanon' => $thread['isanon'],
+                        'groupSetId' => $forumData['groupsetid'],
+                    );
+                    array_push($threadArray, $temparray);
+                    array_push($uniquesDataArray, $uniquesData);
+                }
+            }
+            $FinalUniquesData = array();
+            foreach ($uniquesDataArray as $unique) {
+                foreach ($unique as $un) {
+                    $username = User::getById($un['userid']);
+                    $temparrayForUnique = array(
+                        'threadId' => $un['threadid'],
+                        'lastView' => AppController::customizeDate($un['lastview']),
+                        'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                    );
+                    array_push($FinalUniquesData, $temparrayForUnique);
+                }
+            }
+        } else
+        {
+            return $this->terminateResponse('');
+        }
+        $this->includeJS(['forum/forum.js']);
+        $responseData = array('threadArray' => $threadArray, 'uniquesDataArray' => $FinalUniquesData, 'isValue' => $isValue);
+        return $this->successResponse($responseData);
     }
 }

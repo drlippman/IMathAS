@@ -586,13 +586,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->from('imas_users')
             ->where(['>', 'rights', '19']);
         if ($myRight < AppConstant::ADMIN_RIGHT) {
-            $query->andWhere(['groupid = :groupId']);
+            $query->andWhere('groupid', $groupId);
         }
         $query->orderBy('LastName');
         $command = $query->createCommand();
-        if ($myRight < AppConstant::ADMIN_RIGHT) {
-            $command->bindValue(':groupId',$groupId);
-        }
         $data = $command->queryAll();
         return $data;
     }

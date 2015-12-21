@@ -127,7 +127,7 @@ $now = $currentTime;
         </div>
     <?php } ?>
     <div class="col-md-6 col-md-offset-2 col-sm-6 col-sm-offset-2 padding-left-twenty-five padding-bottom-thirty padding-top-five">
-        <a href="#"class="btn btn-primary add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
+        <a href="#" class="btn btn-primary add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
     </div>
 </div>
 </form>
