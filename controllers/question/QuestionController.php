@@ -1136,8 +1136,26 @@ class QuestionController extends AppController
         $params = $this->getRequestParams();
         $myRights = $user['rights'];
         $libraryData = Libraries::getAllLibrariesByJoin();
-        $this->includeCSS(['question/libtree.css']);
-        $this->includeJS(['general.js', 'question/libtree2.js']);
+
+
+        AppUtility::dump($libraryData);
+        $libraryTree = array();
+        foreach($libraryData as $singleLibrary){
+
+            if(!empty($singleLibrary['id'])){
+                if($singleLibrary['id'] == 0) {
+//                    $libraryTree[][] =
+                }
+            }
+
+
+
+        }
+
+
+        //
+//        $this->includeCSS(['question/libtree.css']);
+//        $this->includeJS(['general.js', 'question/libtree2.js']);
         $renderData = array('myRights' => $myRights, 'params' => $params, 'libraryData' => $libraryData);
         return $this->renderWithData('questionLibraries', $renderData);
     }
