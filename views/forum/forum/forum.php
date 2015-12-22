@@ -204,7 +204,7 @@ if (count($taginfo)==0) {
                      </div>
                      </td>
 
-                     <td class="c width-hundread-per word-break-all-width"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['forumid']);?>"><?php echo $line['name']?></a></td>
+                     <td class="c width-hundread-per word-break-all-width"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['forumid']);?>"><?php echo $line['name']?></a></td>
                     <?php echo "<td class='C '>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
                     echo "</td></tr>\n";
                 } ?>
@@ -315,11 +315,11 @@ if (count($taginfo)==0) {
                      </span>
 
                             <?php } ?>
-                            <b><a class="word-break-break-all width-hundread-per" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id']);?>"><?php echo $line['name'];?></a></b>
-                            <?php if ($newcnt[$line['id']]>0)
-                                { ?>
-                                <a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forum='.$line['id'].'&page=-1');?>" style="color:red">New Posts  (<?php echo $newcnt[$line['id']];?>) </a>
-                            <?php }
+                            <b><a class="word-break-break-all width-hundread-per" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['id']);?>"><?php echo $line['name'];?></a></b>
+<!--                            --><?php //if ($newcnt[$line['id']]>0)
+//                                { ?>
+<!--                                <a href="--><?php //echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['id'].'&page=-1');?><!--" style="color:red">New Posts  (--><?php //echo $newcnt[$line['id']];?><!--) </a>-->
+<!--                            --><?php //}
                             echo "</td>\n";
                             if (isset($threadcount[$line['id']])) {
                                 $threads = $threadcount[$line['id']];

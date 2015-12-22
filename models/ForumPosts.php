@@ -127,29 +127,30 @@ class ForumPosts extends BaseImasForumPosts
         $this->subject = trim($params['subject']);
         $this->userid = isset($userId) ? $userId : null;
         $this->message = isset($params['message']) ? $params['message'] : null;
-            $postdate = AppController::dateToString();
-            $this->postdate = $postdate;
-            $this->posttype = $postType;
-            if ($alwaysReplies == AppConstant::NUMERIC_ONE)
-            {
-                $this->replyby = AppConstant::ALWAYS_TIME;
-            }
-            elseif ($alwaysReplies == AppConstant::NUMERIC_TWO)
-            {
-                $this->replyby = AppConstant::NUMERIC_ZERO;
-            }
-            elseif ($alwaysReplies == AppConstant::NUMERIC_THREE)
-            {
-                $this->replyby = $date;
-            }
-            else
-            {
-                $this->replyby = null;
-            }
+        $postdate = AppController::dateToString();
+        $this->postdate = $postdate;
+        $this->posttype = $postType;
+        if ($alwaysReplies == AppConstant::NUMERIC_ONE)
+        {
+            $this->replyby = AppConstant::ALWAYS_TIME;
+        }
+        elseif ($alwaysReplies == AppConstant::NUMERIC_TWO)
+        {
+            $this->replyby = AppConstant::NUMERIC_ZERO;
+        }
+        elseif ($alwaysReplies == AppConstant::NUMERIC_THREE)
+        {
+            $this->replyby = $date;
+        }
+        else
+        {
+            $this->replyby = null;
+        }
         $this->isanon = $isNonValue;
         $this->files = $fileName;
         $this->save();
         return ($this->threadid);
+
 
     }
 

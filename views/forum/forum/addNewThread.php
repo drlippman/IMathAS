@@ -120,7 +120,7 @@ $now = $currentTime;
             </span>
         </div>
     <?php }elseif($rights == AppConstant::STUDENT_RIGHT && ($forumData['settings'] & AppConstant::NUMERIC_ONE == AppConstant::NUMERIC_ONE))
-    {?>
+    { ?>
         <div class="col-sm-12 col-md-12">
             <div class="col-sm-2 col-md-2"><b><?php echo AppUtility::t('Post Anonymously')?></b></div>
             <div class="col-sm-8 col-md-8"><input name="settings" id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
@@ -131,6 +131,7 @@ $now = $currentTime;
     </div>
 </div>
 </form>
+
 
 
 
