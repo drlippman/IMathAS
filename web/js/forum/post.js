@@ -6,43 +6,43 @@ $(document).ready(function () {
         $('#flag-link').hide();
     }
 });
-    $("a[name=remove]").on("click", function (event) {
-        event.preventDefault();
-        var threadid = $(this).attr("data-var");
-        var parentId = $(this).attr("data-parent");
-        var checkPostOrThread = 0;
-        if(parentId == 0){
-            var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
-        }else{
-            var html = '<div><p>Are you SURE you want to remove this post?</p></div>';
-        }
+$("a[name=remove]").on("click", function (event) {
+    event.preventDefault();
+    var threadid = $(this).attr("data-var");
+    var parentId = $(this).attr("data-parent");
+    var checkPostOrThread = 0;
+    if(parentId == 0){
+        var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
+    }else{
+        var html = '<div><p>Are you SURE you want to remove this post?</p></div>';
+    }
 
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto',resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Cancel": function () {
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "confirm": function () {
-                    $(this).dialog("close");
-                    var threadId = threadid;
-                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread,parentId:parentId}, 'markAsRemoveSuccess');
-                    return true;
-                }
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto',resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
             },
-            close: function (event, ui) {
-                $(this).remove();
-            },
-            open: function(){
-                jQuery('.ui-widget-overlay').bind('click',function(){
-                    jQuery('#dialog').dialog('close');
-                })
+            "confirm": function () {
+                $(this).dialog("close");
+                var threadId = threadid;
+                jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread,parentId:parentId}, 'markAsRemoveSuccess');
+                return true;
             }
-        });
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
+        }
     });
+});
 function toggleitem(inum) {
     var node = document.getElementById('item' + inum);
     var butn = document.getElementById('buti' + inum);
@@ -60,7 +60,7 @@ function expandall() {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
         if(node){
-        node.className = 'forumgrp';
+            node.className = 'forumgrp';
         }
         //     butn.value = 'Collapse';
         //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
@@ -107,7 +107,7 @@ function markAsRemoveSuccess(response) {
     var threadId = $("#thread-id").val();
     if(result.data == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }else if(result.data != 0)
     {
         window.location = "post?courseid="+courseid+"&threadid="+threadId+"&forumid="+forumid;
@@ -135,18 +135,17 @@ function changeImageSuccess(response) {
     var result = JSON.parse(response);
     if(result.status == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }
 }
 function changeUnreadSuccess(response) {
-
     var forumid = $("#forum-id").val();
     var courseid = $("#course-id").val();
     var threadId = $("#thread-id").val();
     var result = JSON.parse(response);
     if(result.status == 0)
     {
-        window.location = "thread?cid="+courseid+"&forumid="+forumid+"&unread="+threadId;
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
     }
 }
 function markAsUnreadPost(){
@@ -161,7 +160,7 @@ function changeProfileImage(element,id)
 {
     if(flag == 0 )
     {
-       element.style.width = "100px";
+        element.style.width = "100px";
         element.style.height = "105px";
         document.getElementById(id).style.height = "109px";
         flag =1;
@@ -182,9 +181,9 @@ function saveLikes(el,element,id,threadid,type)
     if(element == true)
     {
 
-      like = 0;
+        like = 0;
         $(el).parent().append('<img style="vertical-align: middle" src="../../img/updating.gif" id="updating"/>');
-     jQuerySubmit('like-post-ajax',{id:id,threadid:threadid,type:type,like:like},'likepostresponse');
+        jQuerySubmit('like-post-ajax',{id:id,threadid:threadid,type:type,like:like},'likepostresponse');
 
     }
     else
@@ -217,7 +216,6 @@ function countPopup(id,threadid,type)
 
 function showPopup(response)
 {
-
     response = JSON.parse(response);
 
     if(response.status == 0)
@@ -226,8 +224,8 @@ function showPopup(response)
 
         var html = '<div id="postid"><p>Post Likes : </p></div><p>';
         $.each(countData, function (index, data) {
-         html += '<pre><span class="col-lg-12 pull-left " >'+ data.userName +'</span></pre>'
-         });
+            html += '<pre><span class="col-lg-12 pull-left " >'+ data.userName +'</span></pre>'
+        });
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
