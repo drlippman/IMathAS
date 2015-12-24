@@ -115,7 +115,6 @@ function markAsRemoveSuccess(response) {
 
 }
 function changeImage(checkFlagValue, rowId) {
-
     var userId = $("#user-id").val();
     if(checkFlagValue == false){
         $('#flag-link').hide();

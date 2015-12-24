@@ -8,7 +8,7 @@ use \app\components\AppConstant;
 $this->title = $defaultBlockData['pageTitle'];
 $this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/course/course/course?cid=' . $courseId]];
 $this->params['breadcrumbs'][] = $this->title;
-//AppUtility::dump($defaultBlockData);?>
+?>
 
 <form method=post action="create-block?cid=<?php echo $courseId;
 if (isset($block)) {

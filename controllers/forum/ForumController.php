@@ -672,7 +672,6 @@ class ForumController extends AppController
                 if (count($parts)==5) {
                     //wants to show ans
                     $result = AssessmentSession::getDataWithUserIdAssessment($userId,$assessmentId);
-//                    AppUtility::dump($result);
 //                    $query = "SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$parts[3]}'";
 //                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
                     $seeds = explode(',',mysql_result($result,0,0));
@@ -851,7 +850,6 @@ class ForumController extends AppController
             }
         }
 //        $thread[0]['message'] = $message;
-//AppUtility::dump($thread[0]['message']);
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
@@ -1061,6 +1059,7 @@ class ForumController extends AppController
         }
     }
 
+
     /*
      * controller ajax method for fetch select as remove thread from Thread page and remove from database.
      */
@@ -1240,6 +1239,7 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];
         $userId = $params['userId'];
+        $courseId = $params['cid'];
         if ($rowId == AppConstant::NUMERIC_NEGATIVE_ONE) {
             $threadId = $params['threadId'];
             ForumView::deleteByUserIdAndThreadId($threadId, $userId);

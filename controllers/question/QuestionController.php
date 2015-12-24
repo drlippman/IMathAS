@@ -1138,7 +1138,6 @@ class QuestionController extends AppController
         $libraryData = Libraries::getAllLibrariesByJoin();
 
 
-        AppUtility::dump($libraryData);
         $libraryTree = array();
         foreach($libraryData as $singleLibrary){
 

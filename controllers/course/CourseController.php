@@ -578,7 +578,6 @@ class CourseController extends AppController
             }
             if (($addedfile) || count($filestoremove) > 0 || ($params['movefile'])) {
                 $resultFileOrder = InlineText::getFileOrder($params['id']);
-//                AppUtility::dump($resultFileOrder);
                 $fileorder = explode(',', $resultFileOrder['fileorder']);
 
                 if ($fileorder['fileorder'] == '') {
@@ -668,7 +667,6 @@ class CourseController extends AppController
             if (isset($params['id'])) {
                 $result = InstrFiles::getFileName($params['id']);
                 $page_fileorderCount = count($fileorder);
-//                AppUtility::dump($page_fileorderCount);
                 $i = 0;
                 $page_FileLinks = array();
                 if (count($result) > 0) {

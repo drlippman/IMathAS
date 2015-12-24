@@ -321,20 +321,15 @@ echo '</div>';
                                 if ($line['posttype']==0) {
 
                                     if (isset($flags[$line['id']])) { ?>
-
                                         <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
                                     <?php
-
                                     } else { ?>
-
-                                        <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" )'> <i class='fa fa-flag-o'></i> Flag</a>
+                                        <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)"> <i class='fa fa-flag-o'></i> Flag</a>
                         <?php
-
                       }
                                 }else{
                                     echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
                                 } ?>
-
 
                                 <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
                                     <span class="fa fa-caret-down "></span>

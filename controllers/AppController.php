@@ -878,13 +878,16 @@ class AppController extends Controller
             return true;
         }
 
-        if (($user['rights'] < AppConstant::STUDENT_RIGHT) || (($user['rights'] == AppConstant::STUDENT_RIGHT) && ($actionPath == 'move-thread' || $actionPath == 'add-forum' || $actionPath == 'change-forum' || $actionPath == 'view-forum-grade'))) {
+        if(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'change-image-ajax' || $actionPath == 'mark-as-remove-ajax' || $actionPath == 'get-only-post-ajax' || $actionPath == 'data-like-post-ajax')){
+            return true;
+        } elseif (($user['rights'] < AppConstant::STUDENT_RIGHT) || (($user['rights'] == AppConstant::STUDENT_RIGHT) && ($actionPath == 'move-thread' || $actionPath == 'add-forum' || $actionPath == 'change-forum' || $actionPath == 'view-forum-grade'))) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
         } else if (($user['rights'] == AppConstant::STUDENT_RIGHT && !$studentId) || ($user['rights'] > AppConstant::STUDENT_RIGHT && $user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && !$teacherId)) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
-        } else {
+        }  else {
+
             return true;
         }
     }

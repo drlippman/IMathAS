@@ -233,8 +233,6 @@ echo '<form>';
                 $ips = explode(',', $ips);
 
                 for ($i = AppConstant::NUMERIC_ZERO; $i < count($ips); $i++) {
-                    AppUtility::dump($ips);
-
                     ?>
                     <tr id="tripout-<?php echo $i ?>">
                         <td><input type=hidden id="ipout-<?php echo $i ?>" name="ipout-<?php echo $i ?>"
