@@ -1108,6 +1108,7 @@ class CourseController extends AppController
 
     public function actionCourse()
     {
+
         /**
          * Can access: greater than student
          *  1. Full Admin
@@ -1288,8 +1289,8 @@ class CourseController extends AppController
 
             $line = Course::getCourseDataById($courseId);
             if ($line == null) {
-                $overwriteBody = AppConstant::NUMERIC_ONE;
-                $body = _("Course does not exist.  <a href='#'>Return to main page</a>") . "</body></html>\n";
+                $this->setWarningFlash("Course does not exist");
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
             }
 
             $allowUnEnroll = $line['allowunenroll'];
@@ -1426,8 +1427,8 @@ class CourseController extends AppController
                     if (($items[$blockTree[$i]-1]['grouplimit']) && count($items[$blockTree[$i]-1]['grouplimit']) > 0 && !($teacherId) && !($isTutor))
                     {
                         if (!in_array('s-'.$studentInfo['section'],$items[$blockTree[$i]-1]['grouplimit'])) {
-                            echo 'Not authorized';
-                            exit;
+                            $this->setWarningFlash("Not authorized");
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
                         }
                     }
                     /*
@@ -1630,14 +1631,14 @@ class CourseController extends AppController
         $previewShift = -1;
 
         if (!($teacherId) && !($isTutor) && !($isStudent)) {
-            echo "You are not enrolled in this course.  Please return to the <a href=\"#\">Home Page</a> and enroll\n";
-            exit;
+            $this->setWarningFlash("You are not enrolled in this course.");
+            return $this->redirect(AppUtility::getHomeURL());
         }
 
         $line = Course::getCourseDataById($courseId);
         if ($line == null) {
-            echo "Course does not exist.  <a href=\"#\">Return to main page</a></body></html>\n";
-            exit;
+            $this->setWarningFlash("Course does not exist");
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
         }
 
         $allowUnEnroll = $line['allowunenroll'];
@@ -2192,8 +2193,8 @@ class CourseController extends AppController
         $id = $this->getParamVal('id');
 
         if (!isset($courseId)) {
-            echo "Need course id";
-            exit;
+            $this->setWarningFlash("Need course id.");
+            return $this->redirect(AppUtility::getHomeURL());
         }
 
         if (isset($from)) {

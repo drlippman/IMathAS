@@ -202,7 +202,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                 'imas_teachers',
                 'imas_users.id = imas_teachers.userid'
             )
-            ->where('imas_teachers.courseid = :courseId')
+            ->where('imas_teachers.courseid= :courseId')
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->bindValue('courseId',$courseId)->queryAll();
