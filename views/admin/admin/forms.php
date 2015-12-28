@@ -717,7 +717,7 @@ switch ($action) {
                 </span>
 
                         <div class='col-md-6 col-sm-6 padding-left-zero'>
-                            <input class='form-control' type=text name="ltikey" size=20>
+                            <input class='form-control' type=text name="ltikey" size=20 required="">
                         </div>
                     </div>
                     <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
@@ -726,7 +726,7 @@ switch ($action) {
                 </span>
 
                         <div class='col-md-6 col-sm-6 padding-left-zero'>
-                            <input class='form-control' type=text name="ltisecret" size=20>
+                            <input class='form-control' type=text name="ltisecret" size=20 >
                         </div>
                     </div>
                     <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>

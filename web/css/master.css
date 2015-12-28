@@ -651,3 +651,6 @@ div.vidsegblock
 .padding-top-fifteen{
     padding-top: 15px;
 }
+.error-message{
+    color: red;
+}

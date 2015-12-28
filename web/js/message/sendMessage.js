@@ -20,7 +20,7 @@ $(document).ready(function () {
             if(subject == '')
             {
                 $('#subject').css('border-color','red');
-                alert('Please fill out subject field');
+                $('#subject-error').html('Please fill out subject field');
             } else if(subject != '')
             {
                     jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
@@ -29,7 +29,7 @@ $(document).ready(function () {
         else
         {
             $('#seluid').css('border-color','red');
-            alert('Please fill out receiver field')
+            $('#receiver').html('Please fill out receiver field');
         }
     });
 

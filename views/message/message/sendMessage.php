@@ -55,6 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php echo ucfirst($user['LastName']).", ".ucfirst($user['FirstName']); ?>
                             </option><?php } ?>
                     </select>
+                        <span id="receiver" class="error-message col-md-10 col-sm-10 padding-left-zero"></span>
                         <?php }?>
                 </span>
             </div>
@@ -63,7 +64,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <span class="col-md-1 col-sm-1"><?php echo AppUtility::t('Subject')?></span>
                 <span class="col-md-11 col-sm-11 padding-right-thirty" >
                     <input type="text" size="50" id="subject" class="textbox subject form-control" required  maxlength="60"/>
+
                 </span>
+                <span id="subject-error" class="error-message col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1"></span>
             </div>
 
             <div class="col-md-12 col-sm-12 padding-top">

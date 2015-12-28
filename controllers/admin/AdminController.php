@@ -1495,8 +1495,18 @@ class AdminController extends AppController
                     return $this->redirect($this->goHome());
                 }
                 if ($params['id']=='new') {
+                    $LTIDomain = array();
+                    $LTIDomain['email'] = $params['ltidomain'];
+                    $LTIDomain['FirstName'] = $params['ltidomain'];
+                    $LTIDomain['LastName'] = 'LTIcredential';
+                    $LTIDomain['SID'] = $params['ltikey'];
+                    $LTIDomain['password'] = $params['ltisecret'];
+                    $LTIDomain['rights'] = $params['createinstr'];
+                    $LTIDomain['groupid'] = $params['groupid'];
+
+
                     $user = new User();
-                    $resultLTI = $user->createLTIDomainCredentials($params);
+                    $resultLTI = $user->createLTIDomainCredentials($LTIDomain);
                     if($resultLTI->errors['SID'])
                     {
                         $this->setWarningFlash($resultLTI->errors['SID'][0]);
@@ -1504,12 +1514,18 @@ class AdminController extends AppController
                     }
 
                 } else {
-                    $resultUpdate = User::updateLTIDomainCredentials($params);
-                    if($resultUpdate->errors['SID'])
-                    {
-                        $this->setWarningFlash($resultUpdate->errors['SID'][0]);
-                        return $this->redirect('forms?action=listltidomaincred');
+                    if($params['ltikey'] == ''){
+                        $this->setWarningFlash('Please enter the Key');
+                        return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
+                    }else{
+                        $resultUpdate = User::updateLTIDomainCredentials($params);
+                        if($resultUpdate->errors['SID'])
+                        {
+                            $this->setWarningFlash($resultUpdate->errors['SID'][0]);
+                            return $this->redirect('forms?action=listltidomaincred');
+                        }
                     }
+
                 }
                 break;
             case "delltidomaincred":
