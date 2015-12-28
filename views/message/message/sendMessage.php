@@ -61,7 +61,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-12 col-sm-12 padding-top">
                 <span class="col-md-1 col-sm-1"><?php echo AppUtility::t('Subject')?></span>
-                <span class="col-md-4 col-sm-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
+                <span class="col-md-11 col-sm-11 padding-right-thirty" >
+                    <input type="text" size="50" id="subject" class="textbox subject form-control" required  maxlength="60"/>
+                </span>
             </div>
 
             <div class="col-md-12 col-sm-12 padding-top">
@@ -73,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div></span><br>"; ?>
             </div>
             <div class="header-btn hide-hover col-md-6 col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty">
-                <a href="#"id="mess" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
+                <a href="#" id="mess" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
             </div>
     </div>
 </div>

@@ -17,7 +17,11 @@ $(document).ready(function () {
         var body = $("#message").val();
         if(receiver != 0)
         {
-            if(subject != '')
+            if(subject == '')
+            {
+                $('#subject').css('border-color','red');
+                alert('Please fill out subject field');
+            } else if(subject != '')
             {
                     jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
             }
@@ -25,6 +29,7 @@ $(document).ready(function () {
         else
         {
             $('#seluid').css('border-color','red');
+            alert('Please fill out receiver field')
         }
     });
 
@@ -32,12 +37,18 @@ $(document).ready(function () {
     {
         $('#seluid').css('border-color','grey');
     });
+
+    $('#subject').click(function()
+    {
+        $('#subject').css('border-color','grey');
+    });
 });
 
 function sendMessage(response)
 {
         var cid = $(".send-msg").val();
         var result = JSON.parse(response);
+
         if(result.status == 0)
         {
             window.location = "index?cid="+cid;
