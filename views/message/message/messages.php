@@ -71,7 +71,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                 <div class="">
                     <span class=" pull-left message-second-level">Filter By Course :</span>
                     <span class="" >
-                        <select class="show-course form-control display-inline-block width-fifty-five-per width-one-thirty" id="filtercid" onclick="chgfilter()" >
+                        <select class="show-course form-control display-inline-block width-fifty-five-per width-one-thirty" id="filtercid" onchange="chgfilter()" >
                             <?php
                                     echo "<option value=\"0\" ";
                                     if($filtercid==0) {
@@ -95,9 +95,9 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             </div>
             <div class="col-md-3 display-inline-block padding-right-zero padding-top-five">
                 <div class="floatright">
-                <span class="pull-left message-second-level floatleft" >By Sender :</span>
+                <span class="pull-left message-second-level floatleft">By Sender</span>
                  <span class="floatleft">
-                     <select class="show-users form-control width-one-thirty" id="filteruid" onclick="chgfilter()">
+                     <select class="show-users form-control width-one-thirty" id="filteruid" onchange="chgfilter()">
                          <option value="0" ';
                         <?php if($filteruid==0) {
                          echo 'selected="selected" ';

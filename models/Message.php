@@ -226,6 +226,7 @@ class Message extends BaseImasMsgs
             ->from('imas_courses')
             ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_courses.id=imas_msgs.courseid')
             ->where('imas_msgs.msgfrom= :userId',[':userId' => $userId]);
+        $query->orderBy('imas_courses.name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
