@@ -199,7 +199,6 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                         echo "<td>$senddate</td></tr>";
 
                     }
-
                 }
             }
             ?>

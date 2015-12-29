@@ -579,10 +579,7 @@ class Message extends BaseImasMsgs
         }
 
         $query .= "ORDER BY senddate DESC ";
-        $offset = ($page-1)*$threadsperpage;
-        if (!$limittotagged) {
-            $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
-        }
+
         $data = Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }

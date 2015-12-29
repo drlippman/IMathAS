@@ -82,7 +82,7 @@ function showMessage(messageData, status)
     $('.message-div div').remove();
     createTableHeader();
     $(".message-table-body").append(html);
-    $('.display-message-table').DataTable({"bPaginate": false});
+    $('.display-message-table').DataTable({"bPaginate": true});
 }
 
 function selectCheckBox(){
