@@ -57,7 +57,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             </span>
     <!--         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >-->
             <div class="col-md-3 display-inline-block padding-left-right-zero padding-top-five padding-left-ten">
-            <span class="pull-left message-second-level" >With Selected :</span>
+            <span class="pull-left message-second-level" id="index-zero" >With Selected :</span>
                 <span class="with-selected-dropdown">
                     <select  class="form-control with-selected display-inline-block width-fifty-five-per width-one-thirty">
                         <option value="-1" id="Select">Select</option>
@@ -119,10 +119,12 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         </div>
    </div>
     <div class="message-div">
-        <table class="display table table-bordered table-striped table-hover data-table">
+        <table id="message-table-show display-message-table" class="display table table-bordered table-striped table-hover data-table">
             <thead>
+
             <tr><th><div class='checkbox override-hidden'><label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''>
-                            <span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th></tr>
+                            <span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div>
+                </th><th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th></tr>
             </thead>
             <tbody class="message-table-body">
             <?php
@@ -153,8 +155,10 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                         if(($line['isread']&8)==8) {
                             echo 'class="tagged" ';
                         }
-                        echo "><td><input type=checkbox name=\"msg-check\" id='Checkbox' class='message-checkbox' value=\"{$line['id']}\"/></td><td>";
-                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
+                        echo ">"; ?>
+                        <td><input type=checkbox name=msg-check id="Checkbox" class='message-checkbox-<?php echo $line['id']?>' value=<?php echo $line['id']?>></td><td>
+
+                       <?php echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
                         if (($line['isread']&1)==0) {
                             echo "<b>{$line['title']}</b>";
                         } else {

@@ -501,8 +501,8 @@ class SiteController extends AppController
             $status = User::createStudentAccount($params);
             if ($status) {
                 $message = "<p>We received a request for student account with following credentials.</p> ";
-                $message .= 'First Name: ' . $params['FirstName'] . "<br/>\n";
-                $message .= 'Last Name: ' . $params['LastName'] . "<br/>\n";
+                $message .= 'First Name: ' . $params['firstName'] . "<br/>\n";
+                $message .= 'Last Name: ' . $params['lastName'] . "<br/>\n";
                 $message .= 'Email Name: ' . $params['email'] . "<br/>\n";
                 $message .= 'User Name: ' . $params['username'] . "<br/>\n";
                 $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
