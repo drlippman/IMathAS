@@ -23,7 +23,8 @@ $(document).ready(function () {
                 $('#subject-error').html('Please fill out subject field');
             } else if(subject != '')
             {
-                    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+                $('.subject-error-message').removeClass("subject-error-message");
+                jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
             }
         }
         else
@@ -32,6 +33,7 @@ $(document).ready(function () {
             $('#receiver').html('Please fill out receiver field');
         }
     });
+
 
     $('#seluid').click(function()
     {
@@ -43,6 +45,21 @@ $(document).ready(function () {
         $('#subject').css('border-color','grey');
     });
 });
+
+
+function changeSubject()
+{
+    var subject = $("#subject").val();
+    var receiver = $("#seluid").val();
+    if(subject != '')
+    {
+        $('#subject-error').html('');
+    }
+    if(receiver != '')
+    {
+        $('#receiver').html('');
+    }
+}
 
 function sendMessage(response)
 {
