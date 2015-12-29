@@ -119,12 +119,18 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         </div>
    </div>
     <div class="message-div">
-        <table id="message-table-show display-message-table" class="display table table-bordered table-striped table-hover data-table">
+        <table id="message-table-show display-message-table" class="display-message-pagination display table table-bordered table-striped table-hover data-table">
             <thead>
-
-            <tr><th><div class='checkbox override-hidden'><label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''>
-                            <span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div>
-                </th><th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th></tr>
+            <tr>
+                <th>
+                    <div class='checkbox override-hidden'>
+                        <label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''>
+                            <span class='cr'><i class='cr-icon fa fa-check'></i></span>
+                        </label>
+                    </div>
+                </th>
+                <th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>
+            </tr>
             </thead>
             <tbody class="message-table-body">
             <?php
@@ -215,7 +221,17 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
     }
 
-    var AHAHsaveurl = "<?php echo $saveTagged;?>"
+    var AHAHsaveurl = "<?php echo $saveTagged;?>";
+
+    $(document).ready(function (){
+         $('.display-message-pagination').DataTable(
+            {
+                "bPaginate": true
+            }
+        );
+
+        $(".checkbox").parent().removeClass('sorting_asc');
+    })
 
 </script>
 <style type="text/css"> tr.tagged {background-color: #dff;}</style>

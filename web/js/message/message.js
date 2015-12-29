@@ -14,6 +14,7 @@ $(document).ready(function () {
 //    jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
 //    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
 //    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
+
     selectCheckBox();
 //    filterByCourse();
 });
