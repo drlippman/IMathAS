@@ -59,7 +59,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <div class="col-md-3 display-inline-block padding-left-right-zero padding-top-five padding-left-ten">
             <span class="pull-left message-second-level" id="index-zero" >With Selected :</span>
                 <span class="with-selected-dropdown">
-                    <select  class="form-control with-selected display-inline-block width-fifty-five-per width-one-thirty">
+                    <select onchange="changeMessageStatus()" class="form-control with-selected display-inline-block width-fifty-five-per width-one-thirty" id="index-zero">
                         <option value="-1" id="Select">Select</option>
                          <option value="0" id="mark-as-unread">Mark as Unread</option>
                         <option value="1" id="mark-read">Mark as Read</option>

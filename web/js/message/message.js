@@ -16,28 +16,6 @@ $(document).ready(function () {
 //    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
 //    filterByCourse();
-
-    $('.with-selected-dropdown').click(function(){
-
-        var with_selected = $('.with-selected :selected').val();
-
-        if(with_selected  == 0)
-        {
-            markAsUnread();
-
-        }
-        else if(with_selected  == 1)
-        {
-            markAsRead();
-
-
-        }else if(with_selected  == 2){
-
-            markAsDelete();
-
-        }
-    });
-
 });
 
 var messageData;
@@ -45,6 +23,22 @@ var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
 var courseInfo = [];
+
+function changeMessageStatus(){
+
+    var with_selected = $('.with-selected :selected').val();
+
+    if(with_selected  == 0)
+    {
+        markAsUnread();
+    }
+    else if(with_selected  == 1)
+    {
+        markAsRead();
+    }else if(with_selected  == 2){
+        markAsDelete();
+    }
+}
 
 function showMessageSuccess(response) {
     response = JSON.parse(response);
@@ -313,3 +307,5 @@ function picshow(size) {
     }
 
 }
+
+
