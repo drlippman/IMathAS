@@ -639,6 +639,10 @@ img.small-icon{
     color: #ffffff;
     text-transform: capitalize;
 }
+.title-active-form{
+    font-size: 30px;
+    color: #ffffff;
+}
 .vertical-align{
     vertical-align: middle;
 }

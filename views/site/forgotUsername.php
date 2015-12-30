@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
-$this->title = 'Forgot Username';
+$this->title = 'Lookup Username';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">

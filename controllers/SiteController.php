@@ -571,9 +571,11 @@ class SiteController extends AppController
                 AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotPasswordForm();
                 //TODO: Add administrator email in there which was added while installing app.
-                $this->setSuccessFlash('<p>An email with a password reset link has been sent your email address on record: <b>'.$user->email.'</b></p><p><p>If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.</p>If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.</p>');
+                $this->setSuccessFlash('<p>An email with a password reset link has been sent your email address on record: <b>'.$user->email.'</b></p>
+                <p>If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.</p><p>If you still have trouble or the wrong email address is on file, contact your instructor - they can reset your password for you.</p>');
             }else{
                 $this->setErrorFlash('Such username does not exist.');
+                return $this->redirect('forgot-password');
             }
         }
         $this->includeCSS(['login.css']);
@@ -609,13 +611,14 @@ class SiteController extends AppController
                     $message .= "<p>Username: <b>".$singleUser['SID']."</b>  Last logged in: ".$lastLogin."</br></p>";
                 }
                 $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
-                $message .= "<br>This is an automated message from OpenMath.  Do not respond to this email</p><br>";
+                $message .= "This is an automated message from OpenMath.  Do not respond to this email</p><br>";
                 $message .= "<p>Best Regards,<br>OpenMath Team</p></p>";
                 AppUtility::sendMail(AppConstant::FORGOT_USER_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotUsernameForm();
                 $this->setSuccessFlash(count($users).' usernames match this email address and were emailed.');
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_EMAIL);
+                return $this->redirect('forgot-username');
             }
         }
         $responseData = array('model' => $model,);

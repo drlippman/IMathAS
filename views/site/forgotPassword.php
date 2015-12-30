@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
-$this->title = 'Forgot Password';
+$this->title = 'Reset Password';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
