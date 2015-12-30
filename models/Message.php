@@ -373,9 +373,9 @@ class Message extends BaseImasMsgs
     {
         $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
         $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
-        $query .= "imas_msgs.msgto=$userid AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+        $query .= "imas_msgs.msgto=:userid AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
         $query .= "ORDER BY senddate DESC ";
-        return Yii::$app->db->createCommand($query)->queryAll();
+        return Yii::$app->db->createCommand($query)->bindValue('userid',$userid)->queryAll();
     }
 
     public static function getUserById($userid)
@@ -563,31 +563,37 @@ class Message extends BaseImasMsgs
         return $data;
     }
 
-    public static function displayMessageById($userId, $filteruid, $filtercid, $limittotagged,$page,$threadsperpage)
+    public static function displayMessageById($userId, $filteruid, $filtercid, $limittotagged)
     {
         $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
         $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-        $query .= "imas_msgs.msgto='$userId' AND (imas_msgs.isread&2)=0 ";
+        $query .= "imas_msgs.msgto= :userId AND (imas_msgs.isread&2)=0 ";//int
         if ($filteruid>0) {
-            $query .= "AND imas_msgs.msgfrom='$filteruid' ";
+            $query .= "AND imas_msgs.msgfrom= :filteruid ";//int
         }
         if ($filtercid>0) {
-            $query .= "AND imas_msgs.courseid='$filtercid' ";
+            $query .= "AND imas_msgs.courseid= :filtercid ";//int
         }
         if ($limittotagged) {
             $query .= "AND (imas_msgs.isread&8)=8 ";
         }
-
         $query .= "ORDER BY senddate DESC ";
-
-        $data = Yii::$app->db->createCommand($query)->queryAll();
+        $command = Yii::$app->db->createCommand($query);
+        $command->bindParam(':userId', $userId);
+        if ($filteruid>0) {
+            $command->bindParam(':filteruid', $filteruid);
+        }
+        if ($filtercid>0) {
+            $command->bindParam(':filtercid', $filtercid);
+        }
+        $data = $command->queryAll();
         return $data;
     }
 
     public static function saveTagged($userId, $threadid)
     {
-        $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto='$userId' AND id='$threadid'";
-        return Yii::$app->db->createCommand($query)->execute();
+        $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto=':userId' AND id=':threadid'";
+        return Yii::$app->db->createCommand($query)->bindValues([':userId' => $userId, ':threadid' => $threadid])->execute();
     }
 }
 

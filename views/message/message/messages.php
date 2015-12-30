@@ -229,7 +229,6 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                 "bPaginate": true
             }
         );
-
         $(".checkbox").parent().removeClass('sorting_asc');
     })
 

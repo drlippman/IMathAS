@@ -889,4 +889,17 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = $command->queryAll();
         return $data;
     }
+
+    public function createInstructorAcc($params)
+    {
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
+        $this->save();
+        return $this;
+    }
+
+    public static function duplicateUserName($userName)
+    {
+        return User::find()->select('id')->where(['SID' => $userName])->all();
+    }
 }

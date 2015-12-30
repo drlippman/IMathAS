@@ -75,7 +75,7 @@ class MessageController extends AppController
             $threadsperpage = $userData['listperpage'];
             $filterByCourse = Message::getCoursesForMessage($user['id']);
             $filterByUserName = Message::getMessagesByUserName($user['id'], $filtercid);
-            $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged,$page,$threadsperpage);
+            $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged);
 
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;

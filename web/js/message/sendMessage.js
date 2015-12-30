@@ -15,6 +15,12 @@ $(document).ready(function () {
         }
         var subject = $(".subject").val();
         var body = $("#message").val();
+
+//        if(receiver == '' && subject == '')
+//        {
+//            $('#subject-error').html('Please fill out subject field');
+//            $('#receiver').html('Please fill out receiver field');
+//        }
         if(receiver != 0)
         {
             if(subject == '')
@@ -51,11 +57,14 @@ function changeSubject()
 {
     var subject = $("#subject").val();
     var receiver = $("#seluid").val();
-    if(subject != '')
+    if(subject != '' && receiver != '')
     {
         $('#subject-error').html('');
-    }
-    if(receiver != '')
+        $('#receiver').html('');
+    }else if(subject != '')
+    {
+        $('#subject-error').html('');
+    }else if(receiver != '')
     {
         $('#receiver').html('');
     }

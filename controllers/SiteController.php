@@ -455,24 +455,28 @@ class SiteController extends AppController
             $params['SID'] = $params['username'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
+            $userName = User::duplicateUserName($params['SID']);
+            if(count($userName) > AppConstant::NUMERIC_ZERO){
+                $this->setErrorFlash('Username '.$params['SID'].' is already in use.  Please try another');
+                return $this->redirect(AppUtility::getURLFromHome('site','registration'));
+            }else{
+                $user = new User();
+                $user = $user->createInstructorAcc($params);
+                $toEmail = $user->email;
+                $message = "<p>Welcome to OpenMath</p> ";
+                $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName)." ,</p> ";
+                $message .= '<p>We received a request for instructor account with following credentials.</p>';
+                $message .= 'First Name: ' . $user->FirstName . "<br/>\n";
+                $message .= 'Last Name: ' . $user->LastName . "<br/>\n";
+                $message .= 'Email Name: ' . $user->email . "<br/>\n";
+                $message .= 'User Name: ' . $user->SID . "<br/>\n";
+                $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
+                $message .= "</p>Best Regards,<br></p>";
+                $message .= "</p>OpenMath Team<br></p>";
+                AppUtility::sendMail(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT, $message, $toEmail);
+                $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
+            }
 
-            $user = new User();
-            $user->attributes = $params;
-            $user->save();
-
-            $toEmail = $user->email;
-            $message = "<p>Welcome to OpenMath</p> ";
-            $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName)." ,</p> ";
-            $message .= '<p>We received a request for instructor account with following credentials.</p>';
-            $message .= 'First Name: ' . $user->FirstName . "<br/>\n";
-            $message .= 'Last Name: ' . $user->LastName . "<br/>\n";
-            $message .= 'Email Name: ' . $user->email . "<br/>\n";
-            $message .= 'User Name: ' . $user->SID . "<br/>\n";
-            $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
-            $message .= "</p>Best Regards,<br></p>";
-            $message .= "</p>OpenMath Team<br></p>";
-            AppUtility::sendMail(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT, $message, $toEmail);
-            $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
             return $this->redirect(AppUtility::getURLFromHome('site','registration'));
         }
         $this->includeJS(["registration.js"]);
@@ -760,7 +764,6 @@ class SiteController extends AppController
              */
             $newMsgCnt = array();
             if ($showMessagesGadget) {
-//                $page_newmessagelist = array();
 
                 $result = Message::getNewMessageData($user->id);
                 foreach($result as $key => $line) {

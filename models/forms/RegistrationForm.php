@@ -56,7 +56,7 @@ class RegistrationForm extends Model
     {
 
         return [
-            [['FirstName', 'LastName', 'username', 'password','email'], 'required'],
+            [['FirstName', 'LastName', 'username', 'password','email','phoneno','school','confirmPassword'], 'required'],
             ['email','email','message' => 'Enter a valid email address.'],
             [['password'], 'string', 'max' => 254],
             [['FirstName', 'LastName'], 'string', 'max' => 20,'tooLong'=>'{attribute} contains maximum 20 characters.'],
