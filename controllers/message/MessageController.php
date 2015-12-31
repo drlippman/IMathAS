@@ -244,7 +244,9 @@ class MessageController extends AppController
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights, 'isTeacher' => $isTeacher, 'byRecipient' => $byRecipient, 'filteruid' => $filteruid, 'filtercid' => $filtercid, 'byCourse' => $byCourse, 'displayMessage' => $displayMessage);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users,
+                'teachers' => $teacher, 'userRights' => $userRights, 'isTeacher' => $isTeacher, 'byRecipient' => $byRecipient,
+                'filteruid' => $filteruid, 'filtercid' => $filtercid, 'byCourse' => $byCourse, 'displayMessage' => $displayMessage, 'page' => $page);
             $this->includeCSS(['dataTables.bootstrap.css',"message.css"]);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'message/sentMessage.js']);
             return $this->renderWithData('sentMessage', $responseData);
