@@ -45,7 +45,8 @@ $address = AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$co
                            if ($filtercid==$row['id']) {
                                echo 'selected=1';
                            }
-                           echo " >{$row['name']}</option>";
+                           $CourseName = AppUtility::truncate($row['name'], 60);
+                           echo " >{$CourseName}</option>";
                        }
                        echo "</select></span> ";?>
             </div>
@@ -91,7 +92,56 @@ $address = AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$co
         </div>
 
     </div>
-    <div class="message-div"></div>
+    <div class="message-div">
+    <table id="message-table-show display-message-table" class="display-message-pagination display table table-bordered table-striped table-hover data-table">
+        <thead>
+        <tr><th>
+                <div class='checkbox override-hidden'>
+                    <label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''>
+                        <span class='cr'><i class='cr-icon fa fa-check'></i></span>
+                    </label>
+                </div>
+        </th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr>
+        </thead>
+        <tbody class="message-table-body">
+        <?php
+
+        if (count($displayMessage)==0) {
+            echo "<tr><td></td><td>No messages</td><td></td><td></td></tr>";
+        }
+        foreach($displayMessage as $line) {
+            if (trim($line['title'])=='') {
+                $line['title'] = '[No Subject]';
+            }
+            $n = 0;
+            while (strpos($line['title'],'Re: ')===0) {
+                $line['title'] = substr($line['title'],4);
+                $n++;
+            }
+            if ($n==1) {
+                $line['title'] = 'Re: '.$line['title'];
+            } else if ($n>1) {
+                $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
+            }
+            echo "<tr class='message-checkbox-\"{$line['id']}\"'><td><div class='checkbox override-hidden'><label>
+
+            <input type=checkbox name=\"msg-check\" class='message-checkbox-\"{$line['id']}\"' value=\"{$line['id']}\"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td><td>";
+//		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid={$line['id']}\">";
+            echo $line['title'];
+            echo "</a></td>";
+            echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
+            if (($line['isread']&1)==1) {
+                echo "<td>Yes</td>";
+            } else {
+                echo "<td>No</td>";
+            }
+            $senddate = AppUtility::tzdate("F j, Y, g:i a",$line['senddate']);
+            echo "<td>$senddate</td></tr>";
+        }
+        ?>
+        </tbody>
+    </table>
+    </div>
 </div>
 
 <script type="text/javascript">

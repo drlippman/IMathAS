@@ -84,7 +84,8 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                                         if($filtercid==$row['id']) {
                                             echo 'selected=1';
                                         }
-                                        echo " >{$row['name']}</option>";
+                                        $CourseName = AppUtility::truncate($row['name'], 60);
+                                        echo " >{$CourseName}</option>";
                                     }
                                     echo "</select> ";
                                 ?>

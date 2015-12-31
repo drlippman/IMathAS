@@ -237,13 +237,14 @@ class MessageController extends AppController
 
             $byRecipient = User::getByRecipient($userRights['id'],$filtercid);
             $byCourse = Message::getByCourse($userRights['id']);
+            $displayMessage = Message::getCourseFilter($userRights['id'], $filteruid, $filtercid);
             $model = new MessageForm();
             $course = Course::getById($courseId);
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights, 'isTeacher' => $isTeacher, 'byRecipient' => $byRecipient, 'filteruid' => $filteruid, 'filtercid' => $filtercid, 'byCourse' => $byCourse);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights, 'isTeacher' => $isTeacher, 'byRecipient' => $byRecipient, 'filteruid' => $filteruid, 'filtercid' => $filtercid, 'byCourse' => $byCourse, 'displayMessage' => $displayMessage);
             $this->includeCSS(['dataTables.bootstrap.css',"message.css"]);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'message/sentMessage.js']);
             return $this->renderWithData('sentMessage', $responseData);

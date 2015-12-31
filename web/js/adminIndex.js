@@ -31,7 +31,7 @@ function bindEvent() {
         var html = "<div>Are you sure to delete your course?</div>";
         var cancelUrl = $(this).attr('href');
         $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            modal: true, title: 'Delete Course', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {

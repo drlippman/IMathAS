@@ -2,7 +2,7 @@ $(document).ready(function () {
     var cid = $(".send-course-id").val();
     var userId = $(".send-user-id").val();
     var inputData = {cid: cid, userId: userId};
-    jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
+//    jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
     selectCheckBox();
     jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
     jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
@@ -33,9 +33,9 @@ function changeMessageStatus(){
 
 function createTableHeader()
 {
-    var html = "<div class='message-div'><table id='message-table-show display-message-table' class='display table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>";
-    html += "<tbody class='message-table-body'></tbody></table></div>";
+//    var html = "<div class='message-div'><table id='message-table-show display-message-table' class='display table table-bordered table-striped table-hover data-table'>";
+//    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' id='message-header-checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>";
+//    html += "<tbody class='message-table-body'></tbody></table></div>";
     $('.message-div').append(html);
 }
 function showMessageSuccess(response)
@@ -66,7 +66,8 @@ function showMessage(messageData, status)
     var htmlCourse ="";
     if(status == 0){
         $.each(messageData, function(index, msg){
-            html += "<tr class='message-checkbox-'" + msg.id + "><td><div class='checkbox override-hidden'><label><input type='checkbox' name='msg-check' value='"+msg.id+"' class='message-checkbox-"+msg.id+"' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
+            html += "<tr class='message-checkbox-'" + msg.id + "><td><div class='checkbox override-hidden'><label>" +
+                "<input type='checkbox' name='msg-check' value='"+msg.id+"' class='message-checkbox-"+msg.id+"' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             html += "<td><a href='view-message?message=1&msgid="+msg.id+"&cid="+cid+"'> "+msg.title+"</a></td>";
             html += "<td>"+msg.FirstName.substr(0,1).toUpperCase()+ msg.FirstName.substr(1)+" "+msg.LastName.substr(0,1).toUpperCase()+ msg.LastName.substr(1)+"</td>";
             if(msg.isread==0)
@@ -81,7 +82,7 @@ function showMessage(messageData, status)
     }
 
     $('.message-div div').remove();
-    createTableHeader();
+//    createTableHeader();
     $(".message-table-body").append(html);
     $('.display-message-table').DataTable({"bPaginate": true});
 }
@@ -124,7 +125,6 @@ function courseDisplay(courseData)
 }
 function markSentDelete()
 {
-
         var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());

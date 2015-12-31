@@ -31,7 +31,7 @@ function deleteLtiUser(ltiUserId)
 {
     var html ='<div><p>Are you SURE you want to remove this LTI User?</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        modal: true, title: 'Delete LTI User', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
