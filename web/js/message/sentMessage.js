@@ -7,29 +7,30 @@ $(document).ready(function () {
     jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
     jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
 
-
-    $('.with-selected-dropdown').click(function(){
-
-        var with_selected = $('.with-selected :selected').val();
-
-        if(with_selected  == 1)
-        {
-            markSentDelete()
-
-        }
-        else if(with_selected  == 2)
-        {
-
-            markUnsend();
-
-        }
-    });
 });
 
 var messageData;
 var cid = $(".send-course-id").val();
 var selectedUserId = $('#user-sent-id').val();
 var selectedCourseId;
+
+function changeMessageStatus(){
+
+    var with_selected = $('.with-selected :selected').val();
+
+    if(with_selected  == 1)
+    {
+        markSentDelete()
+
+    }
+    else if(with_selected  == 2)
+    {
+
+        markUnsend();
+
+    }
+}
+
 function createTableHeader()
 {
     var html = "<div class='message-div'><table id='message-table-show display-message-table' class='display table table-bordered table-striped table-hover data-table'>";
@@ -197,74 +198,6 @@ function userDisplay(userData)
 
 }
 
-function filterByCourse()
-{
-    $('#course-sent-id').on('change', function() {
-        var filteredArray = [];
-        selectedCourseId = this.value;
-        if (selectedCourseId == 0 && selectedUserId == 0) {
-            showMessage(messageData, status = 0);
-        } else if(selectedCourseId == 0 && selectedUserId != 0){
-            $.each(messageData, function (index, msg) {
-                if (selectedUserId == msg.msgto) {
-                    filteredArray.push(msg);
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        } else if(selectedCourseId != 0 && selectedUserId == 0){
-            $.each(messageData, function (index, msg) {
-                if (selectedCourseId == msg.courseid) {
-                    filteredArray.push(msg);
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        } else {
-            $.each(messageData, function (index, msg) {
-                if (selectedCourseId == msg.courseid) {
-                    if (selectedUserId == msg.msgto) {
-                        filteredArray.push(msg);
-                    }
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        }
-    });
-}
-
-function filterByUser()
-{
-    $('#user-sent-id').on('change', function() {
-        var filteredArray = [];
-        selectedUserId = this.value;
-        selectedCourseId = $('#course-sent-id').val();
-        if (selectedCourseId == 0 && selectedUserId == 0) {
-            showMessage(messageData, status = 0);
-        } else if(selectedCourseId == 0 && selectedUserId != 0){
-            $.each(messageData, function (index, msg) {
-                if (selectedUserId == msg.msgto) {
-                    filteredArray.push(msg);
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        } else if(selectedCourseId != 0 && selectedUserId == 0){
-            $.each(messageData, function (index, msg) {
-                if (selectedCourseId == msg.courseid) {
-                    filteredArray.push(msg);
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        } else {
-            $.each(messageData, function (index, msg) {
-                if (selectedCourseId == msg.courseid) {
-                    if (selectedUserId == msg.msgto) {
-                        filteredArray.push(msg);
-                    }
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        }
-    });
-}
 
 function markUnsend()
 {

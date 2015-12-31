@@ -902,4 +902,22 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return User::find()->select('id')->where(['SID' => $userName])->all();
     }
+
+    public static function getByRecipient($userid,$filtercid)
+    {
+        $query = "SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users ";
+        $query .= "JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userid'";
+        if ($filtercid>0) {
+            $query .= " AND imas_msgs.courseid='$filtercid'";
+        }
+        $query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
+        $command = Yii::$app->db->createCommand($query);
+//        $command->bindParam(':userId', $userid);
+
+//        if ($filtercid>0) {
+//            $command->bindParam(':filtercid', $filtercid);
+//        }
+        $data = $command->queryAll();
+        return $data;
+    }
 }

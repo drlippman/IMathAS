@@ -595,5 +595,20 @@ class Message extends BaseImasMsgs
         $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto=':userId' AND id=':threadid'";
         return Yii::$app->db->createCommand($query)->bindValues([':userId' => $userId, ':threadid' => $threadid])->execute();
     }
+
+    public static function getByCourse($userId)
+    {
+        $query  = new Query();
+        $query->select('imas_courses.id,imas_courses.name')
+            ->distinct()
+            ->from('imas_courses')
+            ->join(	'INNER JOIN',
+                'imas_msgs',
+                'imas_courses.id=imas_msgs.courseid')
+            ->where('imas_msgs.msgfrom= :userId',[':userId' => $userId]);
+        $query->orderBy('imas_courses.name');
+        $data = $command = $query->createCommand()->queryAll();
+        return $data;
+    }
 }
 

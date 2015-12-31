@@ -6,6 +6,7 @@ $this->title = AppUtility::t('Sent Message ',false);
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
+$address = AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$course->id.'&filtercid=');
 ?>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
@@ -28,24 +29,48 @@ $now = $currentTime;
             <a  href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"><?php echo AppUtility::t('Received Messages')?></a>
         </div>
         <div class="col-md-10 padding-left-right-zero">
+
             <div class="col-md-4 col-sm-5 padding-left-right-zero">
-                <span class="select-text-margin floatleft">
-                    <?php echo AppUtility::t('Filter By Courses')?>
-                </span>
-                <span class="col-md-6 col-sm-6 padding-right-zero">
-                    <select name="seluid" class="show-course form-control" id="course-sent-id">
-                        <option value="0"><?php echo AppUtility::t('All Courses')?></option>
-                    </select>
-                </span>
+                <span class="select-text-margin floatleft">Filter by course:</span>
+               <span class="col-md-7 col-sm-7 mobile-float-right">
+                   <select id="filtercid" class="form-control" onchange="chgfilter()">
+                       <?php
+                       echo "<option value=\"0\" ";
+                       if ($filtercid==0) {
+                           echo "selected=1 ";
+                       }
+                       echo ">All courses</option>";
+                       foreach($byCourse as $row){
+                           echo "<option value=\"{$row['id']}\" ";
+                           if ($filtercid==$row['id']) {
+                               echo 'selected=1';
+                           }
+                           echo " >{$row['name']}</option>";
+                       }
+                       echo "</select></span> ";?>
             </div>
-            <div class="col-md-4 col-sm-4 padding-left-right-zero">
+
+
+                <div class="col-md-4 col-sm-4 padding-left-right-zero">
                 <span class="select-text-margin floatleft">
-                    <?php echo AppUtility::t('By Recipient')?>
-                </span>
-                <span class="col-md-8 col-sm-8 mobile-float-right">
-                    <select name="seluid" class="show-users form-control" id="user-sent-id">
-                        <option value="0"><?php echo AppUtility::t('Select a user')?></option>
-                    </select>
+                    <?php echo 'By recipient: </span>
+                    <span class="col-md-8 col-sm-8 mobile-float-right">
+                    <select id="filteruid" class="form-control" onchange="chgfilter()"><option value="0" ';
+                        if ($filteruid==0) {
+                        echo 'selected="selected" ';
+                        }
+                        echo '>All</option>';
+                    foreach($byRecipient as $row){
+                        echo "<option value=\"{$row['id']}\" ";
+                            if ($filteruid==$row['id']) {
+                            echo 'selected=1';
+                            }
+                        echo " > ";
+                        echo "{$row['LastName']}, {$row['FirstName']}</option> ";
+
+                        }
+                    echo "</select></p>";
+                    ?>
                 </span>
             </div>
 
@@ -53,11 +78,13 @@ $now = $currentTime;
                 <span class="select-text-margin floatleft padding-left-one-em mobile-padding-left-zero">
                     <?php echo AppUtility::t('With Selected')?>
                 </span>
-                <span class="col-md-7 col-sm-7 padding-right-zero with-selected-dropdown floatright padding-left-zero">
-                    <select class="form-control with-selected">
+                <span class="col-md-7 col-sm-7 padding-right-zero floatright padding-left-zero">
+                    <select onchange="changeMessageStatus()"  class="form-control with-selected">
                         <option value="0"><?php echo AppUtility::t('Select')?></option>
                         <option value="1" id="mark-sent-delete"><?php echo AppUtility::t('Remove From Sent Message List')?></option>
+                        <?php if($isTeacher) {?>
                         <option value="2" id="mark-unsend"><?php echo AppUtility::t('Unsend')?></option>
+                        <?php }?>
                     </select>
                 </span>
             </div>
@@ -67,3 +94,10 @@ $now = $currentTime;
     <div class="message-div"></div>
 </div>
 
+<script type="text/javascript">
+    function chgfilter() {
+        var filtercid = document.getElementById("filtercid").value;
+        var filteruid = document.getElementById("filteruid").value;
+        window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
+    }
+</script>

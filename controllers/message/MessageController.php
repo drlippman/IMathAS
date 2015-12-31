@@ -200,18 +200,54 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
         $userRights = $this->getAuthenticatedUser();
-        if ($this->getAuthenticatedUser()) {
+        $threadsperpage = $userRights['listperpage'];
+        $isTeacher = $this->isTeacher($userRights['id'], $courseId);
+        $isStudent = $this->isStudent($userRights['id'], $courseId);
+        $isTutor = $this->isTutor($userRights['id'], $courseId);
+        $getPage = $this->getParamVal('page');
+        $filterCid = $this->getParamVal('filtercid');
+        $filterUid = $this->getParamVal('filteruid');
+            if ($courseId != 0 && !$isTeacher && !$isTutor && !$isStudent) {
+                $this->setErrorFlash("You are not enrolled in this course.");
+                return $this->redirect('sent-message');
+            }
+            if (isset($isTeacher)) {
+                $teacherId = true;
+            } else {
+                $teacherId = false;
+            }
+
+            if (!isset($getPage) || $getPage=='') {
+                $page = 1;
+            } else {
+                $page = $getPage;
+            }
+            if (isset($filterCid)) {
+                $filtercid = $filterCid;
+            } else if ($courseId != 'admin' && $courseId > 0) {
+                $filtercid = $courseId;
+            } else {
+                $filtercid = 0;
+            }
+            if (isset($filterUid)) {
+                $filteruid = intval($filterUid);
+            } else {
+                $filteruid = 0;
+            }
+
+            $byRecipient = User::getByRecipient($userRights['id'],$filtercid);
+            $byCourse = Message::getByCourse($userRights['id']);
             $model = new MessageForm();
             $course = Course::getById($courseId);
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights, 'isTeacher' => $isTeacher, 'byRecipient' => $byRecipient, 'filteruid' => $filteruid, 'filtercid' => $filtercid, 'byCourse' => $byCourse);
             $this->includeCSS(['dataTables.bootstrap.css',"message.css"]);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'message/sentMessage.js']);
             return $this->renderWithData('sentMessage', $responseData);
-        }
+
     }
     /*
      * Ajax call method to display sent message

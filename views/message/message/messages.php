@@ -48,7 +48,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
     }?>
 </div>
 <div class="tab-content shadowBox">
-    <div class="second-level-message-navigation height-ninety">
+    <div class="second-level-message-navigation height-ninety margin-top-one-em">
         <div class="col-md-12 display-inline-block">
             <span class="col-sm-3 message-second-level display-inline-block padding-left-right-zero padding-top-twelve">
                  <a  id="limit-to-tag-link" href="index?cid=<?php echo $course->id; ?>&show=1">Limit to Tagged</a>
