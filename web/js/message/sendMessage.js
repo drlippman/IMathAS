@@ -16,11 +16,11 @@ $(document).ready(function () {
         var subject = $(".subject").val();
         var body = $("#message").val();
 
-//        if(receiver == '' && subject == '')
-//        {
-//            $('#subject-error').html('Please fill out subject field');
-//            $('#receiver').html('Please fill out receiver field');
-//        }
+        if(receiver == 0 && subject == '')
+        {
+            $('#subject-error').html('Please fill out subject field');
+            $('#receiver').html('Please fill out receiver field');
+        }
         if(receiver != 0)
         {
             if(subject == '')
