@@ -11,7 +11,8 @@ $now = $currentTime;
 
 $address = AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id.'&filtercid=');
 $imasroot = AppUtility::getHomeURL();
-$saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$course->id);?>
+$saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$course->id);
+?>
 <input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL() ?>">
 
 <div>
@@ -136,9 +137,11 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <tbody class="message-table-body">
             <?php
             if(empty($messageDisplay)) {
+
                 echo "<tr><td></td><td>No messages</td><td></td></tr>";
+
             } else {
-                foreach($messageDisplay as $key=>$line) {
+            foreach($messageDisplay as $key=>$line) {
 
                     if($line)
                     {
@@ -207,8 +210,9 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 
                     }
                 }
-            }
-            ?>
+
+             }
+?>
             </tbody>
         </table>
     </div>

@@ -38,7 +38,6 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
-        $this->userAuthentication($user, $courseId);
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $this->setSessionData('messageCount',$msgList);
@@ -82,14 +81,11 @@ class MessageController extends AppController
 
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/msg.js','message/message.js']);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page);
             return $this->renderWithData('messages', $responseData);
         }
-
-
     }
     /*
      * Send new message initial load
@@ -609,15 +605,18 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $this->layout = 'master';
         $threadid = $this->getParamVal('threadid');
+
         $user = $this->getAuthenticatedUser();
+
         if (!isset($threadid)) {
              $this->setErrorFlash('Exit');
             return $this->redirect('index');
         }
         $ischanged = false;
+
         $saveTagged = Message::saveTagged($user['id'], $threadid);
 
-        if(count($saveTagged) > 0)
+        if(($saveTagged) > 0)
         {
             $ischanged = true;
         }
