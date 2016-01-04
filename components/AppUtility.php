@@ -3089,7 +3089,8 @@ class AppUtility extends Component
             $lockId = $courseStudent['lockaid'];
             $locked = Student::getStudentData($userId, $data[$i]['id']);
             echo '<li>';
-            if ($type=='take') { ?>
+            if ($type=='take') {
+                 ?>
                 <span class="delx" onclick="return hidefromcourselist(<?php echo $data[$i]['id'] ?>,this);" title="Hide from course list">x</span>
            <?php }
             if ($isStudent && ($lockId > 0)) {
@@ -3099,10 +3100,10 @@ class AppUtility extends Component
             } elseif($locked['locked'] > 0){ ?>
                 <a class="word-wrap-break-word" href="#" onclick="studLocked()">
                 <?php echo $data[$i]['name'].'</a>';
-            }else {
+            }
                 ?>
             <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
-            <?php echo $data[$i]['name'].'</a>'; }
+            <?php echo $data[$i]['name'].'</a>';
             if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {
                 echo ' <span style="color:green;">', _('Hidden'), '</span>';
             }

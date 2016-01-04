@@ -1136,7 +1136,6 @@ class CourseController extends AppController
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
-
         $this->setSessionData('courseId',$courseId);
         $teacherId = $this->isTeacher($userId, $courseId);
         $isStudent = $this->isStudent($userId, $courseId);

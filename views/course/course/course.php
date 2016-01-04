@@ -136,7 +136,7 @@ if ($overwriteBody == 1) {
     echo $body;
 } else {
 
-    if (($teacherId)) {
+    if (isset($teacherId)) {
         ?>
         <script type="text/javascript">
             function moveitem(from,blk) {
@@ -235,7 +235,7 @@ if ($overwriteBody == 1) {
 
         ?>
         <?php
-        if (($teacherId)) {
+        if (isset($teacherId)) {
             ?>
             <div class=cp>
             <span class=column>
