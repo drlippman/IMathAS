@@ -127,7 +127,6 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-
             $userId = $this->getUserId();
             if ($params['receiver'] != AppConstant::ZERO_VALUE && $params['cid'] != null) {
                 $message = new Message();

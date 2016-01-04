@@ -711,7 +711,6 @@ class ForumController extends AppController
 //                        return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
 //                    }, $message);
 //                }
-//                print_r($message);die;
                 $message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
                 $line['message'] = '<p> </p><br/><hr/>'.$message;
                 if (isset($parts[3])) {

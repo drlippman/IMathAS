@@ -36,7 +36,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         <?php if($userRights->rights > AppConstant::GUEST_RIGHT){?>
         <div class="pull-left header-btn hide-hover">
             <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>"
-            class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
+            class="btn btn-primary1 pull-right  btn-color" onclick="this.disabled = true"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
         </div>
         <?php } ?>
     </div>
@@ -227,6 +227,12 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
     }
 
     var AHAHsaveurl = "<?php echo $saveTagged;?>";
+
+    function DisableButton() {
+
+        document.getElementById("send-message").disabled = true;
+    }
+    window.onbeforeunload = DisableButton;
 
     $(document).ready(function (){
          $('.display-message-pagination').DataTable(

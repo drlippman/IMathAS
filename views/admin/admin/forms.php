@@ -844,7 +844,8 @@ switch ($action) {
                                 if ($group['id'] == $user['groupid']) {
                                     echo ' selected="selected"';
                                 }
-                                echo '>' . $group['name'] . '</option>';
+                                $groupName = AppUtility::truncate($group['name'],30);
+                                echo '>' . $groupName. '</option>';
                             }
                             echo '</select>';
                             ?>

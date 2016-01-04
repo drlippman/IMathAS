@@ -26,7 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
 <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
-<input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
 <div class="tab-content shadowBox col-md-12 col-sm-12 padding-left-zero padding-right-zero">
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
