@@ -367,6 +367,7 @@ class MessageController extends AppController
      */
     public function actionViewMessage()
     {
+
         $this->layout = "master";
         $this->guestUserHandler();
         $userRights = $this->getAuthenticatedUser();
@@ -518,6 +519,7 @@ class MessageController extends AppController
         $messages = Message::getByBaseId($msgId, $baseId);
         if ($messages) {
             foreach ($messages as $message) {
+
                 $this->children[$message['parent']][] = $message['id'];
                 $hasChild = Message::isMessageHaveChild($message['id']);
                 $tempArray = array();

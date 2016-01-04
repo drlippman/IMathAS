@@ -36,7 +36,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         <?php if($userRights->rights > AppConstant::GUEST_RIGHT){?>
         <div class="pull-left header-btn hide-hover">
             <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>"
-            class="btn btn-primary1 pull-right  btn-color" onclick="this.disabled = true"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
+            class="btn btn-primary1 pull-right btn-color" ondblclick="return false;"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
         </div>
         <?php } ?>
     </div>
@@ -228,11 +228,14 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 
     var AHAHsaveurl = "<?php echo $saveTagged;?>";
 
-    function DisableButton() {
+    function clickAndDisable(link) {
+        // add any additional logic here
 
-        document.getElementById("send-message").disabled = true;
+        // disable subsequent clicks
+        link.onclick = function(event) {
+            e.preventDefault();
+        }
     }
-    window.onbeforeunload = DisableButton;
 
     $(document).ready(function (){
          $('.display-message-pagination').DataTable(
@@ -241,7 +244,29 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             }
         );
         $(".checkbox").parent().removeClass('sorting_asc');
-    })
+    });
+
+    function do_nothing() {
+        return false;
+    }
+    $("#send-message").click(function(e) {
+        e.preventDefault();
+
+        if (!$(this).data('isClicked')) {
+            var link = $(this);
+
+            // Your code on successful click
+            window.location = $(this).attr("href");
+            // Set the isClicked value and set a timer to reset in 3s
+            link.data('isClicked', true);
+            setTimeout(function() {
+                link.removeData('isClicked')
+            }, 3000);
+        } else {
+            // Anything you want to say 'Bad user!'
+        }
+    });
+    // prevent a second click for 10 seconds. :)
 
 </script>
 <style type="text/css"> tr.tagged {background-color: #dff;}</style>

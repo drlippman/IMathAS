@@ -66,7 +66,8 @@ $now = $currentTime;
 
          <div class="reply message-body col-md-12 col-sm-12 padding-left-zero">
              <?php $sent = $messageId;?>
-             <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
+             <?php if ($sent != AppConstant::NUMERIC_ONE) {
+                 ?>
                     <span class="padding-left-fifteen padding-right-fifteen text-deco-none">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
                             class="btn1 reply-button"> <i class="fa fa-reply"></i>&nbsp;&nbsp;<?php echo AppUtility::t('Reply')?></a>

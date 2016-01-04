@@ -67,10 +67,10 @@ echo Nav::widget([
                     [
                         $actionPath == 'dashboard' ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=msg']:
 
-                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
+                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId] : ['label' => 'Message'.'('.$messageCount.')', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
                         '<li class="divider"></li>',
                         $actionPath == 'dashboard' ? ['label' => 'Forum'.'('.$postCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=forum']:
-                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
+                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
                     ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] ),
          ],
