@@ -536,16 +536,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public function createLTIDomainCredentials($params)
     {
-        $this->email = $params['ltidomain'];
-        $this->FirstName = $params['ltidomain'];
-        $this->LastName = 'LTIcredential';
-        $this->SID = $params['ltikey'];
-        $this->password = $params['ltisecret'];
-        $this->rights = $params['createinstr'];
-        $this->groupid = $params['groupid'];
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
         $this->save();
         return $this;
-
     }
 
     public static function deleteUserById($id)

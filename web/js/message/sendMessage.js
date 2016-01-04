@@ -74,9 +74,11 @@ function sendMessage(response)
 {
         var cid = $(".send-msg").val();
         var result = JSON.parse(response);
+    console.log(result);
 
         if(result.status == 0)
         {
+
             window.location = "index?cid="+cid;
         }
 }
