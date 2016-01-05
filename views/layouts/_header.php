@@ -53,24 +53,24 @@ echo Nav::widget([
             ($totalCount > AppConstant::NUMERIC_ZERO ?['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><div class="notification msg-count">'.$totalCount.'</div></div>',
                 'items' =>
                 [
-                     $actionPath == 'dashboard' ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=msg']:
+                     $actionPath == 'dashboard' ? ['label' => 'Message'.' ('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=msg']:
 
-                    ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
+                    ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.' ('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message'.' ('.$messageCount.')', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
                     '<li class="divider"></li>',
-                    $actionPath == 'dashboard' ? ['label' => 'Forum'.'('.$postCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=forum']:
-                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/new-post?cid='.$courseId] :['label' => 'Forum', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
+                    $actionPath == 'dashboard' ? ['label' => 'Forum'.' ('.$postCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=forum']:
+                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/new-post?cid='.$courseId] :['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
                 ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] :
 
                 ['label' =>'<img class="small-icon" src="'.AppUtility::getAssetURL().'img/notifctn.png">&nbsp;Notifications',
                 'items' =>
                     [
-                        $actionPath == 'dashboard' ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=msg']:
+                        $actionPath == 'dashboard' ? ['label' => 'Message'.' ('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=msg']:
 
-                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId] : ['label' => 'Message'.'('.$messageCount.')', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
+                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.' ('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId] : ['label' => 'Message'.' ('.$messageCount.')', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
                         '<li class="divider"></li>',
-                        $actionPath == 'dashboard' ? ['label' => 'Forum'.'('.$postCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=forum']:
-                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum'.'('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
+                        $actionPath == 'dashboard' ? ['label' => 'Forum'.' ('.$postCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=forum']:
+                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
                     ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] ),
          ],
