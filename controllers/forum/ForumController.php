@@ -361,17 +361,11 @@ class ForumController extends AppController
             }
             if (isset($params['save']) && $params['save'] == 'Save Grades and View Previous')
             {
-                AppUtility::dump('hey');
-
                 return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['prevth']);
             } else if (isset($params['save']) && $params['save'] == 'Save Grades and View Next') {
-                AppUtility::dump('hey1');
-
                 return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['nextth']);
             } else
             {
-                AppUtility::dump('hey2');
-
                 return $this->redirect('thread?page=' . $page . '&cid=' . $courseId . '&forumid=' . $forumId);
             }
         }

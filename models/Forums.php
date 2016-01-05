@@ -315,15 +315,12 @@ class Forums extends BaseImasForums {
 
     public static function getByCourseIdAndTeacher($courseId,$isteacher,$now)
     {
-        $query = new Query();
-        $query->select('*')
-            ->from('imas_forums')->where('imas_forums.courseid=imas_forums.courseid');
-        if (!$isteacher)
-        {
-            $query->andWhere(['imas_forums.avail' => 2])->orWhere(['imas_forums.avail' => 2] and ['<','imas_forums.startdate',$now] and ['>','imas_forums.enddate',$now]);
+        $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid=':courseId'";
+        if (!$isteacher) {
+            $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
         }
-        $query->andWhere('imas_forums.courseid = :courseId');
-        return $query->createCommand()->bindValue(':courseId',$courseId)->queryAll();
+        $data = Yii::$app->db->createCommand($query)->bindValue(':courseId', $courseId)->queryAll();
+        return $data;
     }
 
     public static function getMaxPostDate($cid)
