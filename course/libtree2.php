@@ -187,7 +187,7 @@ END;
 				} else {  //no children
 					if ($select == "child" || $select=="all" || $isempty[$child]==true) {
 						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
+							if (in_array($child,$locked)) { // || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
 								echo "1,";
 							} else {
 								echo ",";

@@ -633,7 +633,7 @@ function AMpreview(inputId,outputId) {
 	  if (vars[i].length>1) {
 		  var isgreek = false;
 		  for (var j=0; j<greekletters.length;j++) {
-			  if (vars[i]==greekletters[j]) {
+			  if (vars[i].toLowerCase()==greekletters[j]) {
 				isgreek = true; 
 				break;
 			  }
@@ -799,7 +799,7 @@ function syntaxcheckexpr(str,format,vl) {
 	  return err;
 }
 
-var greekletters = ['alpha','beta','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu'];
+var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega'];
 var calctoproc = {};
 var intcalctoproc = {};
 var calcformat = {};

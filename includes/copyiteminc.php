@@ -538,6 +538,9 @@ function getiteminfo($itemid) {
 		case ($itemtype==="Wiki"):
 			$query = "SELECT name,description FROM imas_wikis WHERE id=$typeid";
 			break;
+		case ($itemtype==="Drill"):
+			$query = "SELECT name,summary FROM imas_drillassess WHERE id=$typeid";
+			break;
 	}
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$name = mysql_result($result,0,0);

@@ -918,6 +918,9 @@ if (mysql_num_rows($result)==0) {
 					require("includes/copyiteminc.php");
 					$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid']}'";
 					$result = mysql_query($query) or die("Query failed : " . mysql_error());
+					if (mysql_num_rows($result)==0) {
+						reporterror("Error.  Assessment ID '{$_SESSION['place_aid']}' not found.");
+					}
 					$cid = $destcid;
 					$newitem = copyitem(mysql_result($result,0,0),array());
 					$query = "SELECT typeid FROM imas_items WHERE id=$newitem";
@@ -1959,6 +1962,9 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						require("includes/copyiteminc.php");
 						$query = "SELECT id FROM imas_items WHERE itemtype='Assessment' AND typeid='{$_SESSION['place_aid'][1]}'";
 						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						if (mysql_num_rows($result)==0) {
+							reporterror("Error.  Assessment ID '{$_SESSION['place_aid'][1]}' not found.");
+						}
 						$cid = $destcid;
 						$newitem = copyitem(mysql_result($result,0,0),array());
 						$query = "SELECT typeid FROM imas_items WHERE id=$newitem";

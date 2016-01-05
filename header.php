@@ -119,7 +119,7 @@ if (isset($sessiondata['graphdisp']) && $sessiondata['graphdisp']==1) {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false; var ASnoSVG=true;</script>";
 }
 
-$start_time = microtime(true); 
+
 if (isset($placeinhead)) {
 	echo $placeinhead;
 }
