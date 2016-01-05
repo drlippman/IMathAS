@@ -243,7 +243,10 @@ if (isset($teacherid)) {
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if ($row[1]=='##hidden##') {
-		$row[1] = strip_tags( $row[3]);
+		$row[1] = preg_replace('/\s+/',' ',strip_tags($row[3]));
+		if (strlen($row[1])>25) {
+			$row[1] = substr($row[1],0,25).'...';
+		}
 	}
 	if ($row[5]==1) {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));

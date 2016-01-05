@@ -2022,7 +2022,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$la = htmlentities($la);
 			}
 			if ($rows<2) {
-				$out .= "<input type=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
+				$out .= "<input type=\"text\" class=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
 				$out .= getcolormark($colorbox);
 			} else {
 				if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
