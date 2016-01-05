@@ -557,4 +557,41 @@ class ForumPosts extends BaseImasForumPosts
         }
         return $query->createCommand()->queryAll();
     }
+
+    public static function getDataById($threadid)
+    {
+        return ForumPosts::find()->select('posttype')->where(['id' => $threadid])->one();
+    }
+
+    public static function getPostPoints($courseId, $threadId)
+    {
+        $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_grades.score,imas_grades.feedback,imas_students.section FROM ";
+        $query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
+        $query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseId ";
+        $query .= "LEFT JOIN imas_grades ON imas_grades.gradetype='forum' AND imas_grades.refid=imas_forum_posts.id ";
+        $query .= "WHERE (imas_forum_posts.id=:threadId OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
+        $data = Yii::$app->db->createCommand($query)->bindValues([':courseId' => $courseId, ':threadId' => $threadId, ':threadid' => $threadId])->queryAll();
+        return $data;
+    }
+
+    public static function getForumPost($courseId, $threadId)
+    {
+        $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,imas_students.section FROM ";
+        $query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
+        $query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseId ";
+        $query .= "WHERE (imas_forum_posts.id=:threadId OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
+        $data = Yii::$app->db->createCommand($query)->bindValues([':courseId' => $courseId, ':threadId' => $threadId, ':threadid' => $threadId])->queryAll();
+        return $data;
+    }
+
+    public static function updateViews($threadId, $newviews)
+    {
+        $id = ForumPosts::find()->where(['id' => $threadId])->one();
+        if($id)
+        {
+            $id->views = $newviews;
+            $id->save();
+            return $id;
+        }
+    }
 }

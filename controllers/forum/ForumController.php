@@ -204,7 +204,6 @@ class ForumController extends AppController
             $searchedPost = ForumPosts::getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$user->id);
 
         } else {
-
                 //default display
             $forumPost = ForumPosts::threadCount($cid);
 
@@ -366,7 +365,7 @@ class ForumController extends AppController
                 return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['nextth']);
             } else
             {
-                return $this->redirect('thread?page=' . $page . '&cid=' . $courseId . '&forumid=' . $forumId);
+                return $this->redirect('thread?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId);
             }
         }
 
@@ -893,7 +892,7 @@ class ForumController extends AppController
         if ($isTeacher || $isTutor) {
             $canViewAll = true;
         }
-        $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId, $currentUser['id']);
+            $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId, $currentUser['id']);
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
         $titleCountArray = array();
