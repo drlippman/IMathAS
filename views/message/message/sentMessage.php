@@ -19,7 +19,11 @@ $address = AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$co
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+    <?php if($userRights->rights == 100 || $userRights->rights == 20) {
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);
+    } elseif($userRights->rights == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course]);
+    }?>
 </div>
 <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
 <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
