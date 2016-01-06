@@ -737,8 +737,8 @@ if (isset($_GET['delete'])) {
 		</table>
 	</div>
 	<?php
-	echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
-	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in Moodle)</button></p>";
+	//echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
+	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in BlackBoard and Moodle)</button></p>";
 	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
 	
