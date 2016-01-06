@@ -255,6 +255,7 @@ class ForumPosts extends BaseImasForumPosts
           $query ->select(['DISTINCT(threadid)'])
                     ->from('imas_forum_posts ')
                     ->where('forumid= :forumid',[':forumid' => $forumId]);
+//        TODO: fix below query
         if ($dofilter)
         {
             $query .= " AND threadid IN ($limthreads)";
@@ -324,9 +325,11 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getPostData($threadlist)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('imas_forum_posts.*,imas_users.LastName,imas_users.FirstName')
-            ->from('imas_forum_posts,imas_users')->where('imas_forum_posts.userid=imas_users.id')
+            ->from('imas_forum_posts,imas_users')
+            ->where('imas_forum_posts.userid=imas_users.id')
             ->andWhere(['IN','imas_forum_posts.id',$threadlist]);
         return $query->createCommand()->queryAll();
     }
@@ -338,6 +341,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getThreadId($limthreads,$dofilter,$tagfilter)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('threadid')->from('imas_forum_posts')->where(['LIKE','tag',$tagfilter]);
         if ($dofilter)
@@ -359,6 +363,7 @@ class ForumPosts extends BaseImasForumPosts
                 $limthreads = implode(',', $limthreads);
             }
         }
+        //        TODO: fix below query
         if (isset($params['allforums']))
         {
             $query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
@@ -381,6 +386,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getMaxPostDate($dofilter,$limthreads,$forumId)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate')
             ->from('imas_forum_posts')->where('forumid = :forumId');
@@ -394,6 +400,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getForumPostId($forumId,$limthreads,$dofilter)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('COUNT(id)')->from('imas_forum_posts')->where('parent=0')
         ->andWhere('forumid= :forumId');
@@ -408,10 +415,12 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getPostIds($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist)
     {
-
+        //        TODO: fix below query
         $query = new Query();
-        $query->select('imas_forum_posts.id,count(imas_forum_views.userid)')->from('imas_forum_views,imas_forum_posts')
-            ->where('imas_forum_views.threadid=imas_forum_posts.id')->andWhere('imas_forum_posts.parent=0')
+        $query->select('imas_forum_posts.id,count(imas_forum_views.userid)')
+            ->from('imas_forum_views,imas_forum_posts')
+            ->where('imas_forum_views.threadid=imas_forum_posts.id')
+            ->andWhere('imas_forum_posts.parent=0')
             ->andWhere('imas_forum_posts.forumid= :forumId');
 
         if ($dofilter)
@@ -428,11 +437,13 @@ class ForumPosts extends BaseImasForumPosts
         $query->groupBy('imas_forum_posts.id');
         $data = $query->createCommand();
         $data->bindValue('forumId', $forumId);
+
         return $data->queryAll();
     }
 
     public static function getPostDataForThread($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist,$sortby,$threadsperpage)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid')
             ->from('imas_forum_posts,imas_users,imas_forum_threads')
@@ -468,6 +479,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getPosts($userId,$forumId,$limthreads,$dofilter)
     {
+        //        TODO: fix below query
         $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
         $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid= :userId) AS ifv ON ";
         $query .= "ifv.threadid=imas_forum_posts.threadid WHERE imas_forum_posts.forumid='$forumId' AND imas_forum_posts.isanon=0 ";
@@ -488,6 +500,7 @@ class ForumPosts extends BaseImasForumPosts
     }
     public static function getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$userid)
     {
+        //        TODO: fix below query
         $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.posttype,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
@@ -513,6 +526,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getBySearchTextForThread($isteacher, $now, $cid, $searchlikes,$anyforumsgroup,$searchstr,$searchtag,$userid)
     {
+        //        TODO: fix below query
         $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.posttype,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
@@ -538,6 +552,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getMaxPostDateWithThreadId($limthreads)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate')->from('imas_forum_posts')
             ->where(['IN','threadid',$limthreads])->groupBy('threadid');
@@ -546,6 +561,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getDataByJoin($subject, $forumId, $groupsetid, $isteacher, $groupid)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query->select('ift.id')
             ->from('imas_forum_posts AS ifp')

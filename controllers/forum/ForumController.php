@@ -211,6 +211,8 @@ class ForumController extends AppController
                 $threadcount[$post['id']] = $post['COUNT(imas_forum_posts.id)'];
             }
             $maxPostDate = Forums::getMaxPostDate($cid);
+//            AppUtility::dump($maxPostDate);
+
             foreach ($maxPostDate as $row ) {
                 $postcount[$row['id']] = $row['postcount'];
                 $maxdate[$row['id']] = $row['MAX(imas_forum_posts.postdate)'];

@@ -51,6 +51,7 @@ class Tutor extends BaseImasTutors
 
     public static function findTutorsToList($courseId,$isteacher=false,$section=false)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
             ->from('imas_tutors')
@@ -87,10 +88,11 @@ class Tutor extends BaseImasTutors
 
     public static function getTutorData($userId)
     {
-        $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
-        $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userId'";
-        $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-        $command = \Yii::$app->db->createCommand($query);
+        $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid
+                    FROM imas_tutors,imas_courses ";
+        $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=:userId";
+        $query .= " AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+        $command = \Yii::$app->db->createCommand($query)->bindParam(':userId', $userId);
         $data = $command->queryAll();
 
         return $data;

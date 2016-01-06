@@ -340,6 +340,7 @@ class Course extends BaseImasCourses {
     }
     public static function getDataByJoins($groupId,$userId)
     {
+        //        TODO: fix below query
         return self::find()->select('ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid')
             ->from('imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups')->where('it.courseid=ic.id')
             ->andWhere('it.userid=iu.id')->andWhere('iu.groupid=imas_groups.id')->andWhere(['<>','iu.groupid',$groupId])
@@ -488,6 +489,7 @@ class Course extends BaseImasCourses {
 
     public static function getBlckTitles($search)
     {
+        //        TODO: fix below query
         $query = new Query();
         $query	->select(['id','itemorder','name'])
             ->from('imas_courses')
@@ -534,9 +536,9 @@ class Course extends BaseImasCourses {
         $query = new Query();
         $query	->select(['imas_courses.id'])
             ->from(['imas_courses', 'imas_users'])
-            ->where(['imas_courses.id' => $params['id']]);
+            ->where(['imas_courses.id=:courseId',[':courseId' => $params['id']]]);
         $query->andWhere(['imas_courses.ownerid' => 'imas_users.id']);
-        $query->andWhere(['imas_users.groupid'=> $groupId]);
+        $query->andWhere(['imas_users.groupid=:groupId',[':groupId' => $groupId]]);
         $command = $query->createCommand();
         $data = $command->queryone();
         return $data;
@@ -616,7 +618,7 @@ class Course extends BaseImasCourses {
         $query->select('imas_courses.name,imas_courses.id,imas_students.hidefromcourselist')->from('imas_students')
             ->join('INNER JOIN','imas_courses','imas_students.courseid=imas_courses.id')
             ->where('imas_courses.available=0')->orWhere('imas_courses.available=2')
-            ->andWhere(['imas_students.userid'=> $userId] )->orderBy('imas_courses.name');
+            ->andWhere('imas_students.userid=:userId',[':userId'=> $userId])->orderBy('imas_courses.name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

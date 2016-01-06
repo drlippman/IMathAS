@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\components\AppConstant;
 use Yii;
+use yii\base\ErrorException;
 use yii\db\Exception;
 use app\components\AppUtility;
 use app\models\_base\BaseImasMsgs;
@@ -613,13 +614,16 @@ class Message extends BaseImasMsgs
 
     public static function getCourseFilter($userId, $filteruid, $filtercid)
     {
-        $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users ";
-        $query .= "WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$userId' AND (imas_msgs.isread&4)=0 ";
+        $query = "SELECT imas_msgs.id, imas_msgs.title, imas_msgs.senddate, imas_users.LastName, imas_users.FirstName, imas_msgs.isread
+                  FROM imas_msgs,imas_users ";
+        $query .= "WHERE imas_users.id=imas_msgs.msgto
+                     AND imas_msgs.msgfrom = :userId
+                     AND (imas_msgs.isread&4)=0 ";
         if ($filtercid>0) {
-            $query .= "AND imas_msgs.courseid='$filtercid' ";
+            $query .= "AND imas_msgs.courseid=:filtercid ";
         }
         if ($filteruid>0) {
-            $query .= "AND imas_msgs.msgto='$filteruid' ";
+            $query .= "AND imas_msgs.msgto=:filteruid ";
         }
         $query .= " ORDER BY senddate DESC ";
         $command = Yii::$app->db->createCommand($query);
@@ -631,6 +635,7 @@ class Message extends BaseImasMsgs
             $command->bindParam(':filtercid', $filtercid);
         }
         $data = $command->queryAll();
+
         return $data;
     }
 }

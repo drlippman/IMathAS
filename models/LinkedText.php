@@ -142,6 +142,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function updateVideoId($from,$to)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_linkedtext SET text=REPLACE(text,'$from','$to') WHERE text LIKE '%$from%'";
         $connection=\Yii::$app->db;
         $command=$connection->createCommand($query);
@@ -151,6 +152,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function updateSummary($from,$to)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_linkedtext SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
         $connection=\Yii::$app->db;
         $command=$connection->createCommand($query);
@@ -160,14 +162,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getByTextAndId($courseId)
     {
-//        $query = new Query();
-//        $query ->select(['text','points','id'])
-//            ->from('imas_linkedtext')
-//            ->where('courseid:=courseId', [':courseId' => $courseId]);
-//        $query->andWhere(['LIKE','text','file:%']);
-//        $command = $query->createCommand();
-//        $data = $command->queryAll();
-//        return $data;
+        //TODO: fix below query
         return \Yii::$app->db->createCommand("SELECT text,points,id FROM imas_linkedtext WHERE courseid='{$courseId}' AND text LIKE 'file:%'")->queryAll();
     }
 
@@ -212,7 +207,7 @@ class LinkedText extends BaseImasLinkedtext
         $query = new Query();
         $query->select('title as name')
             ->from('imas_linkedtext')
-            ->where(['id' => $typeId]);
+            ->where('id=:typeId',[':typeId' => $typeId]);
         return $query->createCommand()->queryOne();
     }
 

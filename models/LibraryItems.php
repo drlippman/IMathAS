@@ -14,6 +14,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getByGroupId($groupId, $qSetId,$userId,$isGrpAdmin,$isAdmin)
     {
+        //TODO: fix below query
         if ($isGrpAdmin) {
             $query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
             $query .= "AND (imas_users.groupid='$groupId' OR ili.libid=0) AND ili.qsetid='$qSetId'";
@@ -116,6 +117,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function updateWrongLibFlag($val)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_library_items AS ili
      	JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
 	    JOIN imas_libraries AS il ON ili.libid=il.id
@@ -155,6 +157,7 @@ class LibraryItems extends BaseImasLibraryItems
     }
 
     public static function getByLibAndUserTable($groupId,$list){
+        //TODO: fix below query
         $data = LibraryItems::find()->select('imas_library_items.qsetid, imas_library_items.libid')
             ->from('imas_library_items,imas_users')->where('imas_library_items.ownerid=imas_users.id')
             ->andWhere('imas_users.groupid=:groupId'or ['imas_library_items.libid' => AppConstant::NUMERIC_ZERO], [':groupId' => $groupId])
@@ -164,6 +167,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getByListAndOwnerId($isAdmin, $chgList, $userId)
     {
+     //TODO: fix below query
         $query = new Query();
         $query->select('ili.qsetid,ili.libid')->from('imas_library_items AS ili')
             ->join('LEFT JOIN', 'imas_libraries AS il',
@@ -184,6 +188,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataToExportLib($libList,$nonPrivate)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_library_items.qsetid,imas_library_items.libid')->from('imas_library_items')
             ->join('INNER JOIN', 'imas_questionset',
@@ -243,6 +248,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataByAdmin($safesearch, $llist, $checked)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')
             ->from('imas_questionset')
@@ -264,6 +270,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataByGrpAdmin($groupid, $llist, $safesearch, $checked)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')
             ->from('imas_questionset,imas_library_items,imas_users')
@@ -285,6 +292,7 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataByUserId($userid,$safesearch,$llist,$checked)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')
             ->from('imas_questionset')

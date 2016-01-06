@@ -22,6 +22,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes)
     {
+        //TODO: fix below query
         $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
         $query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
         $query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
@@ -147,6 +148,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByQuestionId($questionList)
     {
+        //TODO: fix below query
         $questionList = implode(',',$questionList);
         $query  = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id AS qid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
@@ -162,6 +164,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function updateVideoId($from,$to)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_questionset SET extref=REPLACE(extref,'$from','$to') WHERE extref LIKE '%$from%'";
         $connection=\Yii::$app->db;
         $command=$connection->createCommand($query);
@@ -173,7 +176,6 @@ class QuestionSet extends BaseImasQuestionset
     {
         $query = "SELECT uniqueid,lastmoddate,extref FROM imas_questionset WHERE extref<>''";
         return $data = \Yii::$app->db->createCommand($query)->queryAll();
-//        return self::find()->select(['uniqueid','lastmoddate','extref'])->where(['<>','extref',''])->all();
     }
     public static function getWrongLibFlag()
     {
@@ -232,6 +234,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function findDataToImportLib($qIdsToCheck)
     {
+        //TODO: fix below query
         $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qIdsToCheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
@@ -256,6 +259,7 @@ class QuestionSet extends BaseImasQuestionset
     }
 
     public static function getByQSetIdAndGroupId($list, $groupId){
+        //TODO: fix below query
         $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
                 ->where(['IN','imas_questionset.id', $list])->andWhere('imas_questionset.ownerid=imas_users.id')
                 ->andWhere('imas_users.groupid=:groupId', [':groupId' => $groupId])->all();
@@ -493,8 +497,8 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getQidByQSetIdAndGroupId($id, $groupId){
         $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
-            ->where(['imas_questionset.id' => $id])->andWhere('imas_questionset.ownerid=imas_users.id')
-            ->andWhere(['imas_users.groupid' => $groupId])->all();
+            ->where('imas_questionset.id=:id',[':id' => $id])->andWhere('imas_questionset.ownerid=imas_users.id')
+            ->andWhere('imas_users.groupid=:groupId',[':groupId' => $groupId])->all();
         return $data;
     }
 
@@ -523,6 +527,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId)
         {
+            //TODO: fix below query
         $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
         $query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
         $query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
@@ -564,6 +569,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getDataToExportLib($qList,$nonPrivate,$call)
     {
+        //TODO: fix below query
         $query = "SELECT * FROM imas_questionset WHERE id IN ($qList)";
         if ($nonPrivate)
         {
@@ -614,6 +620,7 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByIdLike($clist)
     {
+        //TODO: fix below query
         $query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
         $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
         return \Yii::$app->db->createCommand($query)->queryAll();

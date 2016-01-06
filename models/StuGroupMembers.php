@@ -48,6 +48,7 @@ class StuGroupMembers extends BaseImasStugroupmembers
 
     public static function alreadyStuAdded($grpSetId, $stuList)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select(['i_sgm.userid'])
             ->from(['imas_stugroupmembers as i_sgm'])
@@ -107,6 +108,7 @@ class StuGroupMembers extends BaseImasStugroupmembers
 
     public static function getByStuGrpWithUser($groupList)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select(['isg.stugroupid,iu.LastName,iu.FirstName'])
             ->from(['imas_stugroupmembers AS isg'])
@@ -129,5 +131,10 @@ class StuGroupMembers extends BaseImasStugroupmembers
         $command = $query->createCommand()->bindValues(['userId' => $userId, 'groupSetId' => $groupSetId]);
         $data = $command->queryAll();
         return $data;
+    }
+
+    public static function getById($groupId, $userId)
+    {
+        return StuGroupMembers::find()->select('id')->where(['stugroupid'  => $groupId, 'userid' => $userId])->all();
     }
 }

@@ -61,10 +61,10 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <span class="pull-left message-second-level" id="index-zero" >With Selected :</span>
                 <span class="with-selected-dropdown">
                     <select onchange="changeMessageStatus()" class="form-control with-selected display-inline-block width-fifty-five-per width-one-thirty" id="index-zero">
-                        <option value="-1" id="Select">Select</option>
-                         <option value="0" id="mark-as-unread">Mark as Unread</option>
-                        <option value="1" id="mark-read">Mark as Read</option>
-                        <option value="2" id="mark-delete">Delete</option>
+                        <option value="0" id="Select">Select</option>
+                         <option value="1" id="mark-as-unread">Mark as Unread</option>
+                        <option value="2" id="mark-read">Mark as Read</option>
+                        <option value="3" id="mark-delete">Delete</option>
                     </select>
                 </span>
             </div>
@@ -219,6 +219,16 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 </div>
 
 <script type="text/javascript">
+
+    jQuery(document).ready(function (){
+         $('.display-message-pagination').DataTable(
+            {
+                "bPaginate": true
+            }
+        );
+        $(".checkbox").parent().removeClass('sorting_asc');
+    });
+
     function chgfilter() {
         var filtercid = document.getElementById("filtercid").value;
         var filteruid = document.getElementById("filteruid").value;
@@ -228,24 +238,8 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 
     var AHAHsaveurl = "<?php echo $saveTagged;?>";
 
-    function clickAndDisable(link) {
-        // add any additional logic here
-
-        // disable subsequent clicks
-        link.onclick = function(event) {
-            e.preventDefault();
-        }
-    }
-
-    $(document).ready(function (){
-         $('.display-message-pagination').DataTable(
-            {
-                "bPaginate": true
-            }
-        );
-        $(".checkbox").parent().removeClass('sorting_asc');
-    });
-
+//    $("#index-zero option:selected").removeAttr("selected");
+    $('#index-zero').val(0);
     function do_nothing() {
         return false;
     }

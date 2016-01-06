@@ -135,6 +135,7 @@ class Questions extends BaseImasQuestions
 
     public static function getByQuestionSetId($allusedqids)
     {
+        //TODO: fix below query
         $query =  new Query();
         $query->select(['questionsetid','COUNT(id)'])
             ->from('imas_questions')->where(['IN', 'questionsetid', $allusedqids])->groupBy('questionsetid');
@@ -145,7 +146,9 @@ class Questions extends BaseImasQuestions
     {
         $query  = new Query();
         $query->select('imas_questions.id,imas_questionset.id AS qid,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid')
-            ->from('imas_questionset,imas_questions,imas_users')->where('imas_questionset.id=imas_questions.questionsetid')->andWhere('imas_questionset.ownerid=imas_users.id')
+            ->from('imas_questionset,imas_questions,imas_users')
+            ->where('imas_questionset.id=imas_questions.questionsetid')
+            ->andWhere('imas_questionset.ownerid=imas_users.id')
             ->where('imas_questions.assessmentid = :aidq');
         $data = $query->createCommand()->bindValue(':aidq',$aidq)->queryAll();
         return $data;
@@ -189,6 +192,7 @@ class Questions extends BaseImasQuestions
 
     public static function updateQuestionSetId($aidarr)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id ";
         if (!is_array($aidarr)) {
             $query .= "JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
@@ -204,6 +208,7 @@ class Questions extends BaseImasQuestions
 
     public static function FindAssessmentAndWithdrawn($aidarr)
     {
+        //TODO: fix below query
         $query = "SELECT iq.assessmentid,iq.id,iq.withdrawn FROM imas_questions AS iq ";
         if (!is_array($aidarr)) {
             $query .= "JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
@@ -221,9 +226,9 @@ class Questions extends BaseImasQuestions
     public static function setQuestionSetId($qsetid,$replaceby)
     {
         $query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
-        $query .= "SET imas_questions.questionsetid='$replaceby' WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid='$qsetid'";
+        $query .= "SET imas_questions.questionsetid=':replaceby' WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid=':qsetid'";
 
-        \Yii::$app->db->createCommand($query)->query();
+        \Yii::$app->db->createCommand($query)->bindValues([':replaceby' => $replaceby, ':qsetid' => $qsetid])->query();
 
     }
     public static function numberOfQuestionByIdAndCategory($assessmentid)
@@ -240,7 +245,7 @@ class Questions extends BaseImasQuestions
     }
 
     public static function getQidCount($userId,$qSetId){
-
+        //TODO: fix below query
         $query = "SELECT count('imas_questions.id') AS qidCount FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
         $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid= :qSetId AND imas_courses.ownerid<>'$userId'";
         $queryResult = Yii::$app->db->createCommand($query)->bindValue('qSetId',$qSetId)->queryOne();
@@ -283,6 +288,7 @@ class Questions extends BaseImasQuestions
     }
 
     public static function retrieveQuestionData($qids){
+        //TODO: fix below query
         $query = "SELECT imas_questions.id, imas_questionset.description, imas_questions.points, imas_questions.attempts, imas_questions.showhints, imas_questionset.extref ";
         $query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
         $query .= "imas_questions.id IN ('".implode("','",$qids)."')";

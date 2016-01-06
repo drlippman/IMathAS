@@ -190,6 +190,6 @@ class ExternalTools extends BaseImasExternalTools
 
     public static function getToolData($tool, $courseId, $groupId)
     {
-        return Yii::$app->db->createCommand("SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$courseId' OR (courseid=0 AND (groupid='$groupId' OR groupid=0)))")->queryOne();
+        return Yii::$app->db->createCommand("SELECT * from imas_external_tools WHERE id=$tool AND (courseid=':courseId' OR (courseid=0 AND (groupid=':groupId' OR groupid=0)))")->bindValues(['courseId' => $courseId, ':groupId' => $groupId])->queryOne();
     }
 }

@@ -59,21 +59,22 @@ function CommonPopUp(message)
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {
-            "Okay": function () {
+            "Ok": function () {
                 jQuery('#searchText').val(null);
 
                 jQuery(this).dialog('destroy').remove();
                 return false;
             }
         },
-        close: function (event, ui) {
-            jQuery(this).remove();
-        },
         open: function(){
             jQuery('.ui-widget-overlay').bind('click',function(){
                 jQuery('#dialog').dialog('close');
             })
+        },
+        close: function (event, ui) {
+            jQuery(this).remove();
         }
+
 
     });
 

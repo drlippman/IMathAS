@@ -94,6 +94,7 @@ class Thread extends BaseImasForumThreads
 
     public static function  findNewPostCnt($cid, $user)
     {
+        //TODO: fix below query
         $query = "SELECT imas_forum_threads.forumid,COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
         $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid= :cid ";
         $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid= :userId ";

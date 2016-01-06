@@ -110,7 +110,8 @@ class Grades extends BaseImasGrades
             ->where(['gradetype' => 'offline'])
             ->andWhere('gradetypeid = :gbitemId');
         $grades != 'all' ? $query->andWhere('userid=:grades') : $query->andWhere(':grades = :grades');
-        $command = $query->createCommand()->bindValues(['gbitemId' => $gbitemId, 'grades' => $grades]);
+        $command = $query->createCommand()
+            ->bindValues(['gbitemId' => $gbitemId, 'grades' => $grades]);
         $data = $command->queryAll();
         return $data;
     }

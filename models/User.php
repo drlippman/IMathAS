@@ -335,6 +335,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function findUserDataForIsolateAssessmentGrade($isTutor, $tutorsection, $aid, $cid, $hidelocked, $sortorder, $hassection)
     {
+        //TODO: fix below query
         $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
         $query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid= :courseId ";
         $query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid= :assessmentId WHERE istu.courseid= :courseId ";
@@ -450,6 +451,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getStuCount($skipCid, $date, $skipCidS)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_students.id')
             ->from(['imas_users', 'imas_students'])
@@ -465,6 +467,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function queryForStu($skipCid, $date, $skipCidS)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id')
             ->distinct('imas_users.id')
@@ -481,6 +484,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getCountByJoin($skipCid, $date, $skipCidS)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id')
             ->distinct('imas_users.id')
@@ -497,6 +501,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getStuData($date)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id')
             ->distinct('imas_users.id')
@@ -562,6 +567,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getUserDetailsByJoin($srch)
     {
+        //TODO: fix below query
         $query = "SELECT DISTINCT imas_users.*,imas_courses.id AS cid,imas_groups.name AS groupname FROM imas_users JOIN imas_courses ON imas_users.id=imas_courses.ownerid JOIN imas_groups ON imas_groups.id=imas_users.groupid WHERE imas_courses.id IN ";
         $query .= "(SELECT courseid FROM imas_inlinetext WHERE text LIKE '%$srch%') OR imas_courses.id IN ";
         $query .= "(SELECT courseid FROM imas_linkedtext WHERE text LIKE '%$srch%' OR summary LIKE '%$srch%') ORDER BY imas_groups.name,imas_users.LastName";
@@ -575,6 +581,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getByUserRight($myRight, $groupId)
     {
+        //TODO: fix below query
         $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
 
         if ($myRight < AppConstant::ADMIN_RIGHT) {
@@ -715,6 +722,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getDataForExternalTool($UserId,$courseId,$isTutor,$tutorSection,$hasSection,$sortOrder)
     {
+        //TODO: fix below query
             $query  = new Query();
         $query->select('imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked')
             ->from('imas_users')
@@ -877,7 +885,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->join('INNER JOIN',
                 'imas_teachers',
                 'imas_teachers.userid=imas_users.id'
-            )->where(['imas_teachers.courseid' => $courseId]);
+            )->where('imas_teachers.courseid=:courseId',[':course'=> $courseId]);
         $query->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -900,17 +908,17 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function getByRecipient($userid,$filtercid)
     {
         $query = "SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users ";
-        $query .= "JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userid'";
+        $query .= "JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom=:userId";
         if ($filtercid>0) {
-            $query .= " AND imas_msgs.courseid='$filtercid'";
+            $query .= " AND imas_msgs.courseid=:filtercid";
         }
         $query .= " ORDER BY imas_users.LastName, imas_users.FirstName";
         $command = Yii::$app->db->createCommand($query);
-//        $command->bindParam(':userId', $userid);
+        $command->bindParam(':userId', $userid);
 
-//        if ($filtercid>0) {
-//            $command->bindParam(':filtercid', $filtercid);
-//        }
+       if ($filtercid>0) {
+            $command->bindParam(':filtercid', $filtercid);
+        }
         $data = $command->queryAll();
         return $data;
     }

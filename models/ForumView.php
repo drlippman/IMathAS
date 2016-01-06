@@ -231,4 +231,27 @@ class ForumView extends BaseImasForumViews
         $data->bindValue('userId', $userId);
         return $data->queryAll();
     }
+
+    public static function getByTagged($userId,$threadId)
+    {
+        return ForumView::find(['lastview', 'tagged'])->where(['userid' => $userId, 'threadid' => $threadId])->all();
+    }
+
+    public static function updateLastView($userId,$threadId)
+    {
+        $forum = ForumView::find()->where(['userid' => $userId, 'threadid' => $threadId])->one();
+        if($forum)
+        {
+            $forum->lastview = time();
+            $forum->save();
+        }
+    }
+
+    public function addForumView($userId, $threadId,$now)
+    {
+        $this->userid = $userId;
+        $this->threadid = $threadId;
+        $this->lastview = $now;
+        $this->save();
+    }
 }

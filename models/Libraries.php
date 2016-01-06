@@ -88,12 +88,14 @@ class Libraries extends BaseImasLibraries
     public static function getByQuestionId($questionid){
         $query = new Query();
         return $query->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name')->from('imas_questions')
-            ->join('LEFT JOIN','imas_libraries','imas_questions.category=imas_libraries.id')->where(['imas_questions.id' => $questionid])
+            ->join('LEFT JOIN','imas_libraries','imas_questions.category=imas_libraries.id')
+            ->where('imas_questions.id:questionid',[':questionid' => $questionid])
             ->createCommand()->queryOne();
     }
 
     public static function getAllQSetId($qids)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id')
             ->from('imas_questions')
@@ -215,6 +217,7 @@ class Libraries extends BaseImasLibraries
 
     public static function updateByGrpIdUserId($params, $newgpid,$isadmin,$groupid, $isgrpadmin, $userid, $translist)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";
@@ -227,6 +230,7 @@ class Libraries extends BaseImasLibraries
 
     public static function getLibraryData($rootLibs,$nonPrivate)
     {
+        //TODO: fix below query
         $query = new Query();
         $query ->select('id,name,parent,uniqueid,lastmoddate')
             ->from('imas_libraries')
@@ -246,7 +250,7 @@ class Libraries extends BaseImasLibraries
         $query = new Query();
         $query ->select(['id','name','uniqueid','lastmoddate'])
             ->from('imas_libraries')
-            ->where(['parent' => $lib]);
+            ->where('parent=:lib',[':lib' => $lib]);
         if($nonPrivate)
         {
             $query->andWhere(['>','userights','0']);
@@ -303,6 +307,7 @@ class Libraries extends BaseImasLibraries
 
     public static function deleteLibraryAdmin($remlist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
+        //TODO: fix below query
         $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";
@@ -315,6 +320,7 @@ class Libraries extends BaseImasLibraries
 
     public static function deleteLibrarySingle($remove,$isadmin,$groupid,$isgrpadmin,$userid)
     {
+        //TODO: fix below query
         $query = "DELETE FROM imas_libraries WHERE id='$remove'";
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";
@@ -327,6 +333,7 @@ class Libraries extends BaseImasLibraries
 
     public static function updateUserRightLastModeDate($rights,$now, $llist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_libraries SET userights='$rights',lastmoddate=$now WHERE id IN ($llist)";
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";
@@ -339,6 +346,7 @@ class Libraries extends BaseImasLibraries
 
     public static function updateParent($lib,$now,$parlist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_libraries SET parent='$lib',lastmoddate=$now WHERE id IN ($parlist)";
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";

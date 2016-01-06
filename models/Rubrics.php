@@ -105,4 +105,9 @@ class Rubrics extends BaseImasRubrics
         $data = $command->bindValue(':questionId',$questionId)->queryAll();
         return $data;
     }
+
+    public static function getByRubricId($rubric)
+    {
+        return Rubrics::find()->select('id,rubrictype,rubric')->where(['id',$rubric])->all();
+    }
 }

@@ -170,6 +170,7 @@ class Student extends BaseImasStudents
 
     public static function findStudentByCourseId($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
     {
+        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment')
             ->from('imas_users')
@@ -225,7 +226,7 @@ class Student extends BaseImasStudents
 
     public static function findStudentByCourseIdForOutcomes($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
     {
-
+        //TODO: fix below query
         $query = new Query();
         $query->select(['imas_users.id', 'imas_users.SID', 'imas_users.FirstName', 'imas_users.LastName', 'imas_users.SID', 'imas_users.email', 'imas_students.section', 'imas_students.code', 'imas_students.locked', 'imas_students.timelimitmult', 'imas_students.lastaccess', 'imas_users.hasuserimg', 'imas_students.gbcomment'])
             ->from('imas_users')
@@ -554,6 +555,7 @@ class Student extends BaseImasStudents
 
     public static function updateStudentDataFromException($n,$userId,$courseId)
     {
+        //TODO: fix below query
         $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$userId}' AND courseid='$courseId'";
         \Yii::$app->db->createCommand($query)->execute();
     }

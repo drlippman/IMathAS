@@ -231,7 +231,8 @@ class MessageController extends AppController
             }
 
             $byRecipient = User::getByRecipient($userRights['id'],$filtercid);
-            $byCourse = Message::getByCourse($userRights['id']);
+
+        $byCourse = Message::getByCourse($userRights['id']);
             $displayMessage = Message::getCourseFilter($userRights['id'], $filteruid, $filtercid);
             $model = new MessageForm();
             $course = Course::getById($courseId);

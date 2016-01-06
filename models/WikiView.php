@@ -50,6 +50,7 @@ class WikiView extends BaseImasWikiViews
         $lastView = WikiView::find()->where(['userid' => $userId])->andWhere(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->one();
         if($lastView){
             $lastView->lastview = $now;
+            
         }
     }
 
