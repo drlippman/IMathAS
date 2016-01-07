@@ -95,7 +95,6 @@ class Libraries extends BaseImasLibraries
 
     public static function getAllQSetId($qids)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id')
             ->from('imas_questions')

@@ -259,7 +259,6 @@ class QuestionSet extends BaseImasQuestionset
     }
 
     public static function getByQSetIdAndGroupId($list, $groupId){
-        //TODO: fix below query
         $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
                 ->where(['IN','imas_questionset.id', $list])->andWhere('imas_questionset.ownerid=imas_users.id')
                 ->andWhere('imas_users.groupid=:groupId', [':groupId' => $groupId])->all();

@@ -135,7 +135,6 @@ class Questions extends BaseImasQuestions
 
     public static function getByQuestionSetId($allusedqids)
     {
-        //TODO: fix below query
         $query =  new Query();
         $query->select(['questionsetid','COUNT(id)'])
             ->from('imas_questions')->where(['IN', 'questionsetid', $allusedqids])->groupBy('questionsetid');

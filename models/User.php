@@ -41,8 +41,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->password = $student[7];
         $this->save();
         return $this->id;
-    }
 
+    }
 
     public static function findUser($username)
     {
@@ -451,7 +451,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getStuCount($skipCid, $date, $skipCidS)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_students.id')
             ->from(['imas_users', 'imas_students'])
@@ -467,7 +466,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function queryForStu($skipCid, $date, $skipCidS)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id')
             ->distinct('imas_users.id')
@@ -484,7 +482,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getCountByJoin($skipCid, $date, $skipCidS)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id')
             ->distinct('imas_users.id')
@@ -501,7 +498,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getStuData($date)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id')
             ->distinct('imas_users.id')
@@ -722,7 +718,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getDataForExternalTool($UserId,$courseId,$isTutor,$tutorSection,$hasSection,$sortOrder)
     {
-        //TODO: fix below query
             $query  = new Query();
         $query->select('imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked')
             ->from('imas_users')

@@ -170,7 +170,6 @@ class Student extends BaseImasStudents
 
     public static function findStudentByCourseId($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment')
             ->from('imas_users')
@@ -226,7 +225,6 @@ class Student extends BaseImasStudents
 
     public static function findStudentByCourseIdForOutcomes($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select(['imas_users.id', 'imas_users.SID', 'imas_users.FirstName', 'imas_users.LastName', 'imas_users.SID', 'imas_users.email', 'imas_students.section', 'imas_students.code', 'imas_students.locked', 'imas_students.timelimitmult', 'imas_students.lastaccess', 'imas_users.hasuserimg', 'imas_students.gbcomment'])
             ->from('imas_users')

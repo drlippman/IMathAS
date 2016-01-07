@@ -188,7 +188,6 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataToExportLib($libList,$nonPrivate)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('imas_library_items.qsetid,imas_library_items.libid')->from('imas_library_items')
             ->join('INNER JOIN', 'imas_questionset',
@@ -248,7 +247,6 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataByAdmin($safesearch, $llist, $checked)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')
             ->from('imas_questionset')
@@ -270,7 +268,6 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataByGrpAdmin($groupid, $llist, $safesearch, $checked)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('DISTINCT (imas_questionset.id),imas_questionset.description,imas_questionset.qtype')
             ->from('imas_questionset,imas_library_items,imas_users')
@@ -292,7 +289,6 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getDataByUserId($userid,$safesearch,$llist,$checked)
     {
-        //TODO: fix below query
         $query = new Query();
         $query->select('DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype')
             ->from('imas_questionset')

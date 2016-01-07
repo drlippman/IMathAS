@@ -171,7 +171,7 @@ class ForumController extends AppController
                 $searchterms = explode(" ", $searchstr);
                 $searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
             }
-            $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchlikes,$anyforumsgroup,$searchstr,$searchtag,$user->id);
+            $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchlikes, $anyforumsgroup, $searchstr, $searchtag, $user->id);
 
             $threaddata = array();
             $threadids = array();
@@ -202,7 +202,6 @@ class ForumController extends AppController
 
             }
             $searchedPost = ForumPosts::getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$user->id);
-
         } else {
                 //default display
             $forumPost = ForumPosts::threadCount($cid);
@@ -211,7 +210,6 @@ class ForumController extends AppController
                 $threadcount[$post['id']] = $post['COUNT(imas_forum_posts.id)'];
             }
             $maxPostDate = Forums::getMaxPostDate($cid);
-//            AppUtility::dump($maxPostDate);
 
             foreach ($maxPostDate as $row ) {
                 $postcount[$row['id']] = $row['postcount'];
@@ -470,9 +468,9 @@ class ForumController extends AppController
             $safesearch = $params['search'];
             $safesearch = str_replace(' and ', ' ', $safesearch);
             $searchterms = explode(" ", $safesearch);
-            $searchlikes = "(imas_forum_posts.message LIKE '%" . implode("%' AND imas_forum_posts.message LIKE '%", $searchterms) . "%')";
-            $searchlikes2 = "(imas_forum_posts.subject LIKE '%" . implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms) . "%')";
-            $searchlikes3 = "(imas_users.LastName LIKE '%" . implode("%' AND imas_users.LastName LIKE '%", $searchterms) . "%')";
+            $searchlikes = implode("%' AND imas_forum_posts.message LIKE '%", $searchterms);
+            $searchlikes2 = implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms);
+            $searchlikes3 = implode("%' AND imas_users.LastName LIKE '%", $searchterms);
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
         }
 
@@ -748,12 +746,7 @@ class ForumController extends AppController
                     }
                     if (!$isgroupedq) {
                         $result = ForumPosts::getDataByJoin($line['subject'], $forumId, $groupsetid, $isteacher, $groupid);
-//                        $query = "SELECT ift.id FROM imas_forum_posts AS ifp JOIN imas_forum_threads AS ift ON ifp.threadid=ift.id AND ifp.parent=0 ";
-//                        $query .= "WHERE ifp.subject='".addslashes($line['subject'])."' AND ift.forumid='$forumid'";
-//                        if ($groupsetid >0 && !$isteacher) {
-//                            $query .= " AND ift.stugroupid='$groupid'";
-//                        }
-//                        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+
                         if (count($result)>0) {
                             $notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
                             $notice .= 'Please read and participate in the existing discussion.';
@@ -1416,7 +1409,7 @@ class ForumController extends AppController
             if (count($limthreads)==0) {
                 $limthreads = '0';
             } else {
-                $limthreads = implode(',',$limthreads);
+                $limthreads = $limthreads;
             }
         }
         $posts = ForumPosts::getPosts($userId,$forumId,$limthreads,$dofilter);
