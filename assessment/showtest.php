@@ -2110,13 +2110,16 @@ if (!isset($_POST['embedpostback'])) {
 			echo '<input type="hidden" name="disptime" value="'.time().'" />';
 			echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 			$numdisplayed = 0;
+			
 			for ($i = 0; $i < count($questions); $i++) {
-				if (unans($scores[$i]) || amreattempting($i)) {
+				if (unans($bestscores[$i]) || amreattempting($i) || unans($scores[$i])) {
 					basicshowq($i);
 					showqinfobar($i,true,false,1);
 					$numdisplayed++;
 				}
 			}
+			$reattempting = array();
+			recordtestdata();
 			if ($numdisplayed > 0) {
 				echo '<br/><input type="submit" class="btn" value="', _('Submit'), '" />';
 				echo '<input type="submit" class="btn" name="saveforlater" value="', _('Save answers'), '" onclick="return confirm(\'', _('This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.'), '\');" />';
