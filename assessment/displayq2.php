@@ -5132,8 +5132,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if (!isset($function[2])) {
 					$function[2] = $settings[1];
 				}
-				$xminpix = max(2*$imgborder,($function[1] - $settings[0])*$pixelsperx + $imgborder);
-				$xmaxpix = min($settings[6]-2*$imgborder,($function[2] - $settings[0])*$pixelsperx + $imgborder);
+				$xminpix = round(max(2*$imgborder,($function[1] - $settings[0])*$pixelsperx + $imgborder));
+				$xmaxpix = round(min($settings[6]-2*$imgborder,($function[2] - $settings[0])*$pixelsperx + $imgborder));
 				for ($k=ceil($xminpix/$step); $k*$step <= $xmaxpix; $k++) {
 					$x = $k*$step;
 					$coordx = ($x - $imgborder)/$pixelsperx + $settings[0]+1E-10;
@@ -5186,14 +5186,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$totinterp = 0;
 			foreach ($lines as $k=>$line) {
 				for ($i=1;$i<count($line);$i++) {
-					$leftx = min($line[$i][0],$line[$i-1][0]);
-					$rightx = max($line[$i][0],$line[$i-1][0]);
+					$leftx = round(max(min($line[$i][0],$line[$i-1][0]), 2*$imgborder));
+					$rightx = round(min(max($line[$i][0],$line[$i-1][0]), $settings[6]-2*$imgborder));
 					if ($line[$i][0]==$line[$i-1][0]) {
 						$m = 9999;
 					} else {
 						$m = ($line[$i][1] - $line[$i-1][1])/($line[$i][0]-$line[$i-1][0]);
 					}
-					for ($k = ceil($leftx/$step); $k*$step<$rightx; $k++) {
+					for ($k = ceil($leftx/$step); $k*$step<=$rightx; $k++) {
 						$x = $k*$step;
 						$y = $line[$i-1][1] + $m*($x-$line[$i-1][0]);
 						if ($y>$imgborder && $y<($settings[7]-$imgborder)) {
@@ -5259,6 +5259,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			//divide up over all the lines
 			$percentunmatcheddrawn = $percentunmatcheddrawn;
+			//if ($GLOBALS['myrights']==100) {
+			//	print_r($anslines);
+			//	print_r($linedata);
+			//}
 			foreach ($anslines as $key=>$answerline) {
 				if ($stcnts[$key]<2) {
 					$stdevs[$key] = 0;
@@ -5275,7 +5279,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$percentunmatchedans = 0;
 				}
 				$scores[$key] = 1-($stdevpen + $percentunmatcheddrawn + $percentunmatchedans)/$reltolerance;
-				//echo "Line: $key, stdev: {$stdevs[$key]}, unmatchedrawn: $percentunmatcheddrawn, unmatchedans: $percentunmatchedans <br/>";
+				//if ($GLOBALS['myrights']==100) {
+				 //echo "Line: $key, stdev: {$stdevs[$key]}, unmatchedrawn: $percentunmatcheddrawn, unmatchedans: $percentunmatchedans <br/>";
+				//}
 				if ($scores[$key]<0) { 
 					$scores[$key] = 0;
 				} else if ($scores[$key]>1) {
