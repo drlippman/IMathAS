@@ -108,7 +108,8 @@ class Thread extends BaseImasForumThreads
         if ($user->rights == AppConstant::TEACHER_RIGHT) {
             $command->bindValue(':userId',$userId);
         }
-        $data = $command->bindValues([':cid',$cid,':userId',$user->id])->queryAll();
+        $command->bindValues([':cid'=> $cid,':userId'=> $user->id]);
+        $data = $command->queryAll();
         return $data;
     }
 
