@@ -42,13 +42,13 @@ class ForumController extends AppController
     public $totalPosts = array();
     public $children = array();
     public $threadLevel = AppConstant::NUMERIC_ONE;
-
+    public $user = null;
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacherAndStudentForumController($user,$courseId,$actionPath);
+        return $this->accessForTeacherAndStudentForumController($this->user,$courseId,$actionPath);
     }
 
     /*
@@ -58,7 +58,7 @@ class ForumController extends AppController
     {
         $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $this->layout = "master";
         $teacherid = $this->isTeacher($user['id'],$cid);
@@ -169,9 +169,10 @@ class ForumController extends AppController
             if ($searchstr != '') {
                 $searchstr = str_replace(' and ', ' ',$searchstr);
                 $searchterms = explode(" ", $searchstr);
-                $searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
+//                AppUtility::dump($searchterms);
+//                $searchlikes = $searchterms;
             }
-            $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchlikes, $anyforumsgroup, $searchstr, $searchtag, $user->id);
+            $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchterms, $anyforumsgroup, $searchstr, $searchtag, $user->id);
 
             $threaddata = array();
             $threadids = array();
@@ -196,12 +197,16 @@ class ForumController extends AppController
                 $searchstr = str_replace(' and ', ' ',$searchstr);
                 $searchterms = explode(" ",$searchstr);
 
-                $searchlikes = "(imas_forum_posts.message LIKE '%".implode("%' AND imas_forum_posts.message LIKE '%",$searchterms)."%')";
-                $searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
-                $searchlikes3 = "(imas_users.LastName LIKE '%".implode("%' AND imas_users.LastName LIKE '%",$searchterms)."%')";
+//                $searchlikes = "(imas_forum_posts.message LIKE '%".implode("%' AND imas_forum_posts.message LIKE '%",$searchterms)."%')";
+                $searchlikes = $searchterms;
+//                $searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
+                $searchlikes2 = $searchterms;
+//                $searchlikes3 = "(imas_users.LastName LIKE '%".implode("%' AND imas_users.LastName LIKE '%",$searchterms)."%')";
+                $searchlikes3 = $searchterms;
 
             }
             $searchedPost = ForumPosts::getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$user->id);
+//            AppUtility::dump($searchedPost);
         } else {
                 //default display
             $forumPost = ForumPosts::threadCount($cid);
@@ -237,7 +242,7 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = 'master';
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId, $user);
         $msgList = $this->getNotificationDataMessage($courseId, $user);
@@ -287,7 +292,7 @@ class ForumController extends AppController
         $this->layout = "master";
         $this->guestUserHandler();
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $threadsperpage = $currentUser['listperpage'];
         $forumId = $params['forum'];
         $courseId = $params['cid'];
@@ -579,7 +584,7 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumId');
         $forums = Forums::getByCourseId($courseId);
         $thread = ThreadForm::thread($forumId);
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $forumArray = array();
         foreach ($forums as $key => $forum) {
             $tempArray = array
@@ -637,7 +642,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $userId = $currentUser['id'];
         $threadId = $this->getParamVal('threadId');
         $forumId = $this->getParamVal('forumId');
@@ -871,7 +876,7 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = 'master';
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $courseId = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
@@ -1087,7 +1092,7 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $Id = $this->getParamVal('id');
         $threadId = $this->getParamVal('threadId');
-        $userData = $this->getAuthenticatedUser();
+        $userData = $this->user;
         $threadData = ForumPosts::getbyidpost($Id);
         $contentTrackRecord = new ContentTrack();
         if ($userData->rights == AppConstant::STUDENT_RIGHT) {
@@ -1133,7 +1138,7 @@ class ForumController extends AppController
             }
             $fileName = implode('@@', $files);
             $isPost = $params['isPost'];
-            $user = $this->getAuthenticatedUser();
+            $user = $this->user;
             $reply = new ForumPosts();
             $reply->createReply($params, $user, $fileName);
             if (isset($isPost)) {
@@ -1155,7 +1160,7 @@ class ForumController extends AppController
     public function actionAddNewThread()
     {
         $this->layout = 'master';
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $this->getUserId();
         $rights = $user->rights;
         $forumId = $this->getParamVal('forumid');
@@ -1464,7 +1469,7 @@ class ForumController extends AppController
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $block = $this->getParamVal('block');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $modifyForumId = $params['id'];
@@ -1831,7 +1836,7 @@ class ForumController extends AppController
     public function actionChangeForum()//only for teacher
     {
         $courseId = $this->getParamVal('cid');
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = $this->isTeacher($currentUser->id, $courseId);
         $course = Course::getById($courseId);
         $this->layout = "master";
@@ -2049,7 +2054,7 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $courseId = intval($params['cid']);
         $course = Course::getById($courseId);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = $this->isTeacher($currentUser['id'], $courseId);
         $isTutor = $this->isTutor($currentUser['id'], $courseId);;
         $studentId = intval($params['stu']);
@@ -2132,7 +2137,7 @@ class ForumController extends AppController
 
     public function actionListViews()
     {
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $params = $this->getRequestParams();
 
         $teacherid = $this->isTeacher($currentUser['id'],$params['cid']);

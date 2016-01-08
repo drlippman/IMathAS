@@ -54,13 +54,14 @@ class InstructorController extends AppController
     public $enableCsrfValidation = false;
     public $shift;
     public $cnt = AppConstant::NUMERIC_ZERO;
+    public $user = null;
 
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $actionPath = Yii::$app->controller->action->id;
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($user,$courseId, $actionPath);
+        return $this->accessForTeacher($this->user,$courseId, $actionPath);
     }
 
     /**
@@ -125,7 +126,7 @@ class InstructorController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $eventData = $this->getRequestParams();
         $courseId = $eventData['cid'];
         $teacherId = Teacher::getByUserId($user->id, $courseId);
@@ -199,7 +200,7 @@ class InstructorController extends AppController
     public function deleteItemById($itemId)
     {
         $ItemType =Items::getByTypeId($itemId);
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         switch($ItemType['itemtype'])
         {
             case AppConstant::FORUM:
@@ -339,7 +340,7 @@ class InstructorController extends AppController
     public function actionTimeShift()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
@@ -424,7 +425,7 @@ class InstructorController extends AppController
     public function actionMassChangeDates()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
@@ -759,7 +760,7 @@ class InstructorController extends AppController
          $this->guestUserHandler();
          $courseId = $this->getParamVal('cid');
          $course = Course::getById($courseId);
-         $user = $this->getAuthenticatedUser();
+         $user = $this->user;
         global $userid;
         $userid = $user['id'];
          $loadToOthers = $this->getParamVal('loadothers');
@@ -1207,7 +1208,7 @@ class InstructorController extends AppController
     public function actionContentStats()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);

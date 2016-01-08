@@ -62,21 +62,22 @@ class CourseController extends AppController
      * Display all course in item order
      */
     public $enableCsrfValidation = false;
+    public $user = null;
 
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $actionPath = Yii::$app->controller->action->id;
         $params = $this->getRequestParams();
         $courseId =   ($params['cid'] || $params['courseId']) ? ($params['cid'] ? $params['cid'] : $params['courseId'] ) : AppUtility::getDataFromSession('courseId');
-        return $this->accessForCourseController($user,$courseId, $actionPath);
+        return $this->accessForCourseController($this->user,$courseId, $actionPath);
     }
 
     public function actionUpdateOwner()
     {
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-            $user = $this->getAuthenticatedUser();
+            $user = $this->user;
             if ($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
                 $this->setErrorFlash(AppConstant::NO_ACCESS_RIGHTS);
             }
@@ -233,7 +234,7 @@ class CourseController extends AppController
          * Greater than guest user.
          */
         $this->layout = 'master';
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $courseId = $this->getParamVal('cid');
         $id = $this->getParamVal('id');
         $course = Course::getById($courseId);
@@ -285,7 +286,7 @@ class CourseController extends AppController
          * Ajax
          */
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $cid = $params['cid'];
         $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -358,7 +359,7 @@ class CourseController extends AppController
     {
         $this->layout = "master";
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
@@ -392,7 +393,7 @@ class CourseController extends AppController
          */
         global $outcomes;
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user['id'];
         $params = $this->getRequestParams();
@@ -724,7 +725,7 @@ class CourseController extends AppController
          *  5. Teacher
          */
         $params = $this->getRequestParams();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
@@ -1123,7 +1124,7 @@ class CourseController extends AppController
                $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
                $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess,
                $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useViewButtons,$previewshift, $useviewButtons, $courseStudent;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $myRights = $user['rights'];
         $userId = $user['id'];
@@ -1139,7 +1140,6 @@ class CourseController extends AppController
         $this->setSessionData('courseId',$courseId);
         $teacherId = $this->isTeacher($userId, $courseId);
         $isStudent = $this->isStudent($userId, $courseId);
-        $stuView = $this->getParamVal('stuview');
         $params = $this->getRequestParams();
         $this->checkSession($params);
         $teacherData = Teacher::getByUserId($userId,$courseId);
@@ -1618,7 +1618,7 @@ class CourseController extends AppController
         global $teacherId,$isTutor,$isStudent,$courseId,$imasroot,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights,
                $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,
                $studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $courseId = $this->getParamVal('cid');
         $teacherId = $this->isTeacher($userId, $courseId);
@@ -1858,7 +1858,7 @@ class CourseController extends AppController
     public function actionDeleteItemsAjax()
     {
         $params = $this->getRequestParams();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $courseId = $params['courseId'];
         $cid = $params['cid'];
         $block = $params['block'];
@@ -1975,7 +1975,7 @@ class CourseController extends AppController
     public function deleteItemById($itemId)
     {
         $ItemType =Items::getByTypeId($itemId);
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         switch($ItemType['itemtype'])
         {
             case AppConstant::FORUM:
@@ -2022,7 +2022,7 @@ class CourseController extends AppController
     {
         global $teacherId,$courseId,$userId,$openBlocks,$firstLoad,$previewShift,
                $hideIcons,$graphicalIcons,$isPublic;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $this->layout = 'nonLoggedUser';
         $isPublic = true;
@@ -2117,7 +2117,7 @@ class CourseController extends AppController
     {
         global $teacherId,$courseId,$userId,$openBlocks,$firstLoad,$previewShift,
                $hideIcons,$graphicalIcons,$isPublic;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $isPublic = true;
 
@@ -2184,7 +2184,7 @@ class CourseController extends AppController
     public function actionShowLinkedTextPublic()
     {
         global $isPublic, $courseId;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'nonLoggedUser';
         $userId = $user['id'];
         $courseId = intval($this->getParamVal('cid'));

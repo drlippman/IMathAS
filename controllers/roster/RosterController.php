@@ -43,12 +43,13 @@ class RosterController extends AppController
 {
     public $newUser = array();
     public $existUserRecords = array();
+    public $user = null;
 
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($user,$courseId);
+        return $this->accessForTeacher($this->user,$courseId);
     }
  /*
  * Controller method to display student information on student roster page.
@@ -58,7 +59,7 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $courseId = $this->getParamVal('cid');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $sessionId = $this->getSessionId();
@@ -139,7 +140,7 @@ class RosterController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $sessionId = Yii::$app->session->getId();
         $sessionData = Sessions::getById($sessionId);
         $tzoffset = $sessionData['tzoffset'];
@@ -578,7 +579,7 @@ class RosterController extends AppController
         $nowTime = time();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $studentRecords = '';
         $this->includeCSS(['roster/roster.css']);
         if ($model->load($this->isPostMethod()))
@@ -840,7 +841,7 @@ class RosterController extends AppController
         if ($this->isPost()) {
             $selectedStudents = $this->getRequestParams();
             $isGradebook = $selectedStudents['gradebook'];
-            $emailSender = $this->getAuthenticatedUser();
+            $emailSender = $this->user;
             $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : AppConstant::NUMERIC_ZERO;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
             if (!$isActionForEmail) {
@@ -1040,7 +1041,7 @@ class RosterController extends AppController
                 $students = array();
                 $sendToStudents = array();
                 $filteredStudents = array();
-                $user = $this->getAuthenticatedUser();
+                $user = $this->user;
                 $studentsInfo = unserialize($selectedStudents['studentInformation']);
                 $courseId = $selectedStudents['courseid'];
                 $course = Course::getById($courseId);
@@ -1110,7 +1111,7 @@ class RosterController extends AppController
     public function sendMassMessage($courseId, $receiver, $subject, $messageBody, $isRead)
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $tempArray = array('cid' => $courseId, 'receiver' => $receiver, 'subject' => $subject, 'body' => $messageBody, 'isread' => $isRead);
         $message = new Message();
         $message->create($tempArray, $user->id);
@@ -1406,7 +1407,7 @@ class RosterController extends AppController
     public function actionActivityLog()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $from = $this->getParamVal('from');

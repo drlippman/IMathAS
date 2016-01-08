@@ -27,11 +27,12 @@ use app\controllers\AppController;
 class UtilitiesController extends AppController
 {
     public $a = array();
+    public $user = null;
 
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
-        return $this->accessForAdmin($user['rights']);
+        $this->user = $this->getAuthenticatedUser();
+        return $this->accessForAdmin($this->user['rights']);
     }
 
     /**
@@ -41,7 +42,7 @@ class UtilitiesController extends AppController
     public function actionAdminUtilities()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $removeLti = $this->getParamVal('removelti');
         $form = $this->getParamVal('form');
         $debug = $this->getParamVal('debug');
@@ -192,7 +193,7 @@ class UtilitiesController extends AppController
     public function actionGetStudentCount()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         if($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
         {
@@ -261,7 +262,7 @@ class UtilitiesController extends AppController
     {
         $this->layout = 'master';
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $days = $this->getParamVal('days');
         $start = $this->getParamVal('start');
         $end = $this->getParamVal('end');
@@ -302,7 +303,7 @@ class UtilitiesController extends AppController
     {
         $this->layout = 'master';
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
@@ -344,7 +345,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $skipN = $this->getParamVal('skipn');
         $go = $this->getParamVal('go');
@@ -446,7 +447,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
 
         if($user->rights < AppConstant::ADMIN_RIGHT) {
             $body = AppConstant::NUMERIC_ONE;
@@ -461,7 +462,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
@@ -498,7 +499,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
@@ -551,7 +552,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
@@ -581,7 +582,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
@@ -800,7 +801,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $massEnd = $this->getParamVal('masssend');
         if($user->rights < AppConstant::ADMIN_RIGHT)
@@ -827,7 +828,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $massEnd = $this->getParamVal('masssend');
         $courseId = $this->getParamVal('cid');

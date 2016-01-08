@@ -27,12 +27,12 @@ class OutcomesController extends AppController
     public $seenOutcomesArr = array();
     public $courseId;
     public $params;
-
+    public $user;
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($user,$courseId);
+        return $this->accessForTeacher($this->user,$courseId);
     }
 
     public function actionAddOutcomes()

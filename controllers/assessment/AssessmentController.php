@@ -36,12 +36,13 @@ use app\components\AppConstant;
 include("../components/handled.php");
 class AssessmentController extends AppController
 {
+    public $user = null;
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId = ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid') ? $this->getRequestParams('cid') : $this->getRequestParams('courseId')) : AppUtility::getDataFromSession('courseId');
-        return $this->accessForAssessmentController($user, $courseId, $actionPath);
+        return $this->accessForAssessmentController($this->user, $courseId, $actionPath);
     }
 
     /*
@@ -72,7 +73,7 @@ class AssessmentController extends AppController
 
     public function actionAddAssessment()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
@@ -629,7 +630,7 @@ class AssessmentController extends AppController
 
     public function actionChangeAssessment()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
@@ -973,7 +974,7 @@ class AssessmentController extends AppController
     public function actionAssessmentMessage()
     {
         $params = $this->getRequestParams();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $courseId = $params['cid'];
         $this->layout = 'master';
         $course = Course::getById($courseId);
@@ -1125,7 +1126,7 @@ class AssessmentController extends AppController
 
     public function actionShowTest()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $userid = $user['id'];
@@ -3961,7 +3962,7 @@ class AssessmentController extends AppController
     public function actionShowPrintTest()
     {
         global $seeds, $questions, $temp;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user['id'];
         $sessionId = $this->getSessionId();
@@ -4242,7 +4243,7 @@ class AssessmentController extends AppController
         $courseId = $this->getParamVal('cid');
         $undo = $this->getParamVal('undo');
         $confirm = $this->getParamVal('confirm');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);

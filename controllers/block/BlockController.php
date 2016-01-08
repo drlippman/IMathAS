@@ -21,18 +21,18 @@ class BlockController extends AppController
     public  $existblockids = array();
     public  $existBlocksVals = array();
     public  $existBlocksLabels = array();
-
+    public $user = null;
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($user,$courseId);
+        return $this->accessForTeacher($this->user,$courseId);
     }
 
     public function actionAddBlock()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
@@ -299,7 +299,7 @@ class BlockController extends AppController
     public function actionChangeBlock()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
@@ -398,7 +398,7 @@ class BlockController extends AppController
     {
         global $courseId,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = $params['cid'];

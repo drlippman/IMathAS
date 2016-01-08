@@ -20,7 +20,7 @@ class StudentController extends AppController
         if($user['rights'] == AppConstant::GUEST_RIGHT)
         {
             $this->setErrorFlash("Guest user can't access this page.");
-            return $this->redirect($this->goHome());
+            return $this->goHome();
         }
         $this->guestUserHandler();
         $this->layout = 'master';

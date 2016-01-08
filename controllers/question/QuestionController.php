@@ -27,17 +27,18 @@ use app\components\AppConstant;
 require("../components/displayQuestion.php");
 class QuestionController extends AppController
 {
+    public $user = null;
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getRequestParams('cid') || $this->getRequestParams('courseId')) ? ($this->getRequestParams('cid')?$this->getRequestParams('cid'):$this->getRequestParams('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForQuestionController($user,$courseId,$actionPath);
+        return $this->accessForQuestionController($this->user,$courseId,$actionPath);
     }
 
     public function actionAddQuestions()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $groupId = $user['groupid'];
         $userId = $user['id'];
         $params = $this->getRequestParams();
@@ -867,7 +868,7 @@ class QuestionController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $isTeacher = $this->isTeacher($user['id'], $courseId);
         $aid = $this->getParamVal('aid');
         $params = $this->getRequestParams();
@@ -1106,7 +1107,7 @@ class QuestionController extends AppController
 
     public function actionPrintTest()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $this->layout = 'master';
@@ -1133,7 +1134,7 @@ class QuestionController extends AppController
 
     public function actionLibraryTree()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $myRights = $user['rights'];
         $libraryData = Libraries::getAllLibrariesByJoin();
@@ -1162,7 +1163,7 @@ class QuestionController extends AppController
 
     public function actionModDataSet()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $myRights = $user['rights'];
         $userId = $user['id'];
         $userFullName = $user['FirstName'] . ' ' . $user['LastName'];
@@ -1718,7 +1719,7 @@ class QuestionController extends AppController
 
     public function actionModQuestion()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user['id'];
         $params = $this->getRequestParams();
@@ -1895,7 +1896,7 @@ class QuestionController extends AppController
 
     public function actionTestQuestion()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $myRights = $user['rights'];
         $params = $this->getRequestParams();
@@ -2002,7 +2003,7 @@ class QuestionController extends AppController
 
     public function actionAddQuestionsSave()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $assessmentId = $params['aid'];
@@ -2124,7 +2125,7 @@ class QuestionController extends AppController
     public function actionSaveLibAssignFlag()
     {
         $params = $this->getRequestParams();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $myRights = $user['rights'];
         if (!isset($params['libitemid']) || $myRights < AppConstant::TEACHER_RIGHT) {
             exit;
@@ -2143,7 +2144,7 @@ class QuestionController extends AppController
 
     public function actionPrintLayout()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
 //        $this->layout = 'master';
@@ -2233,7 +2234,7 @@ class QuestionController extends AppController
 
     public function actionPrintLayoutBare()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $assessmentId = $params['aid'];
@@ -2352,7 +2353,7 @@ class QuestionController extends AppController
 
     public function actionManageQuestionSet()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $remove = $this->getParamVal('remove');
         $transfer = $this->getParamVal('transfer');
         $params = $this->getRequestParams();
@@ -3076,7 +3077,7 @@ class QuestionController extends AppController
 
     public function actionModTutorialQuestion()
     {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $isAdmin = false;
         $isGrpAdmin = false;
         global $qSetId;
@@ -3740,7 +3741,7 @@ class QuestionController extends AppController
     }
 
     public function actionSaveBrokenQuestionFlag() {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userfullname = $user['FirstName'].''.$user['LastName'];
         if (!isset($_GET['qsetid']) || $user['rights']<20) {
             exit;
@@ -3799,7 +3800,7 @@ class QuestionController extends AppController
     }
 
     public function actionViewSource() {
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
@@ -3874,7 +3875,7 @@ class QuestionController extends AppController
     public function actionPrintLayoutWord()
     {
         global $temp;
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $userId = $user['id'];
         $params = $this->getRequestParams();
         $this->layout = 'master';

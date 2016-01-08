@@ -30,18 +30,19 @@ use app\models\WikiRevision;
 
 class GroupsController extends AppController
 {
+    public $user = null;
 
     public function beforeAction($action)
     {
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($user,$courseId);
+        return $this->accessForTeacher($this->user,$courseId);
     }
 
     public function actionManageStudentGroups()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);

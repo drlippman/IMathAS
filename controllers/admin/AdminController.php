@@ -55,12 +55,12 @@ use yii\base\Exception;
 
 class AdminController extends AppController
 {
-
+    public $user = null;
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
-        $user = $this->getAuthenticatedUser();
-        return $this->accessForAdminController($user['rights'],$actionPath);
+        $this->user = $this->getAuthenticatedUser();
+        return $this->accessForAdminController($this->user['rights'],$actionPath);
     }
     public function actionIndex()
     {
@@ -69,7 +69,7 @@ class AdminController extends AppController
         $sortBy = AppConstant::FIRST_NAME;
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $userId = $user->id;
         $showCid = $this->getParamVal('showcourses');
@@ -266,7 +266,7 @@ class AdminController extends AppController
     public function actionDiagnostics()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user->id;
         $myRights = $user['rights'];
@@ -493,7 +493,7 @@ class AdminController extends AppController
     public function actionExternalTool()
     {
        $this->guestUserHandler();
-       $user = $this->getAuthenticatedUser();
+       $user = $this->user;
        $this->layout = 'master';
        $userId = $user->id;
        $myRights = $user['rights'];
@@ -648,7 +648,7 @@ class AdminController extends AppController
     {
         $installname = "OpenMath";
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $myRights = $currentUser['rights'];
         $this->layout = 'master';
         $enablebasiclti = true;
@@ -889,7 +889,7 @@ class AdminController extends AppController
         $params = $this->getRequestParams();
         $allowmacroinstall = true;
         $this->layout = 'master';
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $userId = $currentUser['id'];
         $getId = $this->getParamVal('id');
         $action = $params['action'];
@@ -1556,7 +1556,7 @@ class AdminController extends AppController
     public function actionDiagOneTime()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $myRights = $user['rights'];
         $diag = $this->getParamVal('id');
@@ -1650,7 +1650,7 @@ class AdminController extends AppController
         $allowNonGroupLibs = false;
         $isGrpAdmin = false;
         $courseId = $this->getParamVal('cid');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $teacherId = AppConstant::TEACHER_RIGHT;
         $myRights  = $user->rights;
@@ -1900,7 +1900,7 @@ class AdminController extends AppController
         $body = "";
         $this->layout = "master";
         $courseId = $this->getParamVal('cid');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $myRights  = $user->rights;
         $teacherId = AppConstant::TEACHER_RIGHT;
@@ -2546,7 +2546,7 @@ class AdminController extends AppController
     {
         global $rights,$parents,$qcount,$ltlibs, $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user->id;
         $allownongrouplibs = false;
@@ -2949,7 +2949,7 @@ class AdminController extends AppController
         $isGrpAdmin = false;
         $teacherId = AppConstant::TEACHER_RIGHT;
         $courseId = $this->getParamVal('cid');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $myRights  = $user->rights;
         if (!(isset($teacherId)) && $myRights< AppConstant::GROUP_ADMIN_RIGHT)
@@ -3380,7 +3380,7 @@ class AdminController extends AppController
     public function actionExportQuestionSet()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user->id;
         $myRights = $user['rights'];
@@ -3607,7 +3607,7 @@ class AdminController extends AppController
     public function actionReviewLibrary()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $this->layout = 'master';
         $userId = $user->id;
         $myRights = $user['rights'];

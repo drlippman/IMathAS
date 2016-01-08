@@ -21,13 +21,14 @@ class MessageController extends AppController
     public $totalMessages = array();
     public $children = array();
     public $enableCsrfValidation = false;
+    public $user = null;
 
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForMessageController($user,$courseId,$actionPath);
+        return $this->accessForMessageController($this->user,$courseId,$actionPath);
     }
     /*
      * Initial load of message index page.
@@ -36,7 +37,8 @@ class MessageController extends AppController
     {
         $this->layout = "master";
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+
+        $user = $this->user;
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
@@ -44,7 +46,7 @@ class MessageController extends AppController
         $this->setSessionData('postCount',$countPost);
         $isNewMessage = $this->getParamVal('newmsg');
         $isImportant = $this->getParamVal('show');
-        $rights = $this->getAuthenticatedUser();
+        $rights = $this->user;
         if ($rights) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
@@ -94,7 +96,7 @@ class MessageController extends AppController
     {
         $this->layout = "master";
         $this->guestUserHandler();
-        $userRights = $this->getAuthenticatedUser();
+        $userRights = $this->user;
         $newTo = $this->getParamVal('new');
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('userid');
@@ -194,7 +196,7 @@ class MessageController extends AppController
         $this->layout = "master";
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
-        $userRights = $this->getAuthenticatedUser();
+        $userRights = $this->user;
         $threadsperpage = $userRights['listperpage'];
         $isTeacher = $this->isTeacher($userRights['id'], $courseId);
         $isStudent = $this->isStudent($userRights['id'], $courseId);
@@ -371,7 +373,7 @@ class MessageController extends AppController
 
         $this->layout = "master";
         $this->guestUserHandler();
-        $userRights = $this->getAuthenticatedUser();
+        $userRights = $this->user;
         $messageId = $this->getParamVal('message');
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId,$userRights);
@@ -431,7 +433,7 @@ class MessageController extends AppController
     {
         $this->layout = 'master';
         $this->guestUserHandler();
-        $userRights = $this->getAuthenticatedUser();
+        $userRights = $this->user;
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
         $courseId = $this->getParamVal('cid');
@@ -508,12 +510,12 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
-        $userRights = $this->getAuthenticatedUser();
+        $userRights = $this->user;
         $course = Course::getById($courseId);
         $messageId = $this->getParamVal('message');
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         if ($baseId == AppConstant::ZERO_VALUE) {
             $baseId = $msgId;
         }
@@ -608,7 +610,7 @@ class MessageController extends AppController
         $this->layout = 'master';
         $threadid = $this->getParamVal('threadid');
 
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
 
         if (!isset($threadid)) {
              $this->setErrorFlash('Exit');

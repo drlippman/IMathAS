@@ -55,12 +55,13 @@ include ("../components/htmLawed.php");
 require("../components/displayQuestion.php");
 class GradebookController extends AppController
 {
+    public $user = null;
     public function beforeAction($action)
     {
         $actionPath = Yii::$app->controller->action->id;
-        $user = $this->getAuthenticatedUser();
+        $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacherAndStudent($user,$courseId,$actionPath);
+        return $this->accessForTeacherAndStudent($this->user,$courseId,$actionPath);
     }
 
      public function actionGradebook()
@@ -68,7 +69,7 @@ class GradebookController extends AppController
         global $get;
         $this->guestUserHandler();
         $this->layout = "master";
-        $user = $this->getAuthenticatedUser();
+        $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId, $user);
@@ -2014,7 +2015,7 @@ class GradebookController extends AppController
     public function actionAddGrades()
     {
         $this->guestUserHandler();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $courseId = $this->getParamVal('cid');
         $this->layout = 'master';
         $params = $this->getRequestParams();
@@ -2381,7 +2382,7 @@ class GradebookController extends AppController
     {
         $params = $this->getRequestParams();
         $this->layout = 'master';
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
         $courseId = $params['cid'];
@@ -2559,7 +2560,7 @@ class GradebookController extends AppController
         $this->layout = 'master';
         $model = new AddGradesForm();
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $gradeNames = GbItems::getbyCourseId($courseId);
@@ -2887,7 +2888,7 @@ class GradebookController extends AppController
         $courseId = $params['cid'];
         $userId = $params['studentId'];
         $course = Course::getById($courseId);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $StudentData = Student::getByUserId($userId);
         $totalData = $this->gbtable($currentUser['id'], $course['id'], $userId);
         $defaultValuesArray = $totalData['defaultValuesArray'];
@@ -2932,7 +2933,7 @@ class GradebookController extends AppController
     public function actionSendMessageModel()
     {
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $userId = $params['sendto'];
         $sendType = $params['sendtype'];
         $courseId = $params['cid'];
@@ -3058,7 +3059,7 @@ class GradebookController extends AppController
     {
         $this->layout = 'master';
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $teacherid = Teacher::getByUserId($currentUser['id'], $courseId);
@@ -3535,7 +3536,7 @@ class GradebookController extends AppController
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $assessmentId = $params['aid'];
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
@@ -3692,7 +3693,7 @@ class GradebookController extends AppController
         $assessmentId = $params['aid'];
         $questionId = $params['qid'];
         $type = $params['type'];
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
         if($teacher){
@@ -3798,7 +3799,7 @@ class GradebookController extends AppController
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $assessmentId = $params['aid'];
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
@@ -3905,7 +3906,7 @@ class GradebookController extends AppController
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $assessmentId = $params['aid'];
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
@@ -4223,7 +4224,7 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $assessmentId = $params['aid'];
         $att = $params['att'];
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = false;
         $teacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
@@ -4316,7 +4317,7 @@ class GradebookController extends AppController
         $params = $this->getRequestParams();
         $get = $params;
         $this->layout = "master";
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $teacherId = $this->isTeacher($currentUser['id'],$courseId);
         $tutorId = $this->isTutor($currentUser['id'],$courseId);
         if ($teacherId) {
@@ -4366,7 +4367,7 @@ class GradebookController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
         if (isset($sessionData[$courseId.'gbmode'])) {
@@ -4404,7 +4405,7 @@ class GradebookController extends AppController
     public function actionIsolateAssessmentGroup()
     {
         $params = $this->getRequestParams();
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $courseId = $params['cid'];
         $aid = $params['aid'];
         $this->layout = 'master';
@@ -4449,7 +4450,7 @@ class GradebookController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTutor = $this->isTutor($currentUser['id'],$courseId);
         $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
@@ -4615,7 +4616,7 @@ class GradebookController extends AppController
         $cid = $params['cid'];
         $this->layout = 'master';
         $course = Course::getById($cid);
-        $currentUser = $this->getAuthenticatedUser();
+        $currentUser = $this->user;
         $isTeacher = $this->isTeacher($currentUser['id'],$course['id']);
         $assessmentId = $params['asid'];
         $aid = $params['aid'];
