@@ -19,7 +19,7 @@ class StudentController extends AppController
         $user = $this->getAuthenticatedUser();
         if($user['rights'] == AppConstant::GUEST_RIGHT)
         {
-            $this->setWarningFlash("Guest user can't access this page.");
+            $this->setErrorFlash("Guest user can't access this page.");
             return $this->redirect($this->goHome());
         }
         $this->guestUserHandler();
@@ -42,6 +42,8 @@ class StudentController extends AppController
                         $student->create($param);
                         $this->setSuccessFlash(AppConstant::ENROLL_SUCCESS . $course->name . ' successfully');
                         return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
+                    }elseif($user['rights'] < AppConstant::STUDENT_RIGHT){
+                        AppUtility::dump('hey');
                     } else {
                         $errorMessage = AppConstant::ALREADY_ENROLLED;
                         if ($teacher) {

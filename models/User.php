@@ -566,14 +566,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getUserDetailsByJoin($srch)
     {
-        //TODO: fix below query
         $query = "SELECT DISTINCT imas_users.*,imas_courses.id AS cid,imas_groups.name AS groupname
                     FROM imas_users JOIN imas_courses ON imas_users.id=imas_courses.ownerid
                     JOIN imas_groups ON imas_groups.id=imas_users.groupid
                     WHERE imas_courses.id IN ";
-        $query .= "(SELECT courseid FROM imas_inlinetext WHERE text LIKE '%$srch%') OR imas_courses.id IN ";
-        $query .= "(SELECT courseid FROM imas_linkedtext WHERE text LIKE '%$srch%' OR summary LIKE '%$srch%') ORDER BY imas_groups.name,imas_users.LastName";
-        return Yii::$app->db->createCommand($query)->query();
+        $query .= "(SELECT courseid FROM imas_inlinetext WHERE text LIKE :srch) OR imas_courses.id IN ";
+        $query .= "(SELECT courseid FROM imas_linkedtext WHERE text LIKE :srch OR summary LIKE :srch) ORDER BY imas_groups.name,imas_users.LastName";
+        $command = Yii::$app->db->createCommand($query)->bindValue(':srch', "%".$srch."%");
+        return $data = $command->query();
     }
 
     public static function getFirstNameAndLastName($toList)

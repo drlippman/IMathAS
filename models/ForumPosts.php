@@ -528,30 +528,65 @@ class ForumPosts extends BaseImasForumPosts
             ->where(['imas_forum_posts.parent' => '0'])->andWhere('imas_forums.courseid = :cid')->groupBy('imas_forum_posts.forumid')->orderBy('imas_forums.id');
         return $query->createCommand()->bindValue('cid',$cid)->queryAll();
     }
-    public static function getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$userid)
+    public static function getBySearchTextForForum($isteacher, $now, $cid, $searchterms, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$userid)
     {
         //        TODO: fix below query
+        if(!empty($searchterms) && is_array($searchterms)){
+            $searchTermsMessage = "";
+            $searchTermsSubject = "";
+            $searchTermsLastName = "";
+            foreach($searchterms as $index => $singleTerm){
+                $searchTermsMessage .= " AND imas_forum_posts.message LIKE :searchTerm".$index;
+                $searchTermsSubject .= " AND imas_forum_posts.subject LIKE :searchTerm".$index;
+                $searchTermsLastName .= " AND imas_users.LastName LIKE :searchTerm".$index;
+            }
+            $searchTermsMessage = "(".trim(trim(trim($searchTermsMessage),'AND')).")";
+            $searchTermsSubject = "(".trim(trim(trim($searchTermsSubject),'AND')).")";
+            $searchTermsLastName = "(".trim(trim(trim($searchTermsLastName),'AND')).")";
+        }
+
         $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.posttype,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
         if ($anyforumsgroup && !$isteacher) {
             $query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
         }
-        $query .= "WHERE imas_forums.courseid='$cid' ";
+        $query .= "WHERE imas_forums.courseid=:courseId ";
         if ($searchstr != '') {
-            $query .= "AND ($searchlikes OR $searchlikes2 OR $searchlikes3) ";
+            $query .= "AND ($searchTermsMessage OR $searchTermsSubject OR $searchTermsLastName) ";
         }
         if ($searchtag != '') {
-            $query .= "AND imas_forum_posts.tag='$searchtag' ";
+            $query .= "AND imas_forum_posts.tag=:searchtag ";
         }
         if (!$isteacher) {
-            $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+            $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<:now AND imas_forums.enddate>:now)) ";
         }
         if ($anyforumsgroup && !$isteacher) {
-            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userId)) ";
         }
         $query .= " ORDER BY imas_forum_posts.postdate DESC";
-        return Yii::$app->db->createCommand($query)->queryAll();
+
+        $command = Yii::$app->db->createCommand($query);
+
+        $command->bindValue(':courseId',$cid);
+        if ($searchstr != '') {
+            if(!empty($searchterms) && is_array($searchterms)){
+
+                foreach($searchterms as $index => $singleTerm){
+                    $command->bindValue(":searchTerm".$index , "%".$singleTerm."%");
+                }
+            }
+        }
+        if ($searchtag != '') {
+            $command->bindValue(':searchtag',$searchtag);
+        }
+        if (!$isteacher) {
+            $command->bindValue(':now', $now);
+        }
+        if ($anyforumsgroup && !$isteacher) {
+            $command->bindValue(':userId', $userid);
+        }
+        return $command->queryAll();
     }
 
     public static function getBySearchTextForThread($isteacher, $now, $cid, $searchlikes, $anyforumsgroup,$searchstr,$searchtag,$userid)
@@ -560,7 +595,7 @@ class ForumPosts extends BaseImasForumPosts
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
         $query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
-        $query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid='$userid' ";
+        $query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid=:userid ";
 
         $query .= "WHERE imas_forums.courseid=:cid AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
         if ($searchstr != '') {
@@ -577,7 +612,7 @@ class ForumPosts extends BaseImasForumPosts
         }
         $query .= " ORDER BY imas_forum_threads.lastposttime DESC";
         $command = Yii::$app->db->createCommand($query);
-        $command->bindValue(':cid', $cid);
+        $command->bindValues([':cid'=> $cid, ':userid' => $userid]);
         if ($searchstr != '') {
             $command->bindValue(':searchlikes', $searchlikes);
         }
