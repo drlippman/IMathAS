@@ -142,20 +142,20 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function updateVideoId($from,$to)
     {
-        //TODO: fix below query
-        $query = "UPDATE imas_linkedtext SET text=REPLACE(text,'$from','$to') WHERE text LIKE '%$from%'";
+        $query = "UPDATE imas_linkedtext SET text=REPLACE(text,':from',':to') WHERE text LIKE ':fromLike'";
         $connection=\Yii::$app->db;
         $command=$connection->createCommand($query);
+        $command->bindValues([':from' => $from, ':to' => $to, ':fromLike' => "%".$from."%"]);
         $rowCount=$command->execute();
         return $rowCount;
     }
 
     public static function updateSummary($from,$to)
     {
-        //TODO: fix below query
-        $query = "UPDATE imas_linkedtext SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
+        $query = "UPDATE imas_linkedtext SET summary=REPLACE(summary,':from',':to') WHERE summary LIKE ':fromLike'";
         $connection=\Yii::$app->db;
         $command=$connection->createCommand($query);
+        $command->bindValues([':from' => $from, ':to' => $to, ':fromLike' => "%".$from."%"]);
         $rowCount=$command->execute();
         return $rowCount;
     }
@@ -163,7 +163,7 @@ class LinkedText extends BaseImasLinkedtext
     public static function getByTextAndId($courseId)
     {
         //TODO: fix below query
-        return \Yii::$app->db->createCommand("SELECT text,points,id FROM imas_linkedtext WHERE courseid='{$courseId}' AND text LIKE 'file:%'")->queryAll();
+        return \Yii::$app->db->createCommand("SELECT text,points,id FROM imas_linkedtext WHERE courseid=:courseId AND text LIKE 'file:%'")->bindValues([':courseId' => $courseId])->queryAll();
     }
 
     public static function getByIdForFile($safetext)

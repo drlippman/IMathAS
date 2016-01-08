@@ -191,23 +191,46 @@ class Questions extends BaseImasQuestions
 
     public static function updateQuestionSetId($aidarr)
     {
-        //TODO: fix below query
+        $placeholders= "";
+        if($aidarr)
+        {
+            foreach($aidarr as $i => $singleAssignment){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
         $query = "UPDATE imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id ";
         if (!is_array($aidarr)) {
             $query .= "JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
         }
         $query .= "SET iq.questionsetid=iqs.replaceby WHERE iqs.replaceby>0 ";
         if (is_array($aidarr)) {
-            $query .= " AND iq.assessmentid IN (" . implode(',', $aidarr) . ")";
+            $query .= " AND iq.assessmentid IN ($placeholders)";
         } else {
-            $query .= " AND ia.courseid='$aidarr'";
+            $query .= " AND ia.courseid=:aidarr";
         }
-        \Yii::$app->db->createCommand($query)->query();
+        $command = \Yii::$app->db->createCommand($query);
+
+        if (is_array($aidarr)) {
+            foreach($aidarr as $i => $parent){
+                $command->bindValue(":".$i, $parent);
+            }
+        } else {
+            $command->bindValue(':aidarr', $aidarr);
+        }
+        $command->query();
     }
 
     public static function FindAssessmentAndWithdrawn($aidarr)
     {
-        //TODO: fix below query
+        $placeholders= "";
+        if($aidarr)
+        {
+            foreach($aidarr as $i => $singleAssignment){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
         $query = "SELECT iq.assessmentid,iq.id,iq.withdrawn FROM imas_questions AS iq ";
         if (!is_array($aidarr)) {
             $query .= "JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
@@ -215,11 +238,19 @@ class Questions extends BaseImasQuestions
         $query .= "WHERE iq.withdrawn>0";
 
         if (is_array($aidarr)) {
-            $query .= " AND iq.assessmentid IN (" . implode(',', $aidarr) . ")";
+            $query .= " AND iq.assessmentid IN ($placeholders)";
         } else {
-            $query .= " AND ia.courseid='$aidarr'";
+            $query .= " AND ia.courseid=:aidarr";
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+        if (is_array($aidarr)) {
+            foreach($aidarr as $i => $parent){
+                $command->bindValue(":".$i, $parent);
+            }
+        } else {
+           $command->bindValue(':aidarr', $aidarr);
+        }
+        $data =  $command->queryAll();
         return $data;
     }
     public static function setQuestionSetId($qsetid,$replaceby)
@@ -244,10 +275,12 @@ class Questions extends BaseImasQuestions
     }
 
     public static function getQidCount($userId,$qSetId){
-        //TODO: fix below query
-        $query = "SELECT count('imas_questions.id') AS qidCount FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
-        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid= :qSetId AND imas_courses.ownerid<>'$userId'";
-        $queryResult = Yii::$app->db->createCommand($query)->bindValue('qSetId',$qSetId)->queryOne();
+        $query = "SELECT count('imas_questions.id') AS qidCount
+                    FROM imas_questions,imas_assessments,imas_courses
+                    WHERE imas_assessments.id=imas_questions.assessmentid ";
+        $query .= "AND imas_assessments.courseid=imas_courses.id
+                    AND imas_questions.questionsetid= :qSetId AND imas_courses.ownerid<> :userId";
+        $queryResult = Yii::$app->db->createCommand($query)->bindValues(['qSetId' => $qSetId, ':userId' => $userId])->queryOne();
         return $queryResult;
     }
 
@@ -287,11 +320,23 @@ class Questions extends BaseImasQuestions
     }
 
     public static function retrieveQuestionData($qids){
-        //TODO: fix below query
+        $placeholders= "";
+        if($qids)
+        {
+            foreach($qids as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+
         $query = "SELECT imas_questions.id, imas_questionset.description, imas_questions.points, imas_questions.attempts, imas_questions.showhints, imas_questionset.extref ";
         $query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
-        $query .= "imas_questions.id IN ('".implode("','",$qids)."')";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "imas_questions.id IN ($placeholders)";
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($qids as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        $data =  $command->queryAll();
         return $data;
     }
 

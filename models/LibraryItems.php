@@ -14,19 +14,27 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getByGroupId($groupId, $qSetId,$userId,$isGrpAdmin,$isAdmin)
     {
-        //TODO: fix below query
         if ($isGrpAdmin) {
             $query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
-            $query .= "AND (imas_users.groupid='$groupId' OR ili.libid=0) AND ili.qsetid='$qSetId'";
+            $query .= "AND (imas_users.groupid=:groupId OR ili.libid=0) AND ili.qsetid=:qSetId ";
         } else {
             $query = "SELECT ili.libid FROM imas_library_items AS ili JOIN imas_libraries AS il ON ";
-            $query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid='$qSetId'";
+            $query .= "ili.libid=il.id OR ili.libid=0 WHERE ili.qsetid=:qSetId ";
             if (!$isAdmin) {
                 //unassigned, or owner and lib not closed or mine
-                $query .= " AND ((ili.ownerid='$userId' AND (il.ownerid='$userId' OR il.userights%3<>1)) OR ili.libid=0)";
+                $query .= " AND ((ili.ownerid=:userId AND (il.ownerid=:userid OR il.userights%3<>1)) OR ili.libid=0)";
             }
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+        if ($isGrpAdmin) {
+            $command->bindValues([':groupId' => $groupId, ':qSetId' => $qSetId]);
+        } else {
+            $command->bindValue(':qSetId',$qSetId);
+            if (!$isAdmin) {
+                $command->bindValues([':userId' => $userId, ':userid'=> $userId]);
+            }
+        }
+        $data = $command->queryAll();
         return $data;
     }
 
@@ -117,12 +125,24 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function updateWrongLibFlag($val)
     {
-        //TODO: fix below query
+        $placeholders= "";
+        if($val)
+        {
+            foreach($val as $i => $singleQSet){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+
         $query = "UPDATE imas_library_items AS ili
      	JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
 	    JOIN imas_libraries AS il ON ili.libid=il.id
-	    SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN (".implode(',',$val).")";
-        $data = \Yii::$app->db->createCommand($query)->execute();
+	    SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN($placeholders)";
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($val as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        $data = $command->execute();
         return $data;
     }
 
@@ -157,9 +177,9 @@ class LibraryItems extends BaseImasLibraryItems
     }
 
     public static function getByLibAndUserTable($groupId,$list){
-        //TODO: fix below query
         $data = LibraryItems::find()->select('imas_library_items.qsetid, imas_library_items.libid')
-            ->from('imas_library_items,imas_users')->where('imas_library_items.ownerid=imas_users.id')
+            ->from('imas_library_items,imas_users')
+            ->where('imas_library_items.ownerid=imas_users.id')
             ->andWhere('imas_users.groupid=:groupId'or ['imas_library_items.libid' => AppConstant::NUMERIC_ZERO], [':groupId' => $groupId])
             ->andWhere(['IN', 'imas_library_items.qsetid',$list])->all();
         return $data;
@@ -167,9 +187,9 @@ class LibraryItems extends BaseImasLibraryItems
 
     public static function getByListAndOwnerId($isAdmin, $chgList, $userId)
     {
-     //TODO: fix below query
         $query = new Query();
-        $query->select('ili.qsetid,ili.libid')->from('imas_library_items AS ili')
+        $query->select('ili.qsetid,ili.libid')
+            ->from('imas_library_items AS ili')
             ->join('LEFT JOIN', 'imas_libraries AS il',
                 'ili.libid=il.id')
             ->andWhere(['IN', 'ili.qsetid', $chgList]);

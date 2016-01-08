@@ -22,14 +22,21 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes)
     {
-        //TODO: fix below query
+        $placeholders= "";
+        if($llist)
+        {
+            foreach($llist as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
         $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
         $query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
         $query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
         $query .= " (imas_questionset.ownerid=':userid' OR imas_questionset.userights>0)";
 
         if ($searchall==0) {
-            $query .= "AND imas_library_items.libid IN ($llist)";
+            $query .= "AND imas_library_items.libid IN ($placeholders)";
         }
         if ($searchmine==1) {
             $query .= " AND imas_questionset.ownerid=':userid'";
@@ -37,7 +44,14 @@ class QuestionSet extends BaseImasQuestionset
             $query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=':userid') ";
         }
         $query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
-        $data = \Yii::$app->db->createCommand($query)->bindValue('userid', $userid)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+        $command->bindValue('userid', $userid);
+        if ($searchall==0) {
+            foreach($llist as $i => $parent){
+                $command->bindValue(":".$i, $parent);
+            }
+        }
+        $data = $command->queryAll();
         return $data;
     }
 
@@ -148,12 +162,24 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByQuestionId($questionList)
     {
-        //TODO: fix below query
-        $questionList = implode(',',$questionList);
+        $placeholders= "";
+        if($questionList)
+        {
+            foreach($questionList as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+//        $questionList = implode(',',$questionList);
         $query  = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id AS qid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
-		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		$query .= " AND imas_questions.id IN ($questionList)";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+		$query .= "FROM imas_questionset,imas_questions
+		          WHERE imas_questionset.id=imas_questions.questionsetid";
+		$query .= " AND imas_questions.id IN ($placeholders)";
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($questionList as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        $data = $command->queryAll();
         return $data;
     }
 
@@ -164,10 +190,10 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function updateVideoId($from,$to)
     {
-        //TODO: fix below query
-        $query = "UPDATE imas_questionset SET extref=REPLACE(extref,'$from','$to') WHERE extref LIKE '%$from%'";
+        $query = "UPDATE imas_questionset SET extref=REPLACE(extref,':from',':to') WHERE extref LIKE ':fromLike'";
         $connection=\Yii::$app->db;
         $command=$connection->createCommand($query);
+        $command->bindValues([':from' => $from, ':to' => $to, ':fromLike' => "%".$from."%"]);
         $rowCount=$command->execute();
         return $rowCount;
     }
@@ -235,8 +261,20 @@ class QuestionSet extends BaseImasQuestionset
     public static function findDataToImportLib($qIdsToCheck)
     {
         //TODO: fix below query
-        $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qIdsToCheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $placeholders= "";
+        if($qIdsToCheck)
+        {
+            foreach($qIdsToCheck as $i => $singleQId){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+        $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($placeholders) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($qIdsToCheck as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        $data = $command->queryAll();
         return $data;
     }
     public static function getUniqueId($includedList)
@@ -527,49 +565,97 @@ class QuestionSet extends BaseImasQuestionset
     public static function getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId)
         {
             //TODO: fix below query
-        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
+            $placeholders= "";
+            if($llist)
+            {
+                foreach($llist as $i => $singleList){
+                    $placeholders .= ":".$i.", ";
+                }
+                $placeholders = trim(trim(trim($placeholders),","));
+            }
+
+            $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
         $query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
         $query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
         $query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 
         if ($isAdmin) {
             if ($searchall==0) {
-                $query .= "AND imas_library_items.libid IN ($llist)";
+                $query .= "AND imas_library_items.libid IN ($placeholders)";
             }
             if ($hidepriv==1) {
                 $query .= " AND imas_questionset.userights>0";
             }
             if ($searchmine==1) {
-                $query .= " AND imas_questionset.ownerid='$userId'";
+                $query .= " AND imas_questionset.ownerid=:userId";
             }
         } else if ($isGrpAdmin) {
-            $query .= "AND (imas_users.groupid='$groupId' OR imas_questionset.userights>0) ";
-            $query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid='$groupId')";
+            $query .= "AND (imas_users.groupid=:groupId OR imas_questionset.userights>0) ";
+            $query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid=:groupId)";
             if ($searchall==0) {
-                $query .= " AND imas_library_items.libid IN ($llist)";
+                $query .= " AND imas_library_items.libid IN ($placeholders)";
             }
             if ($searchmine==1) {
-                $query .= " AND imas_questionset.ownerid='$userId'";
+                $query .= " AND imas_questionset.ownerid=:userId";
             }
         } else {
-            $query .= "AND (imas_questionset.ownerid='$userId' OR imas_questionset.userights>0) ";
-            $query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userId')";
+            $query .= "AND (imas_questionset.ownerid=:userId OR imas_questionset.userights>0) ";
+            $query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=:userId)";
             if ($searchall==0) {
-                $query .= " AND imas_library_items.libid IN ($llist)";
+                $query .= " AND imas_library_items.libid IN ($placeholders)";
             }
             if ($searchmine==1) {
-                $query .= " AND imas_questionset.ownerid='$userId'";
+                $query .= " AND imas_questionset.ownerid=:userId";
             }
         }
         $query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id LIMIT 500";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+            if ($isAdmin) {
+                if ($searchall==0) {
+                    foreach($llist as $i => $parent){
+                        $command->bindValue(":".$i, $parent);
+                    }
+                }
+
+                if ($searchmine==1) {
+                    $command->bindValue(':userId',$userId);
+                }
+            } else if ($isGrpAdmin) {
+                $command->bindValue(':groupId', $groupId);
+                if ($searchall==0) {
+                    foreach($llist as $i => $parent){
+                        $command->bindValue(":".$i, $parent);
+                    }
+                }
+                if ($searchmine==1) {
+                    $command->bindValue(':userId', $userId);
+                }
+            } else {
+                $command->bindValue(':userId',$userId);
+                if ($searchall==0) {
+                    foreach($llist as $i => $parent){
+                        $command->bindValue(":".$i, $parent);
+                    }
+                }
+                if ($searchmine==1) {
+                    $command->bindValue(':userId', $userId);
+                }
+            }
+        $data = $command->queryAll();
         return $data;
     }
 
     public static function getDataToExportLib($qList,$nonPrivate,$call)
     {
-        //TODO: fix below query
-        $query = "SELECT * FROM imas_questionset WHERE id IN ($qList)";
+        $placeholders= "";
+        if($qList)
+        {
+            foreach($qList as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+        $query = "SELECT * FROM imas_questionset WHERE id IN ($placeholders)";
         if ($nonPrivate)
         {
             $query.= " AND userights>0";
@@ -582,7 +668,11 @@ class QuestionSet extends BaseImasQuestionset
         {
             $query.= " ORDER BY uniqueid";
         }
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($qList as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        $data = $command->queryAll();
         return $data;
     }
     public static function getUniqueIdToExportLib($includedGs)
@@ -619,10 +709,21 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByIdLike($clist)
     {
-        //TODO: fix below query
-        $query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
+        $placeholders= "";
+        if($clist)
+        {
+            foreach($clist as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+        $query = "SELECT * FROM imas_questionset WHERE id IN ($placeholders)";
         $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-        return \Yii::$app->db->createCommand($query)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($clist as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        $command->queryAll();
     }
     public static function updateId($qlist)
     {

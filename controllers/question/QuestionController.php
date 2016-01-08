@@ -517,7 +517,8 @@ class QuestionController extends AppController
                         $searchLibs = $user['deflib'];
                     }
                 }
-                $lList = "'" . implode("','", explode(',', $searchLibs)) . "'";
+//                $lList = "'" . implode("','", explode(',', $searchLibs)) . "'";
+                $lList = explode(',', $searchLibs);
                 if (!$beenTaken) {
                     /*
                      * Potential questions
@@ -2925,7 +2926,8 @@ class QuestionController extends AppController
                 } else {
                     $searchLibs = $userDefLib;
                 }
-                $lList = "'" . implode("','", explode(',', $searchLibs)) . "'";
+//                $lList = "'" . implode("','", explode(',', $searchLibs)) . "'";
+                $lList = explode(',', $searchLibs);
                 $libSortOrder = array();
                 if (substr($searchLibs, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ONE) == "0") {
                     $lNamesArray[0] = AppConstant::UNASSIGNED;

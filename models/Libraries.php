@@ -216,20 +216,38 @@ class Libraries extends BaseImasLibraries
 
     public static function updateByGrpIdUserId($params, $newgpid,$isadmin,$groupid, $isgrpadmin, $userid, $translist)
     {
-        //TODO: fix below query
-        $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
+        $placeholders= "";
+        if($translist)
+        {
+            foreach($translist as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+        $newOwner = $params['newowner'];
+        $query = "UPDATE imas_libraries SET ownerid=:newOwner,groupid=:newgpid WHERE imas_libraries.id IN ($placeholders)";
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+            $query .= " AND groupid =:groupid";
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+            $query .= " AND ownerid =:userid";
         }
-        \Yii::$app->db->createCommand($query)->execute();
+        $command = \Yii::$app->db->createCommand($query);
+        $command->bindValues([':newOwner' => $newOwner, ':newgpid' => $newgpid]);
+        foreach($translist as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        if (!$isadmin) {
+            $command->bindValue(':groupid',$groupid);
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $command->bindValue(':userid', $userid);
+        }
+        $command->execute();
     }
 
     public static function getLibraryData($rootLibs,$nonPrivate)
     {
-        //TODO: fix below query
         $query = new Query();
         $query ->select('id,name,parent,uniqueid,lastmoddate')
             ->from('imas_libraries')
@@ -306,54 +324,117 @@ class Libraries extends BaseImasLibraries
 
     public static function deleteLibraryAdmin($remlist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
-        //TODO: fix below query
-        $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
+        $placeholders= "";
+        if($remlist)
+        {
+            foreach($remlist as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+        $query = "DELETE FROM imas_libraries WHERE id IN ($placeholders)";
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+            $query .= " AND groupid=:groupid";
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+            $query .= " AND ownerid=:userid";
         }
-        \Yii::$app->db->createCommand($query)->execute();
+        $command = \Yii::$app->db->createCommand($query);
+        foreach($remlist as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        if (!$isadmin) {
+           $command->bindValue(':groupid',$groupid);
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $command->bindValue(':userid',$userid);
+        }
+        $command->execute();
     }
 
     public static function deleteLibrarySingle($remove,$isadmin,$groupid,$isgrpadmin,$userid)
     {
-        //TODO: fix below query
-        $query = "DELETE FROM imas_libraries WHERE id='$remove'";
+        $query = "DELETE FROM imas_libraries WHERE id=:remove";
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+            $query .= " AND groupid=:groupid";
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+            $query .= " AND ownerid=:userid";
         }
-      return  \Yii::$app->db->createCommand($query)->execute();
+          $command = \Yii::$app->db->createCommand($query);
+          $command->bindValue(':remove',$remove);
+        if (!$isadmin) {
+            $command->bindValue(':groupid', $groupid);
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $command->bindValue(':userid', $userid);
+        }
+        $command->execute();
     }
 
     public static function updateUserRightLastModeDate($rights,$now, $llist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
-        //TODO: fix below query
-        $query = "UPDATE imas_libraries SET userights='$rights',lastmoddate=$now WHERE id IN ($llist)";
+        $placeholders= "";
+        if($llist)
+        {
+            foreach($llist as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+
+        $query = "UPDATE imas_libraries SET userights=:rights,lastmoddate=:now WHERE id IN ($placeholders)";
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+            $query .= " AND groupid=:groupid";
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+            $query .= " AND ownerid=:userid'";
         }
-        \Yii::$app->db->createCommand($query)->execute();
+
+        $command = \Yii::$app->db->createCommand($query);
+        $command->bindValues([':rights' => $rights, ':now' => $now]);
+        foreach($llist as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        if (!$isadmin) {
+            $command->bindValue(':groupid',$groupid);
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $command->bindValue(':userid',$userid);
+        }
+
+        $command->execute();
     }
 
     public static function updateParent($lib,$now,$parlist,$isadmin,$groupid,$isgrpadmin,$userid)
     {
-        //TODO: fix below query
-        $query = "UPDATE imas_libraries SET parent='$lib',lastmoddate=$now WHERE id IN ($parlist)";
+        $placeholders= "";
+        if($parlist)
+        {
+            foreach($parlist as $i => $singleParent){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
+        }
+        $query = "UPDATE imas_libraries SET parent=:lib,lastmoddate=:now WHERE id IN ($placeholders)";
         if (!$isadmin) {
-            $query .= " AND groupid='$groupid'";
+            $query .= " AND groupid=:groupid";
         }
         if (!$isadmin && !$isgrpadmin) {
-            $query .= " AND ownerid='$userid'";
+            $query .= " AND ownerid=:userid";
         }
-        \Yii::$app->db->createCommand($query)->execute();
+        $command = \Yii::$app->db->createCommand($query);
+        $command->bindValues([':lib' => $lib, ':now' => $now]);
+        foreach($parlist as $i => $parent){
+            $command->bindValue(":".$i, $parent);
+        }
+        if (!$isadmin) {
+            $command->bindValue(':groupid',$groupid);
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $command->bindValue(':userid', $userid);
+        }
+        $command->execute();
     }
 
     public static function getByName($id)

@@ -352,7 +352,6 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getBySearchText($isTeacher,$now,$courseId,$searchlikes,$searchlikes2,$searchlikes3,$forumId,$limthreads,$dofilter,$params)
     {
-
         $placeholders= "";
         if($limthreads)
         {
@@ -361,7 +360,6 @@ class ForumPosts extends BaseImasForumPosts
             }
             $placeholders = trim(trim(trim($placeholders),","));
         }
-
 
         if (isset($params['allforums']))
         {

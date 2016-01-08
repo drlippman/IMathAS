@@ -554,8 +554,14 @@ class Student extends BaseImasStudents
     public static function updateStudentDataFromException($n,$userId,$courseId)
     {
         //TODO: fix below query
-        $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$userId}' AND courseid='$courseId'";
-        \Yii::$app->db->createCommand($query)->execute();
+        $query = "UPDATE imas_students SET latepass = CASE
+                    WHEN latepass>$n
+                    THEN latepass-$n
+                    ELSE 0 END
+                    WHERE userid=:userId AND courseid=:courseId";
+        $command = \Yii::$app->db->createCommand($query);
+        $command->bindValues([':userId' => $userId, ':courseId' => $courseId]);
+        $command->execute();
     }
 
     public function insertUIdCId($userId, $pcid)

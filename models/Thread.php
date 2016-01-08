@@ -94,17 +94,21 @@ class Thread extends BaseImasForumThreads
 
     public static function  findNewPostCnt($cid, $user)
     {
-        //TODO: fix below query
+        $userId = $user->id;
         $query = "SELECT imas_forum_threads.forumid,COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
         $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid= :cid ";
         $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid= :userId ";
         $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
         if ($user->rights == AppConstant::TEACHER_RIGHT) {
-            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$user->id')) ";
+            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userId)) ";
         }
         $query .= "GROUP BY imas_forum_threads.forumid";
 
-        $data = \Yii::$app->db->createCommand($query)->bindValue(':cid',$cid)->bindValue(':userId',$user->id)->queryAll();
+        $command = \Yii::$app->db->createCommand($query);
+        if ($user->rights == AppConstant::TEACHER_RIGHT) {
+            $command->bindValue(':userId',$userId);
+        }
+        $data = $command->bindValues([':cid',$cid,':userId',$user->id])->queryAll();
         return $data;
     }
 

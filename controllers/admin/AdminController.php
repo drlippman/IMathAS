@@ -1775,7 +1775,8 @@ class AdminController extends AppController
                         $qIds = $this->parseQs($filename,$toUse,$qRights);
                          if(count($qIds) > AppConstant::NUMERIC_ZERO)
                         {
-                            $qIdsToCheck = implode(',',$qIds);
+//                            $qIdsToCheck = implode(',',$qIds);
+                            $qIdsToCheck = $qIds;
                             $qIdsToUpdate = array();
                             $includedQs = array();
                             $questionSetData = QuestionSet::findDataToImportLib($qIdsToCheck);
@@ -2024,7 +2025,8 @@ class AdminController extends AppController
                     }
                 }
                 $imgFiles = array();
-                $qList = implode(',',array_unique(array_keys($qAssoc)));
+//                $qList = implode(',',array_unique(array_keys($qAssoc)));
+                $qList = array_unique(array_keys($qAssoc));
                 $questionSetData = QuestionSet::getDataToExportLib($qList,$nonPrivate,AppConstant::NUMERIC_ZERO);
                 $includedGs = array();
                 if($questionSetData)
@@ -2617,7 +2619,8 @@ class AdminController extends AppController
                 {
                     if ($params['remove']!='') {
                         $removeArray = explode(',',$params['remove']);
-                        $remlist = "'".implode("','",explode(',',$params['remove']))."'";
+//                        $remlist = "'".implode("','",explode(',',$params['remove']))."'";
+                        $remlist = explode(',',$params['remove']);
 
                         $result = LibraryItems::getDistictqlibData($remlist);
                        foreach($result as $key => $row) {
@@ -2693,7 +2696,7 @@ class AdminController extends AppController
                 {
                     if ($params['newrights'] != '')
                     {
-                        $llist = "'".implode("','",explode(',',$params['chgrights']))."'";
+                        $llist = explode(',',$params['chgrights']);
                         $rights = $params['newrights'];
                         $query = new Libraries();
                         $query->updateUserRightLastModeDate($rights,$now, $llist,$isAdmin,$groupId,$isGrpAdmin,$userId);
@@ -2752,7 +2755,8 @@ class AdminController extends AppController
             {
                 if (isset($params['newowner'])) {
                     if ($params['transfer']!='') {
-                        $translist = "'".implode("','",explode(',',$params['transfer']))."'";
+//                        $translist = "'".implode("','",explode(',',$params['transfer']))."'";
+                        $translist = explode(',',$params['transfer']);
                         $newgroup = User::getByGroupId($params['newowner']);
                         $newgpid = $newgroup[0]['groupid'];
                         $libraryUpdate = new Libraries();
@@ -2788,7 +2792,8 @@ class AdminController extends AppController
                         }
                         if (count($toset) > 0)
                         {
-                            $parlist = "'".implode("','",$toset)."'";
+//                            $parlist = "'".implode("','",$toset)."'";
+                            $parlist = $toset;
                             $lib = $params['libs'];
                             $query = new Libraries();
                             $query->updateParent($lib,$now,$parlist,$isAdmin,$groupId,$isGrpAdmin,$userId);
@@ -3441,7 +3446,8 @@ class AdminController extends AppController
              * USED FOR STEP 2
              */
             $checked = array_merge((array)$params['pchecked'],(array)$params['nchecked']);
-            $clist = "'".implode("','",$checked)."'";
+//            $clist = "'".implode("','",$checked)."'";
+            $clist = $checked;
             $now = time();
             $result = QuestionSet::getById($checked);
             $i = AppConstant::NUMERIC_ZERO;

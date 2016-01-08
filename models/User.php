@@ -41,7 +41,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->password = $student[7];
         $this->save();
         return $this->id;
-
     }
 
     public static function findUser($username)
@@ -335,12 +334,11 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function findUserDataForIsolateAssessmentGrade($isTutor, $tutorsection, $aid, $cid, $hidelocked, $sortorder, $hassection)
     {
-        //TODO: fix below query
         $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
         $query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid= :courseId ";
         $query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid= :assessmentId WHERE istu.courseid= :courseId ";
         if ($isTutor && isset($tutorsection) && $tutorsection != '') {
-            $query .= " AND istu.section='$tutorsection' ";
+            $query .= " AND istu.section=:tutorsection ";
         }
         if ($hidelocked) {
             $query .= ' AND istu.locked=0 ';
@@ -350,7 +348,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         } else {
             $query .= " ORDER BY iu.LastName,iu.FirstName";
         }
-        $data = Yii::$app->db->createCommand($query)->bindValues([':courseId' => $cid, 'assessmentId'=> $aid])->queryAll();
+        $command = Yii::$app->db->createCommand($query);
+        $command->bindValues([':courseId' => $cid, 'assessmentId'=> $aid]);
+        if ($isTutor && isset($tutorsection) && $tutorsection != '') {
+            $command->bindValue(':tutorsection', $tutorsection);
+        }
+        $data = $command->queryAll();
         return $data;
     }
 
@@ -564,7 +567,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function getUserDetailsByJoin($srch)
     {
         //TODO: fix below query
-        $query = "SELECT DISTINCT imas_users.*,imas_courses.id AS cid,imas_groups.name AS groupname FROM imas_users JOIN imas_courses ON imas_users.id=imas_courses.ownerid JOIN imas_groups ON imas_groups.id=imas_users.groupid WHERE imas_courses.id IN ";
+        $query = "SELECT DISTINCT imas_users.*,imas_courses.id AS cid,imas_groups.name AS groupname
+                    FROM imas_users JOIN imas_courses ON imas_users.id=imas_courses.ownerid
+                    JOIN imas_groups ON imas_groups.id=imas_users.groupid
+                    WHERE imas_courses.id IN ";
         $query .= "(SELECT courseid FROM imas_inlinetext WHERE text LIKE '%$srch%') OR imas_courses.id IN ";
         $query .= "(SELECT courseid FROM imas_linkedtext WHERE text LIKE '%$srch%' OR summary LIKE '%$srch%') ORDER BY imas_groups.name,imas_users.LastName";
         return Yii::$app->db->createCommand($query)->query();
@@ -577,14 +583,17 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getByUserRight($myRight, $groupId)
     {
-        //TODO: fix below query
         $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
 
         if ($myRight < AppConstant::ADMIN_RIGHT) {
-            $query .= " AND groupid='$groupId'";
+            $query .= " AND groupid=:groupId";
         }
         $query .= " ORDER BY LastName";
-       return Yii::$app->db->createCommand($query)->queryAll();
+        $command = Yii::$app->db->createCommand($query);
+        if ($myRight < AppConstant::ADMIN_RIGHT) {
+            $command->bindValue(':groupId',$groupId);
+        }
+        return $data = $command->queryAll();
     }
 
     public static function updateUserForPendingReq($id)

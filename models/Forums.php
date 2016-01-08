@@ -315,12 +315,17 @@ class Forums extends BaseImasForums {
 
     public static function getByCourseIdAndTeacher($courseId,$isteacher,$now)
     {
-        //TODO: fix below query
-        $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$courseId'";
+        $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid =:courseId ";
         if (!$isteacher) {
-            $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+            $query .= "AND (imas_forums.avail = 2 OR (imas_forums.avail = 1 AND imas_forums.startdate < :now AND imas_forums.enddate > :now)) ";
         }
-        $data = Yii::$app->db->createCommand($query)->queryAll();
+        $command = Yii::$app->db->createCommand($query);
+        $command->bindValue(':courseId',$courseId);
+        if (!$isteacher) {
+
+            $command->bindValue('now',$now);
+        }
+        $data = $command->queryAll();
         return $data;
     }
 
