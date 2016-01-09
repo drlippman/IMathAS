@@ -16,6 +16,7 @@ $(document).ready(function () {
 //    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
 
     selectCheckBox();
+    checkUncheckHeaderCheckbox();
 //    filterByCourse();
 });
 
@@ -24,21 +25,21 @@ var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
 var courseInfo = [];
-
+var isModifiedArray = [];
 function changeMessageStatus(){
 
     var with_selected = $('.with-selected :selected').val();
-
-    if(with_selected  == 0)
+    if(with_selected  == 1)
     {
         markAsUnread();
     }
-    else if(with_selected  == 1)
+    else if(with_selected  == 2)
     {
         markAsRead();
-    }else if(with_selected  == 2){
+    }else if(with_selected  == 3){
         markAsDelete();
     }
+    $('.with-selected').val('0');
 }
 
 function showMessageSuccess(response) {
@@ -62,16 +63,33 @@ function showMessageSuccess(response) {
 //    showMessage(filteredArray, response.status);
 }
 
+function checkUncheckHeaderCheckbox(){
+    $(document).on('click', '.message-table-body input:checkbox', function() {
+        totalMessagesSize = $('.message-table-body input:checkbox').size();
+        checkedMessagesSize = $('.message-table-body input[name="msg-check"]:checked').size();
+        $('#message-header-checkbox').prop('checked', false);
+        if(totalMessagesSize == checkedMessagesSize){
+            $('#message-header-checkbox').prop('checked', true);
+        }
+    })
+}
+
 function selectCheckBox(){
     $(document).on('click', '#message-header-checkbox', function() {
         if($(this).prop("checked") == true){
             $('.message-table-body input:checkbox').each(function () {
                 $(this).prop('checked', true);
+                if($.inArray($(this).val(), isModifiedArray) != -1){
+                    $(this).closest('tr').remove();
+                }
             })
         }
         else if($(this).prop("checked") == false){
             $('.message-table-body input:checkbox').each(function () {
                 $(this).prop('checked', false);
+                if($.inArray($(this).val(), isModifiedArray) != -1){
+                    $(this).closest('tr').remove();
+                }
             })
         }
     });
@@ -100,7 +118,6 @@ function getCourseSuccess(response) {
 
 function markAsUnread() {
     var markArray = [];
-
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
         $(this).closest('tr').css('font-weight', 'bold');
         markArray.push($(this).val());
@@ -122,7 +139,7 @@ function markAsUnread() {
 
 function markAsRead() {
     var markArray = [];
- $('.message-table-body input[name="msg-check"]:checked').each(function () {
+    $('.message-table-body input[name="msg-check"]:checked').each(function () {
         markArray.push($(this).val());
         $(this).closest('tr').css('font-weight', 'normal');
         $(this).prop('checked', false);
@@ -225,6 +242,7 @@ function markAsDelete() {
     var markArray = [];
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
         markArray.push($(this).val());
+        isModifiedArray.push($(this).val());
     });
     if (markArray.length != 0) {
         var html = '<div><p>Are you sure? This will delete your message from</p>' +
@@ -250,7 +268,7 @@ function markAsDelete() {
                     $(this).dialog("close");
                     $('input[name = "header-checked"]:checked').prop('checked', false);
                     var readMsg = {checkedMsg: markArray};
-                    jQuerySubmit('mark-as-delete-ajax', readMsg,{ });
+                    jQuerySubmit('mark-as-delete-ajax', readMsg,{});
                     return true;
                 }
             },

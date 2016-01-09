@@ -6,29 +6,26 @@ $(document).ready(function () {
     selectCheckBox();
     jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
     jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
-
+    checkUncheckHeaderCheckbox();
 });
 
 var messageData;
 var cid = $(".send-course-id").val();
 var selectedUserId = $('#user-sent-id').val();
 var selectedCourseId;
-
+var isModifiedArray = [];
 function changeMessageStatus(){
 
     var with_selected = $('.with-selected :selected').val();
-
     if(with_selected  == 1)
     {
         markSentDelete()
-
     }
     else if(with_selected  == 2)
     {
-
         markUnsend();
-
     }
+    $('.with-selected').val('0');
 }
 
 function createTableHeader()
@@ -87,16 +84,33 @@ function showMessage(messageData, status)
     $('.display-message-table').DataTable({"bPaginate": true});
 }
 
+function checkUncheckHeaderCheckbox(){
+    $(document).on('click', '.message-table-body input:checkbox', function() {
+        totalMessagesSize = $('.message-table-body input:checkbox').size();
+        checkedMessagesSize = $('.message-table-body input[name="msg-check"]:checked').size();
+        $('#message-header-checkbox').prop('checked', false);
+        if(totalMessagesSize == checkedMessagesSize){
+            $('#message-header-checkbox').prop('checked', true);
+        }
+    })
+}
+
 function selectCheckBox(){
     $(document).on('click', '#message-header-checkbox', function() {
         if($(this).prop("checked") == true){
             $('.message-table-body input:checkbox').each(function () {
                 $(this).prop('checked', true);
+                if($.inArray($(this).val(), isModifiedArray) != -1){
+                    $(this).closest('tr').remove();
+                }
             })
         }
         else if($(this).prop("checked") == false){
             $('.message-table-body input:checkbox').each(function () {
                 $(this).prop('checked', false);
+                if($.inArray($(this).val(), isModifiedArray) != -1){
+                    $(this).closest('tr').remove();
+                }
             })
         }
     });
@@ -128,6 +142,7 @@ function markSentDelete()
         var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
+            isModifiedArray.push($(this).val());
         });
         if(markArray.length!=0) {
             var html = '<div><p>Are you sure ? you want to Remove.</p></div>';
