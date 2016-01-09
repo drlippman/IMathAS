@@ -147,7 +147,7 @@ echo '</div>';
             if ($page == 1) {
                 $prevnext .= "<b>1</b> ";
             } else {
-                $prevnext .= "<a href=\"thread.php?page=1&cid=$cid&forum=$forumid\">1</a> ";
+                $prevnext .= "<a href=\"thread?page=1&cid=$cid&forum=$forumid\">1</a> ";
             }
             if ($min != 2) {
                 $prevnext .= " ... ";
@@ -156,7 +156,7 @@ echo '</div>';
                 if ($page == $i) {
                     $prevnext .= "<b>$i</b> ";
                 } else {
-                    $prevnext .= "<a href=\"thread.php?page=$i&cid=$cid&forum=$forumid\">$i</a> ";
+                    $prevnext .= "<a href=\"thread?page=$i&cid=$cid&forum=$forumid\">$i</a> ";
                 }
             }
             if ($max != $numpages - 1) {
@@ -165,17 +165,17 @@ echo '</div>';
             if ($page == $numpages) {
                 $prevnext .= "<b>$numpages</b> ";
             } else {
-                $prevnext .= "<a href=\"thread.php?page=$numpages&cid=$cid&forum=$forumid\">$numpages</a> ";
+                $prevnext .= "<a href=\"thread?page=$numpages&cid=$cid&forum=$forumid\">$numpages</a> ";
             }
             $prevnext .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
             if ($page > 1) {
-                $prevnext .= "<a href=\"thread.php?page=" . ($page - 1) . "&cid=$cid&forum=$forumid\">Previous</a> ";
+                $prevnext .= "<a href=\"thread?page=" . ($page - 1) . "&cid=$cid&forum=$forumid\">Previous</a> ";
             } else {
                 $prevnext .= "Previous ";
             }
             if ($page < $numpages) {
-                $prevnext .= "| <a href=\"thread.php?page=" . ($page + 1) . "&cid=$cid&forum=$forumid\">Next</a> ";
+                $prevnext .= "| <a href=\"thread?page=" . ($page + 1) . "&cid=$cid&forum=$forumid\">Next</a> ";
             } else {
                 $prevnext .= "| Next ";
             }

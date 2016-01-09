@@ -473,9 +473,12 @@ class ForumController extends AppController
             $safesearch = $params['search'];
             $safesearch = str_replace(' and ', ' ', $safesearch);
             $searchterms = explode(" ", $safesearch);
-            $searchlikes = implode("%' AND imas_forum_posts.message LIKE '%", $searchterms);
-            $searchlikes2 = implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms);
-            $searchlikes3 = implode("%' AND imas_users.LastName LIKE '%", $searchterms);
+//            $searchlikes = implode("%' AND imas_forum_posts.message LIKE '%", $searchterms);
+            $searchlikes = $searchterms;
+//            $searchlikes2 = implode("%' AND imas_forum_posts.subject LIKE '%", $searchterms);
+            $searchlikes2 = $searchterms;
+//            $searchlikes3 = implode("%' AND imas_users.LastName LIKE '%", $searchterms);
+            $searchlikes3 = $searchterms;
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
         }
 

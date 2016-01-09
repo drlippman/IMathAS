@@ -42,8 +42,6 @@ class StudentController extends AppController
                         $student->create($param);
                         $this->setSuccessFlash(AppConstant::ENROLL_SUCCESS . $course->name . ' successfully');
                         return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
-                    }elseif($user['rights'] < AppConstant::STUDENT_RIGHT){
-                        AppUtility::dump('hey');
                     } else {
                         $errorMessage = AppConstant::ALREADY_ENROLLED;
                         if ($teacher) {

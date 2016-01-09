@@ -392,6 +392,7 @@ class ForumPosts extends BaseImasForumPosts
                 $command->bindValue(":".$i, $parent);
             }
         }
+
         $data = $command->queryAll();
         return $data;
     }
@@ -452,37 +453,78 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getPostDataForThread($forumId,$dofilter,$page,$limthreads,$newpostlist,$flaggedlist,$sortby,$threadsperpage)
     {
-        $query = new Query();
-        $query->select('imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid')
-            ->from('imas_forum_posts,imas_users,imas_forum_threads')
-            ->where('imas_forum_posts.userid=imas_users.id')->andWhere('imas_forum_posts.threadid=imas_forum_threads.id')
-            ->andWhere('imas_forum_posts.parent=0')->andWhere('imas_forum_posts.forumid= :forumId');
-        if ($dofilter)
+        $placeholders= "";
+        if(!empty($limthreads))
         {
-            $query->andWhere(['IN','imas_forum_posts.threadid',$limthreads]);
+            foreach($limthreads as $i => $singleThread){
+                $placeholders .= ":".$i.", ";
+            }
+            $placeholders = trim(trim(trim($placeholders),","));
         }
-        if ($page==-1)
+
+        $placePostList= "";
+        if($newpostlist)
         {
-            $query->andWhere(['IN','imas_forum_posts.threadid',$newpostlist]);
-        } else if ($page==-2)
-        {
-            $query->andWhere(['IN','imas_forum_posts.threadid',$flaggedlist]);
+            foreach($newpostlist as $i => $singleThread){
+                $placePostList .= ":".$i.", ";
+            }
+            $placePostList = trim(trim(trim($placePostList),","));
         }
-        if ($sortby==0)
+
+        $placeFlaggedList= "";
+        if($flaggedlist)
         {
-            $query->orderBy(['imas_forum_posts.posttype' => AppConstant::DESCENDING])->orderBy(['imas_forum_posts.id' => AppConstant::DESCENDING]);
-        } else if ($sortby==1)
-        {
-            $query->orderBy(['imas_forum_posts.posttype' => AppConstant::DESCENDING])->orderBy(['imas_forum_threads.lastposttime' => AppConstant::DESCENDING]);
+            foreach($flaggedlist as $i => $singleThread){
+                $placeFlaggedList .= ":".$i.", ";
+            }
+            $placeFlaggedList = trim(trim(trim($placeFlaggedList),","));
         }
-        $offset = ($page-1)*$threadsperpage;
-        if ($page>0)
-        {
-            $query->limit($threadsperpage)->offset($offset);
+
+        $query = "SELECT imas_forum_posts.*,imas_forum_threads.views as tviews,imas_users.LastName,imas_users.FirstName,imas_forum_threads.stugroupid
+                    FROM imas_forum_posts,imas_users,imas_forum_threads WHERE ";
+        $query .= "imas_forum_posts.userid=imas_users.id
+                    AND imas_forum_posts.threadid=imas_forum_threads.id
+                    AND imas_forum_posts.parent=0 AND imas_forum_posts.forumid=:forumId ";
+
+        if ($dofilter) {
+            $query .= "AND imas_forum_posts.threadid IN ($placeholders) ";
         }
-        $data = $query->createCommand();
-        $data->bindValue('forumId', $forumId);
-        return $data->queryAll();
+        if ($page==-1) {
+            $query .= "AND imas_forum_posts.threadid IN ($placePostList) ";
+        } else if ($page==-2) {
+            $query .= "AND imas_forum_posts.threadid IN ($placeFlaggedList) ";
+        }
+        if ($sortby==0) {
+            $query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_posts.id DESC ";
+        } else if ($sortby==1) {
+            $query .= "ORDER BY imas_forum_posts.posttype DESC,imas_forum_threads.lastposttime DESC ";
+        }
+        $offset = ($page-1) * $threadsperpage;
+
+        if ($page>0) {
+            $query .= "LIMIT :offset,:threadsperpage";// OFFSET $offset";
+        }
+        $command = Yii::$app->db->createCommand($query)->bindValues([':forumId'=> $forumId]);
+
+        if ($dofilter) {
+            foreach($limthreads as $i => $parent){
+                $command->bindValue(":".$i, $parent);
+            }
+        }
+        if ($page==-1) {
+            foreach($newpostlist as $i => $parent){
+                $command->bindValue(":".$i, $parent);
+            }
+        }else if ($page==-2) {
+            foreach($flaggedlist as $i => $parent){
+                $command->bindValue(":".$i, $parent);
+            }
+        }
+        if ($page>0) {
+            $command->bindValues([':offset' => $offset, ':threadsperpage' => $threadsperpage]);
+        }
+        $data = $command->queryAll();
+        return $data;
     }
 
     public static function getPosts($userId,$forumId,$limthreads,$dofilter)
