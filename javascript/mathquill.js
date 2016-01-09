@@ -284,7 +284,7 @@ var manageTextarea = (function() {
 	      && document.selection.createRange
 	      && document.selection.createRange().parentElement() === textarea[0]
 	 ) {return true;} else { return false;}
-      	   
+
       }
       return dom.selectionStart !== dom.selectionEnd;
     }
@@ -304,13 +304,13 @@ var manageTextarea = (function() {
       keydown = e;
       keypress = null;
       var which = keydown.which || keydown.keyCode;
-      
+
       if (isAndroid) { //Android Chrome
       	      onKeypress();
       } else {
       	      handleKey();
       }
-      
+
     }
 
     function onKeypress(e) {
@@ -319,11 +319,11 @@ var manageTextarea = (function() {
       // after keydown.  In that case, there will be
       // no previous keypress, so we skip it here
       var which = keydown.which || keydown.keyCode;
-      
+
       if (keydown && (keypress || isAndroid)) handleKey();
-      
+
       keypress = e;
-      
+
       checkTextareaFor(typedText);
     }
     function typedText() {
@@ -345,7 +345,7 @@ var manageTextarea = (function() {
       // If anything like #40 or #71 is reported in IE < 9, see
       // b1318e5349160b665003e36d4eedd64101ceacd8
       if (hasSelection()) return;
-     
+
       popText(textCallback);
     }
 
@@ -1266,7 +1266,7 @@ function createRoot(jQ, root, textbox, editable) {
   	  	textarea = textareaSpan.children();
   } else {
   	 var textareaSpan = root.textarea = $('<span class="textarea"><textarea></textarea></span>'),
-  	  	textarea = textareaSpan.children(); 
+  	  	textarea = textareaSpan.children();
   }
 
   /******
@@ -1430,7 +1430,7 @@ function createRoot(jQ, root, textbox, editable) {
   jQ.bind('focus.mathquill blur.mathquill', function(e) {
     textarea.trigger(e);
   }).bind('click.mathquill', function(e) {
-  	if (document.activeElement != textarea[0]) {textarea.focus();}	  
+  	if (document.activeElement != textarea[0]) {textarea.focus();}
   }).blur();
 }
 
@@ -1509,7 +1509,7 @@ var RootMathBlock = P(MathBlock, function(_, _super) {
       break;
 
     // Prevent newlines from showing up
-    case 'Enter': 
+    case 'Enter':
     	    if (typeof savemathquill === 'function') {
           	savemathquill();
             }
@@ -1777,7 +1777,7 @@ else if ('filter' in div_style) { //IE 6, 7, & 8 fallback, see https://github.co
     .css('filter', 'progid:DXImageTransform.Microsoft'
         + '.Matrix(M11=' + x + ",SizingMethod='auto expand')"
     );
-    
+
     function calculateMarginRight() {
       jQ.css('marginRight', (innerjQ.width()-1)*(x-1)/x + 'px');
     }
@@ -2667,7 +2667,7 @@ var Variable = P(Symbol, function(_, _super) {
 	  	  if (m[0].match(/(sqrt|root)/)) {
 	  	  	  c.writeLatex('\\'+m[0]+'{}').parent.blur();;
 	  	  } else {
-	  	  	  c.writeLatex('\\'+m[0]+'\\left(\\right)').parent.blur();; 
+	  	  	  c.writeLatex('\\'+m[0]+'\\left(\\right)').parent.blur();;
 	  	  }
 	  	  c.moveLeft();
 	  } else if (m = lookback.match(/(pi|^oo)$/)) {
@@ -2837,12 +2837,12 @@ var LatexFragment = P(MathCommand, function(_) {
 // [2]: http://en.wikipedia.org/wiki/Number_Forms
 // [3]: http://en.wikipedia.org/wiki/ISO/IEC_8859-1
 // [4]: http://en.wikipedia.org/wiki/Windows-1252
-LatexCmds['Â¹'] = bind(LatexFragment, '^1');
-LatexCmds['Â²'] = bind(LatexFragment, '^2');
-LatexCmds['Â³'] = bind(LatexFragment, '^3');
-LatexCmds['Â¼'] = bind(LatexFragment, '\\frac14');
-LatexCmds['Â½'] = bind(LatexFragment, '\\frac12');
-LatexCmds['Â¾'] = bind(LatexFragment, '\\frac34');
+LatexCmds['¹'] = bind(LatexFragment, '^1');
+LatexCmds['²'] = bind(LatexFragment, '^2');
+LatexCmds['³'] = bind(LatexFragment, '^3');
+LatexCmds['¼'] = bind(LatexFragment, '\\frac14');
+LatexCmds['½'] = bind(LatexFragment, '\\frac12');
+LatexCmds['¾'] = bind(LatexFragment, '\\frac34');
 
 var BinaryOperator = P(Symbol, function(_, _super) {
   _.init = function(ctrlSeq, html, text) {
@@ -2874,8 +2874,8 @@ var PlusMinus = P(BinaryOperator, function(_) {
 
 LatexCmds['+'] = bind(PlusMinus, '+', '+');
 //yes, these are different dashes, I think one is an en dash and the other is a hyphen
-LatexCmds['â€“'] = LatexCmds['-'] = bind(PlusMinus, '-', '&minus;');
-LatexCmds['Â±'] = LatexCmds.pm = LatexCmds.plusmn = LatexCmds.plusminus =
+LatexCmds['–'] = LatexCmds['-'] = bind(PlusMinus, '-', '&minus;');
+LatexCmds['±'] = LatexCmds.pm = LatexCmds.plusmn = LatexCmds.plusminus =
   bind(PlusMinus,'\\pm ','&plusmn;');
 LatexCmds.mp = LatexCmds.mnplus = LatexCmds.minusplus =
   bind(PlusMinus,'\\mp ','&#8723;');
@@ -2901,10 +2901,10 @@ LatexCmds.otimes = P(BinaryOperator, function(_, _super) {
 
 LatexCmds.times = bind(BinaryOperator, '\\times ', '&times;', '[x]');
 
-LatexCmds['Ã·'] = LatexCmds.div = LatexCmds.divide = LatexCmds.divides =
+LatexCmds['÷'] = LatexCmds.div = LatexCmds.divide = LatexCmds.divides =
   bind(BinaryOperator,'\\div ','&divide;', '[/]');
 
-LatexCmds['â‰ '] = LatexCmds.ne = LatexCmds.neq = bind(BinaryOperator,'\\ne ','&ne;');
+LatexCmds['≠'] = LatexCmds.ne = LatexCmds.neq = bind(BinaryOperator,'\\ne ','&ne;');
 
 LatexCmds.ast = LatexCmds.star = LatexCmds.loast = LatexCmds.lowast =
   bind(BinaryOperator,'\\ast ','&lowast;');
@@ -2917,15 +2917,15 @@ LatexCmds.because = bind(BinaryOperator,'\\because ','&#8757;');
 
 LatexCmds.prop = LatexCmds.propto = bind(BinaryOperator,'\\propto ','&prop;');
 
-LatexCmds['â‰ˆ'] = LatexCmds.asymp = LatexCmds.approx = bind(BinaryOperator,'\\approx ','&asymp;');
+LatexCmds['≈'] = LatexCmds.asymp = LatexCmds.approx = bind(BinaryOperator,'\\approx ','&asymp;');
 
 LatexCmds.lt = bind(BinaryOperator,'<','&lt;');
 
 LatexCmds.gt = bind(BinaryOperator,'>','&gt;');
 
-LatexCmds['â‰¤'] = LatexCmds.le = LatexCmds.leq = bind(BinaryOperator,'\\le ','&le;');
+LatexCmds['≤'] = LatexCmds.le = LatexCmds.leq = bind(BinaryOperator,'\\le ','&le;');
 
-LatexCmds['â‰¥'] = LatexCmds.ge = LatexCmds.geq = bind(BinaryOperator,'\\ge ','&ge;');
+LatexCmds['≥'] = LatexCmds.ge = LatexCmds.geq = bind(BinaryOperator,'\\ge ','&ge;');
 
 LatexCmds.isin = LatexCmds['in'] = bind(BinaryOperator,'\\in ','&isin;');
 
@@ -2978,10 +2978,10 @@ var BigSymbol = P(Symbol, function(_, _super) {
   };
 });
 
-LatexCmds['âˆ‘'] = LatexCmds.sum = LatexCmds.summation = bind(BigSymbol,'\\sum ','&sum;');
-LatexCmds['âˆ'] = LatexCmds.prod = LatexCmds.product = bind(BigSymbol,'\\prod ','&prod;');
+LatexCmds['∑'] = LatexCmds.sum = LatexCmds.summation = bind(BigSymbol,'\\sum ','&sum;');
+LatexCmds['∏'] = LatexCmds.prod = LatexCmds.product = bind(BigSymbol,'\\prod ','&prod;');
 LatexCmds.coprod = LatexCmds.coproduct = bind(BigSymbol,'\\coprod ','&#8720;');
-LatexCmds['âˆ«'] = LatexCmds['int'] = LatexCmds.integral = bind(BigSymbol,'\\int ','&int;');
+LatexCmds['∫'] = LatexCmds['int'] = LatexCmds.integral = bind(BigSymbol,'\\int ','&int;');
 
 
 
@@ -3149,9 +3149,9 @@ LatexCmds.setminus = LatexCmds.smallsetminus =
   bind(VanillaSymbol,'\\setminus ','&#8726;');
 
 LatexCmds.not = //bind(Symbol,'\\not ','<span class="not">/</span>');
-LatexCmds['Â¬'] = LatexCmds.neg = bind(VanillaSymbol,'\\neg ','&not;');
+LatexCmds['¬'] = LatexCmds.neg = bind(VanillaSymbol,'\\neg ','&not;');
 
-LatexCmds['â€¦'] = LatexCmds.dots = LatexCmds.ellip = LatexCmds.hellip =
+LatexCmds['…'] = LatexCmds.dots = LatexCmds.ellip = LatexCmds.hellip =
 LatexCmds.ellipsis = LatexCmds.hellipsis =
   bind(VanillaSymbol,'\\dots ','&hellip;');
 
@@ -4007,7 +4007,7 @@ jQuery.fn.mathquill = function(cmd, latex) {
 			  cursor.clearSelection().show();
 			  if (latex=='l') { cursor.moveLeft();}
 			  else if (latex=='r') {cursor.moveRight();}
-			  else if (latex=='u') { cursor.moveUp();} 
+			  else if (latex=='u') { cursor.moveUp();}
 			  else if (latex=='d') {cursor.moveDown();}
           	  }
           }
@@ -4018,7 +4018,7 @@ jQuery.fn.mathquill = function(cmd, latex) {
         var blockId = $(this).attr(mqBlockId),
           block = blockId && MathElement[blockId],
           cursor = block && block.cursor;
-          
+
            if (cursor) {
           	  if (cursor.selection) {
           	  	  cursor.writeLatex('\\frac{'+cursor.selection.latex()+'}{}').parent.blur();
@@ -4081,13 +4081,13 @@ jQuery.fn.mathquill = function(cmd, latex) {
         	if (cursor.selection) {
         		  cursor.writeLatex(left+cursor.selection.latex()+right).parent.blur();
           	} else {
-          	
+
           	  	  cursor.writeLatex(left+right).parent.blur();
           	}
           	cursor.moveLeft();
-        }  
-     });  
-  	  
+        }
+     });
+
   default:
     var textbox = cmd === 'textbox',
       editable = textbox || cmd === 'editable',
@@ -4108,4 +4108,3 @@ jQuery(function() {
 
 
 }());
-
