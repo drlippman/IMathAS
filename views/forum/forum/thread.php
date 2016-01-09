@@ -251,7 +251,11 @@ echo '</div>';
                     <th class="width-five-per text-align-center"><?php echo AppUtility::t('Replies')?></th>
                     <th class="width-five-per text-align-center"><?php echo AppUtility::t('Views (Unique)')?></th>
                     <th class="width-twenty-per text-align-center"><?php echo AppUtility::t('Last Post')?></th>
+                    <?php if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
                     <th class="width-fifteen-per text-align-center"><?php echo AppUtility::t('Actions')?></th>
+                    <?php } else{?>
+                        <th class="width-fifteen-per text-align-center"></th>
+                    <?php }?>
                     </thead>
                     <tbody class="forum-table-body">
 
@@ -320,38 +324,46 @@ echo '</div>';
                                 <?php
                                 if ($line['posttype']==0) {
 
-                                    if (isset($flags[$line['id']])) { ?>
+                                    if (isset($flags[$line['id']])) {
+                                        if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
                                         <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
+                                            <?php }?>
                                     <?php
-                                    } else { ?>
+                                    } else {
+                                        if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
+
                                         <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)"> <i class='fa fa-flag-o'></i> Flag</a>
+                                            <?php }?>
                         <?php
                       }
                                 }else{
+                                    if($users['rights'] > AppConstant::STUDENT_RIGHT){
                                     echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
-                                } ?>
-
+                                    }
+                                    } ?>
+                                <?php if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
                                 <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
                                     <span class="fa fa-caret-down "></span>
                                 </a>
                                 <ul class="dropdown-menu thread-dropdown">
 
                                     <?php if ($isteacher) { ?>
-                                        <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
+                                        <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
 
                                     <?php }
                                     if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
-                                        <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?&courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
+                                        <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
                                     <?php }
                                     if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
                                         <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
                                     <?php }
                                     ?>
                                 </ul>
+                        <?php }?>
                             </div>
                         </td>
                         </tr>
-                    <?php          }
+                    <?php  }
                     ?>
                     </tbody>
                 </table>

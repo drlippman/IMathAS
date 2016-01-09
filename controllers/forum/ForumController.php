@@ -661,111 +661,7 @@ class ForumController extends AppController
         }
 
         $thread = ThreadForm::thread($forumId);
-        if ($params['modify']=='new') {
-            echo "Add Thread</div>\n";
-            $line['subject'] = "";
-            $line['message'] = "";
-            $line['posttype'] = 0;
-            $line['files'] = '';
-            $line['tag'] = '';
-            $curstugroupid = 0;
-            $replyby = null;
-            echo "<h2>Add Thread - \n";
-            if (isset($params['quoteq'])) {
-                require_once("../components/displayQuestion.php");
-                $showa = false;
-                $parts = explode('-',$params['quoteq']);
-                $assessmentId = $parts[3];
-                if (count($parts)==5) {
-                    //wants to show ans
-                    $result = AssessmentSession::getDataWithUserIdAssessment($userId,$assessmentId);
-//                    $query = "SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$parts[3]}'";
-//                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-                    $seeds = explode(',',mysql_result($result,0,0));
-                    $seeds = $seeds[$parts[0]];
-                    $attempts = explode(',',mysql_result($result,0,1));
-                    $attempts = $attempts[$parts[0]];
-                    $qs = explode(',',mysql_result($result,0,2));
-                    $qid = intval($qs[$parts[0]]);
-                    $query = "SELECT questionsetid,attempts,showans FROM imas_questions WHERE id=$qid";
-                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-                    $parts[1] = mysql_result($result,0,0);
-                    $allowedattempts = mysql_result($result,0,1);
-                    $showans = mysql_result($result,0,2);
 
-                    $query = "SELECT defattempts,deffeedback,displaymethod FROM imas_assessments WHERE id='{$parts[3]}'";
-                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-                    list($displaymode,$defshowans) = explode('-',mysql_result($result,0,1));
-                    if ($allowedattempts==9999) {
-                        $allowedattempts = mysql_result($result,0,0);
-                    }
-                    if ($showans==0) {
-                        $showans = $defshowans;
-                    }
-                    if ($attempts >= $allowedattempts) {
-                        if ($showans=='F' || $showans=='J') {
-                            $showa = true;
-                        }
-                    }
-
-                }
-                $message = displayq($parts[0],$parts[1],$parts[2],$showa,false,0,true);
-                $message = printfilter(forcefiltergraph($message));
-
-//                if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {
-//                    $message = preg_replace_callback('|'.$imasroot.'/filter/graph/imgs/([^\.]*?\.png)|', function ($matches) {
-//                        $curdir = rtrim(dirname(__FILE__), '/\\');
-//                        return relocatefileifneeded($curdir.'/../filter/graph/imgs/'.$matches[1], 'gimgs/'.$matches[1]);
-//                    }, $message);
-//                }
-                $message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-                $line['message'] = '<p> </p><br/><hr/>'.$message;
-                if (isset($parts[3])) {
-                    $result = Assessments::getDataWithUserId(intval($parts[3]));
-//                    $query = "SELECT name,itemorder FROM imas_assessments WHERE id='".intval($parts[3])."'";
-//                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-                    $line['subject'] = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',$result[0]['name']);
-                    $itemorder = $result[0]['itemorder'];
-                    $isgroupedq = false;
-                    if (strpos($itemorder, '~')!==false) {
-                        $itemorder = explode(',',$itemorder);
-                        $icnt = 0;
-                        foreach ($itemorder as $item) {
-                            if (strpos($item,'~')===false) {
-                                if ($icnt==$parts[0]) { break;}
-                                $icnt++;
-                            } else {
-                                $pts = explode('|',$item);
-                                if ($parts[0]<$icnt+$pts[0]) {
-                                    $isgroupedq = true; break;
-                                }
-                                $icnt += $pts[0];
-                            }
-                        }
-                    }
-                    if ($groupsetid>0) {
-                        if ($isteacher) {
-                            if (isset($params['stugroup'])) {
-                                $groupid = $params['stugroup'];
-                            } else {
-                                $groupid = 0;
-                            }
-                        }
-                    }
-                    if (!$isgroupedq) {
-                        $result = ForumPosts::getDataByJoin($line['subject'], $forumId, $groupsetid, $isteacher, $groupid);
-
-                        if (count($result)>0) {
-                            $notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
-                            $notice .= 'Please read and participate in the existing discussion.';
-                            foreach ($result as $row ) {
-//                                /$notice .=  "<br/><a href=\"posts.php?cid=$cid&forum=$forumid&thread={$row[0]}\">{$line['subject']}</a>";
-                            }
-                        }
-                    }
-                }
-            } //end if quoteq
-        }
         $threadArray = array();
 
         foreach ($thread as $data) {
@@ -845,7 +741,7 @@ class ForumController extends AppController
                     $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
                 }else
                 {
-                    $this->redirect('list-post-by-name?page=1&cid='.$courseId.'&forumid='.$forumId);
+                    $this->redirect('thread?cid='.$courseId.'&forum='.$forumId);
                 }
 
             }
@@ -854,7 +750,7 @@ class ForumController extends AppController
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
-        $responseData = array('threadId' => $threadId,'message'=> $message,  'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser, 'threadCreatedUserData' => $threadCreatedUserData, 'forumData' => $forumData, 'forumPostData' => $forumPostData);
+        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser, 'threadCreatedUserData' => $threadCreatedUserData, 'forumData' => $forumData, 'forumPostData' => $forumPostData);
         return $this->renderWithData('modifyPost', $responseData);
     }
 
