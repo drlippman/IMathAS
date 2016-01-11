@@ -219,9 +219,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
         </table>
     </div>
     <?php
-    if ($msgmonitor==1) {
-        echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
-    }
+   
     ?>
 
 </div>
