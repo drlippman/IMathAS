@@ -705,6 +705,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
         return self::find()->select(['seeds,attempts,questions'])->where(['userid' => $userId])->andWhere(['assessmentid' => $assessmentId])->one();
 
     }
+
+    public static function getByAssessmentIdAndUserId($assessmentId,$userId)
+    {
+        return AssessmentSession::find()->select(['id'])->where(['assessmentid' => $assessmentId, 'userid' => $userId])->all();
+    }
 }
 
 

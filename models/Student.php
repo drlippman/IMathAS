@@ -623,5 +623,9 @@ class Student extends BaseImasStudents
     {
         return static::findOne(['userid' => $id]);
     }
+
+    public static  function getId($userId,$courseId){
+        return Student::find()->select('id')->where(['userid' => $userId, 'courseid' => $courseId])->all();
+    }
 }
 

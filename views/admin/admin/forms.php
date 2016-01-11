@@ -311,7 +311,7 @@ switch ($action) {
                     </div>
                     <div class="col-md-12 col-sm-12 margin-top-five">
                     <input type=checkbox name="msgmonitor" value="1" ';
-            if ($msgmonitor == AppConstant::NUMERIC_ONE) {
+            if ($msgmonitor==1) {
                 echo "checked=1";
             }
             echo '/> <span class="margin-left-five">' . AppUtility::t('Enable monitoring of student-to-student messages', false) . '</span>

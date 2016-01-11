@@ -120,4 +120,7 @@ class Teacher extends BaseImasTeachers
     public function getId($courseId,$userId){
         return self::find()->select('id')->where(['courseid' => $courseId, 'userid' => $userId])->all();
     }
+    public function selectByCourseId($userId){
+        return self::find()->select('courseid')->where(['userid' => $userId])->all();
+    }
 }

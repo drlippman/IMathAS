@@ -504,4 +504,9 @@ class Assessments extends BaseImasAssessments
     {
         return self::find()->select('name,itemorder')->where(['id' => $userId])->all();
     }
+
+    public static function getByNameAndCourseId($aname, $courseId)
+    {
+        return Assessments::find()->select('id,enddate')->where(['name' => $aname, 'courseid' => $courseId])->all();
+    }
 }

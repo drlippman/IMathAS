@@ -130,7 +130,7 @@ $address = AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$co
             echo "<tr class='message-checkbox-\"{$line['id']}\"'><td><div class='checkbox override-hidden'><label>
 
             <input type=checkbox name=\"msg-check\" class='message-checkbox-\"{$line['id']}\"' value=\"{$line['id']}\"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td><td>";
-		echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
+		echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=sent&msgid={$line['id']}\">";
             echo $line['title'];
             echo "</a></td>";
             echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";

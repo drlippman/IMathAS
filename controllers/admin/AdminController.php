@@ -742,8 +742,8 @@ class AdminController extends AppController
                     $picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
                     $allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
                     //0 no un, 1 allow un;  0 allow enroll, 2 no enroll
-                    $copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
-                    $msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
+                    $copyrights = isset($params['copyrights'])?$params['copyrights'][0]:0;
+                    $msgset = isset($params['msgset'])?$params['msgset'][0]:0;
                     $toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
                     $msgmonitor = (floor($msgset/5))&1;
                     $msgQtoInstr = (floor($msgset/5))&2;
@@ -856,6 +856,7 @@ class AdminController extends AppController
                 }
                 break;
         }
+//        AppUtility::dump($msgmonitor);
         $this->includeCSS(['assessment.css','dataTables.bootstrap.css']);
         $this->includeJS(['general.js','forms.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'myRights' => $myRights,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,

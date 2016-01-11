@@ -223,8 +223,8 @@ if ($studentId>0) {
     $now = time();
     }
     if (count($StudentData)==0) { //shouldn't happen
-    echo 'Invalid student id';
-    exit;
+//    echo 'Invalid student id';
+//    exit;
     }
     $gbcomment = $StudentData['gbcomment'];
     $stuemail = $currentUser['email'];

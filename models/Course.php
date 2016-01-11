@@ -669,7 +669,7 @@ class Course extends BaseImasCourses {
         return self::find()->select('name')->where(['id' => $id])->one();
     }
 
-    public static function  getMsgSet($id){
+    public static function getMsgSet($id){
         return Course::find()->select('msgset')->where(['id' => $id])->one();
     }
 }

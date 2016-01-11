@@ -638,5 +638,28 @@ class Message extends BaseImasMsgs
 
         return $data;
     }
+
+    public static function getMessageData($courseId, $messageId, $type, $isTeacher, $userId)
+    {
+        $query = "SELECT imas_msgs.*,imas_users.LastName,imas_users.FirstName,imas_users.email,imas_users.hasuserimg,imas_students.section ";
+        $query .= "FROM imas_msgs JOIN imas_users ON imas_msgs.msgfrom=imas_users.id LEFT JOIN imas_students ON imas_students.userid=imas_users.id AND imas_students.courseid=:courseId ";
+        $query .= "WHERE imas_msgs.id=:messageId ";
+
+        if ($type!='allstu' || !$isTeacher) {
+            $query .= "AND (imas_msgs.msgto=:userId OR imas_msgs.msgfrom=:userId )";
+        }
+        $command = Yii::$app->db->createCommand($query);
+        $command->bindValues([':courseId' => $courseId, ':messageId' => $messageId]);
+        if ($type!='allstu' || !$isTeacher) {
+            $command->bindValue(':userId', $userId);
+        }
+       return $data = $command->queryOne();
+    }
+
+    public static function updateIsReadView($msgId)
+    {
+        $query = "UPDATE imas_msgs SET isread=isread+1 WHERE id=:msgId ";
+        return Yii::$app->db->createCommand($query)->bindValue(':msgId', $msgId)->execute();
+    }
 }
 

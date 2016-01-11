@@ -38,24 +38,32 @@ $now = $currentTime;
          <div class="row">
 
                  <div class="col-md-6 col-sm-6 message-title">
-                     <h4 class="margin-top-zero"><b><?php echo $messages->title ?></b></h4>
+                     <h4 class="margin-top-zero"><b><?php echo 'Subject '?> </b><?php echo $messages->title ?></h4>
                   </div>
                  <div class="pull right col-md-6 col-sm-6 message-title ">
-                     <?php echo AppUtility::tzdate(AppConstant::MESSAGE_CUSTOMIZE_DATE, $messages->senddate)?>
+                     <?php echo $senddate?>
                  </div>
          </div>
          <div class="second-level-div row">
                  <span class="padding-top-five padding-left-one-em padding-right-pt-five-em">
-                     From: <?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName) ?>
+                     From: <?php echo ucfirst($messageData['FirstName']) . ' ' . ucfirst($messageData['LastName']) ?>
                  </span>
-             <?php if($userRights['rights'] == AppConstant::ADMIN_RIGHT) { ?>
-                 <span class="text-deco-none padding-right-fifteen">
-                    <a class="btn1 reply-button" href="#"><?php echo AppUtility::t('email');?></a>
-                 </span>
+
+             <?php
+             if ($messageData['section']!='') {
+                 echo ' <span class="small">(Section: '.$messageData['section'].')</span>';
+             }
+
+             if (isset($teacherof[$messageData['courseid']])) {?>
+             <span class="text-deco-none padding-right-fifteen">
+                    <a class="btn1 reply-button" href="mailto:<?php echo $messageData['email']; ?>"><?php echo AppUtility::t('email');?></a>
+             </span>
                  <span class="text-deco-none">
-                    <a class="btn1 reply-button" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$fromUser['id']); ?>"><?php echo AppUtility::t('gradebook');?></a>
+                    <a class="btn1 reply-button" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$messageData['id']); ?>"><?php echo AppUtility::t('gradebook');?></a>
                  <span>
-             <?php } ?>
+
+               <?php
+               }?>
          </div>
         <div class="col-md-12 col-sm-12 message-body word-break-break-all">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
@@ -63,33 +71,38 @@ $now = $currentTime;
                    } ?>
            <?php echo $messages->message ?>
          </div>
-
          <div class="reply message-body col-md-12 col-sm-12 padding-left-zero">
-             <?php $sent = $messageId;?>
-             <?php if ($sent != AppConstant::NUMERIC_ONE) {
-                 ?>
-                    <span class="padding-left-fifteen padding-right-fifteen text-deco-none">
+         <?php if ($type!='sent' && $type!='allstu'){
+             if ($cansendmsgs) {?>
+                 <span class="padding-left-fifteen padding-right-fifteen text-deco-none">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
                             class="btn1 reply-button"> <i class="fa fa-reply"></i>&nbsp;&nbsp;<?php echo AppUtility::t('Reply')?></a>
                     </span>
-                 <span class="padding-right-fifteen text-deco-none">
+            <?php } ?>
+
+             <span class="padding-right-fifteen text-deco-none">
                     <a class="btn1 btn-bg-color" href="#" id="mark-delete"><?php echo AppUtility::t('Delete Message')?></a>
                  </span>
-                 <span class="padding-right-fifteen text-deco-none">
+             <span class="padding-right-fifteen text-deco-none">
                      <a class="btn1 btn-bg-color" href="#" id="mark-as-unread"><?php echo AppUtility::t('Mark As Unread ')?></a>
                  </span>
-             <?php }?>
+
              <span class="text-deco-none">
                  <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
             </span>
-             <span class="pull-right btn-hover">
-                 <?php if(($messages['isread']) < AppConstant::NUMERIC_SEVEN){?>
-                      <a href="#" onclick='changeImage(this,false,<?php echo $messages['id'];?>)' class="btn1 flag-button"><img class="small-icon" src="<?php echo AppUtility::getAssetURL()?>img/flagempty.gif">&nbsp;&nbsp;<?php echo AppUtility::t('Flag')?></a>
-                 <?php }else{?>
-                     <a href="#"  onclick='changeImage(this,true,<?php echo $messages['id'];?>)' class="btn1 flag-button"><img class="small-icon" src="<?php echo AppUtility::getAssetURL()?>img/flagfilled.gif">&nbsp;&nbsp;<?php echo AppUtility::t('Flag')?></a>
-                 <?php }?>
-              </span>
-         </div>
+             <?php
+             if($isTeacher && $messageData['courseid'] == $cid) {
+             ?>
+                 <span class="text-deco-none">
+                    <a class="btn1 reply-button" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$messageData['id']); ?>"><?php echo AppUtility::t('gradebook');?></a>
+                 <span>
+            <?php }
+         } else if ($type=='sent' && $type!='allstu') {?>
+                <span class="text-deco-none">
+                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
+            </span>
+         <?php } ?>
+        </div>
         </div>
     <br>
  </div>

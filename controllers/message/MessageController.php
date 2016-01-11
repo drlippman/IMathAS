@@ -4,7 +4,10 @@ namespace app\controllers\message;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\models\Assessments;
+use app\models\AssessmentSession;
 use app\models\Course;
+use app\models\Exceptions;
 use app\models\Message;
 use app\models\Student;
 use app\models\Teacher;
@@ -47,7 +50,7 @@ class MessageController extends AppController
         $isNewMessage = $this->getParamVal('newmsg');
         $isImportant = $this->getParamVal('show');
         $rights = $this->user;
-        $isTeacher = $this->isTeacher($user['rights'],$courseId);
+        $isTeacher = $this->isTeacher($user['id'],$courseId);
         $cansendmsgs = false;
         if ($rights) {
             $model = new MessageForm();
@@ -96,7 +99,8 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/msg.js','message/message.js']);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page, 'cansendmsgs' => $cansendmsgs, 'msgmonitor' => $msgmonitor);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page, 'cansendmsgs' => $cansendmsgs, 'msgmonitor' => $msgmonitor,
+            'isTeacher' => $isTeacher);
             return $this->renderWithData('messages', $responseData);
         }
     }
@@ -389,19 +393,118 @@ class MessageController extends AppController
         $courseId = $this->getParamVal('cid');
         $countPost = $this->getNotificationDataForum($courseId,$userRights);
         $msgList = $this->getNotificationDataMessage($courseId,$userRights);
+        $isTeacher = $this->isTeacher($userRights['id'],$courseId);
+        $isTutor = $this->isTutor($userRights['id'],$courseId);
+        $isStudent = $this->isStudent($userRights['id'],$courseId);
+        $params = $this->getRequestParams();
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
+        if ($courseId != 0 && !($isTeacher) && !($isTutor) && !($isStudent)) {
+            $this->setErrorFlash('You are not enrolled in this course.');
+            return $this->goHome();
+        }
+        if (isset($isTeacher)) {
+            $isTeacher = true;
+        } else {
+            $isTeacher = false;
+        }
+        if (isset($params['filtercid'])) {
+            $filtercid = $params['filtercid'];
+        } else {
+            $filtercid = 0;
+        }
+        if (isset($params['filterstu'])) {
+            $filterstu = $params['filterstu'];
+        } else {
+            $filterstu = 0;
+        }
+
+        $cid = $params['cid'];
+        $page = $params['page'];
+        $type = $params['type'];
+
+        $teacherof = array();
+        $teacher = new Teacher();
+        $result = $teacher->selectByCourseId($userRights['id']);
+        foreach($result as $row) {
+            $teacherof[$row['courseid']] = true;
+        }
+
+
         $course = Course::getById($courseId);
         $msgId = $this->getParamVal('msgid');
-        if ($this->getAuthenticatedUser()) {
+        $messageData = Message::getMessageData($courseId,$msgId, $type, $isTeacher, $userRights['id']);
+        if(count($messageData) == AppConstant::NUMERIC_ZERO){
+            $this->setErrorFlash('Message not found');
+            return $this->redirect('view-message');
+        }
+        $isTeacher = isset($teacherof[$messageData['courseid']]);
+        $senddate = AppUtility::tzdate("F j, Y, g:i a",$messageData['senddate']);
+        if (isset($teacherof[$messageData['courseid']])) {
+            if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$messageData['title'],$matches)) {
+                $aname = addslashes($matches[2]);
+                $assessmentData = Assessments::getByNameAndCourseId($aname, $courseId);
+                if(count($assessmentData) > 0){
+                    $assessmentId = $assessmentData['id'];
+                    $due = $assessmentData['enddate'];
+                    $exceptionData = Exceptions::getEndDateById($messageData['msgfrom'], $assessmentId);
+                    if(count($exceptionData) > 0) {
+                        $due = $exceptionData['enddate'];
+                    }
+                    $duedate = AppUtility::tzdate('D m/d/Y g:i a',$due);
+
+                    $assessmentSessionData = AssessmentSession::getByAssessmentIdAndUserId($assessmentId,$userRights['id']);
+                    if(count($assessmentSessionData) > 0){
+                        $asid = $assessmentSessionData['id'];?>
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-view-asid?cid='.$messageData['courseid']. '&uid='.$messageData['msgfrom']. '&asid=' .$asid)?>">Assignment</a>
+                        <?php
+                        if($due < 2000000000){
+                            echo ' <span class="small">Due '.$duedate.'</span>';
+                            }
+                        }
+                    }
+                }
+            }
+
+        if ($type!='sent' && $type!='allstu') {
+            if ($messageData['courseid']>0) {
+                $result = Course::getMsgSet($messageData['courseid']);
+                $msgset = $result['msgset'];
+                $msgmonitor = floor($msgset/5);
+                $msgset = $msgset%5;
+                if ($msgset<3 || $isTeacher) {
+                    $cansendmsgs = true;
+                    if ($msgset==1 && !$isTeacher) { //check if sending to teacher
+                        $teacher = new Teacher();
+                        $result = $teacher->getId($messageData['courseid'],$messageData['msgfrom']);
+                        if (count($result) == 0) {
+                            $cansendmsgs = false;
+                        }
+                    } else if ($msgset==2 && !$isTeacher) { //check if sending to stu
+                        $result = Student::getId($messageData['msgfrom'],$messageData['courseid']);
+                        if (count($result)==0) {
+                            $cansendmsgs = false;
+                        }
+                    }
+                } else {
+                    $cansendmsgs = false;
+                }
+            } else {
+                $cansendmsgs = true;
+            }
+        }
+
+        if ($type!='sent' && $type!='allstu' && ($messageData['isread']==0 || $messageData['isread']==4)) {
+            Message::updateIsReadView($msgId);
+        }
+
             $messages = Message::getByMsgId($msgId);
-            Message::updateRead($msgId);
-            $fromUser = User::getById($messages->msgfrom);
             $this->includeCSS(['jquery-ui.css', 'message.css']);
             $this->includeJS(['message/viewmessage.js']);
-            $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId);
+            $responseData = array('messages' => $messages, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId, 'messageData' => $messageData, 'senddate' => $senddate, 'teacherof' => $teacherof,
+            'isTeacher' => $isTeacher, 'filtercid' => $filtercid, 'filterstu' => $filterstu, 'cansendmsgs' => $cansendmsgs, 'type' => $type, 'cid' => $cid, 'page' => $page);
             return $this->renderWithData('viewMessage', $responseData);
-        }
+
     }
     /*
      * Ajax call method to delete message from inbox
