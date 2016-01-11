@@ -238,7 +238,7 @@ switch ($action) {
                     </div>
             </div>';
         }
-        if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1] == AppConstant::NUMERIC_ONE) {
+        if (!($_POST['copyrights']) || $_POST['copyrights'][1] == AppConstant::NUMERIC_ONE) {
             echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                     <div class='col-md-3 col-sm-3'>" . AppUtility::t('Allow other instructors to copy course items', false) . "
                     </div>

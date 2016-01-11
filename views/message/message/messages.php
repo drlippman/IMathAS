@@ -33,9 +33,11 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
 
-        <?php if($userRights->rights > AppConstant::GUEST_RIGHT){?>
+        <?php if($cansendmsgs){?>
+
         <div class="pull-left header-btn hide-hover">
             <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>"
+
             class="btn btn-primary1 pull-right btn-color" ondblclick="return false;"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
         </div>
         <?php } ?>
@@ -138,7 +140,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <?php
             if(empty($messageDisplay)) {
 
-                echo "<tr><td></td><td>No messages</td><td></td></tr>";
+                echo "<tr><td></td><td></td><td></td><td></td><td>No messages</td><td></td><td></td><td></td></tr>";
 
             } else {
             foreach($messageDisplay as $key=>$line) {
@@ -216,6 +218,12 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             </tbody>
         </table>
     </div>
+    <?php
+    if ($msgmonitor==1) {
+        echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
+    }
+    ?>
+
 </div>
 
 <script type="text/javascript">

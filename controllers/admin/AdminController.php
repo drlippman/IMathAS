@@ -773,6 +773,7 @@ class AdminController extends AppController
                 } else {
                     $defstimedisp = $deftimedisp;
                 }
+
                 break;
             case "chgteachers":
                 $courseChangeTeacher = Course::getById($params['id']);

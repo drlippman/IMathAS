@@ -47,6 +47,8 @@ class MessageController extends AppController
         $isNewMessage = $this->getParamVal('newmsg');
         $isImportant = $this->getParamVal('show');
         $rights = $this->user;
+        $isTeacher = $this->isTeacher($user['rights'],$courseId);
+        $cansendmsgs = false;
         if ($rights) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
@@ -72,6 +74,15 @@ class MessageController extends AppController
             } else {
                 $filteruid = 0;
             }
+            if ($user['rights'] > 5 && $courseId>0) {
+                $result = Course::getMsgSet($courseId);
+                $msgset = $result['msgset'];
+                $msgmonitor = (floor($msgset/5)&1);
+                $msgset = $msgset%5;
+                if ($msgset<3 || $isTeacher) {
+                    $cansendmsgs = true;
+                }
+            }
             $userData = User::getById($user['id']);
             $threadsperpage = $userData['listperpage'];
             $filterByCourse = Message::getCoursesForMessage($user['id']);
@@ -85,7 +96,7 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/msg.js','message/message.js']);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page, 'cansendmsgs' => $cansendmsgs, 'msgmonitor' => $msgmonitor);
             return $this->renderWithData('messages', $responseData);
         }
     }
