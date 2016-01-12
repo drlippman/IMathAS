@@ -172,7 +172,7 @@ function markSentDelete()
                             $(this).closest('tr').remove();
                         });
                         $(this).dialog("close");
-
+                        $('input[name = "header-checked"]:checked').prop('checked', false);
                         var readMsg = {checkedMsgs: markArray};
                         jQuerySubmit('mark-sent-remove-ajax',readMsg,'markDeleteSuccess');
                         return true;
@@ -221,8 +221,7 @@ function markUnsend()
             markArray.push($(this).val());
         });
         if(markArray.length!=0) {
-            var html = '<div><p>Are you sure ? you want to Delete. </p></div>';
-
+            var html = '<div><p>Are you sure? This will delete the question from the receiver\'s inbox and your send list.\</p></div>';
             var cancelUrl = $(this).attr('href');
             e.preventDefault;
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({

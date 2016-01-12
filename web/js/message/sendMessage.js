@@ -74,11 +74,20 @@ function sendMessage(response)
 {
         var cid = $(".send-msg").val();
         var result = JSON.parse(response);
-    console.log(result);
 
         if(result.status == 0)
         {
 
             window.location = "index?cid="+cid;
         }
+}
+
+function clickAndDisable(link) {
+
+    // add any additional logic here
+
+    // disable subsequent clicks
+    link.onclick = function(event) {
+        e.preventDefault();
+    }
 }

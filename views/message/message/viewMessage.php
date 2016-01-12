@@ -46,7 +46,7 @@ $now = $currentTime;
          </div>
          <div class="second-level-div row">
                  <span class="padding-top-five padding-left-one-em padding-right-pt-five-em">
-                     From: <?php echo ucfirst($messageData['FirstName']) . ' ' . ucfirst($messageData['LastName']) ?>
+                     From: <?php echo ucfirst($messageData['LastName']) . ' ' . ucfirst($messageData['FirstName']) ?>
                  </span>
 
              <?php

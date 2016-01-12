@@ -123,7 +123,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <div class="col-sm-3 padding-bottom-one-em padding-left-zero">
                 <?php
                 if ($isTeacher && $course['id'] >0 && $msgmonitor==1) {
-                    AppUtility::dump('hey');?>
+                    ?>
                   <a href="#"> Student Messages</a>
                <?php }?>
             </div>
@@ -151,6 +151,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 
             } else {
             foreach($messageDisplay as $key=>$line) {
+//            AppUtility::dump($line);
 
                     if($line)
                     {

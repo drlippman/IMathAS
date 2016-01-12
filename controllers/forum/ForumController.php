@@ -833,7 +833,7 @@ class ForumController extends AppController
             $tempArray['forumIdData'] = $postData['forumid'];
             $tempArray['subject'] = $titleLevel['title'];
             $tempArray['forumName'] = ucfirst($forumName->name);
-            $tempArray['postdate'] = AppController::customizeDate($postData->postdate);
+            $tempArray['postdate'] = AppUtility::tzdate("D, M j, Y, g:i a",$postData->postdate);
             $tempArray['postType'] = $postData['posttype'];
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['userId'] = $username->id;
@@ -868,6 +868,7 @@ class ForumController extends AppController
         $myLikes = $Count->UserLikes($threadId, $currentUser);
         $this->setReferrer();
         foreach ($this->totalPosts as $key => $threadArray) {
+
             if ($threadArray) {
                 foreach ($this->totalPosts as $singleThread) {
                     if ($threadArray['parent'] == $singleThread['id']) {
@@ -885,7 +886,9 @@ class ForumController extends AppController
             if ($threadArray['parent'] == AppConstant::NUMERIC_ZERO) {
                 $postType = $threadArray['postType'];
             }
-            if ($threadArray['userId'] == $currentUser['id']) {
+
+            if ($threadArray['userId'] && $currentUser['id'] != 0) {
+
                 $studentPosts[] = $threadArray['id'];
             }
         }
@@ -895,29 +898,32 @@ class ForumController extends AppController
         }
         if ($postType == AppConstant::NUMERIC_THREE && $currentUser['rights'] == AppConstant::NUMERIC_TEN) {
             $threadOnce = AppConstant::NUMERIC_ZERO;
-            foreach ($FinalPostArray as $array) {
-                global $parentArray;
-                $this->parentList($array['id']);
-                $isShow = false;
-                if ($parentArray) {
-                    foreach ($studentPosts as $studentPost) {
-                        if (in_array($studentPost, $parentArray)) {
-                            $isShow = true;
-                            break;
+            if($FinalPostArray){
+                foreach ($FinalPostArray as $array) {
+                    global $parentArray;
+                    $this->parentList($array['id']);
+                    $isShow = false;
+                    if ($parentArray) {
+                        foreach ($studentPosts as $studentPost) {
+                            if (in_array($studentPost, $parentArray)) {
+                                $isShow = true;
+                                break;
+                            }
                         }
+                        $parentArray = null;
                     }
-                    $parentArray = null;
-                }
 
-                if ($array['parent'] == AppConstant::NUMERIC_ZERO && $threadOnce == AppConstant::NUMERIC_ZERO) {
-                    $threadOnce = AppConstant::NUMERIC_ONE;
-                    array_push($data, $array);
-                } else if ($array['userId'] == $currentUser['id'] || in_array($array['parent'], $studentPosts)) {
-                    array_push($data, $array);
-                } else if ($isShow == true) {
-                    array_push($data, $array);
+                    if ($array['parent'] == AppConstant::NUMERIC_ZERO && $threadOnce == AppConstant::NUMERIC_ZERO) {
+                        $threadOnce = AppConstant::NUMERIC_ONE;
+                        array_push($data, $array);
+                    } else if ($array['userId'] == $currentUser['id'] || in_array($array['parent'], $studentPosts)) {
+                        array_push($data, $array);
+                    } else if ($isShow == true) {
+                        array_push($data, $array);
+                    }
                 }
             }
+
         } else {
             $data = $FinalPostArray;
         }

@@ -26,7 +26,7 @@ $("a[name=remove]").on("click", function (event) {
                 $(this).dialog('destroy').remove();
                 return false;
             },
-            "confirm": function () {
+            "Confirm": function () {
                 $(this).dialog("close");
                 var threadId = threadid;
                 jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread,parentId:parentId}, 'markAsRemoveSuccess');

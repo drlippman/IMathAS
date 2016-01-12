@@ -23,10 +23,12 @@ $(document).ready(function ()
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "confirm": function () {
+                "Confirm": function () {
+//                        $(this).dialog("close");
+//                        window.location = "actions?action=delgroup&id="+groupId;
                     $(this).dialog("close");
                     var threadId = threadid;
-                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax',{threadId:threadId},'markAsRemoveSuccess');
                     return true;
                 }
             },
@@ -186,6 +188,11 @@ function onenter(e,field) {
     } else {
         return true;
     }
+}
+
+function markAsRemoveSuccess(response)
+{
+    console.log(response);
 }
 
 

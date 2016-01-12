@@ -41,7 +41,6 @@ function changeMessageStatus(){
     }
     $('.with-selected').val('0');
 }
-
 function showMessageSuccess(response) {
     response = JSON.parse(response);
     messageData = response.data;
@@ -278,7 +277,6 @@ function markAsDelete() {
         });
     }
     else {
-
         var msg ="Select atleast one message to delete";
         CommonPopUp(msg);
     }
