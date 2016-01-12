@@ -132,7 +132,9 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result);
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
-			$headers .= "From: $self\r\n";
+			//$headers .= "From: $self\r\n";
+			$headers .= "From: {$row[0]} {$row[1]} <$sendfrom>\r\n";
+			$headers .= "Reply-To: $self\r\n";
 			$teacheraddys = array();
 			if ($_POST['self']!="none") {
 				$teacheraddys[] = $self;
