@@ -44,6 +44,17 @@ $now = $currentTime;
                      <?php echo $senddate?>
                  </div>
          </div>
+         <?php
+         if ($messageData['hasuserimg']==1) {
+             if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+                 echo " <img style=\"float:left;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/Uploads/userimg_sm{$messageData['msgfrom']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+             } else {
+                 $uploads = AppConstant::UPLOAD_DIRECTORY;
+                  ?>
+                 <img style="float:left;" class="circular-profile-image Align-link-post padding-five" src="<?php echo AppUtility::getHomeURL().$uploads.$messageData['msgfrom'].".jpg"?>" onclick="togglepic(this)" ">
+              <?php }
+         }
+         ?>
          <div class="second-level-div row">
                  <span class="padding-top-five padding-left-one-em padding-right-pt-five-em">
                      From: <?php echo ucfirst($messageData['LastName']) . ' ' . ucfirst($messageData['FirstName']) ?>
@@ -65,7 +76,7 @@ $now = $currentTime;
                <?php
                }?>
          </div>
-        <div class="col-md-12 col-sm-12 message-body word-break-break-all">
+        <div class="col-md-12 col-sm-12 message-body word-break-break-all" style="padding-left: 80px">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
              {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">['.AppUtility::t('Show trimmed content', false).']</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
                    } ?>

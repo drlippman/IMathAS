@@ -499,7 +499,7 @@ class MessageController extends AppController
         }
 
             $messages = Message::getByMsgId($msgId);
-            $this->includeCSS(['jquery-ui.css', 'message.css']);
+            $this->includeCSS(['jquery-ui.css', 'message.css', 'forums.css']);
             $this->includeJS(['message/viewmessage.js']);
             $responseData = array('messages' => $messages, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId, 'messageData' => $messageData, 'senddate' => $senddate, 'teacherof' => $teacherof,
             'isTeacher' => $isTeacher, 'filtercid' => $filtercid, 'filterstu' => $filterstu, 'cansendmsgs' => $cansendmsgs, 'type' => $type, 'cid' => $cid, 'page' => $page);
