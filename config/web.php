@@ -35,6 +35,8 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'class'=>'CWebUser',
+            'autoUpdateFlash' => false,
         ],
         'errorHandler' => [
         	'maxSourceLines' => 20,
