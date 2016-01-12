@@ -66,6 +66,7 @@ if($actionPath == 'dashboard')
                         if (isset($flashes)) {
                             foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                                 echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
+                                Yii::$app->session->removeFlash($key);
                             }
                         }
                         ?>
