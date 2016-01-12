@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div></span><br>"; ?>
             </div>
             <div class="header-btn hide-hover col-md-6 col-sm-6 col-sm-offset-1 padding-left-twenty-eight padding-top-twenty">
-                <a href="#" id="mess" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
+                <div id="message-send-btn" class="btn btn-primary1 btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</div>
             </div>
     </div>
 </div>

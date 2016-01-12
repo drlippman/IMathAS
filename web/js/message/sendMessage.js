@@ -1,42 +1,50 @@
 
 $(document).ready(function () {
     initEditor();
-    $("#mess").click(function()
+    $("#message-send-btn").click(function()
     {
-        tinyMCE.triggerSave();
-        var cid = $(".send-msg").val();
-        var newTo = $("#newTo").val();
-        if(newTo)
-        {
-            var receiver = $("#newUserId").val();
-        }else
-        {
-            var receiver = $("#seluid").val();
+        if($(this).attr('clicked')){
+            return false;
         }
-        var subject = $(".subject").val();
-        var body = $("#message").val();
+        else{
+            $(this).attr('clicked',true);
+            tinyMCE.triggerSave();
 
-        if(receiver == 0 && subject == '')
-        {
-            $('#subject-error').html('Please fill out subject field');
-            $('#receiver').html('Please fill out receiver field');
-        }
-        if(receiver != 0)
-        {
-            if(subject == '')
+
+            var cid = $(".send-msg").val();
+            var newTo = $("#newTo").val();
+            if(newTo)
             {
-                $('#subject').css('border-color','red');
-                $('#subject-error').html('Please fill out subject field');
-            } else if(subject != '')
+                var receiver = $("#newUserId").val();
+            }else
             {
-                $('.subject-error-message').removeClass("subject-error-message");
-                jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+                var receiver = $("#seluid").val();
             }
-        }
-        else
-        {
-            $('#seluid').css('border-color','red');
-            $('#receiver').html('Please fill out receiver field');
+            var subject = $(".subject").val();
+            var body = $("#message").val();
+
+            if(receiver == 0 && subject == '')
+            {
+                $('#subject-error').html('Please fill out subject field');
+                $('#receiver').html('Please fill out receiver field');
+            }
+            if(receiver != 0)
+            {
+                if(subject == '')
+                {
+                    $('#subject').css('border-color','red');
+                    $('#subject-error').html('Please fill out subject field');
+                } else if(subject != '')
+                {
+                    $('.subject-error-message').removeClass("subject-error-message");
+                    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+                }
+            }
+            else
+            {
+                $('#seluid').css('border-color','red');
+                $('#receiver').html('Please fill out receiver field');
+            }
         }
     });
 
