@@ -706,9 +706,8 @@ switch ($action) {
                 <span class='col-md-2 col-sm-2 padding-left-zero'>
                     <?php AppUtility::t('Domain') ?>
                 </span>
-
                         <div class='col-md-6 col-sm-6 padding-left-zero'>
-                            <input class='form-control' type=text name="ltidomain" size=20>
+                            <input class='form-control' type=text name="ltidomain" id="domain-char-limitation" size=40>
                         </div>
                     </div>
                     <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
@@ -759,7 +758,7 @@ switch ($action) {
                         </div>
                     </div>
                 <div class="col-md-2 col-sm-2 padding-top-twenty padding-left-three col-sm-offset-2">
-                    <input class="margin-left-minus-five" type=submit value="<?php AppUtility::t('Add LTI Credentials') ?>">
+                    <input class="margin-left-minus-five"  id="lti-btn"  type=submit value="<?php AppUtility::t('Add LTI Credentials') ?>">
                 </div>
                 </div>
         </div>

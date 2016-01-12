@@ -1509,6 +1509,11 @@ class AdminController extends AppController
 
                     $user = new User();
                     $resultLTI = $user->createLTIDomainCredentials($LTIDomain);
+                    if($resultLTI->errors['email'])
+                    {
+                        $this->setWarningFlash("Domain should contain at most 100 characters.");
+                        return $this->redirect('forms?action=listltidomaincred');
+                    }
                     if($resultLTI->errors['SID'])
                     {
                         $this->setWarningFlash($resultLTI->errors['SID'][0]);
@@ -1521,10 +1526,15 @@ class AdminController extends AppController
                         return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                     }else{
                         $resultUpdate = User::updateLTIDomainCredentials($params);
+                        if($resultUpdate->errors['email'])
+                        {
+                            $this->setWarningFlash("Domain should contain at most 100 characters.");
+                            return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
+                        }
                         if($resultUpdate->errors['SID'])
                         {
                             $this->setWarningFlash($resultUpdate->errors['SID'][0]);
-                            return $this->redirect('forms?action=listltidomaincred');
+                            return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                     }
 
