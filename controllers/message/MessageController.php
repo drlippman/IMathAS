@@ -52,6 +52,10 @@ class MessageController extends AppController
         $rights = $this->user;
         $isTeacher = $this->isTeacher($user['id'],$courseId);
         $cansendmsgs = false;
+        if($cansendmsgs == false){
+            $this->setErrorFlash('Message System is "OFF" for this course');
+            return $this->goHome();
+        }
         if ($rights) {
             $model = new MessageForm();
             $course = Course::getById($courseId);

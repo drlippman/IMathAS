@@ -3,9 +3,9 @@ $(document).ready(function () {
     var userId = $(".send-user-id").val();
     var inputData = {cid: cid, userId: userId};
 //    jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
-    selectCheckBox();
     jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
     jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
+    selectCheckBox();
     checkUncheckHeaderCheckbox();
 });
 
@@ -96,6 +96,25 @@ function checkUncheckHeaderCheckbox(){
 }
 
 function selectCheckBox(){
+//    $(document).on('click', '#message-header-checkbox', function() {
+//        if($(this).prop("checked") == true){
+//            $('.message-table-body input:checkbox').each(function () {
+//                $(this).prop('checked', true);
+//                if($.inArray($(this).val(), isModifiedArray) != -1){
+//                    $(this).closest('tr').remove();
+//                }
+//            })
+//        }
+//        else if($(this).prop("checked") == false){
+//            $('.message-table-body input:checkbox').each(function () {
+//                $(this).prop('checked', false);
+//                if($.inArray($(this).val(), isModifiedArray) != -1){
+//                    $(this).closest('tr').remove();
+//                }
+//            })
+//        }
+//    });
+
     $(document).on('click', '#message-header-checkbox', function() {
         if($(this).prop("checked") == true){
             $('.message-table-body input:checkbox').each(function () {
@@ -142,7 +161,7 @@ function markSentDelete()
         var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
-            isModifiedArray.push($(this).val());
+//            isModifiedArray.push($(this).val());
         });
         if(markArray.length!=0) {
             var html = '<div><p>Are you sure ? you want to Remove.</p></div>';
