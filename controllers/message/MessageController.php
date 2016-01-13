@@ -54,10 +54,7 @@ class MessageController extends AppController
         $course = Course::getById($courseId);
 
         $cansendmsgs = false;
-        if($cansendmsgs == false){
-            $this->setErrorFlash('Message System is "OFF" for ' .$course['name']. ' course');
-            return $this->goHome();
-        }
+
         if ($rights) {
             $model = new MessageForm();
             if (!isset($_GET['page']) || $_GET['page']=='') {
@@ -90,6 +87,10 @@ class MessageController extends AppController
                 if ($msgset<3 || $isTeacher) {
                     $cansendmsgs = true;
                 }
+            }
+            if($cansendmsgs == false){
+                $this->setErrorFlash('Message System is "OFF" for ' .$course['name']. ' course');
+                return $this->goHome();
             }
             $userData = User::getById($user['id']);
             $threadsperpage = $userData['listperpage'];
