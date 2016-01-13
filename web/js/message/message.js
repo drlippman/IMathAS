@@ -256,7 +256,6 @@ function markAsDelete() {
                     $('.message-table-body input[name="msg-check"]:checked').each(function () {
                         $(this).prop('checked', false);
                     });
-                    $('input[name = "header-checked"]:checked').prop('checked', false);
                     return false;
                 },
                 "Confirm": function () {
@@ -280,6 +279,7 @@ function markAsDelete() {
         var msg ="Select atleast one message to delete";
         CommonPopUp(msg);
     }
+
 }
 
 function changeImage(element, temp, rowId) {

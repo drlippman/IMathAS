@@ -10,7 +10,6 @@ $(document).ready(function () {
             $(this).attr('clicked',true);
             tinyMCE.triggerSave();
 
-
             var cid = $(".send-msg").val();
             var newTo = $("#newTo").val();
             if(newTo)

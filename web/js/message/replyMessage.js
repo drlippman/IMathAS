@@ -6,14 +6,19 @@ $(document).ready(function () {
         var cid = $(".send-msg").val();
         var receiver = $(".msg-sender").val();
         var sender = $(".msg-receiver").val();
-        var subject = $(".subject").val();
         var body = $("#message").val();
         var parentId = $(".parent-id").val();
         var checkedValue = $('.header-checked:checked').val();
         var baseId = $(".base-id").val();
         var isReplied = $(".is-replied").val();
-        var messageDetails = {cid: cid, sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied,checkedValue :checkedValue };
-        jQuerySubmit('reply-message-ajax', messageDetails, 'replyMessage');
+        var subject = $(".subject").val();
+        if(subject == '')
+        {
+            $('#subject-error').html('Please fill out subject field');
+        }else{
+            var messageDetails = {cid: cid, sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied,checkedValue :checkedValue };
+            jQuerySubmit('reply-message-ajax', messageDetails, 'replyMessage');
+        }
     });
 
 });
@@ -23,5 +28,15 @@ function replyMessage(response) {
     var result = JSON.parse(response);
     if (result.status == 0) {
         window.location = "index?cid=" + cid;
+    }
+}
+
+function changeSubject()
+{
+    var subject = $("#subject").val();
+
+    if(subject != '')
+    {
+        $('#subject-error').html('');
     }
 }
