@@ -571,7 +571,7 @@ class AdminController extends AppController
                    }
                    if($saveExternalTool->errors['ltikey'])
                    {
-                       $this->setWarningFlash($saveExternalTool->errors['ltikey'][0]);
+                       $this->setWarningFlash("Key should contains 100 characters.");
                        return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
                    }
                    if($saveExternalTool->errors['secret'])
@@ -594,7 +594,7 @@ class AdminController extends AppController
                        }
                        if($externalTool->errors['ltikey'])
                        {
-                           $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                           $this->setWarningFlash("Key should contains 100 characters.");
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
                        if($externalTool->errors['secret'])
@@ -614,7 +614,7 @@ class AdminController extends AppController
                        }
                        if($externalTool->errors['ltikey'])
                        {
-                           $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                           $this->setWarningFlash("Key should contains 100 characters.");
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
                        if($externalTool->errors['secret'])
@@ -636,7 +636,7 @@ class AdminController extends AppController
                                }
                                if($externalTool->errors['ltikey'])
                                {
-                                   $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                                   $this->setWarningFlash("Key should contains 100 characters.");
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                                if($externalTool->errors['secret'])
@@ -653,7 +653,7 @@ class AdminController extends AppController
                                }
                                if($externalTool->errors['ltikey'])
                                {
-                                   $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                                   $this->setWarningFlash("Key should contains 100 characters.");
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                                if($externalTool->errors['secret'])
