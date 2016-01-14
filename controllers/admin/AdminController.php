@@ -587,22 +587,80 @@ class AdminController extends AppController
                    if ($isTeacher) {
                        $attr = 'courseid';
                        $attrValue = $courseId;
-                       ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
+                       $externalTool =  ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
+                       if($externalTool->errors['name']){
+                           $this->setWarningFlash($externalTool->errors['name'][0]);
+                           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                       }
+                       if($externalTool->errors['ltikey'])
+                       {
+                           $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                       }
+                       if($externalTool->errors['secret'])
+                       {
+                           $this->setWarningFlash($externalTool->errors['secret'][0]);
+                           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                       }
+
                    } else if ($isGrpAdmin)
                    {
                        $attr = 'groupid';
                        $attrValue = $groupId;
-                       ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
+                       $externalTool = ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
+                       if($externalTool->errors['name']){
+                           $this->setWarningFlash($externalTool->errors['name'][0]);
+                           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                       }
+                       if($externalTool->errors['ltikey'])
+                       {
+                           $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                       }
+                       if($externalTool->errors['secret'])
+                       {
+                           $this->setWarningFlash($externalTool->errors['secret'][0]);
+                           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                       }
+
                    }
                    else{
                        if($isAdmin)
                        {
                            if($params['scope'] == AppConstant::NUMERIC_ZERO)
                            {
-                               ExternalTools::updateExternalTool($params,0,$privacy);
+                               $externalTool = ExternalTools::updateExternalTool($params,0,$privacy);
+                               if($externalTool->errors['name']){
+                                   $this->setWarningFlash($externalTool->errors['name'][0]);
+                                   return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                               }
+                               if($externalTool->errors['ltikey'])
+                               {
+                                   $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                                   return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                               }
+                               if($externalTool->errors['secret'])
+                               {
+                                   $this->setWarningFlash($externalTool->errors['secret'][0]);
+                                   return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                               }
 
                            } else{
-                               ExternalTools::updateExternalTool($params,$params['groupId'],$privacy);
+                               $externalTool = ExternalTools::updateExternalTool($params,$params['groupId'],$privacy);
+                               if($externalTool->errors['name']){
+                                   $this->setWarningFlash($externalTool->errors['name'][0]);
+                                   return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                               }
+                               if($externalTool->errors['ltikey'])
+                               {
+                                   $this->setWarningFlash($externalTool->errors['ltikey'][0]);
+                                   return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                               }
+                               if($externalTool->errors['secret'])
+                               {
+                                   $this->setWarningFlash($externalTool->errors['secret'][0]);
+                                   return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
+                               }
                            }
                        }
                    }

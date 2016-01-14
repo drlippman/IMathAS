@@ -49,7 +49,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     <div style="margin-left: 10.7%">
     <?php if($reply[0]['forumType'] == 1)
-    { ?>
+    {
+        ?>
         <input name="file-0" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
         <br><button class="add-more">Add More Files</button><br>
     <?php }?>
@@ -64,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </span>
                 <span class="right">
                 </span>
-                <b  style="font-family: "Times New Roman", Times, serif"><?php echo $reply[0]['subject']?></b>
+                <b  style="font-family: Times New Roman, Times, serif"><?php echo $reply[0]['subject']?></b>
                 <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;&nbsp;&nbsp;<?php echo $reply[0]['userName']?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
             </div>
             <div class="blockitems col-sm-12 col-md-12" id="item1">

@@ -38,7 +38,7 @@ class BaseImasExternalTools extends \yii\db\ActiveRecord
         return [
 //            [['name', 'url', 'ltikey', 'secret', 'custom', 'privacy', 'courseid', 'groupid'], 'required'],
             [['privacy', 'courseid', 'groupid'], 'integer'],
-            [['name', 'url', 'ltikey', 'secret', 'custom'], 'string', 'max' => 255]
+            [['name', 'url', 'ltikey', 'secret', 'custom'], 'string', 'max' => 100]
         ];
     }
 

@@ -51,24 +51,6 @@ class ExternalTools extends BaseImasExternalTools
 
     public function saveExternalTool($params)
     {
-//        $this->name = trim($params['tname']);
-//        $this->url = $params['url'];
-//        $this->ltikey = $params['key'];
-//        $this->secret = $params['secret'];
-//        $this->custom = $params['custom'];
-//        $this->privacy = $privacy;
-//        if ($isTeacher) {
-//            $this->groupid = $groupId;
-//            $this->courseid = $courseId;
-//        } else if ($isGroupAdmin || ($isAdmin && $params['scope'] == AppConstant::NUMERIC_ONE)) {
-//            $this->groupid = $groupId;
-//            $this->courseid = AppConstant::NUMERIC_ZERO;
-//        } else {
-//            $this->groupid = AppConstant::NUMERIC_ZERO;
-//            $this->courseid = AppConstant::NUMERIC_ZERO;
-//        }
-//        $data = $this->save();
-//        return $data;
         $data = AppUtility::removeEmptyAttributes($params);
         $this->attributes = $data;
         $this->save();
@@ -94,6 +76,7 @@ class ExternalTools extends BaseImasExternalTools
             }
         }
         $updateExtTool->save();
+       return $updateExtTool;
     }
 
     public static function updateExternalTool($params, $attr, $privacy)
@@ -107,8 +90,10 @@ class ExternalTools extends BaseImasExternalTools
             $updateExtTool->custom = $params['custom'];
             $updateExtTool->privacy = $privacy;
             $updateExtTool->groupid = $attr;
+            $updateExtTool->save();
+            return $updateExtTool;
         }
-        $updateExtTool->save();
+
     }
 
     public static function deleteById($id, $isTeacher, $isGrpAdmin, $courseId, $groupId)
