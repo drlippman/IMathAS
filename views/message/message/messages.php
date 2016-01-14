@@ -155,7 +155,6 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 
             } else {
             foreach($messageDisplay as $key=>$line) {
-//            AppUtility::dump($line);
 
                     if($line)
                     {

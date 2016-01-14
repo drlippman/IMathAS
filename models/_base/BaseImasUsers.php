@@ -74,7 +74,7 @@ class BaseImasUsers extends \yii\db\ActiveRecord
             [['hideonpostswidget'], 'string'],
             [['SID'], 'string', 'max' => 50],
             [['password'], 'string', 'max' => 254],
-            [['FirstName', 'LastName'], 'string', 'max' => 20],
+            [['FirstName', 'LastName'], 'string', 'max' => 254],
             [['email'], 'string', 'max' => 100],
             [['homelayout'], 'string', 'max' => 32],
             [['remoteaccess'], 'string', 'max' => 10],

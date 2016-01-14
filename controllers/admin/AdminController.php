@@ -1561,7 +1561,6 @@ class AdminController extends AppController
                         return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                     }else{
                         $resultUpdate = User::updateLTIDomainCredentials($params);
-//                        AppUtility::dump($resultUpdate);
                         if($resultUpdate->errors['email'])
                         {
                             $this->setWarningFlash("Domain should contain at most 100 characters.");
