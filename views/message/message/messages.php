@@ -151,7 +151,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
             <?php
             if(empty($messageDisplay)) {
 
-                echo "<tr><td></td><td></td><td></td><td></td><td>No messages</td><td></td><td></td><td></td></tr>";
+                echo "<tr><td></td><td></td><td></td><td></td><td>No messages</td><td></td><td></td></tr>";
 
             } else {
             foreach($messageDisplay as $key=>$line) {
