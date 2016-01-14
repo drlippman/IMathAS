@@ -148,20 +148,20 @@ switch ($action) {
             </div>
         </div>
 
-<!--        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">-->
-<!--            <div class="col-md-2 col-sm-3">-->
-<!--                <label for="perpage">--><?php //AppUtility::t('Messages/Posts per page'); ?><!--</label>-->
-<!--            </div>-->
-<!--            <div class="col-md-2 col-sm-2">-->
-<!--                <select class="form-control" name="perpage">-->
-<!--                    --><?php //for ($i=10;$i<=100;$i+=10) {
-//                        echo '<option value="'.$i.'" ';
-//                        if ($i==$line['listperpage']) {echo 'selected="selected"';}
-//                        echo '>'.$i.'</option>';
-//                    } ?>
-<!--                </select>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
+            <div class="col-md-2 col-sm-3">
+                <label for="perpage"><?php AppUtility::t('Messages/Posts per page'); ?></label>
+            </div>
+            <div class="col-md-2 col-sm-2">
+                <select class="form-control" name="perpage">
+                    <?php for ($i=10;$i<=100;$i+=10) {
+                        echo '<option value="'.$i.'" ';
+                        if ($i==$line['listperpage']) {echo 'selected="selected"';}
+                        echo '>'.$i.'</option>';
+                    } ?>
+                </select>
+            </div>
+        </div>
         <?php $pagelayout = explode('|',$line['homelayout']);
         foreach($pagelayout as $k=>$v) {
             if ($v=='') {
