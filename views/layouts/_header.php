@@ -58,7 +58,7 @@ echo Nav::widget([
                     ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.' ('.$messageCount.')' , 'url' => AppUtility::getHomeURL().'message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message'.' ('.$messageCount.')', 'url' => AppUtility::getHomeURL().'message/message/index?cid='.$courseId]),
                     '<li class="divider"></li>',
                     $actionPath == 'dashboard' ? ['label' => 'Forum'.' ('.$postCount.')' , 'url' => AppUtility::getHomeURL().'site/dashboard?from=forum']:
-                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/new-post?cid='.$courseId] :['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
+                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum'.' ('.$postCount.')', 'url' => AppUtility::getHomeURL().'forum/forum/search-forum?cid='.$courseId]),
                 ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] :
 
