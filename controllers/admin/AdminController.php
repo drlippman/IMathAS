@@ -1619,17 +1619,17 @@ class AdminController extends AppController
                     $resultLTI = $user->createLTIDomainCredentials($LTIDomain);
                     if($resultLTI->errors['email'])
                     {
-                        $this->setWarningFlash("Domain should contain at most 100 characters.");
+                        $this->setWarningFlash($resultLTI->errors['email'][0]);
                         return $this->redirect('forms?action=listltidomaincred');
                     }
                     if($resultLTI->errors['SID'])
                     {
-                        $this->setWarningFlash("Key should contain at most 50 characters.");
+                        $this->setWarningFlash($resultLTI->errors['SID'][0]);
                         return $this->redirect('forms?action=listltidomaincred');
                     }
                     if($resultLTI->errors['password'])
                     {
-                        $this->setWarningFlash("Secret should contain at most 254 characters.");
+                        $this->setWarningFlash($resultLTI->errors['password'][0]);
                         return $this->redirect('forms?action=listltidomaincred');
                     }
 
@@ -1641,17 +1641,17 @@ class AdminController extends AppController
                         $resultUpdate = User::updateLTIDomainCredentials($params);
                         if($resultUpdate->errors['email'])
                         {
-                            $this->setWarningFlash("Domain should contain at most 100 characters.");
+                            $this->setWarningFlash($resultUpdate->errors['email'][0]);
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                         if($resultUpdate->errors['SID'])
                         {
-                            $this->setWarningFlash("Key should contain at most 50 characters.");
+                            $this->setWarningFlash($resultUpdate->errors['SID'][0]);
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                         if($resultUpdate->errors['password'])
                         {
-                            $this->setWarningFlash("Secret should contain at most 254 characters.");
+                            $this->setWarningFlash($resultUpdate->errors['password'][0]);
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                     }
