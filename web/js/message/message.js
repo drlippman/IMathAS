@@ -241,6 +241,7 @@ function markAsDelete() {
     var markArray = [];
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
         markArray.push($(this).val());
+        isModifiedArray.push($(this).val());
     });
     if (markArray.length != 0) {
         var html = '<div><p>Are you sure? This will delete your message from</p>' +

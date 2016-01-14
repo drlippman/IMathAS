@@ -144,7 +144,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                         </label>
                     </div>
                 </th>
-                <th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>
+                <th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>
             </tr>
             </thead>
             <tbody class="message-table-body">
@@ -197,16 +197,6 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                         }
                         echo '</td><td>';
 
-                        if ($line['hasuserimg']==1) {
-                            if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-                                echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
-                            } else {
-                                $uploads = AppConstant::UPLOAD_DIRECTORY;?>
-                                <img style="display: none" class="circular-profile-image Align-link-post padding-five" src="<?php echo AppUtility::getHomeURL().$uploads.$line['msgfrom'].".jpg"?>"  onclick="togglepic(this)">
-                            <?php }
-                        }
-
-                        echo "</td><td>";
                         if (($line['isread']&8)==8) { ?>
                             <img class=pointer id="tag<?php echo $line['id']?>" src=<?php echo AppUtility::getHomeURL()?>img/flagfilled.gif onClick=toggletagged(<?php echo $line['id']?>); />
                         <?php } else { ?>
