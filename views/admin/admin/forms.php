@@ -664,7 +664,7 @@ switch ($action) {
                 <table class='margin-top-fifteen table table-bordered table-striped table-hover data-table'>
                     <thead>
                     <tr>
-                        <th><?php AppUtility::t('Domain') ?></th>
+                        <th class='word-break-break-all'><?php AppUtility::t('Domain') ?></th>
                         <th><?php AppUtility::t('Key') ?></th>
                         <th><?php AppUtility::t('Can create Instructors') ?>?</th>
                         <th><?php AppUtility::t('Modify') ?></th>
@@ -675,8 +675,8 @@ switch ($action) {
                     foreach ($users as $row) {
                         echo "<tbody>
                     <tr>
-                        <td>{$row['email']}</td>
-                        <td>{$row['SID']}</td>";
+                        <td class='word-break-break-all'>{$row['email']}</td>
+                        <td class='word-break-break-all'>{$row['SID']}</td>";
                         if ($row['rights'] == AppConstant::SEVENTY_SIX) {
                             ?>
                             <td><?php AppUtility::t('Yes') ?></td>

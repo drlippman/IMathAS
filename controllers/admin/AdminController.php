@@ -1551,13 +1551,18 @@ class AdminController extends AppController
                     }
                     if($resultLTI->errors['SID'])
                     {
-                        $this->setWarningFlash($resultLTI->errors['SID'][0]);
+                        $this->setWarningFlash("Key should contain at most 50 characters.");
+                        return $this->redirect('forms?action=listltidomaincred');
+                    }
+                    if($resultLTI->errors['password'])
+                    {
+                        $this->setWarningFlash("Secret should contain at most 254 characters.");
                         return $this->redirect('forms?action=listltidomaincred');
                     }
 
                 } else {
                     if($params['ltikey'] == ''){
-                        $this->setWarningFlash('Please enter the Key');
+                        $this->setWarningFlash('Please enter the Key.');
                         return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                     }else{
                         $resultUpdate = User::updateLTIDomainCredentials($params);
@@ -1568,7 +1573,12 @@ class AdminController extends AppController
                         }
                         if($resultUpdate->errors['SID'])
                         {
-                            $this->setWarningFlash($resultUpdate->errors['SID'][0]);
+                            $this->setWarningFlash("Key should contain at most 50 characters.");
+                            return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
+                        }
+                        if($resultUpdate->errors['password'])
+                        {
+                            $this->setWarningFlash("Secret should contain at most 254 characters.");
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                     }
