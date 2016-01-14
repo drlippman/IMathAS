@@ -135,7 +135,7 @@ if (isset($params['id'])) {
         <table class="display course-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
-                <th ><?php AppUtility::t('Name'); ?></th>
+                <th class="word-break-break-all"><?php AppUtility::t('Name'); ?></th>
                 <th ><?php AppUtility::t('Setting'); ?></th>
                 <th ><?php AppUtility::t('Delete'); ?></th>
 
@@ -146,7 +146,7 @@ if (isset($params['id'])) {
             <?php
 
              foreach ($resultFirst as $key => $row) { ?>
-                <td>
+                <td class="word-break-break-all">
                <?php echo  $row['nm'];
 
                if ($isAdmin) {
