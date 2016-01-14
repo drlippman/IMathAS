@@ -134,7 +134,7 @@ echo '</div>';
 {
 
     if ($page > 0) {
-        $numpages = ceil($countOfPostId['id'] / $threadsperpage);
+        $numpages = ceil($countOfPostId[COUNT('id')] / $threadsperpage);
         if ($numpages > 1) {
             $prevnext .= "Page: ";
             if ($page < $numpages / 2) {

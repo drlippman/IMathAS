@@ -159,8 +159,8 @@ function changeProfileImage(element,id)
 {
     if(flag == 0 )
     {
-        element.style.width = "100px";
-        element.style.height = "105px";
+        element.style.width = "80px";
+        element.style.height = "80px";
         document.getElementById(id).style.height = "109px";
         flag =1;
     }else

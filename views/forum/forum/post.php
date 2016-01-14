@@ -173,7 +173,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                     <input type=button class="hide-button" id="buti<?php echo $index ?>" value="Hide"
                            onClick="toggleitem(<?php echo $index ?>)">
                             </span>
-                <span class="col-sm-6 col-md-7 word-break-break-all">
+                <span class="col-sm-6 col-md-7 word-break-break-all" style="padding-left: 35px">
                 <b><?php echo $data['subject'] ?></b><br/><?php AppUtility::t('Posted by')?>: <a
                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $data['userId'] . '&new=1') ?>"><?php echo $data['name'] ?></a>
 
@@ -184,7 +184,6 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                     <?php
 
                     if ((strtotime($data['postdate']) > $data['lastView']) && ($data['id'] != $data['threadId'])) {
-
                         ?>
                         <span style="color:red;"><?php AppUtility::t('New')?></span>
                     <?php } ?>
