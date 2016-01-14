@@ -767,7 +767,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public function addUserFromAdmin($adminName, $passwd, $firstname, $lastname,$ten, $eclass, $groupId,$homelayout)
     {
-        $this->SID = $adminName;
+        $this->SID = trim($adminName);
         $this->password = $passwd;
         $this->FirstName = $firstname;
         $this->LastName = $lastname;
@@ -776,7 +776,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->groupid = $groupId;
         $this->homelayout = $homelayout;
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function updateUserRight($myRights, $newRights, $group, $id, $groupId)
@@ -810,6 +810,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->listperpage = $perpage;
             $user->hasuserimg = $chguserimg;
             $user->save();
+            return $user;
         }
     }
 

@@ -1189,7 +1189,18 @@ class SiteController extends AppController
                     $emailErr = "Invalid email format";
                 }
             }
-            User::updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qRightsDef, $defLib, $useDefLib, $layoutStr, $perpage,$chgUserImg);
+            $userDetails = User::updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qRightsDef, $defLib, $useDefLib, $layoutStr, $perpage,$chgUserImg);
+
+            if($userDetails->errors['FirstName'])
+            {
+             $this->setWarningFlash($userDetails->errors['FirstName'][0]);
+             return $this->redirect('form?action=chguserinfo');
+            }
+            if($userDetails->errors['LastName'])
+            {
+                $this->setWarningFlash($userDetails->errors['LastName'][0]);
+                return $this->redirect('action?action=chguserinfo');
+            }
             if ($params['dochgpw']) {
                 $line = User::getUserPassword($userId);
                 if ((md5($params['oldpw']) == $line['password'] || (password_verify($params['oldpw'],$line['password']))) && ($params['newpw1'] == $params['newpw2']) && $myRights > 5)

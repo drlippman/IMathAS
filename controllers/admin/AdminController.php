@@ -1026,10 +1026,9 @@ class AdminController extends AppController
                 $adminName = $params['adminname'];
                 $row = User::getBySIDForAdmin($adminName);
                 if ($row != null) {
-                    echo "<html><body>Username is already used.\n";
-                    echo "<a href=\"forms?action=newadmin\">Try Again</a> or ";
-                    echo "<a href=\"forms?action=chgrights&id={$row['id']}\">Change rights for existing user</a></body></html>\n";
-                    exit;
+                    $this->setErrorFlash("Username is already used.");
+                    return $this->redirect('forms?action=newadmin');
+
                 }
                 if (isset($CFG['GEN']['newpasswords'])) {
                     $md5pw = password_hash($params['password'], PASSWORD_DEFAULT);
@@ -1051,7 +1050,23 @@ class AdminController extends AppController
                 $rights = $params['newrights'];
                 $email = $params['email'];
                 $user = new User();
-                $newUserid = $user->addUserFromAdmin($adminName, $md5pw, $firstName, $lastName,$rights, $email, $newGroup,$homelayout);
+                $newUser = $user->addUserFromAdmin($adminName, $md5pw, $firstName, $lastName,$rights, $email, $newGroup,$homelayout);
+                if($newUser->errors['SID'])
+                {
+                    $this->setWarningFlash("User name should contain at most 50 characters.");
+                    return $this->redirect('forms?action=newadmin');
+                }
+                if($newUser->errors['FirstName'])
+                {
+                    $this->setWarningFlash("FirstName should contain at most 100 characters.");
+                    return $this->redirect('forms?action=newadmin');
+                }
+                if($newUser->errors['LastName'])
+                {
+                    $this->setWarningFlash("LastName should contain at most 100 characters.");
+                    return $this->redirect('forms?action=newadmin');
+                }
+                $newUserid = $newUser['id'];
                 if (isset($CFG['GEN']['enrollonnewinstructor'])) {
                     $valbits = array();
                     foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {

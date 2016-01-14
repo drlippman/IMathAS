@@ -47,7 +47,7 @@ switch ($action) {
                 <label for="firstname"><?php AppUtility::t('Enter First Name'); ?></label>
             </div>
             <div class="col-md-8 col-sm-8">
-                <input class='form form-control-1' type=text size=20 id="firstname" name=firstname  value="<?php echo $line['FirstName'] ?>" />
+                <input class='form form-control-1' required="" type=text size=20 id="firstname" name=firstname  value="<?php echo $line['FirstName'] ?>" />
             </div>
         </div>
 
@@ -56,7 +56,7 @@ switch ($action) {
                 <label for="lastname"><?php AppUtility::t('Enter Last Name'); ?></label>
             </div>
             <div class="col-md-6 col-sm-6">
-            <input class='form form-control' type=text size=20 id=lastname name=lastname value="<?php echo $line['LastName'] ?>" >
+            <input class='form form-control'required="" type=text size=20 id=lastname name=lastname value="<?php echo $line['LastName'] ?>" >
             </div>
         </div>
 
@@ -108,7 +108,7 @@ switch ($action) {
                 <label for="email"><?php AppUtility::t('E-mail address'); ?></label>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-6">
-                <input class="form form-control" type=text size=60 id="email" name=email value="<?php echo $line['email'] ?>" >
+                <input class="form form-control" type=email size=60 id="email" name=email value="<?php echo $line['email'] ?>" >
             </div>
         </div>
 
@@ -148,20 +148,20 @@ switch ($action) {
             </div>
         </div>
 
-        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
-            <div class="col-md-2 col-sm-3">
-                <label for="perpage"><?php AppUtility::t('Messages/Posts per page'); ?></label>
-            </div>
-            <div class="col-md-2 col-sm-2">
-                <select class="form-control" name="perpage">
-                    <?php for ($i=10;$i<=100;$i+=10) {
-                        echo '<option value="'.$i.'" ';
-                        if ($i==$line['listperpage']) {echo 'selected="selected"';}
-                        echo '>'.$i.'</option>';
-                    } ?>
-                </select>
-            </div>
-        </div>
+<!--        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">-->
+<!--            <div class="col-md-2 col-sm-3">-->
+<!--                <label for="perpage">--><?php //AppUtility::t('Messages/Posts per page'); ?><!--</label>-->
+<!--            </div>-->
+<!--            <div class="col-md-2 col-sm-2">-->
+<!--                <select class="form-control" name="perpage">-->
+<!--                    --><?php //for ($i=10;$i<=100;$i+=10) {
+//                        echo '<option value="'.$i.'" ';
+//                        if ($i==$line['listperpage']) {echo 'selected="selected"';}
+//                        echo '>'.$i.'</option>';
+//                    } ?>
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
         <?php $pagelayout = explode('|',$line['homelayout']);
         foreach($pagelayout as $k=>$v) {
             if ($v=='') {
@@ -185,22 +185,7 @@ switch ($action) {
             <span>'.AppUtility::t('New forum posts widget',false).'</span>
             </div>';
         }
-        if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(3,$CFG['GEN']['fixedhomelayout'])) {
 
-            $hpsets .= '<div class="col-md-10 col-sm-10">
-            <input type="checkbox" name="homelayout3-0" ';
-            if (in_array(0,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
-            $hpsets .= ' />
-            <span>New messages notes on course list</span>
-            </div>';
-
-            $hpsets .= '<div class="col-md-10 col-sm-10">
-                <input type="checkbox" name="homelayout3-1" ';
-                if (in_array(1,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
-                $hpsets .= ' />
-                <span>'.AppUtility::t('New posts notes on course list',false).'</span>
-            </div>';
-        }
         if ($hpsets != '') { ?>
             <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
                 <div class="col-md-2 col-sm-3"><?php AppUtility::t('Show on home page') ?></div>

@@ -62,14 +62,18 @@ switch ($action) {
 
     case "chgrights":
     case "newadmin":
+            echo "</br>";
             echo "<form method=post action=\"actions?action=$getAction";
             if ($getAction == "chgrights") { echo "&id=$getId"; }
             echo "\">";
             if ($getAction == "newadmin") {
-                echo "<div class='col-md-2 col-sm-2'>New User username</div>  <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
-                echo "<div class='col-md-2 col-sm-2'>First Name</div> <input class='form form-control-1' type=text size=40 name=firstname><BR class=form>\n";
-                echo "<div class='col-md-2 col-sm-2'>Last Name</div> <input class='form form-control-1' type=text size=40 name=lastname><BR class=form>\n";
-                echo "<div class='col-md-2 col-sm-2'>Email</div> <input class='form form-control-1' type=text size=40 name=email><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>New User username</div>
+                <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>First Name</div>
+                <input class='form form-control-1' required='' type=text size=40 name=firstname><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>Last Name</div>
+                <input class='form form-control-1'  required='' type=text size=40 name=lastname><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>Email</div> <input class='form form-control-1' type=email size=40 name=email><BR class=form>\n";
                 echo '<div class="col-md-2 col-sm-2">Password</div> <input class="form form-control-1" type="password" size="40" name="password"/><br class="form"/>';
                 $oldGroup = 0;
                 $oldRights = 10;
