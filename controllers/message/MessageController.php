@@ -96,14 +96,15 @@ class MessageController extends AppController
             $threadsperpage = $userData['listperpage'];
             $filterByCourse = Message::getCoursesForMessage($user['id']);
             $filterByUserName = Message::getMessagesByUserName($user['id'], $filtercid);
-            $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged);
+            $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged,$page, $threadsperpage);
 
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
-
+            $limitToTaggedMsg = new Message;
+//            $limitToTagged = $limitToTaggedMsg->getCountOfIdByIsRead($user['id'], $filtercid, $limittotagged);
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-            $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
+            $this->includeCSS(['dataTables.bootstrap.css', 'message.css', 'forums.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/msg.js','message/message.js']);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id, 'filtercid' => $filtercid, 'filterByCourse' => $filterByCourse, 'filteruid' => $filteruid, 'filterByUserName' => $filterByUserName, 'messageDisplay' => $messageDisplay, 'page' => $page, 'cansendmsgs' => $cansendmsgs, 'msgmonitor' => $msgmonitor,
             'isTeacher' => $isTeacher);
@@ -150,6 +151,7 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
+            AppUtility::dump($params);
             $userId = $this->getUserId();
             if ($params['receiver'] != AppConstant::ZERO_VALUE && $params['cid'] != null) {
                 $message = new Message();
@@ -450,17 +452,17 @@ class MessageController extends AppController
             if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$messageData['title'],$matches)) {
                 $aname = addslashes($matches[2]);
                 $assessmentData = Assessments::getByNameAndCourseId($aname, $courseId);
-                if(count($assessmentData) > 0){
+                if(count($assessmentData) > AppConstant::NUMERIC_ZERO){
                     $assessmentId = $assessmentData['id'];
                     $due = $assessmentData['enddate'];
                     $exceptionData = Exceptions::getEndDateById($messageData['msgfrom'], $assessmentId);
-                    if(count($exceptionData) > 0) {
+                    if(count($exceptionData) > AppConstant::NUMERIC_ZERO) {
                         $due = $exceptionData['enddate'];
                     }
                     $duedate = AppUtility::tzdate('D m/d/Y g:i a',$due);
 
                     $assessmentSessionData = AssessmentSession::getByAssessmentIdAndUserId($assessmentId,$userRights['id']);
-                    if(count($assessmentSessionData) > 0){
+                    if(count($assessmentSessionData) > AppConstant::NUMERIC_ZERO){
                         $asid = $assessmentSessionData['id'];?>
                         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-view-asid?cid='.$messageData['courseid']. '&uid='.$messageData['msgfrom']. '&asid=' .$asid)?>">Assignment</a>
                         <?php
@@ -473,22 +475,22 @@ class MessageController extends AppController
             }
 
         if ($type!='sent' && $type!='allstu') {
-            if ($messageData['courseid']>0) {
+            if ($messageData['courseid'] > AppConstant::NUMERIC_ZERO) {
                 $result = Course::getMsgSet($messageData['courseid']);
                 $msgset = $result['msgset'];
                 $msgmonitor = floor($msgset/5);
                 $msgset = $msgset%5;
-                if ($msgset<3 || $isTeacher) {
+                if ($msgset < AppConstant::NUMERIC_THREE || $isTeacher) {
                     $cansendmsgs = true;
-                    if ($msgset==1 && !$isTeacher) { //check if sending to teacher
+                    if ($msgset== AppConstant::NUMERIC_ONE && !$isTeacher) { //check if sending to teacher
                         $teacher = new Teacher();
                         $result = $teacher->getId($messageData['courseid'],$messageData['msgfrom']);
-                        if (count($result) == 0) {
+                        if (count($result) == AppConstant::NUMERIC_ZERO) {
                             $cansendmsgs = false;
                         }
-                    } else if ($msgset==2 && !$isTeacher) { //check if sending to stu
+                    } else if ($msgset == AppConstant::NUMERIC_TWO && !$isTeacher) { //check if sending to stu
                         $result = Student::getId($messageData['msgfrom'],$messageData['courseid']);
-                        if (count($result)==0) {
+                        if (count($result) == AppConstant::NUMERIC_ZERO) {
                             $cansendmsgs = false;
                         }
                     }
@@ -739,8 +741,7 @@ class MessageController extends AppController
         $ischanged = false;
 
         $saveTagged = Message::saveTagged($user['id'], $threadid);
-
-        if(($saveTagged) > 0)
+        if(count($saveTagged) > 0)
         {
             $ischanged = true;
         }

@@ -54,7 +54,7 @@ if (isset($params['id'])) {
 ?>
             <br/><div class="col-md-2 col-sm-2"><?php AppUtility::t('Tool Name')?></div>
             <div class="col-md-10 col-sm-10">
-                <input class="form-control-1" required="Please fill out this field" maxlength="30" size="40" type="text" name="tname" value="<?php echo $name;?>" />
+                <input class="form-control-1" required=" " size="10" type="text" name="tname" value="<?php echo $name;?>" />
             </div>
             <br class="form" /><br/>
 
@@ -67,13 +67,13 @@ if (isset($params['id'])) {
 
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Key') ?></div>
         <div class="col-md-10 col-sm-10">
-            <input type="text" class="form-control-1" size="40" maxlength="40" name="key" value="<?php echo $key; ?>"/>
+            <input type="text" class="form-control-1" required=" " size="10" name="key" value="<?php echo $key; ?>"/>
         </div>
         <br class="form"/><br/>
 
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Secret') ?></div>
         <div class="col-md-10 col-sm-10">
-            <input type="password" class="form-control-1" size="40" maxlength="40" name="secret"
+            <input type="password" class="form-control-1" required=" " size="40"  name="secret"
                    value="<?php echo $secret; ?>"/>
         </div>
         <br class="form"/><br/>

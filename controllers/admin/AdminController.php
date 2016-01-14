@@ -541,8 +541,44 @@ class AdminController extends AppController
                    /**
                     * Create tool
                     */
+                   $LTIDomain = array();
+                   $LTIDomain['name'] = trim($params['tname']);
+                   $LTIDomain['url'] = $params['url'];
+                   $LTIDomain['ltikey'] = $params['key'];
+                   $LTIDomain['secret'] = $params['secret'];
+                   $LTIDomain['custom'] = $params['custom'];
+                   $LTIDomain['rights'] = $params['createinstr'];
+                   $LTIDomain['privacy'] = $privacy;
+
+                   if ($isTeacher) {
+                       $LTIDomain['groupid'] = $groupId;
+                       $LTIDomain['courseid'] = $courseId;
+                   } else if ($isGrpAdmin || ($isAdmin && $params['scope'] == AppConstant::NUMERIC_ONE)) {
+                       $LTIDomain['groupid'] = $groupId;
+                       $LTIDomain['courseid'] = AppConstant::NUMERIC_ZERO;
+                   } else {
+                       $LTIDomain['groupid'] = AppConstant::NUMERIC_ZERO;
+                       $LTIDomain['courseid'] = AppConstant::NUMERIC_ZERO;
+                   }
+
                    $external = new ExternalTools();
-                   $external->saveExternalTool($courseId,$groupId,$params, $isTeacher, $isGrpAdmin, $isAdmin, $privacy);
+                   $saveExternalTool = $external->saveExternalTool($LTIDomain);
+
+                   if($saveExternalTool->errors['name'])
+                   {
+                       $this->setWarningFlash($saveExternalTool->errors['name'][0]);
+                       return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
+                   }
+                   if($saveExternalTool->errors['ltikey'])
+                   {
+                       $this->setWarningFlash($saveExternalTool->errors['ltikey'][0]);
+                       return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
+                   }
+                   if($saveExternalTool->errors['secret'])
+                   {
+                       $this->setWarningFlash($saveExternalTool->errors['secret'][0]);
+                       return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
+                   }
                } else {
                    /**
                     * Update external tool
@@ -1494,7 +1530,7 @@ class AdminController extends AppController
             case "modltidomaincred":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
                     $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-                    return $this->redirect($this->goHome());
+                    return $this->goHome();
                 }
                 if ($params['id']=='new') {
                     $LTIDomain = array();
@@ -1505,7 +1541,6 @@ class AdminController extends AppController
                     $LTIDomain['password'] = $params['ltisecret'];
                     $LTIDomain['rights'] = $params['createinstr'];
                     $LTIDomain['groupid'] = $params['groupid'];
-
 
                     $user = new User();
                     $resultLTI = $user->createLTIDomainCredentials($LTIDomain);
@@ -1526,6 +1561,7 @@ class AdminController extends AppController
                         return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                     }else{
                         $resultUpdate = User::updateLTIDomainCredentials($params);
+//                        AppUtility::dump($resultUpdate);
                         if($resultUpdate->errors['email'])
                         {
                             $this->setWarningFlash("Domain should contain at most 100 characters.");
@@ -1537,7 +1573,6 @@ class AdminController extends AppController
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                     }
-
                 }
                 break;
             case "delltidomaincred":

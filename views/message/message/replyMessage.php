@@ -56,8 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php echo AppUtility::t('Subject');?>
             </div>
             <div class="col-md-11 col-sm-11">
-                <input class="textbox subject form-control" type="text" value="Re: <?php echo $messages->title ?>">
+                <input class="textbox subject form-control" id="subject" type="text" value="Re: <?php echo $messages->title ?>" onchange="changeSubject()">
             </div>
+            <span id="subject-error" class="error-message subject-error-message col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1"></span>
         </div>
         <div class="col-md-12 col-sm-12 padding-top">
             <div class="col-md-1 col-sm-1"><?php echo AppUtility::t('Message');?></div>

@@ -15,17 +15,14 @@ class Message extends BaseImasMsgs
 {
     public function create($params,$uid)
     {
-        $this->courseid = $params['cid'];
-        $this->msgfrom = $uid;
-        $this->msgto = $params['receiver'];
         $this->title = $params['subject'];
         $this->message = $params['body'];
+        $this->msgfrom = $uid;
+        $this->msgto = $params['receiver'];
         $sendDate = AppController::dateToString();
         $this->senddate = $sendDate;
-        if($params['isread'] == 4)
-        {
-            $this->isread = 4;
-        }
+        $this->courseid = $params['cid'];
+        $this->isread = 0;
         $this->save();
         return $this->id;
     }
@@ -564,7 +561,7 @@ class Message extends BaseImasMsgs
         return $data;
     }
 
-    public static function displayMessageById($userId, $filteruid, $filtercid, $limittotagged)
+    public static function displayMessageById($userId, $filteruid, $filtercid, $limittotagged, $page, $threadsperpage)
     {
         $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg ";
         $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
@@ -579,6 +576,10 @@ class Message extends BaseImasMsgs
             $query .= "AND (imas_msgs.isread&8)=8 ";
         }
         $query .= "ORDER BY senddate DESC ";
+        $offset = ($page-1)*$threadsperpage;
+//        if (!$limittotagged) {
+//            $query .= "LIMIT $offset,$threadsperpage";// OFFSET $offset";
+//        }
         $command = Yii::$app->db->createCommand($query);
         $command->bindParam(':userId', $userId);
         if ($filteruid>0) {
@@ -593,8 +594,10 @@ class Message extends BaseImasMsgs
 
     public static function saveTagged($userId, $threadid)
     {
-        $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto=':userId' AND id=':threadid'";
-        return Yii::$app->db->createCommand($query)->bindValues([':userId' => $userId, ':threadid' => $threadid])->execute();
+        $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto=:userId AND id=:threadid";
+        $command = Yii::$app->db->createCommand($query)->bindValues([':userId' => $userId, ':threadid' => $threadid]);
+        $data = $command->execute();
+        return $data;
     }
 
     public static function getByCourse($userId)

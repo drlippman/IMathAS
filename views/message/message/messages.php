@@ -54,8 +54,12 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
     <div class="second-level-message-navigation height-ninety margin-top-one-em">
         <div class="col-md-12 display-inline-block">
             <span class="col-sm-3 message-second-level display-inline-block padding-left-right-zero padding-top-twelve">
-                 <a  id="limit-to-tag-link" href="index?cid=<?php echo $course->id; ?>&show=1">Limit to Tagged</a>
-                 <a  id="show-all-link" href="index?cid=<?php echo $course->id; ?>">Show All</a>
+
+                <?php if ($page==-2) {?>
+                    <a  href="<?php echo AppUtility::getURLFromHome('message', 'message/index?page=1&cid='.$course->id.'&filtercid='.$filtercid.'&filteruid='.$filteruid)?>">Show All</a>
+                <?php } else { ?>
+                    <a  href="<?php echo AppUtility::getURLFromHome('message', 'message/index?page=-2&cid='.$course->id.'&filtercid='.$filtercid.'&filteruid='.$filteruid)?>">Limit to Tagged</a>
+                <?php } ?>
                  <a class="padding-left-zero display-inline-block" id="sent-message"  href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>">Sent Messages</a>
             </span>
     <!--         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >-->
@@ -197,8 +201,9 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                             if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                                 echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
                             } else {
-                                echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
-                            }
+                                $uploads = AppConstant::UPLOAD_DIRECTORY;?>
+                                <img style="display: none" class="circular-profile-image Align-link-post padding-five" src="<?php echo AppUtility::getHomeURL().$uploads.$line['msgfrom'].".jpg"?>"  onclick="togglepic(this)">
+                            <?php }
                         }
 
                         echo "</td><td>";
@@ -252,29 +257,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
 
     var AHAHsaveurl = "<?php echo $saveTagged;?>";
 
-//    $("#index-zero option:selected").removeAttr("selected");
-    $('#index-zero').val(0);
-    function do_nothing() {
-        return false;
-    }
-    $("#send-message").click(function(e) {
-        e.preventDefault();
-
-        if (!$(this).data('isClicked')) {
-            var link = $(this);
-
-            // Your code on successful click
-            window.location = $(this).attr("href");
-            // Set the isClicked value and set a timer to reset in 3s
-            link.data('isClicked', true);
-            setTimeout(function() {
-                link.removeData('isClicked')
-            }, 3000);
-        } else {
-            // Anything you want to say 'Bad user!'
-        }
-    });
-    // prevent a second click for 10 seconds. :)
-
 </script>
-<style type="text/css"> tr.tagged {background-color: #dff;}</style>
+<style type="text/css">
+    tr.tagged {background-color: #dff;}
+</style>

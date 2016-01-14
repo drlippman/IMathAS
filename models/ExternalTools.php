@@ -49,32 +49,37 @@ class ExternalTools extends BaseImasExternalTools
         return $this->id;
     }
 
-    public function saveExternalTool($courseId, $groupId, $params, $isTeacher, $isGroupAdmin, $isAdmin, $privacy)
+    public function saveExternalTool($params)
     {
-        $this->name = $params['tname'];
-        $this->url = $params['url'];
-        $this->ltikey = $params['key'];
-        $this->secret = $params['secret'];
-        $this->custom = $params['custom'];
-        $this->privacy = $privacy;
-        if ($isTeacher) {
-            $this->groupid = $groupId;
-            $this->courseid = $courseId;
-        } else if ($isGroupAdmin || ($isAdmin && $params['scope'] == AppConstant::NUMERIC_ONE)) {
-            $this->groupid = $groupId;
-            $this->courseid = AppConstant::NUMERIC_ZERO;
-        } else {
-            $this->groupid = AppConstant::NUMERIC_ZERO;
-            $this->courseid = AppConstant::NUMERIC_ZERO;
-        }
+//        $this->name = trim($params['tname']);
+//        $this->url = $params['url'];
+//        $this->ltikey = $params['key'];
+//        $this->secret = $params['secret'];
+//        $this->custom = $params['custom'];
+//        $this->privacy = $privacy;
+//        if ($isTeacher) {
+//            $this->groupid = $groupId;
+//            $this->courseid = $courseId;
+//        } else if ($isGroupAdmin || ($isAdmin && $params['scope'] == AppConstant::NUMERIC_ONE)) {
+//            $this->groupid = $groupId;
+//            $this->courseid = AppConstant::NUMERIC_ZERO;
+//        } else {
+//            $this->groupid = AppConstant::NUMERIC_ZERO;
+//            $this->courseid = AppConstant::NUMERIC_ZERO;
+//        }
+//        $data = $this->save();
+//        return $data;
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
         $this->save();
+        return $this;
     }
 
     public static function updateExternalToolByAdmin($params, $isAdmin, $attrValue, $attr, $privacy)
     {
         $updateExtTool = ExternalTools::find()->where(['id' => $params['id']])->andWhere([$attr => $attrValue])->one();
         if ($updateExtTool) {
-            $updateExtTool->name = $params['tname'];
+            $updateExtTool->name = trim($params['tname']);
             $updateExtTool->url = $params['url'];
             $updateExtTool->ltikey = $params['key'];
             $updateExtTool->secret = $params['secret'];

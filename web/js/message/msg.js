@@ -15,6 +15,7 @@ function togglecolor(threadid,tagged) {
 
 function toggletagged(threadid) {
 	var trchg = document.getElementById("tr"+threadid);
+    console.log(trchg);
 	if (trchg.className=="tagged") {
 		submitTagged(threadid,0);
 	} else {
@@ -38,12 +39,12 @@ function submitTagged(thread,tagged) {
 }  
 
 function ahahDone(url, threadid, tagged) {
-  if (req.readyState == 4) { // only if req is "loaded"
+    if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK"
 	    if ($.trim(req.responseText=='OK')) {
-		    togglecolor(threadid, tagged);
+            togglecolor(threadid, tagged);
 	    } else {
-		    alert(req.responseText);
+            alert(req.responseText);
 		    alert("Oops, error toggling the tag");
 	    }
     } else { 
