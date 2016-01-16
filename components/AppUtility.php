@@ -3152,4 +3152,222 @@ class AppUtility extends Component
     public static function truncate($str, $width) {
         return strtok(wordwrap($str, $width, "...\n",true), "\n");
     }
+
+    public function printchildren($base,$restricttoowner=false) {
+        $curdir = rtrim(dirname(__FILE__), '/\\');
+        global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$cid,$userid,$ownerid,$points;
+        global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
+        global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
+        global $canviewall, $caneditscore, $canviewscore;
+
+        if (!isset($CFG['CPS']['itemicons'])) {
+            $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
+                'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
+                'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
+                'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png',
+                'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png',
+                'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png',
+                'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png');
+        } else {
+            $itemicons = $CFG['CPS']['itemicons'];
+        }
+        foreach($children[$base] as $child) {
+            if ($restricttoowner && $ownerid[$child] != $userid) {
+                continue;
+            }
+            echo "<div class=block> ";
+            echo '<span class="leftbtns">';
+            if (isset($children[$child])) {
+                if ($view==1) {
+                    $lbl = '+';
+                    $img = "expand";
+                } else {
+                    $lbl = '-';
+                    $img = "collapse";
+                } ?>
+                <img  class="pointer" id="butb<?php echo $bcnt?>" style="float: left" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $img?>.gif" onclick="toggleshow(<?php $bcnt ?>)">
+          <?php  }
+            if ($hasuserimg[$child]==1) {
+                if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+                    echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
+                } else {
+                    $uploads = AppConstant::UPLOAD_DIRECTORY;
+                    ?>
+                    <img style="float:left;" class="circular-profile-image Align-link-post padding-five" src="<?php echo AppUtility::getHomeURL().$uploads.$ownerid[$child].".jpg"?>" onclick="togglepic(this)" ">
+               <?php }
+            }
+            echo '</span>';
+            echo "<span class=right>";
+
+            if ($view==2) {
+                echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
+            } else {
+                echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
+            }
+
+            if ($isTeacher) {
+                echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a> \n";
+            }
+            if ($isTeacher || ($ownerid[$child]==$userid && $allowmod)) {
+                if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isTeacher) {
+                    echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
+                }
+            }
+            if ($isTeacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
+                echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
+            }
+            if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
+                echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\">Reply</a>";
+            }
+
+            echo "</span>\n";
+            echo '<span style="float:left">';
+            echo "<b>{$subject[$child]}</b><br/>Posted by: ";
+            //if ($isteacher && $ownerid[$child]!=0) {
+            //	echo "<a href=\"mailto:{$email[$child]}\">";
+            //} else if ($allowmsg && $ownerid[$child]!=0) {
+            if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {
+                echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\" ";
+                if ($section[$child]!='') {
+                    echo 'title="Section: '.$section[$child].'"';
+                }
+                echo ">";
+            }
+            echo $poster[$child];
+            if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {
+                echo "</a>";
+            }
+            if ($isTeacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
+                echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
+                if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
+                    $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
+                    $aname = addslashes($matches[2]);
+                    $query .= "WHERE ia.name='$aname' AND ias.userid=".intval($ownerid[$child]);
+                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+                    if (mysql_num_rows($result)>0) {
+                        $r = mysql_fetch_row($result);
+                        echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r[0]}\" target=\"_popoutgradebook\">[assignment]</a>";
+                    }
+                }
+            }
+            echo ', ';
+            echo AppUtility::tzdate("D, M j, Y, g:i a",$date[$child]);
+            if ($date[$child]>$lastview) {
+                echo " <span style=\"color:red;\">New</span>\n";
+            }
+            echo '</span>';
+
+            if ($allowlikes) {
+                $icon = (in_array($child,$mylikes))?'liked':'likedgray';
+                $likemsg = 'Liked by ';
+                $likecnt = 0;
+                $likeclass = '';
+                if ($likes[$child][0]>0) {
+                    $likeclass = ' liked';
+                    $likemsg .= $likes[$child][0].' ' . ($likes[$child][0]==1?'student':'students');
+                    $likecnt += $likes[$child][0];
+                }
+                if ($likes[$child][1]>0 || $likes[$child][2]>0) {
+                    $likeclass = ' likedt';
+                    $n = $likes[$child][1] + $likes[$child][2];
+                    if ($likes[$child][0]>0) { $likemsg .= ' and ';}
+                    $likemsg .= $n.' ';
+                    if ($likes[$child][2]>0) {
+                        $likemsg .= ($n==1?'teacher':'teachers');
+                        if ($likes[$child][1]>0) {
+                            $likemsg .= '/tutors/TAs';
+                        }
+                    } else if ($likes[$child][1]>0) {
+                        $likemsg .= ($n==1?'tutor/TA':'tutors/TAs');
+                    }
+                    $likecnt += $n;
+                }
+                if ($likemsg=='Liked by ') {
+                    $likemsg = '';
+                } else {
+                    $likemsg .= '.';
+                }
+                if ($icon=='liked') {
+                    $likemsg = 'You like this. '.$likemsg;
+                } else {
+                    $likemsg = 'Click to like this post. '.$likemsg;;
+                }
+
+                echo '<div class="likewrap">';
+                echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";
+                echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
+                echo '</div>';
+            }
+            echo '<div class="clear"></div>';
+            echo "</div>\n";
+            if ($view==2) {
+                echo "<div class=hidden id=\"item$icnt\">";
+            } else {
+                echo "<div class=blockitems id=\"item$icnt\" style=\"clear:all\">";
+            }
+            if(isset($files[$child]) && $files[$child]!='') {
+                $fl = explode('@@',$files[$child]);
+                if (count($fl)>2) {
+                    echo '<p><b>Files:</b> ';//<ul class="nomark">';
+                } else {
+                    echo '<p><b>File:</b> ';
+                }
+                for ($i=0;$i<count($fl)/2;$i++) {
+                    //if (count($fl)>2) {echo '<li>';}
+                    echo '<a href="'.filehandler::getuserfileurl('ffiles/'.$child.'/'.$fl[2*$i+1]).'" target="_blank">';
+                    $extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
+                    if (isset($itemicons[$extension])) {
+                        echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
+                    } else {
+                        echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
+                    }
+                    echo $fl[2*$i].'</a> ';
+                    //if (count($fl)>2) {echo '</li>';}
+                }
+                //if (count($fl)>2) {echo '</ul>';}
+                echo '</p>';
+            }
+            echo filter($message[$child]);
+            if ($haspoints) {
+                if ($caneditscore && $ownerid[$child]!=$userid) {
+                    echo '<hr/>';
+                    echo "Score: <input type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
+                    if ($points[$child]!==null) {
+                        echo $points[$child];
+                    }
+                    echo "\"/> ";
+                    if ($rubric != 0) {
+                        echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
+                    }
+                    echo " Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
+                    if ($feedback[$child]!==null) {
+                        echo $feedback[$child];
+                    }
+                    echo "</textarea>";
+                } else if (($ownerid[$child]==$userid || $canviewscore) && $points[$child]!==null) {
+                    echo '<div class="signup">Score: ';
+                    echo "<span class=red>{$points[$child]} points</span><br/> ";
+                    if ($feedback[$child]!==null && $feedback[$child]!='') {
+                        echo 'Private Feedback: ';
+                        echo $feedback[$child];
+                    }
+                    echo '</div>';
+                }
+            }
+            echo "<div class=\"clear\"></div></div>\n";
+            $icnt++;
+            if (isset($children[$child])) { //if has children
+                echo "<div class=";
+                if ($view==0 || $view==2) {
+                    echo '"forumgrp"';
+                } else if ($view==1) {
+                    echo '"hidden"';
+                }
+                echo " id=\"block$bcnt\">\n";
+                $bcnt++;
+                $this->printchildren($child, ($posttype[$child]==3 && !$isTeacher));
+                echo "</div>\n";
+            }
+        }
+    }
 }

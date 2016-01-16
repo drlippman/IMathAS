@@ -234,7 +234,7 @@ class ForumView extends BaseImasForumViews
 
     public static function getByTagged($userId,$threadId)
     {
-        return ForumView::find(['lastview', 'tagged'])->where(['userid' => $userId, 'threadid' => $threadId])->all();
+        return ForumView::find(['lastview', 'tagged'])->where(['userid' => $userId, 'threadid' => $threadId])->one();
     }
 
     public static function updateLastView($userId,$threadId)

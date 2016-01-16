@@ -874,7 +874,7 @@ class AppController extends Controller
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $studentId = $this->isStudent($user['id'], $courseId);
 
-        if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)) {
+        if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT || $isOwner)) {
             return true;
         }
 

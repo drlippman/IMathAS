@@ -343,4 +343,9 @@ class Forums extends BaseImasForums {
         $items = $command->queryAll();
         return $items;
     }
+
+    public static function getForumDetails($forumId)
+    {
+        return Forums::find()->select('settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail')->where(['id' => $forumId])->all();
+    }
 }

@@ -3,6 +3,7 @@ namespace app\controllers\forum;
 
 use app\components\AppConstant;
 use app\components\AssessmentUtility;
+use app\components\filehandler;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\ContentTrack;
@@ -227,7 +228,6 @@ class ForumController extends AppController
             }
 
         }
-
         $this->includeCSS(['dataTables.bootstrap.css','forums.css', 'dashboard.css']);
         $this->includeJS(['forum/thread.js','general.js?ver=012115','jquery.dataTables.min.js','dataTables.bootstrap.js','forum/thread.js']);
         $this->setReferrer();
@@ -773,164 +773,274 @@ class ForumController extends AppController
     */
     public function actionPost()
     {
+        global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$cid,$userid,$ownerid,$points;
+        global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
+        global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
+        global $canviewall, $caneditscore, $canviewscore;
         $this->guestUserHandler();
         $this->layout = 'master';
         $currentUser = $this->user;
         $courseId = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
-        $threadId = $this->getParamVal('threadid');
-        $forumId = $this->getParamVal('forumid');
-        $forumData = Forums::getById($forumId);
-        $allThreadIds = Thread::getAllThread($forumId);
-        $prevNextValueArray = Thread::checkPreOrNextThreadByForunId($forumId);
-        $isNew = ForumView::getById($threadId, $currentUser['id']);
+        $forumid = $this->getParamVal('forumid');
+        $threadid = $this->getParamVal('threadid');
+        $getView = $this->getParamVal('view');
+        $page = $this->getParamVal('page');
+        $markunread = $this->getParamVal('markunread');
+        $grp = $this->getParamVal('grp');
+        $forumData = Forums::getById($forumid);
+        $allThreadIds = Thread::getAllThread($forumid);
+        $prevNextValueArray = Thread::checkPreOrNextThreadByForunId($forumid);
+        $isNew = ForumView::getById($threadid, $currentUser['id']);
         $tagValue = $isNew[0]['tagged'];
         $isTeacher = $this->isTeacher($currentUser['id'], $courseId);
         $isTutor = $this->isTutor($currentUser['id'], $courseId);
-        $canViewAll = false;
-        if ($isTeacher || $isTutor) {
-            $canViewAll = true;
+        $isStudent = $this->isStudent($currentUser['id'], $courseId);
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $myrights = $currentUser['rights'];
+        $userid = $currentUser['id'];
+        if (!isset($isTeacher) && !isset($isTutor) && !isset($isStudent)) {
+           $this->setErrorFlash("You are not enrolled in this course.");
+            $this->goHome();
         }
-            $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId, $currentUser['id']);
-        $FullThread = ForumPosts::getbyid($threadId);
-        $data = array();
-        $titleCountArray = array();
-        foreach ($FullThread as $postData) {
-            $this->children[$postData['parent']][] = $postData['id'];
-            $username = User::getById($postData['userid']);
-            $forumName = Forums::getById($postData['forumid']);
-            $titleLevel = AppUtility::calculateLevel($postData['subject']);
-            $likeImage = ForumLike::checkStatus($postData['id'], $currentUser);
-            $count = new ForumLike();
-            $likeCnt = $count->CalculateCount($postData['id']);
-            $studentCount = AppConstant::NUMERIC_ZERO;
-            $teacherCount = AppConstant::NUMERIC_ZERO;
-            $isReplies = AppConstant::NUMERIC_ZERO;
-            $threadReplies = ForumPosts::isThreadHaveReply($postData['id']);
-            if ($threadReplies) {
-                $isReplies = AppConstant::NUMERIC_ONE;
-            }
-            foreach ($likeCnt as $like) {
-                $Rights = User::getById($like['userid']);
-                if ($Rights->rights == AppConstant::STUDENT_RIGHT) {
-                    $studentCount = $studentCount + AppConstant::NUMERIC_ONE;
-                } elseif ($Rights->rights >= AppConstant::TEACHER_RIGHT) {
-                    $teacherCount = $teacherCount + AppConstant::NUMERIC_ONE;
-                }
-                $tempArray = array(
-                    'postId' => $like['postid'],
-                    'studentCount' => $studentCount,
-                    'teacherCount' => $teacherCount,
-                );
-            }
-            if ($postData['parent'] == AppConstant::NUMERIC_ZERO) {
-                $replyBy = $postData['replyby'];
-            }
-            array_push($titleCountArray, $tempArray);
-            $tempArray = array();
-            $tempArray['id'] = $postData['id'];
-            $tempArray['threadId'] = $postData['threadid'];
-            $tempArray['forumIdData'] = $postData['forumid'];
-            $tempArray['subject'] = $titleLevel['title'];
-            $tempArray['forumName'] = ucfirst($forumName->name);
-            $tempArray['postdate'] = AppUtility::tzdate("D, M j, Y, g:i a",$postData->postdate);
-            $tempArray['postType'] = $postData['posttype'];
-            $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
-            $tempArray['userId'] = $username->id;
-            $tempArray['userRights'] = $username->rights;
-            $tempArray['userId'] = $username->id;
-            $tempArray['settings'] = $forumName->settings;
-            $tempArray['hasImg'] = $username->hasuserimg;
-            $tempArray['likeImage'] = $likeImage;
-            $tempArray['studentCount'] = $studentCount;
-            $tempArray['teacherCount'] = $teacherCount;
-            $tempArray['likeCnt'] = count($likeCnt);
-            $tempArray['lastView'] = $isNew[AppConstant::NUMERIC_ZERO]['lastview'];
-            $tempArray['message'] = $postData['message'];
-            $tempArray['level'] = $titleLevel['level'];
-            $tempArray['parent'] = $postData['parent'];
-            $tempArray['files'] = $postData['files'];
-            $tempArray['fileType'] = $forumData['forumtype'];
-            $tempArray['isReplies'] = $isReplies;
-            if (($postData['parent'] != AppConstant::NUMERIC_ZERO) && (substr($postData['subject'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR) !== 'Re: ')) {
-                $this->threadLevel = AppConstant::NUMERIC_ONE;
-                $this->calculatePostLevel($postData);
-                $tempArray['level'] = $this->threadLevel;
-            }
-            $this->postData[$postData['id']] = $tempArray;
-        }
-        Thread::saveViews($threadId);
-        $viewsData = new ForumView();
-        $viewsData->updateData($threadId, $currentUser);
-        $this->createChild($this->children[0]);
-        $Count = new ForumLike();
-        $likeCount = $Count->findCOunt($threadId);
-        $myLikes = $Count->UserLikes($threadId, $currentUser);
-        $this->setReferrer();
-        foreach ($this->totalPosts as $key => $threadArray) {
-
-            if ($threadArray) {
-                foreach ($this->totalPosts as $singleThread) {
-                    if ($threadArray['parent'] == $singleThread['id']) {
-                        if (substr($threadArray['subject'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_TWO) !== 'Re') {
-                            $moveThreadSubject = $threadArray['id'];
-                            $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
-                        }
-                        if ($threadArray['parent'] == $moveThreadSubject) {
-                            $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
-                        }
-                    }
-                }
-            }
-            $FinalPostArray[$key] = $threadArray;
-            if ($threadArray['parent'] == AppConstant::NUMERIC_ZERO) {
-                $postType = $threadArray['postType'];
-            }
-
-            if ($threadArray['userId'] && $currentUser['id'] != 0) {
-
-                $studentPosts[] = $threadArray['id'];
-            }
-        }
-        $allowReply = AppConstant::NUMERIC_ZERO;
-        if ($forumData['replyby'] == AppConstant::ALWAYS_TIME || $forumData['replyby'] > time()) {
-            $allowReply = AppConstant::NUMERIC_ONE;
-        }
-        if ($postType == AppConstant::NUMERIC_THREE && $currentUser['rights'] == AppConstant::NUMERIC_TEN) {
-            $threadOnce = AppConstant::NUMERIC_ZERO;
-            if($FinalPostArray){
-                foreach ($FinalPostArray as $array) {
-                    global $parentArray;
-                    $this->parentList($array['id']);
-                    $isShow = false;
-                    if ($parentArray) {
-                        foreach ($studentPosts as $studentPost) {
-                            if (in_array($studentPost, $parentArray)) {
-                                $isShow = true;
-                                break;
-                            }
-                        }
-                        $parentArray = null;
-                    }
-
-                    if ($array['parent'] == AppConstant::NUMERIC_ZERO && $threadOnce == AppConstant::NUMERIC_ZERO) {
-                        $threadOnce = AppConstant::NUMERIC_ONE;
-                        array_push($data, $array);
-                    } else if ($array['userId'] == $currentUser['id'] || in_array($array['parent'], $studentPosts)) {
-                        array_push($data, $array);
-                    } else if ($isShow == true) {
-                        array_push($data, $array);
-                    }
-                }
-            }
-
+        if (isset($isTeacher)) {
+            $isTeacher = true;
         } else {
-            $data = $FinalPostArray;
+            $isTeacher = false;
+        }
+
+        $forumDetails = Forums::getForumDetails($forumid);
+        $forumsettings = $forumDetails['settings'];
+        $replyby = $forumDetails['replyby'];
+        $defdisplay = $forumDetails['defdisplay'];
+        $forumname = $forumDetails['name'];
+        $pointsposs = $forumDetails['points'];
+        $groupset = $forumDetails['groupsetid'];
+        $postby = $forumDetails['postby'];
+        $rubric = $forumDetails['rubric'];
+        $tutoredit = $forumDetails['tutoredit'];
+        $enddate = $forumDetails['enddate'];
+        $avail = $forumDetails['avail'];
+
+        if (($isStudent) && ($avail==0 || ($avail==1 && time() > $enddate))) {
+            $this->setErrorFlash("<p>This forum is closed.</p>");
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
+
+        }
+
+        if(isset($markunread)){
+            ForumView::deleteByUserIdAndThreadId($threadid, $currentUser['id']);
+            if ($page==-4) {
+//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
+                return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/forums?cid='.$courseId));
+            } else if ($page==-3) {
+                return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid='.$forumid.'&cid='.$courseId));
+//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
+            } else {
+                return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid));
+//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
+            }
+        }
+
+        $allowreply = ($isTeacher || (time()<$replyby));
+        $allowanon = (($forumsettings&1)==1);
+        $allowmod = ($isTeacher || (($forumsettings&2)==2));
+        $allowdel = ($isTeacher || (($forumsettings&4)==4));
+        $allowlikes = (($forumsettings&8)==8);
+        $postbeforeview = (($forumsettings&16)==16);
+        $haspoints =  ($pointsposs > 0);
+        $groupid = 0;
+
+        $canviewall = (isset($isTeacher) || isset($isTutor));
+        $caneditscore = (isset($isTeacher) || (isset($isTutor) && $tutoredit==1));
+        $canviewscore = (isset($isTeacher) || (isset($isTutor) && $tutoredit<2));
+
+
+        if ($groupset>0) {
+            if (!isset($grp)) {
+                if (!$canviewall) {
+
+                    $result = StuGroupMembers::getStudGroupAndStudGroupMemberData($currentUser['id'],$groupset);
+                    if (count($result)>0) {
+                        $groupid = $result['i_sg.id'];
+                    } else {
+                        $groupid=0;
+                    }
+                } else {
+                    $groupid = -1;
+                }
+            } else {
+                if (!$canviewall) {
+                    $groupid = intval($grp);
+                    $result = StuGroupMembers::getById($groupid, $currentUser['id']);
+                    if (count($result) == 0) {
+                        $this->setErrorFlash('Invalid group - try again');
+                        return $this->redirect('post?courseid='.$courseId.'&forumid='.$forumid.'&threadid='.$threadid);
+                    }
+                } else {
+                    $groupid = intval($grp);
+                }
+            }
+        }
+
+        if (isset($getView)) {
+            $view = $getView;
+        } else {
+            $view = $defdisplay;  //0: expanded, 1: collapsed, 2: condensed
+        }
+
+        $allowmsg = false;
+        if (!$canviewall) {
+            $result = Course::getMsgSet($courseId);
+            if (($result['msgset']%5)==0) {
+                $allowmsg = true;
+            }
+        }
+
+        if ($postbeforeview && !$canviewall) {
+            $result = ForumPosts::checkLeastOneThread($forumid,$currentUser['id']);
+            $oktoshow = (count($result)>0);
+            if (!$oktoshow) {
+                $result = ForumPosts::getDataById($threadid);
+                $oktoshow = (($result['posttype'])>0);
+            }
+        } else {
+            $oktoshow = true;
+        }
+
+        if ($oktoshow) {
+            if ($haspoints) {
+                $forumPostResult = ForumPosts::getPostPoints($courseId, $threadid);
+            } else {
+                $forumPostResult = ForumPosts::getForumPost($courseId, $threadid);
+            }
+            $children = array();
+            $date = array();
+            $subject = array();
+            $message = array();
+            $posttype = array();
+            $likes = array();
+            $mylikes = array();
+            $ownerid = array();
+            $files = array();
+            $points= array();
+            $feedback= array();
+            $poster= array();
+            $email= array();
+            $hasuserimg = array();
+            $section = array();
+           foreach($forumPostResult as $line) {
+                if ($line['parent']==0) {
+                    if ($line['replyby']!=null) {
+                        $allowreply = ($canviewall || (time()<$line['replyby']));
+                    }
+                }
+
+                if ($line['id']==$threadid) {
+                    $newviews = $line['views']+1;
+                }
+                $children[$line['parent']][] = $line['id'];
+                $date[$line['id']] = $line['postdate'];
+                $n = 0;
+                while (strpos($line['subject'],'Re: ')===0) {
+                    $line['subject'] = substr($line['subject'],4);
+                    $n++;
+                }
+                if ($n==1) {
+                    $line['subject'] = 'Re: '.$line['subject'];
+                } else if ($n>1) {
+                    $line['subject'] = "Re<sup>$n</sup>: ".$line['subject'];
+                }
+
+                $subject[$line['id']] = $line['subject'];
+                if ($sessionData['graphdisp']==0) {
+                    $line['message'] = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $line['message']);
+                }
+                $message[$line['id']] = $line['message'];
+                $posttype[$line['id']] = $line['posttype'];
+                $ownerid[$line['id']] = $line['userid'];
+                $hasuserimg[$line['id']] = $line['hasuserimg'];
+
+                if ($line['files']!='') {
+                    $files[$line['id']] = $line['files'];
+                }
+                if ($haspoints && $line['score']!==null) {
+                    $points[$line['id']] = 1*$line['score'];
+                    $feedback[$line['id']] = $line['feedback'];
+                } else {
+                    $points[$line['id']] = $line['score'];
+                    $feedback[$line['id']] = null;
+                }
+                if ($line['isanon']==1) {
+                    $poster[$line['id']] = "Anonymous";
+                    $ownerid[$line['id']] = 0;
+                } else {
+                    $poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
+                    $section[$line['id']] = $line['section'];
+                    $email[$line['id']] = $line['email'];
+                }
+                $likes[$line['id']] = array(0,0,0);
+
+            }
+
+            if ($allowlikes) {
+                //get likes
+                $Count = new ForumLike();
+                $likeCount = $Count->findCOunt($threadid);
+                foreach($likeCount as $row){
+                    $likes[$row['postid']][$row['type']] = $row['count(*)'];
+                }
+
+                $myLikes = $Count->UserLikes($threadid, $currentUser);
+                foreach($myLikes as $row) {
+                    $mylikes[] = $row['postid'];
+                }
+            }
+
+            if (count($files)>0) {
+                require_once('../includes/filehandler.php');
+            }
+            //update view count
+            ForumPosts::updateViews($threadid, $newviews);
+
+            ForumThread::updateViews($threadid);
+
+//            mark as read
+            $result = ForumView::getByTagged($currentUser['id'],$threadid);
+            $now = time();
+            if (count($result)>0) {
+                $lastview = $result['lastview'];
+                $tagged = $result['tagged'];
+                ForumView::updateLastView($currentUser['id'],$threadid);
+            } else {
+                $lastview = 0;
+                $tagged = 0;
+                $forumView = new ForumView();
+                $forumView->addForumView($currentUser['id'],$threadid,$now);
+            }
+        }
+
+        if (!$oktoshow) {
+            $this->setErrorFlash('<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>');
+            return $this->redirect('post?courseid='.$courseId.'&forumid='.$forumid.'&threadid='.$threadid);
+            } else
+        {
+            $resultPrev = ForumThread::getDataForPrev($forumid, $threadid,$groupid,$groupset);
+
+
+
+            $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
+
+            $bcnt = 0;
+            $icnt = 0;
         }
 
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/post.js?ver=<?php echo time() ?>"]);
-        $responseData = array('atLeastOneThread' => $atLeastOneThread, 'postdata' => $data, 'allowReply' => $allowReply, 'canViewAll' => $canViewAll, 'forumData' => $forumData, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray, 'allThreadIds' => $allThreadIds, 'replyBy' => $replyBy);
+        $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
+        'view' => $view, 'bcnt' => $bcnt, 'icnt' => $icnt, 'caneditscore' => $caneditscore, 'haspoints' => $haspoints, 'courseId' => $courseId, 'forumid' => $forumid, 'groupid' => $groupid,
+        'page' => $page, 'course' => $course, 'tagValue' => $tagValue);
         return $this->render('post', $responseData);
     }
 
@@ -1011,7 +1121,7 @@ class ForumController extends AppController
                 'message' => $data['message'],
                 'forumType' => $forumData['forumtype'],
                 'files' => $data['files'],
-                'postDate' => AppController::customizeDate($data['postdate']),
+                'postDate' => AppUtility::tzdate(AppConstant::CUSTOMIZE_DATE,$data['postdate']),
             );
             array_push($threadArray, $tempArray);
         }
@@ -2099,5 +2209,4 @@ class ForumController extends AppController
         }
 
     }
-
 }
