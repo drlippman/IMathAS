@@ -11,13 +11,8 @@ $(document).ready(function () {
         $("#show-all-link").show();
     }
     var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow, showNewMsg: isNewMessage};
-//    jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-//    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
-//    jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
-
     selectCheckBox();
     checkUncheckHeaderCheckbox();
-//    filterByCourse();
 });
 
 var messageData;
@@ -59,7 +54,6 @@ function showMessageSuccess(response) {
     {
 
     }
-//    showMessage(filteredArray, response.status);
 }
 
 function checkUncheckHeaderCheckbox(){
@@ -98,22 +92,9 @@ function getCourseSuccess(response) {
     var result = JSON.parse(response);
     var course = result.data;
     if (result.status == 0) {
-//        courseDisplay(course);
         filterByCourse();
     }
 }
-
-//function courseDisplay(courseData) {
-//    var html = "";
-//    $.each(courseData, function (index, courseData) {
-//        if(courseData.courseId != cid){
-//            html += "<option value = " + courseData.courseId + ">" + courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
-//        }else{
-//            html += "<option selected='selected' value = " + courseData.courseId + ">" +  courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
-//        }
-//    });
-//    $(".show-course").append(html);
-//}
 
 function markAsUnread() {
     var markArray = [];
@@ -328,5 +309,3 @@ function picshow(size) {
     }
 
 }
-
-

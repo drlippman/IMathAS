@@ -90,13 +90,13 @@ class Message extends BaseImasMsgs
         return Message::findOne($id);
     }
 
-    public static function getByMsgId($msgId)
+    public static function updateReplied($msgId)
     {
         $message = Message::findOne($msgId);
         $message ->replied = AppConstant::NUMERIC_ONE;
         $message->save();
-        return $message;
     }
+
     public static function deleteFromReceivedMsg($msgId)
     {
         $message =Message::getById($msgId);
@@ -156,6 +156,7 @@ class Message extends BaseImasMsgs
 
     public function createReply($params)
     {
+        Message::updateReplied($params['parentId']);
         $this->courseid = $params['cid'];
         $this->msgfrom = isset($params['sender']) ? $params['sender'] : null;
         $this->msgto = isset($params['receiver']) ? $params['receiver'] : null;
@@ -244,7 +245,7 @@ class Message extends BaseImasMsgs
     }
     public static function updateFlagValue($row)
     {
-        $query = Message::getByMsgId($row);
+        $query = Message::getById($row);
         $query->isread = ($query->isread)^8;
         $query->save();
     }
