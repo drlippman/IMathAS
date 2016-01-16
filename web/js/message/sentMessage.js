@@ -96,25 +96,6 @@ function checkUncheckHeaderCheckbox(){
 }
 
 function selectCheckBox(){
-//    $(document).on('click', '#message-header-checkbox', function() {
-//        if($(this).prop("checked") == true){
-//            $('.message-table-body input:checkbox').each(function () {
-//                $(this).prop('checked', true);
-//                if($.inArray($(this).val(), isModifiedArray) != -1){
-//                    $(this).closest('tr').remove();
-//                }
-//            })
-//        }
-//        else if($(this).prop("checked") == false){
-//            $('.message-table-body input:checkbox').each(function () {
-//                $(this).prop('checked', false);
-//                if($.inArray($(this).val(), isModifiedArray) != -1){
-//                    $(this).closest('tr').remove();
-//                }
-//            })
-//        }
-//    });
-
     $(document).on('click', '#message-header-checkbox', function() {
         if($(this).prop("checked") == true){
             $('.message-table-body input:checkbox').each(function () {
@@ -161,7 +142,6 @@ function markSentDelete()
         var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
-//            isModifiedArray.push($(this).val());
         });
         if(markArray.length!=0) {
             var html = '<div><p>Are you sure ? you want to Remove.</p></div>';
@@ -176,24 +156,14 @@ function markSentDelete()
                     "Cancel": function () {
 
                         $(this).dialog('destroy').remove();
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-
-                            $(this).prop('checked', false);
-
-                        });
+                        uncheckAllCheckbox(false);
                         return false;
                     },
                     "Confirm": function () {
-//                            window.location = cancelUrl;
-
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                            $(this).prop('checked', false);
-                            $(this).closest('tr').remove();
-                        });
+                        uncheckAllCheckbox(true);
                         $(this).dialog("close");
-                        $('input[name = "header-checked"]:checked').prop('checked', false);
                         var readMsg = {checkedMsgs: markArray};
-                        jQuerySubmit('mark-sent-remove-ajax',readMsg,'markDeleteSuccess');
+                        jQuerySubmit('mark-sent-remove-ajax', readMsg, {});
                         return true;
                     }
                 },
@@ -211,7 +181,17 @@ function markSentDelete()
 
 
 }
-function markDeleteSuccess(){}
+
+function uncheckAllCheckbox(isRemoveMessageRows){
+    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+        $(this).prop('checked', false);
+        if(isRemoveMessageRows == true){
+            $(this).closest('tr').remove();
+            isModifiedArray.push($(this).val());
+        }
+    });
+    $('input[name = "header-checked"]:checked').prop('checked', false);
+}
 
 function getUserSuccess(response) {
     var result = JSON.parse(response);
@@ -249,21 +229,15 @@ function markUnsend()
                 closeText: "hide",
                 buttons: {
                     "Cancel": function () {
-
                         $(this).dialog('destroy').remove();
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                            $(this).prop('checked', false);
-                        });
+                        uncheckAllCheckbox(false);
                         return false;
                     },
                     "Confirm": function () {
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                            $(this).prop('checked', false);
-                            $(this).closest('tr').remove();
-                        });
+                        uncheckAllCheckbox(true);
                         $(this).dialog("close");
                         var readMsg = {checkedMsgs: markArray};
-                        jQuerySubmit('mark-sent-unsend-ajax', readMsg, 'markUnsendSuccess');
+                        jQuerySubmit('mark-sent-unsend-ajax', readMsg, {});
                         return true;
                     }
                 },
@@ -278,7 +252,5 @@ function markUnsend()
             CommonPopUp(msg);
         }
 
-}
-function markUnsendSuccess(){
 }
 

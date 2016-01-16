@@ -241,7 +241,6 @@ function markAsDelete() {
     var markArray = [];
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
         markArray.push($(this).val());
-        isModifiedArray.push($(this).val());
     });
     if (markArray.length != 0) {
         var html = '<div><p>Are you sure? This will delete your message from</p>' +
@@ -254,18 +253,12 @@ function markAsDelete() {
             buttons: {
                 "Cancel": function () {
                     $(this).dialog('destroy').remove();
-                    $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                        $(this).prop('checked', false);
-                    });
+                    uncheckAllCheckbox(false);
                     return false;
                 },
                 "Confirm": function () {
-                    $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                        $(this).prop('checked', false);
-                        $(this).closest('tr').remove();
-                    });
+                    uncheckAllCheckbox(true);
                     $(this).dialog("close");
-                    $('input[name = "header-checked"]:checked').prop('checked', false);
                     var readMsg = {checkedMsg: markArray};
                     jQuerySubmit('mark-as-delete-ajax', readMsg,{});
                     return true;
@@ -281,6 +274,17 @@ function markAsDelete() {
         CommonPopUp(msg);
     }
 
+}
+
+function uncheckAllCheckbox(isRemoveMessageRows){
+    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+        $(this).prop('checked', false);
+        if(isRemoveMessageRows == true){
+            $(this).closest('tr').remove();
+            isModifiedArray.push($(this).val());
+        }
+    });
+    $('input[name = "header-checked"]:checked').prop('checked', false);
 }
 
 function changeImage(element, temp, rowId) {
