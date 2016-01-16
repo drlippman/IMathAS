@@ -99,8 +99,11 @@ function getCourseSuccess(response) {
 function markAsUnread() {
     var markArray = [];
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
-        $(this).closest('tr').css('font-weight', 'bold');
-        markArray.push($(this).val());
+        var msgId = $(this).val()
+        markArray.push(msgId);
+        $('.message-title-'+msgId).removeClass("read-message");
+        $('.message-title-'+msgId).addClass("unread-message");
+
         $(this).prop('checked', false);
     });
     $('input[name = "header-checked"]:checked').prop('checked', false);
@@ -120,8 +123,10 @@ function markAsUnread() {
 function markAsRead() {
     var markArray = [];
     $('.message-table-body input[name="msg-check"]:checked').each(function () {
-        markArray.push($(this).val());
-        $(this).closest('tr').css('font-weight', 'normal');
+        var msgId = $(this).val()
+        markArray.push(msgId);
+        $('.message-title-'+msgId).removeClass("unread-message");
+        $('.message-title-'+msgId).addClass("read-message");
         $(this).prop('checked', false);
     });
     $('input[name = "header-checked"]:checked').prop('checked', false);

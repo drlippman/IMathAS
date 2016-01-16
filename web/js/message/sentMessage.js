@@ -145,7 +145,6 @@ function markSentDelete()
         });
         if(markArray.length!=0) {
             var html = '<div><p>Are you sure ? you want to Remove.</p></div>';
-
             var cancelUrl = $(this).attr('href');
             e.preventDefault;
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({

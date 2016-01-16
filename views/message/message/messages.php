@@ -179,14 +179,17 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                             echo 'class="tagged" ';
                         }
                         echo ">"; ?>
-                        <td><input type=checkbox name=msg-check id="Checkbox" class='message-checkbox-<?php echo $line['id']?>' value=<?php echo $line['id']?>></td><td>
-
-                       <?php echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
-                        if (($line['isread']&1)==0) {
-                            echo "<b>{$line['title']}</b>";
-                        } else {
-                            echo $line['title'];
-                        }
+                        <td>
+                            <input type=checkbox name=msg-check id="Checkbox" class='message-checkbox-<?php echo $line['id']?>' value=<?php echo $line['id']?>>
+                        </td>
+                        <?php
+                            if (($line['isread']&1)==0) {
+                                echo "<td class=\"message-title-{$line['id']} unread-message\">";
+                            } else {
+                                echo "<td class=\"message-title-{$line['id']} read-message\">";
+                            }
+                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
+                        echo $line['title'];
                         echo "</a></td><td>";
                         if ($line['replied']==1) {
                             echo "Yes";
