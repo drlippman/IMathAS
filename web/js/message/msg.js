@@ -15,8 +15,7 @@ function togglecolor(threadid,tagged) {
 
 function toggletagged(threadid) {
 	var trchg = document.getElementById("tr"+threadid);
-    console.log(trchg);
-	if (trchg.className=="tagged") {
+	if (trchg.className.includes("tagged")) {
 		submitTagged(threadid,0);
 	} else {
 		submitTagged(threadid,1);
