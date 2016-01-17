@@ -1461,11 +1461,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		
-		if (!isset($sz)) { $sz = 20;}
+		
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
+			if (!isset($sz)) { $sz = 3;}
 			if ($colorbox=='') {
 				$out .= '<table id="qnwrap'.$qn.'">';
 			} else {
@@ -1479,7 +1480,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			for ($row=0; $row<$answersize[0]; $row++) {
 				$out .= "<tr>";
 				for ($col=0; $col<$answersize[1]; $col++) {
-					$out .= "<td><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$count\" value=\"{$las[$count]}\"  autocomplete=\"off\" /></td>\n";
+					$out .= "<td><input class=\"text\" type=\"text\" size=\"$sz\" name=\"qn$qn-$count\" value=\"{$las[$count]}\"  autocomplete=\"off\" /></td>\n";
 					$count++;
 				}
 				$out .= "</tr>";
@@ -1489,7 +1490,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
 			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
 		} else {
-			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
+			if (!isset($sz)) { $sz = 20;}
+			$out .= "<input class=\"text $colorbox\" type=\"text\" size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= getcolormark($colorbox);
 			$out .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> ";
@@ -1509,14 +1511,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = explode(',',$answerformat);
 		
-		if (!isset($sz)) { $sz = 20;}
-		
 		$la = explode('$#$',$la);
 		$la = $la[0];
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (isset($ansprompt)) {$out .= $ansprompt;}
 		if (isset($answersize)) {
+			if (!isset($sz)) { $sz = 3;}
 			$answersize = explode(",",$answersize);
 			if ($colorbox=='') {
 				$out .= '<table id="qnwrap'.$qn.'">';
@@ -1530,7 +1531,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			for ($row=0; $row<$answersize[0]; $row++) {
 				$out .= "<tr>";
 				for ($col=0; $col<$answersize[1]; $col++) {
-					$out .= "<td><input class=\"text\" type=\"text\"  size=3 name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"{$las[$count]}\" autocomplete=\"off\" /></td>\n";
+					$out .= "<td><input class=\"text\" type=\"text\" size=\"$sz\" name=\"qn$qn-$count\" id=\"qn$qn-$count\" value=\"{$las[$count]}\" autocomplete=\"off\" /></td>\n";
 					$count++;
 				}
 				$out .= "</tr>";
@@ -1544,7 +1545,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip .= formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
 			//$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
 		} else {
-			$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
+			if (!isset($sz)) { $sz = 20;}
+			$out .= "<input class=\"text $colorbox\" type=\"text\" size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\" />\n";
 			$out .= getcolormark($colorbox);
 			$out .= "<input type=button value=\"" . _('Preview') . "\" onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
 			$out .= "<span id=p$qn></span> \n";
