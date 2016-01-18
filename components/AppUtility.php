@@ -3155,7 +3155,7 @@ class AppUtility extends Component
 
     public function printchildren($base,$restricttoowner=false) {
         $curdir = rtrim(dirname(__FILE__), '/\\');
-        global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$cid,$userid,$ownerid,$points;
+        global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$courseId,$userid,$ownerid,$points;
         global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
         global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
         global $canviewall, $caneditscore, $canviewscore;
@@ -3206,18 +3206,19 @@ class AppUtility extends Component
             }
 
             if ($isTeacher) {
-                echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&move=$child\">Move</a> \n";
+                echo "<a href=\"move-thread?forumid=$forumid&courseid=$courseId&threadid=$threadid\">Move</a> \n";
             }
             if ($isTeacher || ($ownerid[$child]==$userid && $allowmod)) {
                 if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isTeacher) {
-                    echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
+                    echo "<a href=\"modify-post?courseId=$courseId&forumId=$forumid&threadId=$threadid\">Modify</a> \n";
                 }
             }
             if ($isTeacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
-                echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
+                echo "<a href=\"post?view=$view&cid=$courseId&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
             }
             if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-                echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\">Reply</a>";
+                //reply-post?courseid=477&id=81154&threadId=81154&forumid=19921
+                echo "<a href=\"reply-post?courseid=$courseId&id=$child&threadId=$threadid&forumid=$forumid\">Reply</a>";
             }
 
             echo "</span>\n";
@@ -3227,7 +3228,7 @@ class AppUtility extends Component
             //	echo "<a href=\"mailto:{$email[$child]}\">";
             //} else if ($allowmsg && $ownerid[$child]!=0) {
             if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {
-                echo "<a href=\"../msgs/msglist.php?cid=$cid&add=new&to={$ownerid[$child]}\" ";
+                echo "<a href=\"../msgs/msglist.php?cid=$courseId&add=new&to={$ownerid[$child]}\" ";
                 if ($section[$child]!='') {
                     echo 'title="Section: '.$section[$child].'"';
                 }
@@ -3238,7 +3239,7 @@ class AppUtility extends Component
                 echo "</a>";
             }
             if ($isTeacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
-                echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$cid&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
+                echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$courseId&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
                 if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
                     $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
                     $aname = addslashes($matches[2]);
@@ -3246,7 +3247,7 @@ class AppUtility extends Component
                     $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
                     if (mysql_num_rows($result)>0) {
                         $r = mysql_fetch_row($result);
-                        echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r[0]}\" target=\"_popoutgradebook\">[assignment]</a>";
+                        echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$courseId&uid={$ownerid[$child]}&asid={$r[0]}\" target=\"_popoutgradebook\">[assignment]</a>";
                     }
                 }
             }
@@ -3295,7 +3296,7 @@ class AppUtility extends Component
 
                 echo '<div class="likewrap">';
                 echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";
-                echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
+                echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$courseId&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
                 echo '</div>';
             }
             echo '<div class="clear"></div>';

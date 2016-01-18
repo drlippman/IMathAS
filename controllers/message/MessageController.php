@@ -406,7 +406,7 @@ class MessageController extends AppController
         $params = $this->getRequestParams();
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
-        if ($courseId != AppConstant::NUMERIC_ZERO && !($isTeacher) && !($isTutor) && !($isStudent)) {
+        if ($courseId != 0 && !($isTeacher) && !($isTutor) && !($isStudent)) {
             $this->setErrorFlash('You are not enrolled in this course.');
             return $this->goHome();
         }
@@ -418,12 +418,12 @@ class MessageController extends AppController
         if (isset($params['filtercid'])) {
             $filtercid = $params['filtercid'];
         } else {
-            $filtercid = AppConstant::NUMERIC_ZERO;
+            $filtercid = 0;
         }
         if (isset($params['filterstu'])) {
             $filterstu = $params['filterstu'];
         } else {
-            $filterstu = AppConstant::NUMERIC_ZERO;
+            $filterstu = 0;
         }
 
         $cid = $params['cid'];
@@ -467,18 +467,18 @@ class MessageController extends AppController
                         <?php
                         if($due < 2000000000){
                             echo ' <span class="small">Due '.$duedate.'</span>';
+                            }
                         }
                     }
                 }
             }
-        }
 
         if ($type!='sent' && $type!='allstu') {
             if ($messageData['courseid'] > AppConstant::NUMERIC_ZERO) {
                 $result = Course::getMsgSet($messageData['courseid']);
                 $msgset = $result['msgset'];
-                $msgmonitor = floor($msgset/AppConstant::NUMERIC_FIVE);
-                $msgset = $msgset%AppConstant::NUMERIC_FIVE;
+                $msgmonitor = floor($msgset/5);
+                $msgset = $msgset%5;
                 if ($msgset < AppConstant::NUMERIC_THREE || $isTeacher) {
                     $cansendmsgs = true;
                     if ($msgset== AppConstant::NUMERIC_ONE && !$isTeacher) { //check if sending to teacher
@@ -501,16 +501,15 @@ class MessageController extends AppController
             }
         }
 
-        if ($type!='sent' && $type!='allstu' && ($messageData['isread']==AppConstant::NUMERIC_ZERO || $messageData['isread']==AppConstant::NUMERIC_FOUR)) {
+        if ($type!='sent' && $type!='allstu' && ($messageData['isread']==0 || $messageData['isread']==4)) {
             Message::updateIsReadView($msgId);
         }
-
-        $messages = Message::getById($msgId);
-        $this->includeCSS(['jquery-ui.css', 'message.css', 'forums.css']);
-        $this->includeJS(['message/viewmessage.js']);
-        $responseData = array('messages' => $messages, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId, 'messageData' => $messageData, 'senddate' => $senddate, 'teacherof' => $teacherof,
-        'isTeacher' => $isTeacher, 'filtercid' => $filtercid, 'filterstu' => $filterstu, 'cansendmsgs' => $cansendmsgs, 'type' => $type, 'cid' => $cid, 'page' => $page);
-        return $this->renderWithData('viewMessage', $responseData);
+            $messages = Message::getByMsgId($msgId);
+            $this->includeCSS(['jquery-ui.css', 'message.css', 'forums.css']);
+            $this->includeJS(['message/viewmessage.js']);
+            $responseData = array('messages' => $messages, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId, 'messageData' => $messageData, 'senddate' => $senddate, 'teacherof' => $teacherof,
+            'isTeacher' => $isTeacher, 'filtercid' => $filtercid, 'filterstu' => $filterstu, 'cansendmsgs' => $cansendmsgs, 'type' => $type, 'cid' => $cid, 'page' => $page);
+            return $this->renderWithData('viewMessage', $responseData);
 
     }
     /*
@@ -525,7 +524,7 @@ class MessageController extends AppController
             foreach ($msgIds as $msgId) {
                 Message::deleteFromReceivedMsg($msgId);
             }
-            return $this->successResponse();
+            return $this->successResponse($params['checkedMsg']);
         }
     }
     /*
@@ -555,11 +554,12 @@ class MessageController extends AppController
         $this->layout = 'master';
         $this->guestUserHandler();
         $userRights = $this->user;
+        $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         if ($this->getAuthenticatedUser()) {
-            $messages = Message::getById($msgId);
+            $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
             $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights);
             $this->includeCSS(['message.css']);
@@ -613,6 +613,7 @@ class MessageController extends AppController
                         {
                             $changeIsReadValue = new Message();
                             $changeIsReadValue ->updateIsRead($params);
+
                         }
                     }
                 }

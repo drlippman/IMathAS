@@ -348,7 +348,7 @@ echo '</div>';
                                 <ul class="dropdown-menu thread-dropdown">
 
                                     <?php if ($isteacher) { ?>
-                                        <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
+                                        <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
 
                                     <?php }
                                     if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>

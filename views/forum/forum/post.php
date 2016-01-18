@@ -8,6 +8,7 @@ use app\components\AppConstant;
 
 $this->title = 'Post';
 $currentLevel = AppConstant::NUMERIC_ZERO;
+
 ?>
 <div class="item-detail-header">
     <?php if($currentUser->rights > AppConstant::STUDENT_RIGHT) {
@@ -41,6 +42,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <input type="hidden" id="tag-id" value="<?php echo $tagValue ?>">
 <input type="hidden" id="thread-id" value="<?php echo $threadid ?>">
 <input type="hidden" id="user-id" value="<?php echo $currentUser['id'] ?>">
+<input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL() ?>">
 
 <div class="tab-content shadowBox padding-top-one">
 
@@ -75,7 +77,6 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         }
 
 
-
         echo '| <button onclick="expandall()">'._('Expand All').'</button>';
         echo '<button onclick="collapseall()">'._('Collapse All').'</button> | ';
         echo '<button onclick="showall()">'._('Show All').'</button>';
@@ -83,18 +84,38 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
 
         if ($view==2) {
-            echo "<a href=\"posts?view=$view&courseid=$courseId&forumid=$forumid&page=$page&thread=$threadid&view=0\">View Expanded</a>";
+            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=0\">View Expanded</a>";
         } else {
-            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&thread=$threadid&view=2\">View Condensed</a>";
+            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=2\">View Condensed</a>";
         }
         echo "<br/>";echo "<br/>";
         $printChildren = new AppUtility();
         $printChildren->printchildren(0);
+        if ($caneditscore && $haspoints) {
+            echo '<div><input type=submit name="save" value="Save Grades" /></div>';
+            if ($prevth!='' && $page!=-3) {
+                echo '<input type="hidden" name="prevth" value="'.$prevth.'"/>';
+                echo '<input type="submit" name="save" value="Save Grades and View Previous"/>';
+            }
+            if ($nextth!='' && $page!=-3) {
+                echo '<input type="hidden" name="nextth" value="'.$nextth.'"/>';
+                echo '<input type="submit" name="save" value="Save Grades and View Next"/>';
+            }
+            echo "</form>";
+        }
+
+        echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" />";
+        echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" />";
+
+        echo "<script type=\"text/javascript\">";
+        echo "var bcnt =$bcnt; var icnt = $icnt;\n";
+        echo "</script>";
     }
     ?>
 </div>
 
 <script type="text/javascript">
+    var imasroot = $('.home-path').val();
     function toggleshow(bnum) {
         var node = document.getElementById('block'+bnum);
         var butn = document.getElementById('butb'+bnum);
@@ -122,6 +143,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         }
     }
     function expandall() {
+
         for (var i=0;i<bcnt;i++) {
             var node = document.getElementById('block'+i);
             var butn = document.getElementById('butb'+i);
@@ -132,6 +154,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         }
     }
     function collapseall() {
+        alert(bcnt);
         for (var i=0;i<bcnt;i++) {
             var node = document.getElementById('block'+i);
             var butn = document.getElementById('butb'+i);

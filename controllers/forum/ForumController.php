@@ -581,10 +581,10 @@ class ForumController extends AppController
     public function actionMoveThread()//only for teacher
     {
         $this->layout = 'master';
-        $courseId = $this->getParamVal('courseId');
+        $courseId = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
-        $threadId = $this->getParamVal('threadId');
-        $forumId = $this->getParamVal('forumId');
+        $threadId = $this->getParamVal('threadid');
+        $forumId = $this->getParamVal('forumid');
         $forums = Forums::getByCourseId($courseId);
         $thread = ThreadForm::thread($forumId);
         $user = $this->user;
@@ -592,9 +592,9 @@ class ForumController extends AppController
         foreach ($forums as $key => $forum) {
             $tempArray = array
             (
-                'forumId' => $forum->id,
+                'forumid' => $forum->id,
                 'forumName' => $forum->name,
-                'courseId' => $forum->courseid,
+                'courseid' => $forum->courseid,
             );
             array_push($forumArray, $tempArray);
         }
@@ -602,7 +602,7 @@ class ForumController extends AppController
             $threadArray = array();
             foreach ($thread as $data) {
                 $tempArray = array(
-                    'threadId' => $data['id'],
+                    'threadid' => $data['id'],
                     'forumIdData' => $data['forumid'],
                     'subject' => $data['subject'],
                     'parent' => $data['parent'],
@@ -612,7 +612,8 @@ class ForumController extends AppController
             if ($this->isPostMethod()) {
                 $params = $this->getRequestParams();
                 $moveType = $params['movetype'];
-                $thread_Id = $params['threadId'];
+                $thread_Id = $params['threadid'];
+
                 if ($moveType == AppConstant::NUMERIC_ONE) {
                     if (isset($params['thread-name'])) {
                         $moveThreadId = $params['thread-name'];
@@ -773,7 +774,7 @@ class ForumController extends AppController
     */
     public function actionPost()
     {
-        global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$cid,$userid,$ownerid,$points;
+        global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$courseId,$userid,$ownerid,$points;
         global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
         global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
         global $canviewall, $caneditscore, $canviewscore;
@@ -1028,16 +1029,13 @@ class ForumController extends AppController
         {
             $resultPrev = ForumThread::getDataForPrev($forumid, $threadid,$groupid,$groupset);
 
-
-
             $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
-
-            $bcnt = 0;
-            $icnt = 0;
+            //$bcnt = 0;
+            //cnt = 0;
         }
 
         $this->includeCSS(['forums.css']);
-        $this->includeJS(["general.js", "forum/post.js?ver=<?php echo time() ?>"]);
+        $this->includeJS(["general.js"]);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
         'view' => $view, 'bcnt' => $bcnt, 'icnt' => $icnt, 'caneditscore' => $caneditscore, 'haspoints' => $haspoints, 'courseId' => $courseId, 'forumid' => $forumid, 'groupid' => $groupid,
         'page' => $page, 'course' => $course, 'tagValue' => $tagValue);
