@@ -77,6 +77,7 @@
 	$tcnt = array();
 	$qincomplete = array();
 	$timetaken = array();
+	$timeontaskbystu = array();
 	$timeontask = array();
 	$attempts = array();
 	$regens = array();
@@ -130,6 +131,7 @@
 		$attp = explode(',',$line['bestattempts']);
 		$bla = explode('~',$line['bestlastanswers']);
 		$timeot = explode(',',$line['timeontask']);
+		$timeotthisstu = 0;
 		foreach ($questions as $k=>$ques) {
 			if (trim($ques)=='') {continue;}
 
@@ -149,13 +151,17 @@
 			$qcnt[$ques] += 1;
 			$timeot[$k] = explode('~',$timeot[$k]);
 			$tcnt[$ques] += count($timeot[$k]);
-			$timeontask[$ques] += array_sum($timeot[$k]);
+			$totsum = array_sum($timeot[$k]);
+			$timeontask[$ques] += $totsum;
+			$timeotthisstu += $totsum;
+			
 		}
 		if ($line['endtime'] >0 && $line['starttime'] > 0) {
 			$timetaken[] = $line['endtime']-$line['starttime'];
 		} else {
 			$timetaken[] = 0;
 		}
+		$timeontaskbystu[] = $timeotthisstu;
 	}
 	
 	$vidcnt = array();
@@ -325,7 +331,15 @@
 		} else {
 			echo 0;
 		}
-		echo " minutes</p>\n";
+		echo " minutes<br/>\n";
+		echo 'Average time in questions: ';
+		if (count($timeontaskbystu)>0) {
+			echo round(array_sum($timeontaskbystu)/count($timeontaskbystu)/60,1);
+		} else {
+			echo 0;
+		}
+		echo ' minutes</p>';
+		
 	} else {
 		echo '</tbody></table>';
 	}
