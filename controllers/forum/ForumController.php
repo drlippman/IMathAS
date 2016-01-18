@@ -33,6 +33,7 @@ use app\models\Thread;
 use app\models\Tutor;
 use app\models\User;
 use app\components\htmLawed;
+use yii\base\View;
 use yii\web\UploadedFile;
 use app\components\AppUtility;
 use Yii;
@@ -775,9 +776,11 @@ class ForumController extends AppController
     public function actionPost()
     {
         global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$courseId,$userid,$ownerid,$points;
-        global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
+        global $feedback,$posttype,$lastview,$bcnt ,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
         global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
         global $canviewall, $caneditscore, $canviewscore;
+        $bcnt = 0;
+        $icnt = 0;
         $this->guestUserHandler();
         $this->layout = 'master';
         $currentUser = $this->user;
@@ -1030,12 +1033,12 @@ class ForumController extends AppController
             $resultPrev = ForumThread::getDataForPrev($forumid, $threadid,$groupid,$groupset);
 
             $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
-            //$bcnt = 0;
-            //cnt = 0;
+
         }
 
         $this->includeCSS(['forums.css']);
-        $this->includeJS(["general.js"]);
+        $this->includeJS(["general.js", "forum/posts.js"]);
+//        $this->getView()->registerJs('var bcnt='.$bcnt);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
         'view' => $view, 'bcnt' => $bcnt, 'icnt' => $icnt, 'caneditscore' => $caneditscore, 'haspoints' => $haspoints, 'courseId' => $courseId, 'forumid' => $forumid, 'groupid' => $groupid,
         'page' => $page, 'course' => $course, 'tagValue' => $tagValue);

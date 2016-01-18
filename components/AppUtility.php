@@ -3171,7 +3171,9 @@ class AppUtility extends Component
         } else {
             $itemicons = $CFG['CPS']['itemicons'];
         }
-        foreach($children[$base] as $child) {
+        ?>
+
+        <?php foreach($children[$base] as $child) {
             if ($restricttoowner && $ownerid[$child] != $userid) {
                 continue;
             }
@@ -3185,7 +3187,8 @@ class AppUtility extends Component
                     $lbl = '-';
                     $img = "collapse";
                 } ?>
-                <img  class="pointer" id="butb<?php echo $bcnt?>" style="float: left" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $img?>.gif" onclick="toggleshow(<?php $bcnt ?>)">
+                <img  class="pointer" id="butb<?php echo $bcnt?>" style="float: left" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $img?>.gif" onclick="toggleshow(<?php echo $bcnt ?>)">
+
           <?php  }
             if ($hasuserimg[$child]==1) {
                 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
@@ -3199,11 +3202,12 @@ class AppUtility extends Component
             echo '</span>';
             echo "<span class=right>";
 
-            if ($view==2) {
-                echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
-            } else {
-                echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
-            }
+            if ($view==2) { ?>
+                <input type="button" id="buti<?php echo $icnt;?>" value="Show" onclick="toggleitem(<?php echo $icnt;?>)">
+           <?php } else { ?>
+                <input type="button" id="buti<?php echo $icnt;?>" value="Hide" onclick="toggleitem(<?php echo $icnt;?>)">
+<!--                echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";-->
+            <?php }
 
             if ($isTeacher) {
                 echo "<a href=\"move-thread?forumid=$forumid&courseid=$courseId&threadid=$threadid\">Move</a> \n";
@@ -3301,11 +3305,11 @@ class AppUtility extends Component
             }
             echo '<div class="clear"></div>';
             echo "</div>\n";
-            if ($view==2) {
-                echo "<div class=hidden id=\"item$icnt\">";
-            } else {
-                echo "<div class=blockitems id=\"item$icnt\" style=\"clear:all\">";
-            }
+            if ($view==2) { ?>
+                <div class="hidden" id="item<?php echo $icnt;?>">
+           <?php } else { ?>
+                <div class="blockitems" id="item<?php echo $icnt;?>" style="clear:all">
+           <?php }
             if(isset($files[$child]) && $files[$child]!='') {
                 $fl = explode('@@',$files[$child]);
                 if (count($fl)>2) {
@@ -3368,7 +3372,10 @@ class AppUtility extends Component
                 $bcnt++;
                 $this->printchildren($child, ($posttype[$child]==3 && !$isTeacher));
                 echo "</div>\n";
-            }
-        }
-    }
+            }?>
+            <input type="hidden" class="bcnt-value" value="<?php echo $bcnt;?>">
+        <?php }  ?>
+        <input type="hidden" class="icnt-value" value="<?php echo $icnt;?>">
+
+    <?php }
 }
