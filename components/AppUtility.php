@@ -3173,7 +3173,8 @@ class AppUtility extends Component
         }
         ?>
 
-        <?php foreach($children[$base] as $child) {
+        <?php
+        foreach($children[$base] as $child) {
             if ($restricttoowner && $ownerid[$child] != $userid) {
                 continue;
             }
@@ -3206,7 +3207,6 @@ class AppUtility extends Component
                 <input type="button" id="buti<?php echo $icnt;?>" value="Show" onclick="toggleitem(<?php echo $icnt;?>)">
            <?php } else { ?>
                 <input type="button" id="buti<?php echo $icnt;?>" value="Hide" onclick="toggleitem(<?php echo $icnt;?>)">
-<!--                echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";-->
             <?php }
 
             if ($isTeacher) {
@@ -3217,11 +3217,10 @@ class AppUtility extends Component
                     echo "<a href=\"modify-post?courseId=$courseId&forumId=$forumid&threadId=$threadid\">Modify</a> \n";
                 }
             }
-            if ($isTeacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
-                echo "<a href=\"post?view=$view&cid=$courseId&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
-            }
+            if ($isTeacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) { ?>
+                <a href="#" name="remove" data-parent="<?php echo $child ?>" data-var="<?php echo $threadid ?>" class="mark-remove"><?php AppUtility::t('Remove')?></a>
+            <?php }
             if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-                //reply-post?courseid=477&id=81154&threadId=81154&forumid=19921
                 echo "<a href=\"reply-post?courseid=$courseId&id=$child&threadId=$threadid&forumid=$forumid\">Reply</a>";
             }
 
@@ -3319,7 +3318,7 @@ class AppUtility extends Component
                 }
                 for ($i=0;$i<count($fl)/2;$i++) {
                     //if (count($fl)>2) {echo '<li>';}
-                    echo '<a href="'.filehandler::getuserfileurl('ffiles/'.$child.'/'.$fl[2*$i+1]).'" target="_blank">';
+                    echo '<a href="'.filehandler::getuserfileurl($fl[2*$i+1]).'" target="_blank">';
                     $extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
                     if (isset($itemicons[$extension])) {
                         echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
@@ -3360,6 +3359,7 @@ class AppUtility extends Component
                 }
             }
             echo "<div class=\"clear\"></div></div>\n";
+
             $icnt++;
             if (isset($children[$child])) { //if has children
                 echo "<div class=";
@@ -3372,10 +3372,12 @@ class AppUtility extends Component
                 $bcnt++;
                 $this->printchildren($child, ($posttype[$child]==3 && !$isTeacher));
                 echo "</div>\n";
-            }?>
+            }
+            ?>
             <input type="hidden" class="bcnt-value" value="<?php echo $bcnt;?>">
-        <?php }  ?>
-        <input type="hidden" class="icnt-value" value="<?php echo $icnt;?>">
+            <input type="hidden" class="icnt-value" value="<?php echo $icnt;?>">
+        <?php }
+        ?>
 
-    <?php }
+    <?php  }
 }

@@ -89,3 +89,55 @@ $('#updating').remove();
 });
 }
 
+$("a[name=remove]").on("click", function (event) {
+    event.preventDefault();
+    var threadid = $(this).attr("data-var");
+    var parentId = $(this).attr("data-parent");
+    var checkPostOrThread = 0;
+    if(parentId == 0){
+        var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
+    }else{
+        var html = '<div><p>Are you SURE you want to remove this post?</p></div>';
+    }
+
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto',resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            },
+            "Confirm": function () {
+                $(this).dialog("close");
+                var threadId = threadid;
+                jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread,parentId:parentId}, 'markAsRemoveSuccess');
+                return true;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
+        }
+    });
+});
+
+function markAsRemoveSuccess(response) {
+    var forumid = $("#forum-id").val();
+    var courseid = $("#course-id").val();
+    var result = JSON.parse(response);
+    var threadId = $("#thread-id").val();
+    if(result.data == 0)
+    {
+        window.location = "thread?cid="+courseid+"&forum="+forumid;
+    }else if(result.data != 0)
+    {
+        window.location = "post?courseid="+courseid+"&threadid="+threadId+"&forumid="+forumid;
+    }
+
+}

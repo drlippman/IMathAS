@@ -707,7 +707,7 @@ class ForumController extends AppController
             if ($_FILES['file-0'])
             {
                 $j = 0;
-                $uploadDir = AppConstant::UPLOAD_DIRECTORY . 'forumFiles/';
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY;
 
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
                 while (isset($_FILES['file-' . $j]) && is_uploaded_file($_FILES['file-' . $j]['tmp_name'])) {
@@ -748,7 +748,6 @@ class ForumController extends AppController
 
             }
         }
-//        $thread[0]['message'] = $message;
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
@@ -761,7 +760,7 @@ class ForumController extends AppController
         if ($GLOBALS['filehandertype'] == 's3') {
             /*for amazon*/
         } else {
-            $base = $uploadDir = AppConstant::UPLOAD_DIRECTORY . 'forumFiles/';
+            $base = $uploadDir = AppConstant::UPLOAD_DIRECTORY;
             if (unlink($base . "$file")) {
                 return true;
             } else {
@@ -781,6 +780,7 @@ class ForumController extends AppController
         global $canviewall, $caneditscore, $canviewscore;
         $bcnt = 0;
         $icnt = 0;
+
         $this->guestUserHandler();
         $this->layout = 'master';
         $currentUser = $this->user;
@@ -1003,7 +1003,7 @@ class ForumController extends AppController
             }
 
             if (count($files)>0) {
-                require_once('../includes/filehandler.php');
+                require_once("../components/filehandler.php");
             }
             //update view count
             ForumPosts::updateViews($threadid, $newviews);
@@ -1038,7 +1038,6 @@ class ForumController extends AppController
 
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/posts.js"]);
-//        $this->getView()->registerJs('var bcnt='.$bcnt);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
         'view' => $view, 'bcnt' => $bcnt, 'icnt' => $icnt, 'caneditscore' => $caneditscore, 'haspoints' => $haspoints, 'courseId' => $courseId, 'forumid' => $forumid, 'groupid' => $groupid,
         'page' => $page, 'course' => $course, 'tagValue' => $tagValue);
@@ -1198,7 +1197,7 @@ class ForumController extends AppController
             }
             if ($_FILES['file-0']) {
                 $j = 0;
-                $uploadDir = AppConstant::UPLOAD_DIRECTORY . 'forumFiles/';
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY;
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
                 while (isset($_FILES['file-' . $j])) {
                     $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);

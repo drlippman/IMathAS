@@ -482,7 +482,7 @@ function deleteuserfile($uid,$file) {
 function deleteforumfile($postid,$file) {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new \S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-		$s3object = "ffiles/$postid/$file";
+		$s3object = "/$postid/$file";
 		if($s3->deleteObject($GLOBALS['AWSbucket'],$s3object)) {
 			return true;
 		}else {
@@ -490,7 +490,7 @@ function deleteforumfile($postid,$file) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (unlink($base."/ffiles/$postid/$file")) {
+		if (unlink($base."/$postid/$file")) {
 			return true;
 		} else {
 			return false;
@@ -645,7 +645,6 @@ function copyqimage($key,$dest) {
 
 public static function getuserfileurl($key) {
 	global $urlmode,$imasroot;
-//		return "localhost/math/web/Uploads/$key";
     return AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$key;
 }
 public static function getcoursefileurl($key) {
