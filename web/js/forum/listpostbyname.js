@@ -1,3 +1,4 @@
+var bcnt = $('#cnt').val()
 $(document).ready(function ()
 {
     var isData =  $('#isData').val();
@@ -62,7 +63,7 @@ function collapseall()
     {
         var node = document.getElementById('item' + i);
         var buti = document.getElementById('butn' + i);
-        node.className = 'blockitems col-sm-12 col-md-12';
+        node.className = 'blockitems';
         buti.value = '-';
     }
     document.getElementById("expand").value = 'Collapse All';
@@ -95,8 +96,8 @@ function changeProfileImage(element,id)
 {
     if(flag == 0 )
     {
-        element.style.width = "200px";
-        element.style.height = "175px";
+        element.style.width = "105px";
+        element.style.height = "120px";
         flag =1;
     }else
     {
@@ -114,7 +115,7 @@ function toggleshow(bnum) {
         node.className = 'hidden';
         butn.value = '+';
     } else {
-        node.className = 'blockitems col-sm-12 col-md-12';
+        node.className = 'blockitems';
         butn.value = '-';
     }
 }
@@ -122,7 +123,7 @@ function toggleshowall() {
     for (var i=0; i<bcnt; i++) {
         var node = document.getElementById('m'+i);
         var butn = document.getElementById('butn'+i);
-        node.className = 'blockitems col-sm-12 col-md-12';
+        node.className = 'blockitems';
         butn.value = '-';
     }
     document.getElementById("toggleall").value = 'Collapse All';

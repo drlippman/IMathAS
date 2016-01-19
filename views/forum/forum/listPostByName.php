@@ -45,7 +45,6 @@ if ($haspoints && $caneditscore && $rubric != 0) {
 
 ?>
 <div class="midwrapper margin-left-twenty">
-    <!--    <input type="button" id="expand" onclick="collapseall()" class="btn btn-primary add-new-thread" value="Expand All">-->
     <input type="button" value="Expand All" onclick="toggleshowall()" id="toggleall"/>
     <button type="button" onclick="window.location.href='<?php echo AppUtility::getURLFromHome('forum','forum/list-post-by-name?cid='.$course->id.'&page='.$page.'&forumid='.$forumId.'&read=1');?>'">Mark All Read</button>
     <br><br>
@@ -72,7 +71,7 @@ $urlmode = AppUtility::urlMode();?>
                     echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\"  onclick=\"changeProfileImage(this,{$line['userid']})\"  />";
                 } else {
                     $imageUrl = $line['userid'].".jpg";
-                    ?><img class="circular-profile-image Align-link-post padding-five" id="img<?php echo $imgCount?>"src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $line['userid']?>); /><?php
+                    ?><img class="circular-profile-image Align-link-post padding-five" id="img<?php echo $imgCount?>" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $line['userid']?>); /><?php
                 }
             }else {
                 ?><img class="circular-profile-image Align-link-post padding-five" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/> <?php
@@ -154,9 +153,11 @@ $urlmode = AppUtility::urlMode();?>
         echo '</div>';
         echo '</div>';
         $cnt++;
-    }
-    echo '</div>';
-    echo "<script>var bcnt = $cnt;</script>";
+
+    }?>
+    <input type="hidden" id="cnt" value="<?php echo $cnt?>">
+    <?php echo '</div>';
+//    echo "<script>var bcnt = $cnt;</script>";
     if ($caneditscore && $haspoints) {
         echo "<div><input type=submit value=\"Save Grades\" /></div>";
         echo "</form>";
