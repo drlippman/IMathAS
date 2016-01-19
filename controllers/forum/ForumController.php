@@ -839,14 +839,11 @@ class ForumController extends AppController
         if(isset($markunread)){
             ForumView::deleteByUserIdAndThreadId($threadid, $currentUser['id']);
             if ($page==-4) {
-//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/forums.php?cid=$cid");
                 return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/forums?cid='.$courseId));
             } else if ($page==-3) {
                 return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid='.$forumid.'&cid='.$courseId));
-//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newthreads.php?cid=$cid");
             } else {
                 return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid));
-//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?cid=$cid&forum=$forumid&page=$page");
             }
         }
 
