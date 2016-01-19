@@ -704,21 +704,21 @@ class ForumController extends AppController
                     }
                 }
             }
-            if($_FILES['file-0'] != '') {
+
+            if(!empty($_FILES)) {
                 $j = 0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY;
 
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
-                while (isset($_FILES['file-' . $j]) && is_uploaded_file($_FILES['file-' . $j]['tmp_name'])) {
+                while (isset($_FILES['file-' . $j])) {
                     if($_FILES['file-' . $j]['error'] == 0){
                         $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);
                         $userFileName = basename($_FILES['file-' . $j]['name']);
 
-                        if (trim($params['description-' . $j]) == '') {
-                            $params['description-' . $j] = $userFileName;
-                        }
+                        $params['description-' . $j] = $userFileName;
                         $params['description-' . $j] = str_replace('@@', '@', $params['description-' . $j]);
                         $extension = strtolower(strrchr($userFileName, "."));
+
                         if (!in_array($extension, $badExtensions)) {
                             $files[] = stripslashes($params['description-' . $j]);
                             $files[] = $userFileName;
@@ -1199,7 +1199,6 @@ class ForumController extends AppController
                 $isNonValue = $params['settings'];
             }
            if(!empty($_FILES)) {
-                ;
                 $j = 0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY;
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
