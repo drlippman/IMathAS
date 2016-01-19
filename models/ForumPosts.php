@@ -717,7 +717,8 @@ class ForumPosts extends BaseImasForumPosts
         $query .= "imas_forum_posts JOIN imas_users ON imas_forum_posts.userid=imas_users.id ";
         $query .= "LEFT JOIN imas_students ON imas_students.userid=imas_forum_posts.userid AND imas_students.courseid=:courseId ";
         $query .= "WHERE (imas_forum_posts.id=:threadId OR imas_forum_posts.threadid=:threadid) ORDER BY imas_forum_posts.id";
-        $data = Yii::$app->db->createCommand($query)->bindValues([':courseId' => $courseId, ':threadId' => $threadId, ':threadid' => $threadId])->queryAll();
+        $command = Yii::$app->db->createCommand($query)->bindValues([':courseId' => $courseId, ':threadId' => $threadId, ':threadid' => $threadId]);
+        $data = $command->queryAll();
         return $data;
     }
 

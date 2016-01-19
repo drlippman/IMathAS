@@ -811,7 +811,7 @@ class ForumController extends AppController
            $this->setErrorFlash("You are not enrolled in this course.");
             $this->goHome();
         }
-        if (isset($isTeacher)) {
+        if (($isTeacher)) {
             $isTeacher = true;
         } else {
             $isTeacher = false;
@@ -856,7 +856,7 @@ class ForumController extends AppController
         $haspoints =  ($pointsposs > 0);
         $groupid = 0;
 
-        $canviewall = (isset($isTeacher) || isset($isTutor));
+        $canviewall = (($isTeacher) || ($isTutor));
         $caneditscore = (isset($isTeacher) || (isset($isTutor) && $tutoredit==1));
         $canviewscore = (isset($isTeacher) || (isset($isTutor) && $tutoredit<2));
 
@@ -965,7 +965,6 @@ class ForumController extends AppController
                 $posttype[$line['id']] = $line['posttype'];
                 $ownerid[$line['id']] = $line['userid'];
                 $hasuserimg[$line['id']] = $line['hasuserimg'];
-
                 if ($line['files']!='') {
                     $files[$line['id']] = $line['files'];
                 }
@@ -1330,7 +1329,7 @@ class ForumController extends AppController
         $read = $params['read'];
 
         $teacherid = $this->isTeacher($userId,$courseId);
-        if (isset($teacherid)) {
+        if (($teacherid)) {
             $isteacher = true;
         } else {
             $isteacher = false;
@@ -1434,7 +1433,6 @@ class ForumController extends AppController
             }
         }
         $posts = ForumPosts::getPosts($userId,$forumId,$limthreads,$dofilter);
-//        if ($thread) {
             $this->includeCSS(['forums.css']);
             $this->includeJS(['general.js','forum/listpostbyname.js','gradebook/manageaddgrades.js']);
             $status = AppConstant::NUMERIC_ONE;
@@ -1442,7 +1440,6 @@ class ForumController extends AppController
                 'rubric' => $rubric,'scores' => $scores,'haspoints' => $haspoints,'caneditscore' => $caneditscore,'page' => $page,'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status,
                 'allowmod' => $allowmod,'allowdel' => $allowdel,'allowreply' => $allowreply,'userRights' => $userRights, 'canviewscore' => $canviewscore,'isteacher' => $isteacher,'userId' => $userId);
             return $this->renderWithData('listPostByName', $responseData);
-//        }
     }
 
     public function actionLikePostAjax()

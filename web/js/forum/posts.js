@@ -33,7 +33,7 @@ function expandall() {
         var node = document.getElementById('block'+i);
     var butn = document.getElementById('butb'+i);
     node.className = 'forumgrp';
-butn.src = imasroot+'/img/collapse.gif';
+butn.src = imasroot+'img/collapse.gif';
 }
 }
 function collapseall() {
@@ -41,7 +41,7 @@ function collapseall() {
     var node = document.getElementById('block'+i);
     var butn = document.getElementById('butb'+i);
     node.className = 'hidden';
-butn.src = imasroot+'/img/expand.gif';
+butn.src = imasroot+'img/expand.gif';
 }
 }
 
