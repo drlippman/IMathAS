@@ -110,6 +110,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
     <?php
         }
+    echo "<div class='right padding-right-twenty'>
+            <a href=\"thread?cid=$cid&forumid=$forumid\">Back to Forum Topics</a>
+         </div>\n";
     ?>
 </div>
 
