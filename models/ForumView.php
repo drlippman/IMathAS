@@ -145,12 +145,12 @@ class ForumView extends BaseImasForumViews
         }
         else
         {
-            $query  = ForumView::findOne(['id' => $threadId ]);
-            $query->userid = $userId;
-            $query->threadid =$threadId;
-            $query->lastview = $now;
+//            $query  = ForumView::findOne(['id' => $threadId ]);
+            $this->userid = $userId;
+            $this->threadid = $threadId;
+            $this->lastview = $now;
 
-            $query->save();
+            $this->save();
         }
     }
 

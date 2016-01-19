@@ -24,6 +24,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         </div>
     </div>
 </div>
+<input type="hidden" id="course-id" value="<?php echo $course->id?>">
 
 <div class="item-detail-content">
     <?php

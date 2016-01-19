@@ -1338,7 +1338,6 @@ class ForumController extends AppController
 
         if(isset($params['read']) && $read == 1)
         {
-
             $now = time();
             $readThreadId = ForumPosts::MarkAllRead($forumId);
             foreach ($readThreadId as $data) {
@@ -1435,7 +1434,7 @@ class ForumController extends AppController
             }
         }
         $posts = ForumPosts::getPosts($userId,$forumId,$limthreads,$dofilter);
-        if ($thread) {
+//        if ($thread) {
             $this->includeCSS(['forums.css']);
             $this->includeJS(['general.js','forum/listpostbyname.js','gradebook/manageaddgrades.js']);
             $status = AppConstant::NUMERIC_ONE;
@@ -1443,7 +1442,7 @@ class ForumController extends AppController
                 'rubric' => $rubric,'scores' => $scores,'haspoints' => $haspoints,'caneditscore' => $caneditscore,'page' => $page,'forumId' => $forumId, 'forumName' => $forumName, 'course' => $course, 'status' => $status,
                 'allowmod' => $allowmod,'allowdel' => $allowdel,'allowreply' => $allowreply,'userRights' => $userRights, 'canviewscore' => $canviewscore,'isteacher' => $isteacher,'userId' => $userId);
             return $this->renderWithData('listPostByName', $responseData);
-        }
+//        }
     }
 
     public function actionLikePostAjax()
@@ -2210,5 +2209,129 @@ class ForumController extends AppController
             }
         }
 
+    }
+
+    public function actionListLikes()
+    {
+        $this->guestUserHandler();
+        $this->layout = 'master';
+        $postId = $this->getParamVal('post');
+        $courseId = $this->getParamVal('cid');
+        $threadId = $this->getParamVal('threadId');
+        $user = $this->user;
+
+        $postLike = ForumPosts::getLikePost($postId,$courseId);
+        if(count($postLike) == 0){
+            $this->setErrorFlash('Invalid Post');
+            return $this->redirect('post?courseid='.$courseId.'&forumid='.$postId.'&threadid='.$threadId);
+        }
+
+        $flexwidth = true;
+        $nologo = true;
+
+        echo '<h4>'._('Post Likes').'</h4>';
+
+        $getUserDetails = ForumLike::getPostLikeDetails($postId);
+
+        if (count($getUserDetails)==0) {
+            echo '<p>'._('No post likes').'</p>';
+        } else {
+            echo '<ul class="nomark">';
+           foreach($getUserDetails as $row) {
+                echo '<li>'.$row['LastName'].', '.$row['FirstName'].'</li>';
+            }
+            echo '</ul>';
+        }
+    }
+
+    public function actionRecordLikes()
+    {
+        $cid = intval($this->getParamVal('cid'));
+        $postId = intval($this->getParamVal('postid'));
+        $like = intval($this->getParamVal('like'));
+        $user = $this->user;
+        $isTeacher = $this->isTeacher($user['id'], $cid);
+        $isTutor = $this->isTutor($user['id'], $cid);
+        $isStudent = $this->isStudent($user['id'], $cid);
+        if (empty($cid) || empty($postId) || !isset($like)) {
+            echo "fail";
+            exit;
+        }
+        if (!isset($isTeacher) && !isset($isTutor) && !isset($isStudent)) {
+            echo "fail";
+            exit;
+        }
+        if (isset($isTeacher)) {
+            $isTeacher = 2;
+        } else if (isset($isTutor)) {
+            $isTeacher = 1;
+        } else {
+            $isTeacher = 0;
+        }
+
+        if ($like==0) {
+            $result = ForumLike::deleteLikes($postId, $user['id']);
+            $aff = $result;
+        } else {
+            $result = ForumLike::getById($postId, $user['id']);
+            if (count($result)>0) {
+                $aff =0;
+            } else {
+                $result = ForumPosts::getByThreadId($postId);
+                if (count($result)==0)
+                {
+                    echo "fail";exit;
+                }
+                $threadid = $result['threadid'];
+
+                $saveLikes = new ForumLike();
+                $saveLikes->InsertLike($threadid,$postId,$isTeacher, $user['id']);
+                $aff = 1;
+            }
+        }
+
+        $likes = array(0,0,0);
+
+        $result = ForumLike::findCountLike($postId);
+        foreach($result as $row) {
+            $likes[$row['type']] = $row['count(*)'];
+        }
+
+        $likemsg = 'Liked by ';
+        $likecnt = 0;
+        $likeclass = '';
+
+        if ($likes[0]>0) {
+            $likeclass = ' liked';
+            $likemsg .= $likes[0].' ' . ($likes[0]==1?'student':'students');
+            $likecnt += $likes[0];
+        }
+        if ($likes[1]>0 || $likes[2]>0) {
+            $likeclass = ' likedt';
+            $n = $likes[1] + $likes[2];
+            if ($likes[0]>0) { $likemsg .= ' and ';}
+            $likemsg .= $n.' ';
+            if ($likes[2]>0) {
+                $likemsg .= ($n==1?'teacher':'teachers');
+                if ($likes[1]>0) {
+                    $likemsg .= '/tutors/TAs';
+                }
+            } else if ($likes[1]>0) {
+                $likemsg .= ($n==1?'tutor/TA':'tutors/TAs');
+            }
+            $likecnt += $n;
+        }
+        if ($likemsg=='Liked by ') {
+            $likemsg = '';
+        } else {
+            $likemsg .= '.';
+        }
+        if ($like==1) {
+            $likemsg = 'You like this. '.$likemsg;
+        } else {
+            $likemsg = 'Click to like this post. '.$likemsg;;
+        }
+        header('Content-type: application/json');
+        echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.'}';
     }
 }

@@ -1,6 +1,7 @@
 var imasroot = $('.home-path').val();
 var bcnt = $('.bcnt-value').val();
 var icnt = $('.icnt-value').val();
+var cid = $('#course-id').val();
 function toggleshow(bnum) {
     var node = document.getElementById('block'+bnum);
     var butn = document.getElementById('butb'+bnum);
@@ -63,11 +64,11 @@ function hideall() {
 function savelike(el) {
     var like = (el.src.match(/gray/))?1:0;
     var postid = el.id.substring(8);
-    $(el).parent().append('<img style="vertical-align: middle" src="../img/updating.gif" id="updating"/>');
+    $(el).parent().append('<img style="vertical-align: middle" src="../../img/updating.gif" id="updating"/>');
     $.ajax({
-    url: "recordlikes.php",
-//    data: {cid:<?php echo $courseId;?>, postid: postid, like: like},
-dataType: "json"
+        url: "record-likes",
+        data: {cid: cid, postid: postid, like: like},
+        dataType: "json"
 }).done(function(msg) {
     if (msg.aff==1) {
     el.title = msg.msg;

@@ -3296,9 +3296,10 @@ class AppUtility extends Component
                     $likemsg = 'Click to like this post. '.$likemsg;;
                 }
 
-                echo '<div class="likewrap">';
-                echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";
-                echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$courseId&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
+                echo '<div class="likewrap">'; ?>
+<!--                echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";-->
+                <img id="likeicon<?php echo $child?>" class="likeicon<?php echo $likeclass?>" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $icon?>.png" title="<?php echo $likemsg?>" onclick="savelike(this)">
+                <?php echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','list-likes?cid=$courseId&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
                 echo '</div>';
             }
             echo '<div class="clear"></div>';
@@ -3383,4 +3384,11 @@ class AppUtility extends Component
         <input type="hidden" class="bcnt-value" value="<?php echo $bcnt;?>">
         <input type="hidden" class="icnt-value" value="<?php echo $icnt;?>">
     <?php  }
+
+    public function printrubriclink($rubricid, $points, $scorebox, $feedbackbox, $qn = 'null', $width = 600)
+    {
+            $out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
+        $out .= "<img border=0 src='../../img/assess.png' alt=\"rubric\"></a>";
+        return $out;
+    }
 }

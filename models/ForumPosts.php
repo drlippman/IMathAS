@@ -69,9 +69,7 @@ class ForumPosts extends BaseImasForumPosts
             $threadPost->isanon = $isANonValue;
             $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
-//        AppUtility::dump($fileName);
             $threadPost->files = $fileName;
-//        AppUtility::dump($threadPost);
             $threadPost->save();
             return $threadPost->threadid;
     }
@@ -732,5 +730,20 @@ class ForumPosts extends BaseImasForumPosts
             $id->save();
             return $id;
         }
+    }
+
+    public static function getLikePost($postId,$courseId)
+    {
+        $query = "SELECT imas_forums.id
+                    FROM imas_forums JOIN imas_forum_posts
+                    ON imas_forums.id=imas_forum_posts.forumid ";
+        $query .= " WHERE imas_forum_posts.id=:postId AND imas_forums.courseid=:courseId";
+        $command = Yii::$app->db->createCommand($query)->bindValues([':postId' => $postId,':courseId' => $courseId]);
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getByThreadId($postId){
+       return ForumPosts::find('threadid')->where(['id' => $postId])->all();
     }
 }
