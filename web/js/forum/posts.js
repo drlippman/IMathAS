@@ -32,8 +32,6 @@ function expandall() {
         var node = document.getElementById('block'+i);
     var butn = document.getElementById('butb'+i);
     node.className = 'forumgrp';
-    //     butn.value = 'Collapse';
-    //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
 butn.src = imasroot+'/img/collapse.gif';
 }
 }
@@ -42,14 +40,11 @@ function collapseall() {
     var node = document.getElementById('block'+i);
     var butn = document.getElementById('butb'+i);
     node.className = 'hidden';
-    //     butn.value = 'Expand';
-    //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
 butn.src = imasroot+'/img/expand.gif';
 }
 }
 
 function showall() {
-//    alert(icnt);
     for (var i=0;i<icnt;i++) {
     var node = document.getElementById('item'+i);
     var buti = document.getElementById('buti'+i);
@@ -58,7 +53,6 @@ function showall() {
     }
 }
 function hideall() {
-//    alert(icnt);
     for (var i=0;i<icnt;i++) {
     var node = document.getElementById('item'+i);
     var buti = document.getElementById('buti'+i);

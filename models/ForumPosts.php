@@ -69,7 +69,9 @@ class ForumPosts extends BaseImasForumPosts
             $threadPost->isanon = $isANonValue;
             $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
+//        AppUtility::dump($fileName);
             $threadPost->files = $fileName;
+//        AppUtility::dump($threadPost);
             $threadPost->save();
             return $threadPost->threadid;
     }
@@ -150,8 +152,6 @@ class ForumPosts extends BaseImasForumPosts
         $this->files = $fileName;
         $this->save();
         return ($this->threadid);
-
-
     }
 
     public static function getPostById($Id)
@@ -313,7 +313,8 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getFileDetails($modifyId)
     {
-        return self::find()->select(['files'])->where(['id' => $modifyId])->one();
+        $file = ForumPosts::find()->select(['files'])->where(['id' => $modifyId])->one();
+        return $file;
     }
 
     public static function getbyForumIdAndUserID($forumid, $currentUserId)

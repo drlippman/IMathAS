@@ -52,9 +52,11 @@ $now = $currentTime;
         </div>
     </div>
     <?php if($forumData['forumtype'] == AppConstant::NUMERIC_ONE)
-    { ?>
+    {
+        ?>
     <div style="margin-left: 18%">
-            <input name="file-0" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
+            <input name="file-0" type="file" id="uplaod-file" style="border: white 1px solid;" class="file-upload"/><br>
+            <input type="text" size="20" name="description-0" placeholder="Description"><br>
             <br><button class="add-more">Add More Files</button><br>
     </div>
 <?php }?>

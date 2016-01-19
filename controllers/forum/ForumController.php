@@ -704,33 +704,36 @@ class ForumController extends AppController
                     }
                 }
             }
-            if ($_FILES['file-0'])
-            {
+            if($_FILES['file-0'] != '') {
                 $j = 0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY;
 
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
                 while (isset($_FILES['file-' . $j]) && is_uploaded_file($_FILES['file-' . $j]['tmp_name'])) {
-                    $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);
-                    $userFileName = basename($_FILES['file-' . $j]['name']);
+                    if($_FILES['file-' . $j]['error'] == 0){
+                        $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);
+                        $userFileName = basename($_FILES['file-' . $j]['name']);
 
-                    if (trim($params['description-' . $j]) == '') {
-                        $params['description-' . $j] = $userFileName;
-                    }
-                    $params['description-' . $j] = str_replace('@@', '@', $params['description-' . $j]);
-                    $extension = strtolower(strrchr($userFileName, "."));
-                    if (!in_array($extension, $badExtensions)) {
-                        $files[] = stripslashes($params['description-' . $j]);
-                        $files[] = $userFileName;
-                        move_uploaded_file($_FILES['file-' . $j]['tmp_name'], $uploadFile);
-                    } else {
-                        $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
-                        return $this->redirect('add-new-thread?forumid=' . $forumId . '&cid=' . $courseId);
+                        if (trim($params['description-' . $j]) == '') {
+                            $params['description-' . $j] = $userFileName;
+                        }
+                        $params['description-' . $j] = str_replace('@@', '@', $params['description-' . $j]);
+                        $extension = strtolower(strrchr($userFileName, "."));
+                        if (!in_array($extension, $badExtensions)) {
+                            $files[] = stripslashes($params['description-' . $j]);
+                            $files[] = $userFileName;
+                            move_uploaded_file($_FILES['file-' . $j]['tmp_name'], $uploadFile);
+                        } else {
+                            $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
+                            return $this->redirect('modify-post?courseId='.$courseId.'&forumId='.$forumId.'&threadId='.$threadId);
+                        }
                     }
                     $j++;
                 }
-                $fileName = implode('@@', $files);
             }
+
+            $fileName = implode('@@', $files);
+
             if (strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO)
             {
                 $threadIdOfPost = ForumPosts::modifyPost($params, $fileName);
@@ -1195,31 +1198,34 @@ class ForumController extends AppController
             } else {
                 $isNonValue = $params['settings'];
             }
-            if ($_FILES['file-0']) {
+           if(!empty($_FILES)) {
+                ;
                 $j = 0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY;
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
                 while (isset($_FILES['file-' . $j])) {
+                    if($_FILES['file-' . $j]['error'] == 0){
                     $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);
-                    $userFileName = preg_replace('/[^\w\.]/', '', basename($_FILES['file-' . $j]['name']));
-                    if (trim($params['description-' . $j]) == '') {
+                    $userFileName = basename($_FILES['file-' . $j]['name']);
+
                         $params['description-' . $j] = $userFileName;
-                    }
-                    $params['description-' . $j] = str_replace('@@', '@', $params['description-' . $j]);
-                    $extension = strtolower(strrchr($userFileName, "."));
-                    if (!in_array($extension, $badExtensions)) {
-                        $files[] = stripslashes($params['description-' . $j]);
-                        $files[] = $userFileName;
-                        move_uploaded_file($_FILES['file-' . $j]['tmp_name'], $uploadFile);
-                    } else {
-                        $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
-                        return $this->redirect('add-new-thread?forumid=' . $forumId . '&cid=' . $courseId);
-                    }
+                        $params['description-' . $j] = str_replace('@@', '@', $params['description-' . $j]);
+                        $extension = strtolower(strrchr($userFileName, "."));
+
+                        if (!in_array($extension, $badExtensions)) {
+                            $files[] = stripslashes($params['description-' . $j]);
+                            $files[] = $userFileName;
+                            move_uploaded_file($_FILES['file-' . $j]['tmp_name'], $uploadFile);
+                        } else {
+                            $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
+                            return $this->redirect('add-new-thread?forumid=' . $forumId . '&cid=' . $courseId);
+                        }
+                }
                     $j++;
                 }
-            }
 
-            $fileName = implode('@@', $files);
+            }
+            $fileName = implode('@@',$files);
             $alwaysReplies = $params['always-replies'];
             if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
                 $alwaysReplies = 0;

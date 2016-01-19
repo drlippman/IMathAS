@@ -8,6 +8,16 @@ $(document).ready(function () {
         tinyMCE.triggerSave();
         var forumId = $("#forumId").val();
         var subject = $(".subject").val();
+        var fileUpload = $(".file-upload").val();
+//        if(fileUpload == '')
+//        {
+//            $('#flash-message').show();
+//            $(".file-upload").css('border-color', 'red');
+//            $('#flash-message').html("<div class='alert alert-danger'>File cannot be blank");
+//            return false;
+//        }else {
+//            document.forms["add-thread"].submit();
+//        }
         var courseId =$("#courseId").val();
         if(!subject.length > 0)
         {
@@ -50,7 +60,7 @@ $(document).ready(function () {
     var i=1;
     $('.add-more').click(function(e){
         e.preventDefault();
-        $(this).before('<input name="file-'+i+'" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-'+i+'" placeholder="Description"><br>');
+        $(this).before('<input required="" name="file-'+i+'" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-'+i+'placeholder="Description"><br>');
         i++;
     });
 });

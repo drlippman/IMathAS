@@ -3159,7 +3159,6 @@ class AppUtility extends Component
         global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
         global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
         global $canviewall, $caneditscore, $canviewscore;
-
         if (!isset($CFG['CPS']['itemicons'])) {
             $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
                 'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
@@ -3230,9 +3229,9 @@ class AppUtility extends Component
             //if ($isteacher && $ownerid[$child]!=0) {
             //	echo "<a href=\"mailto:{$email[$child]}\">";
             //} else if ($allowmsg && $ownerid[$child]!=0) {
-            if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {
-                echo "<a href=\"../msgs/msglist.php?cid=$courseId&add=new&to={$ownerid[$child]}\" ";
-                if ($section[$child]!='') {
+            if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {?>
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$courseId.'&userid='.$ownerid[$child].'&new='.$ownerid[$child])?>"
+                <?php if ($section[$child]!='') {
                     echo 'title="Section: '.$section[$child].'"';
                 }
                 echo ">";
@@ -3317,8 +3316,10 @@ class AppUtility extends Component
                     echo '<p><b>File:</b> ';
                 }
                 for ($i=0;$i<count($fl)/2;$i++) {
-                    //if (count($fl)>2) {echo '<li>';}
-                    echo '<a href="'.filehandler::getuserfileurl($fl[2*$i+1]).'" target="_blank">';
+                    if(!empty($fl[2*$i+1]))
+                    {
+                        echo '<a href="'.filehandler::getuserfileurl($fl[2*$i+1]).'" target="_blank">';
+                    }
                     $extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
                     if (isset($itemicons[$extension])) {
                         echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";
@@ -3326,9 +3327,7 @@ class AppUtility extends Component
                         echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
                     }
                     echo $fl[2*$i].'</a> ';
-                    //if (count($fl)>2) {echo '</li>';}
                 }
-                //if (count($fl)>2) {echo '</ul>';}
                 echo '</p>';
             }
             echo filter($message[$child]);
@@ -3374,10 +3373,11 @@ class AppUtility extends Component
                 echo "</div>\n";
             }
             ?>
-            <input type="hidden" class="bcnt-value" value="<?php echo $bcnt;?>">
-            <input type="hidden" class="icnt-value" value="<?php echo $icnt;?>">
-        <?php }
-        ?>
 
+        <?php }
+
+        ?>
+        <input type="hidden" class="bcnt-value" value="<?php echo $bcnt;?>">
+        <input type="hidden" class="icnt-value" value="<?php echo $icnt;?>">
     <?php  }
 }

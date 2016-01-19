@@ -56,19 +56,24 @@ $now = $currentTime;
         <?php if($thread[0]['files'] != '')
         {
             $files = explode('@@',$thread[0]['files']);
-            for ($i=0;$i<count($files)/2;$i++){?>
-                <br><input type="text" name="file[<?php echo $i;?>]" value="<?php echo $files[2*$i]?>"/>
-                <?php if ($GLOBALS['filehandertype'] == 's3')
+
+
+                for ($i=0;$i<count($files)/2;$i++){
+                    ?>
+                    <br><input type="text" name="file[<?php echo $i;?>]" value="<?php echo $files[2*$i]?>"/>
+                    <?php if ($GLOBALS['filehandertype'] == 's3')
                     {
-                       /*PATH TO AMAZON IMAGE */
+                        /*PATH FOR AMAZON IMAGE */
                     }
                     else{?>
-                       <a href="<?php echo AppUtility::getAssetURL()?>Uploads/forumFiles/<?php echo $files[2*$i+1]?>" target="_blank">View</a>
+                        <a href="<?php echo AppUtility::getAssetURL()?>Uploads/<?php echo $files[2*$i+1]?>" target="_blank">View</a>
                     <?php }?>
-                        Delete? <input type="checkbox" name="fileDel[<?php echo $i;?>]" value="1"/><br/>
-            <?php }?>
-        <?php }?>
-        <br><input name="file-0" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
+                    Delete? <input type="checkbox" name="fileDel[<?php echo $i;?>]" value="1"/><br/>
+                <?php }
+             ?>
+
+        <?php } ?>
+        <br><input name="file-0" type="file" id="uplaod-file" style="border: white 1px solid;" class="file-upload"/><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
         <br><button class="add-more">Add More Files</button><br>
     <?php }?>
      </div>
