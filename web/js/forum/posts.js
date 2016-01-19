@@ -9,12 +9,12 @@ function toggleshow(bnum) {
     node.className = 'hidden';
     //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
 //       butn.value = 'Expand';
-butn.src = imasroot+'/img/expand.gif';
+butn.src = imasroot+'img/expand.gif';
 } else {
     node.className = 'forumgrp';
     //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
 //       butn.value = 'Collapse';
-butn.src = imasroot+'/img/collapse.gif';
+butn.src = imasroot+'img/collapse.gif';
 }
 }
 function toggleitem(inum) {
