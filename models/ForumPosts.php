@@ -35,6 +35,12 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
+    public static function getByIdOne($threadId)
+    {
+        $ForumPost = ForumPosts::findOne(['threadid' => $threadId]);
+        return $ForumPost;
+    }
+
     public static function getbyidpost($id)
     {
 

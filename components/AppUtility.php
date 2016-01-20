@@ -3240,7 +3240,7 @@ class AppUtility extends Component
                 echo "</a>";
             }
             if ($isTeacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
-                echo " <a class=\"small\" href=\"$imasroot/course/gradebook.php?cid=$courseId&stu={$ownerid[$child]}\" target=\"_popoutgradebook\">[GB]</a>";
+                echo " <a class=\"small\" href=\"#\">[GB]</a>";
                 if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
                     $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
                     $aname = addslashes($matches[2]);

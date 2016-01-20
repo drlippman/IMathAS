@@ -152,3 +152,78 @@ function changeProfileImage(element,id)
     }
 
 }
+
+function saveLikes(el,element,id,threadid,type)
+{
+    var courseid =$('#course-id').val();
+    if(element == true)
+    {
+
+        like = 0;
+        $(el).parent().append('<img style="vertical-align: middle" src="../../img/updating.gif" id="updating"/>');
+        jQuerySubmit('like-post-ajax',{id:id,threadid:threadid,type:type,like:like},'likepostresponse');
+
+    }
+    else
+    {
+
+        like =1;
+        $(el).parent().append('<img style="vertical-align: middle" src="../../img/updating.gif" id="updating"/>');
+        jQuerySubmit('like-post-ajax',{id:id,threadid:threadid,type:type,like:like},'likepostresponse');
+
+    }
+
+}
+
+function likepostresponse(response)
+{
+    response = JSON.parse(response);
+    $('#updating').remove();
+    if(response.status == 0)
+    {
+        window.location.reload();
+
+    }
+}
+
+function countPopup(id,threadid,type)
+{
+    jQuerySubmit('data-like-post-ajax',{id:id,threadid:threadid,type:type},'showPopup');
+
+}
+
+function showPopup(response)
+{
+
+    response = JSON.parse(response);
+
+    if(response.status == 0)
+    {
+        var countData = response.data.displayCountData;
+
+        var html = '<div id="postid"><p>Post Likes : </p></div><p>';
+        $.each(countData, function (index, data) {
+            html += '<pre><span class="col-lg-12 pull-left " >'+ data.userName +'</span></pre>'
+        });
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                }
+
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
+            }
+        });
+    }
+}
