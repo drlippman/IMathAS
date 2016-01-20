@@ -1136,7 +1136,7 @@ class ForumController extends AppController
                 'forumType' => $forumData['forumtype'],
                 'files' => $data['files'],
                 'postDate' => AppUtility::tzdate(AppConstant::CUSTOMIZE_DATE,$data['postdate']),
-                'postanon' => $data['isanon'],
+//                'postanon' => $data['isanon'],
             );
 
             array_push($threadArray, $tempArray);

@@ -112,11 +112,12 @@ class ForumPosts extends BaseImasForumPosts
         $this->subject = isset($params['Subject']) ? $params['Subject'] : null;
         $this->userid = isset($user->id) ? $user->id : null;
         $this->parent = $params['parentId'];
-        $this->isanon = $params['postanon'];
+        //$this->isanon = $params['postanon'];
         $this->message = isset($params['post-reply']) ? $params['post-reply'] : null;
         $postdate = AppController::dateToString();
         $this->postdate = $postdate;
         $this->files = $fileName;
+//        AppUtility::dump($this);
         $this->save();
     }
 
