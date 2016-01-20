@@ -3195,8 +3195,9 @@ class AppUtility extends Component
                     echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
                 } else {
                     $uploads = AppConstant::UPLOAD_DIRECTORY;
-                    ?>
-                    <img style="float:left;" class="circular-profile-image Align-link-post padding-five" src="<?php echo AppUtility::getHomeURL().$uploads.$ownerid[$child].".jpg"?>" onclick="togglepic(this)" ">
+                    $imageUrl = $ownerid[$child].".jpg";?>
+<!--                    <img style="float:left;" class="circular-profile-image Align-link-post padding-five" src="--><?php //echo AppUtility::getHomeURL().$uploads.$ownerid[$child].".jpg"?><!--" onclick="onclick=changeProfileImage(this,--><?php //echo $userid ?><!--);">-->
+                    <img class="circular-profile-image Align-link-post padding-five" id="img" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $userid?>); />
                <?php }
             }
             echo '</span>';
@@ -3226,9 +3227,7 @@ class AppUtility extends Component
             echo "</span>\n";
             echo '<span style="float:left">';
             echo "<b>{$subject[$child]}</b><br/>Posted by: ";
-            //if ($isteacher && $ownerid[$child]!=0) {
-            //	echo "<a href=\"mailto:{$email[$child]}\">";
-            //} else if ($allowmsg && $ownerid[$child]!=0) {
+
             if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {?>
                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$courseId.'&userid='.$ownerid[$child].'&new='.$ownerid[$child])?>"
                 <?php if ($section[$child]!='') {

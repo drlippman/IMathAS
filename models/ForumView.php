@@ -252,4 +252,15 @@ class ForumView extends BaseImasForumViews
         $this->lastview = $now;
         $this->save();
     }
+
+    public static function markTagged($userId,$threadId)
+    {
+        $query = "UPDATE imas_forum_views SET tagged=1 WHERE userid=:userId AND threadid=:threadId";
+        return Yii::$app->db->createCommand($query)->bindValues([':userId' => $userId, ':threadId' => $threadId])->execute();
+    }
+    public static function markUnTagged($userId,$threadId)
+    {
+        $query = "UPDATE imas_forum_views SET tagged=0 WHERE userid=:userId AND threadid=:threadId";
+        return Yii::$app->db->createCommand($query)->bindValues([':userId' => $userId, ':threadId' => $threadId])->execute();
+    }
 }

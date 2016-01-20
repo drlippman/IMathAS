@@ -36,7 +36,7 @@ $now = $currentTime;
     <div style="padding-top: 20px">
         <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');?></div>
         <div class="col-sm-10">
-            <input type=text  value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox">
+            <input type=text maxlength="60" value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox">
         </div>
     </div>
     <BR class=form>

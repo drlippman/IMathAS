@@ -781,8 +781,8 @@ class ForumController extends AppController
         global $feedback,$posttype,$lastview,$bcnt ,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
         global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
         global $canviewall, $caneditscore, $canviewscore;
-        $bcnt = 0;
-        $icnt = 0;
+        $bcnt = AppConstant::NUMERIC_ZERO;
+        $icnt = AppConstant::NUMERIC_ZERO;
 
         $this->guestUserHandler();
         $this->layout = 'master';
@@ -794,6 +794,8 @@ class ForumController extends AppController
         $getView = $this->getParamVal('view');
         $page = $this->getParamVal('page');
         $markunread = $this->getParamVal('markunread');
+        $marktagged = $this->getParamVal('marktagged');
+        $markuntagged = $this->getParamVal('markuntagged');
         $grp = $this->getParamVal('grp');
         $forumData = Forums::getById($forumid);
         $allThreadIds = Thread::getAllThread($forumid);
@@ -847,6 +849,13 @@ class ForumController extends AppController
             }
         }
 
+        if (isset($marktagged)) {
+            ForumView::markTagged($currentUser['id'],$threadid);
+            return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid));
+        } else if (isset($markuntagged)) {
+            ForumView::markUnTagged($currentUser['id'],$threadid);
+            return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid));
+        }
         $allowreply = ($isTeacher || (time()<$replyby));
         $allowanon = (($forumsettings&1)==1);
         $allowmod = ($isTeacher || (($forumsettings&2)==2));
@@ -1012,13 +1021,13 @@ class ForumController extends AppController
 //            mark as read
             $result = ForumView::getByTagged($currentUser['id'],$threadid);
             $now = time();
-            if (count($result)>0) {
+            if (count($result)> AppConstant::NUMERIC_ZERO) {
                 $lastview = $result['lastview'];
                 $tagged = $result['tagged'];
                 ForumView::updateLastView($currentUser['id'],$threadid);
             } else {
-                $lastview = 0;
-                $tagged = 0;
+                $lastview = AppConstant::NUMERIC_ZERO;
+                $tagged = AppConstant::NUMERIC_ZERO;;
                 $forumView = new ForumView();
                 $forumView->addForumView($currentUser['id'],$threadid,$now);
             }
@@ -1329,7 +1338,7 @@ class ForumController extends AppController
         $read = $params['read'];
 
         $teacherid = $this->isTeacher($userId,$courseId);
-        if (($teacherid)) {
+        if (x($teacherid)) {
             $isteacher = true;
         } else {
             $isteacher = false;
@@ -2282,7 +2291,7 @@ class ForumController extends AppController
                 $threadid = $result['threadid'];
 
                 $saveLikes = new ForumLike();
-                $saveLikes->InsertLike($threadid,$postId,$isTeacher, $user['id']);
+                $saveLikes->InsertLikes($threadid,$postId,$isTeacher, $user['id']);
                 $aff = 1;
             }
         }

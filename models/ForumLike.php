@@ -10,14 +10,27 @@ use yii\db\Query;
 class ForumLike extends BaseImasForumLikes
 {
 
-    public function InsertLike($threadid,$postId,$isTeacher, $userId)
+    public function InsertLike($params, $userId)
     {
+        $isRecord = $this->find('threadid', 'userid', 'postid')->where(['threadid' => $params['threadid'], 'userid' => $userId, 'postid' => $params['id']])->all();
+        if (!$isRecord) {
             $this->userid = $userId;
-            $this->threadid = $threadid;
-            $this->postid = $postId;
-            $this->type = $isTeacher;
+            $this->threadid = $params['threadid'];
+            $this->postid = $params['id'];
+            $this->type = $params['type'];
             $this->save();
+        }
     }
+
+    public function InsertLikes($threadid,$postId,$isTeacher, $userId)
+    {
+        $this->userid = $userId;
+        $this->threadid = $threadid;
+        $this->postid = $postId;
+        $this->type = $isTeacher;
+        $this->save();
+    }
+
 
     public function findCOunt($threadId)
     {
