@@ -141,15 +141,13 @@ function changeProfileImage(element,id)
 {
     if(flag == 0 )
     {
-        element.style.width = "80px";
-        element.style.height = "80px";
-        document.getElementById(id).style.height = "109px";
+        element.style.width = "105px";
+        element.style.height = "120px";
         flag =1;
     }else
     {
         element.style.width = "47px";
         element.style.height = "47px";
-        document.getElementById(id).style.height = "10%";
         flag=0;
     }
 

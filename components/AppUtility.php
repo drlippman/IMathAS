@@ -3319,7 +3319,7 @@ class AppUtility extends Component
 //                    print_r();die;
                     if(!empty($fl[2*$i+1]))
                     {
-                        echo '<a href="'.filehandler::getuserfileurl($fl[2*$i+1]).'" target="_blank">';
+                        echo '<a href="'.filehandler::getuserfileurl($fl[2*$i+1]).'" changeProfileImagetarget="_blank">';
                     }
                     $extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
                     if (isset($itemicons[$extension])) {
