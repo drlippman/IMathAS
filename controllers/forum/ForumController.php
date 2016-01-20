@@ -1338,7 +1338,7 @@ class ForumController extends AppController
         $read = $params['read'];
 
         $teacherid = $this->isTeacher($userId,$courseId);
-        if (x($teacherid)) {
+        if (($teacherid)) {
             $isteacher = true;
         } else {
             $isteacher = false;
