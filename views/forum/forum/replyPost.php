@@ -47,6 +47,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <textarea id='post-reply' name='post-reply' style='width: 70%;' rows='12' cols='20'></textarea>
         </div></div><br>"; ?>
         </div>
+    <?php
+    if (!$isTeacher && $allowanon==1) {
+    foreach($threadData as $data) {
+            echo "<span class=form>Post Anonymously:</span><span class=formright>";
+            echo "<input type=checkbox name=\"postanon\" value=1 ";
+            if ($data['isanon']==1) {echo "checked=1";}
+            echo "></span><br class=form/>";
+        }
+    }
+    ?>
     <div style="margin-left: 10.7%">
     <?php if($reply[0]['forumType'] == 1)
     {
@@ -66,7 +76,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 <span class="right">
                 </span>
                 <b  style="font-family: Times New Roman, Times, serif"><?php echo $reply[0]['subject']?></b>
-                <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;&nbsp;&nbsp;<?php echo $reply[0]['userName']?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
+                <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;&nbsp;&nbsp;
+
+                   <?php
+                   if ($reply[0]['postanon']==1) {
+                       echo 'Anonymous';
+                    } else {
+                       echo $reply[0]['userName'];
+                    }
+                    ?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
             </div>
             <div class="blockitems col-sm-12 col-md-12" id="item1">
                 <h5><?php echo $reply[0]['message']?></h5></div>

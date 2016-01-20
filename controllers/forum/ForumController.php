@@ -1116,12 +1116,18 @@ class ForumController extends AppController
         $Id = $this->getParamVal('id');
         $threadId = $this->getParamVal('threadId');
         $userData = $this->user;
+        $isTeacher = $this->isTeacher($userData['id'], $courseId);
         $threadData = ForumPosts::getbyidpost($Id);
         $contentTrackRecord = new ContentTrack();
         if ($userData->rights == AppConstant::STUDENT_RIGHT) {
             $contentTrackRecord->insertForumData($userData->id, $courseId, $forumId, $Id, $threadId, $type = AppConstant::NUMERIC_ONE);
         }
+
+        $forumDetails = Forums::getForumDetailByForumId($forumId);
+        $allowanon = ($forumDetails['settings'])%2;
+
         foreach ($threadData as $data) {
+
             $tempArray = array
             (
                 'subject' => $data['subject'],
@@ -1130,13 +1136,16 @@ class ForumController extends AppController
                 'forumType' => $forumData['forumtype'],
                 'files' => $data['files'],
                 'postDate' => AppUtility::tzdate(AppConstant::CUSTOMIZE_DATE,$data['postdate']),
+                'postanon' => $data['isanon'],
             );
+
             array_push($threadArray, $tempArray);
         }
+//        AppUtility::dump($threadArray);
         if ($this->isPostMethod()) {
             $files = array();
             $params = $this->getRequestParams();
-            if ($_FILES['file-0']) {
+            if (!empty($_FILES)) {
                 $j = 0;
                 $uploadDir = AppConstant::UPLOAD_DIRECTORY . 'forumFiles/';
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
@@ -1164,6 +1173,7 @@ class ForumController extends AppController
             $user = $this->user;
             $reply = new ForumPosts();
             $reply->createReply($params, $user, $fileName);
+
             if (isset($isPost)) {
                 return $this->redirect('list-post-by-name?cid=' . $params['courseid'] . '&forumid=' . $params['forumid']);
             } else {
@@ -1173,7 +1183,7 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypost.js']);
-        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id, 'isPost' => $isPost, 'currentUser' => $userData);
+        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id, 'isPost' => $isPost, 'currentUser' => $userData, 'threadData' => $threadData, 'isTeacher' => $isTeacher, 'allowanon' => $allowanon);
         return $this->renderWithData('replyPost', $responseData);
     }
 

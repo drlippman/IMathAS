@@ -348,4 +348,8 @@ class Forums extends BaseImasForums {
     {
         return Forums::find()->select('settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail')->where(['id' => $forumId])->one();
     }
+    public static function getForumDetailByForumId($forumId)
+    {
+        return Forums::find()->select('name,settings,forumtype,taglist')->where(['id' => $forumId])->one();
+    }
 }
