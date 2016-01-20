@@ -164,14 +164,13 @@ if ($myrights < 40) {
 	while ($row = mysql_fetch_row($result)) {
 		$groupdata[$row[0]] = $row;
 	}
-	$j = 0;
 	foreach ($groupdata as $row) {
-		$page_userSelectVal[$j] = $row[0];
-		$page_userSelectLabel[$j] = $row[1];
+		$page_userSelectVal[$i] = $row[0];
+		$page_userSelectLabel[$i] = $row[1];
 		if ($row[2]>0) {
-			$page_userSelectLabel[$j] .= ' ('.$groupdata[$row[2]][1].')';
+			$page_userSelectLabel[$i] .= ' ('.$groupdata[$row[2]][1].')';
 		}
-		$j++;
+		$i++;
 	}
 	/*for ($let=ord("A");$let<=ord("Z");$let++) {
 		$page_userSelectVal[$i] = chr($let);
