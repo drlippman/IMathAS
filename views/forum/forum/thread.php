@@ -251,7 +251,7 @@ echo '</div>';
                     <th class="width-five-per text-align-center"><?php echo AppUtility::t('Replies')?></th>
                     <th class="width-five-per text-align-center"><?php echo AppUtility::t('Views (Unique)')?></th>
                     <th class="width-twenty-per text-align-center"><?php echo AppUtility::t('Last Post')?></th>
-                    <?php if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
+                    <?php if($users['rights'] >= AppConstant::STUDENT_RIGHT){?>
                     <th class="width-fifteen-per text-align-center"><?php echo AppUtility::t('Actions')?></th>
                     <?php } else{?>
                         <th class="width-fifteen-per text-align-center"></th>
@@ -325,19 +325,19 @@ echo '</div>';
                                 if ($line['posttype']==0) {
 
                                     if (isset($flags[$line['id']])) {
-                                        if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
+                                        if($users['rights'] >= AppConstant::STUDENT_RIGHT){?>
                                         <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}"  onClick="changeImage(this,'true',<?php echo $line['id'] ?>)" > <i class='fa fa-flag'></i> Unflag</a>
                                             <?php }?>
                                     <?php
                                     } else {
-                                        if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
+                                        if($users['rights'] >= AppConstant::STUDENT_RIGHT){?>
 
                                         <a class='btn btn-primary flag-btn' id="tag{<?php echo $line['id'] ?>}" onClick="changeImage(this,'true',<?php echo $line['id'] ?>)"> <i class='fa fa-flag-o'></i> Flag</a>
                                             <?php }?>
                         <?php
                       }
                                 }else{
-                                    if($users['rights'] > AppConstant::STUDENT_RIGHT){
+                                    if($users['rights'] >= AppConstant::STUDENT_RIGHT){
                                     echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
                                     }
                                     } ?>
