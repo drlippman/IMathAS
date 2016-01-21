@@ -663,7 +663,6 @@ class ShowItemCourse extends Component
 
                 <?php
                 ShowItemCourse::enditem($canEdit);
-                echo "</div>";
             } else if ($line['itemtype'] == "Assessment") {
                 /**
                  * Assessment

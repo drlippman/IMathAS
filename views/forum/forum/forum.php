@@ -226,7 +226,7 @@ if (count($taginfo)==0) {
             }
             foreach($searchedPost as $line) {
                 echo "<div class='col-md-12 col-sm-12 padding-left-right-thirty padding-top-twenty'>
-        <div class=block>";
+        <div class='block'>";
                 echo "<b>{$line['subject']}</b>";
                 echo ' (in '.$line['name'].')';
                 if ($line['isanon']==1) {
