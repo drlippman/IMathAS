@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </tr>
             </thead>
-            <tbody>
+            <tbody >
             <?php
             $alt = AppConstant::NUMERIC_ZERO;
             for ($i = AppConstant::NUMERIC_ZERO; $i < count($page_courseList); $i++) {
@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     $alt = AppConstant::NUMERIC_ZERO;
                 }
                 ?>
-                <td>
+                <td class="word-break-break-all">
                     <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $page_courseList[$i]['id']) ?>">
                         <?php
                         if (($page_courseList[$i]['available'] & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE) {
@@ -259,7 +259,7 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
             <th><?php AppUtility::t('Settings'); ?></th>
         </tr>
         </thead>
-        <tbody class="">
+        <tbody class="word-break-break-all">
 
         <?php
         for ($i = AppConstant::NUMERIC_ZERO; $i < count($page_userDataId); $i++) {
