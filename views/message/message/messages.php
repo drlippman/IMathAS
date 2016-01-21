@@ -188,7 +188,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                             } else {
                                 echo "<td class=\"message-title-{$line['id']} read-message\">";
                             }
-                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
+                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\"class=\"word-break-break-all\">";
                         echo $line['title'];
                         echo "</a></td><td>";
                         if ($line['replied']==1) {
@@ -211,7 +211,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                         if ($line['name']==null) {
                             $line['name'] = "[Deleted]";
                         }
-                        echo "<td>{$line['name']}</td>";
+                        echo "<td class='word-break-break-all'>{$line['name']}</td>";
                         $senddate = AppUtility::tzdate("F j, Y, g:i a",$line['senddate']);
                         echo "<td>$senddate</td></tr>";
 

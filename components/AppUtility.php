@@ -2918,13 +2918,13 @@ class AppUtility extends Component
             } else if ($n>1) {
                 $line['title'] = "Re<sup>$n</sup>: ".$line['title'];
             }
-            echo "<td>" ?>
+            echo "<td class='word-break-break-all'>" ?>
             <a href="<?php echo AppUtility::getURLFromHome('message','message/view-message?message=0&msgid='.$line['id'].'&cid='.$line['courseid'])?>">
 <!--            <a href=\"msgs/viewmsg.php?cid={$line['courseid']}&type=new&msgid={$line['id']}\">";-->
             <?php echo $line['title'];
             echo '</a></td>';
             echo '<td>'.$line['LastName'].', '.$line['FirstName'].'</td>';
-            echo '<td>'.$page_coursenames[$line['courseid']].'</td>';
+            echo '<td class="word-break-break-all">'.$page_coursenames[$line['courseid']].'</td>';
             echo '<td>'.AppUtility::tzdate("D n/j/y, g:i a",$line['senddate']).'</td>';
             echo '</tr>';
         }
