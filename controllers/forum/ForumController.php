@@ -572,7 +572,8 @@ class ForumController extends AppController
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
         $responseData = array('params' => $params, 'flags' => $flags, 'lastview' => $lastview, 'newpost' => $newpost, 'postInformtion' => $postInformtion, 'postIds' => $postIds, 'groupnames' => $groupnames, 'curfilter' => $curfilter,
             'dofilter' => $dofilter, 'groupsetid' => $groupsetid, 'isteacher' => $isteacher, 'countOfPostId' => $countOfPostId, 'cid' => $courseId, 'users' => $currentUser,
-            'searchedPost' => $searchedPost, 'forumid' => $forumId,'tagfilter' => $tagfilter,'taglist' => $taglist, 'maxdate' => $maxdate, 'course' => $course, 'forumData' => $forumData, 'page' => $page, 'threadsperpage' => $threadsperpage, 'postcount' => $postcount);
+            'searchedPost' => $searchedPost, 'forumid' => $forumId,'tagfilter' => $tagfilter,'taglist' => $taglist, 'maxdate' => $maxdate, 'course' => $course, 'forumData' => $forumData, 'page' => $page, 'threadsperpage' => $threadsperpage, 'postcount' => $postcount,
+        'allowmod' => $allowmod, 'postby' => $postby, 'allowdel' => $allowdel);
         return $this->renderWithData('thread', $responseData);
     }
 
@@ -1136,7 +1137,7 @@ class ForumController extends AppController
                 'forumType' => $forumData['forumtype'],
                 'files' => $data['files'],
                 'postDate' => AppUtility::tzdate(AppConstant::CUSTOMIZE_DATE,$data['postdate']),
-//                'postanon' => $data['isanon'],
+                'postanon' => $data['isanon'],
             );
 
             array_push($threadArray, $tempArray);
@@ -1169,10 +1170,11 @@ class ForumController extends AppController
                 }
             }
             $fileName = implode('@@', $files);
+            $isaNon = $params['postanon'];
             $isPost = $params['isPost'];
             $user = $this->user;
             $reply = new ForumPosts();
-            $reply->createReply($params, $user, $fileName);
+            $reply->createReply($params, $user, $fileName,$isaNon);
 
             if (isset($isPost)) {
                 return $this->redirect('list-post-by-name?cid=' . $params['courseid'] . '&forumid=' . $params['forumid']);
@@ -1195,19 +1197,18 @@ class ForumController extends AppController
         $this->layout = 'master';
         $user = $this->user;
         $userId = $this->getUserId();
-        $rights = $user->rights;
+        $rights = $user['rights'];
         $forumId = $this->getParamVal('forumid');
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $forumData = Forums::getById($forumId);
         $files = array();
         if ($this->isPostMethod()) {
-
             $params = $this->getRequestParams();
             $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = null;
             $isNonValue = AppConstant::NUMERIC_ZERO;
-            if ($user->rights > AppConstant::NUMERIC_TEN) {
+            if ($user['rights'] > AppConstant::STUDENT_RIGHT) {
                 $postType = $params['post-type'];
                 $date = strtotime($params['endDate'] . ' ' . $params['startTime']);
             } else {
@@ -1241,16 +1242,14 @@ class ForumController extends AppController
             }
             $fileName = implode('@@',$files);
             $alwaysReplies = $params['always-replies'];
-            if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
-                $alwaysReplies = 0;
-                $postType = 0;
-                $isNonValue = 0;
 
-            }
             $newThread = new ForumPosts();
             $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date, $isNonValue, $fileName);
+
             $newThread = new ForumThread();
             $newThread->createThread($params, $user->id, $threadId);
+
+
             $views = new ForumView();
             $views->createThread($user->id, $threadId);
             $contentTrackRecord = new ContentTrack();

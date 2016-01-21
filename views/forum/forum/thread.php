@@ -341,20 +341,22 @@ echo '</div>';
                                     echo '<a class="btn btn-primary flag-btn disable-btn-not-allowed"> No Flag</a>';
                                     }
                                     } ?>
-                                <?php if($users['rights'] > AppConstant::STUDENT_RIGHT){?>
+                                <?php
+
+                                if(($isteacher || ($line['userid']==$users['id'] && $allowmod && time()<$postby)) || ($isteacher || ($allowdel && $line['userid']==$users['id'] && $posts==0))) {?>
                                 <a class="btn btn-primary dropdown-toggle" id="drop-down-id" data-toggle="dropdown" href="#">
                                     <span class="fa fa-caret-down "></span>
                                 </a>
                                 <ul class="dropdown-menu thread-dropdown">
 
-                                    <?php if ($isteacher) { ?>
+                                    <?php if($isteacher) { ?>
                                         <li> <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id'])?>"><i class='fa fa-scissors'></i>&nbsp;&nbsp;Move</a></li>
 
                                     <?php }
-                                    if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) { ?>
+                                    if ($isteacher || ($line['userid']==$users['id'] && $allowmod && time()<$postby)) { ?>
                                         <li><a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$cid.'&forumId='.$line['forumid'].'&threadId='.$line['id'])?>"><i class='fa fa-pencil fa-fw padding-right-five'></i>&nbsp;Modify</a></li>
                                     <?php }
-                                    if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) { ?>
+                                    if ($isteacher || ($allowdel && $line['userid']==$users['id'] && $posts==0)) { ?>
                                         <li><a href='#' name='tabs' data-var='<?php echo $line['id'];?>' class='mark-remove'><i class='fa fa-trash-o'></i>&nbsp;&nbsp;&nbsp;Remove</a></li>
                                     <?php }
                                     ?>

@@ -61,7 +61,7 @@ $now = $currentTime;
     </div>
 <?php }?>
     <?php if($rights > AppConstant::STUDENT_RIGHT)
-    {?>
+    { ?>
         <div class="col-sm-12 col-md-12">
             <span class="col-sm-2 col-md-2 align-title"><?php echo AppUtility::t('Post Type')?></span>
             <span class="col-sm-10 col-md-10" id="post-type-radio-list">
@@ -121,11 +121,15 @@ $now = $currentTime;
                 echo '</div>';?>
             </span>
         </div>
-    <?php }elseif($rights == AppConstant::STUDENT_RIGHT && ($forumData['settings'] & AppConstant::NUMERIC_ONE == AppConstant::NUMERIC_ONE))
-    { ?>
+    <?php }elseif($rights == AppConstant::STUDENT_RIGHT)
+    {
+        ?>
         <div class="col-sm-12 col-md-12">
             <div class="col-sm-2 col-md-2"><b><?php echo AppUtility::t('Post Anonymously')?></b></div>
-            <div class="col-sm-8 col-md-8"><input name="settings" id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
+            <div class="col-sm-8 col-md-8"><input name="settings" id="post-anonymously" value="1" type="checkbox" ></div>
+<!--            echo "<input type=checkbox name=\"postanon\" value=1 ";-->
+            <?php if ($forumData['settings']==1) {echo "checked=1";}
+           echo "></span><br class=form/>"; ?>
         </div>
     <?php } ?>
     <div class="col-md-6 col-md-offset-2 col-sm-6 col-sm-offset-2 padding-left-twenty-five padding-bottom-thirty padding-top-five">
