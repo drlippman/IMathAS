@@ -504,7 +504,7 @@ class MessageController extends AppController
         if ($type!='sent' && $type!='allstu' && ($messageData['isread']==0 || $messageData['isread']==4)) {
             Message::updateIsReadView($msgId);
         }
-            $messages = Message::getByMsgId($msgId);
+            $messages = Message::getById($msgId);
             $this->includeCSS(['jquery-ui.css', 'message.css', 'forums.css']);
             $this->includeJS(['message/viewmessage.js']);
             $responseData = array('messages' => $messages, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId, 'messageData' => $messageData, 'senddate' => $senddate, 'teacherof' => $teacherof,
@@ -559,7 +559,7 @@ class MessageController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         if ($this->getAuthenticatedUser()) {
-            $messages = Message::getByMsgId($msgId, $baseId);
+            $messages = Message::getById($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
             $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights);
             $this->includeCSS(['message.css']);

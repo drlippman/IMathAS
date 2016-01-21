@@ -3316,7 +3316,6 @@ class AppUtility extends Component
                     echo '<p><b>File:</b> ';
                 }
                 for ($i=0;$i<count($fl)/2;$i++) {
-//                    print_r();die;
                     if(!empty($fl[2*$i+1]))
                     {
                         echo '<a href="'.filehandler::getuserfileurl($fl[2*$i+1]).'" changeProfileImagetarget="_blank">';
@@ -3328,9 +3327,7 @@ class AppUtility extends Component
                         echo "<img alt=\"doc\" src=\"$imasroot/img/doc.png\" class=\"mida\"/> ";
                     }
                     echo $fl[2*$i].'</a> ';
-                    //if (count($fl)>2) {echo '</li>';}
                 }
-                //if (count($fl)>2) {echo '</ul>';}
                 echo '</p>';
             }
             echo filter($message[$child]);

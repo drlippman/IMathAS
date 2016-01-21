@@ -1142,7 +1142,6 @@ class ForumController extends AppController
 
             array_push($threadArray, $tempArray);
         }
-//        AppUtility::dump($threadArray);
         if ($this->isPostMethod()) {
             $files = array();
             $params = $this->getRequestParams();

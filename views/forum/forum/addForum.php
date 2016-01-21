@@ -33,7 +33,7 @@ $this->title = $pageTitle;
                 if ($forumData) {
                 $title = $forumData['name'];
                 } ?>
-                <input class="name form-control" id="name-forum" maxlength="60" required=" " type=text size=0 style="width: 100%;height: 40px; border: #a9a9a9 1px solid;" name=name value="<?php echo trim($title);?>">
+                <input class="name form-control" id="name-forum" maxlength="60" required="" type=text size=0 style="width: 100%;height: 40px; border: #a9a9a9 1px solid;" name=name value="<?php echo trim($title);?>">
             </div>
         </div>
             <BR class=form>
