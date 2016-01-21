@@ -45,21 +45,22 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <input type="hidden" id="user-id" value="<?php echo $currentUser['id'] ?>">
 <input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL() ?>">
 
-<div class="tab-content shadowBox padding-top-one">
+<div class="tab-content shadowBox padding-top-one padding-left-right-thirty">
 
     <?php
     if (!$oktoshow) {
 
     } else{
-        echo "<br/><b style=\"font-size: 120%\">Post: {$subject[$threadid]}</b><br/>\n";
-        echo "<b style=\"font-size: 100%\">Forum: $forumname</b></p>";
+
+        echo "<br/><b style=\"font-size: 120%\">Post:&nbsp;&nbsp;&nbsp;{$subject[$threadid]}</b><br/>\n";
+        echo "<br> <b style=\"font-size: 100%\">Forum:&nbsp;&nbsp;$forumname</b></p><br>";
 
         $nextth = '';
         $prevth = '';
 
         if (($resultPrev) > 0) {
             $prevth = $resultPrev['id'];
-            echo "<a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$prevth&grp=$groupid\">Prev</a> ";
+            echo "<a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$prevth&grp=$groupid\">Prev </a> ";
         } else {
             echo "Prev ";
         }
@@ -72,21 +73,20 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         }
         echo " | <a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$threadid&markunread=true\">Mark Unread</a>";
         if ($tagged) {
-            echo " | <a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$threadid&markuntagged=true\">Unflag</a>";
+            echo " | <a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$threadid&markuntagged=true\">Unflag &nbsp;</a>";
         } else {
-            echo " | <a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$threadid&marktagged=true\">Flag</a>";
+            echo " | <a href=\"post?courseid=$courseId&forumid=$forumid&threadid=$threadid&marktagged=true\">Flag &nbsp;</a>";
         } ?>
 
-
-        <button onclick="expandall()">Expand All</button>
-        <button onclick="collapseall()">Collapse All</button>
-        <button onclick="showall()">Show All</button>
-        <button onclick="hideall()">Hide All</button>
+        <button class="btn post-btn-color expand" onclick="expandall()">&nbsp;Expand All</button>
+        <button class="btn post-btn-color expand" onclick="collapseall()">&nbsp;Collapse All</button>
+        <button class="btn post-btn-color expand" onclick="showall()">&nbsp;Show All</button>
+        <button  class="btn post-btn-color expand" onclick="hideall()">&nbsp;Hide All</button>
 
       <?php   if ($view==2) {
-            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=0\">View Expanded</a>";
+            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=0\">&nbsp;View Expanded</a>";
         } else {
-            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=2\">View Condensed</a>";
+            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=2\">&nbsp;View Condensed</a>";
         }
         echo "<br/>";echo "<br/>";
         $printChildren = new AppUtility();
