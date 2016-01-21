@@ -1140,18 +1140,48 @@ class QuestionController extends AppController
         $libraryData = Libraries::getAllLibrariesByJoin();
 
 
+//        AppUtility::dump($libraryData);
         $libraryTree = array();
         foreach($libraryData as $singleLibrary){
 
             if(!empty($singleLibrary['id'])){
-                if($singleLibrary['id'] == 0) {
-//                    $libraryTree[][] =
+
+//                [id] => 4
+//                            [name] => library fffffffffffffff gggggggggggggg sddddddddddddddwe we
+//                            [parent] => 0
+//                            [ownerid] => 26
+//                            [userights] => 8
+//                            [sortorder] => 0
+//                            [groupid] => 0
+//                            [count] => 0
+
+
+                if(empty($libraryTree[$singleLibrary['parent']]['branch'])){
+                    $libraryTree[$singleLibrary['parent']]['branch'] = array();
                 }
+                if($singleLibrary['parent'] == '0') {
+                    $libraryTree[$singleLibrary['id']] = array(
+                        'id' => $singleLibrary['id'],
+                        'name' => $singleLibrary['name'],
+                        'parent' => $singleLibrary['parent'],
+                        'ownerid' => $singleLibrary['ownerid'],
+                        'userights' => $singleLibrary['userights'],
+                        'sortorder' => $singleLibrary['sortorder'],
+                        'groupid' => $singleLibrary['groupid'],
+                        'count' => $singleLibrary['count']
+                    );
+                }
+                else{
+                    array_push($libraryTree[$singleLibrary['parent']]['branch'], $singleLibrary);
+                }
+//                $libraryTree[$singleLibrary['parent']]['branch'] = $singleLibrary;
             }
 
 
 
         }
+
+        AppUtility::dump($libraryTree);
 
 
         //
