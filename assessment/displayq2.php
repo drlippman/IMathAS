@@ -2431,6 +2431,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if (count($answerformat)>1 && $answerformat[1]=='abs') { $out .= 'class="sel" '; $def = 8;}
 					$out .= '/>';
 				}
+				if (count($answerformat)==1 || in_array('rational',$answerformat)) {
+					$out .= "<img src=\"$imasroot/img/tprat.png\" onclick=\"settool(this,$qn,8.2)\" ";
+					if (count($answerformat)>1 && $answerformat[1]=='rational') { $out .= 'class="sel" '; $def = 8.2;}
+					$out .= '/>';
+				}
 				if (in_array('exp',$answerformat)) {
 					$out .= "<img src=\"$imasroot/img/tpexp.png\" onclick=\"settool(this,$qn,8.3)\" ";
 					if (count($answerformat)>1 && $answerformat[1]=='exp') { $out .= 'class="sel" '; $def = 8.3;}
@@ -4381,6 +4386,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ansexps = array();
 			$anscoss = array();
 			$ansvecs = array();
+			$ansrats = array();
 			$x0 = $settings[0];
 			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
@@ -4444,9 +4450,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$func = str_replace("(x)",'($x)',$func);
 					$func = create_function('$x', 'return ('.$func.');');
 					
-					$y1 = $func($x1);
-					$y2 = $func($x2);
-					$y3 = $func($x3);
+					$y1 = @$func($x1);
+					$y2 = @$func($x2);
+					$y3 = @$func($x3);
 					$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
 					$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
 					$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
@@ -4535,6 +4541,30 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						$str = ($yop-$y3p)/safepow($base,$x3p-$xop);
 						$ansexps[$key] = array($str,$base);
 						
+					} else if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
+						if ($y1===false) {
+							$x1 = $x1+.2*($x2-$x1);
+							$y1 = @$func($x1);
+							$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+						} else if ($y2===false) {
+							$x2 = $x2+.2*($x2-$x1);
+							$y2 = @$func($x2);
+							$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
+						} else if ($y3===false) {
+							$x3 = $x3-.2*($x2-$x1);
+							$y3 = @$func($x3);
+							$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
+						} 
+						$h = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
+						$k = (($x1*$y1-$x2*$y2)-$h*($y1-$y2))/($x1-$x2);
+						$c = ($y1-$k)*($x1-$h);
+						
+						$hp = ($h - $settings[0])*$pixelsperx + $imgborder;
+						$kp = $settings[7] - ($k-$settings[2])*$pixelspery - $imgborder;
+						//eval at point on graph closest to (h,k), at h+sqrt(c)
+						$np = $settings[7] - (@$func($h+sqrt(abs($c)))-$settings[2])*$pixelspery - $imgborder;
+						$ansrats[$key] = array($hp,$kp,$np);
+						
 					} else if (abs(($y3-$y2)-($y2-$y1))<1e-9) {
 						//colinear
 						$slope = ($y2p-$y1p)/($x2p-$x1p);
@@ -4577,6 +4607,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$coss = array();
 			$exps = array();
 			$vecs = array();
+			$rats = array();
 			if ($tplines=='') {
 				$tplines = array();
 			} else {
@@ -4653,6 +4684,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							}
 							//$exps[] = array($str,$base);
 							$exps[] = array($pts[1]-$xop, $adjy1, $pts[3]-$xop, $adjy2, $base);
+						}
+					} else if ($pts[0]==8.2) { //rational
+						if ($pts[1]!=$pts[3] && $pts[2]!=$pts[4]) {
+							$stretch = ($pts[3]-$pts[1])*($pts[4]-$pts[2]);
+							$yp = $pts[2]+(($stretch>0)?1:-1)*sqrt(abs($stretch));
+						
+							$rats[] = array($pts[1],$pts[2],$yp);
 						}
 					} else if ($pts[0]==9 || $pts[0]==9.1) {
 						if ($pts[0]==9.1) {
@@ -4891,6 +4929,22 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if (abs($anssqrt[2]-$sqrts[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			foreach ($ansrats as $key=>$ansrat) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($rats); $i++) {
+					if (abs($ansrat[0]-$rats[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansrat[1]-$rats[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (sqrt(2)*abs($ansrat[2]-$rats[$i][2])>$defpttol*$reltolerance) {
 						continue;
 					}
 					$scores[$key] = 1;
