@@ -8,13 +8,13 @@ $this->title = AppUtility::t(' Manage Calendar Items',false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Manage Calendar Items',false)],
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name],
         'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Manage Event',false);?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Manage Calendar Items',false);?></div>
         </div>
     </div>
 </div>
@@ -83,7 +83,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'mm/dd/yyyy' ]
                     ]);
                     ?></td>
-                <td class="col-sm-2 col-md-2"><?php echo $form->field($model, 'newTag')->textInput(); ?></td>
+                <td class="col-sm-2 col-md-2">
+<!--                    --><?php //echo $form->field($model, 'newTag')->textInput(['readonly' => !$model->isNewRecord]); ?><!--</td>-->
+                <input type="text" name="newTag" value="!">
                 <td ><?php echo $form->field($model, 'newEventDetails')->textInput(); ?></td></tr>
             </tbody>
         </table>

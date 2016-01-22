@@ -130,6 +130,8 @@ class InstructorController extends AppController
         $eventData = $this->getRequestParams();
         $courseId = $eventData['cid'];
         $teacherId = Teacher::getByUserId($user->id, $courseId);
+        $params = $this->getRequestParams();
+//        AppUtility::dump($params);
         if (!($teacherId)) {
 //            echo AppConstant::UNAUTHORIZED_ACCESS;
 //            exit;
@@ -161,17 +163,20 @@ class InstructorController extends AppController
             /*
              * Add new Events
              */
-            if (trim($eventData['ManageEventForm']['newEventDetails'])!='' || $eventData['ManageEventForm']['newTag'] != '!') {
+            if (trim($params['newTag'] != '!')) {
                 $date = $eventData['startDate'];
-                $tag = $eventData['ManageEventForm']['newTag'];
+                $tag = $params['newTag'];
                 $title = $eventData['ManageEventForm']['newEventDetails'];
                 $newDate = AppUtility::dateMatch($date);
-                $items = new CalItem();
-                $items->createEvent($newDate,$tag,$title,$courseId);
+//                if(trim($tag)!=''){
+                    $items = new CalItem();
+                    $items->createEvent($newDate,$tag,$title,$courseId);
+//                }
+
             }
             if ($eventData['Submit']=='Save') {
                 if ($from=='indexPage') {
-                    return $this->redirect(AppUtility::getURLFromHome('course','course/course?cid='. $courseId));
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/calendar?cid='. $courseId));
                 } else {
                     return $this->redirect(AppUtility::getURLFromHome('course','course/calendar?cid='. $courseId));
                 }

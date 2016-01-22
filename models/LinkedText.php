@@ -162,7 +162,6 @@ class LinkedText extends BaseImasLinkedtext
 
     public static function getByTextAndId($courseId)
     {
-        //TODO: fix below query
         return \Yii::$app->db->createCommand("SELECT text,points,id FROM imas_linkedtext WHERE courseid=:courseId AND text LIKE 'file:%'")->bindValues([':courseId' => $courseId])->queryAll();
     }
 

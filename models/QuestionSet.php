@@ -260,7 +260,6 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function findDataToImportLib($qIdsToCheck)
     {
-        //TODO: fix below query
         $placeholders= "";
         if($qIdsToCheck)
         {

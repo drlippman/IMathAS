@@ -181,7 +181,7 @@ class AdminController extends AppController
                 $userData = User::getUserByIdAndGroupId(AppConstant::STUDENT_RIGHT,$showusers,'LastName');
             } else {
                 $page_userBlockTitle = "All Users - $showusers";
-                $userData = User::getUserByLastNameSubstring($showusers,'LastName');
+                $userData = User::getUserByLastNameSubstring($showusers);
             }
         }
             foreach($userData as $i=>$line)

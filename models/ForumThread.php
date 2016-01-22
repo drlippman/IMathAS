@@ -86,7 +86,6 @@ class ForumThread extends BaseImasForumThreads
 
     public static function getNewPostData($poststucidlist, $now, $userid)
     {
-//        $poststucidlist = implode(',',$poststucidlist);
         $placeholders= "";
         if($poststucidlist)
         {
@@ -116,8 +115,6 @@ class ForumThread extends BaseImasForumThreads
 
     public static function getPostThread($poststucidlist, $now, $userid)
     {
-//        $poststucidlist = implode(',',$poststucidlist);
-
         $placeholders= "";
         if($poststucidlist)
         {

@@ -318,7 +318,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $user;
     }
 
-    public static function getUserByLastNameSubstring($showusers, $orderBy)
+    public static function getUserByLastNameSubstring($showusers)
     {
         $user = User::find()
             ->where('LastName LIKE :query')
