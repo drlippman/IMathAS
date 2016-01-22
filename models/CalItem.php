@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasCalitems;
 
 class CalItem extends BaseImasCalitems
@@ -33,6 +34,7 @@ class CalItem extends BaseImasCalitems
         $this->title = $title;
         $this->courseid = $courseId;
         $this->save();
+        return $this;
     }
 
     public static function deleteByCourseId($id, $courseId)

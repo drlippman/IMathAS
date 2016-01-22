@@ -43,9 +43,10 @@ class BaseImasForumPosts extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-//            [['forumid', 'threadid', 'userid', 'postdate', 'views', 'parent', 'posttype', 'subject', 'message', 'files', 'tag'], 'required'],
+//            [['subject','files', 'tag'], 'required'],
             [['forumid', 'threadid', 'userid', 'postdate', 'views', 'parent', 'posttype', 'isanon'], 'integer'],
             [['message', 'files'], 'string'],
+//            ['files', 'skipOnEmpty' => 'false', 'extensions' => 'png, jpg, jpeg, pdf'],
             [['subject', 'tag'], 'string', 'max' => 254]
         ];
     }
