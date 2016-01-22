@@ -3199,7 +3199,11 @@ class AppUtility extends Component
 <!--                    <img style="float:left;" class="circular-profile-image Align-link-post padding-five" src="--><?php //echo AppUtility::getHomeURL().$uploads.$ownerid[$child].".jpg"?><!--" onclick="onclick=changeProfileImage(this,--><?php //echo $userid ?><!--);">-->
                     <img class="circular-profile-image Align-link-post padding-five" id="img" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $userid?>); />
                <?php }
-            }
+            } else {
+                ?>
+                <img class="circular-profile-image" id="img"
+                     src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/>
+            <?php }
             echo '</span>';
             echo "<span class=right>";
 

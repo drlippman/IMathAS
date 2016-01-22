@@ -67,15 +67,11 @@ $urlmode = AppUtility::urlMode();?>
             echo "<div class='col-sm-12 col-md-12'><b>{$line['LastName']}, {$line['FirstName']}</b>";
             if ($line['hasuserimg']==1)
             {
-                if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-                    echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\"  onclick=\"changeProfileImage(this,{$line['userid']})\"  />";
-                } else {
-                    $imageUrl = $line['userid'].".jpg";
-                    ?><img class="circular-profile-image Align-link-post padding-five" id="img<?php echo $imgCount?>" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $line['userid']?>); /><?php
-                }
-            }else {
-                ?><img class="circular-profile-image Align-link-post padding-five" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/> <?php
-            }
+                        $imageUrl = $line['userid'].".jpg";
+                        ?><img class="circular-profile-image Align-link-post padding-five" id="img<?php echo $imgCount?>" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $line['userid']?>); /><?php
+             }else {
+                        ?><img class="circular-profile-image Align-link-post padding-five" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/> <?php
+                    }
             echo '</div>';
             echo '<div class="col-sm-12 col-md-12 padding-left-three-per">';
             $laststu = $line['userid'];
