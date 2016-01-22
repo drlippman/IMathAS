@@ -31,7 +31,7 @@ class BaseImasCalitems extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'date', 'title', 'tag'], 'required'],
+            [['courseid', 'date', 'tag'], 'required'],
             [['courseid', 'date'], 'integer'],
             [['title', 'tag'], 'string', 'max' => 254]
         ];

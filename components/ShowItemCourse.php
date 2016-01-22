@@ -833,8 +833,7 @@ class ShowItemCourse extends Component
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
                                 <li><a class="question" href="<?php echo AppUtility::getURLFromHome('question', 'question/add-questions?cid='.$courseId.'&aid='.$typeid); ?>"><?php AppUtility::t('Questions'); ?></a></li>
-                                <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$typeid . '&cid=' . $courseId . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a>
+                                <li><a class="modify"  href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$typeid . '&cid=' . $courseId . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a>
                                 </li>
                                 <li><a id="delete" href="javascript:deleteItem('<?php echo $typeid; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>

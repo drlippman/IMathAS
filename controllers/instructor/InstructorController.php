@@ -130,8 +130,6 @@ class InstructorController extends AppController
         $eventData = $this->getRequestParams();
         $courseId = $eventData['cid'];
         $teacherId = Teacher::getByUserId($user->id, $courseId);
-        $params = $this->getRequestParams();
-//        AppUtility::dump($params);
         if (!($teacherId)) {
 //            echo AppConstant::UNAUTHORIZED_ACCESS;
 //            exit;
@@ -163,15 +161,14 @@ class InstructorController extends AppController
             /*
              * Add new Events
              */
-            if (trim($params['newTag'] != '!')) {
+            if (trim($eventData['ManageEventForm']['newTag'] != '!') || (trim($eventData['ManageEventForm']['newEventDetails'])!='')) {
                 $date = $eventData['startDate'];
-                $tag = $params['newTag'];
+                $tag = $eventData['newTag'];
                 $title = $eventData['ManageEventForm']['newEventDetails'];
                 $newDate = AppUtility::dateMatch($date);
-//                if(trim($tag)!=''){
-                    $items = new CalItem();
-                    $items->createEvent($newDate,$tag,$title,$courseId);
-//                }
+                $items = new CalItem();
+                $items->createEvent($newDate,$tag,$title,$courseId);
+
 
             }
             if ($eventData['Submit']=='Save') {

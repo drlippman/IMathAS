@@ -10,6 +10,7 @@ $imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid=
 <input type="hidden" class="home-path-course" value="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' . $course->id) ?>">
 <input type="hidden" class="web-path" value="<?php echo AppUtility::getHomeURL() ?>">
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
+<input type="hidden" class="user-rights" value="<?php echo $myRights?>">
 
 <?php
 

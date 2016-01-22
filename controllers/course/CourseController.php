@@ -372,7 +372,7 @@ class CourseController extends AppController
         $typeid = $line['typeid'];
         $parent = AppConstant::NUMERIC_ZERO;
 
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
         $responseData = array('course' => $course, 'user' => $user, 'items' => $items, 'typeid' => $typeid, 'parent' => $parent);
         return $this->render('calendar', $responseData);
