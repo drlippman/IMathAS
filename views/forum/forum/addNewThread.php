@@ -127,7 +127,6 @@ $now = $currentTime;
         <div class="col-sm-12 col-md-12">
             <div class="col-sm-2 col-md-2"><b><?php echo AppUtility::t('Post Anonymously')?></b></div>
             <div class="col-sm-8 col-md-8"><input name="settings" id="post-anonymously" value="1" type="checkbox" ></div>
-<!--            echo "<input type=checkbox name=\"postanon\" value=1 ";-->
             <?php if ($forumData['settings']==1) {echo "checked=1";}
            echo "></span><br class=form/>"; ?>
         </div>

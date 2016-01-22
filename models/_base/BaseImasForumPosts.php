@@ -43,7 +43,6 @@ class BaseImasForumPosts extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-//            [['subject','files', 'tag'], 'required'],
             [['forumid', 'threadid', 'userid', 'postdate', 'views', 'parent', 'posttype', 'isanon'], 'integer'],
             [['message', 'files'], 'string'],
 //            ['files', 'skipOnEmpty' => 'false', 'extensions' => 'png, jpg, jpeg, pdf'],

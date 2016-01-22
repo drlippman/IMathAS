@@ -1241,10 +1241,12 @@ class ForumController extends AppController
             }
             $fileName = implode('@@',$files);
             $alwaysReplies = $params['always-replies'];
-
+            if($isNonValue == '')
+            {
+                $isNonValue = AppConstant::NUMERIC_ZERO;
+            }
             $newThread = new ForumPosts();
             $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date, $isNonValue, $fileName);
-
             $newThread = new ForumThread();
             $newThread->createThread($params, $user->id, $threadId);
 
