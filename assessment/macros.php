@@ -2250,6 +2250,19 @@ function intervaltoineq($str,$var) {
 }
 
 function cleanbytoken($str,$funcs = array()) {
+	$str = str_replace('`', '', $str);
+	$instr = 0;
+	$primeoff = 0;
+	while (($p = strpos($str, "'", $primeoff))!==false) {
+		if ($instr == 0) {  //if not a match for an earlier quote
+			if ($p>0 && (ctype_alpha($str{$p-1}) || $str{$p-1}=='`')) {
+				$str{$p} = '`';
+			} else {
+				$instr = 1-$instr;
+			}
+		}
+		$primeoff = $p+1;
+	}
 	$parts = preg_split('/(<=|>=|=|,|<|>)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	$finalout = array();
 	for ($k=0;$k<count($parts);$k+=2) {
@@ -2351,7 +2364,7 @@ function cleanbytoken($str,$funcs = array()) {
 		}
 		$parts[$k] = implode('',$finalout);
 	}
-	return implode(' ',$parts);
+	return str_replace('`',"'", implode(' ',$parts));
 }
 
 
