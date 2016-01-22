@@ -225,7 +225,7 @@ margin-right: 30px;
 }
 .text-deco-none a:hover {
     text-decoration: none;
-    color: #ffffff;
+    color: white;
 }
 .reply-message-textarea iframe, .send-message-textarea iframe {
     max-width: 100% !important;
@@ -241,4 +241,7 @@ margin-right: 30px;
 
 .read-message {
     font-weight: normal;
+}
+.white-color{
+ color: #ffffff!important;
 }

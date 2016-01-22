@@ -67,7 +67,7 @@ $now = $currentTime;
 
              if (isset($teacherof[$messageData['courseid']])) {?>
              <span class="text-deco-none padding-right-fifteen">
-                    <a class="btn1 reply-button" style="color: #ffffff" href="mailto:<?php echo $messageData['email']; ?>"><?php echo AppUtility::t('email');?></a>
+                    <a class="btn1 reply-button white-color" href="mailto:<?php echo $messageData['email']; ?>"><?php echo AppUtility::t('email');?></a>
              </span>
                  <span class="text-deco-none">
                     <a class="btn1 reply-button" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$messageData['id']); ?>"><?php echo AppUtility::t('gradebook');?></a>
@@ -92,7 +92,7 @@ $now = $currentTime;
             <?php } ?>
 
              <span class="padding-right-fifteen text-deco-none">
-                    <a class="btn1 btn-bg-color" style="color: #ffffff" href="#" id="mark-delete"><?php echo AppUtility::t('Delete Message')?></a>
+                    <a class="btn1 btn-bg-color white-color" href="#" id="mark-delete"><?php echo AppUtility::t('Delete Message')?></a>
                  </span>
              <span class="padding-right-fifteen text-deco-none">
                      <a class="btn1 btn-bg-color" href="#" id="mark-as-unread"><?php echo AppUtility::t('Mark As Unread ')?></a>
