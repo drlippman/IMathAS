@@ -10,38 +10,8 @@ function moveitem(from,blk) {
         window.location = toopen;
     }
 }
-// Add new items
-function additem(blk,tb) {
-    var courseId = jQuery('.calender-course-id').val();
-    var block= jQuery('#block').val(blk);
-    var tbValue = jQuery('#tb-value').val(tb);
 
-    var type = document.getElementById('addtype'+blk+'-'+tb).value;
-    if (tb=='BB' || tb=='LB') { tb = 'b';}
-    if (type!='') {
-        if(type == 'assessment') {
-            var toOpen = webPath+'assessment/assessment/add-assessment?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
-        } else if(type == 'inlinetext') {
-            var toOpen = webPath+'course/course/modify-inline-text?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
-        } else if(type == 'linkedtext') {
-            var toOpen = webPath+'course/course/add-link?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
-        } else if(type == 'forum') {
-            var toOpen = webPath+'forum/forum/add-forum?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
-        } else if(type == 'wiki') {
-            var toOpen = webPath+'wiki/wiki/add-wiki?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
-        } else if(type == 'block') {
-            var toOpen = webPath+'block/block/add-block?cid='+courseId+'&block='+blk+'&tb='+tb+'&type='+type;
-        } else if(type == 'calendar') {
-            var toOpen = document.getElementById('calendar-display').value;
-        }
-        window.location = toOpen;
-}
-
-}
 function getAddItem(blk,tb) {
-
-    jQuery('.add-item').on('click', function (evt)
-    {
         var courseId = jQuery('.calender-course-id').val();
         var html = '<div class="">' +
             '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'&block='+blk+'&tb='+tb+'">' +
@@ -93,7 +63,6 @@ function getAddItem(blk,tb) {
                 })
             }
         });
-    });
 }
 function deleteItem(id,type,block,courseId) {
      if(type == 'Block')
@@ -181,7 +150,8 @@ function deleteItem(id,type,block,courseId) {
 
 function responseSuccess(response)
 {
-    window.location.reload();
+    //window.location.reload();
+    window.location = homePath;
 }
 
 function copyItem(id,type,block,courseId) {
@@ -215,6 +185,7 @@ function copyItem(id,type,block,courseId) {
 
 function copyResponseSuccess(response)
 {
-    window.location.reload();
+    //window.location.reload();
+    window.location = homePath;
 
 }

@@ -37,7 +37,7 @@ class Course extends BaseImasCourses {
         $data = AppUtility::removeEmptyAttributes($course);
         $this->attributes = $data;
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function getByIdAndEnrollmentKey($id, $enroll)
