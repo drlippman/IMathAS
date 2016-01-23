@@ -31,17 +31,19 @@ class Tutor extends BaseImasTutors
         return static::findOne(['userid' => $id]);
     }
 
-    public static function deleteTutorByUserId($userId)
+    public static function deleteTutorByUserId($userId, $courseId)
     {
-        $tutor = Tutor::getById($userId);
+        $tutor = Tutor::getByUserId($userId, $courseId);
         $tutor->delete();
     }
 
     public static function updateSection($userid, $courseid, $section)
     {
         $tutor = Tutor::getByUserId($userid, $courseid);
-        $tutor->section = $section;
-        $tutor->save();
+        if($tutor){
+            $tutor->section = $section;
+            $tutor->save();
+        }
     }
 
     public static function getByUser($userId)
@@ -96,4 +98,15 @@ class Tutor extends BaseImasTutors
 
         return $data;
     }
+
+    public static function getAllTutorsNameByCourseId($courseId)
+    {
+        $query = new Query();
+        $query->select('u.SID')->from('imas_tutors AS tut')->join('INNER JOIN','imas_users AS u','tut.userid=u.id')
+            ->where('tut.courseid = :courseId');
+        $command = $query->createCommand();
+        $results = $command->bindValue(':courseId',$courseId)->queryAll();
+        return $results;
+    }
+
 } 

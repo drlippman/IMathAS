@@ -515,58 +515,67 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $params['username'] = trim($params['username']);
-        $users = explode(',', $params['username']);
         $courseId = $params['courseId'];
-        $sortBy = 'section';
-        $order = AppConstant::ASCENDING;
-        $userIdArray = array();
         $userNotFoundArray = array();
-        $studentArray = array();
-        $tutorsArray = array();
-        $sections = Student::findByCourseId($courseId, $sortBy, $order);
-        $sectionArray = array();
-        foreach ($sections as $section) {
-            array_push($sectionArray, $section->section);
-        }
-        if (count($users)) {
-            foreach ($users as $entry) {
-                $entry = trim($entry);
-                if($entry != null){
-                    $userId = User::findByUsername($entry);
-                    if (!$userId) {
-                        array_push($userNotFoundArray, $entry);
-                    } else {
-                        array_push($userIdArray, $userId->id);
-                        $isTeacher = Teacher::getUniqueByUserId($userId->id);
-                        if ($isTeacher) {
-                            $tutors = Tutor::getByUserId($isTeacher->userid, $courseId);
-                            if (!$tutors) {
-                                $tutorInfo = array('Name' => AppUtility::getFullName($userId->FirstName, $userId->LastName), 'id' => $userId->id);
-                                array_push($tutorsArray, $tutorInfo);
-                                $tutor = new Tutor();
-                                $tutor->create($isTeacher->userid, $courseId);
-                            }
-                        } else {
-                            array_push($studentArray, $userId->id);
-                        }
-                    }
-                }
-            }
-        }
-        $params['sectionArray'] = isset($params['sectionArray']) ? $params['sectionArray'] : '';
+        $foundedUsers = array();
 
-        if ($params['sectionArray']) {
-            foreach ($params['sectionArray'] as $tutors) {
-                Tutor::updateSection($tutors['tutorId'], $courseId, $tutors['tutorSection']);
-            }
-        }
+        //remove any selected tutors
         $params['checkedTutor'] = isset($params['checkedTutor']) ? $params['checkedTutor'] : '';
         if ($params['checkedTutor']) {
             foreach ($params['checkedTutor'] as $tutor) {
-                Tutor::deleteTutorByUserId($tutor);
+                Tutor::deleteTutorByUserId($tutor,$courseId);
             }
         }
-        $responseData = array('userNotFound' => $userNotFoundArray, 'tutors' => $tutorsArray, 'section' => $sectionArray);
+
+        //update sections
+        $params['sectionArray'] = isset($params['sectionArray']) ? $params['sectionArray'] : '';
+        if ($params['sectionArray']) {
+            foreach ($params['sectionArray'] as $tutors) {
+                if($tutors['tutorSection']!=""){
+                    Tutor::updateSection($tutors['tutorId'], $courseId, $tutors['tutorSection']);
+                }
+            }
+        }
+
+        if ($params['username']!='') {
+            $existingTutors = array();
+
+            //gotta check if they're already a tutor
+            $tutors = Tutor::getAllTutorsNameByCourseId($courseId);
+            foreach($tutors as $tutor){
+                $existingTutors[] = $tutor['SID'];
+            }
+
+
+            //also don't want students enrolled as tutors
+            $students = Student::findStudentsCompleteInfo($courseId);
+            foreach($students as $student){
+                $existingTutors[] = $student['SID'];
+            }
+            $sids = explode(',',$params['username']);
+            for ($i=0;$i<count($sids);$i++) {
+                $sids[$i] = trim($sids[$i]);
+            }
+
+            //Added new tutors
+
+            $usernamesToUse = array_diff($sids,$existingTutors);
+            if (count($usernamesToUse)>0) {
+                $usersData = User::getPresentUsersInfo($usernamesToUse);
+                if(count($usersData) > 0){
+                    foreach($usersData as $user){
+                        $tutor = new Tutor();
+                        $tutor->create($user['id'], $courseId);
+                        $foundedUsers[] = $user['SID'];
+                    }
+                }
+            }
+            $userNotFound = array_diff($sids,$foundedUsers);
+            foreach($userNotFound as $user){
+                array_push($userNotFoundArray,$user);
+            }
+        }
+        $responseData = array('userNotFound' => $userNotFoundArray);
         return $this->successResponse($responseData);
     }
 

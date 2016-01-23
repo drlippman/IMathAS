@@ -927,4 +927,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getPresentUsersInfo($usernames){
+        return User::find()->where(['IN','SID',$usernames])->all();
+    }
 }
