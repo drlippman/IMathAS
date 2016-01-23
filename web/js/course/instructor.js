@@ -150,7 +150,8 @@ function deleteItem(id,type,block,courseId) {
 
 function responseSuccess(response)
 {
-    window.location.reload();
+    //window.location.reload();
+    window.location = homePath;
 }
 
 function copyItem(id,type,block,courseId) {
@@ -184,6 +185,7 @@ function copyItem(id,type,block,courseId) {
 
 function copyResponseSuccess(response)
 {
-    window.location.reload();
+    //window.location.reload();
+    window.location = homePath;
 
 }

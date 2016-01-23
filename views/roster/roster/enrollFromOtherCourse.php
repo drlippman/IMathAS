@@ -21,11 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);?>
 </div>
 
-<div class="tab-content shadowBox"">
+<div class="tab-content shadowBox">
     <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
 
 <div class="inner-content">
-<div class="padding-one-em text-gray-background">
+<div class="">
     <?php $form =ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]
     ) ?>
-      <div class="col-md-12 col-sm-12">
+      <div class="col-md-12 col-sm-12 padding-one-em text-gray-background">
           <h4><?php AppUtility::t('Select a course to choose students from');?>:</h4>
         <?php
              foreach($data as $value)

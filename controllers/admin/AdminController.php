@@ -769,12 +769,14 @@ class AdminController extends AppController
                     return $this->redirect($this->goHome());
                 }
                 break;
+
             case "chgrights":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
                     $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
+                break;
             case "newadmin":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
@@ -1186,8 +1188,18 @@ class AdminController extends AppController
                 $blockcnt = AppConstant::NUMERIC_ONE;
                 $itemorder =  serialize(array());
                 $query = new Course();
-                $cid = $query->create($userId, $params,$blockcnt);
-
+                $courseData = $query->create($userId, $params,$blockcnt);
+                if($courseData->errors['name'])
+                {
+                    $this->setWarningFlash("Course Name should contain at most 150 characters.");
+                    return $this->redirect('forms?action=addcourse');
+                }
+                if($courseData->errors['enrollkey'])
+                {
+                    $this->setWarningFlash("Enrollkey should contain at most 50 characters.");
+                    return $this->redirect('forms?action=addcourse');
+                }
+                $cid = $courseData['id'];
                 $queryTeacher = new Teacher();
                 $queryTeacher->create($userId, $cid);
 
