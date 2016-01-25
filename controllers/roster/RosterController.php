@@ -543,9 +543,8 @@ class RosterController extends AppController
             //gotta check if they're already a tutor
             $tutors = Tutor::getAllTutorsNameByCourseId($courseId);
             foreach($tutors as $tutor){
-                $existingTutors[] = $tutor['SID'];
+                $existingTutors[] = strtolower($tutor['SID']);
             }
-
 
             //also don't want students enrolled as tutors
             $students = Student::findStudentsCompleteInfo($courseId);
@@ -554,7 +553,8 @@ class RosterController extends AppController
             }
             $sids = explode(',',$params['username']);
             for ($i=0;$i<count($sids);$i++) {
-                $sids[$i] = trim($sids[$i]);
+                 $username = trim($sids[$i]);
+                $sids[$i] = strtolower($username);
             }
 
             //Added new tutors

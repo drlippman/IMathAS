@@ -1176,13 +1176,7 @@ class QuestionController extends AppController
                 }
 //                $libraryTree[$singleLibrary['parent']]['branch'] = $singleLibrary;
             }
-
-
-
         }
-
-        AppUtility::dump($libraryTree);
-
 
         //
 //        $this->includeCSS(['question/libtree.css']);

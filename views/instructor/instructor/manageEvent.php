@@ -84,8 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     ?></td>
                 <td class="col-sm-2 col-md-2">
-<!--                    --><?php //echo $form->field($model, 'newTag')->textInput(['readonly' => !$model->isNewRecord]); ?><!--</td>-->
-                <input type="text" name="newTag" value="!" maxlength="15" class="form-control">
+                <input type="text" name="newTag" value="!" maxlength="15" class="form-control"></td>
 
                 <td ><?php echo $form->field($model, 'newEventDetails')->textInput();  ?></td></tr>
             </tbody>
