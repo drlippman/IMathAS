@@ -29,7 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 if($defaultValue['name']){
                       $title = $defaultValue['name'];
                     } ?>
-                <input class="input-item-title form-control" type=text size=0 name=name value="<?php echo $defaultValue['title'];?>">
+                <input class="input-item-title form-control" id="title-blank" type=text size=0 name=name value="<?php echo $defaultValue['title'];?>">
+                <span id="title-error" class="error-message col-md-10 col-sm-10 col-md-offset-1 col-sm-offset-1"></span>
             </div>
         </div>
         <BR class=form>

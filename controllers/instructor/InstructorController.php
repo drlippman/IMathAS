@@ -161,7 +161,7 @@ class InstructorController extends AppController
             /*
              * Add new Events
              */
-            if (trim($eventData['ManageEventForm']['newTag'] != '!') || (trim($eventData['ManageEventForm']['newEventDetails'])!='')) {
+            if (trim($eventData['newTag'] != '!') || (trim($eventData['ManageEventForm']['newEventDetails'])!='')) {
                 $date = $eventData['startDate'];
                 $tag = $eventData['newTag'];
                 $title = $eventData['ManageEventForm']['newEventDetails'];
