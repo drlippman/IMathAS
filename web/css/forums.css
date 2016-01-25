@@ -43,7 +43,6 @@ span.leftbtns img {
 }
 .block {
 	min-height: 36px;
-    
 }
 .pseudohidden {
 	overflow: hidden;
@@ -475,6 +474,7 @@ margin: 20px;
     background-color: #12856D !important;
     color:whitesmoke !important;
     border-radius:0px !important;
+    border: none;
 }
 .hide-button {
     color: #000 !important;
@@ -520,3 +520,9 @@ table.search-forum tr.tagged {
 .post-reply-message-textarea table,.post-reply-message-textarea iframe {
     max-width: 100% !important;
 }
+
+.white-color{
+    color: #ffffff;
+}
+
+

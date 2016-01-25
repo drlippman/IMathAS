@@ -36,7 +36,7 @@ $now = $currentTime;
     <div style="padding-top: 20px">
         <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');?></div>
         <div class="col-sm-10">
-            <input type=text maxlength="60" value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox">
+            <input type=text maxlength="60" value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox padding-left-ten">
         </div>
     </div>
     <BR class=form>
@@ -75,7 +75,7 @@ $now = $currentTime;
         <?php } ?>
         <br><input name="file-0" type="file" id="uplaod-file" style="border: white 1px solid;" class="file-upload"/><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
         <br><button class="add-more">Add More Files</button><br>
-    <?php }?>
+    <?php }?>S
      </div>
     <?php if($currentUser['rights'] > 10)
     {?>

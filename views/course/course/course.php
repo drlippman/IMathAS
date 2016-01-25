@@ -21,11 +21,11 @@ if (($teacherId && (!$backLink))) {?>
     <div class = "title-container padding-bottom-two-em">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+                <div class="vertical-align title-page word-wrap-break-word"><?php echo $this->title ?></div>
             </div>
             <div class="pull-left header-btn">
                 <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
-                   class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting
+                 class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting
                 </a>
             </div>
         </div>
@@ -63,7 +63,7 @@ if (($teacherId && (!$backLink))) {?>
 <?php }
 ?>
 <?php if($user['rights'] == AppConstant::STUDENT_RIGHT){?>
-<div class="tab-content shadowBox course-page-setting student-course-setting">
+<div class="tab-content shadowBox student-course-setting">
     <?php } elseif($user['rights'] >= AppConstant::STUDENT_RIGHT) {?>
     <div class="tab-content shadowBox">
     <?php }?>
@@ -123,9 +123,9 @@ if (($teacherId && (!$backLink))) {?>
             </ul>
         </div>
     </div>
+
     <div class="clear-both"></div>
 <?php }
-
 ?>
     <input type="hidden" class="courseId" value="<?php echo $course->id?>">
 
@@ -180,6 +180,7 @@ if ($overwriteBody == 1) {
         }
         exit;
     }
+
     ?>
 
     <?php
@@ -249,5 +250,5 @@ if ($overwriteBody == 1) {
         echo "document.cookie = 'loadedblocks-$courseId=0';</script>\n";
     }
 }
-?></div>
+?></div></div>
 

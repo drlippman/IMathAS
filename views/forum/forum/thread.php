@@ -243,7 +243,7 @@ echo '</div>';
     {            ?>
 
         <div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
-            <div class="overflow-x-auto">
+            <div >
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
                     <th class="width-thirty-five-per text-align-center"><?php echo AppUtility::t('Topic')?></th>

@@ -375,7 +375,7 @@ switch ($action) {
             <div class="col-md-3 col-sm-3">' . AppUtility::t('LTI access secret (max 10 chars; blank to not use)', false) . '</div>';
             echo '
 
-            <div class="col-md-6 col-sm-9">
+            <div class="col-md-9 col-sm-9">
             <input class="form-control width-sixty-four-per display-inline-block" name="ltisecret" type="text" value="' . $ltisecret . '" maxlength="10"/> ';
             echo '<button class="margin-left-ten" type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">' . _('Show LTI key and URL') . '</button>';
             echo '<span id="ltiurl" style="display:none;">';
