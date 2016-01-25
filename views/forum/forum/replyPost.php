@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <br><button class="add-more">Add More Files</button><br>
     <?php }?>
     </div>
-    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 col-md-6 col-md-offset-1 padding-left-twenty-eight">
+    <div class="header-btn hide-hover col-sm-6 col-sm-offset-1 col-md-6 col-md-offset-1 padding-left-twenty-eight padding-top-twenty">
         <a href="#" id="reply-btn" class="btn btn-primary1 btn-color"><i class="fa fa-reply"></i>&nbsp;Post Reply</a>
     </div>
         <div  class="col-sm-12 col-md-12 replyTo padding-top">

@@ -203,7 +203,7 @@ echo '</div>';
                     if ($curfilter==$gid) { echo 'selected="1"';}
                     echo ">$gname</option>";
                 }
-                echo '</select></div>';
+                echo '</select>';
 
             } ?>
             <?php if ($taglist != '') {
@@ -227,8 +227,10 @@ echo '</div>';
                 }
                 $tagselect .= '</select></span>';
                 $toshow[] = $tagselect;
-            } ?>
-        </div>
+            }
+            ?>
+            </div>
+
     <?php }
     echo implode(' | ',$toshow);
 
