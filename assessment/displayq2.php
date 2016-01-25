@@ -4299,8 +4299,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
 			foreach ($answers as $key=>$function) {
 				$function = explode(',',$function);
-				$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
-				$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+				$pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
+				$pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;	
 				$ansdots[$key] = array($pixx,$pixy);
 			}
 			$isclosed = false;
@@ -4410,8 +4410,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				//	x,y,"closed" or "open"
 				//form: function, color, xmin, xmax, startmaker, endmarker
 				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
-					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+					$pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
+					$pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;	
 					if (count($function)==2 || $function[2]=='closed') {
 						$ansdots[$key] = array($pixx,$pixy);
 					} else {
@@ -4730,6 +4730,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else {
 				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
 			}
+			
 			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($dots); $i++) {
@@ -5200,8 +5201,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				//	x,y,"closed" or "open"
 				//form: function, color, xmin, xmax, startmaker, endmarker
 				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
-					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
-					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+					$pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
+					$pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;	
 					if (count($function)==2 || $function[2]=='closed') {
 						$ansdots[$key] = array($pixx,$pixy);
 					} else {
@@ -5383,6 +5384,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else {
 				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
 			}
+
 			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($dots); $i++) {
