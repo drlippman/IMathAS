@@ -1,7 +1,9 @@
 .common-setting {
-    position: absolute;
-    right: 90px;
-}
+    position: relative;
+    float:right;
+   }
+
+
 .common-setting-calendar{
     position: absolute;
     right: 0;

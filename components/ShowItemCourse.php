@@ -189,7 +189,7 @@ class ShowItemCourse extends Component
                                 <li><a class="modify"
                                        href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>
-                                <li><a id="delete"
+                                <li><a id=" delete"
                                        href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')"><?php AppUtility::t('Delete'); ?></a>
                                 </li>
                                 <li><a id="copy"
@@ -249,8 +249,10 @@ class ShowItemCourse extends Component
                             echo '</span>';
                         }
                         if ($canEdit) { ?>
+
                             <span class="instronly common-setting">
-                            <a class="dropdown-toggle grey-color-link select_button1 floatright"
+
+                                <a class="dropdown-toggle grey-color-link select_button1"
                                data-toggle="dropdown" href="javascript:void(0);">
                                 <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
@@ -269,8 +271,10 @@ class ShowItemCourse extends Component
                                        href="<?php echo AppUtility::getURLFromHome('block', 'block/new-flag?cid=' . $courseId . '&newflag=' . $parent . '-' . $bnum) ?>"><?php AppUtility::t('NewFlag'); ?></a>
                                 </li>
                             </ul>
+
                             </span>
-                           <?php
+
+                        <?php
                         }
                         if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             echo "</div>";
@@ -322,7 +326,7 @@ class ShowItemCourse extends Component
                         }
                         if ($canEdit) {
                            ?>
-                            <span class="instronly common-setting">
+                            <span class="instronly common-setting margin-right-minus-fifteen">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright"
                                data-toggle="dropdown" href="javascript:void(0);">
                                 <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -826,7 +830,7 @@ class ShowItemCourse extends Component
                         if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
                         } ?>
-                        <div class="floatright common-setting">
+                        <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1067,7 +1071,7 @@ class ShowItemCourse extends Component
                             echo '</span>';
                         }
                         if ($canEdit) { ?>
-                            <div class="floatright common-setting">
+                            <div class=" floatright common-setting">
                                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                    href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                    src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1089,7 +1093,7 @@ class ShowItemCourse extends Component
                             echo '</span>';
                         }
                         if ($canEdit) { ?>
-                            <div class="floatright common-setting">
+                            <div class=" floatright common-setting">
                                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                    href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                    src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1149,7 +1153,7 @@ class ShowItemCourse extends Component
                     echo "<i>$show</i> ";
                     echo '</span>';
                     if ($canEdit) { ?>
-                        <div class="floatright common-setting">
+                        <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1335,7 +1339,7 @@ class ShowItemCourse extends Component
                     echo "<br/><i>$show</i> ";
                     echo '</span>';
                     if ($canEdit) { ?>
-                        <div class="floatright common-setting">
+                        <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1459,7 +1463,7 @@ class ShowItemCourse extends Component
                     echo '</span>';
 
                     if ($canEdit) { ?>
-                        <div class="floatright common-setting">
+                        <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1576,7 +1580,7 @@ class ShowItemCourse extends Component
                         echo '<span class="instronly">';
                         $itemsTypeId = $items['typeid'];
                         ?>
-                        <div class="floatright common-setting">
+                        <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1625,7 +1629,7 @@ class ShowItemCourse extends Component
                     if ($canEdit) {
                         echo '<span class="instronly">';
                         ?>
-                        <div class="floatright common-setting">
+                        <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
@@ -1670,8 +1674,10 @@ class ShowItemCourse extends Component
                 <input type="hidden" id="tb-value" value="<?php echo $tb ?>">
                 <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png">
             </div>
+
+
             <div class="col-md-2 col-sm-2 add-item-text">
-                <p><?php AppUtility::t('Add An Item...');?></p>
+                <p><a><?php AppUtility::t('Add An Item...');?></a></p>
             </div>
         </div>
 
