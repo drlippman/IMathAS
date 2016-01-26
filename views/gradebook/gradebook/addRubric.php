@@ -89,7 +89,7 @@ if ($overwriteBody==1) {
         echo '<div class="col-sm-12 col-md-12 padding-top-fifteen">
         <div class="col-sm-2 col-md-2 select-text-margin">Rubric Type</div>
         <div class="col-sm-6 col-md-4">';
-        AssessmentUtility::writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');
+        AssessmentUtility::writeHtmlSelectRubric('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');
         echo '</div></div>';
 
         echo '<div class="col-sm-12 col-md-12 padding-top-fifteen padding-bottom-five">

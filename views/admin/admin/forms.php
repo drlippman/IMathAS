@@ -137,11 +137,12 @@ switch ($action) {
     break;
     case "modify":
     case "addcourse":
-        if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
+        if ($myRights < AppConstant::STUDENT_RIGHT) {
             echo AppConstant::NO_ACCESS_RIGHTS;
             break;
         }
         if (isset($params['cid'])) {
+
             $cid = $params['cid'];
         }
         echo "<form method=post action=\"actions?action={$params['action']}";

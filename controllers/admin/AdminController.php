@@ -952,7 +952,6 @@ class AdminController extends AppController
                 }
                 break;
         }
-//        AppUtility::dump($msgmonitor);
         $this->includeCSS(['assessment.css','dataTables.bootstrap.css']);
         $this->includeJS(['general.js','forms.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'myRights' => $myRights,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
@@ -1143,7 +1142,7 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
-            if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+            if ($myRights < AppConstant::STUDENT_RIGHT)
             {
                 $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                 return $this->redirect($this->goHome());
@@ -1176,13 +1175,14 @@ class AdminController extends AppController
                 {
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
-                    $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
+                   $courseDataUpdate = $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
+
                 }else{
                     $columnName = 'id'; $columnValue = $params['id'];
                     $updateResult = new Course();
                     $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
                 }
-                return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$params['id']));
             } else {
 
                 $blockcnt = AppConstant::NUMERIC_ONE;

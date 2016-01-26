@@ -27,6 +27,25 @@ class AssessmentUtility extends Component
         echo "</select>\n";
     }
 
+    public static function writeHtmlSelectRubric($name, $valList, $labelList, $selectedVal = null, $defaultLabel = null, $defaultVal = null, $actions = null)
+    {
+        echo "<select class='form-control' name=\"$name\" id=\"$name\" ";
+        echo (isset($actions)) ? $actions : "";
+        echo ">\n";
+        if (isset($defaultLabel) && isset($defaultVal)) {
+            echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
+        }
+        for ($i = AppConstant::NUMERIC_ZERO; $i < count($valList); $i++) {
+            echo "<option value='" . $valList[$i] . "'";
+            if ((isset($selectedVal)) && ($valList[$i] == $selectedVal)) {
+                echo " selected";
+            }
+
+            echo ">$labelList[$i]</option>\n";
+        }
+        echo "</select>\n";
+    }
+
     public static function writeHtmlMultiSelect($name, $valList, $labelList, $selectedVals = array(), $defaultLabel = null)
     {
         echo "<div class=\"multisel\"><div class='col-md-4 col-sm-6'><select class='form-control' name=\"{$name}[]\" id=\"$name\">";
