@@ -201,9 +201,11 @@
 	function hidenonzero() {
 		var butn = $("#nztoggle");
 		if (!butn.hasClass("nzhidden")) {
+			if (!$("#hctoggle").hasClass("hchidden")) { hidecorrect();}
 			butn.html("'._('Show Nonzero Score Questions').'");
 			butn.addClass("nzhidden");
 		} else {
+			if ($("#hctoggle").hasClass("hchidden")) { hidecorrect();}
 			butn.html("'._('Hide Nonzero Score Questions').'");
 			butn.removeClass("nzhidden");
 		}
@@ -398,7 +400,7 @@
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
 				echo 'class="iscorrect"';	
-			} else if ($scores[$loc]>0) {
+			} else if (getpts($scores[$loc])>0) {
 				echo 'class="isnonzero"';
 			} else if ($scores[$loc]==-1) {
 				echo 'class="notanswered"';
