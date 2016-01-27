@@ -102,11 +102,11 @@
 			writesessiondata();
 		}
 		if (!$isteacher) {
-			$query = 'SELECT i_sg.id FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+			$query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
 			$query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='$groupsetid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if (mysql_num_rows($result)>0) {
-				$groupid = mysql_result($result,0,0);
+				list($groupid,$groupname) = mysql_fetch_row($result);
 			} else {
 				$groupid=0;
 			}
@@ -436,6 +436,10 @@
 			echo ">$gname</option>";
 		}
 		echo '</select></p>';
+	} else if ($groupsetid>0 && $groupid>0) {
+		echo '<p><b>'._('Showing posts for group: ').$groupname.'</b> ';
+		echo '<a class="small" href="#" onclick="basicahah(\'../course/showstugroup.php?cid='.$cid.'&gid='.$groupid.'\',\'grouplistout\');$(this).hide();return false;">['._('Show group members').']</a> <span id="grouplistout"></span>';
+		echo '</p>';
 	}
 	echo '<p>';
 	$toshow = array();
