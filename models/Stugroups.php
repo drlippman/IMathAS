@@ -128,7 +128,7 @@ class Stugroups extends BaseImasStugroups
             ->where('i_sgm.userid = :userId')->andWhere('i_sg.groupsetid= :grpSetId');
         $command = $query->createCommand();
 
-        return $command->bindValue('grpSetId', $grpSetId)->bindValue('userId', $userId)->queryAll();
+        return $command->bindValue('grpSetId', $grpSetId)->bindValue('userId', $userId)->queryOne();
     }
 
     public static function getByGrpSetIdAndName($groupsetId)

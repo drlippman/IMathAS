@@ -1206,6 +1206,7 @@ class ForumController extends AppController
         {
             $groupSet = Stugroups::getByGrpSetOrderByName($groupSetId);
         }
+
         $files = array();
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
@@ -1259,15 +1260,24 @@ class ForumController extends AppController
                     } else {
                         $groupId = AppConstant::NUMERIC_ZERO;
                     }
+                } else{
+                    $stuGroup = StuGroupMembers::getStudGroupAndStudGroupMemberData($userId,$groupSetId);
+                    if (count($stuGroup) > 0)
+                    {
+                        $groupId = $stuGroup['id'];
+                    } else {
+                        $groupId=0;
+                    }
                 }
             }
+
             $newThread = new ForumThread();
             $newThread->createThread($params, $user->id, $threadId,$groupId);
-
+            
             $views = new ForumView();
             $views->createThread($user->id, $threadId);
-            $contentTrackRecord = new ContentTrack();
-            if ($this->getAuthenticatedUser()->rights == AppConstant::STUDENT_RIGHT) {
+            if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
+                $contentTrackRecord = new ContentTrack();
                 $contentTrackRecord->insertForumData($user->id, $params['cid'], $params['forumid'], $threadId, $threadIdOfPost = null, $type = AppConstant::NUMERIC_ZERO);
             }
 
@@ -1276,7 +1286,7 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
-        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId);
+        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId, 'isTeacher' => $isTeacher);
         return $this->renderWithData('addNewThread', $responseData);
     }
 

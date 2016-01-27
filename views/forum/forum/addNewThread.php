@@ -133,10 +133,10 @@ $now = $currentTime;
            echo "></span><br class=form/>"; ?>
         </div>
     <?php }
-    if($groupSetId > AppConstant::NUMERIC_ZERO){
+    if($isTeacher && $groupSetId > AppConstant::NUMERIC_ZERO){
 
-        echo '<span class="form">Set thread to group:</span><span class="formright">';
-        echo '<select name="stugroup">';
+        echo '<div class="col-sm-12 col-md-12"><div class="col-md-2 col-sm-2">Set thread to group:</div><div class="col-sm-4 col-md-4">';
+        echo '<select name="stugroup" class="form-control">';
         echo '<option value="0" ';
         if ($curstugroupid==0) { echo 'selected="selected"';}
         echo '>Non group-specific</option>';
@@ -145,7 +145,7 @@ $now = $currentTime;
             if ($curstugroupid==$row['id']) { echo 'selected="selected"';}
             echo '>'.$row['name'].'</option>';
         }
-        echo '</select></span><br class="form" />';
+        echo '</select></div></div><br class="form" />';
     }?>
 
     <div class="col-md-6 col-md-offset-2 col-sm-6 col-sm-offset-2 padding-left-twenty-five padding-bottom-thirty padding-top-five">
