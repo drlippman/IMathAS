@@ -517,6 +517,7 @@ class Course extends BaseImasCourses {
             $updateCourse->deflatepass = $params['deflatepass'];
             $updateCourse->lockaid = $params['lockaid'];
             $updateCourse->save();
+            return $updateCourse;
         }
     }
 

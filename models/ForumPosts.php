@@ -469,6 +469,10 @@ class ForumPosts extends BaseImasForumPosts
             }
             $placeholders = trim(trim(trim($placeholders),","));
         }
+        if($placeholders == '')
+        {
+            $placeholders = 0;
+        }
 
         $placePostList= "";
         if($newpostlist)
@@ -515,9 +519,12 @@ class ForumPosts extends BaseImasForumPosts
         $command = Yii::$app->db->createCommand($query)->bindValues([':forumId'=> $forumId]);
 
         if ($dofilter) {
-            foreach($limthreads as $i => $parent){
-                $command->bindValue(":".$i, $parent);
+            if($limthreads){
+                foreach($limthreads as $i => $parent){
+                    $command->bindValue(":".$i, $parent);
+                }
             }
+
         }
         if ($page==-1) {
             foreach($newpostlist as $i => $parent){

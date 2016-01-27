@@ -11,7 +11,7 @@ use Yii;
 
 class ForumThread extends BaseImasForumThreads
 {
-    public function createThread($params,$userId,$threadId)
+    public function createThread($params,$userId,$threadId, $groupId)
     {
         $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->id = $threadId;
@@ -19,6 +19,7 @@ class ForumThread extends BaseImasForumThreads
         $this->lastposttime = $postdate;
         $this->lastpostuser = $userId;
         $this->views = AppConstant::NUMERIC_ZERO;
+        $this->stugroupid = $groupId;
         $this->save();
     }
 

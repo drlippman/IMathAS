@@ -297,7 +297,6 @@ class CourseController extends AppController
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
-//            AppUtility::dump($assessment);
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),

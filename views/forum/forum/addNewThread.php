@@ -119,6 +119,8 @@ $now = $currentTime;
                         ]
                     ]);
                 echo '</div>';?>
+
+
             </span>
         </div>
     <?php }elseif($rights == AppConstant::STUDENT_RIGHT)
@@ -130,7 +132,22 @@ $now = $currentTime;
             <?php if ($forumData['settings']==1) {echo "checked=1";}
            echo "></span><br class=form/>"; ?>
         </div>
-    <?php } ?>
+    <?php }
+    if($groupSetId > AppConstant::NUMERIC_ZERO){
+
+        echo '<span class="form">Set thread to group:</span><span class="formright">';
+        echo '<select name="stugroup">';
+        echo '<option value="0" ';
+        if ($curstugroupid==0) { echo 'selected="selected"';}
+        echo '>Non group-specific</option>';
+        foreach($groupSet as $row){
+            echo '<option value="'.$row['id'].'" ';
+            if ($curstugroupid==$row['id']) { echo 'selected="selected"';}
+            echo '>'.$row['name'].'</option>';
+        }
+        echo '</select></span><br class="form" />';
+    }?>
+
     <div class="col-md-6 col-md-offset-2 col-sm-6 col-sm-offset-2 padding-left-twenty-five padding-bottom-thirty padding-top-five">
         <a href="#" class="btn btn-primary add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
     </div>

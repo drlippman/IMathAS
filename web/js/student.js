@@ -199,8 +199,11 @@ function calendar() {
                     jQuery.each(assessmentData.calendarInlineTextArray, function (index, calendarInlineTextItem) {
                         var eventColor = '#FF6666';
                         if(calendarInlineTextItem.oncal == 2){
-                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
-                            {
+
+//                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
+//                            {                            console.log(calendarInlineTextItem.oncal);
+
+
                                 events.push({
                                     title: calendarInlineTextItem.calTag,
                                     start: calendarInlineTextItem.endDate,
@@ -212,11 +215,11 @@ function calendar() {
                                     message: 'Inline text events',
                                     calInlineTextOncal: true
                                 });
-                            }
+//                            }
                         } else if(calendarInlineTextItem.oncal == 1){
 
-                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
-                            {
+//                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
+//                            {
                                 events.push({
                                     title: calendarInlineTextItem.calTag,
                                     start: calendarInlineTextItem.startDate,
@@ -228,7 +231,7 @@ function calendar() {
                                     message: 'Inline text events',
                                     calInlineTextItem: true
                                 });
-                            }
+//                            }
                         }
 
                     });
@@ -309,7 +312,6 @@ function calendar() {
                     } else if(selectedDate.calInlineTextOncal == true){
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
                         var tag = selectedDate.title;
-                        var title = "<a class='link-title'style='color: #0000ff' href='../../course/course/show-linked-text?cid="+selectedDate.courseId+"&id="+selectedDate.linkedId+" '>"+selectedDate.linkTitle+"</a>";
                         if(userRights > 10){
                             var html = '<span class="instronly common-setting">'+
                                 '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
@@ -317,9 +319,9 @@ function calendar() {
                                 '<ul class="select1 dropdown-menu selected-options pull-right">' +
                                 "<li><a href='../../course/course/add-link?cid="+selectedDate.courseId+"&id="+selectedDate.id+" '>"+modify+"</a></li>"+
                                 "</ul></span>";
-                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+html+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+html+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                         }else{
-                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br><p style='padding-left: 36px'>"+tag+"</p><br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                         }
                     } else if(selectedDate.calLinkItemOnCal == true){
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
@@ -488,24 +490,6 @@ function displayCalEvents(events) {
                         '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
                         '<ul class="select1 dropdown-menu selected-options pull-right">' +
                         "<li><a href='../../course/course/modify-inline-text?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
-                        "</ul>"+
-                        "</span>";
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
-                } else{
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
-                }
-            } else if(dateEvent.calInlineTextItem == true){
-
-                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
-                var tag = dateEvent.title;
-                if(userRights > 10){
-                    var dropdown = '<span class="instronly common-setting-calendar">'+
-                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
-                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
-                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
-                        "<li><a href='../../course/course/modify-inline-text?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
-
-
                         "</ul>"+
                         "</span>";
                     jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");

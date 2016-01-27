@@ -171,8 +171,6 @@ class ForumController extends AppController
             if ($searchstr != '') {
                 $searchstr = str_replace(' and ', ' ',$searchstr);
                 $searchterms = explode(" ", $searchstr);
-//                AppUtility::dump($searchterms);
-//                $searchlikes = $searchterms;
             }
             $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchterms, $anyforumsgroup, $searchstr, $searchtag, $user->id);
 
@@ -1201,6 +1199,13 @@ class ForumController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $forumData = Forums::getById($forumId);
+        $isTeacher = $this->isTeacher($userId, $courseId);
+        $groupSetId = $forumData['groupsetid'];
+        $curstugroupid = AppConstant::NUMERIC_ZERO;
+        if($groupSetId > AppConstant::NUMERIC_ZERO)
+        {
+            $groupSet = Stugroups::getByGrpSetOrderByName($groupSetId);
+        }
         $files = array();
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
@@ -1247,9 +1252,17 @@ class ForumController extends AppController
             }
             $newThread = new ForumPosts();
             $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date, $isNonValue, $fileName);
+            if ($groupSetId > AppConstant::NUMERIC_ZERO) {
+                if ($isTeacher) {
+                    if (isset($params['stugroup'])) {
+                        $groupId = $params['stugroup'];
+                    } else {
+                        $groupId = AppConstant::NUMERIC_ZERO;
+                    }
+                }
+            }
             $newThread = new ForumThread();
-            $newThread->createThread($params, $user->id, $threadId);
-
+            $newThread->createThread($params, $user->id, $threadId,$groupId);
 
             $views = new ForumView();
             $views->createThread($user->id, $threadId);
@@ -1257,12 +1270,13 @@ class ForumController extends AppController
             if ($this->getAuthenticatedUser()->rights == AppConstant::STUDENT_RIGHT) {
                 $contentTrackRecord->insertForumData($user->id, $params['cid'], $params['forumid'], $threadId, $threadIdOfPost = null, $type = AppConstant::NUMERIC_ZERO);
             }
+
             return $this->redirect('thread?cid='.$params['cid'].'&forumid='.$params['forumid']);
 
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
-        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
+        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId);
         return $this->renderWithData('addNewThread', $responseData);
     }
 
