@@ -206,7 +206,6 @@ class ForumController extends AppController
 
             }
             $searchedPost = ForumPosts::getBySearchTextForForum($isteacher, $now, $cid, $searchlikes, $searchlikes2, $searchlikes3,$anyforumsgroup,$searchstr,$searchtag,$user->id);
-//            AppUtility::dump($searchedPost);
         } else {
                 //default display
             $forumPost = ForumPosts::threadCount($cid);
@@ -1201,15 +1200,23 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $isTeacher = $this->isTeacher($userId, $courseId);
         $groupSetId = $forumData['groupsetid'];
+        $lineTag = '';
         $curstugroupid = AppConstant::NUMERIC_ZERO;
         if($groupSetId > AppConstant::NUMERIC_ZERO)
         {
             $groupSet = Stugroups::getByGrpSetOrderByName($groupSetId);
         }
-
+        $forumDetails = Forums::getForumDetailByForumId($forumId);
+        $tagList = $forumDetails['taglist'];
         $files = array();
+
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
+            if (isset($params['tag'])) {
+                $tag = $params['tag'];
+            } else {
+                $tag = '';
+            }
             $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = null;
             $isNonValue = AppConstant::NUMERIC_ZERO;
@@ -1252,7 +1259,7 @@ class ForumController extends AppController
                 $isNonValue = AppConstant::NUMERIC_ZERO;
             }
             $newThread = new ForumPosts();
-            $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date, $isNonValue, $fileName);
+            $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date, $isNonValue, $fileName,$tag);
             if ($groupSetId > AppConstant::NUMERIC_ZERO) {
                 if ($isTeacher) {
                     if (isset($params['stugroup'])) {
@@ -1286,7 +1293,8 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
-        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId, 'isTeacher' => $isTeacher);
+        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId,
+            'isTeacher' => $isTeacher, 'tagList' => $tagList, 'lineTag' => $lineTag);
         return $this->renderWithData('addNewThread', $responseData);
     }
 

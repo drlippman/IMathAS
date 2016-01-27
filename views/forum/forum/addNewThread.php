@@ -42,6 +42,24 @@ $now = $currentTime;
         </div>
     </div>
     <BR class=form>
+    <?php
+
+    if ($tagList != '') {
+        $p = strpos($tagList,':');
+        echo '<br><div class="col-md-12 col-sm-12"><span class="col-md-2 col-sm-2"><label for="tag">'.substr($tagList,0,$p).'</label></span>';
+        echo '<span class="col-md-6 col-sm-6"><select name="tag" class="form-control" style="border: #6d6d6d 1px solid">';
+        echo '<option value="">Select...</option>';
+        $tags = explode(',',substr($tagList,$p));
+
+        foreach ($tags as $tag) {
+            $tag =  str_replace('"','&quot;',$tag);
+            echo '<option value="'.$tag.'" ';
+            if ($tag==$lineTag) {echo 'selected="selected"';}
+            echo '>'.$tag.'</option>';
+        }
+        echo '</select></span></div><br class="form" />';
+    }
+    ?>
     <div class="col-sm-12 col-md-12" style="padding-top: 20px;">
         <div class="col-sm-2 col-md-2 message-label"><?php echo AppUtility::t('Message')?></div>
         <div class="col-sm-10 col-md-10 message-div">
