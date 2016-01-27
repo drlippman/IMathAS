@@ -67,6 +67,8 @@ var didMultiTouch = false;
 	6.5: square root
 	7: circle (only works on square grids)
 	8: abs value
+	8.2: linear/linear rational
+	8.3: exponential (unshifted)
 	9: cosine/sine
    ineqtypes
    	10: linear >= or <=
@@ -338,7 +340,7 @@ function drawTarget(x,y) {
 	if (drawlocky[curTarget]==1) {
 		ctx.lineWidth = 4;
 	} else {
-	ctx.lineWidth = 2;
+		ctx.lineWidth = 2;
 	}
 	ctx.strokeStyle = "rgb(0,0,255)";
 	for (var i=0;i<tplines[curTarget].length; i++) {
@@ -561,6 +563,48 @@ function drawTarget(x,y) {
 						} 
 					}
 				}
+			}
+		} else if (tptypes[curTarget][i]==8.2) {//if a tp linear/linear rational
+			var y2 = null;
+			var x2 = null;
+			if (tplines[curTarget][i].length==2) {
+				x2 = tplines[curTarget][i][1][0];
+				y2 = tplines[curTarget][i][1][1];
+			} else if (curTPcurve==i && x!=null && tplines[curTarget][i].length==1) {
+				x2 = x;
+				y2 = y;
+			}
+			ctx.strokeStyle = "rgb(0,255,0)";
+			ctx.dashedLine(5,tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]);
+			ctx.dashedLine(tplines[curTarget][i][0][0],5,tplines[curTarget][i][0][0],targets[curTarget].imgheight);	
+			ctx.beginPath();
+			ctx.strokeStyle = "rgb(0,0,255)";
+			if (x2 != null && x2!=tplines[curTarget][i][0][0] && y2!=tplines[curTarget][i][0][1]) {
+				
+				//y = c/(x-p) + k
+				var stretch = (y2 - tplines[curTarget][i][0][1])*(x2 - tplines[curTarget][i][0][0]);
+				
+				for (var curx=tplines[curTarget][i][0][0]-1;curx>-4;curx -= 3) {
+					cury = stretch/(curx - tplines[curTarget][i][0][0]) + tplines[curTarget][i][0][1];
+					if (cury<-100) { cury = -100;}
+					if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+					if (curx==tplines[curTarget][i][0][0]-1) {
+						ctx.moveTo(curx,cury); 
+					} else {
+						ctx.lineTo(curx,cury);
+					}
+				} 
+				for (var curx=tplines[curTarget][i][0][0]+1;curx<targets[curTarget].imgwidth+4;curx += 3) {
+					cury = stretch/(curx - tplines[curTarget][i][0][0]) + tplines[curTarget][i][0][1];
+					if (cury<-100) { cury = -100;}
+					if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+					if (curx==tplines[curTarget][i][0][0]+1) {
+						ctx.moveTo(curx,cury); 
+					} else {
+						ctx.lineTo(curx,cury);
+					}
+				} 
+				ctx.stroke();
 			}
 		} else if (tptypes[curTarget][i]==9  || tptypes[curTarget][i]==9.1 ) {//if a tp sin/cos
 			var y2 = null;
@@ -1370,7 +1414,7 @@ function initCanvases(k) {
 		    dashes = Math.round(dashes);
 		    
 		    var q = 0;
-		    while (q++ < dashes && y1>0 && y1<targets[curTarget].imgheight) {
+		    while (q++ < dashes && y1>-1 && y1<targets[curTarget].imgheight+1 && x1>-1 && x1<targets[curTarget].imgwidth+1) {
 		     x1 += dashX;
 		     y1 += dashY;
 		     this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x1, y1);

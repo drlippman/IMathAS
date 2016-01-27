@@ -1037,7 +1037,8 @@ function mathjs(st,varlist) {
   //parenthesizes the function variables
   st = st.replace("[","(");
   st = st.replace("]",")");
-   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
+  st = st.replace(/root\s*(\d+)/,"root($1)");
+  st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/gi, matchtolower);
   if (varlist != null) {
 	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
