@@ -1071,7 +1071,11 @@ function gbstudisp($stu) {
 				//} else {
 					echo '<tr class="grid">';
 				//}
-				echo '<td class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">'.$gbt[0][2][$i][0].'</span></td>';
+				echo '<td class="cat'.$gbt[0][2][$i][1].'"><span class="cattothdr">'.$gbt[0][2][$i][0].'</span>';
+				if (isset($gbt[0][2][$i][11])) {  //category weight
+					echo ' ('.$gbt[0][2][$i][11].'%'.')';
+				}
+				echo '</td>';
 				if (($show&1)==1) {
 					echo '<td>';
 					//show points if not averaging or if points possible scoring

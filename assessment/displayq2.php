@@ -2665,7 +2665,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\"/>";
 					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
-						$out .= " <br/><img id=\"img$qn\" style=\"display:none;max-width:80%;\" src=\"$url\" />";
+						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" onclick=\"rotateimg(this)\" src=\"$url\" /></div>";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
 						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
@@ -5131,6 +5131,97 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 			$extrastuffpenalty = max((count($ineqlines)-count($answers))/(max(count($answers),count($ineqlines))),0);
+			
+		} else if ($answerformat[0]=='numberline') {
+			foreach ($answers as $key=>$function) {
+				if ($function=='') { continue; }
+				$function = explode(',',$function);
+				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
+					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
+					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
+					if (count($function)==2 || $function[2]=='closed') {
+						$ansdots[$key] = array($pixx,$pixy);
+					} else {
+						$ansodots[$key] = array($pixx,$pixy);
+					}
+				} else {
+					$xminpix = round(max(1,($function[1] - $settings[0])*$pixelsperx + $imgborder));
+					$xmaxpix = round(min($settings[6]-1,($function[2] - $settings[0])*$pixelsperx + $imgborder));
+					$anslines[$key] = array($xminpix,$xmaxpix);
+				}
+			}
+			
+			list($lines,$dots,$odots,$tplines,$ineqlines) = explode(';;',$givenans);
+			
+			if ($lines=='') {
+				$lines = array();
+			} else {
+				$lines = explode(';',$lines);
+				foreach ($lines as $k=>$line) {
+					$lines[$k] = explode('),(',substr($line,1,strlen($line)-2));
+					$minp = explode(',', $lines[$k][0]);
+					$maxp = explode(',', $lines[$k][count($lines[$k])-1]);
+					$lines[$k] = array(min($minp[0], $maxp[0]), max($minp[0], $maxp[0]));
+				}
+			}
+			
+			if ($dots=='') {
+				$dots = array();
+			} else {
+				$dots = explode('),(', substr($dots,1,strlen($dots)-2));
+				foreach ($dots as $k=>$pt) {
+					$dots[$k] = explode(',',$pt);
+				}
+			}
+			if ($odots=='') {
+				$odots = array();
+			} else {
+				$odots = explode('),(', substr($odots,1,strlen($odots)-2));
+				foreach ($odots as $k=>$pt) {
+					$odots[$k] = explode(',',$pt);
+				}
+			}
+
+			$scores = array();
+			if ((count($dots)+count($odots))==0) {
+				$extradots = 0;
+			} else {
+				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
+			}
+			$defpttol = 5;
+			foreach ($ansdots as $key=>$ansdot) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($dots); $i++) {
+					if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
+						$scores[$key] = 1-$extradots;
+						break;
+					}
+				}
+			}
+			foreach ($ansodots as $key=>$ansodot) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($odots); $i++) {
+					if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= $defpttol*$defpttol*max(1,$reltolerance)) {
+						$scores[$key] = 1-$extradots;
+						break;
+					}
+				}
+			}
+			
+			foreach ($anslines as $key=>$ansline) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($lines); $i++) {
+					if (abs($ansline[0]-$lines[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansline[1]-$lines[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			$extrastuffpenalty = max((count($lines)-count($anslines))/(max(count($answers),count($anslines))),0);
 			
 		} else {
 			//not polygon or twopoint, continue with regular grading

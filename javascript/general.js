@@ -543,6 +543,23 @@ function hidefromcourselist(el,cid) {
 	}
 }
 
+function rotateimg(el) {
+	if ($(el).data('rotation')) {
+		var r = ($(el).data('rotation') + 90)%360;
+	} else {
+		var r = 90;
+	}
+	$(el).data('rotation', r).css({transform: 'rotate('+r+'deg)'});
+	if (r%180==90) {
+		var d = ($(el).width() - $(el).height())/2;
+		if (d>0) {
+			$(el).parent().css({'padding-top':d, 'padding-bottom':d});
+		}
+	} else {
+		$(el).parent().css({'padding-top':0, 'padding-bottom':0});
+	}
+}
+
 jQuery(document).ready(function($) {
 	$(window).on("message", function(e) {
 		if (e.originalEvent.data.match(/lti\.frameResize/)) {
