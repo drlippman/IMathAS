@@ -776,7 +776,6 @@ class AdminController extends AppController
                     $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
-                break;
             case "newadmin":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
