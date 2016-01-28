@@ -647,7 +647,7 @@ class ShowItemCourse extends Component
                     <a href="#" onclick="deleteItem('<?php echo $items[$i] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $courseId ;?>')"><?php AppUtility::t('Delete')?></a> |
                     <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $courseId); ?>">Manage Events</a>
               <?php } ?>
-                <div class="item" style="padding-bottom: 15px; padding-right: 15px">
+                <div style="padding-bottom: 15px; padding-right: 15px">
                     <div class="col-lg-12 padding-alignment calendar-container">
                         <div class='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
                             <input type="hidden" class="current-time" value="<?php echo $currentTime ?>">

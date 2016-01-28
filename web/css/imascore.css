@@ -28,8 +28,8 @@ div.item {
     /*padding-right: 5%;*/
     padding-top: 20px;
     padding-left: 15px;
-    margin-left: 80px;
     min-height: 100px;
+    overflow: auto;
     /*border-radius: 5px;*/
 }
 div.signup {

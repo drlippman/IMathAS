@@ -1,4 +1,5 @@
 <?php
+
 use app\components\AppUtility;
 use app\components\AppConstant;
 $this->title = 'Calendar';
@@ -30,11 +31,11 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
             </div>
             <div class="calendar-day-details-right-side pull-left col-md-3">
-                <div class="day-detail-border">
+                <div class="day-detail-border ">
                     <b style="font-size: 18px"><?php AppUtility::t('Day Details')?></b>
                 </div>
                 <div class="calendar-day-details word-wrap-break-word"></div>
             </div>
         </div>
     </div>
-</div>
+<!--</div>-->
