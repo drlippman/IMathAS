@@ -98,21 +98,23 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return User::find()->orderBy([$sortBy => $order])->where(['rights' => 0])->asArray()->all();
     }
 
-    public static function createStudentAccount($params)
+    public function createStudentAccount($params)
     {
-        $params['SID'] = $params['username'];
-        $params['password'] = AppUtility::passwordHash($params['password']);
-        $params['hideonpostswidget'] = '0';
-        $params['FirstName'] = $params['firstName'];
-        $params['LastName'] = $params['lastName'];
-        $user = new User();
-        $user->attributes = $params;
-        $user->save();
-        if ($user->id && isset($params['userid']) && isset($params['courseid'])) {
+        $this->SID = $params['username'];
+        $this->password = AppUtility::passwordHash($params['password']);
+        $this->hideonpostswidget = '0';
+        $this->FirstName = $params['firstName'];
+        $this->LastName = $params['lastName'];
+//        $user = new User();
+//        $user->attributes = $params;
+//        AppUtility::dump($this);
+
+        $this->save();
+        if ($this->id && isset($params['userid']) && isset($params['courseid'])) {
             $student = new Student();
             $student->create($params);
         }
-        if ($user->id) {
+        if ($this->id) {
             return true;
         }
         return false;
