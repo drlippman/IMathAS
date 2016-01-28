@@ -116,14 +116,14 @@ switch ($action) {
                 echo "<div class='col-md-6 col-sm-6 padding-left-zero'><select name=\"group\" class='form-control' id=\"group\" style='width: auto'>";
                 echo "<option value=0>Default</option>\n";
 
-                foreach($resultGroup as $key => $row) {
-                    echo "<option value=\"{$row['id']}\" ";
-                    if ($oldGroup==$row['id']) {
-                        echo "selected=1";
-                    }
-                   $name = AppUtility::truncate($row['name'], 30);
-                    echo ">{$name}</option>\n";
-                }
+//                foreach($resultGroup as $key => $row) {
+//                    echo "<option value=\"{$row['id']}\" ";
+//                    if ($oldGroup==$row['id']) {
+//                        echo "selected=1";
+//                    }
+//                   $name = AppUtility::truncate($row['name'], 30);
+//                    echo ">{$name}</option>\n";
+//                }
                 echo "</select></div><br class=form /><br/>";
             }
 //            echo "<br/><div class=submit><input type=submit value=Save></div></form><br/>";
