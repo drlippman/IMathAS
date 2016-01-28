@@ -292,8 +292,11 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $currentUser = $this->user;
         $threadsperpage = $currentUser['listperpage'];
+
         $forumId = $params['forum'];
         $courseId = $params['cid'];
+        $cid = $this->getParamVal('courseid');
+        $course = Course::getById($courseId);
         if ($params['forum']) {
             $forumId = $params['forum'];
         } else if ($params['forumid']) {
@@ -695,6 +698,7 @@ class ForumController extends AppController
 
                 }
                 for ($i = count($files) / 2 - 1; $i >= 0; $i--) {
+                    print_r($i);
                     if (isset($params['fileDel'][$i])) {
                         if ($this->deleteForumFile($files[2 * $i + 1])) {
                             array_splice($files, 2 * $i, 2);
@@ -721,9 +725,10 @@ class ForumController extends AppController
                             $files[] = stripslashes($params['description-' . $j]);
                             $files[] = $userFileName;
                             move_uploaded_file($_FILES['file-' . $j]['tmp_name'], $uploadFile);
+
                         } else {
                             $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
-                            return $this->redirect('modify-post?courseId='.$courseId.'&forumId='.$forumId.'&threadId='.$threadId);
+                            return $this->redirect('modify-post?courseId='.$courseId.'&forumId='.$forumId.'&threadId='.$threadId.'&id='.$forumPostData['id']);
                         }
                     }
                     $j++;
@@ -807,6 +812,7 @@ class ForumController extends AppController
         $sessionData = $this->getSessionData($sessionId);
         $myrights = $currentUser['rights'];
         $userid = $currentUser['id'];
+
         if (!isset($isTeacher) && !isset($isTutor) && !isset($isStudent)) {
            $this->setErrorFlash("You are not enrolled in this course.");
             $this->goHome();
@@ -1033,9 +1039,9 @@ class ForumController extends AppController
 
         if (!$oktoshow) {
             $this->setErrorFlash('<p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>');
-            return $this->redirect('post?courseid='.$courseId.'&forumid='.$forumid.'&threadid='.$threadid);
+            return $this->redirect('thread?cid='.$courseId.'&forumid='.$forumid.'&threadid='.$threadid);
             } else
-        {
+            {
             $resultPrev = ForumThread::getDataForPrev($forumid, $threadid,$groupid,$groupset);
 
             $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
@@ -1144,7 +1150,7 @@ class ForumController extends AppController
             $params = $this->getRequestParams();
             if (!empty($_FILES)) {
                 $j = 0;
-                $uploadDir = AppConstant::UPLOAD_DIRECTORY . 'forumFiles/';
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY;
                 $badExtensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
                 while (isset($_FILES['file-' . $j]) && is_uploaded_file($_FILES['file-' . $j]['tmp_name'])) {
                     $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);
@@ -1207,6 +1213,8 @@ class ForumController extends AppController
             $groupSet = Stugroups::getByGrpSetOrderByName($groupSetId);
         }
         $forumDetails = Forums::getForumDetailByForumId($forumId);
+        $forumsettings = $forumDetails['settings'];
+        $allowaNon = (($forumsettings&1)==1);
         $tagList = $forumDetails['taglist'];
         $files = array();
 
@@ -1294,7 +1302,7 @@ class ForumController extends AppController
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
         $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId,
-            'isTeacher' => $isTeacher, 'tagList' => $tagList, 'lineTag' => $lineTag);
+            'isTeacher' => $isTeacher, 'tagList' => $tagList, 'lineTag' => $lineTag, 'allowaNon' => $allowaNon);
         return $this->renderWithData('addNewThread', $responseData);
     }
 

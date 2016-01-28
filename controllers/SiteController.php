@@ -502,7 +502,8 @@ class SiteController extends AppController
         if ($model->load($this->isPostMethod())) {
             $params = $this->getRequestParams();
             $params = $params['StudentRegisterForm'];
-            $status = User::createStudentAccount($params);
+            $status = new User();
+            $status->createStudentAccount($params);
             if ($status) {
                 $message = "<p>We received a request for student account with following credentials.</p> ";
                 $message .= 'First Name: ' . $params['firstName'] . "<br/>\n";

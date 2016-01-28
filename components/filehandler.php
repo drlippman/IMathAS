@@ -644,7 +644,6 @@ function copyqimage($key,$dest) {
 }
 
 public static function getuserfileurl($key) {
-	global $urlmode,$imasroot;
     return AppUtility::getHomeURL().AppConstant::UPLOAD_DIRECTORY.$key;
 }
 public static function getcoursefileurl($key) {

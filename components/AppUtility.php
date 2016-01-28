@@ -3157,7 +3157,7 @@ class AppUtility extends Component
         $curdir = rtrim(dirname(__FILE__), '/\\');
         global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$courseId,$userid,$ownerid,$points;
         global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
-        global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
+        global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section, $postId;
         global $canviewall, $caneditscore, $canviewscore;
         if (!isset($CFG['CPS']['itemicons'])) {
             $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
@@ -3217,7 +3217,7 @@ class AppUtility extends Component
             }
             if ($isTeacher || ($ownerid[$child]==$userid && $allowmod)) {
                 if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isTeacher) {
-                    echo "<a href=\"modify-post?courseId=$courseId&forumId=$forumid&threadId=$threadid\">Modify</a> \n";
+                    echo "<a href=\"modify-post?courseId=$courseId&forumId=$forumid&threadId=$child\">Modify</a> \n";
                 }
             }
             if ($isTeacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) { ?>

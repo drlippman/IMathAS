@@ -141,7 +141,7 @@ $now = $currentTime;
 
             </span>
         </div>
-    <?php }elseif($rights == AppConstant::STUDENT_RIGHT)
+    <?php }elseif($allowaNon == 1 && $rights == AppConstant::STUDENT_RIGHT)
     {
         ?>
         <div class="col-sm-12 col-md-12">
@@ -152,7 +152,6 @@ $now = $currentTime;
         </div>
     <?php }
     if($isTeacher && $groupSetId > AppConstant::NUMERIC_ZERO){
-
         echo '<div class="col-sm-12 col-md-12"><div class="col-md-2 col-sm-2">Set thread to group:</div><div class="col-sm-4 col-md-4">';
         echo '<select name="stugroup" class="form-control">';
         echo '<option value="0" ';
