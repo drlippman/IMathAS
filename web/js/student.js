@@ -200,10 +200,8 @@ function calendar() {
                         var eventColor = '#FF6666';
                         if(calendarInlineTextItem.oncal == 2){
 
-//                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
-//                            {                            console.log(calendarInlineTextItem.oncal);
-
-
+                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
+                            {
                                 events.push({
                                     title: calendarInlineTextItem.calTag,
                                     start: calendarInlineTextItem.endDate,
@@ -215,11 +213,11 @@ function calendar() {
                                     message: 'Inline text events',
                                     calInlineTextOncal: true
                                 });
-//                            }
+                            }
                         } else if(calendarInlineTextItem.oncal == 1){
 
-//                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
-//                            {
+                            if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
+                            {
                                 events.push({
                                     title: calendarInlineTextItem.calTag,
                                     start: calendarInlineTextItem.startDate,
@@ -231,7 +229,7 @@ function calendar() {
                                     message: 'Inline text events',
                                     calInlineTextItem: true
                                 });
-//                            }
+                            }
                         }
 
                     });
@@ -250,8 +248,11 @@ function calendar() {
             var questions = 'Questions';
             var grades = 'Grades';
             var modify = 'Modify';
+
             jQuery(".calendar-day-details").empty();
             jQuery.each(calendarEvents[0], function (index, selectedDate) {
+//                jQuery(".fc-state-highlight").removeClass("fc-state-highlight");
+//                jQuery(jsEvent.target).addClass("fc-state-highlight");
                 if(selectedDate.start == selectedDay) {
                     if(currentDate == formattedSelectedDay){
                         var dateH = "Due " +selectedDate.dueTime+"";
@@ -260,6 +261,7 @@ function calendar() {
 
                     }
                     if(selectedDate.reviewMode == false){
+
                         var title = "<a class='' style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+selectedDate.title+"</a>";
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
                         if(userRights > 10){
@@ -317,28 +319,13 @@ function calendar() {
                                 '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
                                 '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
                                 '<ul class="select1 dropdown-menu selected-options pull-right">' +
-                                "<li><a href='../../course/course/add-link?cid="+selectedDate.courseId+"&id="+selectedDate.id+" '>"+modify+"</a></li>"+
+                                "<li><a href='../../course/course/modify-inline-text?cid="+selectedDate.courseId+"&id="+selectedDate.id+" '>"+modify+"</a></li>"+
                                 "</ul></span>";
                             jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+html+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                         }else{
                             jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                         }
-                    } else if(selectedDate.calLinkItemOnCal == true){
-                        var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
-                        var title = "<a class='link-title' style='color: #0000ff' href='../../course/course/show-linked-text?cid="+selectedDate.courseId+"&id="+selectedDate.linkedId+" '>"+selectedDate.linkTitle+"</a>";
-                        var tag = selectedDate.title;
-                        if(userRights > 10){
-                            var html = '<span class="instronly common-setting">'+
-                                '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
-                                '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
-                                '<ul class="select1 dropdown-menu selected-options pull-right">' +
-                                "<li><a href='../../course/course/add-link?cid="+selectedDate.courseId+"&id="+selectedDate.id+" '>"+modify+"</a></li>"+
-                                "</ul></span>";
-                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+html+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
-                        }else{
-                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br><p style='padding-left: 36px'>"+tag+"</p><br><p style='padding-left: 36px'>"+dateH+"</p></div>");
-                        }
-                    } else if(selectedDate.calInlineTextItem == true){
+                    }  else if(selectedDate.calInlineTextItem == true){
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
                         var tag = selectedDate.title;
                         if(userRights > 10){
@@ -410,6 +397,7 @@ function displayCalEvents(events) {
 
     jQuery(".calendar-day-details").empty();
     jQuery.each(events, function (index, dateEvent) {
+
         var selectedDate = formatDate(dateEvent.start);
         if(selectedDate == now ){
             var dateH = "Due " +dateEvent.dueTime+"";
@@ -473,7 +461,7 @@ function displayCalEvents(events) {
                         '<a class="dropdown-toggle grey-color-link select_button floatright" data-toggle="dropdown" href="javascript:void(0);">' +
                         '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
                         '<ul class="select1 dropdown-menu selected-options pull-right">' +
-                        "<li><a href='../../course/course/add-link?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
+                        "<li><a href='../../course/course/modify-inline-text?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
                         "</ul>"+
                         "</span>";
                     jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
