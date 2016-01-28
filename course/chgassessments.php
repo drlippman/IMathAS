@@ -353,7 +353,7 @@ if (!(isset($teacherid))) {
 		}
 		
 		$page_forumSelect = array();
-		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid'";
+		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$page_forumSelect['val'][0] = 0;
 		$page_forumSelect['label'][0] = "None";

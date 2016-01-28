@@ -232,16 +232,22 @@ function matrixsystemdisp($m,$v=array('x','y','z','w','v')) {
 				$out .= '=,'.$m[$i][$j];
 				break;
 			}
-			if (!is_numeric($m[$i][$j]) && $firstout) {  //something like a variable coefficient
-				$out .= '+,';
-			} else if ($m[$i][$j]==0) {
-				$out .= ",";
-			} else if ($m[$i][$j]<0) {
-				$out .= "-,";
-			} else if ($firstout) {
-				$out .= "+,";
+			if ($j==0) {
+				if ($m[$i][$j]<0) {
+					$out .= "-";
+				}
 			} else {
-				$out .= ',';
+				if (!is_numeric($m[$i][$j]) && $firstout) {  //something like a variable coefficient
+					$out .= '+,';
+				} else if ($m[$i][$j]==0) {
+					$out .= ",";
+				} else if ($m[$i][$j]<0) {
+					$out .= "-,";
+				} else if ($firstout) {
+					$out .= "+,";
+				} else {
+					$out .= ',';
+				}
 			}
 			if (!is_numeric($m[$i][$j])) {
 				$out .= $m[$i][$j];
