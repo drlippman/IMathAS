@@ -248,11 +248,22 @@ function calendar() {
             var questions = 'Questions';
             var grades = 'Grades';
             var modify = 'Modify';
-
+            jQuery(this).addClass('ac_checked_date');
+            jQuery('.fc-day').not(jQuery(this)).removeClass('ac_checked_date');
             jQuery(".calendar-day-details").empty();
+            jQuery(".day-details").empty();
+
+            jQuery('.calendar').fullCalendar('clientEvents', function(event) {
+
+                var clickedDate = date;
+
+                if(clickedDate >= event.start && clickedDate <= event.end) {
+                }
+            });
+            jQuery(".day-details").append("<div class='day-details'> "+ date.format('dddd DD/MM/YYYY')+"</div>");
+
             jQuery.each(calendarEvents[0], function (index, selectedDate) {
-//                jQuery(".fc-state-highlight").removeClass("fc-state-highlight");
-//                jQuery(jsEvent.target).addClass("fc-state-highlight");
+
                 if(selectedDate.start == selectedDay) {
                     if(currentDate == formattedSelectedDay){
                         var dateH = "Due " +selectedDate.dueTime+"";
@@ -394,11 +405,16 @@ function displayCalEvents(events) {
     var questions = 'Questions';
     var grades = 'Grades';
     var modify = 'Modify';
+    var moment = jQuery('.calendar').fullCalendar('getDate');
 
     jQuery(".calendar-day-details").empty();
+    jQuery(".day-details").empty();
+    jQuery(".day-details").append("<div class='day-details'> "+ moment.format('dddd DD/MM/YYYY')+"</div>");
+
     jQuery.each(events, function (index, dateEvent) {
 
         var selectedDate = formatDate(dateEvent.start);
+
         if(selectedDate == now ){
             var dateH = "Due " +dateEvent.dueTime+"";
             if(dateEvent.reviewMode == false){
