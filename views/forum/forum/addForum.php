@@ -166,7 +166,7 @@ $this->title = $pageTitle;
                 </div>
             </div>
         </div>
-        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
+        <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em padding-bottom-fifteen">
             <div class="col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero">
                 <?php AppUtility::t('Group forum?')?>
             </div>
@@ -178,46 +178,49 @@ $this->title = $pageTitle;
                 }        ?>
             </div>
         </div>
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-10">
-            <div class="floatleft">
-                <input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowAnonymous']) { echo "checked=1";}?> >
-            </div>
-            <div class="col-md-4 col-sm-4 padding-left-pt-six-em">
+     <div class="col-md-12 col-sm-12  padding-left-zero ">
+        <div class="col-md-12 col-sm-12">
+            <div class="padding-left-zero col-md-2 col-sm-2">
                 <?php AppUtility::t('Allow anonymous posts')?>
             </div>
+            <div class="col-md-10 col-sm-10 padding-left-five">
+                <input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowAnonymous']) { echo "checked=1";}?> >
+            </div>
+
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
-            <div class="floatleft">
-                <input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowModify']) { echo "checked=1";}?>><br>
-            </div>
-            <div class="col-md-6 col-sm-6 padding-left-pt-six-em">
+        <div class="padding-top-one-em col-md-12 col-sm-12">
+            <div class="padding-left-zero col-md-2 col-sm-2">
                 <?php AppUtility::t('Allow students to modify posts')?>
             </div>
+            <div class="col-md-10 col-sm-10 padding-left-five">
+                <input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowModify']) { echo "checked=1";}?>><br>
+            </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
-            <div class="floatleft">
-                <input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowDelete']) { echo "checked=1";}?>><br>
-            </div>
-            <div class="col-md-6 col-sm-8 padding-left-pt-six-em">
+        <div class="padding-top-one-em col-md-12 col-sm-12">
+            <div class="padding-left-zero col-md-2 col-sm-2">
                 <?php AppUtility::t('Allow students to delete own posts (if no replies)')?>
             </div>
+            <div class="col-md-10 col-sm-10 padding-left-five">
+                <input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowDelete']) { echo "checked=1";}?>><br>
+            </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
-            <div class="floatleft">
-                <input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowLikes']) { echo "checked=1";}?>><br>
-            </div>
-            <div class="col-md-4 col-sm-4 padding-left-pt-six-em">
+        <div class="padding-top-one-em col-md-12 col-sm-12">
+            <div class="padding-left-zero col-md-2 col-sm-2">
                 <?php AppUtility::t('Turn on "liking" posts')?>
             </div>
-        </div>
+            <div class="col-md-10 col-sm-10 padding-left-five">
+                <input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowLikes']) { echo "checked=1";}?>><br>
+            </div>
 
+        </div>
+     </div>
 
         <div class="padding-top-one-em col-md-12 col-sm-12 padding-left-zero">
             <div class="col-md-2 col-sm-3 padding-right-zero"><?php AppUtility::t('Viewing before posting')?></div>
-            <div class="col-md-10 col-sm-9 padding-left-one-pt-two-em">
+            <div class="col-md-10 col-sm-9 padding-left-one-pt-one-em">
                 <input class="floatleft" type="checkbox" name="viewing-before-posting" value="16"<?php if ($defaultValue['viewAfterPost']) { echo "checked=1";}?>>
                 <label class="col-sm-11 col-md-11 padding-left non-bold padding-left-pt-six-em">
                     <?php AppUtility::t('Prevent students from viewing posts until they have created a thread.You will likely also want to disable modifying posts')?>
@@ -225,7 +228,7 @@ $this->title = $pageTitle;
             </div>
         </div>
 
-        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
+        <div class="padding-top-one-em col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 padding-left-pt-nine-em">
             <div class="floatleft">
                 <input type="checkbox" name="Get-email-notify-of-new-posts" value="1"<?php if ($defaultValue['hasSubScrip']) { echo "checked=1";}?>><br>
             </div>

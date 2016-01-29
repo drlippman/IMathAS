@@ -251,12 +251,12 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
     <table class="display user-section table table-bordered table-striped table-hover data-table">
         <thead>
         <tr>
-            <th><?php AppUtility::t('Name'); ?></th>
-            <th><?php AppUtility::t('Username'); ?></th>
-            <th><?php AppUtility::t('Email'); ?></th>
-            <th><?php AppUtility::t('Rights'); ?></th>
-            <th><?php AppUtility::t('Last Login'); ?></th>
-            <th><?php AppUtility::t('Settings'); ?></th>
+            <th style="width: 16%"><?php AppUtility::t('Name'); ?></th>
+            <th style="width: 16%"><?php AppUtility::t('Username'); ?></th>
+            <th style="width: 20%"><?php AppUtility::t('Email'); ?></th>
+            <th style="width: 16%"><?php AppUtility::t('Rights'); ?></th>
+            <th style="width: 16%"><?php AppUtility::t('Last Login'); ?></th>
+            <th style="width: 16%"><?php AppUtility::t('Settings'); ?></th>
         </tr>
         </thead>
         <tbody class="word-break-break-all">
@@ -271,11 +271,11 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
                 $alt = AppConstant::NUMERIC_ZERO;
             }
             ?>
-            <td><?php echo $page_userDataLastName[$i] . ", " . $page_userDataFirstName[$i] ?></td>
-            <td><?php echo $page_userDataSid[$i] ?></td>
-            <td><?php echo $page_userDataEmail[$i] ?></td>
-            <td><?php echo $page_userDataType[$i] ?></td>
-            <td><?php echo $page_userDataLastAccess[$i] ?></td>
+            <td style="width: 16%"><?php echo $page_userDataLastName[$i] . ", " . $page_userDataFirstName[$i] ?></td>
+            <td style="width: 16%"><?php echo $page_userDataSid[$i] ?></td>
+            <td style="width: 20%"><?php echo $page_userDataEmail[$i] ?></td>
+            <td style="width: 16%"><?php echo $page_userDataType[$i] ?></td>
+            <td style="width: 16%"><?php echo $page_userDataLastAccess[$i] ?></td>
 
             <td class=c>
                 <ul class="nav roster-menu-bar-nav sub-menu col-md-12 col-sm-12">

@@ -1461,6 +1461,14 @@ div.multiselitem {
 .padding-left-pt-eight-em {
     padding-left: 0.8em;
 }
+.padding-left-pt-nine-em {
+    padding-left: 0.9em;
+}
+
+.padding-left-one-pt-one-em {
+    padding-left: 1.1em;
+}
+
 .padding-left-one-pt-two-em {
     padding-left: 1.2em;
 }
@@ -1593,4 +1601,15 @@ padding-left: 0.4em;
 }
 .scroll-x{
     overflow-x: scroll
+}
+div.items {
+    border: 1px solid #a9a9a9;
+    background-color: #fff;
+    margin-bottom: 20px;
+    /*padding-right: 5%;*/
+    padding-top: 20px;
+    padding-left: 15px;
+    min-height: 100px;
+    margin-left: 80px;
+    /*border-radius: 5px;*/
 }

@@ -1686,7 +1686,7 @@ class ShowItemCourse extends Component
         if ($canEdit) {
             echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
         }
-        echo "<div class=item>\n"; // 13 function
+        echo "<div class=items>\n"; // 13 function
         if ($aname != AppConstant::NUMERIC_ZERO) {
             echo "<a name=\"$aname\"></a>";
         }
