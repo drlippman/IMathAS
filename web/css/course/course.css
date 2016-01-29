@@ -262,3 +262,7 @@ div.dialog-items{
 .select-ask-ques-link select, .select-use-group-set select, .select-gradebook-category select, .select-tutor-access select{
     width:50%;
 }
+
+.ac_checked_date{
+    background-color:#ffcc99;
+}
