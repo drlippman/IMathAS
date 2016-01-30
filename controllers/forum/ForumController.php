@@ -1178,44 +1178,48 @@ class ForumController extends AppController
                     $j++;
                 }
             }
+
+
             $fileName = implode('@@', $files);
             $isaNon = $params['postanon'];
             $isPost = $params['isPost'];
             $point = $params['points'];
             $user = $this->user;
+            $connection = $this->getDatabase();
+            $transaction = $connection->beginTransaction();
+            try{
             $reply = new ForumPosts();
             $reply->createReply($params, $user, $fileName,$isaNon);
             $userPost = ForumPosts::getUserId($Id);
             $userId = $userPost['userid'];
 
+                        if ($isTeacher && isset($point) && trim($point)!='') {
+                            $result = Grades::getId($Id);
+                            if (count($result)>0) {
+                                $gradeId = $result['id'];
+                                Grades::updateScore($gradeId,$point);
 
-            if ($isTeacher && isset($point) && trim($point)!='') {
-                $result = Grades::getId($Id);
-                if (count($result)>0) {
-                    $gradeId = $result['id'];
-                    Grades::updateScore($gradeId,$point);
+                            } else {
+                                $grade = array(
+                                    'gradetype' => 'forum',
+                                    'gradetypeid' => $forumId,
+                                    'userid' => $userId,
+                                    'refid' => $Id,
+                                    'score' => $point
+                                );
+                                $insertGrade = new Grades();
+                                $grades = $insertGrade->insertGrades($grade);
+//                                AppUtility::dump($grades);
+                            }
 
-                } else {
-                    $grade = array(
-                        'gradetype' => 'forum',
-                        'gradetypeid' => $forumId,
-                        'userid' => $userId,
-                        'refid' => $Id,
-                        'score' => $point
-                    );
-                    $insertGrade = new Grades();
-                    $grades = $insertGrade->insertGrades($grade);
-
-                    if($grades->errors['score'])
-                    {
-                        $this->setWarningFlash("Score must be an integer.");
-                        return $this->redirect('reply-post?courseid='.$courseId.'&id='.$Id.'&threadId='.$threadId.'&forumid='.$forumId);
                     }
 
+                    $transaction->commit();
+                    }catch (\Exception $e){
+
+                        $transaction->rollBack();
+                        return false;
                 }
-
-            }
-
             if (isset($isPost)) {
                 return $this->redirect('list-post-by-name?cid=' . $params['courseid'] . '&forumid=' . $params['forumid']);
             } else {

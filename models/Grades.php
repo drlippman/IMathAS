@@ -280,12 +280,12 @@ class Grades extends BaseImasGrades
 
     public function insertGrades($grade)
     {
-        $this->gradetypeid = $grade['gradetypeid'];
-        $this->userid = $grade['userid'];
-        $this->refid = $grade['refid'];
-        $this->score = $grade['score'];
-        $this->gradetype = $grade['gradetype'];
-        $this->save();
-        return $this;
+            $this->gradetypeid = $grade['gradetypeid'];
+            $this->userid = $grade['userid'];
+            $this->refid = $grade['refid'];
+            $this->score = $grade['score'];
+            $this->gradetype = $grade['gradetype'];
+            $this->save();
+            return $this;
     }
 }

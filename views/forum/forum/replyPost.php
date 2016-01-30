@@ -61,7 +61,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     if ($isTeacher && $hasPoints) {
         echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
-        echo '<input size="4" name="points" type="text" value="'.$points.'" /></span><br class="form" />';
+        echo '<input name="points" onkeydown="return (event.which >= 48 && event.which <= 57)
+        || event.which == 8 || event.which == 46" type="text" value="'.$points.'" /></span><br class="form" />';
     }
     ?></div>
     <div style="margin-left: 10.7%">
