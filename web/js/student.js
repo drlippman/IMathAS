@@ -260,7 +260,7 @@ function calendar() {
                 if(clickedDate >= event.start && clickedDate <= event.end) {
                 }
             });
-            jQuery(".day-details").append("<div class='day-details'> "+ date.format('dddd DD/MM/YYYY')+"</div>");
+            jQuery(".day-details").append("<div class='day-details'> "+ date.format('dddd MMMM D, YYYY')+"</div>");
 
             jQuery.each(calendarEvents[0], function (index, selectedDate) {
 
@@ -409,7 +409,7 @@ function displayCalEvents(events) {
 
     jQuery(".calendar-day-details").empty();
     jQuery(".day-details").empty();
-    jQuery(".day-details").append("<div class='day-details'> "+ moment.format('dddd DD/MM/YYYY')+"</div>");
+    jQuery(".day-details").append("<div class='day-details'> "+ moment.format('dddd MMMM D, YYYY')+"</div>");
 
     jQuery.each(events, function (index, dateEvent) {
 
@@ -431,9 +431,9 @@ function displayCalEvents(events) {
 
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 } else{
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 }
             }else if(dateEvent.calLinkItem == true){
                 var tag = dateEvent.title;
@@ -447,9 +447,9 @@ function displayCalEvents(events) {
                         "<li><a href='../../course/course/add-link?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+dropdown+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details.fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+dropdown+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 } else{
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<p style='padding-left: 36px'>"+dateH+"</p></div>");
 
                 }
             }else if(dateEvent.calLinkItemOnCal == true){
@@ -521,9 +521,9 @@ function displayCalEvents(events) {
 
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"</div>");
+                    jQuery(".calendar-day-details, .fc-event-container").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"</div>");
                 } else{
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"</div>");
+                    jQuery(".calendar-day-details, .fc-event-container").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"</div>");
 
                 }
             } else if(dateEvent.reviewModeDueDate == true){
@@ -540,9 +540,9 @@ function displayCalEvents(events) {
 
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 } else{
-                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
 
                 }
             }
@@ -572,3 +572,20 @@ function formatDate(date){
     selectedDate = selectedDate.replace(',', '-');
     return selectedDate;
 }
+
+//var selectionManager = (function(){
+//    //i like making private variables :-)
+//    var $curSelectedDay = null
+//
+//    //define a "select" method for switching 'selected' state
+//    return {
+//        select: function($newEvent) {
+//            if ($curSelectedDay){
+//                //if we already had a day chosen, let's get rid of its CSS 'selectedDay' class
+//                $curSelectedDay.removeClass("selectedDay");
+//            }
+//            //find the parent div that has a class matching the pattern 'fc-day', and add the "selectedDay" class to it
+//            $curSelectedDay = $thisEvent.closest('div[class~="fc-day"]').addClass("selectedDay");
+//        }
+//    };
+//})();
