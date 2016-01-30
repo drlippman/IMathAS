@@ -710,6 +710,13 @@ class AssessmentSession extends BaseImasAssessmentSessions
     {
         return AssessmentSession::find()->select(['id'])->where(['assessmentid' => $assessmentId, 'userid' => $userId])->all();
     }
+
+    public static function getDataByAssessment($aname,$userId)
+    {
+        $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
+        $query .= "WHERE ia.name='$aname' AND ias.userid='$userId'";
+        return Yii::$app->db->createCommand($query)->bindValues([':aname' => $aname,':userId' => $userId])->queryAll();
+    }
 }
 
 

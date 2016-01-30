@@ -57,6 +57,13 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
     ?>
+<div class="col-md-12 col-sm-12">
+    <?php
+    if ($isTeacher && $hasPoints) {
+        echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
+        echo '<input size="4" name="points" type="text" value="'.$points.'" /></span><br class="form" />';
+    }
+    ?></div>
     <div style="margin-left: 10.7%">
     <?php if($reply[0]['forumType'] == 1)
     {
@@ -89,5 +96,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="blockitems col-sm-12 col-md-12" id="item1">
                 <h5><?php echo $reply[0]['message']?></h5></div>
         </div>
+
 </div>
     </form>

@@ -18,9 +18,9 @@ foreach ($itemsimporder as $item) {
     $p = strpos($taglist,':');
     $catname = substr($taglist,0,$p);
     if (!isset($taginfo[$catname])) {
-        $taginfo[$catname] = explode(',',substr($taglist,$p+1));
+        $taginfo[$catname] = explode(',',substr($taglist,$p));
     } else {
-        $newtags = array_diff(explode(',',substr($taglist,$p+1)), $taginfo[$catname]);
+        $newtags = array_diff(explode(',',substr($taglist,$p)), $taginfo[$catname]);
         foreach ($newtags as $tag) {
             $taginfo[$catname][] = $tag;
         }

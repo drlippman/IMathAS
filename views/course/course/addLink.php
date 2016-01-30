@@ -38,8 +38,8 @@ $this->title = $defaultValues['saveTitle'];
     <div class="name-of-item col-md-12 col-sm-12">
         <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Name of Link') ?></div>
         <div class="col-md-10 col-sm-10">
-            <input class="form-control input-item-title" type=text size=0 name=name
-                   value="<?php echo str_replace('"', '&quot;', $defaultValues['title']); ?>">
+            <input class="form-control input-item-title" type=text size=0 name=name maxlength="60" required=" "
+                   value="<?php echo str_replace('"', '&quot;', $defaultValues['title']);  ?>">
         </div>
     </div>
     <div class="col-md-12 col-sm-12 padding-top-one-pt-five-em padding-right-zero">
@@ -357,7 +357,7 @@ $this->title = $defaultValues['saveTitle'];
                         <?php AppUtility::t('With tag') ?>
                     </span>
                     <span class="padding-left">
-                        <input class="form-control width-five-per display-inline-block" type="text" size="3" value=<?php echo $defaultValues['caltag'];?> name="tag">
+                        <input class="form-control width-five-per display-inline-block" type="text" size="10" maxlength="20" value=<?php echo $defaultValues['caltag'];?> name="tag">
                     </span>
                 </div>
             </div>

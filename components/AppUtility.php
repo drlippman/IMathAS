@@ -3245,13 +3245,13 @@ class AppUtility extends Component
             if ($isTeacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) {
                 echo " <a class=\"small\" href=\"#\">[GB]</a>";
                 if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
-                    $query = "SELECT ias.id FROM imas_assessment_sessions AS ias JOIN imas_assessments AS ia ON ia.id=ias.assessmentid ";
                     $aname = addslashes($matches[2]);
-                    $query .= "WHERE ia.name='$aname' AND ias.userid=".intval($ownerid[$child]);
-                    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-                    if (mysql_num_rows($result)>0) {
-                        $r = mysql_fetch_row($result);
-                        echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$courseId&uid={$ownerid[$child]}&asid={$r[0]}\" target=\"_popoutgradebook\">[assignment]</a>";
+
+                    $ownerChild = intval($ownerid[$child]);
+                    $result = $result = AssessmentSession::getDataByAssessment($aname,$ownerChild);
+                    if (count($result)>0) {
+                        $r = $result;
+                        echo " <a class=\"small\" href=\"#\" target=\"_popoutgradebook\">[assignment]</a>";
                     }
                 }
             }
@@ -3299,7 +3299,6 @@ class AppUtility extends Component
                 }
 
                 echo '<div class="likewrap">'; ?>
-<!--                echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";-->
                 <img id="likeicon<?php echo $child?>" class="likeicon<?php echo $likeclass?>" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $icon?>.png" title="<?php echo $likemsg?>" onclick="savelike(this)">
                 <?php echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','list-likes?cid=$courseId&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
                 echo '</div>';
@@ -3343,7 +3342,7 @@ class AppUtility extends Component
                     }
                     echo "\"/> ";
                     if ($rubric != 0) {
-                        echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
+                        echo AppUtility::printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
                     }
                     echo " Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
                     if ($feedback[$child]!==null) {

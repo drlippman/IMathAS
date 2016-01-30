@@ -35,7 +35,7 @@ class BaseImasGrades extends \yii\db\ActiveRecord
         return [
 //            [['gradetypeid', 'userid', 'feedback'], 'required'],
             [['gradetypeid', 'refid', 'userid'], 'integer'],
-            [['score'], 'number'],
+            [['score'], 'integer'],
             [['feedback'], 'string'],
             [['gradetype'], 'string', 'max' => 15]
         ];

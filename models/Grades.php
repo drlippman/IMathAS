@@ -252,4 +252,40 @@ class Grades extends BaseImasGrades
             $grade->delete();
         }
     }
+
+    public static function getGradesData($id)
+    {
+        $query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
+        $query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id='$id'";
+        return Yii::$app->db->createCommand($query)->queryOne();
+    }
+
+    public static function getId($Id)
+    {
+        return Grades::find()->select('id')->where(['gradetype' => 'forum', 'refid' => $Id])->all();
+    }
+
+    public static function updateScore($id,$score)
+    {
+        $grades = Grades::find()->where(['id' => $id])->all();
+        if($grades)
+        {
+            foreach($grades as $grade)
+            {
+                $grade->score = $score;
+                $grade->save();
+            }
+        }
+    }
+
+    public function insertGrades($grade)
+    {
+        $this->gradetypeid = $grade['gradetypeid'];
+        $this->userid = $grade['userid'];
+        $this->refid = $grade['refid'];
+        $this->score = $grade['score'];
+        $this->gradetype = $grade['gradetype'];
+        $this->save();
+        return $this;
+    }
 }

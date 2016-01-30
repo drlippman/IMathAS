@@ -429,7 +429,7 @@ class CourseController extends AppController
             $page_formActionTag = "modify-inline-text?block=$block&cid=$cid&folder=" . $params['folder'];
             $page_formActionTag .= "&tb=$filter";
 
-            $calTag = $params['caltag'];
+            $calTag = $params['calTag'];
             if ($params['title'] != null || $params['text'] != null || $params['sdate'] != null) { //if the form has been submitted
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {
                     if ($params['sdatetype'] == '0')
