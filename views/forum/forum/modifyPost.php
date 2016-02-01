@@ -9,6 +9,7 @@ $this->title = AppUtility::t('Modify Post',false);
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
+//AppUtility::dump($forumPostData['parent']);
 ?>
 <form enctype="multipart/form-data" method="post" action="modify-post?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
 <div class="item-detail-header">
@@ -34,7 +35,8 @@ $now = $currentTime;
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
   <div class="tab-content shadowBox">
     <div style="padding-top: 20px">
-        <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');?></div>
+        <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');
+            ?></div>
         <div class="col-sm-10">
             <input type=text maxlength="60" value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox padding-left-ten">
         </div>
@@ -75,9 +77,9 @@ $now = $currentTime;
         <?php } ?>
         <br><input name="file-0" type="file" id="uplaod-file" style="border: white 1px solid;" class="file-upload"/><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
         <br><button class="add-more">Add More Files</button><br>
-    <?php }?>S
+    <?php }?>
      </div>
-    <?php if($currentUser['rights'] > 10)
+    <?php if($currentUser['rights'] > 10 && $forumPostData['parent'] == 0 && $forumPostData['userid'] == $userId)
     {?>
         <div>
             <span class="col-sm-2 align-title"><?php echo AppUtility::t('Post Type');?></span>
@@ -152,7 +154,9 @@ $now = $currentTime;
                 echo '</div>';?>
             </span>
         </div>
-    <?php }if ($currentUser['rights'] == 10 && ($forumData['settings'] & 1 == 1)){
+    <?php }
+
+    if ($currentUser['rights'] == 10 && ($forumData['settings'] & 1 == 1)){
         ?>
         <div>
             <div class="col-md-2"><b><?php echo AppUtility::t('Post Anonymously');?></b></div>

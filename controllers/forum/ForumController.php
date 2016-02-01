@@ -683,8 +683,9 @@ class ForumController extends AppController
             }
         }
 
-        $forumPostData = ForumPosts::getbyid($threadId);
-        $threadCreatedUserData = User::getById($forumPostData[0]['userid']);
+        $forumPostData = ForumPosts::getByIdOne($threadId);
+
+        $threadCreatedUserData = User::getById($forumPostData['userid']);
         if ($this->isPostMethod())
         {
             $files = ForumPosts::getFileDetails($params['threadId']);
@@ -758,7 +759,7 @@ class ForumController extends AppController
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
-        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser, 'threadCreatedUserData' => $threadCreatedUserData, 'forumData' => $forumData, 'forumPostData' => $forumPostData);
+        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser, 'threadCreatedUserData' => $threadCreatedUserData, 'forumData' => $forumData, 'forumPostData' => $forumPostData, 'userId' => $userId);
         return $this->renderWithData('modifyPost', $responseData);
     }
 
@@ -1209,7 +1210,6 @@ class ForumController extends AppController
                                 );
                                 $insertGrade = new Grades();
                                 $grades = $insertGrade->insertGrades($grade);
-//                                AppUtility::dump($grades);
                             }
 
                     }
@@ -1225,7 +1225,6 @@ class ForumController extends AppController
             } else {
                 return $this->redirect('post?courseid=' . $params['courseid'] . '&threadid=' . $params['threadId'] . '&forumid=' . $params['forumid']);
             }
-
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypost.js']);

@@ -12,10 +12,14 @@ $(document).ready(function ()
     });
 });
 
-function isNumber(e){
-    e = e || window.event;
-    var charCode = e.which ? e.which : e.keyCode;
-    return /\d/.test(String.fromCharCode(charCode));
+function checkNumber(event){
+    var code = event.which;
+    alert('hh');
+    if((code == 8) || (code > 47 && code < 58)) { //Backspace key press
+alert('a');
+        return true;
+    }
+    return false;
 }
 
 

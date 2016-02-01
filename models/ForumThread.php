@@ -252,17 +252,34 @@ class ForumThread extends BaseImasForumThreads
 
     public static function getDataForPrev($forumid, $threadid,$groupid,$groupset)
     {
-        $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id<'$threadid' ";
-        if ($groupset>0 && $groupid!=-1) {$query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";}
+        $query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id<:threadid ";
+        if ($groupset>0 && $groupid!=-1)
+        {
+            $query .= "AND (stugroupid=':groupid' OR stugroupid=0) ";
+        }
         $query .= "ORDER BY id DESC LIMIT 1";
-        return Yii::$app->db->createCommand($query)->queryOne();
+        $command = Yii::$app->db->createCommand($query)->bindValues([':forumid' => $forumid, ':threadid' => $threadid]);
+        if ($groupset>0 && $groupid!=-1)
+        {
+            $command->bindValue(':groupid', $groupid);
+        }
+        $data = $command->queryOne();
+        return $data;
     }
 
     public static function getDataForNext($forumid, $threadid,$groupid,$groupset)
     {
-        $query = "SELECT id FROM imas_forum_threads WHERE forumid='$forumid' AND id>'$threadid' ";
-        if ($groupset>0 && $groupid!=-1) {$query .= "AND (stugroupid='$groupid' OR stugroupid=0) ";}
+        $query = "SELECT id FROM imas_forum_threads WHERE forumid=:forumid AND id>:threadid ";
+        if ($groupset>0 && $groupid!=-1) {
+            $query .= "AND (stugroupid=':groupid' OR stugroupid=0) ";
+        }
         $query .= "ORDER BY id LIMIT 1";
-        return Yii::$app->db->createCommand($query)->queryOne();
+        $command = Yii::$app->db->createCommand($query)->bindValues([':forumid' => $forumid, ':threadid' => $threadid]);
+        if ($groupset>0 && $groupid!=-1)
+        {
+            $command->bindValue(':groupid', $groupid);
+        }
+        $data = $command->queryOne();
+        return $data;
     }
 }
