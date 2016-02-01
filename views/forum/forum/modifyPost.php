@@ -9,7 +9,6 @@ $this->title = AppUtility::t('Modify Post',false);
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
-//AppUtility::dump($forumPostData['parent']);
 ?>
 <form enctype="multipart/form-data" method="post" action="modify-post?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
 <div class="item-detail-header">
@@ -67,8 +66,9 @@ $now = $currentTime;
                     {
                         /*PATH FOR AMAZON IMAGE */
                     }
-                    else{?>
-                        <a href="<?php echo AppUtility::getAssetURL()?>Uploads/<?php echo $files[2*$i+1]?>" target="_blank">View</a>
+                    else{
+                        $uploadDir = AppConstant::UPLOAD_DIRECTORY;?>
+                        <a href="<?php echo AppUtility::getHomeURL(). $uploadDir?><?php echo $files[2*$i+1]?>" target="_blank">View</a>
                     <?php }?>
                     Delete? <input type="checkbox" name="fileDel[<?php echo $i;?>]" value="1"/><br/>
                 <?php }

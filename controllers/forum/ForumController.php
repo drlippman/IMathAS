@@ -718,7 +718,6 @@ class ForumController extends AppController
                     if($_FILES['file-' . $j]['error'] == 0){
                         $uploadFile = $uploadDir . basename($_FILES['file-' . $j]['name']);
                         $userFileName = basename($_FILES['file-' . $j]['name']);
-
                         $params['description-' . $j] = $userFileName;
                         $params['description-' . $j] = str_replace('@@', '@', $params['description-' . $j]);
                         $extension = strtolower(strrchr($userFileName, "."));
@@ -741,6 +740,7 @@ class ForumController extends AppController
 
             if (strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO)
             {
+
                 $threadIdOfPost = ForumPosts::modifyPost($params, $fileName);
                 $contentTrackRecord = new ContentTrack();
                 if ($currentUser->rights == AppConstant::STUDENT_RIGHT) {
