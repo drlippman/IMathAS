@@ -2534,7 +2534,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($answers)) {
 			$saarr = array();
 			$ineqcolors = array("blue","red","green");
-			foreach($answers as $k=>$ans) {
+			$k = 0;
+			foreach($answers as $ans) {
 				if (is_array($ans)) { continue;} //shouldn't happen, unless user forgot to set question to multipart
 				if ($ans=='') { continue;}
 				$function = explode(',',$ans);
@@ -2583,13 +2584,48 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							$saarr[$k] .= ','.$function[1].','.$function[2];
 							if ($locky==1) {
 								$saarr[$k] .=',,,3';
+							}
+						} else if ($locky==1) {
+							$saarr[$k] .=',,,,,3';
+						}
+						//add asymptotes for rational function graphs
+						if (strpos($function[0],'/x')!==false || preg_match('|/\([^\)]*x|', $function[0])) {
+							$func = makepretty($function[0]);
+							$func = mathphp($func,'x');
+							$func = str_replace("(x)",'($x)',$func);
+							$func = create_function('$x', 'return ('.$func.');');
+							$x1 = 1/4*$settings[1] + 3/4*$settings[0];
+							$x2 = 1/2*$settings[1] + 1/2*$settings[0];
+							$x3 = 3/4*$settings[1] + 1/4*$settings[0];
+			
+							$y1 = @$func($x1);
+							$y2 = @$func($x2);
+							$y3 = @$func($x3);
+					
+							if ($y1===false) {
+								$x1 = $x1+.2*($x2-$x1);
+								$y1 = @$func($x1);
+								$y1p = $settings[7] - ($y1-$settings[2])*$pixelspery - $imgborder;
+							} else if ($y2===false) {
+								$x2 = $x2+.2*($x2-$x1);
+								$y2 = @$func($x2);
+								$y2p = $settings[7] - ($y2-$settings[2])*$pixelspery - $imgborder;
+							} else if ($y3===false) {
+								$x3 = $x3-.2*($x2-$x1);
+								$y3 = @$func($x3);
+								$y3p = $settings[7] - ($y3-$settings[2])*$pixelspery - $imgborder;
+							} 
+							$va = ($x1*$x2*$y1-$x1*$x2*$y2-$x1*$x3*$y1+$x1*$x3*$y3+$x2*$x3*$y2-$x2*$x3*$y3)/(-$x1*$y2+$x1*$y3+$x2*$y1-$x2*$y3-$x3*$y1+$x3*$y2);
+							$ha = (($x1*$y1-$x2*$y2)-$va*($y1-$y2))/($x1-$x2);
+							
+							$k++;
+							$saarr[$k] = "$ha,green,,,,,,dash";
+							$k++;
+							$saarr[$k] = "[$va,t],green,,,,,,dash";
 						}
 					}
-						if ($locky==1) {
-							$saarr[$k] .=',,,,,3';
 				}
-			}
-				}
+				$k++;
 			}
 			
 			if ($backg!='') {
