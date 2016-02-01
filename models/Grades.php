@@ -256,8 +256,8 @@ class Grades extends BaseImasGrades
     public static function getGradesData($id)
     {
         $query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
-        $query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id='$id'";
-        return Yii::$app->db->createCommand($query)->queryOne();
+        $query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id=:id";
+        return Yii::$app->db->createCommand($query)->bindValue(':id',$id)->queryOne();
     }
 
     public static function getId($Id)
