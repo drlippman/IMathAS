@@ -54,7 +54,6 @@ function calendar() {
     var endDate = jQuery('.end-date').val();
     var startDate = jQuery('.start-date').val();
     var userRights = jQuery('.user-rights').val();
-
     jQuery('.calendar').fullCalendar({
         height: "auto",
         fixedWeekCount: false,
@@ -233,13 +232,16 @@ function calendar() {
                         }
 
                     });
+                    jQuery(".day-details").empty();
+                    jQuery(".day-details").append("<div class='day-details'> " +moment.format('dddd MMMM DD, YYYY')+ "</div>");
+                    jQuery(".calendar-day-details").empty();
                     calendarEvents.push(events);
-                    displayCalEvents(events);
                     callback(events);
 
                 }
             });
         },
+
         dayClick: function(date, jsEvent, view) {
             var currentDate = getCurrentDate();
             var selectedDay = date.format();
@@ -260,7 +262,7 @@ function calendar() {
                 if(clickedDate >= event.start && clickedDate <= event.end) {
                 }
             });
-            jQuery(".day-details").append("<div class='day-details'> "+ date.format('dddd MMMM D, YYYY')+"</div>");
+            jQuery(".day-details").append("<div class='day-details'> "+ date.format('dddd DD/MM/YYYY')+"</div>");
 
             jQuery.each(calendarEvents[0], function (index, selectedDate) {
 
@@ -398,25 +400,193 @@ function calendar() {
     });
 
 }
-function displayCalEvents(events) {
+
+
+/**
+    Displayed All Events of a Month on a click Event
+ **/
+function ShowAll() {
     var now = getCurrentDate();
+    var courseId = jQuery('.calender-course-id').val();
     var userRights = jQuery('.user-rights').val();
     var settings = 'Settings';
     var questions = 'Questions';
     var grades = 'Grades';
     var modify = 'Modify';
     var moment = jQuery('.calendar').fullCalendar('getDate');
-
-    jQuery(".calendar-day-details").empty();
+    var moment_month = moment.month() + 1;
     jQuery(".day-details").empty();
-    jQuery(".day-details").append("<div class='day-details'> "+ moment.format('dddd MMMM D, YYYY')+"</div>");
+    jQuery(".calendar-day-details").empty();
+    jQuery(".day-details").append("<div class='day-details'> " +moment.format('MMMM, YYYY')+ "</div>");
+    jQuery.ajax({
+        url: 'get-assessment-data-ajax',
+        data: {
+            cid: courseId
+        },
+        success: function (response) {
+            var calendarResponse = JSON.parse(response);
+            var assessmentData = calendarResponse.data;
+            var events = [];
+            jQuery.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
+                var eventColor = 'blue';
+                if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > assessmentDetail.now) {
+                    eventColor = 'red';
+                } else if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString == 2000000000) {
+                    eventColor = 'red';
+                }
+                /**
+                 * If assessment is in review mode, event
+                 */
+                if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > assessmentDetail.now) {
+                    events.push({
+                        title: assessmentDetail.name,
+                        start: assessmentDetail.reviewDate,
+                        dueTime: assessmentDetail.dueTime,
+                        reviewDat: assessmentDetail.reviewDate,
+                        end: assessmentDetail.endDate,
+                        message: 'Review Assessment',
+                        courseId: assessmentDetail.courseId,
+                        assessmentId: assessmentDetail.assessmentId,
+                        color: eventColor,
+                        reviewMode: true
+                    });
+                }
+                /**
+                 * If assessment is not in review mode, event
+                 */
+                else if (assessmentDetail.endDateString > assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now) {
+
+                    events.push({
+                        title: assessmentDetail.name,
+                        start: assessmentDetail.endDate,
+                        dueTime: assessmentDetail.dueTime,
+                        startDat: assessmentDetail.endDate,
+                        courseId: assessmentDetail.courseId,
+                        assessmentId: assessmentDetail.assessmentId,
+                        message: 'Assessment',
+                        color: eventColor,
+                        reviewMode: false
+                    });
+                } else if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString == 2000000000) {
+                    events.push({
+                        title: assessmentDetail.name,
+                        start: assessmentDetail.endDate,
+                        dueTime: assessmentDetail.dueTime,
+                        end: assessmentDetail.endDate,
+                        message: 'Review Assessment',
+                        courseId: assessmentDetail.courseId,
+                        assessmentId: assessmentDetail.assessmentId,
+                        color: eventColor,
+                        reviewModeDueDate: true
+                    });
+                }
+            });
+            /**
+             * Display Managed events by admin
+             */
+            jQuery.each(assessmentData.calendarArray, function (index, calendarItem) {
+                var eventColor = '#00FFCC';
+                if (calendarItem != 0) {
+                    events.push({
+                        title: calendarItem.tag,
+                        start: calendarItem.date,
+                        tagTitle: calendarItem.title,
+                        dueTime: calendarItem.dueTime,
+                        message: 'Managed Events',
+                        color: eventColor,
+                        calItem: true
+                    });
+                }
+            });
+            /**
+             * Display Linked text's tag on enddate with title as URL
+             */
+            jQuery.each(assessmentData.calendarLinkArray, function (index, calendarLinkItem) {
+                var eventColor = '#59FF59';
+                if (calendarLinkItem.oncal == 2) {
+                    if (calendarLinkItem.startDateString < calendarLinkItem.now && calendarLinkItem.endDateString > calendarLinkItem.now) {
+                        events.push({
+                            title: calendarLinkItem.calTag,
+                            linkTitle: calendarLinkItem.title,
+                            start: calendarLinkItem.endDate,
+                            linkedId: calendarLinkItem.linkedId,
+                            dueTime: calendarLinkItem.dueTime,
+                            id: calendarLinkItem.id,
+                            oncal: calendarLinkItem.oncal,
+                            color: eventColor,
+                            courseId: calendarLinkItem.courseId,
+                            message: 'Linked text events',
+                            calLinkItemOnCal: true
+
+                        });
+                    }
+                } else if (calendarLinkItem.oncal == 1) {
+                    events.push({
+                        title: calendarLinkItem.calTag,
+                        linkTitle: calendarLinkItem.title,
+                        start: calendarLinkItem.startDate,
+                        linkedId: calendarLinkItem.linkedId,
+                        dueTime: calendarLinkItem.dueTime,
+                        id: calendarLinkItem.id,
+                        oncal: calendarLinkItem.oncal,
+                        color: eventColor,
+                        courseId: calendarLinkItem.courseId,
+                        message: 'Linked text events',
+                        calLinkItem: true
+
+                    });
+                }
+
+            });
+            /**
+             * Display Inline text on calendar
+             */
+            jQuery.each(assessmentData.calendarInlineTextArray, function (index, calendarInlineTextItem) {
+                var eventColor = '#FF6666';
+                if (calendarInlineTextItem.oncal == 2) {
+
+                    if (calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now) {
+                        events.push({
+                            title: calendarInlineTextItem.calTag,
+                            start: calendarInlineTextItem.endDate,
+                            dueTime: calendarInlineTextItem.dueTime,
+                            courseId: calendarInlineTextItem.courseId,
+                            id: calendarInlineTextItem.id,
+                            oncal: calendarInlineTextItem.oncal,
+                            color: eventColor,
+                            message: 'Inline text events',
+                            calInlineTextOncal: true
+                        });
+                    }
+                } else if (calendarInlineTextItem.oncal == 1) {
+
+                    if (calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now) {
+                        events.push({
+                            title: calendarInlineTextItem.calTag,
+                            start: calendarInlineTextItem.startDate,
+                            dueTime: calendarInlineTextItem.dueTime,
+                            courseId: calendarInlineTextItem.courseId,
+                            id: calendarInlineTextItem.id,
+                            oncal: calendarInlineTextItem.oncal,
+                            color: eventColor,
+                            message: 'Inline text events',
+                            calInlineTextItem: true
+                        });
+                    }
+                }
+
+            });
+            calendarEvents.push(events);
 
     jQuery.each(events, function (index, dateEvent) {
-
         var selectedDate = formatDate(dateEvent.start);
+                if(selectedDate.length==10)
+                    var selected_month =selectedDate.substr(5,2);
+                else
+                    var selected_month =selectedDate.substr(5,1);
 
-        if(selectedDate == now ){
-            var dateH = "Due " +dateEvent.dueTime+"";
+                if(selected_month == moment_month) {
+                    var dateH = "Due "+ selectedDate+" | "+ dateEvent.dueTime + "";
             if(dateEvent.reviewMode == false){
                 var title = "<a class='' style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+dateEvent.assessmentId+"&cid="+dateEvent.courseId+" '>"+dateEvent.title+"</a>";
                 var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
@@ -431,9 +601,9 @@ function displayCalEvents(events) {
 
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 } else{
-                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 }
             }else if(dateEvent.calLinkItem == true){
                 var tag = dateEvent.title;
@@ -447,9 +617,9 @@ function displayCalEvents(events) {
                         "<li><a href='../../course/course/add-link?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details.fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+dropdown+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+dropdown+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 } else{
-                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<p style='padding-left: 36px'>"+dateH+"</p></div>");
 
                 }
             }else if(dateEvent.calLinkItemOnCal == true){
@@ -521,9 +691,9 @@ function displayCalEvents(events) {
 
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details, .fc-event-container").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"</div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"</div>");
                 } else{
-                    jQuery(".calendar-day-details, .fc-event-container").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"</div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"</div>");
 
                 }
             } else if(dateEvent.reviewModeDueDate == true){
@@ -540,15 +710,19 @@ function displayCalEvents(events) {
 
                         "</ul>"+
                         "</span>";
-                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
                 } else{
-                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
 
                 }
             }
+
         }
     });
 }
+    });
+   }
+
 
 function getCurrentDate(){
     var now = new Date();
@@ -572,20 +746,3 @@ function formatDate(date){
     selectedDate = selectedDate.replace(',', '-');
     return selectedDate;
 }
-
-//var selectionManager = (function(){
-//    //i like making private variables :-)
-//    var $curSelectedDay = null
-//
-//    //define a "select" method for switching 'selected' state
-//    return {
-//        select: function($newEvent) {
-//            if ($curSelectedDay){
-//                //if we already had a day chosen, let's get rid of its CSS 'selectedDay' class
-//                $curSelectedDay.removeClass("selectedDay");
-//            }
-//            //find the parent div that has a class matching the pattern 'fc-day', and add the "selectedDay" class to it
-//            $curSelectedDay = $thisEvent.closest('div[class~="fc-day"]').addClass("selectedDay");
-//        }
-//    };
-//})();

@@ -658,6 +658,7 @@ class ShowItemCourse extends Component
                         <div class="calendar-day-details-right-side pull-left col-lg-3">
                             <div class="day-detail-border">
                                 <b style="font-size: 18px"><?php AppUtility::t('Day Details')?></b>
+                                <a style="font-size: 12px; float: right" href="#" onclick="ShowAll();">Show All</a>
                                 <div class="day-details"></div>
                             </div>
                             <div class="calendar-day-details word-wrap-break-word"></div>

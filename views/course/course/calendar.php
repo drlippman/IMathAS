@@ -33,6 +33,7 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class="calendar-day-details-right-side pull-left col-md-3">
                 <div class="day-detail-border ">
                     <b style="font-size: 18px"><?php AppUtility::t('Day Details')?></b>
+                    <a style="font-size: 12px; float: right" href="#" onclick="ShowAll();">Show All</a>
                     <div class="day-details"></div>
                 </div>
 
