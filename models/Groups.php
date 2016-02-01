@@ -56,7 +56,8 @@ class Groups extends BaseImasGroups
         return $this->id;
     }
 
-    public static function getIdNameByName()
+    public static function
+    getIdNameByName()
     {
         return Groups::find()->select('id,name')->orderBy('name')->all();
     }

@@ -66,6 +66,7 @@ class ForumController extends AppController
         $teacherid = $this->isTeacher($user['id'],$cid);
         $tutorid = $this->isTutor($user['id'],$cid);
         $studentid = $this->isStudent($user['id'],$cid);
+        $tagfilter = $this->getParamVal('tagfilter');
         if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
             $this->setErrorFlash('You are not enrolled in this course.');
             return $this->redirect(Yii::$app->getHomeUrl());
@@ -870,9 +871,8 @@ class ForumController extends AppController
         $groupid = 0;
 
         $canviewall = (($isTeacher) || ($isTutor));
-        $caneditscore = (isset($isTeacher) || (isset($isTutor) && $tutoredit==1));
-        $canviewscore = (isset($isTeacher) || (isset($isTutor) && $tutoredit<2));
-
+        $caneditscore = (($isTeacher) || (($isTutor) && $tutoredit==1));
+        $canviewscore = (($isTeacher) || (($isTutor) && $tutoredit<2));
 
         if ($groupset>0) {
             if (!isset($grp)) {
@@ -1126,6 +1126,13 @@ class ForumController extends AppController
         if ($userData->rights == AppConstant::STUDENT_RIGHT) {
             $contentTrackRecord->insertForumData($userData->id, $courseId, $forumId, $Id, $threadId, $type = AppConstant::NUMERIC_ONE);
         }
+        $gradeData = Grades::getGradesData($Id);
+        $points = $gradeData['score'];
+        $forum = Forums::getForumDetails($forumId);
+        if ($isTeacher) {
+            $result = $forum['points'];
+            $hasPoints = ($result > 0);
+        }
 
         $forumDetails = Forums::getForumDetailByForumId($forumId);
         $allowanon = ($forumDetails['settings'])%2;
@@ -1171,13 +1178,48 @@ class ForumController extends AppController
                     $j++;
                 }
             }
+
+
             $fileName = implode('@@', $files);
             $isaNon = $params['postanon'];
             $isPost = $params['isPost'];
+            $point = $params['points'];
             $user = $this->user;
+            $connection = $this->getDatabase();
+            $transaction = $connection->beginTransaction();
+            try{
             $reply = new ForumPosts();
             $reply->createReply($params, $user, $fileName,$isaNon);
+            $userPost = ForumPosts::getUserId($Id);
+            $userId = $userPost['userid'];
 
+                        if ($isTeacher && isset($point) && trim($point)!='') {
+                            $result = Grades::getId($Id);
+                            if (count($result)>0) {
+                                $gradeId = $result['id'];
+                                Grades::updateScore($gradeId,$point);
+
+                            } else {
+                                $grade = array(
+                                    'gradetype' => 'forum',
+                                    'gradetypeid' => $forumId,
+                                    'userid' => $userId,
+                                    'refid' => $Id,
+                                    'score' => $point
+                                );
+                                $insertGrade = new Grades();
+                                $grades = $insertGrade->insertGrades($grade);
+//                                AppUtility::dump($grades);
+                            }
+
+                    }
+
+                    $transaction->commit();
+                    }catch (\Exception $e){
+
+                        $transaction->rollBack();
+                        return false;
+                }
             if (isset($isPost)) {
                 return $this->redirect('list-post-by-name?cid=' . $params['courseid'] . '&forumid=' . $params['forumid']);
             } else {
@@ -1187,7 +1229,7 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypost.js']);
-        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id, 'isPost' => $isPost, 'currentUser' => $userData, 'threadData' => $threadData, 'isTeacher' => $isTeacher, 'allowanon' => $allowanon);
+        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id, 'isPost' => $isPost, 'currentUser' => $userData, 'threadData' => $threadData, 'isTeacher' => $isTeacher, 'allowanon' => $allowanon, 'points' => $points, 'hasPoints' => $hasPoints);
         return $this->renderWithData('replyPost', $responseData);
     }
 

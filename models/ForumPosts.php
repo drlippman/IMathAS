@@ -764,4 +764,9 @@ class ForumPosts extends BaseImasForumPosts
     public static function getByThreadId($postId){
        return ForumPosts::find('threadid')->where(['id' => $postId])->all();
     }
+
+    public static function getUserId($Id)
+    {
+        return ForumPosts::find()->select('userid')->where(['id'=> $Id])->one();
+    }
 }

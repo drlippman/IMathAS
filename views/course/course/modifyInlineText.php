@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         if ($line['title']) {
                             $title = $line['title'];
                         } ?>
-                        <div class="col-md-12 col-sm-12"><input class="form-control input-item-title" type=text size=0 name=title value="<?php echo $title; ?>"></div>
+                        <div class="col-md-12 col-sm-12"><input class="form-control input-item-title" maxlength="60" required=" " type=text size=0 name=title value="<?php echo $title; ?>"></div>
                         <div class="col-md-5 col-sm-5 padding-top-two-em">
                             <input type="checkbox" name="hidetitle" value="1" <?php AppUtility::writeHtmlChecked($hidetitle, true) ?>/>
                             <?php AppUtility::t('Hide title and icon') ?>
@@ -220,7 +220,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-pt-five-em">
                                         <span class="floatleft"><?php AppUtility::t('With tag')?></span>
-                                        <span class="col-md-1 col-sm-2 padding-left-one-em"><input class="form-control" name="calTag" type=text size=1 value="<?php echo $line['caltag']; ?>"/></span>
+                                        <span class="col-md-2 col-sm-2 padding-left-one-em">
+                                            <input class="form-control" name="calTag" type=text size=1 maxlength="20" value="<?php echo $line['caltag']; ?>"/></span>
                                     </div>
                                 </div>
                             </div>
