@@ -400,8 +400,6 @@ function calendar() {
     });
 
 }
-
-
 /**
     Displayed All Events of a Month on a click Event
  **/
@@ -722,6 +720,162 @@ function ShowAll() {
 }
     });
    }
+
+/**
+ * Displays current day detail on load of calendar.
+ * @param events
+ */
+function displayCalEvents(events) {
+    var now = getCurrentDate();
+    var userRights = jQuery('.user-rights').val();
+    var settings = 'Settings';
+    var questions = 'Questions';
+    var grades = 'Grades';
+    var modify = 'Modify';
+    var moment = jQuery('.calendar').fullCalendar('getDate');
+
+    jQuery(".calendar-day-details").empty();
+    jQuery(".day-details").empty();
+    jQuery(".day-details").append("<div class='day-details'> "+ moment.format('dddd MMMM D, YYYY')+"</div>");
+
+    jQuery.each(events, function (index, dateEvent) {
+
+        var selectedDate = formatDate(dateEvent.start);
+
+        if(selectedDate == now ){
+            var dateH = "Due " +dateEvent.dueTime+"";
+            if(dateEvent.reviewMode == false){
+                var title = "<a class='' style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+dateEvent.assessmentId+"&cid="+dateEvent.courseId+" '>"+dateEvent.title+"</a>";
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../assessment/assessment/add-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+settings+ "</a></li>"+
+                        "<li><a href='../../question/question/add-questions?cid="+selectedDate.courseId+"&aid="+selectedDate.assessmentId+" '>" +questions+ "</a></li>"+
+                        "<li><a href='../../gradebook/gradebook/item-analysis?cid="+selectedDate.courseId+"&asid=average&aid="+selectedDate.assessmentId+" '>" +grades+ "</a></li>"+
+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                }
+            }else if(dateEvent.calLinkItem == true){
+                var tag = dateEvent.title;
+                var title = "<a class='link-title'style='color: #0000ff' href='../../course/course/show-linked-text?cid="+dateEvent.courseId+"&id="+dateEvent.linkedId+" '>"+dateEvent.linkTitle+"</a>";
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/link.png'/>";
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../course/course/add-link?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details.fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+dropdown+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details, .fc-content").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<p style='padding-left: 36px'>"+dateH+"</p></div>");
+
+                }
+            }else if(dateEvent.calLinkItemOnCal == true){
+                var tag = dateEvent.title;
+                var title = "<a class='link-title' style='color: #0000ff' href='../../course/course/show-linked-text?cid="+dateEvent.courseId+"&id="+dateEvent.linkedId+" '>"+dateEvent.linkTitle+"</a>";
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/link.png'/>";
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../course/course/add-link?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+dropdown+"<br><p style='padding-left: 36px'>"+tag+"</p><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<p style='padding-left: 36px'>"+dateH+"</p></div>");
+
+                }
+            } else if(dateEvent.calInlineTextOncal == true){
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
+                var tag = dateEvent.title;
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../course/course/modify-inline-text?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                }
+
+            } else if(dateEvent.calInlineTextItem == true){
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
+                var tag = dateEvent.title;
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../course/course/modify-inline-text?cid="+dateEvent.courseId+"&id="+dateEvent.id+" '>"+modify+ "</a></li>"+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+tag+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                }
+            } else if(dateEvent.calItem == true){
+                var title = dateEvent.tagTitle;
+                var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' style='outline: none' src=''/>";
+                var tag = dateEvent.title;
+                jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br>"+tag+"<br><p style='padding-left: 36px'></p></div>");
+            } else if(dateEvent.reviewMode == true){
+                var dateH = "Review until <b>" +dateEvent.reviewDat+"</b>";
+                var reviewMode= "<p style='margin-left:35px!important;padding-top: 0'>This assessment is in review mode - no scores will be saved</p>";
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../assessment/assessment/add-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+settings+ "</a></li>"+
+                        "<li><a href='../../question/question/add-questions?cid="+selectedDate.courseId+"&aid="+selectedDate.assessmentId+" '>" +questions+ "</a></li>"+
+                        "<li><a href='../../gradebook/gradebook/item-analysis?cid="+selectedDate.courseId+"&asid=average&aid="+selectedDate.assessmentId+" '>" +grades+ "</a></li>"+
+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details, .fc-event-container").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"</div>");
+                } else{
+                    jQuery(".calendar-day-details, .fc-event-container").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"</div>");
+
+                }
+            } else if(dateEvent.reviewModeDueDate == true){
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../assessment/assessment/add-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+settings+ "</a></li>"+
+                        "<li><a href='../../question/question/add-questions?cid="+selectedDate.courseId+"&aid="+selectedDate.assessmentId+" '>" +questions+ "</a></li>"+
+                        "<li><a href='../../gradebook/gradebook/item-analysis?cid="+selectedDate.courseId+"&asid=average&aid="+selectedDate.assessmentId+" '>" +grades+ "</a></li>"+
+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+
+                }
+            }
+        }
+    });
+}
 
 
 function getCurrentDate(){
