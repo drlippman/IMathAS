@@ -3424,6 +3424,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$tchk = str_replace(array('s$n','p$'),array('sin','pi'),$tchk);
 				} else {
 					$cpts = parsecomplex($tchk);
+					
 					if (!is_array($cpts)) {
 						return 0;
 					}
@@ -5945,8 +5946,21 @@ function parsecomplex($v) {
 				}
 			}
 			//which is bigger?
-			if ($p-$L>1 && $R-$p>1) {
-				return _('error - invalid form');
+			if ($p-$L>0 && $R-$p>0 && ($R==$len || $L==0)) {
+				//return _('error - invalid form');
+				if ($R==$len) {// real + AiB
+					$real = substr($v,0,$L);
+					$imag = substr($v,$L,$p-$L);
+					$imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+				} else if ($L==0) { //AiB + real
+					$real = substr($v,$R);
+					$imag = substr($v,0,$p);
+					$imag .= '*'.substr($v,$p+1+($v{$p+1}=='*'?1:0),$R-$p-1);
+				} else {
+					return _('error - invalid form');
+				}
+				$imag = str_replace('-*','-',$imag);
+				$imag = str_replace('+*','+',$imag);
 			} else if ($p-$L>1) {
 				$imag = substr($v,$L,$p-$L);
 				$real = substr($v,0,$L) . substr($v,$p+1);
