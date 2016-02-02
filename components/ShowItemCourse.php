@@ -1223,6 +1223,7 @@ class ShowItemCourse extends Component
                     $target = '';
                 }
                 if ((substr($line['text'],0,4)=="http") && (strpos(trim($line['text'])," ")===false)) { //is a web link
+
                     $alink = trim($line['text']);
                     $icon = 'web';
                 } else if (substr(strip_tags($line['text']),0,5)=="file:") {

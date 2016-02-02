@@ -294,6 +294,7 @@ class CourseController extends AppController
         $calendarItems = CalItem::getByCourseId($cid);
         $CalendarLinkItems = Links::getByCourseId($cid);
         $calendarInlineTextItems = InlineText::getByCourseId($cid);
+        $notStudent = false;
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -318,15 +319,33 @@ class CourseController extends AppController
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
                 'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
                 'title' => ucfirst($calendarItem['title']),
-                'tag' => ucfirst($calendarItem['tag'])
+                'tag' => ucfirst($calendarItem['tag']),
             );
         }
         $calendarLinkArray = array();
         foreach ($CalendarLinkItems as $CalendarLinkItem) {
+            $aLink = '';
+            $notStudent = false;
+            if($CalendarLinkItem['startdate'] > $currentDate && $CalendarLinkItem['enddate'] > $currentDate){
+                $notStudent = true;
+            } else{
+                $notStudent = false;
+            }
+            $courseId = $CalendarLinkItem['courseid'];
+            $id = $CalendarLinkItem['id'];
+            if((substr($CalendarLinkItem['text'],0,4) == "http")){
+                $aLink = $CalendarLinkItem['text'];
+            } else if(substr(strip_tags($CalendarLinkItem['text']),0,5)=="file:") {
+                $fileName = substr(strip_tags($CalendarLinkItem['text']),5);
+                $aLink = filehandler::getcoursefileurl($fileName);
+            } else{
+                $aLink = "show-linked-text?cid=$courseId&id=$id";
+            }
             $calendarLinkArray[] = array(
                 'courseId' => $CalendarLinkItem['courseid'],
                 'oncal' => $CalendarLinkItem['oncal'],
                 'id' => $CalendarLinkItem['id'],
+                'text' => $CalendarLinkItem['text'],
                 'title' => ucfirst($CalendarLinkItem['title']),
                 'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
                 'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
@@ -335,11 +354,22 @@ class CourseController extends AppController
                 'startDateString' => $CalendarLinkItem['startdate'],
                 'endDateString' => $CalendarLinkItem['enddate'],
                 'linkedId' => $CalendarLinkItem['id'],
-                'calTag' => ucfirst($CalendarLinkItem['caltag'])
+                'calTag' => ucfirst($CalendarLinkItem['caltag']),
+                'avail' => $CalendarLinkItem['avail'],
+                'notStudent' => $notStudent,
+                'userRights' => $user['rights'],
+                'textType' => $aLink
             );
         }
+
         $calendarInlineTextArray = array();
         foreach ($calendarInlineTextItems as $calendarInlineTextItem) {
+            $notStudent = false;
+            if($calendarInlineTextItem['startdate'] > $currentDate && $calendarInlineTextItem['enddate'] > $currentDate){
+                $notStudent = true;
+            } else{
+                $notStudent = false;
+            }
             $calendarInlineTextArray[] = array(
                 'id' => $calendarInlineTextItem['id'],
                 'oncal' => $calendarInlineTextItem['oncal'],
@@ -350,10 +380,14 @@ class CourseController extends AppController
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $calendarInlineTextItem['startdate'],
                 'endDateString' => $calendarInlineTextItem['enddate'],
+                'avail' => $calendarInlineTextItem['avail'],
+                'title' => $calendarInlineTextItem['title'],
+                'notStudent' => $notStudent,
+                'userRights' => $user['rights'],
                 'calTag' => ucfirst($calendarInlineTextItem['caltag'])
             );
         }
-        $responseData = array('user' => $user,'assessmentArray' => $assessmentArray, 'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
+        $responseData = array('user' => $user,'assessmentArray' => $assessmentArray, 'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate, 'aLink' => $aLink);
         return $this->successResponse($responseData);
     }
 

@@ -225,25 +225,25 @@ $this->title = $defaultValues['saveTitle'];
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Visibility') ?></div>
         <div class="col-md-10 col-sm-10 padding-left-zero">
             <span class="col-md-3 col-sm-4">
-                <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ONE); ?>onclick="document.getElementById('datedivwithcalendar').style.display='block';document.getElementById('datediv').style.display='none';"/>
+                <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ONE); ?>onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/>
                 <span class="padding-left-pt-five-em"><?php AppUtility::t("Show by Dates") ?></span>
             </span>
             <span class="col-md-2 col-sm-3 padding-left-pt-eight-em">
                 <label class="non-bold">
-                    <input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ZERO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='none';"/>
+                    <input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_ZERO); ?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/>
                     <span class="padding-left-pt-five-em"><?php AppUtility::t("Hide") ?></span>
                 </label>
             </span>
             <span class="col-md-3 col-sm-4">
             <label class="non-bold">
-                <input type=radio name="avail" value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_TWO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='block';"/>
+                <input type=radio name="avail" value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValues['avail'], AppConstant::NUMERIC_TWO); ?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/>
                 <span class="padding-left-pt-five-em"><?php AppUtility::t("Show Always") ?></span>
             </label>
         </div>
     </div>
 
-    <div class="col-md-12 col-sm-12 padding-top-one-em" id="datedivwithcalendar" style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
-        <div class='col-md-2 col-sm-2 select-text-margin padding-right-zero'>
+    <div id="datediv" style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
+        <div class='col-md-2 col-sm-2 select-text-margin '>
             <?php AppUtility::t('Available After') ?>
         </div>
         <div class="col-md-10 col-sm-10">
@@ -284,9 +284,7 @@ $this->title = $defaultValues['saveTitle'];
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-12 col-sm-12 padding-top-one-em">
         <div class='col-md-2 col-sm-2 padding-right-zero select-text-margin'>
             <?php AppUtility::t('Available Until') ?>
         </div>
@@ -328,10 +326,7 @@ $this->title = $defaultValues['saveTitle'];
                 ]); ?>
             </div>
          </div>
-        </div>
-    </div>
 
-        <div class="col-md-12 col-sm-12 padding-top-ten">
             <div class="col-md-2 col-sm-2">
                 <?php AppUtility::t('Place on Calendar?') ?>
             </div>
@@ -361,10 +356,11 @@ $this->title = $defaultValues['saveTitle'];
                     </span>
                 </div>
             </div>
-        </div>
+    </div>
+    </div>
 
-    <div id="datediv" class="col-md-12 col-sm-12 padding-left-zero" style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_TWO) ? "block" : "none"; ?>">
-        <div class=col-md-2 col-sm-2>
+    <div id="altcaldiv" class="col-md-12 col-sm-12 padding-left-zero" style="display:<?php echo ($defaultValues['avail'] == 2) ? "block" : "none"; ?>" >
+        <div class="col-md-2 col-sm-2">
             <?php AppUtility::t('Place on Calendar?') ?>
         </div>
         <div class="col-md-10 col-sm-10 padding-left-zero">
@@ -409,6 +405,7 @@ $this->title = $defaultValues['saveTitle'];
 
         </div>
     </div>
+<!--    </div>-->
     <?php if (count($pageOutcomesList) > 0) { ?>
     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
         <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Associate Outcomes') ?></div>
@@ -429,5 +426,6 @@ $this->title = $defaultValues['saveTitle'];
         <button class="btn btn-primary page-settings" type="submit" value="Submit">
             <i class="fa fa-share header-right-btn"></i><?php echo $defaultValues['saveButtonTitle']; ?></button>
     </div>
-</div>
+<!--</div>-->
+
 <?php ActiveForm::end(); ?>
