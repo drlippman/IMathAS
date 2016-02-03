@@ -76,18 +76,21 @@ function calendar() {
 
                     var events = [];
                     jQuery.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
+
                         var eventColor = 'blue';
-                        if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > assessmentDetail.now)
+                        if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > now)
                         {
                             eventColor = 'red';
-                        } else  if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString == 2000000000)
+                        } else  if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString == 2000000000)
                         {
                             eventColor = 'red';
+                        } else if(assessmentDetail.endDateString < now && assessmentDetail.startDateString < now){
+                            eventColor = 'grey';
                         }
                         /**
                          * If assessment is in review mode, event
                          */
-                        if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > assessmentDetail.now)
+                        if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > now)
                         {
                             events.push({
                                 title: assessmentDetail.name,
@@ -131,6 +134,19 @@ function calendar() {
                                 assessmentId: assessmentDetail.assessmentId,
                                 color: eventColor,
                                 reviewModeDueDate: true
+                            });
+                        } else if(assessmentDetail.endDateString < now && assessmentDetail.startDateString < now)
+                        {
+                            events.push({
+                                title: assessmentDetail.name,
+                                start: assessmentDetail.endDate,
+                                dueTime: assessmentDetail.dueTime,
+                                end:assessmentDetail.endDate,
+                                message: 'Review Assessment',
+                                courseId: assessmentDetail.courseId,
+                                assessmentId: assessmentDetail.assessmentId,
+                                color: eventColor,
+                                closeMode: true
                             });
                         }
                     });
@@ -426,10 +442,8 @@ function calendar() {
                         var dateH = "Due " +selectedDate.dueTime+"";
                     }else{
                         var dateH = "Due " +selectedDate.start+" "+selectedDate.dueTime+"";
-
                     }
                     if(selectedDate.reviewMode == false){
-
                         var title = "<a class='' style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+selectedDate.title+"</a>";
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
                         if(userRights > 10){
@@ -594,6 +608,23 @@ function calendar() {
                         } else{
                             jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+selectedDate.title+"</b><br>"+dateH+"</div>");
                         }
+                    }else if(selectedDate.closeMode == true){
+                        var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+                        if(userRights > 10){
+                            var dropdown = '<span class="instronly common-setting-calendar">'+
+                                '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                                '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                                '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                                "<li><a href='../../assessment/assessment/add-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+settings+ "</a></li>"+
+                                "<li><a href='../../question/question/add-questions?cid="+selectedDate.courseId+"&aid="+selectedDate.assessmentId+" '>" +questions+ "</a></li>"+
+                                "<li><a href='../../gradebook/gradebook/item-analysis?cid="+selectedDate.courseId+"&asid=average&aid="+selectedDate.assessmentId+" '>" +grades+ "</a></li>"+
+
+                                "</ul>"+
+                                "</span>";
+                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+selectedDate.title+" "+dropdown+"</b><br>"+dateH+"</div>");
+                        } else{
+                            jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+selectedDate.title+"</b><br>"+dateH+"</div>");
+                        }
                     }
                 }
             });
@@ -627,22 +658,29 @@ function ShowAll() {
             var assessmentData = calendarResponse.data;
             var events = [];
             jQuery.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
+
                 var eventColor = 'blue';
-                if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > assessmentDetail.now) {
+                if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > now)
+                {
                     eventColor = 'red';
-                } else if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString == 2000000000) {
+                } else  if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString == 2000000000)
+                {
                     eventColor = 'red';
+                } else if(assessmentDetail.endDateString < now && assessmentDetail.startDateString < now){
+                    eventColor = 'grey';
                 }
                 /**
                  * If assessment is in review mode, event
                  */
-                if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > assessmentDetail.now) {
+                if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 2000000000 && assessmentDetail.reviewDateString > now)
+                {
+
                     events.push({
                         title: assessmentDetail.name,
                         start: assessmentDetail.reviewDate,
                         dueTime: assessmentDetail.dueTime,
                         reviewDat: assessmentDetail.reviewDate,
-                        end: assessmentDetail.endDate,
+                        end:assessmentDetail.endDate,
                         message: 'Review Assessment',
                         courseId: assessmentDetail.courseId,
                         assessmentId: assessmentDetail.assessmentId,
@@ -653,7 +691,8 @@ function ShowAll() {
                 /**
                  * If assessment is not in review mode, event
                  */
-                else if (assessmentDetail.endDateString > assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now) {
+                else if(assessmentDetail.endDateString > assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now)
+                {
 
                     events.push({
                         title: assessmentDetail.name,
@@ -666,17 +705,31 @@ function ShowAll() {
                         color: eventColor,
                         reviewMode: false
                     });
-                } else if (assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString == 2000000000) {
+                } else if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString == 2000000000)
+                {
                     events.push({
                         title: assessmentDetail.name,
                         start: assessmentDetail.endDate,
                         dueTime: assessmentDetail.dueTime,
-                        end: assessmentDetail.endDate,
+                        end:assessmentDetail.endDate,
                         message: 'Review Assessment',
                         courseId: assessmentDetail.courseId,
                         assessmentId: assessmentDetail.assessmentId,
                         color: eventColor,
                         reviewModeDueDate: true
+                    });
+                } else if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now)
+                {
+                    events.push({
+                        title: assessmentDetail.name,
+                        start: assessmentDetail.endDate,
+                        dueTime: assessmentDetail.dueTime,
+                        end:assessmentDetail.endDate,
+                        message: 'Review Assessment',
+                        courseId: assessmentDetail.courseId,
+                        assessmentId: assessmentDetail.assessmentId,
+                        color: eventColor,
+                        closeMode: true
                     });
                 }
             });
@@ -684,26 +737,47 @@ function ShowAll() {
              * Display Managed events by admin
              */
             jQuery.each(assessmentData.calendarArray, function (index, calendarItem) {
+
                 var eventColor = '#00FFCC';
-                if (calendarItem != 0) {
+                if(calendarItem != 0)
+                {
                     events.push({
                         title: calendarItem.tag,
                         start: calendarItem.date,
-                        tagTitle: calendarItem.title,
+                        tagTitle:calendarItem.title,
                         dueTime: calendarItem.dueTime,
                         message: 'Managed Events',
                         color: eventColor,
                         calItem: true
                     });
                 }
-            });
-            /**
+            });            /**
              * Display Linked text's tag on enddate with title as URL
              */
             jQuery.each(assessmentData.calendarLinkArray, function (index, calendarLinkItem) {
                 var eventColor = '#59FF59';
-                if (calendarLinkItem.oncal == 2) {
-                    if (calendarLinkItem.startDateString < calendarLinkItem.now && calendarLinkItem.endDateString > calendarLinkItem.now) {
+                if(calendarLinkItem.oncal == 2 && calendarLinkItem.avail == 1) {
+                    if(calendarLinkItem.notStudent == true)
+                    {
+                        if(calendarLinkItem.userRights > 10){
+                            events.push({
+                                title: calendarLinkItem.calTag,
+                                linkTitle: calendarLinkItem.title,
+                                start: calendarLinkItem.endDate,
+                                linkedId: calendarLinkItem.linkedId,
+                                dueTime: calendarLinkItem.dueTime,
+                                id: calendarLinkItem.id,
+                                oncal:calendarLinkItem.oncal,
+                                text:calendarLinkItem.text,
+                                textType:calendarLinkItem.textType,
+                                avail:calendarLinkItem.avail,
+                                color: eventColor,
+                                courseId: calendarLinkItem.courseId,
+                                message: 'Linked text events',
+                                calLinkItemOnCal: true
+                            });
+                        }
+                    } else if(calendarLinkItem.notStudent == false){
                         events.push({
                             title: calendarLinkItem.calTag,
                             linkTitle: calendarLinkItem.title,
@@ -711,71 +785,205 @@ function ShowAll() {
                             linkedId: calendarLinkItem.linkedId,
                             dueTime: calendarLinkItem.dueTime,
                             id: calendarLinkItem.id,
-                            oncal: calendarLinkItem.oncal,
-                            color: eventColor,
+                            oncal:calendarLinkItem.oncal,
+                            text:calendarLinkItem.text,
                             textType:calendarLinkItem.textType,
+                            avail:calendarLinkItem.avail,
+                            color: eventColor,
                             courseId: calendarLinkItem.courseId,
                             message: 'Linked text events',
                             calLinkItemOnCal: true
-
                         });
                     }
-                } else if (calendarLinkItem.oncal == 1) {
-                    events.push({
-                        title: calendarLinkItem.calTag,
-                        linkTitle: calendarLinkItem.title,
-                        start: calendarLinkItem.startDate,
-                        linkedId: calendarLinkItem.linkedId,
-                        dueTime: calendarLinkItem.dueTime,
-                        id: calendarLinkItem.id,
-                        textType:calendarLinkItem.textType,
-                        oncal: calendarLinkItem.oncal,
-                        color: eventColor,
-                        courseId: calendarLinkItem.courseId,
-                        message: 'Linked text events',
-                        calLinkItem: true
+                } else if(calendarLinkItem.oncal == 1 && calendarLinkItem.avail == 1){
+                    if(calendarLinkItem.notStudent == true)
+                    {
+                        if(calendarLinkItem.userRights > 10){
+                            events.push({
+                                title: calendarLinkItem.calTag,
+                                linkTitle: calendarLinkItem.title,
+                                start: calendarLinkItem.startDate,
+                                linkedId: calendarLinkItem.linkedId,
+                                dueTime: calendarLinkItem.dueTime,
+                                id: calendarLinkItem.id,
+                                textType:calendarLinkItem.textType,
+                                avail:calendarLinkItem.avail,
+                                oncal:calendarLinkItem.oncal,
+                                color: eventColor,
+                                courseId: calendarLinkItem.courseId,
+                                message: 'Linked text events',
+                                calLinkItem: true
+                            });
+                        }
+                    } else if(calendarLinkItem.notStudent == false){
+                        events.push({
+                            title: calendarLinkItem.calTag,
+                            linkTitle: calendarLinkItem.title,
+                            start: calendarLinkItem.startDate,
+                            linkedId: calendarLinkItem.linkedId,
+                            dueTime: calendarLinkItem.dueTime,
+                            id: calendarLinkItem.id,
+                            textType:calendarLinkItem.textType,
+                            avail:calendarLinkItem.avail,
+                            oncal:calendarLinkItem.oncal,
+                            color: eventColor,
+                            courseId: calendarLinkItem.courseId,
+                            message: 'Linked text events',
+                            calLinkItem: true
+                        });
+                    }
 
-                    });
+                } else if(calendarLinkItem.oncal == 1 && calendarLinkItem.avail == 2){
+                    if(calendarLinkItem.notStudent == true)
+                    {
+                        if(calendarLinkItem.userRights > 10){
+                            events.push({
+                                title: calendarLinkItem.calTag,
+                                linkTitle: calendarLinkItem.title,
+                                start: calendarLinkItem.startDate,
+                                linkedId: calendarLinkItem.linkedId,
+                                dueTime: calendarLinkItem.dueTime,
+                                id: calendarLinkItem.id,
+                                textType:calendarLinkItem.textType,
+                                avail:calendarLinkItem.avail,
+                                oncal:calendarLinkItem.oncal,
+                                color: eventColor,
+                                courseId: calendarLinkItem.courseId,
+                                message: 'Linked text events',
+                                calLinkItemAvail: true
+                            });
+                        }
+                    } else if(calendarLinkItem.notStudent == false){
+                        events.push({
+                            title: calendarLinkItem.calTag,
+                            linkTitle: calendarLinkItem.title,
+                            start: calendarLinkItem.startDate,
+                            linkedId: calendarLinkItem.linkedId,
+                            dueTime: calendarLinkItem.dueTime,
+                            id: calendarLinkItem.id,
+                            textType:calendarLinkItem.textType,
+                            avail:calendarLinkItem.avail,
+                            oncal:calendarLinkItem.oncal,
+                            color: eventColor,
+                            courseId: calendarLinkItem.courseId,
+                            message: 'Linked text events',
+                            calLinkItemAvail: true
+                        });
+                    }
                 }
-
             });
             /**
              * Display Inline text on calendar
              */
             jQuery.each(assessmentData.calendarInlineTextArray, function (index, calendarInlineTextItem) {
                 var eventColor = '#FF6666';
-                if (calendarInlineTextItem.oncal == 2) {
-
-                    if (calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now) {
+                if(calendarInlineTextItem.oncal == 2 && calendarInlineTextItem.avail == 1){
+                    if(calendarInlineTextItem.notStudent == true)
+                    {
+                        if(calendarInlineTextItem.userRights > 10){
+                            events.push({
+                                title: calendarInlineTextItem.calTag,
+                                start: calendarInlineTextItem.endDate,
+                                dueTime: calendarInlineTextItem.dueTime,
+                                courseId: calendarInlineTextItem.courseId,
+                                id: calendarInlineTextItem.id,
+                                oncal:calendarInlineTextItem.oncal,
+                                avail:calendarInlineTextItem.avail,
+                                name:calendarInlineTextItem.title,
+                                now:calendarInlineTextItem.now,
+                                end:calendarInlineTextItem.start,
+                                userCheck:calendarInlineTextItem.notStudent,
+                                color: eventColor,
+                                message: 'Inline text events',
+                                calInlineTextOncal: true
+                            });
+                        }
+                    } else if(calendarInlineTextItem.notStudent == false){
                         events.push({
                             title: calendarInlineTextItem.calTag,
                             start: calendarInlineTextItem.endDate,
                             dueTime: calendarInlineTextItem.dueTime,
                             courseId: calendarInlineTextItem.courseId,
                             id: calendarInlineTextItem.id,
-                            oncal: calendarInlineTextItem.oncal,
+                            oncal:calendarInlineTextItem.oncal,
+                            avail:calendarInlineTextItem.avail,
+                            name:calendarInlineTextItem.title,
+                            now:calendarInlineTextItem.now,
+                            end:calendarInlineTextItem.start,
+                            userCheck:calendarInlineTextItem.notStudent,
                             color: eventColor,
                             message: 'Inline text events',
                             calInlineTextOncal: true
                         });
                     }
-                } else if (calendarInlineTextItem.oncal == 1) {
 
-                    if (calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now) {
+                } else if(calendarInlineTextItem.oncal == 1 && calendarInlineTextItem.avail == 1){
+                    if(calendarInlineTextItem.notStudent == true)
+                    {
+                        if(calendarInlineTextItem.userRights > 10){
+                            events.push({
+                                title: calendarInlineTextItem.calTag,
+                                start: calendarInlineTextItem.startDate,
+                                dueTime: calendarInlineTextItem.dueTime,
+                                courseId: calendarInlineTextItem.courseId,
+                                id: calendarInlineTextItem.id,
+                                oncal:calendarInlineTextItem.oncal,
+                                avail:calendarInlineTextItem.avail,
+                                name:calendarInlineTextItem.title,
+                                color: eventColor,
+                                message: 'Inline text events',
+                                calInlineTextItem: true
+                            });
+                        }
+                    } else if(calendarInlineTextItem.notStudent == false){
                         events.push({
                             title: calendarInlineTextItem.calTag,
                             start: calendarInlineTextItem.startDate,
                             dueTime: calendarInlineTextItem.dueTime,
                             courseId: calendarInlineTextItem.courseId,
                             id: calendarInlineTextItem.id,
-                            oncal: calendarInlineTextItem.oncal,
+                            oncal:calendarInlineTextItem.oncal,
+                            avail:calendarInlineTextItem.avail,
+                            name:calendarInlineTextItem.title,
                             color: eventColor,
                             message: 'Inline text events',
                             calInlineTextItem: true
                         });
                     }
+                } else if(calendarInlineTextItem.oncal == 1 && calendarInlineTextItem.avail == 2){
+                    if(calendarInlineTextItem.notStudent == true)
+                    {
+                        if(calendarInlineTextItem.userRights > 10){
+                            events.push({
+                                title: calendarInlineTextItem.calTag,
+                                start: calendarInlineTextItem.startDate,
+                                dueTime: calendarInlineTextItem.dueTime,
+                                courseId: calendarInlineTextItem.courseId,
+                                id: calendarInlineTextItem.id,
+                                oncal:calendarInlineTextItem.oncal,
+                                avail:calendarInlineTextItem.avail,
+                                name:calendarInlineTextItem.title,
+                                color: eventColor,
+                                message: 'Inline text events',
+                                calInlineTextItemAvail: true
+                            });
+                        }
+                    } else if(calendarInlineTextItem.notStudent == false){
+                        events.push({
+                            title: calendarInlineTextItem.calTag,
+                            start: calendarInlineTextItem.startDate,
+                            dueTime: calendarInlineTextItem.dueTime,
+                            courseId: calendarInlineTextItem.courseId,
+                            id: calendarInlineTextItem.id,
+                            oncal:calendarInlineTextItem.oncal,
+                            avail:calendarInlineTextItem.avail,
+                            name:calendarInlineTextItem.title,
+                            color: eventColor,
+                            message: 'Inline text events',
+                            calInlineTextItemAvail: true
+                        });
+                    }
                 }
-
             });
             calendarEvents.push(events);
 
@@ -961,6 +1169,24 @@ function ShowAll() {
                     jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
 
                 }
+            }else if(dateEvent.closeMode == true){
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../assessment/assessment/add-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+settings+ "</a></li>"+
+                        "<li><a href='../../question/question/add-questions?cid="+selectedDate.courseId+"&aid="+selectedDate.assessmentId+" '>" +questions+ "</a></li>"+
+                        "<li><a href='../../gradebook/gradebook/item-analysis?cid="+selectedDate.courseId+"&asid=average&aid="+selectedDate.assessmentId+" '>" +grades+ "</a></li>"+
+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+
+                }
             }
 
         }
@@ -1128,6 +1354,25 @@ function displayCalEvents(events) {
 
                 }
             } else if(dateEvent.reviewModeDueDate == true){
+                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+
+                if(userRights > 10){
+                    var dropdown = '<span class="instronly common-setting-calendar">'+
+                        '<a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);">' +
+                        '<img alt="setting" class="floatright course-setting-button" src="../../img/courseSettingItem.png"/></a>'+
+                        '<ul class="select1 dropdown-menu selected-options pull-right">' +
+                        "<li><a href='../../assessment/assessment/add-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+settings+ "</a></li>"+
+                        "<li><a href='../../question/question/add-questions?cid="+selectedDate.courseId+"&aid="+selectedDate.assessmentId+" '>" +questions+ "</a></li>"+
+                        "<li><a href='../../gradebook/gradebook/item-analysis?cid="+selectedDate.courseId+"&asid=average&aid="+selectedDate.assessmentId+" '>" +grades+ "</a></li>"+
+
+                        "</ul>"+
+                        "</span>";
+                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+" "+dropdown+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+                } else{
+                    jQuery(".calendar-day-details, .fc-content, .fc-title").append("<div class='day-detail-border single-event'>"+assessmentLogo+"<b> "+dateEvent.title+"<br><p style='padding-left: 36px'>"+dateH+"</p></div>");
+
+                }
+            }else if(dateEvent.closeMode == true){
                 var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
 
                 if(userRights > 10){

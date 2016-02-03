@@ -299,15 +299,15 @@ class CourseController extends AppController
         foreach ($assessments as $assessment)
         {
             $assessmentArray[] = array(
-                'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
-                'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
-                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
-                'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
+                'startDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$assessment['startdate']),
+                'endDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$assessment['enddate']),
+                'dueTime' => AppUtility::tzdate(AppConstant::GIA_FORMAT,$assessment['enddate']),
+                'reviewDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$assessment['reviewdate']),
                 'name' => ucfirst($assessment['name']),
                 'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate'],
-                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
+                'now' => AppUtility::parsedatetime(date('m/d/Y'),date('h:i a')),
                 'assessmentId' => $assessment['id'],
                 'courseId' => $assessment['courseid']
             );
@@ -316,8 +316,8 @@ class CourseController extends AppController
         foreach ($calendarItems as $calendarItem) {
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
-                'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
+                'date' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$calendarItem['date']),
+                'dueTime' => AppUtility::tzdate(AppConstant::GIA_FORMAT,$calendarItem['date']),
                 'title' => ucfirst($calendarItem['title']),
                 'tag' => ucfirst($calendarItem['tag']),
             );
@@ -347,9 +347,9 @@ class CourseController extends AppController
                 'id' => $CalendarLinkItem['id'],
                 'text' => $CalendarLinkItem['text'],
                 'title' => ucfirst($CalendarLinkItem['title']),
-                'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
-                'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
-                'dueTime' => AppUtility::getFormattedTime($CalendarLinkItem['enddate']),
+                'startDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$CalendarLinkItem['startdate']),
+                'endDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$CalendarLinkItem['enddate']),
+                'dueTime' => AppUtility::tzdate(AppConstant::GIA_FORMAT,$CalendarLinkItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $CalendarLinkItem['startdate'],
                 'endDateString' => $CalendarLinkItem['enddate'],
@@ -374,9 +374,9 @@ class CourseController extends AppController
                 'id' => $calendarInlineTextItem['id'],
                 'oncal' => $calendarInlineTextItem['oncal'],
                 'courseId' => $calendarInlineTextItem['courseid'],
-                'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
-                'startDate' => AppUtility::getFormattedDate($calendarInlineTextItem['startdate']),
-                'dueTime' => AppUtility::getFormattedTime($calendarInlineTextItem['enddate']),
+                'endDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$calendarInlineTextItem['enddate']),
+                'startDate' => AppUtility::tzdate(AppConstant::YMD_FORMAT,$calendarInlineTextItem['startdate']),
+                'dueTime' => AppUtility::tzdate(AppConstant::GIA_FORMAT,$calendarInlineTextItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $calendarInlineTextItem['startdate'],
                 'endDateString' => $calendarInlineTextItem['enddate'],
