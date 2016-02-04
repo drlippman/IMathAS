@@ -43,7 +43,6 @@ function ahahDone(url, threadid, tagged) {
 	    if ($.trim(req.responseText=='OK')) {
             togglecolor(threadid, tagged);
 	    } else {
-            alert(req.responseText);
 		    alert("Oops, error toggling the tag");
 	    }
     } else { 

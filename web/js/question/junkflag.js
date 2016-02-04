@@ -41,7 +41,6 @@ function submitJunkFlagDone(url, libitemid, tagged) {
 	    if (req.responseText.trim() == 'OK') {
 		    toggleJunkFlagcolor(libitemid, tagged);
 	    } else {
-		    alert(req.responseText);
 		    alert("Oops, error toggling the flag");
 	    }
     } else { 

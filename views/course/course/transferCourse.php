@@ -40,14 +40,13 @@ $( document ).ready(function() {
         var courseId = $("#courseId").val();
         var ownerId = $("#userId").val();
         var transferData = {newOwner: transferTo,cid: courseId,oldOwner: ownerId};
-        alert(JSON.stringify(transferData));
         jQuerySubmit('update-owner', transferData, 'updateSuccess');
 
     });
 });
 
 function updateSuccess(response) {
-    var data = response;alert(response);
+    var data = response;
     if (data.status==0) {
         $("#flash-message").html('<div class="alert alert-success">Ownership transferred successfully.</div>');
     }

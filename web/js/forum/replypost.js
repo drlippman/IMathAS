@@ -14,9 +14,7 @@ $(document).ready(function ()
 
 function checkNumber(event){
     var code = event.which;
-    alert('hh');
     if((code == 8) || (code > 47 && code < 58)) { //Backspace key press
-alert('a');
         return true;
     }
     return false;
