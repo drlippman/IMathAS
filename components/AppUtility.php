@@ -3189,7 +3189,7 @@ class AppUtility extends Component
                 } ?>
                 <img  class="pointer" id="butb<?php echo $bcnt?>" style="float: left" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $img?>.gif" onclick="toggleshow(<?php echo $bcnt ?>)">
 
-          <?php  }
+            <?php  }
             if ($hasuserimg[$child]==1) {
                 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                     echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
@@ -3197,7 +3197,7 @@ class AppUtility extends Component
                     $uploads = AppConstant::UPLOAD_DIRECTORY;
                     $imageUrl = $ownerid[$child].".jpg";?>
                     <img class="circular-profile-image Align-link-post padding-five" id="img" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $userid?>); />
-               <?php }
+                <?php }
             } else {
                 ?>
                 <img class="circular-profile-image" id="img"
@@ -3208,7 +3208,7 @@ class AppUtility extends Component
 
             if ($view==2) { ?>
                 <input type="button" id="buti<?php echo $icnt;?>" value="Show" onclick="toggleitem(<?php echo $icnt;?>)">
-           <?php } else { ?>
+            <?php } else { ?>
                 <input type="button" id="buti<?php echo $icnt;?>" value="Hide" onclick="toggleitem(<?php echo $icnt;?>)">
             <?php }
 
@@ -3287,6 +3287,7 @@ class AppUtility extends Component
                     }
                     $likecnt += $n;
                 }
+
                 if ($likemsg=='Liked by ') {
                     $likemsg = '';
                 } else {
@@ -3300,16 +3301,18 @@ class AppUtility extends Component
 
                 echo '<div class="likewrap">'; ?>
                 <img id="likeicon<?php echo $child?>" class="likeicon<?php echo $likeclass?>" src="<?php echo AppUtility::getHomeURL()?>img/<?php echo $icon?>.png" title="<?php echo $likemsg?>" onclick="savelike(this)">
-                <?php echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','list-likes?cid=$courseId&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
-                echo '</div>';
+                <?php echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','list-likes?cid=$courseId&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';?>
+                <input type="hidden" class="courseid" value="<?php echo $courseId;?>">
+                <input type="hidden" class="likecnt" value="<?php echo $likecnt; ?>">
+                <?php echo '</div>';
             }
             echo '<div class="clear"></div>';
             echo "</div>\n";
             if ($view==2) { ?>
                 <div class="hidden" id="item<?php echo $icnt;?>">
-           <?php } else { ?>
+            <?php } else { ?>
                 <div class="blockitems" id="item<?php echo $icnt;?>" style="clear:all">
-           <?php }
+            <?php }
             if(isset($files[$child]) && $files[$child]!='') {
                 $fl = explode('@@',$files[$child]);
                 if (count($fl)>2) {

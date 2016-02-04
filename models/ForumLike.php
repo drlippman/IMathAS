@@ -110,4 +110,12 @@ class ForumLike extends BaseImasForumLikes
         return $data = $command->queryAll();
     }
 
+
+    public static function getUserId($postId)
+    {
+        $query = "SELECT userid FROM imas_forum_likes WHERE postid=:postId";
+        $command =  \Yii::$app->db->createCommand($query)->bindValue(':postId', $postId);
+        return $data = $command->queryAll();
+    }
+
 } 

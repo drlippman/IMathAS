@@ -1005,8 +1005,8 @@ class ForumController extends AppController
                 //get likes
                 $Count = new ForumLike();
                 $likeCount = $Count->findCOunt($threadid);
-                foreach($likeCount as $row){
-                    $likes[$row['postid']][$row['type']] = $row['count(*)'];
+                foreach($likeCount as $key=> $row){
+                    $likes[$row['postid']][$row['type']] = $row['count'];
                 }
 
                 $myLikes = $Count->UserLikes($threadid, $currentUser);
@@ -2350,28 +2350,46 @@ class ForumController extends AppController
         $isTeacher = $this->isTeacher($user['id'], $cid);
         $isTutor = $this->isTutor($user['id'], $cid);
         $isStudent = $this->isStudent($user['id'], $cid);
+        $userid = intval($this->getParamVal('userid'));
+
+
+
         if (empty($cid) || empty($postId) || !isset($like)) {
             echo "fail";
             exit;
         }
-        if (!isset($isTeacher) && !isset($isTutor) && !isset($isStudent)) {
+        if (!($isTeacher) && !($isTutor) && !($isStudent)) {
             echo "fail";
             exit;
         }
-        if (isset($isTeacher)) {
+        if (($isTeacher)) {
             $isTeacher = 2;
-        } else if (isset($isTutor)) {
+        } else if (($isTutor)) {
             $isTeacher = 1;
         } else {
             $isTeacher = 0;
         }
 
-        if ($like==0) {
+        $uid=ForumLike::getUserId($postId);
+
+        for($i=0;$i<count($uid);$i++)
+        {
+            if($uid[$i]['userid'] == $user['id']) {
+                $flag = 1;
+                break;
+            }else
+                $flag=0;
+        }
+
+
+        if ($like > 0 && $flag == 1) {
             $result = ForumLike::deleteLikes($postId, $user['id']);
             $aff = $result;
+
         } else {
+
             $result = ForumLike::getById($postId, $user['id']);
-            if (count($result)>0) {
+            if (count($result)>0 ) {
                 $aff =0;
             } else {
                 $result = ForumPosts::getByThreadId($postId);
@@ -2379,8 +2397,7 @@ class ForumController extends AppController
                 {
                     echo "fail";exit;
                 }
-                $threadid = $result['threadid'];
-
+                $threadid = $result[0]->threadid;
                 $saveLikes = new ForumLike();
                 $saveLikes->InsertLikes($threadid,$postId,$isTeacher, $user['id']);
                 $aff = 1;
@@ -2393,11 +2410,9 @@ class ForumController extends AppController
         foreach($result as $row) {
             $likes[$row['type']] = $row['count(*)'];
         }
-
         $likemsg = 'Liked by ';
         $likecnt = 0;
         $likeclass = '';
-
         if ($likes[0]>0) {
             $likeclass = ' liked';
             $likemsg .= $likes[0].' ' . ($likes[0]==1?'student':'students');
@@ -2423,12 +2438,11 @@ class ForumController extends AppController
         } else {
             $likemsg .= '.';
         }
-        if ($like==1) {
+        if ($like>=0 && $flag==0) {
             $likemsg = 'You like this. '.$likemsg;
         } else {
             $likemsg = 'Click to like this post. '.$likemsg;;
         }
         header('Content-type: application/json');
         echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.'}';
-    }
-}
+    }}

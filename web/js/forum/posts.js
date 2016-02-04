@@ -62,24 +62,29 @@ function hideall() {
     }
 }
 function savelike(el) {
-    var like = (el.src.match(/gray/))?1:0;
+    var cid = $(".courseid").val();
+    var like = $('.likecnt').val();
     var postid = el.id.substring(8);
+    alert(like);
     $(el).parent().append('<img style="vertical-align: middle" src="../../img/updating.gif" id="updating"/>');
     $.ajax({
         url: "record-likes",
         data: {cid: cid, postid: postid, like: like},
         dataType: "json"
 }).done(function(msg) {
+        alert(JSON.stringify(msg));
     if (msg.aff==1) {
+    $('.likecnt').val(msg.cnt);
     el.title = msg.msg;
     $('#likecnt'+postid).text(msg.cnt>0?msg.cnt:'');
-    el.className = "likeicon"+msg.classn;
-    if (like==0) {
-    el.src = el.src.replace("liked","likedgray");
+    if (like>=0) {
+        el.className = "likeicon"+msg.classn;
     } else {
-    el.src = el.src.replace("likedgray","liked");
+        el.className = "likeicon";
     }
 }
+        else
+        alert(JSON.stringify(msg));
 $('#updating').remove();
 });
 }
