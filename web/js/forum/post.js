@@ -10,6 +10,7 @@ $("a[name=remove]").on("click", function (event) {
     event.preventDefault();
     var threadid = $(this).attr("data-var");
     var parentId = $(this).attr("data-parent");
+   // alert(threadid+" "+ parentId);
     var checkPostOrThread = 0;
     if(parentId == 0){
         var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';

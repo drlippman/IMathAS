@@ -34,6 +34,7 @@ use app\models\Tutor;
 use app\models\User;
 use app\components\htmLawed;
 use yii\base\View;
+use yii\bootstrap\Alert;
 use yii\web\UploadedFile;
 use app\components\AppUtility;
 use Yii;
@@ -785,7 +786,7 @@ class ForumController extends AppController
         global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isTeacher,$courseId,$userid,$ownerid,$points;
         global $feedback,$posttype,$lastview,$bcnt ,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
         global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
-        global $canviewall, $caneditscore, $canviewscore;
+        global $canviewall, $caneditscore, $canviewscore,$parent;
         $bcnt = AppConstant::NUMERIC_ZERO;
         $icnt = AppConstant::NUMERIC_ZERO;
 
@@ -933,6 +934,7 @@ class ForumController extends AppController
             } else {
                 $forumPostResult = ForumPosts::getForumPost($courseId, $threadid);
             }
+
             $children = array();
             $date = array();
             $subject = array();
@@ -948,6 +950,7 @@ class ForumController extends AppController
             $email= array();
             $hasuserimg = array();
             $section = array();
+            $parent = array();
            foreach($forumPostResult as $line) {
                 if ($line['parent']==0) {
                     if ($line['replyby']!=null) {
@@ -998,7 +1001,7 @@ class ForumController extends AppController
                     $email[$line['id']] = $line['email'];
                 }
                 $likes[$line['id']] = array(0,0,0);
-
+                $parent[$line['id']] = $line['parent'];
             }
 
             if ($allowlikes) {
@@ -1095,6 +1098,7 @@ class ForumController extends AppController
         $threadId = $params['threadId'];
         $parentId = $params['parentId'];
         $deleteThreadData = ForumPosts::getPostById($threadId);
+        $parentId= $deleteThreadData['parent'];
         ForumPosts::removeThread($threadId, $parentId);
         if ($parentId == AppConstant::NUMERIC_ZERO) {
             ForumThread::removeThread($threadId);

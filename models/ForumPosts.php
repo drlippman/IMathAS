@@ -82,7 +82,6 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function removeThread($threadId, $parentId)
     {
-
         if ($parentId == AppConstant::NUMERIC_ZERO) {
             $threads = ForumPosts::findAll(['threadid' => $threadId]);
         } else {

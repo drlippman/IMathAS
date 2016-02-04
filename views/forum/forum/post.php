@@ -91,7 +91,6 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         echo "<br/>";echo "<br/>";
         $printChildren = new AppUtility();
         $printChildren->printchildren(0);
-
         if ($caneditscore && $haspoints) {
             echo '<div><input type=submit name="save" value="Save Grades" /></div>';
             if ($prevth!='' && $page!=-3) {

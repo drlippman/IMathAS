@@ -86,6 +86,7 @@ function flagResponse()
 
 function markAsRemoveSuccess(response) {
     var result = JSON.parse(response);
+    alert ('call finished'+ result);
     if(result.status == 0)
     {
         window.location.reload();
