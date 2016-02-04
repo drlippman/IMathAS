@@ -455,6 +455,8 @@ class SiteController extends AppController
             $params['SID'] = $params['username'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
+//            $params['FirstName'] = $params['FirstName'];
+//            $params['LastName'] = $params['LastName'];
             $userName = User::duplicateUserName($params['SID']);
             if(count($userName) > AppConstant::NUMERIC_ZERO){
                 $this->setErrorFlash('Username '.$params['SID'].' is already in use.  Please try another');

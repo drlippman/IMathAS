@@ -234,12 +234,17 @@ echo '</div>';
 
     <?php }
     echo implode(' | ',$toshow);
-
     if (count($postInformtion) == 0)
     {
         echo '<div class="col-sm-12 padding-left-thirty padding-top-thirty">';
         echo ' <h4>No posts have been made yet.  Click Add New Thread to start a new discussion </h4>';
         echo '</div>';
+    }else if ($page == -2 && count($flags) == 0)
+    {
+        $this->setWarningFlash('No result found for limit to flagged');
+
+//            $page = 1;
+        return $this->redirect('thread?page=-2&cid='.$courseId.'&forum='.$forumId);
     }else
     {            ?>
 

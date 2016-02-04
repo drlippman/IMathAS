@@ -1188,6 +1188,12 @@ class AdminController extends AppController
                 $itemorder =  serialize(array());
                 $query = new Course();
                 $courseData = $query->create($userId, $params,$blockcnt);
+
+                if($courseData['name'] == '')
+                {
+                    $this->setWarningFlash("Course Name can not be blanck.");
+                    return $this->redirect('forms?action=addcourse');
+                }
                 if($courseData->errors['name'])
                 {
                     $this->setWarningFlash("Course Name should contain at most 150 characters.");

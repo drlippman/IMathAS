@@ -161,7 +161,7 @@ switch ($action) {
         echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>
                 <div class='col-md-3 col-sm-3 padding-top-five'>" . AppUtility::t('Enter Course name', false) . "</div>
                 <div class='col-md-4 col-sm-4'>
-                    <input class='form-control' required='please fill out this field' type=text size=80 name=\"coursename\" value=\"$name\">
+                    <input class='form-control' type=text size=80 name=\"coursename\" value=\"$name\">
                 </div>
               </div>";
         echo "<div class='col-md-12 col-sm-12 margin-top-fifteen'>

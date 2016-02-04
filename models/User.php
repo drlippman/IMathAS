@@ -901,8 +901,20 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public function createInstructorAcc($params)
     {
-        $data = AppUtility::removeEmptyAttributes($params);
-        $this->attributes = $data;
+//                AppUtility::dump($params);
+
+        $this->SID = $params['username'];
+        $this->hideonpostswidget = AppConstant::ZERO_VALUE;
+        $this->password = AppUtility::passwordHash($params['password']);
+        $this->FirstName = $params['FirstName'];
+        $this->LastName = $params['LastName'];
+        $this->email = $params['email'];
+
+//        $this->save();
+//        $data = AppUtility::removeEmptyAttributes($params);
+//        $this->attributes = $data;
+//        AppUtility::dump($this);
+
         $this->save();
         return $this;
     }

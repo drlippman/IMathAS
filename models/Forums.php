@@ -306,9 +306,10 @@ class Forums extends BaseImasForums {
                 'imas_forum_threads',
                 'imas_forums.id=imas_forum_threads.forumid'
             )
-            ->where(['imas_forum_threads.id=:thread']);
-        $query->andWhere('imas_forums.courseid=:courseId');
-        $command = $query->createCommand()->bindValues(['thread' => $thread,'courseId'=> $courseId]);
+            ->where('imas_forum_threads.id=:thread',['thread' => $thread]);
+        $query->andWhere('imas_forums.courseid=:courseId',['courseId'=> $courseId]);
+        $command = $query->createCommand();
+//        $command->bindValues(['thread' => $thread,'courseId'=> $courseId]);
         $items = $command->queryAll();
         return $items;
     }

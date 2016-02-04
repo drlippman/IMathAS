@@ -304,7 +304,7 @@ class ForumController extends AppController
         } else if ($params['forumid']) {
             $forumId = $params['forumid'];
         }
-        if (!isset($params['page']) || $params['page'] == '') {
+        if (!($params['page']) || $params['page'] == '') {
             $page = 1;
         } else {
             $page = $params['page'];
@@ -319,7 +319,7 @@ class ForumController extends AppController
         }
 
         $forumData = Forums::getById($forumId);
-        if (($isteacher || isset($tutorId)) && isset($params['score'])) {
+        if (($isteacher || ($tutorId)) && ($params['score'])) {
 
             if (isset($tutorId))
             {
@@ -368,12 +368,12 @@ class ForumController extends AppController
             }
             if (isset($params['save']) && $params['save'] == 'Save Grades and View Previous')
             {
-                return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['prevth']);
+                return $this->redirect('post?page=' .$page . '&courseid=' .$courseId . '&forumid=' .$forumId . '&threadid=' .$params['prevth']);
             } else if (isset($params['save']) && $params['save'] == 'Save Grades and View Next') {
-                return $this->redirect('post?page=' . $page . '&courseid=' . $courseId . '&forumid=' . $forumId . '&threadid=' . $params['nextth']);
+                return $this->redirect('post?page=' .$page. '&courseid=' .$courseId . '&forumid=' .$forumId . '&threadid=' .$params['nextth']);
             } else
             {
-                return $this->redirect('thread?page=' . $page . '&cid=' . $courseId . '&forum=' . $forumId);
+                return $this->redirect('thread?page=' .$page. '&cid=' .$courseId . '&forum=' .$forumId);
             }
         }
 
@@ -385,7 +385,7 @@ class ForumController extends AppController
         $taglist = $forumData['taglist'];
         $enddate = $forumData['enddate'];
         $avail = $forumData['avail'];
-        if (isset($studentId) && ($avail == 0 || ($avail == 1 && time() > $enddate))) {
+        if (($studentId) && ($avail == 0 || ($avail == 1 && time() > $enddate))) {
             $this->setWarningFlash('This forum is closed.');
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
         }
@@ -540,10 +540,13 @@ class ForumController extends AppController
         if ($page == -1 && count($newpost) == 0)
         {
             $page = 1;
+
         } else if ($page == -2 && count($flags) == 0)
         {
             $this->setWarningFlash('No result found for limit to flagged');
-            $page = 1;
+
+//            $page = 1;
+            return $this->redirect('thread?page=-2&cid='.$courseId.'&forum='.$forumId);
         }
         $prevnext = '';
         if ($page > 0) {
