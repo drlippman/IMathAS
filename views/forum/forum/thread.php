@@ -15,11 +15,14 @@ $now = $currentTime;
     <input type="hidden" id="page" value="<?php echo $page;?>">
 <?php }?>
 <div class="item-detail-header">
-    <?php if($users['rights'] == 100 || $users['rights'] == 20) {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
-    } elseif($users['rights'] == 10){
+
+    <?php if($params['search'] != 'none') {
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forumid='.$forumid.'&clearsearch=true']]);
+    } else
+    {
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
     }?>
+
 </div>
 
 <div class = "title-container">
@@ -122,7 +125,7 @@ $now = $currentTime;
     echo AppUtility::tzdate("F j, Y, g:i a",$row['postdate']);
 
     echo "</div>
-                    <div class=blockitems>";
+    <div class=blockitems>";
     echo filter($row['message']); ?>
     <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
 </div>
@@ -380,5 +383,6 @@ echo '</div>';
             </div>
         </div>
         <div id="searchpost"></div>
-    <?php } } ?>
+    <?php }
+    } ?>
 </div>

@@ -174,6 +174,7 @@ class ForumController extends AppController
                 $searchstr = str_replace(' and ', ' ',$searchstr);
                 $searchterms = explode(" ", $searchstr);
             }
+
             $searchedPost = ForumPosts::getBySearchTextForThread($isteacher, $now, $cid, $searchterms, $anyforumsgroup, $searchstr, $searchtag, $user->id);
 
             $threaddata = array();

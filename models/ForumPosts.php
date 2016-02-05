@@ -358,7 +358,7 @@ class ForumPosts extends BaseImasForumPosts
         return $data;
     }
 
-    public static function getBySearchText($isTeacher,$now,$courseId,$searchlikes,$searchlikes2,$searchlikes3,$forumId,$limthreads,$dofilter,$params)
+    public static function getBySearchText($isTeacher,$now,$courseId,$searchlikes,$searchlikes2, $searchlikes3,$forumId,$limthreads,$dofilter,$params)
     {
         $placeholders= "";
         if($limthreads)
@@ -369,6 +369,21 @@ class ForumPosts extends BaseImasForumPosts
             $placeholders = trim(trim(trim($placeholders),","));
         }
 
+        if(!empty($searchlikes) && is_array($searchlikes)){
+            $searchTermsMessage = "";
+            $searchTermsSubject = "";
+            $searchTermsLastName = "";
+            foreach($searchlikes as $index => $singleTerm){
+                $searchTermsMessage .= " AND imas_forum_posts.message LIKE :searchTerm".$index;
+                $searchTermsSubject .= " AND imas_forum_posts.subject LIKE :searchTerm".$index;
+                $searchTermsLastName .= " AND imas_users.LastName LIKE :searchTerm".$index;
+            }
+            $searchTermsMessage = "(".trim(trim(trim($searchTermsMessage),'AND')).")";
+            $searchTermsSubject = "(".trim(trim(trim($searchTermsSubject),'AND')).")";
+            $searchTermsLastName = "(".trim(trim(trim($searchTermsLastName),'AND')).")";
+        }
+
+
         if (isset($params['allforums']))
         {
             $query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
@@ -376,10 +391,10 @@ class ForumPosts extends BaseImasForumPosts
             if (!$isTeacher) {
                 $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate < :now AND imas_forums.enddate>:now)) ";
             }
-            $query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid=:courseId AND (imas_forum_posts.message LIKE :searchlikes OR imas_forum_posts.subject LIKE :searchlikes2 OR imas_users.LastName LIKE :searchlikes3)";
+            $query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid=:courseId AND ($searchTermsMessage OR $searchTermsSubject OR $searchTermsLastName)";
         } else {
             $query = "SELECT imas_forum_posts.forumid,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate ";
-            $query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid=:forumId AND imas_users.id=imas_forum_posts.userid AND (imas_forum_posts.message LIKE :searchlikes OR imas_forum_posts.subject LIKE :searchlikes2 OR imas_users.LastName LIKE :searchlikes3)";
+            $query .= "FROM imas_forum_posts,imas_users WHERE imas_forum_posts.forumid=:forumId AND imas_users.id=imas_forum_posts.userid AND ($searchTermsMessage OR $searchTermsSubject OR $searchTermsLastName)";
         }
         if ($dofilter) {
             $query .= " AND imas_forum_posts.threadid IN ($placeholders)";
@@ -391,9 +406,21 @@ class ForumPosts extends BaseImasForumPosts
             if (!$isTeacher) {
                 $command->bindValue(':now',$now);
             }
-            $command->bindValues([':courseId'=> $courseId, ':searchlikes' => "%".$searchlikes."%", ':searchlikes2' => "%".$searchlikes2."%", ':searchlikes3' => "%".$searchlikes3."%"]);
+            $command->bindValue(':courseId', $courseId);
+            if(!empty($searchlikes) && is_array($searchlikes)){
+
+                foreach($searchlikes as $index => $singleTerm){
+                    $command->bindValue(":searchTerm".$index , "%".$singleTerm."%");
+                }
+            }
         } else{
-            $command->bindValues([':forumId' => $forumId, ':searchlikes' => "%".$searchlikes."%", ':searchlikes2' => "%".$searchlikes2."%", ':searchlikes3' => "%".$searchlikes3."%"]);
+            $command->bindValue(':forumId', $forumId);
+            if(!empty($searchlikes) && is_array($searchlikes)){
+
+                foreach($searchlikes as $index => $singleTerm){
+                    $command->bindValue(":searchTerm".$index , "%".$singleTerm."%");
+                }
+            }
         }
         if ($dofilter) {
             foreach($limthreads as $i => $parent){
