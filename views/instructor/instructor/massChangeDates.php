@@ -133,7 +133,7 @@ if ($overwriteBody == 1) {
     </select></div>';
     echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
     echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></div>';
-    echo '<div style="overflow-x: scroll" class="col-sm-12 col-md-12  ">';
+    echo '<div class="col-sm-12 col-md-12  ">';
     if ($picicons) {
         echo '<table  class=gb>
         <thead>
@@ -167,7 +167,7 @@ if ($overwriteBody == 1) {
         if ($types[$i]=='Block') {echo 'onchange="MCDselectblockgrp(this,'.strlen($pres[$i]).')"';}
         echo "/></td>";
         if ($filter=='all') {
-            echo '<td class="mcind'.strlen($pres[$i]).' togdishid'.($avails[$i]==0?' dis':'').'">';
+            echo '<td class="mcind'.strlen($pres[$i]).' togdishid'.($avails[$i]==0?' dis':'').'" style="width:10%">';
         } else {
             echo '<td class="togdishid'.($avails[$i]==0?' dis':'').'">';
         }
@@ -205,11 +205,12 @@ if ($overwriteBody == 1) {
             echo "</td>";
         }
 
-        echo '<td><span class="nowrap"><img src="'.$imasroot2.'img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/>
+        echo '<td class="togdis"><span class="nowrap"><img src="'.$imasroot2.'img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/>
         <span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span>
         <input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
+       ?>
 
-        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot2/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
+       <?php echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot2/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
         if ($startdates[$i]==0) {
             echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
         } else {
@@ -235,7 +236,7 @@ if ($overwriteBody == 1) {
         }
         echo "<input type=hidden size=10 onblur=\"ob(this)\"/>";
         echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
-                                        echo '<div class = "col-sm-10  time-input"">';
+                                        echo '<div class = "col-sm-11  time-input"">';
                                         echo DatePicker::widget([
                                             'name' => 'sdate'.$cnt,
                                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -251,7 +252,7 @@ if ($overwriteBody == 1) {
 //        echo "<input type=hidden size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 
                                         echo '<label class="end pull-left non-bold"> at </label>';
-                                        echo '<div class="col-sm-12  padding-top">';
+                                        echo '<div class="col-sm-12  padding-top" style="width:211px; padding-right: 0px">';
                                         echo TimePicker::widget([
                                             'name' => 'postTime',
                                             'id' => 'stime'.$cnt,
@@ -292,7 +293,7 @@ if ($overwriteBody == 1) {
         echo "<input type=hidden size=10  onblur=\"ob(this)\"/>";
         echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
         //echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-                echo '<div class = "col-md-10 time-input">';
+                echo '<div class = "col-md-11 time-input">';
                 echo DatePicker::widget([
                     'name' => 'edate'.$cnt,
                     'id' => 'edate'.$cnt,
@@ -306,7 +307,7 @@ if ($overwriteBody == 1) {
                 echo '</div>';
 //        echo " <input type=hidden size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
                 echo '<label class="end pull-left non-bold"> at </label>';
-                echo '<div class=" col-md-12 padding-top">';
+                echo '<div class=" col-md-12 padding-top" style="width:211px; padding-right: 0px">';
                 echo TimePicker::widget([
                     'name' => 'etime'.$cnt,
                     'value' => $etime,
@@ -320,7 +321,7 @@ if ($overwriteBody == 1) {
 
         echo '</span></td>';
 
-        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
+        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')." \" style=\"width:40%;\">";
         if ($types[$i]=='Assessment') {
             echo "<img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
             if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
@@ -355,10 +356,10 @@ if ($overwriteBody == 1) {
                 $rdate = AppUtility::tzdate("m/d/Y",$reviewdates[$i]);
                 $rtime = AppUtility::tzdate("g:i a",$reviewdates[$i]);
             }
-            echo "<input type=hidden onblur=\"ob(this)\"/>(";
+            echo "<input type=hidden onblur=\"ob(this)\"/>";
             echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
 
-            echo '<div class = "col-md-10 time-input">';
+            echo '<div class = "col-md-10 time-input padding-bottom-ten">';
             echo DatePicker::widget([
                 'name' => 'rdate'.$cnt,
                 'id' => 'rdate'.$cnt,

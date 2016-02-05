@@ -445,6 +445,7 @@ class InstructorController extends AppController
         $pres = array();
         $body = "";
         $prefix = array();
+        $sd = array();
 
         if(!(isset($teacherId))) {
             $overwriteBody = AppConstant::NUMERIC_ONE;
@@ -560,6 +561,7 @@ class InstructorController extends AppController
             } else {
                 $filter = "all";
             }
+
             if ($orderby == AppConstant::NUMERIC_THREE) {  //course page order
                global $itemsassoc;
                $itemsassoc = array();
@@ -637,9 +639,10 @@ class InstructorController extends AppController
                     $reviewdates[] = -1;
                     $ids[] = $row['id'];
                     $avails[] = $row['avail'];
+                    $sd[]=$startdates;
                     if (isset($prefix['Forum'.$row['id']])) {$pres[] = $prefix['Forum'.$row['id']];} else {$pres[] = '';}
                     if ($orderby == AppConstant::NUMERIC_THREE) {$courseorder[] = $itemscourseorder['Forum'.$row['id']];
-                    }
+                   }
                 }
             }
             if ($filter=='all' || $filter == 'wikis') {
@@ -662,10 +665,8 @@ class InstructorController extends AppController
                 $result = Course::getItemOrder($courseId);
                 $itemOrder = $result->itemorder;
                 $items = unserialize($itemOrder);
-
                $blockItems = $this->getblockinfo($items,'0',$ids,$types,$names,$startdates,$enddates,$reviewdates,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix);
 
-            }
             $names = $blockItems['name'];
             $ids = $blockItems['ids'];
             $types = $blockItems['types'];
@@ -678,9 +679,10 @@ class InstructorController extends AppController
             $avails = $blockItems['avails'];
             $pres = $blockItems['pres'];
             $prefix = $blockItems['prefix'];
-
             $cnt = AppConstant::NUMERIC_ZERO;
             $now = time();
+            }
+
             if ($orderby == AppConstant::NUMERIC_ZERO) {
                 asort($startdates);
                 $keys = array_keys($startdates);

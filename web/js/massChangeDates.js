@@ -131,7 +131,7 @@ Date.prototype.getWeekDays = function(d) {
  	$('span[id^="availname"]').css("cursor","pointer").each(function(i,el) {
  		$(el).on('click',function() {
             alert('jjj');
- 			MCDtoggle("a",el.id.substring(9));
+ 		//	MCDtoggle("a",el.id.substring(9));
  		});
  	});
  });
@@ -157,7 +157,7 @@ Date.prototype.getWeekDays = function(d) {
 	 document.getElementById(el.id.substring(0,2)+el.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
   }
   function senddownselect(el) {
-  	  if ($("input[id^='cb']:checked").length==0) {
+      if ($("input[id^='cb']:checked").length==0) {
   	  	  if (!confirm(_("No items have been selected. This action will apply to ALL items below this item"))) {
   	  	  	  el.selectedIndex= 0;
   	  	  	  return;
@@ -178,7 +178,6 @@ Date.prototype.getWeekDays = function(d) {
 	  } else if (val==6) {
 		  copydown(ln,1,'r');
 	  }
-	  el.selectedIndex= 0;
   }
   function copydownsub(type,basearr,st,usecb,ctype) {  //type: s,e,r
 	  if (document.getElementById(type+"datetype"+st).value==1) {
@@ -302,18 +301,18 @@ Date.prototype.getWeekDays = function(d) {
 	  var globd = getFieldDate(dateField.value);
 	  document.getElementById(dateField.id.substring(0,2)+dateField.id.substring(5)).innerHTML = globd.SHORTDAYS[globd.getDay()];
   }
-  var availnames = [_("Hidden"),_("By Dates"),_("Always")];
+  var availnames = ["Hidden","By Dates","Always"];
   function MCDtoggle(type,cnt) {
-  	if (type=='a') {
-		var curval = $('#avail'+cnt).val();
-		if (baserdates[cnt]=='NA') {
+      if (type=='a') {
+		var curval = $('#avail'+cnt).val()
+          if (baserdates[cnt]=='NA') {
 			curval = (curval+1)%3;	
 		} else {
 			curval = 1-curval;
 		}
 		$('#avail'+cnt).val(curval);
 		if (curval==1) {
-			$('#avail'+cnt).parent().parent().parent().find('td.togdis').removeClass('dis');
+            $('#avail'+cnt).parent().parent().parent().find('td.togdis').removeClass('dis');
 		} else {
 			$('#avail'+cnt).parent().parent().parent().find('td.togdis').addClass('dis');
 		}
@@ -338,26 +337,27 @@ Date.prototype.getWeekDays = function(d) {
 	  
   }
   function MCDtoggleselected(form) {
-	  var type = document.getElementById("swaptype").value;
+      var type = document.getElementById("swaptype").value;
 	  var to = document.getElementById("swapselected").value;
 	  var els = form.getElementsByTagName("input");
-	  for (var i=0; i<els.length; i++) {
-		  if (els[i].type=='checkbox' && els[i].checked && els[i].id!='ca') {
-			var cnt = els[i].id.substr(2);
+      for (var i=0; i<els.length; i++) {
+          if (els[i].type=='checkbox' && els[i].checked && els[i].id!='ca') {
+              var cnt = els[i].id.substr(2);
 			try {
 				if (type=='a') {
-					$('#avail'+cnt).val((baserdates[cnt]!='NA' && to==2)?1:to);
+                    $('#avail'+cnt).val((baserdates[cnt]!='NA' && to==2)?1:to);
 					if (to==0) {
-						$(els[i]).parent().parent().find('td.togdis').addClass('dis');
+                        $(els[i]).parent().parent().find('td.togdis').addClass('dis');
 					} else {
 						$(els[i]).parent().parent().find('td.togdis').removeClass('dis');
 					}
 					if (to==1 || (baserdates[cnt]!='NA' && to==2)) {
 						$('#availname'+cnt).text(availnames[1]);
-					} else {
+
+                    } else {
 						$('#availname'+cnt).text(availnames[to]);
-					}
-					
+                    }
+
 				} else {
 					if (to=="dates") { //swap from A/N to date
 						document.getElementById(type+"span0"+cnt).className="hide";
@@ -465,8 +465,7 @@ Date.prototype.getWeekDays = function(d) {
   
   function chgswaptype(el) {
   	  var elout = document.getElementById("swapselected");
-  	  elout.options.length = 0;
-  	 
+      elout.options.length = 0;
   	  if (el.value=='a') {
   	  	   elout.options[elout.options.length] = new Option('Hidden','0',false,false);
   	  	   elout.options[elout.options.length] = new Option('By Dates','1',false,false);
@@ -478,7 +477,6 @@ Date.prototype.getWeekDays = function(d) {
 		  }
 		  elout.options[elout.options.length] = new Option('Dates','dates',false,false);
   	  }
-
   }
   
   	//TODO: separately calculate day difference (using daysBetween and getWeekDays) and time difference separately
