@@ -1029,6 +1029,7 @@ class ForumController extends AppController
 
             ForumThread::updateViews($threadid);
 
+
 //            mark as read
             $result = ForumView::getByTagged($currentUser['id'],$threadid);
             $now = time();
@@ -1059,7 +1060,7 @@ class ForumController extends AppController
         $this->includeJS(["general.js", "forum/posts.js"]);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
         'view' => $view, 'bcnt' => $bcnt, 'icnt' => $icnt, 'caneditscore' => $caneditscore, 'haspoints' => $haspoints, 'courseId' => $courseId, 'forumid' => $forumid, 'groupid' => $groupid,
-        'page' => $page, 'course' => $course, 'tagValue' => $tagValue);
+        'page' => $page, 'course' => $course, 'tagValue' => $tagValue, 'currentUser' => $currentUser);
         return $this->render('post', $responseData);
     }
 

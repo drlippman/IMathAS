@@ -245,7 +245,7 @@ class ForumThread extends BaseImasForumThreads
 
     public static function updateViews($threadId)
     {
-        $query = "UPDATE imas_forum_threads SET views=views+1 WHERE id=':threadId'";
+        $query = "UPDATE imas_forum_threads SET views=views+1 WHERE id=:threadId";
         $data = Yii::$app->db->createCommand($query)->bindValue(':threadId', $threadId)->execute();
         return $data;
     }

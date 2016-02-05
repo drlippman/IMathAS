@@ -60,10 +60,10 @@ if($totalData['isTutor']){
     <?php  if($currentUser['rights'] > 10){
     echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]);
 }else{
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/grade-book-student-detail?cid=' . $course->id]]);
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/grade-book-student-detail?cid=' . $course->id]]);
 }?>
 <?php }else{ ?>
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course', 'course/course?cid=' . $course->id,AppUtility::getHomeURL().'roster/roster/student-roster?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'roster/roster/student-roster?cid=' . $course->id]]); ?>
 <?php } ?>
 
 
@@ -116,7 +116,7 @@ if($totalData['isTutor']){
         <div class="display-inline-block col-md-3 col-sm-4 padding-right-zero padding-left-zero">
             <div class="display-inline-block"> <?php AppUtility::t('Not Counted');?></div>&nbsp;
              <div class='display-inline-block width-fifty-five-per'>
-                 <select id="toggle2" class='form-control' onchange=chgtoggle()>
+                 <select id="toggle2" class='form-control' onchange="chgtoggle()">
                      <option value=0 <?php AssessmentUtility::writeHtmlSelected($hidenc,0);?> > <?php AppUtility::t('Show all')?> </option>
                      <option value=1 <?php AssessmentUtility::writeHtmlSelected($hidenc,1); ?> > <?php AppUtility::t('Show stu view')?> </option>
                      <option value=2 <?php AssessmentUtility::writeHtmlSelected($hidenc,2); ?> > <?php AppUtility::t('Hide all')?> </option>

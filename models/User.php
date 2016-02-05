@@ -107,7 +107,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->LastName = $params['lastName'];
 //        $user = new User();
 //        $user->attributes = $params;
-//        AppUtility::dump($this);
 
         $this->save();
         if ($this->id && isset($params['userid']) && isset($params['courseid'])) {
@@ -901,8 +900,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public function createInstructorAcc($params)
     {
-//                AppUtility::dump($params);
-
         $this->SID = $params['username'];
         $this->hideonpostswidget = AppConstant::ZERO_VALUE;
         $this->password = AppUtility::passwordHash($params['password']);
@@ -913,7 +910,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 //        $this->save();
 //        $data = AppUtility::removeEmptyAttributes($params);
 //        $this->attributes = $data;
-//        AppUtility::dump($this);
 
         $this->save();
         return $this;

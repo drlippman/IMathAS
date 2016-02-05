@@ -28,7 +28,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
 <div class="item-detail-content">
     <?php
+
     if ($currentUser->rights > AppConstant::STUDENT_RIGHT) {
+
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
     } else {
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);

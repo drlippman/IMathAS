@@ -1139,8 +1139,6 @@ class QuestionController extends AppController
         $myRights = $user['rights'];
         $libraryData = Libraries::getAllLibrariesByJoin();
 
-
-//        AppUtility::dump($libraryData);
         $libraryTree = array();
         foreach($libraryData as $singleLibrary){
 
