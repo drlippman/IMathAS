@@ -120,10 +120,11 @@ if (count($taginfo)==0) {
  }?>
         <?php if($isblank)
         {
-            echo '<div class="col-md-12 title-option">';
-            echo '<h4>No result found for your search</h4>';
+            echo '<div class="col-md-12 col-sm-12 title-option">';
+            echo '<h4>No result found.</h4>';
             echo '</div>';
-        } else if ($searchtype == 'thread') { ?>
+        } else if ($searchtype == 'thread') {
+            ?>
             <!--    doing a search of thread subjects-->
             <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty">
                 <?php echo '<table class="search-forum table table-bordered table-striped table-hover data-table"><thead>';
@@ -248,7 +249,7 @@ if (count($taginfo)==0) {
                     }
                     for ($i=0;$i<count($fl)/2;$i++) {
                         //if (count($fl)>2) {echo '<li>';}
-                        echo '<a href="'.getuserfileurl('ffiles/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
+                        echo '<a href="'.\app\components\filehandler::getuserfileurl('files/'.$line['id'].'/'.$fl[2*$i+1]).'" target="_blank">';
                         $extension = ltrim(strtolower(strrchr($fl[2*$i+1],".")),'.');
                         if (isset($itemicons[$extension])) {
                             echo "<img alt=\"$extension\" src=\"$imasroot/img/{$itemicons[$extension]}\" class=\"mida\"/> ";

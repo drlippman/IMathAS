@@ -178,12 +178,11 @@ class ForumController extends AppController
 
             $threaddata = array();
             $threadids = array();
-            foreach ($searchedPost as $line )
+            foreach ($searchedPost as $line)
             {
                 $threaddata[$line['id']] = $line;
                 $threadids[] = $line['id'];
             }
-
             $maxPost = ForumPosts::getMaxPostDateWithThreadId($threadids);
             $postcount = array();
             $maxdate = array();

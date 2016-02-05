@@ -648,6 +648,14 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function getBySearchTextForThread($isteacher, $now, $cid, $searchlikes, $anyforumsgroup,$searchstr,$searchtag,$userid)
     {
+        if(!empty($searchlikes) && is_array($searchlikes)){
+            $searchTermsMessage = "";
+            foreach($searchlikes as $index => $singleTerm){
+                $searchTermsMessage .= " AND imas_forum_posts.subject LIKE :searchTerm".$index;
+            }
+            $searchTermsMessage = "(".trim(trim(trim($searchTermsMessage),'AND')).")";
+        }
+
         $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.posttype,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
         $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
         $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
@@ -656,10 +664,10 @@ class ForumPosts extends BaseImasForumPosts
 
         $query .= "WHERE imas_forums.courseid=:cid AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
         if ($searchstr != '') {
-            $query .= "AND :searchlikes ";
+            $query .= "AND $searchTermsMessage";
         }
         if ($searchtag != '') {
-            $query .= "AND imas_forum_posts.tag=:searchtag ";
+            $query .= "AND imas_forum_posts.tag=:searchtag";
         }
         if (!$isteacher) {
             $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<:now AND imas_forums.enddate>:now)) ";
@@ -670,8 +678,14 @@ class ForumPosts extends BaseImasForumPosts
         $query .= " ORDER BY imas_forum_threads.lastposttime DESC";
         $command = Yii::$app->db->createCommand($query);
         $command->bindValues([':cid'=> $cid, ':userid' => $userid]);
+
         if ($searchstr != '') {
-            $command->bindValue(':searchlikes', $searchlikes);
+            if(!empty($searchlikes) && is_array($searchlikes)){
+
+                foreach($searchlikes as $index => $singleTerm){
+                    $command->bindValue(":searchTerm".$index , "%".$singleTerm."%");
+                }
+            }
         }
         if ($searchtag != '') {
             $command->bindValue(':searchtag',$searchtag);
@@ -682,6 +696,7 @@ class ForumPosts extends BaseImasForumPosts
         if ($anyforumsgroup && !$isteacher) {
             $command->bindValue(':userid', $userid);
         }
+
         $data = $command->queryAll();
         return $data;
     }
