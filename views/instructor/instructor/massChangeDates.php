@@ -402,10 +402,12 @@ if ($overwriteBody == 1) {
     }
     echo '</tbody></table></div>';
     echo '</form>';
-    echo "<form id=\"realform\" method=post action=\"mass-change-dates?cid=$courseId\" onsubmit=\"prepforsubmit(this)\">";
+    echo '<div class="padding-left-fifteen padding-bottom-fifteen">';
+    echo "<form id=\"realform\" id=\"realform\" method=post action=\"mass-change-dates?cid=$courseId\" onsubmit=\"prepforsubmit(this)\">";
     echo "<input type=hidden id=\"chgcnt\" name=\"chgcnt\" value=\"$cnt\" />";
     echo '<input type=submit value="Save Changes"/>';
     echo '</form>';
+    echo '</div>';
 }
 ?>
 </div>
