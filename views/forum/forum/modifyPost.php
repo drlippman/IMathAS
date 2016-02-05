@@ -68,7 +68,7 @@ $now = $currentTime;
                     }
                     else{
                         $uploadDir = AppConstant::UPLOAD_DIRECTORY;?>
-                        <a href="<?php echo AppUtility::getHomeURL(). $uploadDir?><?php echo $files[2*$i+1]?>" target="_blank">View</a>
+                        <a href="<?php echo AppUtility::getAssetURL()?>Uploads/<?php echo $files[2*$i+1]?>" target="_blank">View</a>
                     <?php }?>
                     Delete? <input type="checkbox" name="fileDel[<?php echo $i;?>]" value="1"/><br/>
                 <?php }
