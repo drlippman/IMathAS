@@ -3100,10 +3100,11 @@ class AppUtility extends Component
             } elseif($locked['locked'] > 0){ ?>
                 <a class="word-wrap-break-word" href="#" onclick="studLocked()">
                 <?php echo $data[$i]['name'].'</a>';
+            } else{
+            ?>
+                <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
+                <?php echo $data[$i]['name'].'</a>';
             }
-                ?>
-            <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
-            <?php echo $data[$i]['name'].'</a>';
             if (isset($data[$i]['available']) && (($data[$i]['available']&1) == 1)) {
                 echo ' <span style="color:green;">', _('Hidden'), '</span>';
             }
