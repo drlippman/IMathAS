@@ -222,6 +222,16 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
+        //$revisionData=array();
+
+       /* foreach($revisionTotalData as $key=>$wikicontent){
+        $wikicontent = $wikicontent[revision];
+        $wikicontent = substr($wikicontent,strpos($wikicontent,'**',6)+2);
+        $revisionData[]=$wikicontent;
+        } */
+
+
+
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
             'canEdit' => $canEdit, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev);
@@ -326,7 +336,7 @@ class WikiController extends AppController
                     $wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
                     $wikicontent = preg_replace('/\s+/',' ',$wikicontent);
                     $now = time();
-
+                    //AppUtility::dump($wikicontent);
                     /*
                      * check for conflicts
                      */
@@ -336,9 +346,16 @@ class WikiController extends AppController
                         /*
                          * editing existing wiki
                          */
-                        $row = ($result);
+                        $row = $result;
                         $revisionId = $row['id'];
                         $revisionText = $row['revision'];
+                        if (strlen($revisionText) > 6 && substr($revisionText,0,6)=='**wver')
+                        {
+                            $wikiVer = substr($revisionText,6,strpos($revisionText,'**',6)-6);
+                            $revisionText = substr($revisionText,strpos($revisionText,'**',6)+2);
+                        } else {
+                            $wikiVer = 1;
+                        }
 
                         if ($revisionId != $params['baserevision'])
                         {
@@ -358,10 +375,11 @@ class WikiController extends AppController
                             if ($diff != '')
                             {
                                 $diffStr = $diff;
-                                $wikicontent = ($wikicontent);
+                                $revisionText = $wikicontent;
                                 if ($wikiVer > 1) {
                                     $wikicontent = '**wver'.$wikiVer.'**'.$wikicontent;
                                 }
+
                                 /*
                                  * insert latest content
                                  */
@@ -381,7 +399,7 @@ class WikiController extends AppController
                         $firstInsertRevision = new WikiRevision();
                         $firstInsertRevision->saveRevision($id,$groupId,$userId,$wikicontent,$now);
                     }
-                    if (!$inConflict) {
+                    if ($inConflict) {
                         return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id);
                     }
                 } else {
@@ -415,7 +433,7 @@ class WikiController extends AppController
             }
         }
         $this->includeJS(['course/inlineText.js','editor/tiny_mce.js','editor/tiny_mce_src.js','general.js']);
-        $responseData = array('wikiName' => $wikiName, 'groupId' => $groupId, 'groupName' => $groupName, 'inConflict' => $inConflict, 'wikicontent' => $wikicontent, 'lastEditedBy' => $lastEditedBy,'lastEditTime' => $lastEditTime, 'courseId' => $courseId, 'id' => $id,
+        $responseData = array('wikiName' => $wikiName, 'groupId' => $groupId, 'groupName' => $groupName, 'inConflict' => $inConflict, 'wikicontent' => $revisionText, 'lastEditedBy' => $lastEditedBy,'lastEditTime' => $lastEditTime, 'courseId' => $courseId, 'id' => $id,
         'grp' => $groupId, 'revisionId' => $revisionId, 'revisionText' => $revisionText, 'course' => $course);
         return $this->renderWithData('editPage', $responseData);
     }

@@ -46,9 +46,9 @@ if (isset($delAll) && $isTeacher) {
     echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
 
 } else if ($snapshot) {
-    echo "<p>Current Version Code.  <a href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id).">Back</a></p>";
+    echo "<p class='padding-left-ten'>Current Version Code.  <a href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id).">Back</a></p>";
     echo '<div class="editor" style="font-family:courier; padding: 10px;">';
-    echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",htmlentities($text));
+    echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",filter($text));
     echo '</div>';
 } else { //default page display
     if ($isgroup && $isTeacher) {
@@ -86,10 +86,10 @@ if (isset($delAll) && $isTeacher) {
             $last = $numRevisions - 1;
             echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision"/></span>';
             echo '<div class="padding-left"><span id="revcontrol" style="display:none;">'; AppUtility::t('Revision history');
-            echo'<a href="#" id="first" onclick="jumpto(1)">'; AppUtility::t('First'); echo'</a>
-            <a id="older" href="#" onclick="seehistory(1); return false;">'; AppUtility::t('Older'); echo'</a> ';
-            echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">'; AppUtility::t('Newer'); echo'</a>
-            <a href="#" class="grayout" id="last" onclick="jumpto(0)">'; AppUtility::t('Last'); echo'</a>
+            echo'<a href="#" id="first" onclick="jumpto(1)"> &nbsp;'; AppUtility::t('First'); echo'</a>
+            <a id="older" href="#" onclick="seehistory(1); return false;"> &nbsp;'; AppUtility::t('Older'); echo'</a> ';
+            echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;"> &nbsp;'; AppUtility::t('Newer'); echo'</a>
+            <a href="#" class="grayout" id="last" onclick="jumpto(0)"> &nbsp;'; AppUtility::t('Last'); echo' &nbsp; </a>
             <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
             if ($isTeacher) { ?>
                 <a id="revrevert" style="display:none;" href="#"><?php AppUtility::t('Revert to this revision')?></a>
@@ -103,10 +103,9 @@ if (isset($delAll) && $isTeacher) {
                class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a></span><br/><br class="form">
         <?php if(!empty($wikiRevisionData)){
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
-                <div class="col-md-12 col-sm-12 padding-left-zero"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%'>
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px'>
                     <?php $text = $singleWikiRevision->revision;
-                    echo $text;?>
-
+                    echo filter($text)?>
                 </textarea></div>
             <?php }?>
         <?php }?>
@@ -323,10 +322,10 @@ if (isset($delAll) && $isTeacher) {
         var courseId = response.data.courseId;
         if (response.status == 0) {
             var message = '';
-            message += 'Are you sure you want to delete this user?';
+            message += 'Are you SURE you want to delete all contents and history for this Wiki page??';
             var html = '<div><p>' + message + '</p></div>';
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Remove User', zIndex: 10000, autoOpen: true,
+                modal: true, title: 'Confirm Page Contents Delete ?', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
                 closeText: "hide",
                 buttons: {
@@ -361,10 +360,10 @@ if (isset($delAll) && $isTeacher) {
         var courseId = response.data.courseId;
         if (response.status == 0) {
             var message = '';
-            message += 'Are you sure you want to delete this user?';
+            message += 'Are you SURE you want to delete all revision history for this Wiki page? The current version will be retained.?';
             var html = '<div><p>' + message + '</p></div>';
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Remove User', zIndex: 10000, autoOpen: true,
+                modal: true, title: 'Confirm History Delete ?', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
                 closeText: "hide",
                 buttons: {

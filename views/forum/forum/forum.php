@@ -104,7 +104,7 @@ if (count($taginfo)==0) {
                 <input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>
                 <span class="padding-left-five">All posts</span>
             </span>
-                        <span class="col-md-2 col-sm-1 padding-left-ten"><input name="searchsubmit" type="submit" value="Search"/></span>
+                        <span class="col-md-2 col-sm-1 padding-left-twelve"><input name="searchsubmit" type="submit" value="Search"/></span>
                     </div>
                 </div>
             </form>
@@ -293,7 +293,7 @@ if (count($taginfo)==0) {
         <div class="col-md-12 col-sm-12 padding-top-twenty padding-left-right-thirty myScrollTable">
                     <table class="search-forum table table-bordered table-striped table-hover data-table">
                         <thead>
-                        <tr><th class="width-sixty-per">Forum Name</th><th class="width-three-per">Threads</th><th class="width-three-per">Posts</th><th class="width-twenty-four-per">Last Post Date</th></tr>
+                        <tr><th class="width-sixty-per padding-left-twenty-five-per">Forum Name</th><th class="width-three-per">Threads</th><th class="width-three-per">Posts</th><th class="width-twenty-four-per padding-left-ten-per">Last Post Date</th></tr>
                         </thead>
                         <tbody>
                         <?php

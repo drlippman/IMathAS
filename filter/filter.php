@@ -104,7 +104,7 @@ global $AS, $AMT, $imasroot;
 		}
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
-		}
+        }
 		if ($sessiondata['graphdisp']==0) {
 			if (strpos($str,'embed')!==FALSE) {
 				$str = preg_replace('/<embed[^>]*alt="([^"]*)"[^>]*>/',"[$1]", $str);

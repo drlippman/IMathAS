@@ -23,7 +23,6 @@ if ($inConflict) {
     <div class="col-md-12 col-sm-12"><span style="color:#f00;"><?php AppUtility::t('Conflict')?></span>.<?php AppUtility::t('Someone else has already submitted a revision to this page since you opened it.
         Your submission is displayed here, and the recently submitted revision has been loaded into the editor so you can reapply your
         changes to the current version of the page')?></div>
-
     <div class="editor wikicontent"><?php echo $wikicontent; ?></div>
 <?php
 }
@@ -31,18 +30,19 @@ if ($inConflict) {
 if (isset($lastEditedBy)) {
     echo "<p>Last Edited by $lastEditedBy on $lastEditTime</p>";
 }
+
 ?>
+
 <form method="post" action="edit-page?courseId=<?php echo $courseId ?>&wikiId=<?php echo $id?>">
     <input type="hidden" name="baserevision" value="<?php echo $revisionId;?>" />
     <div class="editor">
         <textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">
-            <?php echo htmlentities($revisionText);?></textarea>
+
+            <?php echo filter($revisionText);?></textarea>
+
     </div><br/>
 
-<!--    <div class=submit>-->
-<!--        <input type=submit value="--><?php //echo _("Save Revision");?><!--">-->
-<!--    </div>-->
-    <div class="header-btn floatleft">
+  <div class="header-btn floatleft">
         <button class="btn btn-primary page-settings submit" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save Revision' ?></button>
     </div>
 </form>

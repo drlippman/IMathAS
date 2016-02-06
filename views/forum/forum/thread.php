@@ -55,7 +55,7 @@ $now = $currentTime;
 <input type="hidden" name="from" value="<?php echo $unRead; ?>">
 
 <div class="tab-content shadowBox ">
-    <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-ten">
+    <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-eight">
         <form id="myForm">
             <div class="padding-left-zero col-md-5 col-sm-8">
                 <div class="view-drop-down col-md-8  col-sm-8 padding-left-right-zero">
@@ -255,7 +255,7 @@ echo '</div>';
             <div >
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
-                    <th class="width-thirty-five-per text-align-center"><?php echo AppUtility::t('Topic')?></th>
+                    <th class="width-fifteen-per text-align-center"><?php echo AppUtility::t('Topic')?></th>
                     <?php            if ($isteacher && $groupsetid>0 && !$dofilter) { ?>
                         <th class="width-twenty-per text-align-center"><?php echo AppUtility::t('Groups')?></th>
                     <?php } ?>
@@ -295,7 +295,7 @@ echo '</div>';
                             echo "class=tagged";
                         }
                         echo ">
-                    <td class='width-thirty-five-per'>";
+                    <td class='width-fifteen-per'>";
                         if ($line['isanon']==1) {
                             $name = "Anonymous";
                         } else {
@@ -320,7 +320,7 @@ echo '</div>';
                             echo "<div style=\"color: red;\">New</div>";
                         } ?>
                         </td>
-                        <td class="width-fifteen-per">
+                        <td class="width-fifteen-per padding-left-five-per">
                             <div>
                                 <?php                   echo "<span class=\" text-align-center\">\n";
                                 if ($line['tag']!='') { //category tags

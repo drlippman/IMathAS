@@ -1010,9 +1010,29 @@ div.multiselitem {
 .padding-bottom-five {
     padding-bottom: 5px;
 }
+
+.padding-bottom-eight {
+    padding-bottom: 8px !important;
+}
+
 .padding-left-twenty {
     padding-left: 20px !important;
 }
+
+.padding-left-twenty-five-per {
+    padding-left: 25% !important;
+}
+
+
+.padding-left-five-per {
+    padding-left: 5% !important;
+}
+
+
+.padding-left-ten-per {
+    padding-left: 10% !important;
+}
+
 .margin-top-minus-six-per {
     margin-top: -6% !important;
 }
