@@ -964,4 +964,15 @@ class AppController extends Controller
             return $this->redirect(Yii::$app->getHomeUrl());
         }
     }
+
+    public function isLocked($userId, $courseId)
+    {
+        $student = Student::getByCourseId($courseId, $userId);
+        if ($student != null) {
+            if($student['locked'] != "" && $student['locked'] != AppConstant::NUMERIC_ZERO){
+                return true;
+            }
+        }
+        return false;
+    }
 }

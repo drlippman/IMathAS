@@ -400,6 +400,11 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $user = $this->user;
         $courseId = $this->getParamVal('cid');
+        $isLocked = $this->isLocked($user->id, $courseId);
+        if($isLocked){
+            $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+            return $this->redirect(Yii::$app->getHomeUrl());
+        }
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $this->setSessionData('messageCount',$msgList);
@@ -1223,6 +1228,11 @@ class CourseController extends AppController
         $student = Student::getByCId($courseId);
         $line  = Student::getStudentData($userId, $courseId);
         if ($line != null) {
+            $isLocked = $this->isLocked($userId, $courseId);
+            if($isLocked){
+                $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+                return $this->redirect(Yii::$app->getHomeUrl());
+            }
             $studentId = $line['id'];
             $studentInfo['timelimitmult'] = $line['timelimitmult'];
             $studentInfo['section'] = $line['section'];

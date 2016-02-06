@@ -2890,6 +2890,11 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $currentUser = $this->user;
         $StudentData = Student::getByUserId($userId);
+        $isLocked = $this->isLocked($currentUser['id'], $courseId);
+        if($isLocked){
+            $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+            return $this->redirect(Yii::$app->getHomeUrl());
+        }
         $totalData = $this->gbtable($currentUser['id'], $course['id'], $userId);
         $defaultValuesArray = $totalData['defaultValuesArray'];
         $stugbmode = GbScheme::getByCourseId($courseId);

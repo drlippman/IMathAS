@@ -76,11 +76,12 @@ if($totalData['isTutor']){
         </div>
     </div>
 </div>
+
 <div class="item-detail-content">
     <?php if($currentUser['rights'] > 10) {
-        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
     } elseif($currentUser['rights'] == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook']);
     }?>
 </div>
 
