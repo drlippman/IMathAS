@@ -35,8 +35,7 @@ class BaseImasWikiRevisions extends \yii\db\ActiveRecord
         return [
             [['wikiid', 'userid', 'time', 'revision'], 'required'],
             [['wikiid', 'stugroupid', 'userid', 'time'], 'integer'],
-            [['revision'], 'string'],
-            [['userid'], 'unique']
+            [['revision'], 'string']
         ];
     }
 

@@ -9,6 +9,7 @@ use app\models\InlineText;
 use app\models\InstrFiles;
 use app\models\Items;
 use app\models\LinkedText;
+use app\models\Student;
 use app\models\Stugroups;
 use app\models\Wiki;
 use app\models\WikiRevision;
@@ -81,9 +82,9 @@ class ShowItemCourse extends Component
                 }
 
                 if (($items[$i]['grouplimit']) && count($items[$i]['grouplimit']) > AppConstant::NUMERIC_ZERO && !$viewAll) {
-                    if (!in_array('s-'.$studentInfo['section'],$items[$i]['grouplimit'])) {
-                        continue;
-                    }
+                  if (!('s-'.$studentInfo['section']==$items[$i]['grouplimit'])) {
+                      continue;
+                  }
                 }
 
                 $items[$i]['name'] = stripslashes($items[$i]['name']);

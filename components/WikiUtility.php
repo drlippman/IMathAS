@@ -39,8 +39,13 @@ class WikiUtility extends Component
                 $countRevision = count($numrevisions);
                 $text = $numrevisions[AppConstant::NUMERIC_ONE];
                 if (strlen($text) > AppConstant::NUMERIC_SIX && substr($text, AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_SIX) == '**wver') {
+                    $wikiver=substr($text,6,strpos($text,'**',6)-6);
                     $text = substr($text, strpos($text, '**', AppConstant::NUMERIC_SIX) + AppConstant::NUMERIC_TWO);
                 }
+                else{
+                    $wikiver=1;
+                }
+
                 $lastedittime = AppUtility::tzdate("F j, Y, g:i a", $numrevisions[AppConstant::NUMERIC_TWO]);
                 $revisionusers = array();
                 $revisionusers[$numrevisions[AppConstant::NUMERIC_FIVE]] = $numrevisions[AppConstant::NUMERIC_TWO] . ', ' . $numrevisions[AppConstant::NUMERIC_FOUR];
@@ -59,14 +64,15 @@ class WikiUtility extends Component
                             $numrevisions[] = $revisionOne;
                         }
                         $revisionusers[$numrevisions[AppConstant::NUMERIC_FIVE]] = $numrevisions[AppConstant::NUMERIC_THREE] . ', ' . $numrevisions[AppConstant::NUMERIC_FOUR];
+
                         if (function_exists('json_encode')) {
-                            $numrevisions[AppConstant::NUMERIC_ONE] = json_decode($numrevisions[AppConstant::NUMERIC_ONE]);
+                            $numrevisions[1] = json_decode($numrevisions[1]);
 
                         } else {
                             $jsonser = new \Services_JSON();
-                            $numrevisions[AppConstant::NUMERIC_ONE] = $jsonser->decode($numrevisions[AppConstant::NUMERIC_ONE]);
+                            $numrevisions[1] = $jsonser->decode($numrevisions[1]);
                         }
-                        $revisionhistory[] = array('u' => $numrevisions[AppConstant::NUMERIC_FIVE], 'c' => $numrevisions[AppConstant::NUMERIC_ONE], 't' => AppUtility::tzdate("F j, Y, g:i a", $numrevisions[AppConstant::NUMERIC_TWO]), 'id' => $numrevisions[0]);
+                        $revisionhistory[] = array('u' => $numrevisions[AppConstant::NUMERIC_FIVE], 'c' => $numrevisions[AppConstant::NUMERIC_ONE], 't' => AppUtility::tzdate("F j, Y, g:i a", $numrevisions[AppConstant::NUMERIC_TWO]), 'id' => $numrevisions[AppConstant::NUMERIC_ZERO]);
                         $i++;
                     }
                     $keys = array_keys($revisionusers);
@@ -93,7 +99,7 @@ class WikiUtility extends Component
             if (function_exists('json_encode')) {
                 $responseBody = json_encode($out);
             } else {
-                $jsonser = new \Services_JSON();
+                $jsonser = new Services_JSON();
                 $responseBody = $jsonser->encode($out);
             }
         }

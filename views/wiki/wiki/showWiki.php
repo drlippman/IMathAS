@@ -102,10 +102,14 @@ if (isset($delAll) && $isTeacher) {
             <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
                class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a></span><br/><br class="form">
         <?php if(!empty($wikiRevisionData)){
-            foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
-                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px'>
-                    <?php $text = $singleWikiRevision->revision;
-                    echo filter($text)?>
+
+            foreach($wikiRevisionData as $key => $singleWikiRevision) {
+                $text = $singleWikiRevision->revision;
+                $text = substr($text,strpos($text,'**',6)+2);
+                ?>
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; text-indent: -70px;'>
+                    <?php
+                    echo filter(strip_tags($text));?>
                 </textarea></div>
             <?php }?>
         <?php }?>

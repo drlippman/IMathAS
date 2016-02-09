@@ -309,6 +309,7 @@ class BlockController extends AppController
         $courseItemOrder = Course::getItemOrder($courseId);
         $itemOrder = $courseItemOrder->itemorder;
         $items = unserialize($itemOrder);
+
         if(!(isset($teacherId))){
             $overwriteBody = AppConstant::NUMERIC_ONE;
         }elseif(isset($params['checked'])){
@@ -332,6 +333,7 @@ class BlockController extends AppController
                     $grouplimit[] = $params['grouplimit'];
                 }
                 $sets['grouplimit'] = $grouplimit;
+
             }
             $items = $this->updateBlocksArray($items,$checked,$sets);
             $itemorder = serialize($items);
@@ -343,7 +345,6 @@ class BlockController extends AppController
         {
             $parent = AppConstant::NUMERIC_ZERO;
             $this->buildExistBlocksArray($items, $parent);
-
             $page_sectionlistval = array("none");
             $page_sectionlistlabel = array(_("No restriction"));
             $distinctStudSection = new Student();
@@ -353,6 +354,7 @@ class BlockController extends AppController
                 $page_sectionlistlabel[] = 'Section '.$section['section'];
             }
         }
+
         $this->includeCSS(['course/items.css']);
         $this->includeJS(['general.js']);
         $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids, 'page_sectionlistval' => $page_sectionlistval, 'page_sectionlistlabel' => $page_sectionlistlabel, 'overwriteBody' => $overwriteBody);
@@ -362,7 +364,6 @@ class BlockController extends AppController
     public function buildExistBlocksArray($items,$parent) {
         foreach ($items as $k=>$item) {
             if (is_array($item)) {
-
                 $this->existblocks[$parent.'-'.($k+1)] = $item['name'];
                 $this->existblockids[$parent.'-'.($k+1)] = $item['id'];
                 if (count($item['items'])> AppConstant::NUMERIC_ZERO) {

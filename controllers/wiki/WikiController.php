@@ -222,15 +222,6 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-        //$revisionData=array();
-
-       /* foreach($revisionTotalData as $key=>$wikicontent){
-        $wikicontent = $wikicontent[revision];
-        $wikicontent = substr($wikicontent,strpos($wikicontent,'**',6)+2);
-        $revisionData[]=$wikicontent;
-        } */
-
-
 
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
@@ -279,7 +270,6 @@ class WikiController extends AppController
         $body = "";
         $useEditor = "wikicontent";
         $isTeacher = $this->isTeacher($userId, $courseId);
-
         if (isset($frame)) {
             $flexWidth = true;
             $showNav = false;
@@ -336,26 +326,26 @@ class WikiController extends AppController
                     $wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
                     $wikicontent = preg_replace('/\s+/',' ',$wikicontent);
                     $now = time();
-                    //AppUtility::dump($wikicontent);
                     /*
                      * check for conflicts
                      */
+
                     $result = WikiRevision::getDataToCheckConflict($id, $groupId);
                     if (($result) > 0)
                     {
                         /*
                          * editing existing wiki
                          */
-                        $row = $result;
+                        $row = ($result);
                         $revisionId = $row['id'];
                         $revisionText = $row['revision'];
-                        if (strlen($revisionText) > 6 && substr($revisionText,0,6)=='**wver')
-                        {
+                        if (strlen($revisionText)>6 && substr($revisionText,0,6)=='**wver') {
                             $wikiVer = substr($revisionText,6,strpos($revisionText,'**',6)-6);
                             $revisionText = substr($revisionText,strpos($revisionText,'**',6)+2);
                         } else {
                             $wikiVer = 1;
                         }
+
 
                         if ($revisionId != $params['baserevision'])
                         {
@@ -369,13 +359,12 @@ class WikiController extends AppController
                          /**
                           * we're all good for a diff calculation
                           */
-
                             $diff = diff::diffsparsejson($wikicontent,$revisionText);
-
                             if ($diff != '')
                             {
-                                $diffStr = $diff;
-                                $revisionText = $wikicontent;
+
+                                $diffstr = $diff;
+
                                 if ($wikiVer > 1) {
                                     $wikicontent = '**wver'.$wikiVer.'**'.$wikicontent;
                                 }
@@ -388,18 +377,18 @@ class WikiController extends AppController
                                 /*
                                  * replace previous version with diff off current version
                                  */
-                                WikiRevision::updateRevision($revisionId, $diffStr);
+                                WikiRevision::updateRevision($revisionId, $diffstr);
                             }
                         }
                     } else {
                         /**
                          *  no wiki page exists yet - just need to insert revision
                          */
-                        $wikicontent = ('**wver2**'.$wikicontent);
+                        $wikicontent = addslashes('**wver2**'.$wikicontent);
                         $firstInsertRevision = new WikiRevision();
                         $firstInsertRevision->saveRevision($id,$groupId,$userId,$wikicontent,$now);
                     }
-                    if ($inConflict) {
+                    if (!$inConflict) {
                         return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id);
                     }
                 } else {

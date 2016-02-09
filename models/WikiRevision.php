@@ -20,7 +20,11 @@ class WikiRevision extends BaseImasWikiRevisions
         $this->userid = $userId;
         $this->revision = $wikiContent;
         $this->time = $now;
-        $this->save();
+        if($this->save()){
+            echo("yes");
+        }else{
+            print_r($this->getErrors());die;
+        }
     }
 
     public static function getEditedWiki($sortBy, $order, $wikiId)
@@ -140,7 +144,8 @@ class WikiRevision extends BaseImasWikiRevisions
         {
             foreach($updateRevisions as $key => $updateRevision)
             {
-                $updateRevision->revision = $newBase;
+               $updateRevision->revision = $newBase;
+                $updateRevision->save();
             }
         }
 

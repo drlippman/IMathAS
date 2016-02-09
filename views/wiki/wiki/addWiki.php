@@ -1,11 +1,11 @@
-<?php
+    <?php
 use app\components\AppUtility;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AppConstant;
 use app\components\AssessmentUtility;
 $this->title = $defaultValue['pageTitle'];
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
+                                            $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>"
