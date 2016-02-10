@@ -155,7 +155,8 @@ ini_set("post_max_size", "10485760");
 						$error = 'No enrollment key provided';
 					} else {
 						$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
-						if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {
+						$_POST['ekey'] = trim($_POST['ekey']);
+						if (!in_array(strtolower($_POST['ekey']), $keylist)) {
 							$error = 'Incorrect enrollment key';
 						} else {
 							if (count($keylist)>1) {
