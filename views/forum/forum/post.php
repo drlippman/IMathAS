@@ -86,11 +86,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         <button class="btn post-btn-color expand" onclick="showall()">&nbsp;Show All</button>
         <button  class="btn post-btn-color expand" onclick="hideall()">&nbsp;Hide All</button>
 
-      <?php   if ($view==2) {
-            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=0\">&nbsp;View Expanded</a>";
-        } else {
-            echo "<a href=\"post?view=$view&courseid=$courseId&forumid=$forumid&page=$page&threadid=$threadid&view=2\">&nbsp;View Condensed</a>";
-        }
+      <?php 
         echo "<br/>";echo "<br/>";
         $printChildren = new AppUtility();
         $printChildren->printchildren(0);

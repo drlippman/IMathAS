@@ -408,7 +408,8 @@ class ForumController extends AppController
             }
             if (!$isteacher) {
                 $studentGroup = Stugroups::getStuGrpDataForGradebook($currentUser['id'], $groupsetid);
-                if (count($studentGroup) > 0) {
+
+                if (($studentGroup) > 0) {
                     $groupid = $studentGroup['id'];
                 } else {
                     $groupid = 0;
