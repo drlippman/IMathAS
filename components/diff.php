@@ -62,14 +62,14 @@ public static function diffsparsejson($old, $new) {
 }
 
 public static function diffapplydiff($base,$diff) {
-	if (function_exists('json_encode')) {
+    if (function_exists('json_encode')) {
 		$diffs = json_decode($diff);
-	} else {
-		require_once("JSON.php");
-		$jsonser = new Services_JSON();
+    } else {
+      	require_once("JSON.php");
+		$jsonser = new \Services_JSON();
 		return $jsonser->decode($diff);
 	}
-	for ($i = count($diffs)-1; $i>=0; $i--) {
+    for ($i = count($diffs)-1; $i>=0; $i--) {
 		if ($diffs[$i][0]==2) { //replace
 			array_splice($base,$diffs[$i][1],$diffs[$i][2],$diffs[$i][3]);
 		} else if ($diffs[$i][0]==0) { //insert
@@ -78,8 +78,8 @@ public static function diffapplydiff($base,$diff) {
 			array_splice($base,$diffs[$i][1],$diffs[$i][2]);
 		}
 	}
-	
-	return $base;
+
+    return $base;
 }
 
 public static function diffstringsplit($str) {
@@ -88,22 +88,21 @@ public static function diffstringsplit($str) {
 	} else {
 		$wikiver = 1;
 	}
-	$p = preg_split('/(<span\s+class="AM".*?<\/span>|<embed.*?>)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
-	$out = array();
+    $p = preg_split('/(<span\s+class="AM".*?<\/span>|<embed.*?>)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
+    $out = array();
 	foreach ($p as $k=>$cont) {
 		if ($k%2==0) {
-			$cont = trim($cont);
-			if ($cont=='') {continue;}
+            $cont = trim($cont);
+            if ($cont=='') {continue;}
 			if ($wikiver == 2) {
 				$cont = str_replace('><','> <',$cont);
 			}
-			$out = array_merge($out,preg_split('/\s+/',$cont));
-			
-		} else {
+            $out = array_merge($out,preg_split('/\s+/',$cont));
+        } else {
 			$out[] = $cont;
 		}
 	}
-	return $out;
+    return $out;
 }
 }
 

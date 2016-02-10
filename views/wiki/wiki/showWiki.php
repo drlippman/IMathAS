@@ -104,8 +104,6 @@ if (isset($delAll) && $isTeacher) {
         <?php if(!empty($wikiRevisionData)){
 
             foreach($wikiRevisionData as $key => $singleWikiRevision) {
-                $text = $singleWikiRevision->revision;
-                $text = substr($text,strpos($text,'**',6)+2);
                 ?>
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
                     <?php
@@ -147,6 +145,7 @@ if (isset($delAll) && $isTeacher) {
             original = jsonData.o;
             userinfo = jsonData.u;
             curcontent = original.slice();
+            console.log(curcontent[0]);
             wikihistory = jsonData.h;
             contentdiv = document.getElementById("wikicontent");
             contentdiv.innerHTML = original.join(' ');

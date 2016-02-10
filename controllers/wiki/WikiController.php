@@ -91,18 +91,22 @@ class WikiController extends AppController
                 } else {
                     $pageTitle = "Confirm History Delete";
                 }
-            } else if (isset($revert) && ($isTeacher)) {
-                if ($revert == 'true') {
+            }
+            else if (isset($revert) && ($isTeacher)) {
+                if ($revert == 'ask') {
                     $revision = intval($this->getParamVal('torev'));
                     $result = WikiRevision::getRevision($id, $groupId, $revision);
                     if (count($result) > 1 && $revision > 0) {
-                        $row = count($result);
-                        $base = diff::diffstringsplit($row['revision']);
+                        $base = diff::diffstringsplit($result[0]['revision']);
                         foreach($result as $key => $row) { //apply diffs
                             $base = diff::diffapplydiff($base,$row['revision']);
                         }
-                        $newBase = ($base);
-                        WikiRevision::updateRevision($revision, $newBase);
+                        $newBase="";
+                        foreach($base as $key=>$b){
+                        $newBase .=$b." ";
+                        }
+                     //   AppUtility::dump($newBase);
+                        WikiRevision::updateRevertRevision($revision, $newBase);
                         WikiRevision::deleteRevision($id, $groupId,$revision);
                     }
                     return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id);
@@ -110,6 +114,7 @@ class WikiController extends AppController
                     $pageTitle = "Confirm Wiki Version Revert";
                 }
             } else { //just viewing
+
                 require_once("../filter/filter.php");
                 if (isset($isTeacher) || $now < $row['editbydate']) {
                     $canEdit = true;
@@ -222,7 +227,6 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
             'canEdit' => $canEdit, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev);
@@ -365,9 +369,6 @@ class WikiController extends AppController
 
                                 $diffstr = $diff;
 
-                                if ($wikiVer > 1) {
-                                    $wikicontent = '**wver'.$wikiVer.'**'.$wikicontent;
-                                }
 
                                 /*
                                  * insert latest content
@@ -384,7 +385,6 @@ class WikiController extends AppController
                         /**
                          *  no wiki page exists yet - just need to insert revision
                          */
-                        $wikicontent = addslashes('**wver2**'.$wikicontent);
                         $firstInsertRevision = new WikiRevision();
                         $firstInsertRevision->saveRevision($id,$groupId,$userId,$wikicontent,$now);
                     }

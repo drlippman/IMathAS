@@ -144,12 +144,28 @@ class WikiRevision extends BaseImasWikiRevisions
         {
             foreach($updateRevisions as $key => $updateRevision)
             {
-               $updateRevision->revision = $newBase;
+                $updateRevision->revision = $newBase;
                 $updateRevision->save();
             }
         }
-
     }
+
+    public static function updateRevertRevision($revision, $newBase)
+    {
+        $updateRevisions = WikiRevision::findAll(['id' => $revision]);
+        if($updateRevisions)
+        {
+            foreach($updateRevisions as $key => $updateRevision)
+            {
+                $updateRevision->revision = $newBase;
+                $updateRevision->save();
+            }
+        }
+    }
+
+
+
+
 
     public static function deleteRevision($id, $groupId,$revision)
     {
