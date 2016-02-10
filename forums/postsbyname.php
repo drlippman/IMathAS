@@ -221,84 +221,93 @@
 		echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\" onsubmit=\"onsubmittoggle()\">";
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
+	function printuserposts($name, $uid, $content, $postcnt, $replycnt) {
+		echo "<b>$name</b> (";
+		echo $postcnt.($postcnt==1?' post':' posts').', '.$replycnt. ($replycnt==1?' reply':' replies').')';
+		if ($line['hasuserimg']==1) {
+			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\"  />";
+			} else {
+				echo "<img src=\"$imasroot/course/files/userimg_sm$uid.jpg\"  onclick=\"togglepic(this)\" />";
+			}
+		}
+		echo '<div class="forumgrp">'.$content.'</div>';
+	}
+	$content = ''; $postcnt = 0; $replycnt = 0; $lastname = '';
 	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($line['userid']!=$laststu) {
 			if ($laststu!=-1) {
-				echo '</div>';
+				printuserposts($lastname, $laststu, $content, $postcnt, $replycnt);
+				$content = '';  $postcnt = 0; $replycnt = 0;
 			}
-			echo "<b>{$line['LastName']}, {$line['FirstName']}</b>";
-			if ($line['hasuserimg']==1) {
-				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\"  onclick=\"togglepic(this)\"  />";
-				} else {
-					echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\"  onclick=\"togglepic(this)\" />";
-				}
-			}
-			echo '<div class="forumgrp">';
 			$laststu = $line['userid'];
+			$lastname = "{$line['LastName']}, {$line['FirstName']}";
 		}
-		echo '<div class="block">';
+		$content .= '<div class="block">';
 		if ($line['parent']!=0) {
-			echo '<span style="color:green;">';
+			$content .= '<span style="color:green;">';
+			$replycnt++;
+		} else {
+			$postcnt++;
 		}
 		
-		echo '<span class="right">';
+		$content .= '<span class="right">';
 		if ($haspoints) {
 			if ($caneditscore) {
-				echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+				$content .= "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if (isset($scores[$line['id']])) {
-					echo $scores[$line['id']];
+					$content .= $scores[$line['id']];
 				}
 				
-				echo "\"/> Pts ";
+				$content .= "\"/> Pts ";
 				if ($rubric != 0) {
-					echo printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
+					$content .= printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
 				}
 			} else if (($line['ownerid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
-				echo "<span class=red>{$scores[$line['id']]} pts</span> ";
+				$content .= "<span class=red>{$scores[$line['id']]} pts</span> ";
 			}
 		}
-		echo "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
+		$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
 		if ($isteacher || ($line['ownerid']==$userid && $allowmod)) {
-			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify={$line['id']}\">Modify</a> \n";
+			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify={$line['id']}\">Modify</a> \n";
 		}
 		if ($isteacher || ($allowdel && $line['ownerid']==$userid)) {
-			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={$line['id']}\">Remove</a> \n";
+			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={$line['id']}\">Remove</a> \n";
 		}
 		if ($line['posttype']!=2 && $myrights > 5 && $allowreply) {
-			echo "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify=reply&replyto={$line['id']}\">Reply</a>";
+			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify=reply&replyto={$line['id']}\">Reply</a>";
 		}
-		echo '</span>';
-		echo "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
-		echo '<b>'.$line['subject'].'</b>';
+		$content .= '</span>';
+		$content .= "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
+		$content .= '<b>'.$line['subject'].'</b>';
 		if ($line['parent']!=0) {
-			echo '</span>';
+			$content .= '</span>';
 		}
 		$dt = tzdate("F j, Y, g:i a",$line['postdate']);
-		echo ', Posted: '.$dt;
+		$content .= ', Posted: '.$dt;
 		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
-			echo " <span style=\"color:red;\">New</span>\n";
+			$content .= " <span style=\"color:red;\">New</span>\n";
 		}
-		echo '</div>';
-		echo "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
+		$content .= '</div>';
+		$content .= "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
 		if ($haspoints) {
 			if ($caneditscore && $ownerid[$child]!=$userid) {
-				echo '<hr/>';
-				echo "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
+				$content .= '<hr/>';
+				$content .= "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
 				if ($feedback[$line['id']]!==null) {
-					echo $feedback[$line['id']];
+					$content .= $feedback[$line['id']];
 				}
-				echo "</textarea>";
+				$content .= "</textarea>";
 			} else if (($ownerid[$child]==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
-				echo '<div class="signup">Private Feedback: ';
-				echo $feedback[$line['id']];
-				echo '</div>';
+				$content .= '<div class="signup">Private Feedback: ';
+				$content .= $feedback[$line['id']];
+				$content .= '</div>';
 			}
 		}
-		echo '</div>';
+		$content .= '</div>';
 		$cnt++;
 	}
-	echo '</div>';
+	printuserposts($lastname, $laststu, $content, $postcnt, $replycnt);
 	echo "<script>var bcnt = $cnt;</script>";
 	if ($caneditscore && $haspoints) {
 		echo "<div><input type=submit value=\"Save Grades\" /></div>";
