@@ -37,6 +37,7 @@ class WikiUtility extends Component
                     $numrevisions[] = $revision;
                 }
                 $countRevision = count($numrevisions);
+
                 $text = $numrevisions[AppConstant::NUMERIC_ONE];
                 if (strlen($text) > AppConstant::NUMERIC_SIX && substr($text, AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_SIX) == '**wver') {
                     $wikiver=substr($text,6,strpos($text,'**',6)-6);
@@ -66,11 +67,11 @@ class WikiUtility extends Component
                         $revisionusers[$numrevisions[AppConstant::NUMERIC_FIVE]] = $numrevisions[AppConstant::NUMERIC_THREE] . ', ' . $numrevisions[AppConstant::NUMERIC_FOUR];
 
                         if (function_exists('json_encode')) {
-                            $numrevisions[1] = json_decode($numrevisions[1]);
+                            $numrevisions[AppConstant::NUMERIC_ONE] = json_decode($numrevisions[AppConstant::NUMERIC_ONE]);
 
                         } else {
                             $jsonser = new \Services_JSON();
-                            $numrevisions[1] = $jsonser->decode($numrevisions[1]);
+                            $numrevisions[AppConstant::NUMERIC_ONE] = $jsonser->decode($numrevisions[AppConstant::NUMERIC_ONE]);
                         }
                         $revisionhistory[] = array('u' => $numrevisions[AppConstant::NUMERIC_FIVE], 'c' => $numrevisions[AppConstant::NUMERIC_ONE], 't' => AppUtility::tzdate("F j, Y, g:i a", $numrevisions[AppConstant::NUMERIC_TWO]), 'id' => $numrevisions[AppConstant::NUMERIC_ZERO]);
                         $i++;

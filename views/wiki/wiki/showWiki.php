@@ -43,7 +43,7 @@ if (isset($delAll) && $isTeacher) {
     echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 
     echo "<p><button type=\"button\" onclick=\"window.location.href='show-wiki?courseId=$courseId&wikiId=$id&torev=$toRev&revert=true$framed'\">Yes, I'm Sure</button> | ";
-    echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+    echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Cancel</button></p>";
 
 } else if ($snapshot) {
     echo "<p class='padding-left-ten'>Current Version Code.  <a href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id).">Back</a></p>";
@@ -107,7 +107,7 @@ if (isset($delAll) && $isTeacher) {
                 $text = $singleWikiRevision->revision;
                 $text = substr($text,strpos($text,'**',6)+2);
                 ?>
-                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; text-indent: -70px;'>
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
                     <?php
                     echo filter(strip_tags($text));?>
                 </textarea></div>
@@ -333,7 +333,7 @@ if (isset($delAll) && $isTeacher) {
                 width: 'auto', resizable: false,
                 closeText: "hide",
                 buttons: {
-                    "Nevermind": function () {
+                    "Cancel": function () {
                         $(this).dialog('destroy').remove();
                         return false;
                     },
@@ -371,7 +371,7 @@ if (isset($delAll) && $isTeacher) {
                 width: 'auto', resizable: false,
                 closeText: "hide",
                 buttons: {
-                    "Nevermind": function () {
+                    "Cancel": function () {
                         $(this).dialog('destroy').remove();
                         return false;
                     },

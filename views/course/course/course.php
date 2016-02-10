@@ -237,7 +237,7 @@ if ($overwriteBody == 1) {
 
         ?>
         <?php
-        if (isset($teacherId)) {
+        if ($teacherId) {
             ?>
             <div class=cp>
             <span class=column>
