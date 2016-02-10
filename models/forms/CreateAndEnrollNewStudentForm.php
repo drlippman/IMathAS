@@ -24,6 +24,7 @@ class CreateAndEnrollNewStudentForm extends Model
             [['password'],'required','message'=>AppUtility::t('Password cannot be blank', false)],
             [['FirstName'],'required','message'=>AppUtility::t('First Name cannot be blank', false)],
             [['LastName'],'required','message'=>AppUtility::t('Last Name cannot be blank', false)],
+            [['FirstName, LastName'],'string','max'=>20],
             [['email'],'required','message'=>AppUtility::t('Email Address cannot be blank', false)],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => AppUtility::t('Username can contain only alphanumeric characters and Underscore(_).', false)],
             [['FirstName', 'LastName'], 'string'],

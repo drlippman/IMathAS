@@ -69,7 +69,7 @@ if($totalData['isTutor']){
 
 </div>
 
-<div class = "title-container">
+<div class = "title-container padding-bottom-two-em">
     <div class = "row">
         <div class = "pull-left page-heading">
             <div class = "vertical-align title-page"><?php echo $this->title ?></div>

@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 </div>
-<div class = "title-container">
+<div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo AppUtility::t('Message:',false);?><?php echo $this->title ?></div>
@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     {?>
                     <span class="col-md-4 col-sm-4">
                     <select name="seluid" class="dropdown form-control" id="seluid" onchange="changeSubject()">
-                        <option value="0">Select a recipient</option>
+                        <option value="0">Select Recipient</option>
                         <?php foreach ($users as $user) { ?>
                         <option value="<?php echo $user['id'] ?>">
                             <?php echo ucfirst($user['LastName']).", ".ucfirst($user['FirstName']); ?>

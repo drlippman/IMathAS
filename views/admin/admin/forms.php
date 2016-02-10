@@ -5,15 +5,22 @@ use app\components\AppConstant;
 
 $this->title = $pageTitle;
 $imasroot = AppUtility::getHomeURL();
+
 if (isset($params['cid'])) {
     ?>
     <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
     </div>
-<?php } else { ?>
+<?php } elseif($this->title=="Course Settings"){?>
+
     <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
     </div>
+<?php } else{?>
+
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin','Course Creation Confirmation'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+</div>
 <?php } ?>
 <div class="title-container">
     <div class="row">
@@ -168,6 +175,7 @@ switch ($action) {
                     <div class='col-md-3 col-sm-3 padding-top-five'>" . AppUtility::t('Enter Enrollment key', false) . "</div>
                     <div class='col-md-4 col-sm-4'>
                         <input class='form-control' required='please fill out this field' type=text size=30 name=\"ekey\" value=\"$ekey\">
+
                     </div>
               </div>";
         echo '<div class="col-md-12 col-sm-12 margin-top-fifteen">

@@ -162,6 +162,13 @@ tr#quickadd td {
     left: auto;
     /*min-width: 72% !important;*/
 }
+
+.dropdown-header{
+    font-size: 14px!important;
+    color: #333!important;
+    font-weight: bold;
+}
+
 .offline-grade-header {
     background-color: #f8f8f8;
     height: 60px;

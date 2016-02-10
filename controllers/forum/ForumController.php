@@ -572,6 +572,7 @@ class ForumController extends AppController
                 $groupnames[$row['id']] = $row['name'];
             }
         }
+
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
         $course = Course::getById($courseId);
@@ -884,7 +885,6 @@ class ForumController extends AppController
         if ($groupset>0) {
             if (!isset($grp)) {
                 if (!$canviewall) {
-
                     $result = StuGroupMembers::getStudGroupAndStudGroupMemberData($currentUser['id'],$groupset);
                     if (count($result)>0) {
                         $groupid = $result['i_sg.id'];
@@ -1057,7 +1057,6 @@ class ForumController extends AppController
             $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
 
         }
-
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/posts.js"]);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,

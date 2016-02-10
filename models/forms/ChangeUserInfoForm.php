@@ -45,6 +45,7 @@ class ChangeUserInfoForm extends Model
             [['email'], 'required', 'message' => AppUtility::t('Email cannot be blank', false)],
             [['LastName'], 'required', 'message' => AppUtility::t('Last name cannot be blank', false)],
             [['FirstName'], 'required', 'message' => AppUtility::t('First name cannot be blank', false)],
+            [['FirstName, LastName'], 'string','max'=>20],
             ['rePassword', 'compare', 'compareAttribute'=>'password'],
             [['FirstName', 'LastName','oldPassword'], 'string'],
             ['email','email'],

@@ -877,7 +877,7 @@ class AppController extends Controller
             return true;
         }
 
-        if(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'change-image-ajax' || $actionPath == 'mark-as-remove-ajax' || $actionPath == 'get-only-post-ajax' || $actionPath == 'data-like-post-ajax')){
+        if(($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'change-image-ajax' || $actionPath == 'mark-as-remove-ajax' || $actionPath == 'get-only-post-ajax' || $actionPath == 'data-like-post-ajax' || $actionPath == 'thread')){
             return true;
         } elseif (($user['rights'] < AppConstant::STUDENT_RIGHT) || (($user['rights'] == AppConstant::STUDENT_RIGHT) && ($actionPath == 'move-thread' || $actionPath == 'add-forum' || $actionPath == 'change-forum' || $actionPath == 'view-forum-grade'))) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);

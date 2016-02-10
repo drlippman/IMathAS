@@ -50,6 +50,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <div class="tab-content shadowBox padding-top-one padding-left-right-thirty">
 
     <?php
+
     if (!$oktoshow) {
 
     } else{
@@ -111,9 +112,10 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
     <?php
         }
+    if ($currentUser->rights > AppConstant::STUDENT_RIGHT) {
     echo "<div class='right padding-right-twenty'>
-            <a href=\"thread?cid=$cid&forumid=$forumid\">Back to Forum Topics</a>
+            <a href=\"thread?cid=$course->id&forumid=$forumid\">Back to Forum Topics</a>
          </div>\n";
-    ?>
+    } ?>
 </div>
 

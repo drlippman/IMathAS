@@ -32,7 +32,7 @@ $stu = $data['defaultValuesArray']['studentId']
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
 </div>
-<div class = "title-container">
+<div class = "title-container padding-bottom-two-em">
     <div class = "row">
         <div class = "pull-left page-heading">
             <div class = "vertical-align title-page"><?php echo $this->title ?></div>

@@ -10,7 +10,7 @@ $urlmode = AppUtility::urlMode();
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
 </div>
-<div class = "title-container">
+<div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
@@ -194,7 +194,7 @@ $urlmode = AppUtility::urlMode();
                  <a class='btn btn-primary dropdown-toggle width-hundread-per col-sm-12 col-md-12' data-toggle='dropdown' href='#'>
                      <span class=' col-sm-10 col-md-10 padding-left-zero'><i class='fa fa-cog fa-fw'></i> Settings</span><span class=' padding-top-five fa fa-caret-down'></span>
                      </a>
-                 <ul class='dropdown-menu roster-table roster-table-dropdown'>
+                 <ul class='dropdown-menu roster-table roster-table-dropdown' style="width: 170px;">
                      <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?from=listusers&cid='.$course->id.'&studentId='.$line['userid'])?>">
                         <img class='small-icon' src="<?php echo AppUtility::getHomeURL().'img/gradebook.png'; ?>">&nbsp;Grades</a></li>
                      <li><a class ='roster-make-exception' href='<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$line['userid'].'&section-data='.$line['section'] )?>'>

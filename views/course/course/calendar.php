@@ -11,7 +11,7 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 
-<div class = "title-container">
+<div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
@@ -37,7 +37,7 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                     <div class="day-details"></div>
                 </div>
 
-                <div class="calendar-day-details word-wrap-break-word"></div>
+                <div class="calendar-day-details word-wrap-break-word show-all"></div>
             </div>
         </div>
     </div>

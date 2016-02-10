@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
 </div>
 <form id="mainform" method="post" action="#">
-    <div class="title-container">
+    <div class="title-container padding-bottom-two-em">
         <div class="row">
             <div class="pull-left page-heading width-eighty-per">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
