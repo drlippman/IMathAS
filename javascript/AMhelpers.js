@@ -9,6 +9,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
 	str = str.replace(/\bOO\b/i,"oo");
+	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu");
 	return str;
 }
 
