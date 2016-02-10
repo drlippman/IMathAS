@@ -703,6 +703,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES ('{$_GET['move']}','{$_POST['movetof']}','{$row[0]}','{$row[1]}')";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
+			//update grade records
+			$query = "UPDATE imas_grades SET gradetypeid='{$_POST['movetof']}' WHERE gradetype='forum' AND refid IN ($list)";
+			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
