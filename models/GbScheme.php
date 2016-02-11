@@ -73,4 +73,9 @@ class GbScheme extends BaseImasGbscheme
             $courseData->delete();
         }
     }
+
+    public static function getDefGbMode($courseId)
+    {
+        return self::find()->select('defgbmode')->where(['courseid' => $courseId])->one();
+    }
 }

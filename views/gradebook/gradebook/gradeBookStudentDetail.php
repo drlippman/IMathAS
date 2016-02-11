@@ -12,15 +12,13 @@ if($defaultValuesArray['studentId'] > 0){
 }else{
     $this->title = AppUtility::t('Grade Book Averages', false);
 }
-
 //$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 //$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid=' . $course->id]];
 
  $this->params['breadcrumbs'][] = $this->title;
    //show student view
 $gradebook = $totalData['gradebook'];
-$hidenc = $defaultValuesArray['hidenc'];
-$gbmode =  ' ';
+$hidenc = (floor($gbmode/10)%10)%4;
 $availshow= $defaultValuesArray['availshow'];
 $catfilter = $defaultValuesArray['catfilter'];
 $showpics = $defaultValuesArray['showpics'];
@@ -33,20 +31,23 @@ $includeduedate = $defaultValuesArray['includeduedate'];
 $includelastchange = $defaultValuesArray['includelastchange'];
 $lastlogin = $defaultValuesArray['lastlogin'];
 $latepasshrs = $course['latepasshrs'];
-$isteacher = false;
-$canviewall = false;
-if($totalData['isTeacher']){
-    $isteacher = true;
-    $canviewall = true;
-}
-$studentId = $defaultValuesArray['studentId'];
+//$isteacher = false;
+//$canviewall = false;
+//if($totalData['isTeacher']){
+//    $isteacher = true;
+//    $canviewall = true;
+//}
 
-$istutor = false;
-if($totalData['isTutor']){
-    $istutor = true;
-    $canviewall = true;
-}
+
+$studentId = $studentId;
+
+//$istutor = false;
+//if($totalData['isTutor']){
+//    $istutor = true;
+//    $canviewall = true;
+//}
 ?>
+
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" id="student-id" value="<?php echo $studentId ?>">
 <input type="hidden" id="totonleft" value="<?php echo $totonleft ?>">
@@ -150,6 +151,7 @@ if($totalData['isTutor']){
         </div>
     </div>
     <?php } ?>
+
   <br><br>
     <div class="inner-content-gradebook col-md-12 col-sm-12 padding-right-ten">
        <div class="button-container col-md-12 col-sm-12 padding-zero">
@@ -166,7 +168,9 @@ if ($studentId>0) {
 }
 if ($studentId>0) {
 ?>
+
  <div style="font-size:1.1em;font-weight:bold">
+
    <?php  if ($isteacher || $istutor) {
     if ($gradebook[1][0][1] != '') {
         $usersort = $stugbmode['usersort'];
@@ -184,6 +188,7 @@ if ($studentId>0) {
            <?php }
             } ?>
 </div>
+
                    <div class="">
                        <?php
                        if ($gradebook[1][4][2]==1)
@@ -192,6 +197,8 @@ if ($studentId>0) {
                            <?php }else{ ?>
                            <span class="col-md-4 col-sm-4 margin-left-minus-fifteen">
                                <?php }
+
+
     echo '<select id="userselect" class="form-control"   onchange="chgstu(this)">';
         $lastsec = '';
         foreach($allStudentsinformation as $studiinfo) {
@@ -223,11 +230,12 @@ if ($studentId>0) {
     }
     $now = time();
     }
-    if (count($StudentData)==0) { //shouldn't happen
+    if (($StudentData)==0) { //shouldn't happen
 //    echo 'Invalid student id';
 //    exit;
     }
-    $gbcomment = $StudentData['gbcomment'];
+
+       $gbcomment = $StudentData['gbcomment'];
     $stuemail = $currentUser['email'];
     $latepasses = $StudentData['latepass'];
     $stusection = $StudentData['section'];
@@ -240,7 +248,9 @@ if ($studentId>0) {
     </div></div>
     </div>
     </div>
-<?php if ($isteacher) { ?>
+<?php
+if ($isteacher) {
+?>
     <span class="inner-page-options col-md-3 col-sm-3 padding-zero pull-right">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
 
@@ -249,12 +259,12 @@ if ($studentId>0) {
                    href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
                 <ul class="dropdown-menu with-selected">
                     <li>
-                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$StudentData['userid'])?>">
                             <i class="fa fa-clock-o"></i>&nbsp;<?php AppUtility::t('Activity Log'); ?></a>
                     </li>
 
                     <li>
-                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$StudentData['userid'])?>">
                             <i class='fa fa-pencil fa-fw'></i>&nbsp;<?php AppUtility::t('Change Info'); ?></a>
                     </li>
 
@@ -273,7 +283,7 @@ if ($studentId>0) {
                     </li>
 
                     <li>
-                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$StudentData['userid'])?>">
                             <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Login Log'); ?></a>
                     </li>
 
@@ -282,7 +292,7 @@ if ($studentId>0) {
                               method="post">
                             <input type="hidden" id="exception-id" name="student-data" value=""/>
                             <input type="hidden" id="section-name" name="section-data" value=""/>
-                            <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$StudentData->userid.'&section-data='.$StudentData['section'])?>"><i
+                            <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$StudentData['userid'].'&section-data='.$StudentData['section'])?>"><i
                                     class='fa fa-plus-square fa-fw'></i>&nbsp;<?php AppUtility::t('Make Exception'); ?>
                             </a>
                         </form>
@@ -387,7 +397,6 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
 
         continue;
         } else if ($hidenc==2 && ($gradebook[0][1][$i][4]==0 || $gradebook[0][1][$i][4]==3)) {//skip all NC
-
         continue;
         }
         if ($gradebook[0][1][$i][3]>$availshow) {
@@ -538,14 +547,14 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
             }
             if ($includelastchange) {
             if ($gradebook[1][1][$i][9]>0) {
-            echo '<td>'.tzdate('n/j/y g:ia', $gradebook[1][1][$i][9]);
+            echo '<td>'.AppUtility::tzdate('n/j/y g:ia', $gradebook[1][1][$i][9]);
                 } else {
                 echo '<td></td>';
             }
             }
             if ($includeduedate) {
             if ($gradebook[0][1][$i][11]<2000000000) {
-            echo '<td>'.tzdate('n/j/y g:ia',$gradebook[0][1][$i][11]);
+            echo '<td>'.AppUtility::tzdate('n/j/y g:ia',$gradebook[0][1][$i][11]);
                 } else {
                 echo '<td>-</td>';
             }

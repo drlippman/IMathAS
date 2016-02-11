@@ -1815,13 +1815,27 @@ class ForumController extends AppController
                 } else {
                     $params['outcomes'] = " ";
                 }
+                if ($params['count-in-gradebook']==4) {
+                    $cntingb = 0;
+                } elseif($params['count-in-gradebook'] == 1){
+                    $cntingb = 1;
+                } elseif($params['count-in-gradebook'] == 2){
+                    $cntingb = 2;
+                } elseif($params['count-in-gradebook'] == 0){
+                    $cntingb = 0;
+                    $params['points'] = 0;
+                    $params['tutor-edit'] = 0;
+                    $params['gbcategory'] = 0;
+                    $params['rubric'] = AppConstant::NUMERIC_ZERO;
+                    $params['outcomes'] = " ";
+                }
                 $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                 $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                 $postDate = AppUtility::parsedatetime($params['postDate'], $params['postTime']);
                 $replyByDate = AppUtility::parsedatetime($params['replyByDate'], $params['replyByTime']);
                 $settingValue = $params['allow-anonymous-posts'] + $params['allow-students-to-modify-posts'] + $params['allow-students-to-delete-own-posts'] + $params['like-post'] + $params['viewing-before-posting'];
                 $updateForum = new Forums();
-                $updateForum->UpdateForum($params, $endDate, $startDate, $postDate, $replyByDate, $settingValue);
+                $updateForum->UpdateForum($params, $endDate, $startDate, $postDate, $replyByDate, $settingValue,$cntingb);
                 if (isset($params['Get-email-notify-of-new-posts'])) {
                     $subscriptionEntry = new ForumSubscriptions();
                     $subscriptionEntry->AddNewEntry($params['modifyFid'], $user['id']);
@@ -1871,7 +1885,15 @@ class ForumController extends AppController
                     $finalArray['replyby'] = $params['reply'];
                 }
                 if ($params['count-in-gradebook'] != AppConstant::NUMERIC_ZERO) {
-                    $finalArray['gbcategory'] = $params['gradebook-category'];
+
+                        $finalArray['tutoredit'] = intval($finalArray['tutoredit']);
+                        if ($params['count-in-gradebook']==4) {
+                            $finalArray['cntingb'] = 0;
+                        } elseif($params['count-in-gradebook'] == 1){
+                            $finalArray['cntingb'] = 1;
+                        } elseif($params['count-in-gradebook'] == 2){
+                            $finalArray['cntingb'] = 2;
+                        }
                     $finalArray['points'] = $params['points'];
                     $finalArray['tutoredit'] = $params['tutor-edit'];
                     $finalArray['rubric'] = $params['rubric'];
@@ -1890,6 +1912,7 @@ class ForumController extends AppController
                         $params['outcomes'] = " ";
                     }
                     $finalArray['outcomes'] = $params['outcomes'];
+                    $finalArray['gbcategory'] = $params['gradebook-category'];
                 } else {
                     $finalArray['gbcategory'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['points'] = AppConstant::NUMERIC_ZERO;
@@ -1897,8 +1920,10 @@ class ForumController extends AppController
                     $finalArray['rubric'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['outcomes'] = " ";
                 }
+                if (intval($params['points'])==0) {
+                    $finalArray['cntingb'] = 0;
+                }
                 $finalArray['groupsetid'] = $params['groupsetid'];
-                $finalArray['cntingb'] = $params['count-in-gradebook'];
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['forumtype'] = $params['forum-type'];
                 $finalArray['caltag'] = $params['calendar-icon-text1'] . '--' . $params['calendar-icon-text2'];

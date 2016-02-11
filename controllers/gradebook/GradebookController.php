@@ -2889,8 +2889,38 @@ class GradebookController extends AppController
         $userId = $params['studentId'];
         $course = Course::getById($courseId);
         $currentUser = $this->user;
-        $StudentData = Student::getByUserId($userId);
+        $StudentData = Student::getDataForGradebook($userId,$courseId);
+        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+        $isTutor = $this->isTutor($currentUser['id'],$courseId);
         $isLocked = $this->isLocked($currentUser['id'], $courseId);
+        $canviewall = false;
+        $studentId = $this->getParamVal('studentId');
+        $gbMode = $this->getParamVal('gbmode');
+        if (($isTeacher)) {
+            $isTeacher = true;
+        }
+        if (($isTutor)) {
+            $isTutor = true;
+        }
+        if ($isTeacher || $isTutor) {
+            $canviewall = true;
+        } else {
+            $canviewall = false;
+        }
+        if($canviewall){
+            if (isset($gbMode) && $gbMode!='') {
+                $gbmode = $gbMode;
+//                $sessiondata[$cid.'gbmode'] = $gbmode;
+//                writesessiondata();
+            } else if (isset($sessionData[$courseId.'gbmode']) && !isset($_GET['refreshdef'])) {
+                $gbmode =  $sessionData[$courseId . 'gbmode'];
+            } else {
+
+                $gbData = GbScheme::getDefGbMode($courseId);
+                $gbmode = $gbData['defgbmode'];
+
+            }
+        }
         if($isLocked){
             $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
             return $this->redirect(Yii::$app->getHomeUrl());
@@ -2931,7 +2961,7 @@ class GradebookController extends AppController
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css','gradebook.css']);
         $this->includeJS(['general.js', 'jquery.dataTables.min.js','dataTables.bootstrap.js','gradebook/manageofflinegrades.js', 'gradebook/gradebookstudentdetail.js']);
-        $responseData = array('totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
+        $responseData = array('isteacher' => $isTeacher,'studentId' => $studentId,'gbmode' => $gbmode,'canviewall'=> $canviewall, 'isTutor' => $isTutor, 'totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData, 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
     }
 
@@ -3087,8 +3117,8 @@ class GradebookController extends AppController
                 $gbmode = $gbSchemeData['defgbmode'];
             }
 
-            if (isset($params['stu']) && $params['stu'] != '') {
-                $stu = $params['stu'];
+            if (isset($params['studentId']) && $params['studentId'] != '') {
+                $stu = $params['studentId'];
             } else {
                 $stu = 0;
             }

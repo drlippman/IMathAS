@@ -396,7 +396,7 @@ $this->title = $pageTitle;
                 <span class='padding-left'><?php AppUtility::t('Yes')?></span>
             </span>
             <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
-                <input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb'] == 4 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>
+                <input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb'] == 0 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>
                 <span class='padding-left'><?php AppUtility::t('Yes, but hide from students for now')?></span>
             </span>
             <span class="col-md-12 col-sm-12 padding-top-pt-five-em">

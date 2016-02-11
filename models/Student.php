@@ -628,5 +628,12 @@ class Student extends BaseImasStudents
         return Student::find()->select('id')->where(['userid' => $userId, 'courseid' => $courseId])->all();
     }
 
+    public static function getDataForGradebook($studentId,$courseId)
+    {
+        $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess,imas_students.userid FROM imas_students,imas_users WHERE ";
+        $query .= "imas_students.userid=imas_users.id AND imas_users.id=:studentId AND imas_students.courseid=:courseId";
+        return \Yii::$app->db->createCommand($query)->bindValues([':studentId' => $studentId, ':courseId' => $courseId])->queryOne();
+    }
+
 }
 

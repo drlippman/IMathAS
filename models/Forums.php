@@ -108,7 +108,7 @@ class Forums extends BaseImasForums {
         }
     }
 
-    public function updateForum($params,$endDate,$startDate,$postDate,$replyByDate,$settingValue)
+    public function updateForum($params,$endDate,$startDate,$postDate,$replyByDate,$settingValue,$cntingb)
     {
         $updateForumData = Forums::findOne(['id' => $params['modifyFid']]);
         $updateForumData->name = trim($params['name']);
@@ -153,7 +153,7 @@ class Forums extends BaseImasForums {
         }
 
         $updateForumData->groupsetid = $params['groupsetid'];
-        $updateForumData->cntingb = $params['count-in-gradebook'];
+        $updateForumData->cntingb = $cntingb;
         $updateForumData->avail = $params['avail'];
         $updateForumData->forumtype = $params['forum-type'];
         $updateForumData->caltag = $params['calendar-icon-text1'].'--'.$params['calendar-icon-text2'];
@@ -164,7 +164,7 @@ class Forums extends BaseImasForums {
         $updateForumData->taglist = $tagList;
         $updateForumData->gbcategory = $params['gradebook-category'];
         $updateForumData->points = $params['points'];
-        $updateForumData->tutoredit = $params['tutor-access'];
+        $updateForumData->tutoredit = $params['tutor-edit'];
         $updateForumData->rubric = $params['rubric'];
         $updateForumData->outcomes = $params['outcomes'];
         $updateForumData->save();
