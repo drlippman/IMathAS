@@ -61,7 +61,7 @@ $studentId = $studentId;
     <?php  if($currentUser['rights'] > 10){
     echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]);
 }else{
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/grade-book-student-detail?cid=' . $course->id]]);
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/grade-book-student-detail?cid=' . $course->id. '&studentId='.$currentUser['id']]]);
 }?>
 <?php }else{ ?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'roster/roster/student-roster?cid=' . $course->id]]); ?>
@@ -82,7 +82,7 @@ $studentId = $studentId;
     <?php if($currentUser['rights'] > 10) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
     } elseif($currentUser['rights'] == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook']);
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
     }?>
 </div>
 
@@ -234,8 +234,8 @@ if ($studentId>0) {
 //    echo 'Invalid student id';
 //    exit;
     }
-
-       $gbcomment = $StudentData['gbcomment'];
+//AppUtility::dump($StudentData);
+    $gbcomment = $StudentData['gbcomment'];
     $stuemail = $currentUser['email'];
     $latepasses = $StudentData['latepass'];
     $stusection = $StudentData['section'];
@@ -380,8 +380,8 @@ echo $lpmsg;
             $sarr = "'S','N','N','N'";
             }
             if ($studentId>0) {
-            echo '<th>', AppUtility::t('Feedback'), '<br/><a href="#" class="
-Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedback'), '</a></th>';
+//                AppUtility::dump('jhjh');
+            echo '<th>', AppUtility::t('Feedback'), '<br/><a href="#" class="Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedback'), '</a></th>';
             $sarr .= ",'N'";
             }
             echo '</thead><tbody>';

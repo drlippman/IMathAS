@@ -46,7 +46,7 @@ if (($teacherId && (!$backLink))) {?>
         </div>
     </div>
     <div class="item-detail-content">
-        <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students]);?>
+        <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students, 'userId' => $user]);?>
     </div>
 <?php } elseif($teacherId && $backLink) { ?>
 <div class="item-detail-header">
