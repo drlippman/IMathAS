@@ -53,7 +53,7 @@ if ($myrights<20) {
 	$lastanswers = array('');
 
 	if (isset($_POST['seed'])) {
-		list($score,$rawscores) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
+		list($score,$rawscores[0]) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
 		$scores[0] = $score;
 		$lastanswers[0] = stripslashes($lastanswers[0]);
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
@@ -233,10 +233,10 @@ if ($overwriteBody==1) {
 	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
 
 	if (isset($rawscores)) {
-		if (strpos($rawscores,'~')!==false) {
-			$colors = explode('~',$rawscores);
+		if (strpos($rawscores[0],'~')!==false) {
+			$colors = explode('~',$rawscores[0]);
 		} else {
-			$colors = array($rawscores); //scorestocolors($rawscores,1,0,false);
+			$colors = array($rawscores[0]); //scorestocolors($rawscores,1,0,false);
 		}
 	} else {
 		$colors = array();

@@ -382,7 +382,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		}
 	}
 	if (strpos($evaledqtext,'[SAB')!==false) {
-		if (is_array($showanswerloc)) {
+		if (!isset($showanswerloc)) {
+			$evaledqtext = preg_replace('/\[SAB\d*\]/','',$evaledqtext);
+		} else if (is_array($showanswerloc)) {
 			foreach($showanswerloc as $iidx=>$saloc) {
 				if (strpos($evaledqtext,'[SAB'.$iidx.']')!==false) {
 					$evaledqtext = str_replace('[SAB'.$iidx.']', $saloc, $evaledqtext);
