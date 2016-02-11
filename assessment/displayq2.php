@@ -3995,7 +3995,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				if ($flags['special_or']===true) {
 					$specialor = true;
 				}
-				if ($flags['ignore_case']===true) {
+				if ($flags['ignore_case']===true && !isset($flags['regex'])) {
 					$givenans = strtoupper($givenans);
 					$answer = strtoupper($answer);
 					if ($specialor) {
@@ -4042,6 +4042,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					} else if (isset($flags['in_answer'])) {
 						if (strpos($givenans,$anans)!==false) {
+							$correct += 1;
+							$foundloc = $j;
+							break 2;
+						}
+					} else if (isset($flags['regex'])) {
+						$regexstr = '|'.str_replace('|','\\|',$anans).'|'.(isset($flags['regex'])?'i':'');
+						if (preg_match($regexstr,$givenans)) {
 							$correct += 1;
 							$foundloc = $j;
 							break 2;
