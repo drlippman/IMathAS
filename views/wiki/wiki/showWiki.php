@@ -107,7 +107,7 @@ if (isset($delAll) && $isTeacher) {
                 ?>
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
                     <?php
-                    echo filter(strip_tags($text));?>
+                    echo strip_tags( $text);?>
                 </textarea></div>
             <?php }?>
         <?php }?>
@@ -145,7 +145,6 @@ if (isset($delAll) && $isTeacher) {
             original = jsonData.o;
             userinfo = jsonData.u;
             curcontent = original.slice();
-            console.log(curcontent[0]);
             wikihistory = jsonData.h;
             contentdiv = document.getElementById("wikicontent");
             contentdiv.innerHTML = original.join(' ');
@@ -250,7 +249,6 @@ if (isset($delAll) && $isTeacher) {
     function showrevisions() {
         showrev = 1 - showrev;
         if (showrev==1) {
-
             contentdiv.innerHTML = colorrevisions(curcontent,curversion);
             document.getElementById("showrev").value = "Hide Changes";
         } else {
@@ -262,10 +260,10 @@ if (isset($delAll) && $isTeacher) {
 
 
     function colorrevisions(content,ver) {
-
         if (ver==wikihistory.length-1) {return content.join(' ');};
         current = content.slice();
         var diff = wikihistory[ver+1].c;
+        console.log(diff);
         for (var i=diff.length-1; i>=0; i--) {
             deled = null;  insed = null;
             if (diff[i][0]==2) {
@@ -284,12 +282,13 @@ if (isset($delAll) && $isTeacher) {
                     insed = insed.split('</p>').join('</ins></p>');
                 }
             }
+            console.log(deled);
             if (deled != null) {
                 if (deled.match(/<p>/)) {
-                    deled = deled.split('<p>').join('<p><dels>');
+                    deled = deled.split('<p>').join('<p><del>');
                 }
                 if (deled.match(/<\/p>/)) {
-                    deled = deled.split('</p>').join('</dels></p>');
+                    deled = deled.split('</p>').join('</del></p>');
                 }
             }
 

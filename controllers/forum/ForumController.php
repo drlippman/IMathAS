@@ -2360,8 +2360,7 @@ class ForumController extends AppController
         $isTeacher = $this->isTeacher($user['id'], $cid);
         $isTutor = $this->isTutor($user['id'], $cid);
         $isStudent = $this->isStudent($user['id'], $cid);
-        $userid = intval($this->getParamVal('userid'));
-
+        $icon = $this->getParamVal('icon');
 
 
         if (empty($cid) || empty($postId) || !isset($like)) {
@@ -2420,6 +2419,17 @@ class ForumController extends AppController
         foreach($result as $row) {
             $likes[$row['type']] = $row['count(*)'];
         }
+        if($icon=="liked.png"){
+        $image="likedgray.png";
+        }
+
+        if($icon=="likedgray.png"){
+            $image="liked.png";
+        }
+
+
+
+
         $likemsg = 'Liked by ';
         $likecnt = 0;
         $likeclass = '';
@@ -2454,5 +2464,5 @@ class ForumController extends AppController
             $likemsg = 'Click to like this post. '.$likemsg;;
         }
         header('Content-type: application/json');
-        echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.'}';
+        echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.',"icon":"'.$icon.'"}';
     }}

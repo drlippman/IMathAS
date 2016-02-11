@@ -65,10 +65,11 @@ function savelike(el) {
     var cid = $(".courseid").val();
     var like = $('.likecnt').val();
     var postid = el.id.substring(8);
+    var icon =el.src.substring(34);
     $(el).parent().append('<img style="vertical-align: middle" src="../../img/updating.gif" id="updating"/>');
     $.ajax({
         url: "record-likes",
-        data: {cid: cid, postid: postid, like: like},
+        data: {cid: cid, postid: postid, like: like, icon: icon},
         dataType: "json"
 }).done(function(msg) {
     if (msg.aff==1) {
@@ -80,7 +81,14 @@ function savelike(el) {
     } else {
         el.className = "likeicon";
     }
-}
+    if(msg.icon=="liked.png")
+    {
+        el.src = el.src.replace("liked","likedgray");
+    }
+    else{
+            el.src = el.src.replace("likedgray","liked");
+        }
+    }
         
 $('#updating').remove();
 });

@@ -105,7 +105,6 @@ class WikiController extends AppController
                         foreach($base as $key=>$b){
                         $newBase .=$b." ";
                         }
-                     //   AppUtility::dump($newBase);
                         WikiRevision::updateRevertRevision($revision, $newBase);
                         WikiRevision::deleteRevision($id, $groupId,$revision);
                     }
@@ -435,7 +434,6 @@ class WikiController extends AppController
         $courseId = $this->getParamVal('cid');
         $wikiId = $this->getParamVal('id');
         $course = Course::getById($courseId);
-
         $wiki = Wiki::getById($wikiId);
         $block  = $this->getParamVal('block');
         $groupNames = StuGroupSet::getByCourseId($courseId);
@@ -519,11 +517,12 @@ class WikiController extends AppController
            $rdate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
            $rtime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
        }
-        $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
+       $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
         $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
         $page_formActionTag .= "&tb=$filter";
-        if ($this->isPost()) {
-            if ($wikiid) {
+
+       if ($this->isPost()) {
+           if ($wikiid) {
                 $link = new Wiki();
                 $link->updateChange($params, $courseId);
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
@@ -558,6 +557,7 @@ class WikiController extends AppController
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['startdate'] = $startDate;
                 $finalArray['enddate'] = $endDate;
+           //     $finalArray['canedit']=$canEdit;
                 $saveChanges = new Wiki();
                 $lastWikiId = $saveChanges->createItem($finalArray);
                 $saveItems = new Items();
@@ -576,6 +576,7 @@ class WikiController extends AppController
                 } else if ($filter=='t') {
                     array_unshift($sub,$lastItemsId);
                 }
+
                 $itemorder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
@@ -585,7 +586,7 @@ class WikiController extends AppController
         $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime);
-        return $this->render('addWiki', $returnData);
+       return $this->render('addWiki', $returnData);
     }
 
     public function actionViewWikiPublic()
