@@ -93,11 +93,12 @@ $this->params['breadcrumbs'][] = $this->title;
                        echo $reply[0]['userName'];
                       if($isTeacher){
                           foreach($threadData as $data) {
-                              if($data['userid'] != $currentUser['id'])?>
+                              if($isTeacher && $data['userid'] != $currentUser['id']){?>
                           <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$data['userid']) ?>" target=\"_popoutgradebook\"><?php echo "[GB]"?></a>
                     <?php  }
                       }
                     }
+                  }
                    ?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
             </div>
             <div class="blockitems col-sm-12 col-md-12" id="item1">
