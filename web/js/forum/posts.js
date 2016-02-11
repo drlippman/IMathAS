@@ -80,8 +80,8 @@ function savelike(el) {
    } else {
         el.className = "likeicon";
     }
-       // console.log(el.src.substr('liked'));
-    if(el.src.substr("likedgray"))
+
+        if(el.src.substr("likedgray"))
     {
         el.src = el.src.replace("likedgray","liked");
     }

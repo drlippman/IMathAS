@@ -2444,16 +2444,6 @@ class ForumController extends AppController
         foreach($result as $row) {
             $likes[$row['type']] = $row['count(*)'];
         }
-        if($icon=="liked.png"){
-        $image="likedgray.png";
-        }
-
-        if($icon=="likedgray.png"){
-            $image="liked.png";
-        }
-
-
-
 
         $likemsg = 'Liked by ';
         $likecnt = 0;

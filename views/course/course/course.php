@@ -13,6 +13,7 @@ $imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid=
 <input type="hidden" class="user-rights" value="<?php echo $myRights?>">
 
 <?php
+$studview= $sessionData['stuview'];
 
 if (($teacherId && (!$backLink))) {?>
     <div class="item-detail-header">
@@ -68,7 +69,7 @@ if (($teacherId && (!$backLink))) {?>
     <div class="tab-content shadowBox">
     <?php }?>
 <?php if($teacherId){
-    ?>
+  ?>
     <div class="row course-copy-export col-md-12 col-sm-12 padding-left-right-zero">
         <div class="col-md-2 col-sm-2 course-top-menu">
             <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('Copy Items');?></a>
@@ -111,8 +112,7 @@ if (($teacherId && (!$backLink))) {?>
             </a>
             <ul class='dropdown-menu'>
                 <li>
-<!--                    <a href="--><?php //echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&stuview=0');?><!--">-->
-                    <a href="#">
+                    <a href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$course->id. '&stuview=1');?>">
                         <?php AppUtility::t('Student'); ?>
                 </li>
                 <li>
@@ -224,7 +224,7 @@ if ($overwriteBody == 1) {
                 echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
                 echo 'link along the left side of the screen.</p><p class="padding-left-fifteen">If you want to build from scratch, use the "Add An Item" pull down below to get started.</p><p>&nbsp;</p>';
             }
-            echo ShowItemCourse::generateAddItem($folder,'t');
+            echo ShowItemCourse::generateAddItem($folder,'t',$studview);
         }
     }
 
@@ -241,7 +241,7 @@ if ($overwriteBody == 1) {
             ?>
             <div class=cp>
             <span class=column>
-			<?php echo ShowItemCourse::generateAddItem($folder, 'BB') ?>
+			<?php echo ShowItemCourse::generateAddItem($folder, 'BB',$studview) ?>
             <?php
         }
     }

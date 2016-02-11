@@ -1190,6 +1190,7 @@ class CourseController extends AppController
         $courseStudent = Course::getByCourseAndUser($courseId);
         $lockAId = $courseStudent['lockaid']; //ysql_result($result,0,2);
         $type = $this->getParamVal('type');
+
         if ($teacherData != null) {
             if ($myRights>AppConstant::STUDENT_RIGHT) {
                 $teacherId = $teacherData['id'];
@@ -1211,6 +1212,7 @@ class CourseController extends AppController
                 $isTutor = $teacherData['id'];
             }
         }
+
         $isTutor = $this->isTutor($userId, $courseId);
         $body = "";
         $from = $this->getParamVal('from');
