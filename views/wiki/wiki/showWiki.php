@@ -89,8 +89,8 @@ if (isset($delAll) && $isTeacher) {
             echo'<a href="#" id="first" onclick="jumpto(1)"> &nbsp;'; AppUtility::t('First'); echo'</a>
             <a id="older" href="#" onclick="seehistory(1); return false;"> &nbsp;'; AppUtility::t('Older'); echo'</a> ';
             echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;"> &nbsp;'; AppUtility::t('Newer'); echo'</a>
-            <a href="#" class="grayout" id="last" onclick="jumpto(0)"> &nbsp;'; AppUtility::t('Last'); echo' &nbsp; </a>
-            <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
+            <a href="#" class="grayout" id="last" onclick="jumpto(0)"> &nbsp;'; AppUtility::t('Last'); echo'  </a>
+            &nbsp; <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
             if ($isTeacher) { ?>
                 <a id="revrevert" style="display:none;" href="#"><?php AppUtility::t('Revert to this revision')?></a>
            <?php }
