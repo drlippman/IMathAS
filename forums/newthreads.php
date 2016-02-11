@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
    	require("../validate.php");
 	$cid = $_GET['cid'];
-	
+	$from = $_GET['from'];
 	/*
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_posts.threadid,max(imas_forum_posts.postdate) as lastpost,mfv.lastview,count(imas_forum_posts.id) as pcount FROM imas_forum_posts ";
 	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN (SELECT * FROM imas_forum_views WHERE userid='$userid') AS mfv ";
@@ -74,8 +74,11 @@
 				}
 			}
 		}
-		
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
+		if ($from=='home') {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../index.php");
+		} else {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/../course/course.php?cid=$cid");
+		}
 	}
 	
 	
@@ -83,7 +86,7 @@
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; New Forum Topics</div>\n";
 	echo '<div id="headernewthreads" class="pagetitle"><h2>New Forum Posts</h2></div>';
-	echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
+	echo "<p><button type=\"button\" onclick=\"window.location.href='newthreads.php?from=$from&cid=$cid&markallread=true'\">"._('Mark all Read')."</button></p>";
 
 	if (count($lastpost)>0) {
 		$threadids = implode(',',array_keys($lastpost));
