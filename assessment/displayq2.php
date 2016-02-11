@@ -4049,7 +4049,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							break 2;
 						}
 					} else if (isset($flags['regex'])) {
-						$regexstr = '|'.str_replace('|','\\|',$anans).'|'.(isset($flags['regex'])?'i':'');
+						$regexstr = '|'.str_replace('|','\\|',$anans).'|'.(($flags['ignore_case'])?'i':'');
 						if (preg_match($regexstr,$givenans)) {
 							$correct += 1;
 							$foundloc = $j;
