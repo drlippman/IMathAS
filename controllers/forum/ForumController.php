@@ -1190,12 +1190,12 @@ class ForumController extends AppController
                 }
             }
 
-
+            $user = $this->user;
             $fileName = implode('@@', $files);
             $isaNon = $params['postanon'];
             $isPost = $params['isPost'];
             $point = $params['points'];
-            $user = $this->user;
+
             $connection = $this->getDatabase();
             $transaction = $connection->beginTransaction();
             try{

@@ -3246,7 +3246,6 @@ class AppUtility extends Component
                     echo "</a>";
                 }
                 if ($isTeacher && $ownerid[$child]!=0 && $ownerid[$child]!=$userid) { ?>
-<!--                    echo " <a class=\"small\" href=\"<>\">[GB]</a>";-->
                     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$courseId.'&studentId='.$ownerid[$child]) ?>" target=\"_popoutgradebook\"><?php echo "[GB]"?></a>
                   <?php  if ($base==0 && preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$subject[$child],$matches)) {
                         $aname = addslashes($matches[2]);
