@@ -105,10 +105,11 @@ if (isset($delAll) && $isTeacher) {
 
             foreach($wikiRevisionData as $key => $singleWikiRevision) {
                 ?>
-                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><textarea id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="true" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
                     <?php
+                    //echo $text;
                     echo strip_tags( $text);?>
-                </textarea></div>
+                </div></div>
             <?php }?>
         <?php }?>
     </div>
@@ -168,7 +169,6 @@ if (isset($delAll) && $isTeacher) {
         if (n==1) {
             curversion++;
             curcontent = applydiff(curcontent,curversion);
-
             username = userinfo[wikihistory[curversion].u];
             time = wikihistory[curversion].t;
         } else {
@@ -263,7 +263,6 @@ if (isset($delAll) && $isTeacher) {
         if (ver==wikihistory.length-1) {return content.join(' ');};
         current = content.slice();
         var diff = wikihistory[ver+1].c;
-        console.log(diff);
         for (var i=diff.length-1; i>=0; i--) {
             deled = null;  insed = null;
             if (diff[i][0]==2) {
@@ -275,31 +274,31 @@ if (isset($delAll) && $isTeacher) {
                 insed = current.splice(diff[i][1], diff[i][2]).join(' ');
             }
             if (insed != null) {
-                if (insed.match(/<p>/)) {
+                if (insed) {
                     insed = insed.split('<p>').join('<p><ins>');
                 }
-                if (insed.match(/<\/p>/)) {
+                if (insed) {
                     insed = insed.split('</p>').join('</ins></p>');
                 }
             }
-            console.log(deled);
             if (deled != null) {
-                if (deled.match(/<p>/)) {
+                if (deled) {
                     deled = deled.split('<p>').join('<p><del>');
                 }
-                if (deled.match(/<\/p>/)) {
+                if (deled) {
                     deled = deled.split('</p>').join('</del></p>');
                 }
             }
-
+            
             if (diff[i][0]==2) { //replace
-                current.splice(diff[i][1], 0, "<del>"+deled+"</del><ins>"+insed+"</ins>");
+                current.splice(diff[i][1], 0, "<del>"+deled+"</del><p><ins>"+insed+"</ins>");
             } else if (diff[i][0]==0) {//insert
-                current.splice(diff[i][1], 0, "<del>"+deled+"</del>");
+                current.splice(diff[i][1], 0, "<del>"+deled+"</del><p>");
             } else if (diff[i][0]==1) {//delete
-                current.splice(diff[i][1], 0, "<ins>"+insed+"</ins>");
+                current.splice(diff[i][1], 0, "<ins>"+insed+"</ins><p>");
             }
         }
+
         return current.join('');
     }
     function rendermathnode(node)
