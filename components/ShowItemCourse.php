@@ -38,6 +38,9 @@ class ShowItemCourse extends Component
             $itemIcons = $CFG['CPS']['itemicons'];
         }
 
+        if($studview>-1){
+            $studview=1;
+        }
         if ($teacherId) {
             $canEdit = true;
             $viewAll = true;
@@ -49,7 +52,6 @@ class ShowItemCourse extends Component
             $viewAll = false;
         }
         $now = time() + $previewShift;
-
         $blocklist = array();
         for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++)
         {
@@ -65,10 +67,12 @@ class ShowItemCourse extends Component
         {
             echo ShowItemCourse::generateAddItem($parent,'t',$studview);
         }
+
         for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++)
         {
             if (is_array($items[$i]))
             {
+
                 /*
                  * if is a block
                  */
@@ -88,7 +92,7 @@ class ShowItemCourse extends Component
                 }
 
                 $items[$i]['name'] = stripslashes($items[$i]['name']);
-                if ($canEdit) {
+                if ($canEdit && !$studview) {
                     echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
                 }
                 if ($items[$i]['startdate'] == AppConstant::NUMERIC_ZERO) {
@@ -127,7 +131,8 @@ class ShowItemCourse extends Component
                 if (!($items[$i]['avail'])) { //backwards compat
                     $items[$i]['avail'] = AppConstant::NUMERIC_ONE;
                 }
-                if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO || ($items[$i]['avail'] == AppConstant::NUMERIC_ONE && $items[$i]['startdate']<$now && $items[$i]['enddate'] > $now))
+
+                if ($items[$i]['avail'] == AppConstant::NUMERIC_TWO || (($items[$i]['avail'] == AppConstant::NUMERIC_ONE )&& ($items[$i]['startdate']<$now) && ($items[$i]['enddate'] > $now)))
                 {
 
                     /*
@@ -634,7 +639,7 @@ class ShowItemCourse extends Component
              */
             $line = Items::getByItem($items[$i]);
 
-            if ($canEdit) {
+            if ($canEdit && !$studview) {
                 echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
             }
             if ($line['itemtype'] == "Calendar") {
@@ -926,7 +931,7 @@ class ShowItemCourse extends Component
                     }
                     echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i></div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if ($viewAll) { //not avail to stu
+                } else if ($viewAll && !$studview) { //not avail to stu
                     if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
@@ -1133,7 +1138,7 @@ class ShowItemCourse extends Component
                     }
                     echo "</div>";
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if ($viewAll) {
+                } else if ($viewAll && !$studview) {
                     if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
@@ -1323,7 +1328,7 @@ class ShowItemCourse extends Component
                    <?php }
                     echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if ($viewAll) {
+                } else if ($viewAll && !$studview) {
                     if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
@@ -1386,7 +1391,9 @@ class ShowItemCourse extends Component
                 } else {
                     $endDate = AppUtility::formatdate($line['enddate']);
                 }
+
                 if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && $line['enddate']>$now)) {
+
                     if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');
                         $color = '#0f0';
@@ -1417,7 +1424,7 @@ class ShowItemCourse extends Component
                   <?php  if (isset($newPostCnts[$line['id']]) && $newPostCnts[$line['id']] > AppConstant::NUMERIC_ZERO) { ?>
                         <a style="color:red" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forumid='.$line['id'],'&page=-1')?>"><?php echo sprintf(_('New Posts (%s)'),$newPostCnts[$line['id']])?></a>
                   <?php  }
-                    if ($viewAll) {
+                    if ($viewAll ) {
                         echo '<span class="instrdates">';
                         echo "<br/>$show ";
                         echo '</span>';
@@ -1443,7 +1450,9 @@ class ShowItemCourse extends Component
                     if ($duedates!='') {echo "<br/>$duedates";}
                     echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if ($viewAll) {
+
+                } else if ($viewAll && !$studview) {
+
                     if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
@@ -1607,7 +1616,7 @@ class ShowItemCourse extends Component
                     if ($duedates!='') {echo "<br/>$duedates";}
                     echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if ($viewAll) {
+                } else if ($viewAll && !$studview) {
                     if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {
@@ -1658,6 +1667,7 @@ class ShowItemCourse extends Component
                     }
                     echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
+
                 }
             }
         }
@@ -1767,9 +1777,11 @@ class ShowItemCourse extends Component
     }
 
 
-public static function makeTopMenu() {
+public static function makeTopMenu($studview) {
+
     global $teacherId,$courseId,$imasroot,$previewshift, $topBar, $msgSet, $newMsgs, $quickView, $courseNewFlag,$useviewButtons,$newPostsCnt;
     if ($useviewButtons && (($teacherId) || $previewshift > -1)) {
+
         echo '<div id="viewbuttoncont">View: ';
         echo "<a href=\"course?cid=$courseId&quickview=off&teachview=1\" ";
         if ($previewshift == -1 && $quickView != 'on') {
@@ -1799,7 +1811,6 @@ public static function makeTopMenu() {
     } else {
         $useviewButtons = false;
     }
-
     if (($teacherId) && $quickView == 'on') {
         echo '<div class="cpmid">';
         if (!$useviewButtons) {
@@ -1821,9 +1832,27 @@ public static function makeTopMenu() {
     } else {
         $gbnewflag = '';
     }
-    if (($teacherId) && count($topBar[1]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) {
 
-    } else if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || ($previewshift > -1))) {
+
+    if ($previewshift>-1 || $studview) {
+        ?>
+
+    <script type="text/javascript">
+        function changeshift() {
+            var shift = document.getElementById("pshift").value;
+            var CourseId= <?php echo $courseId?>;
+            var toopen = "<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId)?>&stuview="+shift;
+            window.location = toopen;
+        }
+    </script>
+
+<?php } ?>
+
+
+
+<?php    /*if (($teacherId) && count($topBar[1]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) {
+
+    } else*/ if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || $studview)) {
         echo '<div class=breadcrumb>';
         if ($topBar[2] == AppConstant::NUMERIC_ZERO) {
             if (in_array(0,$topBar[0]) && $msgSet < AppConstant::NUMERIC_FOUR) { //messages
@@ -1843,7 +1872,7 @@ public static function makeTopMenu() {
             }
             if ($previewshift>-1 && count($topBar[0]) > AppConstant::NUMERIC_ZERO) { echo '<br/>';}
         }
-        if ($previewshift>-1) {
+    if ($previewshift>-1 || $studview) {
             echo _('Showing student view. Show view:'), ' <select id="pshift" onchange="changeshift()">';
             echo '<option value="0" ';
             if ($previewshift==0) {echo "selected=1";}

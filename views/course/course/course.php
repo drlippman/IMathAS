@@ -15,6 +15,10 @@ $imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid=
 <?php
 $studview= $sessionData['stuview'];
 
+if($studview>-1){
+    $studview=1;
+}
+
 if (($teacherId && (!$backLink))) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
@@ -184,19 +188,7 @@ if ($overwriteBody == 1) {
     ?>
 
     <?php
-    if ($previewshift > -1) {
-        ?>
-        <script type="text/javascript">
-            function changeshift() {
-                var shift = document.getElementById("pshift").value;
-                var toopen = '<?php echo $jsAddress1 ?>&stuview='+shift;
-                window.location = toopen;
-            }
-        </script>
-
-    <?php
-    }
-    ShowItemCourse::makeTopMenu();
+    ShowItemCourse::makeTopMenu($studview);
     if (count($items) > 0) {
         if ($quickView =='on' && isset($teacherId)) {
             echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
