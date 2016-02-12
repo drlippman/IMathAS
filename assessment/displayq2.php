@@ -180,6 +180,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
 	if (isset($answersize)) {$options['answersize'] = $answersize;}
 	if (isset($variables)) {$options['variables'] = $variables;}
+	if (isset($strflags)) {$options['strflags'] = $strflags;}
 	if (isset($domain)) {$options['domain'] = $domain;}	
 	if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
 	if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
@@ -1864,6 +1865,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
+		if (isset($options['strflags'])) {if (is_array($options['strflags'])) {$strflags = $options['strflags'][$qn];} else {$strflags = $options['strflags'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
@@ -1977,7 +1979,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 			}
 		}
-		$sa .= $answer;
+		if (strpos($strflags,'regex')!==false) {
+			$sa .= _('The answer must match a specified pattern');
+		} else {
+			$sa .= $answer;
+		}
 	} else if ($anstype == "essay") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
@@ -3923,7 +3929,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 	} else if ($anstype == "string") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
-		if (is_array($options['strflags'])) {$strflags = $options['strflags'][$qn];} else {$strflags = $options['strflags'];}
+		if (isset($options['strflags'])) {if (is_array($options['strflags'])) {$strflags = $options['strflags'][$qn];} else {$strflags = $options['strflags'];}}
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		
@@ -4049,7 +4055,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							break 2;
 						}
 					} else if (isset($flags['regex'])) {
-						$regexstr = '|'.str_replace('|','\\|',$anans).'|'.(isset($flags['regex'])?'i':'');
+						$regexstr = '/'.str_replace('/','\/',$anans).'/'.(isset($flags['regex'])?'i':'');
 						if (preg_match($regexstr,$givenans)) {
 							$correct += 1;
 							$foundloc = $j;
