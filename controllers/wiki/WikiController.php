@@ -499,7 +499,7 @@ class WikiController extends AppController
             $defaultValues = array(
                 'pageTitle' => 'Create Wiki',
                 'saveTitle' => 'Create Wiki',
-                'title' => "Enter title here",
+                'title' => "Enter Wiki Name here",
                 'description' => "Enter wiki description here (displays on course page)",
                 'sDate' => date("m/d/Y"),
                 'sTime' => time(),

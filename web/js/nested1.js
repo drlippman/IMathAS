@@ -1,5 +1,4 @@
 var noblockcookie = false;
-//var req = null;
 var Nested = new Class({
 	getOptions: function() {
 		return {
@@ -24,7 +23,7 @@ var Nested = new Class({
 		if (!this.options.expandKey.match(/^(control|shift)jQuery/)) {
 			this.options.expandKey = 'shift';
 		}
-		this.list = jQuery(list);
+		this.list = $(list);
 		this.options.parentTag = this.list.nodeName;
 		this.bound = {};
 		this.bound.start = this.start.bindWithEvent(this);
@@ -38,7 +37,7 @@ var Nested = new Class({
 	},
 
 	start: function(event) {
-		var el = jQuery(event.target);
+		var el = $(event.target);
 		if (this.options.handleClass) {
 			while (el.nodeName != this.options.childTag && !el.hasClass(this.options.handleClass) && el != this.list) {
 				el = el.getParent();
@@ -49,7 +48,7 @@ var Nested = new Class({
 			el = el.parentNode;
 		}
 		if (el.nodeName != this.options.childTag) return true;
-		el = jQuery(el);
+		el = $(el);
 		if (this.options.lock == 'class' && !el.hasClass(this.options.lockClass)) return;
 		if (this.options.ghost) { // Create the ghost
 			this.ghost = el.clone().setStyles({
@@ -71,14 +70,14 @@ var Nested = new Class({
 		document.addEvent('mouseup', this.bound.end);
 		if (window.ie) { // IE fix to stop selection of text when dragging
 			this.bound.stop = this.stop.bindWithEvent(this);
-            jQuery(document.body).addEvent('drag', this.bound.stop).addEvent('selectstart', this.bound.stop);
+            $(document.body).addEvent('drag', this.bound.stop).addEvent('selectstart', this.bound.stop);
 		}
 		this.fireEvent('onStart', el);
 		event.stop();
 	},
 
 	collapse: function(event) {
-		var el = jQuery(event.target);
+		var el = $(event.target);
 		if (this.options.handleClass) {
 			while (el.nodeName != this.options.childTag && !el.hasClass(this.options.handleClass) && el != this.list) {
 				el = el.getParent();
@@ -89,7 +88,7 @@ var Nested = new Class({
 			el = el.parentNode;
 		}
 		if (el == this.list) return;
-		el = jQuery(el);
+		el = $(el);
 		if (!el.moved) {
 			var sub = $E(this.options.parentTag, el);
 			if (sub) {
@@ -235,7 +234,7 @@ var Nested = new Class({
 					dest = new Element(this.options.parentTag).injectInside(dest);
 					dest.className = "qview";
 				}
-                jQuery(el).inject(dest, move);
+                $(el).inject(dest, move);
 				el.moved = true;
 				if (!prevParent.getFirst()) prevParent.remove();
 				if (!this.haschanged) {
@@ -313,9 +312,8 @@ function toSimpleJSON(a) {
 
 function submitChanges() {
   var params = 'order='+toSimpleJSON(sortIt.serialize());
-  var url = AHAHsaveurl;
+  var url = AHAHsaveurl;;
   var els = document.getElementsByTagName("input");
-
   for (var i=0; i<els.length; i++) {
 	  if (els[i].type=="hidden" && els[i].value!="") {
 	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
@@ -324,9 +322,6 @@ function submitChanges() {
 	  }
   }
   var target = "submitnotice";
-  //document.getElementById(target).innerHTML = url;
-  //return;
-
   document.getElementById(target).innerHTML = ' Saving Changes... ';
   if (window.XMLHttpRequest) {
     req = new XMLHttpRequest();
@@ -340,7 +335,7 @@ function submitChanges() {
 	req.setRequestHeader("Content-length", params.length);
 	req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {NestedahahDone(url, target);};
-	req.send(params);
+   	req.send(params);
   }
 }  
 
@@ -355,8 +350,7 @@ function NestedahahDone(url, target)
 {
     if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK"
-        console.log(req.responseText);
-	    if (req.responseText.substring(0,2)=='OK') {
+        if (req.responseText.substring(0,2)=='OK') {
 
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
@@ -364,15 +358,15 @@ function NestedahahDone(url, target)
 		    setlinksdisp("")
 		    document.getElementById("qviewtree").innerHTML = req.responseText.substring(2);
             sortIt.haschanged = false;
-	    } else
-        {
-            alert('hey');
-		    document.getElementById(target).innerHTML=req.responseText;
+	    } else{
+            document.getElementById(target).innerHTML=req.responseText;
 	    }
     } else {
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText;
+	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status;
     }
-  } 
+  }
+    document.getElementById(target).innerHTML="";
+
 }
 
 function setlinksdisp(disp) {

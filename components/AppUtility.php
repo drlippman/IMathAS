@@ -2646,11 +2646,11 @@ class AppUtility extends Component
                 } else {
                     $enddate = AppUtility::formatdate($line['enddate']);
                 }
-                if ($items[$i]['avail']== AppConstant::NUMERIC_TWO) {
-                    $color = '#0f0';
-                } else if ($items[$i]['avail'] == AppConstant::NUMERIC_ZERO) {
-                    $color = '#ccc';
-                }
+//                if ($items[$i]['avail']== AppConstant::NUMERIC_TWO) {
+//                    $color = '#0f0';
+//                } else if ($items[$i]['avail'] == AppConstant::NUMERIC_ZERO) {
+//                    $color = '#ccc';
+//                }
                 if (!isset($CFG['CPS']['miniicons']['inline'])) {
                     $icon  = '<span class=icon style="background-color:'.$color.'">!</span>';
                 } else {
@@ -2749,13 +2749,13 @@ class AppUtility extends Component
                 }
 
                 if (!isset($CFG['CPS']['miniicons']['forum'])) {
-                    $icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
+                   $icon  = '<span class=icon style="background-color:'.$color.'">F</span>';
                 } else {
                     $icon = '<img alt="forum" src="'.AppUtility::getHomeURL().'/img/'.$CFG['CPS']['miniicons']['forum'].'" class="mida icon" /> ';
                 }
                 echo '<li id="'.$items[$i].'">'.$icon;
                 if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
-                    //echo '<b>'.$line['name']. "</b>";
+                   // echo '<b>'.$line['name']. "</b>";
                     echo '<b><span id="F'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
                     if ($showdates) {
                         printf(_(' showing until %s'), $enddate);
@@ -2805,7 +2805,7 @@ class AppUtility extends Component
                 if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now) {
                     echo '<b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b>";
                     if ($showdates) {
-                        printf(_(' showing until %s'), $enddate);
+                      printf(_(' showing until %s'), $enddate);
                     }
                 } else {
                     echo '<i><b><span id="W'.$typeid.'" onclick="editinplace(this)">'.$line['name']. "</span></b></i>";

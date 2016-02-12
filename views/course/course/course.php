@@ -195,6 +195,8 @@ if ($overwriteBody == 1) {
             echo "<script>var AHAHsaveurl = '$imasRoot';";
             echo 'var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";';
             echo "</script>";
+            echo "<script src=\"$imasroot/javascript/mootools.js\"></script>";
+            echo "<script src=\"$imasroot/javascript/nested1.js?v=070214\"></script>";
             echo '<p class="margin-ten"><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
             echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
 
@@ -204,7 +206,6 @@ if ($overwriteBody == 1) {
             echo '</ul>';
             echo '<p>&nbsp;</p>';
         } else {
-
             $showItem = new ShowItemCourse();
             $showItem->showItems($items,$folder);
         }
