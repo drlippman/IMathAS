@@ -1633,3 +1633,6 @@ div.items {
     margin-left: 80px;
     /*border-radius: 5px;*/
 }
+td.pointer:hover{
+    text-decoration: underline !important;
+}
