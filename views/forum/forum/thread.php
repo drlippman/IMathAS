@@ -293,7 +293,7 @@ echo '</div>';
                         if ($line['isanon']==1) {
                             $name = "Anonymous";
                         } else {
-                            $name = "{$line['LastName']}, {$line['FirstName']}";
+                            $name = "{$line['LastName']}, {$line['FirstName']} ";
                         } ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$forumid.'&threadid='.$line['id']);?>"><?php echo trim($line['subject'])?></a></b>:
                         <div><?php echo $name?></div>

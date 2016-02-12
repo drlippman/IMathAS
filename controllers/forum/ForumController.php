@@ -325,14 +325,14 @@ class ForumController extends AppController
 
         $forumData = Forums::getById($forumId);
         if (($isteacher || ($tutorId)) && ($params['score'])) {
-
-            if (isset($tutorId))
+            if (($tutorId))
             {
                 if ($forumData['tutoredit'] != 1) {
                     //no rights to edit score
                     exit;
                 }
             }
+
             $existingscores = array();
             $gradeData = Grades::getByGradeTypeIdAndGradeType('forum', $forumId);
             foreach ($gradeData as $grade) {
@@ -344,14 +344,16 @@ class ForumController extends AppController
             foreach ($forumPosts as $forumPost) {
                 $postuserids[$forumPost['id']] = $forumPost['userid'];
             }
+
             foreach ($params['score'] as $k => $v) {
-                if (isset($params['feedback'][$k])) {
+                if (($params['feedback'][$k])) {
                     $feedback = $params['feedback'][$k];
                 } else {
                     $feedback = '';
                 }
+
                 if (is_numeric($v)) {
-                    if (isset($existingscores[$k])) {
+                    if (($existingscores[$k])) {
                         Grades::updateById($v, $feedback, $existingscores[$k]);
                     } else {
                         $grade = array(
@@ -366,15 +368,15 @@ class ForumController extends AppController
                         $insertGrade->insertForumDataInToGrade($grade);
                     }
                 } else {
-                    if (isset($existingscores[$k])) {
+                    if (($existingscores[$k])) {
                         Grades::deleteByOnlyId($existingscores[$k]);
                     }
                 }
             }
-            if (isset($params['save']) && $params['save'] == 'Save Grades and View Previous')
+            if (($params['save']) && $params['save'] == 'Save Grades and View Previous')
             {
                 return $this->redirect('post?page=' .$page . '&courseid=' .$courseId . '&forumid=' .$forumId . '&threadid=' .$params['prevth']);
-            } else if (isset($params['save']) && $params['save'] == 'Save Grades and View Next') {
+            } else if (($params['save']) && $params['save'] == 'Save Grades and View Next') {
                 return $this->redirect('post?page=' .$page. '&courseid=' .$courseId . '&forumid=' .$forumId . '&threadid=' .$params['nextth']);
             } else
             {
@@ -1058,6 +1060,10 @@ class ForumController extends AppController
             $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
 
         }
+//        if ($caneditscore && $haspoints) {
+//            return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId. '&forum='.$forumid));
+////            echo "<form method=post action=\"thread?cid=$courseId&forum=$forumid\">";
+//        }
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/posts.js"]);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
@@ -2307,7 +2313,6 @@ class ForumController extends AppController
             exit;
         }
         $users = User::lastViewsUser($thread);
-        echo '<h4>'._('Thread Views').'</h4>';
         $responseData = array('users' => $users);
         $flexwidth = true;
         $nologo = true;
@@ -2320,8 +2325,8 @@ class ForumController extends AppController
             echo '<table><thead><tr><th>'._('Name').'</th><th>'._('Last Viewed').'</th></tr></thead>';
             echo '<tbody>';
             foreach ($users as $row ) {
-                echo '<tr><td>'.$row['LastName'].', '.$row['FirstName'].'</td>';
-                echo '<td>'.AppUtility::tzdate("F j, Y, g:i a", $row['lastview']).'</td></tr>';
+                echo '<tr><td>'.$row['LastName'].', '.$row['FirstName'].' </td>';
+                echo '<td style="padding-left:25px">'.AppUtility::tzdate("  F j, Y, g:i a", $row['lastview']).'</td></tr>';
             }
             echo '</tbody></table>';
         }
