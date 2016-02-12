@@ -2378,12 +2378,13 @@ A student is asked to enter a string (a word or list of letters).
 		<li>partial_credit: awards partial credit based on Levenshtein distance between strings</li>
 		<li>allow_diff=n: gives full credit for answers with Levenshtein distance between strings &le; n </li>
 		<li>in_answer: gives credit if $answer is contained anywhere in the student answer</li>
+		<li>regex: interprets $answer as a <a href="https://www.youtube.com/watch?v=c-Ov1JUMDv4">regular expression</a> (pattern) to evaluate the student's answer.  For example, $answer="cost.*increas" will give credit if the word <i>cost</i> appears before <i>increas</i> in the student's answer.  $answer="increas|ris" will accept any of the following: <i>increas</i>ing, <i>increas</i>es, <i>ris</i>ing, or <i>ris</i>en etc.</li>
 		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
 		<li>ignore_symbol=sym: Unlike the other flags, this is not an on/off flag. Set this equal to a symbol to ignore that
 		    symbol in student answers.  This flag can be used multiple times with different symbols.</li>
 		</ul>
 		By default, compress_whitespace and ignore_case are On.  Only one of
-		partial_credit, allow_diff, or in_answer may be used at a time.</dd>
+		partial_credit, allow_diff, in_answer or regex may be used at a time.</dd>
 <dt>$scoremethod = "takeanything" (In Common Control)</dt>
 	<dd>Sets the problem to give full credit for any answer.</dd>
 <dt>$answerformat = "list" (In Common Control)</dt>
