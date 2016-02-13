@@ -6,6 +6,7 @@ require_once("../filter/filter.php");
 $this->title = $wiki->name;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/course?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+$editByDate=($wikiTotalData[0]['editbydate']);
 ?>
     <style type="text/css">
         a.grayout {color: #ccc; cursor: default;}  del {color: #f99; text-decoration:none;} ins {color: #6f6; text-decoration:none;} .wikicontent {padding: 10px;}</style>
@@ -98,17 +99,21 @@ if (isset($delAll) && $isTeacher) {
         }
         ?>
     <div class="editor" style="margin-right: 20px; margin-left: 20px">
+        <?php if ($isTeacher || $editByDate>0){?>
         <span>
             <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
-               class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a></span><br/><br class="form">
+               class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a>
+        </span>
+        <?php } ?>
+        <br/><br class="form">
+
         <?php if(!empty($wikiRevisionData)){
 
             foreach($wikiRevisionData as $key => $singleWikiRevision) {
                 ?>
-                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="true" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
                     <?php
-                    //echo $text;
-                    echo strip_tags( $text);?>
+                        echo filter($text); ?>
                 </div></div>
             <?php }?>
         <?php }?>

@@ -113,13 +113,13 @@ class WikiController extends AppController
                     $pageTitle = "Confirm Wiki Version Revert";
                 }
             } else { //just viewing
-
                 require_once("../filter/filter.php");
-                if (isset($isTeacher) || $now < $row['editbydate']) {
+                if ( $now < $row['editbydate']) {
                     $canEdit = true;
                 } else {
                     $canEdit = false;
                 }
+
                 /**
                  * if is group wiki, get groupid or fail
                  */
@@ -490,6 +490,7 @@ class WikiController extends AppController
                 'eDate' => $eDate,
                 'eTime' => $eTime,
                 'pageTitle' => $saveTitle,
+                'rdatetype' => $revisedate,
                 'saveTitle' => AppConstant::SAVE_BUTTON,
                 'avail' => $wiki['avail'],
 
@@ -523,11 +524,19 @@ class WikiController extends AppController
 
        if ($this->isPost()) {
            if ($wikiid) {
-                $link = new Wiki();
-                $link->updateChange($params, $courseId);
+               $link = new Wiki();
+               if($params['rdatetype']=="Always"){
+                   $params['rdatetype']= $revisedate;
+               }
+               elseif($params['rdatetype']=="Never"){
+                   $params['rdatetype']=$revisedate;
+               }elseif($params['rdatetype']=="Date"){
+                 $params['rdatetype']=AppUtility::tzdate($params['rdate'],$params['rtime']);
+               }
+               $link->updateChange($params, $courseId);
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             } else{
-                if ($params['avail']== AppConstant::NUMERIC_ONE) {
+               if ($params['avail']== AppConstant::NUMERIC_ONE) {
                     if ($params['available-after'] == '0') {
                         $startDate = AppConstant::NUMERIC_ZERO;
                     } else if ($params['available-after'] == 'now') {
@@ -551,13 +560,20 @@ class WikiController extends AppController
                     $startDate = AppConstant::NUMERIC_ZERO;
                     $endDate =  AppConstant::ALWAYS_TIME;
                 }
+               if ($params['rdatetype'] == 'Always') {
+                   $canEdit=2000000000;
+               }else if($params['rdatetype'] == 'Never'){
+                   $canEdit=0;
+               }else{
+                   $canEdit=$params['rdate'];
+               }
                 $finalArray['courseid'] = $params['cid'];
                 $finalArray['title'] = $params['name'];
                 $finalArray['description'] = $params['description'];
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['startdate'] = $startDate;
                 $finalArray['enddate'] = $endDate;
-           //     $finalArray['canedit']=$canEdit;
+                $finalArray['editbydate']=$canEdit;
                 $saveChanges = new Wiki();
                 $lastWikiId = $saveChanges->createItem($finalArray);
                 $saveItems = new Items();
@@ -576,8 +592,7 @@ class WikiController extends AppController
                 } else if ($filter=='t') {
                     array_unshift($sub,$lastItemsId);
                 }
-
-                $itemorder = (serialize($items));
+               $itemorder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));

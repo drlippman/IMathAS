@@ -33,6 +33,7 @@ class Wiki extends BaseImasWikis
         $this->avail = $params['avail'];
         $this->startdate = $params['startdate'];
         $this->enddate = $params['enddate'];
+        $this->editbydate=$params['editbydate'];
         $this->save();
         return $this->id;
     }
@@ -46,6 +47,7 @@ class Wiki extends BaseImasWikis
         $updateWiki->name = $params['name'];
         $updateWiki->description = $params['description'];
         $updateWiki->avail = $params['avail'];
+        $updateWiki->editbydate=$params['rdatetype'];
         if ($params['avail'] == AppConstant::NUMERIC_ONE) {
             if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
                 $startDate = AppConstant::NUMERIC_ZERO;
