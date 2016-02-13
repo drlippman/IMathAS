@@ -2407,7 +2407,7 @@ class AppUtility extends Component
         {
             $openblocks = array();
         }
-        $itemtypes = array();
+       $itemtypes = array();
         $iteminfo = array();
         /**
          * Item data
@@ -2466,11 +2466,12 @@ class AppUtility extends Component
 
             if (is_array($items[$i]))
             {
+
                 /**
                  * is a block
                  * */
                 $items[$i]['name'] = ($items[$i]['name']);
-
+//                AppUtility::dump($items);
                 if ($items[$i]['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {
@@ -2504,6 +2505,7 @@ class AppUtility extends Component
                 } else {
                     $color = '#ccc';
                 }
+
                 if (in_array($items[$i]['id'],$openblocks))
                 {
                     $isopen=true;
@@ -2546,7 +2548,7 @@ class AppUtility extends Component
                 if (count($items[$i]['items']) > 0)
                 {
                     echo '<ul class=qview '.$qviewstyle.'>';
-                    $this->quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
+                    $this->quickview($items[$i]['items'],$parent.'-'.$bnum,$showdates,$showlinks);
                     echo '</ul>';
                 }
                 echo '</li>';

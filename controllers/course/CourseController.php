@@ -2301,7 +2301,6 @@ class CourseController extends AppController
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $order = $_POST['order'];
-
         $previewShift = -1;
         foreach ($_POST as $id => $val)
         {
@@ -2311,7 +2310,6 @@ class CourseController extends AppController
             }
             $type = $id{0};
             $typeId = substr($id,1);
-
             if ($type=="I") {
                 $query = new InlineText();
                 $query->updateName($val, $typeId);
@@ -2327,9 +2325,9 @@ class CourseController extends AppController
             } else if ($type=="W") {
                 $query = new Wiki();
                 $query->updateName($val, $typeId);
-            } else if ($type=="B") {
+            } else if ($type=="B"){
                 $query = Course::getItemOrder($courseId);
-                $itemsforblock = unserialize($query[0]['itemorder']);
+                $itemsforblock = unserialize($query['itemorder']);
                 $blocktree = explode('-',$typeId);
                 $existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
                 $sub =& $itemsforblock;
@@ -2342,6 +2340,7 @@ class CourseController extends AppController
                 $itemOrder =  serialize($itemsforblock);
                 $query = new Course();
                 $query->setItemOrder($itemOrder, $courseId);
+                echo('hfghgghhf');
             }
         }
         $query = Course::getItemOrder($courseId);
