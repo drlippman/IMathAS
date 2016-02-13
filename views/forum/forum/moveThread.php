@@ -27,12 +27,51 @@ $now = $currentTime;
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
     <div class="view-message-inner-contents">
         <div class="title-middle center"></div>
+        <?php if($parent == 0){
+            $isHead = true;
+            echo "<h3>Move Thread</h3>\n";
+        } else {
+            $isHead = false;
+            echo "<h3>Move Post</h3>\n";
+        }?>
         <div class="title-option">
-            <h4><?php AppUtility::t('What Do You Want To Do?');?>:</h4>
-            <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' checked name='movetype' value='0' onclick="select(0)">
-            <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Move thread to different forum</td></div></tr>
-            <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='movetype' value='1' onclick="select(1)">
-                            <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Move post to be a reply to a thread</td></div></tr>
+            <h4><?php AppUtility::t('What do you want to do?');?>:</h4>
+            <?php if($isHead){ ?>
+                <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'>
+                            <td>
+                                <input type='radio' checked name='movetype' value='0' onclick="select(0)">
+                                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label>
+                        </td>
+                        <td >Move thread to different forum</td>
+                    </div>
+                </tr>
+                <tr>
+                    <div class='radio student-enroll override-hidden'><label class='checkbox-size'>
+                            <td><input type='radio' name='movetype' value='1' onclick="select(1)">
+                                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label>
+                        </td>
+                        <td>Move post to be a reply to a thread</td>
+                    </div>
+                </tr>
+          <?php } else{ ?>
+                <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'>
+                            <td>
+                                <input type='radio' checked name='movetype' value='0' onclick="select(0)">
+                                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label>
+                        </td>
+                        <td >Move post to be a new thread in this or another forum</td>
+                    </div>
+                </tr>
+                <tr>
+                    <div class='radio student-enroll override-hidden'><label class='checkbox-size'>
+                            <td><input type='radio' name='movetype' value='1' onclick="select(1)">
+                                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label>
+                        </td>
+                        <td>Move post to be a reply to a different thread</td>
+                    </div>
+                </tr>
+            <?php }?>
+
 
 
         <div id="move-forum"><div class="title-middle-option center"><?php AppUtility::t('Move to forum');?></div>
@@ -41,7 +80,8 @@ $now = $currentTime;
                 foreach ($forums as $forum) {
                     if($forum['forumid'] == $forumId)
                     {?>
-                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' checked id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'>
+                            <td><input type='radio' name='forum-name' checked id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
 
                     <?php }else{?>
                         <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
@@ -69,7 +109,7 @@ $now = $currentTime;
                         if($thread['parent'] == 0){
                             $threadCount++;
                         }
-                    } ?>
+                    }  ?>
                 </div>
             </div>
             <div class="buttons-div">

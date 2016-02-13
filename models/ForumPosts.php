@@ -810,4 +810,9 @@ class ForumPosts extends BaseImasForumPosts
     {
         return ForumPosts::find()->select('userid')->where(['id'=> $Id])->one();
     }
+
+    public static function getParentById($id)
+    {
+        return ForumPosts::find()->select('parent')->where(['id' => $id])->one();
+    }
 }

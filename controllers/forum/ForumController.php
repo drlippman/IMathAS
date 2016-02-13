@@ -598,9 +598,12 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $forumId = $this->getParamVal('forumid');
+        $move = $this->getParamVal('move');
         $forums = Forums::getByCourseId($courseId);
         $thread = ThreadForm::thread($forumId);
         $user = $this->user;
+        $parentResult = ForumPosts::getParentById($move);
+        $parent = $parentResult['parent'];
         $forumArray = array();
         foreach ($forums as $key => $forum) {
             $tempArray = array
@@ -644,7 +647,7 @@ class ForumController extends AppController
             }
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/movethread.js']);
-            $responseData = array('forums' => $forumArray, 'threads' => $threadArray, 'threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'user' => $user);
+            $responseData = array('forums' => $forumArray, 'threads' => $threadArray, 'threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'user' => $user, 'parent' => $parent);
             return $this->renderWithData('moveThread', $responseData);
         }
     }

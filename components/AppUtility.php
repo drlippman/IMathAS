@@ -3215,7 +3215,7 @@ class AppUtility extends Component
                 <?php }
 
                 if ($isTeacher) {
-                    echo "<a href=\"move-thread?forumid=$forumid&courseid=$courseId&threadid=$threadid\">Move</a> \n";
+                    echo "<a href=\"move-thread?forumid=$forumid&courseid=$courseId&threadid=$threadid&move=$child\">Move</a> \n";
                 }
                 if ($isTeacher || ($ownerid[$child]==$userid && $allowmod)) {
                     if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isTeacher) {
