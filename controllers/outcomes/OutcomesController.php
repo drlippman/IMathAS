@@ -129,11 +129,11 @@ class OutcomesController extends AppController
 
             }else
             { //is an outcome
-                if (substr($it,AppConstant::NUMERIC_ZERO,3)=='new')
+                if (substr($it,0,3)=='new')
                 {
                     $oCnt = substr($it,3);
                     $query  = new Outcomes();
-                    $insertId = $query->insertOutcomes($this->courseId,$this->params['newo'.$oCnt]);
+                    $insertId = $query->insertOutcomes($this->courseId, $oCnt);
                     $this->seenOutcomesArr[] = $insertId;
                     $outArr[] = $insertId;
 
@@ -879,7 +879,7 @@ class OutcomesController extends AppController
          }
          if (count($gradetypeselects)>AppConstant::NUMERIC_ZERO)
          {
-             $sel = implode(' OR ',$gradetypeselects);
+             $sel = implode('OR ',$gradetypeselects);
              $gradeForOutcomes = Grades::outcomeGrades($sel,$limuser);
              foreach( $gradeForOutcomes as $grades)
              {
