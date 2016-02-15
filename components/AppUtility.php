@@ -2539,11 +2539,13 @@ class AppUtility extends Component
                     echo " $show";
                 }
                 if ($showlinks) {
-                    echo '<span class="links">';
-                    echo "  <a class='modify' href='#'>", _('Modify'),"</a>| <a href='#'>", _('Delete'), "</a>";
-                    echo " | <a href=\"#\">", _('Copy'), "</a>";
-                    echo " | <a href=\"#\">", _('NewFlag'), "</a>";
-                    echo '</span>';
+                    echo '<span class="links">'; ?>
+                    <a class="modify" href="<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>">Modify</a>|
+                    <a id=" delete" href="javascript:deleteItem('<?php echo $parent . '-' . $bnum ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')">Delete</a>|
+                    <a id="copy" href="javascript:copyItem('<?php echo $parent . '-' . $bnum; ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $courseId; ?>')">Copy</a>|
+                    <a id="copy"
+                       href="<?php echo AppUtility::getURLFromHome('block', 'block/new-flag?cid=' . $courseId . '&newflag=' . $parent . '-' . $bnum) ?>">NewFlag</a>
+   <?php            echo '</span>';
                 }
                 if (count($items[$i]['items']) > 0)
                 {
