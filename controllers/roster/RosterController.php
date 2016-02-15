@@ -306,7 +306,7 @@ class RosterController extends AppController
             if ($params['section'])
             {
                 foreach ($params['section'] as $key => $section) {
-                        $code = ($params['code'][$key]);
+                        $code = intval($params['code'][$key]);
                         $codeNSection = Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseId,$params);
                     if($codeNSection->errors['section'] && $codeNSection->errors['code'])
                     {
