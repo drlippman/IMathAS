@@ -32,21 +32,23 @@ $this->params['breadcrumbs'][] = $this->title;
                 </thead>
                 <tbody>
                 <?php
-                foreach ($studentInformation as $singleStudentInformation) { ?>
+                foreach ($studentInformation as $singleStudentInformation) {
+                    ?>
                     <tr>
-                        <td><?php echo ucfirst($singleStudentInformation['Name']) ?></td>
+                        <td><?php echo trim($singleStudentInformation['LastName']) . ", " . trim($singleStudentInformation['FirstName']) ?></td>
                         <td><input class="form-control" type="text" value="<?php echo $singleStudentInformation['section'] ?>"
                                    name='section[<?php echo $singleStudentInformation['userid'] ?>]'></td>
                         <td id="staticParent"><input class="form-control" type="text" id="child" value="<?php echo $singleStudentInformation['code']   ?>"
                                    name='code[<?php echo $singleStudentInformation['userid'] ?>]'></td>
                     </tr>
-                <?php } ?>
+
+                <?php }  ?>
                 </tbody>
             </table>
             <div class="col-md-6 col-sm-6 padding-left-zero">
                 <input type="submit" class="btn btn-primary" id="change-button" value="<?php AppUtility::t('Submit') ?>">
             <span class="padding-left-one-em">
-                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid=' . $course->id) ?>"><?php AppUtility::t('Back') ?></a>
+                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster','roster/student-roster?cid=' .$course->id) ?>"><?php AppUtility::t('Back') ?></a>
             </span>
             </div>
         </form>

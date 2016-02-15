@@ -288,26 +288,16 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $courseId = $this->getParamVal('cid');
-        $query = Student::findByCid($courseId);
+        $studentArray = Student::getStudentDataForSectionNCode($courseId);
         $course = Course::getById($courseId);
-        $studentArray = array();
-        if ($query) {
-            foreach ($query as $student) {
-                $tempArray = array('Name' => ucfirst($student->user->LastName).', '.ucfirst($student->user->FirstName),
-                    'code' => $student->code,
-                    'section' => $student->section,
-                    'userid' => $student->userid
-                );
-                array_push($studentArray, $tempArray);
-            }
-        }
+
         if ($this->isPost()) {
             $params = $this->getRequestParams();
             if ($params['section'])
             {
                 foreach ($params['section'] as $key => $section) {
                         $code = intval($params['code'][$key]);
-                        $codeNSection = Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseId,$params);
+                        $codeNSection = Student::updateSectionAndCodeValue(trim($section), $key, trim($code), $courseId,$params);
                     if($codeNSection->errors['section'] && $codeNSection->errors['code'])
                     {
                         $this->setWarningFlash("Section should contain at most 40 characters and code must be no greater than 32.");

@@ -622,5 +622,14 @@ class Student extends BaseImasStudents
         return \Yii::$app->db->createCommand($query)->bindValues([':studentId' => $studentId, ':courseId' => $courseId])->queryOne();
     }
 
+    public static function getStudentDataForSectionNCode($courseId)
+    {
+        $query = "SELECT imas_students.id,imas_users.FirstName,imas_users.LastName,imas_students.section,imas_students.code ";
+        $query .= "FROM imas_students,imas_users WHERE imas_students.courseid=:courseId AND imas_students.userid=imas_users.id ";
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+        $command = \Yii::$app->db->createCommand($query)->bindValue(':courseId', $courseId);
+        return $command->queryAll();
+    }
+
 }
 
