@@ -56,10 +56,15 @@ $stu = $data['defaultValuesArray']['studentId']
         </div>
     </div>
 </div>
+
 <div class="item-detail-content">
-    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
+    <?php if($user['rights'] > 10) {
+    echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
+} elseif($user['rights'] == 10){
+    echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
+}?>
 </div>
-<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
+    <?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
 <div class="tab-content shadowBox col-md-12 col-sm-12">
 <div class="inner-content-gradebook">
 <div class="button-container col-md-12 col-sm-12 padding-zero">

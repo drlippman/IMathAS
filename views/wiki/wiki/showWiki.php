@@ -16,13 +16,22 @@ $editByDate=($wikiTotalData[0]['editbydate']);
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+                <div class="vertical-align title-page"><?php print_r($wikiTotalData[0]['name']);?></div>
             </div>
         </div>
     </div>
-<div class="tab-content shadowBox non-nav-tab-item">
 
-        <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
+
+
+<div class="tab-content shadowBox non-nav-tab-item">
+    <div class="item-detail-content">
+        <?php if($userData['rights'] > 10) {
+            echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
+        } elseif($userData['rights'] == 10){
+            echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
+        }?>
+    </div>
+    <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
         <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
 <?php
 if (isset($isTeacher) && $groupId >0 && !isset($curGroupName)) {

@@ -421,7 +421,7 @@ class WikiController extends AppController
         }
         $this->includeJS(['course/inlineText.js','editor/tiny_mce.js','editor/tiny_mce_src.js','general.js']);
         $responseData = array('wikiName' => $wikiName, 'groupId' => $groupId, 'groupName' => $groupName, 'inConflict' => $inConflict, 'wikicontent' => $revisionText, 'lastEditedBy' => $lastEditedBy,'lastEditTime' => $lastEditTime, 'courseId' => $courseId, 'id' => $id,
-        'grp' => $groupId, 'revisionId' => $revisionId, 'revisionText' => $revisionText, 'course' => $course);
+        'grp' => $groupId, 'revisionId' => $revisionId, 'revisionText' => $revisionText, 'course' => $course, 'user'=>$user);
         return $this->renderWithData('editPage', $responseData);
     }
 
@@ -441,6 +441,7 @@ class WikiController extends AppController
         $saveTitle = '';
         $teacherId = $this->isTeacher($user['id'], $courseId);
 //        $this->noValidRights($teacherId);
+//     AppUtility::dump($params);
        if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -470,7 +471,6 @@ class WikiController extends AppController
                 $eDate = date("m/d/Y",strtotime("+1 week"));
                 $eTime = time();
             }
-
             if ($params['rdatetype']=='Always') {
                 $revisedate = 2000000000;
             } else if ($params['rdatetype']=='Never') {
@@ -502,7 +502,7 @@ class WikiController extends AppController
                 'pageTitle' => 'Create Wiki',
                 'saveTitle' => 'Create Wiki',
                 'title' => "Enter Wiki Name here",
-                'description' => "Enter wiki description here (displays on course page)",
+              //  'description' => "Enter wiki description here (displays on course page)",
                 'sDate' => date("m/d/Y"),
                 'sTime' => time(),
                 'eDate' => date("m/d/Y",strtotime("+1 week")),
@@ -512,7 +512,7 @@ class WikiController extends AppController
                 'rdatetype' => date("m/d/Y",strtotime("+1 week")),
             );
         }
-
+//AppUtility::dump($defaultValues);
        if (($wiki['editbydate'])<2000000000 && ($wiki['editbydate'])>0) {
            $rdate = AppUtility::tzdate("m/d/Y",($wiki['editbydate']));
            $rtime = AppUtility::tzdate("g:i a",($wiki['editbydate']));

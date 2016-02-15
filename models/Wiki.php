@@ -27,6 +27,7 @@ class Wiki extends BaseImasWikis
 
     public function createItem($params)
     {
+//        AppUtility::dump($params);
         $this->courseid = $params['courseid'];
         $this->name = $params['title'];
         $this->description = $params['description'];

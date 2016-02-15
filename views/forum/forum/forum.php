@@ -70,7 +70,7 @@ if (count($taginfo)==0) {
     </div>
 </div>
 <div class="item-detail-content">
-    <?php if($users->rights == 100 || $users->rights == 20) {
+    <?php if($users->rights!= 10 || $users->rights == 20) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
     } elseif($users->rights == 10){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);

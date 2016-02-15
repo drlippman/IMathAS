@@ -637,7 +637,11 @@ img.small-icon{
 .title-page{
     font-size: 30px;
     color: #ffffff;
-    text-transform: capitalize;
+   /*text-transform: capitalize;*/
+}
+.subheadings{
+    font-size: 15px;
+    color: #ffffff;
 }
 .title-active-form{
     font-size: 30px;

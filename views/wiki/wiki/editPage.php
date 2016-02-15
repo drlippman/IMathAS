@@ -7,14 +7,13 @@ $this->title = $wikiName;
 <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
-<div class = "title-container">
+<div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
     </div>
 </div>
-
 <?php if ($groupId > AppConstant::NUMERIC_ZERO) {
     echo "<p>Group: $groupName</p>";
 }
@@ -27,11 +26,19 @@ if ($inConflict) {
 <?php
 }
 
-if (isset($lastEditedBy)) {
-    echo "<p>Last Edited by $lastEditedBy on $lastEditTime</p>";
-}
 
+if (isset($lastEditedBy)) {
+    echo "<p class='subheadings'>Last Edited by $lastEditedBy on $lastEditTime</p>";
+}
 ?>
+
+<div class="item-detail-content">
+    <?php if($user['rights'] > 10) {
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'course']);
+    } elseif($user['rights'] == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'course', 'userId' => $currentUser]);
+    }?>
+</div>
 
 <form method="post" action="edit-page?courseId=<?php echo $courseId ?>&wikiId=<?php echo $id?>">
     <input type="hidden" name="baserevision" value="<?php echo $revisionId;?>" />

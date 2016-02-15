@@ -5,7 +5,13 @@ use app\components\AppConstant;
 $this->title = 'Calendar';
 $this->params['breadcrumbs'][] = $this->title;
 $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+if($user['rights']!=100)
+$isTeacher= false;
+else
+$isTeacher=true;
+
 ?>
+
 <input type="hidden" class="user-rights" value="<?php echo $user['rights']?>">
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
@@ -19,7 +25,15 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     </div>
 </div>
 
-    <div class="tab-content col-md-12">
+<div class="item-detail-content">
+    <?php if($user['rights'] > 10) {
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
+    } elseif($user['rights'] == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'calendar', 'userId' => $currentUser]);
+    }?>
+</div>
+
+<div class="tab-content col-md-12">
         <div class="col-md-12 padding-alignment calendar-container">
             <?php if($user->rights == AppConstant::ADMIN_RIGHT || $user->rights >= AppConstant::TEACHER_RIGHT) {
                 ?>

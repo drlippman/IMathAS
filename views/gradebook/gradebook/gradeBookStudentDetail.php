@@ -65,7 +65,8 @@ $studentId = $studentId;
 }?>
 <?php }else{ ?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'roster/roster/student-roster?cid=' . $course->id]]); ?>
-<?php } ?>
+<?php }
+?>
 
 
 </div>
