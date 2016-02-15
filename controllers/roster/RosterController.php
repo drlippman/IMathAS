@@ -306,8 +306,22 @@ class RosterController extends AppController
             if ($params['section'])
             {
                 foreach ($params['section'] as $key => $section) {
-                        $code = $params['code'][$key];
-                    Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseId);
+                        $code = ($params['code'][$key]);
+                        $codeNSection = Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseId,$params);
+                    if($codeNSection->errors['section'] && $codeNSection->errors['code'])
+                    {
+                        $this->setWarningFlash("Section should contain at most 40 characters and code must be no greater than 32.");
+                        return $this->redirect('assign-sections-and-codes?cid='.$courseId);
+                    }else if($codeNSection->errors['code'])
+                    {
+                        $this->setWarningFlash("Code must be no greater than 32.");
+                        return $this->redirect('assign-sections-and-codes?cid='.$courseId);
+                    } else if($codeNSection->errors['section'])
+                    {
+                        $this->setWarningFlash("Section should contain at most 40 characters.");
+                        return $this->redirect('assign-sections-and-codes?cid='.$courseId);
+                    }
+
                 }
             }
             $this->redirect('student-roster?cid=' . $courseId);

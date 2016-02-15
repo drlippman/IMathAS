@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <td><?php echo ucfirst($singleStudentInformation['Name']) ?></td>
                         <td><input class="form-control" type="text" value="<?php echo $singleStudentInformation['section'] ?>"
                                    name='section[<?php echo $singleStudentInformation['userid'] ?>]'></td>
-                        <td><input class="form-control" type="text" value="<?php echo $singleStudentInformation['code'] ?>"
+                        <td id="staticParent"><input class="form-control" type="text" id="child" value="<?php echo $singleStudentInformation['code']   ?>"
                                    name='code[<?php echo $singleStudentInformation['userid'] ?>]'></td>
                     </tr>
                 <?php } ?>
@@ -52,3 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </form>
     </div>
 </div>
+<script>
+
+    $(function() {
+        $('#staticParent').on('keydown', '#child', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+    })
+</script>

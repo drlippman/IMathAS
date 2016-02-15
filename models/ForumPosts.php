@@ -14,11 +14,13 @@ class ForumPosts extends BaseImasForumPosts
 {
     public static function updatePostMoveThread($threadId, $moveThreadId)
     {
+
         $ForumPost = ForumPosts::find()->where(['id' => $threadId])->one();
         $ForumPosts = ForumPosts::findAll(['threadid' => $threadId]);
         if($ForumPosts)
         {
-            foreach($ForumPosts as $singleForum){
+            foreach($ForumPosts as $singleForum)
+            {
                 $singleForum->threadid = $moveThreadId;
                 $singleForum->save();
             }
@@ -814,5 +816,16 @@ class ForumPosts extends BaseImasForumPosts
     public static function getParentById($id)
     {
         return ForumPosts::find()->select('parent')->where(['id' => $id])->one();
+    }
+
+    public static function getDataByForumId($forumId)
+    {
+        $sortBy = AppConstant::DESCENDING;
+        return ForumPosts::find()->select(['threadid','subject'])->where(['forumid' => $forumId, 'parent' => AppConstant::NUMERIC_ZERO])->orderBy(['id' => $sortBy])->all();
+    }
+
+    public static function getDataByThreadId($threadId)
+    {
+        return ForumPosts::find()->select('id')->where(['threadid' => $threadId, 'parent' => AppConstant::NUMERIC_ZERO])->one();
     }
 }

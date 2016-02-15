@@ -261,7 +261,7 @@ $this->title = $pageTitle;
                     </span>
                 </span>
                 <span class="col-md-12 col-sm-12 padding-top-pt-five-em">
-                    <input type=radio name="sort-thread" value="1"<?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],1);?>/>
+                    <input type=radio name="sort-thread" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],1);?>/>
                     <span class="padding-left">
                         <?php AppUtility::t('Most recent reply date')?>
                     </span>

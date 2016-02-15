@@ -68,21 +68,8 @@ class Student extends BaseImasStudents
         $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
         $student->section = count($section) != 0? trim($section): 'NULL';
         $student->code = count($code) != 0?trim($code):'NULL';
-        if($params != null)
-        {
-           if($params['locked'] == AppConstant::NUMERIC_ONE) {
-               $student->locked = AppController::dateToString();
-           }
-            else{
-                $student->locked = AppConstant::NUMERIC_ZERO;
-            }
-            $student->hidefromcourselist = $params['hidefromcourselist'];
-
-            if ($params['timelimitmult'] != AppConstant::NUMERIC_ZERO) {
-                $student->timelimitmult = $params['timelimitmult'];
-            }
-        }
         $student->save();
+        return $student;
     }
 
     public static function updateLatepasses($latepass, $userid, $cid)

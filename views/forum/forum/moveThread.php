@@ -9,7 +9,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
 
-<form id="myForm" method="post" action="move-thread?forumid=<?php echo $forumId ?>&courseid=<?php echo $course->id ?>&threadid=<?php echo $threadId ?>">
+<form id="myForm" method="post" action="move-thread?forumid=<?php echo $forumId ?>&courseid=<?php echo $course->id ?>&threadid=<?php echo $threadId ?>&move=<?php echo $move?>">
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
 </div>
@@ -99,14 +99,21 @@ $now = $currentTime;
                         ?>
                         <?php
 
-                        if( $thread['forumIdData'] == $forumId && $thread['threadid'] != $threadId && $thread['parent'] == AppConstant::NUMERIC_ZERO ) { ?>
-                            <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'>
-                            <td><input type='radio' name='thread-name' id='{$thread['threadid']}' value='{$thread['threadid']}'>
-                                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span>
-                                </label>
-                                </td>"." " ."<td>{$thread['subject']}</td></div></tr>";?>
+                        if( $thread['forumIdData'] == $forumId && $thread['parent'] == AppConstant::NUMERIC_ZERO ) {
+                        echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                        <input type='radio' name='thread-name' id='{$thread['threadid']}' value='{$thread['threadid']}'>";?>
+                            <?php if($thread['threadid'] == $threadId)
+                            {
+
+                             echo "<input type='radio' name='thread-name' checked id='{$thread['threadid']}' value='{$thread['threadid']}'>";
+
+                            }
+
+                           echo "<span class='cr'><i class='cr-icon fa fa-check align-check'></i></span>
+                                </label></td>"." " ."<td>{$thread['subject']}</td></div></tr>" ;?>
                         <?php }
-                        if($thread['parent'] == 0){
+                        if($thread['parent'] == 0)
+                        {
                             $threadCount++;
                         }
                     }  ?>

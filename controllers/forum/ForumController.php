@@ -578,6 +578,8 @@ class ForumController extends AppController
 
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
+//        AppUtility::dump($postInformtion);
+
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
@@ -629,12 +631,15 @@ class ForumController extends AppController
                 $params = $this->getRequestParams();
                 $moveType = $params['movetype'];
                 $thread_Id = $params['threadid'];
-
+                $move_Id = $params['move'];
                 if ($moveType == AppConstant::NUMERIC_ONE) {
                     if (isset($params['thread-name'])) {
                         $moveThreadId = $params['thread-name'];
                         ForumPosts::updatePostMoveThread($thread_Id, $moveThreadId);
-                        Thread::deleteThreadById($thread_Id);
+                        $base = ForumPosts::getDataByThreadId($moveThreadId);
+                        if($move_Id != $base){
+                            Thread::deleteThreadById($thread_Id);
+                        }
                     }
                 } else {
                     if ($params['forum-name']) {
@@ -647,7 +652,7 @@ class ForumController extends AppController
             }
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/movethread.js']);
-            $responseData = array('forums' => $forumArray, 'threads' => $threadArray, 'threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'user' => $user, 'parent' => $parent);
+            $responseData = array('forums' => $forumArray, 'threads' => $threadArray, 'threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'user' => $user, 'parent' => $parent, 'move' => $move);
             return $this->renderWithData('moveThread', $responseData);
         }
     }
@@ -1936,6 +1941,7 @@ class ForumController extends AppController
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['forumtype'] = $params['forum-type'];
                 $finalArray['caltag'] = $params['calendar-icon-text1'] . '--' . $params['calendar-icon-text2'];
+                $finalArray['sortby'] = $params['sort-thread'];
                 $tagList = '';
                 if ($params['categorize-posts'] == AppConstant::NUMERIC_ONE) {
                     $tagList = trim($params['taglist']);
