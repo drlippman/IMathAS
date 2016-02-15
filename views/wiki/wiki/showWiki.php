@@ -96,8 +96,7 @@ if (isset($delAll) && $isTeacher) {
                 <a id="revrevert" style="display:none;" href="#"><?php AppUtility::t('Revert to this revision')?></a>
            <?php }
             echo '</div>';
-        }
-        ?>
+        }?>
     <div class="editor" style="margin-right: 20px; margin-left: 20px">
         <?php if ($isTeacher || ($editByDate>0 && $editByDate > time())){?>
         <span>

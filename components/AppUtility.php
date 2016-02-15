@@ -2471,7 +2471,6 @@ class AppUtility extends Component
                  * is a block
                  * */
                 $items[$i]['name'] = ($items[$i]['name']);
-//                AppUtility::dump($items);
                 if ($items[$i]['startdate'] == AppConstant::NUMERIC_ZERO) {
                     $startdate = _('Always');
                 } else {

@@ -441,7 +441,7 @@ class WikiController extends AppController
         $saveTitle = '';
         $teacherId = $this->isTeacher($user['id'], $courseId);
 //        $this->noValidRights($teacherId);
-        if (isset($params['tb'])) {
+       if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
             $filter = 'b';
@@ -470,6 +470,7 @@ class WikiController extends AppController
                 $eDate = date("m/d/Y",strtotime("+1 week"));
                 $eTime = time();
             }
+
             if ($params['rdatetype']=='Always') {
                 $revisedate = 2000000000;
             } else if ($params['rdatetype']=='Never') {
@@ -511,21 +512,20 @@ class WikiController extends AppController
                 'rdatetype' => date("m/d/Y",strtotime("+1 week")),
             );
         }
-       if ($revisedate<2000000000 && $revisedate>0) {
-           $rdate = AppUtility::tzdate("m/d/Y",$revisedate);
-           $rtime = AppUtility::tzdate("g:i a",$revisedate);
+
+       if (($wiki['editbydate'])<2000000000 && ($wiki['editbydate'])>0) {
+           $rdate = AppUtility::tzdate("m/d/Y",($wiki['editbydate']));
+           $rtime = AppUtility::tzdate("g:i a",($wiki['editbydate']));
        } else {
            $rdate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
            $rtime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
        }
-
-       $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
+        $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
         $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
         $page_formActionTag .= "&tb=$filter";
 
        if ($this->isPost()) {
            if ($wikiid) {
-//               AppUtility::dump(strtotime($params['rdate']));
                $link = new Wiki();
                if($params['rdatetype']=="Always"){
                    $params['rdatetype']= $revisedate;
@@ -533,9 +533,10 @@ class WikiController extends AppController
                elseif($params['rdatetype']=="Never"){
                    $params['rdatetype']=$revisedate;
                }elseif($params['rdatetype']=="Date"){
-                 $params['rdatetype']= strtotime($params['rdate']);
+                 $params['rdatetype']= Apputility::parsedatetime($params['rdate'],$params['rtime']);
                }
-               $link->updateChange($params, $courseId);
+
+              $link->updateChange($params, $courseId);
               return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             } else{
                if ($params['avail']== AppConstant::NUMERIC_ONE) {
@@ -562,15 +563,13 @@ class WikiController extends AppController
                     $startDate = AppConstant::NUMERIC_ZERO;
                     $endDate =  AppConstant::ALWAYS_TIME;
                 }
-
                if ($params['rdatetype'] == 'Always') {
                    $canEdit=2000000000;
                }else if($params['rdatetype'] == 'Never'){
                    $canEdit=0;
                }else{
-                   $canEdit=strtotime($params['rdate']);
+                   $canEdit=Apputility::parsedatetime($params['rdate'],$params['rtime']);
                }
-
                 $finalArray['courseid'] = $params['cid'];
                 $finalArray['title'] = $params['name'];
                 $finalArray['description'] = $params['description'];
@@ -602,6 +601,7 @@ class WikiController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             }
         }
+
        $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime);
