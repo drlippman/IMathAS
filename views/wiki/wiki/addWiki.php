@@ -159,6 +159,7 @@ if ($started) {
 } else {
     AppUtility::writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
 }
+$revisedate=$wiki['editbydate'];
 ?>
         </div>
     </div>

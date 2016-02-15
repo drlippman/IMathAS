@@ -99,7 +99,7 @@ if (isset($delAll) && $isTeacher) {
         }
         ?>
     <div class="editor" style="margin-right: 20px; margin-left: 20px">
-        <?php if ($isTeacher || $editByDate>0){?>
+        <?php if ($isTeacher || ($editByDate>0 && $editByDate > time())){?>
         <span>
             <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
                class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a>
@@ -111,7 +111,7 @@ if (isset($delAll) && $isTeacher) {
 
             foreach($wikiRevisionData as $key => $singleWikiRevision) {
                 ?>
-                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px;'>
+                <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; overflow: auto'>
                     <?php
                         echo filter($text); ?>
                 </div></div>

@@ -292,7 +292,6 @@ class WikiController extends AppController
             $row = ($result);
             $wikiName = $row['name'];
             $now = time();
-
             if (!($isTeacher) && ($row['avail'] == 0 || ($row['avail'] == 1 && ($now < $row['startdate'] || $now > $row['enddate'])) || $now > $row['editbydate']))
             {
                 $overWriteBody = AppConstant::NUMERIC_ONE;
@@ -478,6 +477,7 @@ class WikiController extends AppController
             } else {
                 $revisedate = AppUtility::tzdate($params['rdate'],$params['rtime']);
             }
+
             $saveTitle = "Modify Wiki";
             $saveButtonTitle = "Save Changes";
             $defaultValues = array(
@@ -518,12 +518,14 @@ class WikiController extends AppController
            $rdate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
            $rtime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
        }
+
        $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
         $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
         $page_formActionTag .= "&tb=$filter";
 
        if ($this->isPost()) {
            if ($wikiid) {
+//               AppUtility::dump(strtotime($params['rdate']));
                $link = new Wiki();
                if($params['rdatetype']=="Always"){
                    $params['rdatetype']= $revisedate;
@@ -531,10 +533,10 @@ class WikiController extends AppController
                elseif($params['rdatetype']=="Never"){
                    $params['rdatetype']=$revisedate;
                }elseif($params['rdatetype']=="Date"){
-                 $params['rdatetype']=AppUtility::tzdate($params['rdate'],$params['rtime']);
+                 $params['rdatetype']= strtotime($params['rdate']);
                }
                $link->updateChange($params, $courseId);
-                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
+              return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             } else{
                if ($params['avail']== AppConstant::NUMERIC_ONE) {
                     if ($params['available-after'] == '0') {
@@ -560,13 +562,15 @@ class WikiController extends AppController
                     $startDate = AppConstant::NUMERIC_ZERO;
                     $endDate =  AppConstant::ALWAYS_TIME;
                 }
+
                if ($params['rdatetype'] == 'Always') {
                    $canEdit=2000000000;
                }else if($params['rdatetype'] == 'Never'){
                    $canEdit=0;
                }else{
-                   $canEdit=$params['rdate'];
+                   $canEdit=strtotime($params['rdate']);
                }
+
                 $finalArray['courseid'] = $params['cid'];
                 $finalArray['title'] = $params['name'];
                 $finalArray['description'] = $params['description'];
@@ -598,7 +602,7 @@ class WikiController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             }
         }
-        $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+       $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime);
        return $this->render('addWiki', $returnData);
