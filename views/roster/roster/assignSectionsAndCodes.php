@@ -39,10 +39,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <td><input class="form-control" type="text" value="<?php echo $singleStudentInformation['section'] ?>"
                                    name='section[<?php echo $singleStudentInformation['userid'] ?>]'></td>
                         <td class="staticParent"><input class="form-control" type="text" id="child" value="<?php echo $singleStudentInformation['code']   ?>"
-                                   name='code[<?php echo $singleStudentInformation['userid'] ?>]'>
+                                   name='code[<?php echo $singleStudentInformation['userid'] ?>]' maxlength="10">
                         </td>
                     </tr>
-
                 <?php }  ?>
                 </tbody>
             </table>
