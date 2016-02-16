@@ -11,7 +11,7 @@ $editByDate=($wikiTotalData[0]['editbydate']);
     <style type="text/css">
         a.grayout {color: #ccc; cursor: default;}  del {color: #f99; text-decoration:none;} ins {color: #6f6; text-decoration:none;} .wikicontent {padding: 10px;}</style>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title'=>['Home',$course->name,'View Wiki'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title'=>['Home',$course->name,""], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
     <div class = "title-container">
         <div class="row">
@@ -34,7 +34,11 @@ $editByDate=($wikiTotalData[0]['editbydate']);
     <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
         <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
 <?php
-if (isset($isTeacher) && $groupId >0 && !isset($curGroupName)) {
+
+if($overWriteBody==1){
+    echo '<p>'.$Body;
+}else{
+if ($isTeacher && $groupId >0 && isset($curGroupName)) {
     $grpnote = $groupNote;
 } else {
     $grpnote = 'this';
@@ -124,7 +128,8 @@ if (isset($delAll) && $isTeacher) {
                         echo filter($text); ?>
                 </div></div>
             <?php }?>
-        <?php }?>
+        <?php }
+        echo $GroupMembers?>
     </div>
     </div>
     <script>
@@ -401,4 +406,5 @@ if (isset($delAll) && $isTeacher) {
         }
     }
     </script>
-<?php } ?>
+<?php }
+}?>

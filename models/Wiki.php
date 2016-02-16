@@ -27,7 +27,6 @@ class Wiki extends BaseImasWikis
 
     public function createItem($params)
     {
-//        AppUtility::dump($params);
         $this->courseid = $params['courseid'];
         $this->name = $params['title'];
         $this->description = $params['description'];
@@ -35,6 +34,7 @@ class Wiki extends BaseImasWikis
         $this->startdate = $params['startdate'];
         $this->enddate = $params['enddate'];
         $this->editbydate=$params['editbydate'];
+        $this->groupsetid=$params['groupsetid'];
         $this->save();
         return $this->id;
     }
@@ -49,6 +49,7 @@ class Wiki extends BaseImasWikis
         $updateWiki->description = $params['description'];
         $updateWiki->avail = $params['avail'];
         $updateWiki->editbydate=$params['rdatetype'];
+        $updateWiki->groupsetid=$params['ignoregroupsetid'];
         if ($params['avail'] == AppConstant::NUMERIC_ONE) {
             if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
                 $startDate = AppConstant::NUMERIC_ZERO;

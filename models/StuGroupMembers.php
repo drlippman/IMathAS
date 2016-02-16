@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
 use Yii;
 use app\models\_base\BaseImasStugroupmembers;
 use yii\db\Query;
@@ -98,9 +99,10 @@ class StuGroupMembers extends BaseImasStugroupmembers
         $query = new Query();
         $query->select(['i_u.LastName','i_u.FirstName'])
             ->from(['imas_stugroupmembers AS i_sg','imas_users AS i_u'])
-            ->where(['i_u.id=i_sg.userid']);
-        $query->andWhere('i_sg.stugroupid= :groupId');
-        $command = $query->createCommand()->bindValue('groupId', $groupId);
+            ->where('i_u.id=i_sg.userid');
+        $query->andWhere('i_sg.stugroupid=:groupId');
+        $command = $query->createCommand();
+        $command->bindValue(':groupId', $groupId);
         $data = $command->queryAll();
         return $data;
     }

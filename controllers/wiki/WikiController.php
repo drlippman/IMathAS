@@ -123,7 +123,8 @@ class WikiController extends AppController
                 /**
                  * if is group wiki, get groupid or fail
                  */
-                if ($row['groupsetid'] > AppConstant::NUMERIC_ZERO && !isset($isTeacher)) {
+
+                if ($row['groupsetid'] > AppConstant::NUMERIC_ZERO && !($isTeacher)) {
                     $isGroup = true;
                     $groupSetId = $row['groupsetid'];
                     $groupResult = Stugroups::getStuGrpId($userId, $groupSetId);
@@ -154,7 +155,6 @@ class WikiController extends AppController
                     }
                     $i = AppConstant::NUMERIC_ONE;
                     $studGrpResult = Stugroups::getByGrpSetOrderByName($groupSetId);
-
                     foreach($studGrpResult as $key => $row)
                     {
                         $stugroup_ids[$i] = $row['id'];
@@ -178,7 +178,6 @@ class WikiController extends AppController
                 } else {
                     $groupId = AppConstant::NUMERIC_ZERO;
                 }
-
                 if ($groupId > AppConstant::NUMERIC_ZERO) {
                     $grpmem = '<p>Group Members: <ul class="nomark">';
                     $studGrpMemResult = StuGroupMembers::getStudAndUserData($groupId);
@@ -228,7 +227,7 @@ class WikiController extends AppController
         }
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
-            'canEdit' => $canEdit, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev);
+            'canEdit' => $canEdit,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem,'' );
         return $this->renderWithData('showWiki', $responseData);
     }
 
@@ -441,7 +440,6 @@ class WikiController extends AppController
         $saveTitle = '';
         $teacherId = $this->isTeacher($user['id'], $courseId);
 //        $this->noValidRights($teacherId);
-//     AppUtility::dump($params);
        if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -478,6 +476,14 @@ class WikiController extends AppController
             } else {
                 $revisedate = AppUtility::tzdate($params['rdate'],$params['rtime']);
             }
+            if(count($wiki)>0)
+                $started=true;
+            else
+                $started=false;
+
+            $page_groupSelect=array();
+            $page_groupSelect['val'][0]=$groupNames[0]['id'];
+            $page_groupSelect['label'][0]="Use group set: ".$groupNames[0]['name'];
 
             $saveTitle = "Modify Wiki";
             $saveButtonTitle = "Save Changes";
@@ -512,7 +518,6 @@ class WikiController extends AppController
                 'rdatetype' => date("m/d/Y",strtotime("+1 week")),
             );
         }
-//AppUtility::dump($defaultValues);
        if (($wiki['editbydate'])<2000000000 && ($wiki['editbydate'])>0) {
            $rdate = AppUtility::tzdate("m/d/Y",($wiki['editbydate']));
            $rtime = AppUtility::tzdate("g:i a",($wiki['editbydate']));
@@ -535,7 +540,6 @@ class WikiController extends AppController
                }elseif($params['rdatetype']=="Date"){
                  $params['rdatetype']= Apputility::parsedatetime($params['rdate'],$params['rtime']);
                }
-
               $link->updateChange($params, $courseId);
               return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             } else{
@@ -577,6 +581,7 @@ class WikiController extends AppController
                 $finalArray['startdate'] = $startDate;
                 $finalArray['enddate'] = $endDate;
                 $finalArray['editbydate']=$canEdit;
+                $finalArray['groupsetid']=$params['groupsetid'];
                 $saveChanges = new Wiki();
                 $lastWikiId = $saveChanges->createItem($finalArray);
                 $saveItems = new Items();
@@ -601,10 +606,10 @@ class WikiController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             }
         }
-
        $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
-        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime,'started' => $started,
+                'page_groupSelect'=>$page_groupSelect);
        return $this->render('addWiki', $returnData);
     }
 

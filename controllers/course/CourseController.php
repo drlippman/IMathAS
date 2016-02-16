@@ -1784,8 +1784,7 @@ class CourseController extends AppController
                     $hasStats[$row['typeid']] = true;
                 }
             }
-
-            if (count($items) > 0) {
+        if (count($items) > 0) {
                 /*
                  * update block start/end dates to show blocks containing items with exceptions
                  */
@@ -1793,7 +1792,7 @@ class CourseController extends AppController
                 $showItems->showItems($items,$folder);
             } else if ($teacherId) {
                 $courseData = new ShowItemCourse();
-                echo $courseData->generateAddItem($folder,'b');
+                echo $courseData->generateAddItem($folder,'b',1);
          }
 //            if ($firstLoad) {
 //                echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;</script>\n";

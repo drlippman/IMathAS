@@ -1680,7 +1680,8 @@ class ShowItemCourse extends Component
     }
 
     public static function generateAddItem($blk,$tb,$studview)
-    { ?>
+    {
+        ?>
         <?php if(!$studview){?>
         <div class="row add-item" onclick="getAddItem('<?php echo $blk?>', '<?php echo $tb?>')">
             <div class="col-md-1 col-sm-1 plus-icon">
