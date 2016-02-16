@@ -174,6 +174,11 @@ function calendar() {
                      */
                     jQuery.each(assessmentData.calendarLinkArray, function (index, calendarLinkItem) {
                         var eventColor = '#59FF59';
+                        if(calendarLinkItem.endDateString < now && calendarLinkItem.startDateString < now)
+                        {
+                            eventColor = 'grey';
+                        }
+
                         if(calendarLinkItem.oncal == 2 && calendarLinkItem.avail == 1) {
                             if(calendarLinkItem.notStudent == true)
                             {
@@ -295,6 +300,10 @@ function calendar() {
                      */
                     jQuery.each(assessmentData.calendarInlineTextArray, function (index, calendarInlineTextItem) {
                         var eventColor = '#FF6666';
+                        if(calendarInlineTextItem.endDateString < now && calendarInlineTextItem.startDateString < now)
+                        {
+                            eventColor = 'grey';
+                        }
                         if(calendarInlineTextItem.oncal == 2 && calendarInlineTextItem.avail == 1){
                                 if(calendarInlineTextItem.notStudent == true)
                                 {
@@ -334,7 +343,6 @@ function calendar() {
                                         calInlineTextOncal: true
                                     });
                                 }
-
                         } else if(calendarInlineTextItem.oncal == 1 && calendarInlineTextItem.avail == 1){
                             if(calendarInlineTextItem.notStudent == true)
                             {
@@ -402,6 +410,7 @@ function calendar() {
                                 });
                             }
                         }
+
                     });
                     jQuery(".day-details").empty();
                     jQuery(".day-details").append("<div class='day-details'> " +moment.format('dddd MMMM DD, YYYY')+ "</div>");
@@ -877,6 +886,10 @@ function ShowAll() {
              */
             jQuery.each(assessmentData.calendarInlineTextArray, function (index, calendarInlineTextItem) {
                 var eventColor = '#FF6666';
+                if(calendarInlineTextItem.endDateString < now && calendarInlineTextItem.startDateString < now)
+                {
+                    eventColor = 'grey';
+                }
                 if(calendarInlineTextItem.oncal == 2 && calendarInlineTextItem.avail == 1){
                     if(calendarInlineTextItem.notStudent == true)
                     {
@@ -916,7 +929,6 @@ function ShowAll() {
                             calInlineTextOncal: true
                         });
                     }
-
                 } else if(calendarInlineTextItem.oncal == 1 && calendarInlineTextItem.avail == 1){
                     if(calendarInlineTextItem.notStudent == true)
                     {
