@@ -52,6 +52,9 @@ function calculate(inputId,outputId,format) {
 		  try {
 			  var evalstr = str;
 			  evalstr = evalstr.replace(',','*NaN*'); //force eval error on lingering commas
+			  if (evalstr.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
+			  	evalstr = evalstr.replace(/%/,'') + '/100';  
+			  }
 			  if (format.indexOf('mixed')!=-1) {
 				  evalstr = evalstr.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 			  }
@@ -797,6 +800,9 @@ function syntaxcheckexpr(str,format,vl) {
 	  if (str.match(/\|/)) {
 		  err += _(" Use abs(x) instead of |x| for absolute values")+". ";
 	  }
+	  if (str.match(/%/) && !str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {
+	  	  err += _(" Do not use the percent symbol, %")+". ";
+	  }
 	  return err;
 }
 
@@ -927,6 +933,9 @@ function doonsubmit(form,type2,skipconfirm) {
 			//str = str.replace(/,/g,"");
 			if (calcformat[qn].indexOf('scinot')!=-1) {
 				str = str.replace(/(x|X|\u00D7)/,"*");
+			}
+			if (str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
+				str = str.replace(/%/,'') + '/100';  
 			}
 			str = str.replace(/(\d+)\s*_\s*(\d+\s*\/\s*\d+)/,"($1+$2)");
 			if (calcformat[qn].indexOf('mixed')!=-1) {
