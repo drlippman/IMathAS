@@ -2340,7 +2340,6 @@ class CourseController extends AppController
                 $itemOrder =  serialize($itemsforblock);
                 $query = new Course();
                 $query->setItemOrder($itemOrder, $courseId);
-                echo('hfghgghhf');
             }
         }
         $query = Course::getItemOrder($courseId);

@@ -399,7 +399,7 @@ $this->title = $defaultValues['saveTitle'];
             <div class="col-md-12 col-sm-12 margin-left-thirty-five padding-top-twenty padding-bottom-twenty">
                 <?php AppUtility::t('With tag') ?>
                 <span class="padding-left-five">
-                    <input class="form-control display-inline-block width-five-per" type="text" size="3" value=<?php echo $defaultValues['caltag'];?> name="tag-always">
+                    <input class="form-control display-inline-block width-five-per" type="text" size="3" maxlength="20" value=<?php echo $defaultValues['caltag'];?> name="tag-always">
                 </span>
             </div>
 

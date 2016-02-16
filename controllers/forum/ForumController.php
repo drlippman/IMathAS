@@ -2494,4 +2494,5 @@ class ForumController extends AppController
         }
         header('Content-type: application/json');
         echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.',"icon":"'.$icon.'"}';
-    }}
+    }
+}
