@@ -76,13 +76,19 @@ class GroupsController extends AppController
                 }
                 $query = new Stugroups();
                 $insertId = $query->insertStuGrpName($grpSetId,$newGrpName);
+
+                if($insertId->errors['name'])
+                {
+                    $this->setWarningFlash('Group name should contain at most 50 characters.');
+                    return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addGrp=true');
+                }
                 if(!isset($stuToAdd))
                 {
                     return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
 
                 }else
                 {
-                    $addToGrpId = $insertId;
+                    $addToGrpId = $insertId['id'];
                     $addStuToGrp = true;
                 }
             }

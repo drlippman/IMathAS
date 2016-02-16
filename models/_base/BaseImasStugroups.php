@@ -33,7 +33,7 @@ class BaseImasStugroups extends \yii\db\ActiveRecord
         return [
             [['groupsetid', 'name'], 'required'],
             [['groupsetid'], 'integer'],
-            [['name'], 'string', 'max' => 254]
+            [['name'], 'string', 'max' => 50]
         ];
     }
 

@@ -84,7 +84,7 @@ class Stugroups extends BaseImasStugroups
         $this->groupsetid = $grpSetId;
         $this->name = $newGrpName;
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function getByGrpSetId($groupsetId)

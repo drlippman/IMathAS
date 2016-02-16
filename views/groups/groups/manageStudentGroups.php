@@ -57,22 +57,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
                     <span class="floatleft padding-top-pt-five-em">New group set name</span>
                 <span class="col-md-4 col-sm-4 padding-left-one-pt-five-em">
-                    <input class="form-control-grp" name="grpsetname" type="text" maxlength="60" size="40"/>
+                    <input class="form-control-grp" name="grpsetname" type="text" maxlength="50" size="40"/>
                 </span>
                 </div>
                 <div class="margin-left-groups">
                     <div class="col-md-12 col-sm-12 padding-top-one-pt-five-em">
                         <input type="submit" value="Create" />
-                        <span class="padding-left-pt-five-em"><input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></span>
+                        <span class="padding-left-pt-five-em"><input type=button value="Cancel" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></span>
                     </div>
                 </div>
             </form>
         <?php }elseif(isset($renameGrpSet)){?>
             <h4>Rename student group set</h4>
             <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&renameGrpSet='.$renameGrpSet)?>">
-                <p>New group set name: <input class="form-control-grp" name="grpsetname" type="text" value="<?php echo $grpSetName['name'];?>"  maxlength="60"/></p>
+                <p>New group set name: <input class="form-control-grp" name="grpsetname" type="text" value="<?php echo $grpSetName['name'];?>"  maxlength="50"/></p>
                 <p><input style="margin-left: 20.2%" type="submit" value="Rename" />
-                    <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p>
+                    <input type=button value="Cancel" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p>
             </form>
         <?php }elseif(isset($deleteGrpSet)){?>
         <?php }elseif(isset($renameGrp)){?>
@@ -87,14 +87,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-6 col-sm-6 padding-left-zero padding-top-one-pt-five-em">
                     <input type="submit" value="Rename" />
                     <span class="padding-left-pt-five-em">
-                        <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId'.$grpSetId)?>'" />
+                        <input type=button value="Cancel" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId'.$grpSetId)?>'" />
                     </span>
                 </div>
             </form>
         <?php }elseif(isset($deleteGrp)){?>
             <form id="deleteGrp" method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&deleteGrp='.$deleteGrp.'&confirm=true')?>" >
                 <p><input type="submit" value="Yes, Delete">
-                    <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
+                    <input type=button value="Cancel" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
             </form>
         <?php }elseif(isset($addGrp)){?>
             <h4>Add new student group</h4>
@@ -112,7 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-6 col-sm-6 padding-left-zero padding-top-one-pt-five-em">
                     <input type="submit" value="Create" />
                     <span class="padding-left-pt-five-em">
-                        <input type=button value='Nevermind' class='' onClick='window.location="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>"' />
+                        <input type=button value='Cancel' class='' onClick='window.location="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>"' />
                     </span>
                 </div>
             </form>
@@ -134,9 +134,9 @@ $this->params['breadcrumbs'][] = $this->title;
             {
                 echo "<br><b>Group</b>
                  <div class='word-break-all-width'>$grpName&nbsp;&nbsp;</div>";
-                echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
-                echo "[<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>Delete</a>]";
-                echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]";
+                echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>]   ";
+                echo "[<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>Delete</a>]  ";
+                echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]   ";
                 echo '<ul>';
                 if (count($page_GrpMembers[$grpId]) == 0)
                 {
@@ -220,13 +220,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '<table><tbody><tr>';
                         foreach ($page_groupSets as $gs)
                         {
-                            echo "<div class='col-sm-12 col-md-12'><td class='col-sm-8 col-md-8 word-break-break-all'><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td><td class='small col-sm-4 col-md-4'></div>";
+                            echo "<div class='col-sm-12 col-md-12'>
+                            <td class='col-sm-6 col-md-6 word-break-break-all'><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td>
+                            <td class='col-sm-6 col-md-6'>";
                             echo "<a href='manage-student-groups?cid=$course->id&renameGrpSet={$gs['id']}'>Rename</a> | ";
                             echo "<a href='manage-student-groups?cid=$course->id&copyGrpSet={$gs['id']}'>Copy</a> | ";
                             $deleteGrpSet = $gs['id'];
                             $nameGrpSet = $gs['id'];
                             echo "<a href='javascript:deleteGrpSet($course->id,$deleteGrpSet,$nameGrpSet)'>Delete</a>";
-                            echo '</td></tr>';
+                            echo '</td>
+                            </div></tr>';
                         }
                         echo '</body></table>';
                     }
@@ -297,10 +300,10 @@ function deleteResponseSuccess(response)
     if(response.status == 0)
     {
         var message ='';
-        message+='Are you SURE you want to delete the set of student groups <b>'+deleteGrpName+'</b> and all the groups contained within it?';
+        message+='Are you SURE you want to delete the set of student groups <b>'+deleteGrpName+'</b> and <br>all the groups contained within it?';
         if(used !='')
         {
-            message+='This set of groups is currently used in the assessments, wikis, and/or forums below.  These items will be set to non-group if this group set is deleted';
+            message+='This set of groups is currently used in the assessments, wikis, and/or forums below.<br>These items will be set to non-group if this group set is deleted';
             message+=''+used+'';
         }
         else
@@ -310,11 +313,11 @@ function deleteResponseSuccess(response)
         var html = '<div><p>'+message+'</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Delete student group set', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto', resizable: false,draggable:false,
             closeText: "hide",
             buttons:
             {
-                "Nevermind": function ()
+                "Cancel": function ()
                 {
                     $(this).dialog('destroy').remove();
                     return false;
@@ -353,17 +356,17 @@ function deleteGrpResponseSuccess(response)
     {
         var message ='';
         message+='Are you SURE you want to delete the student group<b>'+currGrpNameToDlt+'</b>?';
-        message+='<p>Any wiki page content for this group will be deleted.</p>';
+        message+='<br><p>Any wiki page content for this group will be deleted.</p>';
         message+='<span id="post-type-radio-list"><input type="radio" name="delpost" value="1" checked="checked"/> Delete group forum posts&nbsp;';
         message+='<input type="radio" name="delpost" value="0" /> Make group forum posts non-group-specific posts</span>';
         var html = '<div>'+message+'</div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Delete student group', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto', resizable: false,draggable:false,
             closeText: "hide",
             buttons:
             {
-                "Nevermind": function ()
+                "Cancel": function ()
                 {
                     $(this).dialog('destroy').remove();
                     return false;
@@ -420,11 +423,11 @@ function removeResponseSuccess(response)
         var html = '<div><p>'+message+'</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Remove ALL group members', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto', resizable: false ,draggable:false,
             closeText: "hide",
             buttons:
             {
-                "Nevermind": function ()
+                "Cancel": function ()
                 {
                     $(this).dialog('destroy').remove();
                     return false;
@@ -468,11 +471,11 @@ function removeResponseSuccessAjax(response)
         var html = '<div><p>'+message+'</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Remove group member', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto', resizable: false,draggable:false,
             closeText: "hide",
             buttons:
             {
-                "Nevermind": function ()
+                "Cancel": function ()
                 {
                     $(this).dialog('destroy').remove();
                     return false;
