@@ -571,7 +571,7 @@ function calendar() {
                         var date = selectedDate.start;
                         var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' style='outline: none' src=''/>";
                         var tag = selectedDate.title;
-                        jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+"<b>"+tag+"</b><br>"+title+"<p style='padding-left: 36px'>"+date+"</p></div>");
+                        jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+"<b>"+tag+"</b><br>"+title+"<br><p style='padding-left: 36px'>"+date+"</p></div>");
                     } else if(selectedDate.reviewMode == true){
                         var dateH = "Review until <b>" +selectedDate.reviewDat+"</b>";
                         var reviewMode= "<p style='margin-left:35px!important;padding-top: 0'>This assessment is in review mode - no scores will be saved</p>";
@@ -1128,7 +1128,7 @@ function ShowAll() {
                 var date = dateEvent.start;
                 var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' style='outline: none' src=''/>";
                 var tag = dateEvent.title;
-                jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br><b>"+tag+"</b><p style='padding-left: 36px'></p></div>");
+                jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br><b>"+tag+"</b><br/><p style='padding-left: 36px'>"+date+"</p></div>");
             } else if(dateEvent.reviewMode == true){
                 var dateH = "Review until <b>" +dateEvent.reviewDat+"</b>";
                 var reviewMode= "<p style='margin-left:35px!important;padding-top: 0'>This assessment is in review mode - no scores will be saved</p>";
@@ -1331,7 +1331,7 @@ function displayCalEvents(events) {
                 var date = dateEvent.start;
                 var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' style='outline: none' src=''/>";
                 var tag = dateEvent.title;
-                jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br><b>"+tag+"</b><p style='padding-left: 36px'>"+date+"</p></div>");
+                jQuery(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+title+"<br><b>"+tag+"</b><br/><p style='padding-left: 36px'>"+date+"</p></div>");
             } else if(dateEvent.reviewMode == true){
                 var dateH = "Review until <b>" +dateEvent.reviewDat+"</b>";
                 var reviewMode= "<p style='margin-left:35px!important;padding-top: 0'>This assessment is in review mode - no scores will be saved</p>";

@@ -226,6 +226,40 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                             </div>
                         </div>
+                <div id="altcaldiv" style="display:<?php echo ($line['avail']==2)?"block":"none"; ?>">
+                    <div class="col-md-2 col-sm-2">Place on Calendar?</div>
+             <div class="col-md-10 col-sm-10 padding-left-zero">
+                 <div class="col-md-12 col-sm-12"><input type=radio name="altoncal" value="0" <?php AppUtility::writeHtmlChecked($altoncal,0); ?> />
+                     <span class="padding-left-fifteen">
+                    <?php AppUtility::t('No') ?>
+                </span></div>
+                 <div class='col-md-12 col-sm-12 padding-top-fifteen'>
+                     <label class="pull-left">
+			<input type=radio name="altoncal" value="1" <?php AppUtility::writeHtmlChecked($altoncal,1); ?> /></label>
+                     <span class="pull-left padding-left-twenty">
+                        <?php AppUtility::t('Yes, on') ?>
+                </span>
+
+            <?php
+            echo '<div class = "time-input pull-left col-md-4">';
+            echo DatePicker::widget([
+                'name' => 'cdate',
+                'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                'value' => $sdate,
+                'removeButton' => false,
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'mm/dd/yyyy']
+            ]);
+            echo '</div>'; ?>
+                     <div class="col-md-12 col-sm-12 padding-top-twenty padding-bottom-twenty">
+                         <?php AppUtility::t('With tag') ?>
+                         <span class="padding-left-five">
+                    <input class="form-control display-inline-block width-five-per" type="text" size="3" maxlength="20" value=<?php echo $line['caltag'];?> name="altcaltag">
+                </span>
+                     </div>
+		</div>
+                </div></div>
                         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
                             <?php if (count($outcome) > 0) { ?>
                                 <span class="col-md-2 col-sm-3 padding-top-pt-five-em"><?php AppUtility::t('Associate Outcomes')?></span>
