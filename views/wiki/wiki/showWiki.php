@@ -11,7 +11,7 @@ $editByDate=($wikiTotalData[0]['editbydate']);
     <style type="text/css">
         a.grayout {color: #ccc; cursor: default;}  del {color: #f99; text-decoration:none;} ins {color: #6f6; text-decoration:none;} .wikicontent {padding: 10px;}</style>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title'=>['Home',$course->name,'View Wiki'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
     <div class = "title-container">
         <div class="row">
@@ -26,9 +26,9 @@ $editByDate=($wikiTotalData[0]['editbydate']);
 <div class="tab-content shadowBox non-nav-tab-item">
     <div class="item-detail-content">
         <?php if($userData['rights'] > 10) {
-            echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
+            echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'course']);
         } elseif($userData['rights'] == 10){
-            echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
+            echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'course', 'userId' => $currentUser]);
         }?>
     </div>
     <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">

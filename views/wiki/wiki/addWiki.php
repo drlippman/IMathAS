@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <span class="col-md-2 col-sm-2 padding-left-zero">
                     <label class="non-bold">
-                        <input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],0);?>/>
+                        <input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],0);?>onclick="document.getElementById('datediv').style.display='none';"/>
                         <span class='padding-left'><?php AppUtility::t('Hide')?></span>
                     </label>
                 </span>

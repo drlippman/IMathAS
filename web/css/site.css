@@ -386,7 +386,7 @@ a:focus {
     color: #fff;
     background-color: #428bca;
     border-color: #2C368E;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
 
 }
 .breadcrumb > li + li:before {
@@ -625,7 +625,7 @@ img.small-icon{
     background-color: #104E87;
     border-color: #104E87;
     border-radius: 0px;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
     background-color: #104E88;
@@ -660,7 +660,7 @@ img.small-icon{
 .btn.btn-primary.page-settings{
     color: #FFF;
     background-color: #104E87;
-    text-transform: capitalize;
+    /*text-transform: capitalize;*/
 }
 .input-group-addon {
     padding: 6px 12px;
