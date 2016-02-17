@@ -40,7 +40,7 @@ if (isset($lastEditedBy)) {
     }?>
 </div>
 
-<form method="post" action="edit-page?courseId=<?php echo $courseId ?>&wikiId=<?php echo $id?>">
+<form method="post" action="edit-page?courseId=<?php echo $courseId ?>&wikiId=<?php echo $id?>&grp=<?php echo $groupId?>">
     <input type="hidden" name="baserevision" value="<?php echo $revisionId;?>" />
     <div class="editor">
         <textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">

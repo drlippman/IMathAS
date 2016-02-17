@@ -153,7 +153,7 @@ class WikiController extends AppController
                             $hasNew[$row['stugroupid']] = AppConstant::NUMERIC_ONE;
                         }
                     }
-                    $i = AppConstant::NUMERIC_ONE;
+                    $i = AppConstant::NUMERIC_ZERO;
                     $studGrpResult = Stugroups::getByGrpSetOrderByName($groupSetId);
                     foreach($studGrpResult as $key => $row)
                     {
@@ -225,9 +225,10 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
+//        AppUtility::dump($wikiRevisionData);
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
-            'canEdit' => $canEdit,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem,'' );
+                'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);
         return $this->renderWithData('showWiki', $responseData);
     }
 
@@ -252,7 +253,8 @@ class WikiController extends AppController
         $param = $this->getRequestParams();
         $courseId = $param['courseId'];
         $wikiId = $param['wikiId'];
-        $revisions = WikiUtility::getWikiRevision($courseId, $wikiId);
+        $groupId=$param['grp'];
+        $revisions = WikiUtility::getWikiRevision($courseId, $wikiId,$groupId);
         return $revisions;
     }
     /**
@@ -347,7 +349,6 @@ class WikiController extends AppController
                             $wikiVer = 1;
                         }
 
-
                         if ($revisionId != $params['baserevision'])
                         {
                         /**
@@ -386,7 +387,7 @@ class WikiController extends AppController
                         $firstInsertRevision->saveRevision($id,$groupId,$userId,$wikicontent,$now);
                     }
                     if (!$inConflict) {
-                        return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id);
+                        return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id.'&grp='.$groupId);
                     }
                 } else {
                     $result = WikiRevision::getDataToCheckConflict($id, $groupId);
@@ -481,9 +482,6 @@ class WikiController extends AppController
             else
                 $started=false;
 
-            $page_groupSelect=array();
-            $page_groupSelect['val'][0]=$groupNames[0]['id'];
-            $page_groupSelect['label'][0]="Use group set: ".$groupNames[0]['name'];
 
             $saveTitle = "Modify Wiki";
             $saveButtonTitle = "Save Changes";
@@ -528,6 +526,12 @@ class WikiController extends AppController
         $page_formActionTag = "?block=$block&cid=$courseId&folder=" . $params['folder'];
         $page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
         $page_formActionTag .= "&tb=$filter";
+
+        $page_groupSelect=array();
+        foreach($groupNames as $key=>$groups){
+           $page_groupSelect['val'][$key]=$groups['id'];
+           $page_groupSelect['label'][$key]="Use group set: ".$groups['name'];
+        }
 
        if ($this->isPost()) {
            if ($wikiid) {

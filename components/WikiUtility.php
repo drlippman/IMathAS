@@ -12,9 +12,9 @@ require_once("../filter/filter.php");
 
 class WikiUtility extends Component
 {
-    public static function getWikiRevision($courseId, $wikiId)
+    public static function getWikiRevision($courseId, $wikiId, $groupId)
     {
-        $stuGroupId = AppConstant::NUMERIC_ZERO;
+        $stuGroupId = $groupId;
         $overWriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
         if ($courseId == AppConstant::NUMERIC_ZERO) {

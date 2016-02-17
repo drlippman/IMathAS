@@ -32,9 +32,11 @@ $editByDate=($wikiTotalData[0]['editbydate']);
         }?>
     </div>
     <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
-        <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
-<?php
+    <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
+    <input type="hidden" class="group-id" value="<?php echo $groupId;?>">
 
+<?php
+//AppUtility::dump($groupId);
 if($overWriteBody==1){
     echo '<p>'.$Body;
 }else{
@@ -62,22 +64,21 @@ if (isset($delAll) && $isTeacher) {
 } else if ($snapshot) {
     echo "<p class='padding-left-ten'>Current Version Code.  <a href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id).">Back</a></p>";
     echo '<div class="editor" style="font-family:courier; padding: 10px;">';
-    echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",filter($text));
+    echo str_replace('&gt; &lt;',"&gt;<br/>&lt;",htmlentities($text));
     echo '</div>';
 } else { //default page display
-    if ($isgroup && $isTeacher) {
+    if ($isGroup && $isTeacher) {
         echo '<p>Viewing page for group: ';
-        AppUtility::writeHtmlSelect('gfilter',$stugroup_ids,$stugroup_names,$groupid,null,null,'onchange="chgfilter()"');
+        AppUtility::writeHtmlSelect('gfilter',$stugroup_ids,$stugroup_names,$groupId,null,null,'onchange="chgfilter()"');
         echo '</p>';
-    } else if ($isgroup) {
-        echo "<p>Group: $curgroupname</p>";
+    } else if ($isGroup) {
+        echo "<p>Group: $curGroupName</p>";
     }
     if ($isTeacher) {
         echo '<div class="col-md-12 col-sm-12 print-test-header margin-left-zero padding-top-fifteen">';
-        if ($isgroup) {
+        if ($isGroup) {
             $grpnote = "For this group's wiki: ";
         }?>
-
         <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page Contents</button>
         <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page History</button>
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id.'&grp='.$groupId.'&snapshot=true'.$framed)?>">Current Version Snapshot</a></div>
@@ -113,7 +114,7 @@ if (isset($delAll) && $isTeacher) {
     <div class="editor" style="margin-right: 20px; margin-left: 20px">
         <?php if ($isTeacher || ($editByDate>0 && $editByDate > time())){?>
         <span>
-            <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
+            <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id.'&grp='.$groupId); ?>"
                class="btn btn-primary btn-sm"><?php AppUtility::t('Edit this page');?></a>
         </span>
         <?php } ?>
@@ -125,11 +126,13 @@ if (isset($delAll) && $isTeacher) {
                 ?>
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; overflow: auto'>
                     <?php
-                        echo filter($text); ?>
+                        echo $text; ?>
                 </div></div>
             <?php }?>
         <?php }
-        echo $GroupMembers?>
+        if($isGroup){
+        echo $GroupMembers; }
+        ?>
     </div>
     </div>
     <script>
@@ -153,25 +156,38 @@ if (isset($delAll) && $isTeacher) {
             });
         });
     });
+
     /**
      * To get JSON data on click of show revision history from wikiUtility.
      */
     $('#show-revision').click(function(){
         var courseId = $('.course-id').val();
         var wikiId = $('.wiki-id').val();
-        var AHAHrevurl = $.get( "get-revisions?courseId="+courseId+"&wikiId="+wikiId, function( data ) {
+        var groupId=$('.group-id').val();
+        var AHAHrevurl = $.get( "get-revisions?courseId="+courseId+"&wikiId="+wikiId+"&grp="+groupId, function( data ) {
             jsonData = $.parseJSON(data);
             original = jsonData.o;
             userinfo = jsonData.u;
             curcontent = original.slice();
+            console.log(curcontent);
             wikihistory = jsonData.h;
+            console.log(wikihistory);
             contentdiv = document.getElementById("wikicontent");
             contentdiv.innerHTML = original.join(' ');
             wikirendermath();
             document.getElementById("prevrev").innerHTML="";
-
         });
     });
+
+   function chgfilter() {
+       var gfilter = document.getElementById("gfilter").value;
+       var courseId = $('.course-id').val();
+       var wikiId = $('.wiki-id').val();
+       window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&grp="+gfilter;
+    }
+
+
+
 
     /**
      *
