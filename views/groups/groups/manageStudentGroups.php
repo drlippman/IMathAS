@@ -235,7 +235,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     ?>
                     <p class="hide-hover"><input type="button" class="btn btn-primary1 btn-color" value="Add new set of groups" onclick="window.location.href='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&addgrpset=ask');?>'"></p>
-                <?php } ?>
+                <?php }
+
+                if(count($alreadyGroupedStu) > AppConstant::NUMERIC_ZERO)
+                {
+                    echo $html;
+                }?>
         </div>
     </div>
 </div>

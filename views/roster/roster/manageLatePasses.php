@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content padding-top-one-em">
-    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);?>
+    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>

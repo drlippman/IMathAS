@@ -457,8 +457,8 @@ class BlockController extends AppController
                 }
                 if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
                     if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
-                        echo 'Not authorized';
-                        exit;
+                        $this->setErrorFlash('Not authorized');
+                        return $this->redirect('tree-reader?cid='.$courseId. '&folder='.$folder);
                     }
                 }
                 $items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing

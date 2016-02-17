@@ -27,7 +27,7 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]); ?>
+    <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>

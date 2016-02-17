@@ -49,6 +49,7 @@ class GroupsController extends AppController
         $page_groupSets = array();
         $groupsData = StuGroupSet::findGroupData($courseId);
         $grpSetId =$this->getParamVal('grpSetId');
+        $html = '';
         if($groupsData)
         {
             foreach($groupsData as $group)
@@ -210,18 +211,18 @@ class GroupsController extends AppController
                     }
                     if(count($alreadyGroupedStu) > AppConstant::NUMERIC_ZERO)
                     {
-                        echo '<p>Some students joined a group already and were skipped:</p><p>';
+                        $html .= '<p>Some students joined a group already and were skipped:</p><p>';
                         $stuList = "'".implode("','",$alreadyGroupedStu)."'";
                         $query = User::insertDataFroGroups($alreadyGroupedStu);
                         if($query)
                         {
                             foreach($query as $data)
                             {
-                                echo $data['LastName'].', '.$data['FirstName'].'<br/>';
+                                $html .= $data['LastName'].', '.$data['FirstName'].'<br/>';
                                 $logInfo .= $data['LastName'].', '.$data['FirstName'].' already in group.';
                             }
                         }
-                        echo "<p><a href='#'>Continue</a></p>";
+                        $html .= "<p><a href='#'>Continue</a></p>";
                         $now = time();
                         if(isset($log))
                         {
@@ -409,7 +410,7 @@ class GroupsController extends AppController
             }
         }
         $this->includeCSS(['groups.css']);
-        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'removeAll' => $removeAll,'showImg' => $showImg,'message' => $message]);
+        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'removeAll' => $removeAll,'showImg' => $showImg,'message' => $message, 'html' => $html, 'alreadyGroupedStu' => $alreadyGroupedStu]);
     }
 
     /*Ajax Call to delete group set*/

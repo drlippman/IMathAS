@@ -110,8 +110,8 @@ $address = AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$co
         <tbody class="message-table-body">
         <?php
 
-        if (count($displayMessage)==0) {
-            echo "<tr><td></td><td>No messages</td><td></td><td></td></tr>";
+        if (count($displayMessage)=='') {
+            echo "<tr><td></td><td></td><td>No messages</td><td></td><td></td></tr>";
         }
         foreach($displayMessage as $line) {
             if (trim($line['title'])=='') {

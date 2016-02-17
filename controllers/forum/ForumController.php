@@ -1068,10 +1068,6 @@ class ForumController extends AppController
             $resultNext = ForumThread::getDataForNext($forumid, $threadid,$groupid,$groupset);
 
         }
-//        if ($caneditscore && $haspoints) {
-//            return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId. '&forum='.$forumid));
-////            echo "<form method=post action=\"thread?cid=$courseId&forum=$forumid\">";
-//        }
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/posts.js"]);
         $responseData = array('oktoshow' => $oktoshow, 'resultPrev' => $resultPrev, 'resultNext' => $resultNext, 'tagged' => $tagged, 'subject' => $subject, 'threadid' => $threadid, 'forumname' => $forumname,
@@ -2341,7 +2337,6 @@ class ForumController extends AppController
         }
         echo '<p class="small">'._('Note: Only the most recent thread view per person is shown').'</p>';
 
-//        return $this->renderWithData('listViews',$responseData);
     }
     public  function flattenitems($items,&$addto) {
         global $itemsimporder,$addto;
