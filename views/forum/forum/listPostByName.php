@@ -77,19 +77,20 @@ $urlmode = AppUtility::urlMode();?>
             $laststu = $line['userid'];
         }
         echo '<div class="col-sm-12 col-md-12 padding-left-zero block">';
-        echo '<span class="col-sm-12 col-md-12">';
+        echo '<span class="col-sm-12 col-md-12" style="padding-right: 0">';
         if ($line['parent']!=0)
         {
-            echo '<span class="col-sm-8 col-md-9 padding-left-zero" style="color:green;">';
+            echo '<span class="col-sm-12 col-md-12 padding-left-zero" style="color:green; padding-right: 0">';
         }else{
-            echo '<span class="col-sm-8 col-md-9 padding-left-zero">';
+            echo '<span class="col-sm-12 col-md-12 padding-left-zero" style="padding-right: 0">';
         }
 
         echo "<input type=\"button\" value=\"+\" onclick=\"toggleshow($cnt)\" id=\"butn$cnt\" />";
-        echo '<b class="word-break-break-all">'.$line['subject'].'</b>';
+        echo '<span class="padding-left-five"><b class="word-break-break-all">'. $line['subject'].'</span></b>';
+
     if ($haspoints) {
         if ($caneditscore) {
-            echo "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
+            echo "<span class='padding-left-five'><input type=text size=6  maxlength='6' name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
             if (isset($scores[$line['id']])) {
                 echo $scores[$line['id']];
             }
@@ -110,7 +111,7 @@ $urlmode = AppUtility::urlMode();?>
         }
             echo '</span>';
 
-        echo '<span class="col-sm-4 col-md-3 padding-left-zero padding-top-six right">';?>
+        echo '<span class="col-sm-5 col-md-5 padding-left-zero padding-top-six right" style="padding-right: 0; text-align: right">';?>
 
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$course->id.'&forumid='.$forumId.'&threadid='.$line['threadid']);?> ">Thread</a>
         <?php if ($isteacher || ($line['ownerid']==$userId && $allowmod)) { ?>
@@ -134,14 +135,14 @@ $urlmode = AppUtility::urlMode();?>
             {
                 echo '<hr/>';
                 echo '<div class="padding-bottom-one-em">';
-                echo "<span class='padding-bottom-one-em'>Private Feedback: </span><textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
+                echo "<span class='padding-bottom-one-em padding-left-fifteen'>Private Feedback </span><textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
                 if ($feedback[$line['id']]!==null) {
                     echo $feedback[$line['id']];
                 }
                 echo "</textarea>";
                 echo "</div>";
             } else if (($ownerid[$child]==$userId || $canviewscore) && $feedback[$line['id']]!=null) {
-                echo '<div class="padding-bottom-one-em signup">Private Feedback: ';
+                echo '<div class="padding-bottom-one-em signup padding-left-fifteen">Private Feedback ';
                 echo $feedback[$line['id']];
                 echo '</div>';
             }
@@ -153,13 +154,12 @@ $urlmode = AppUtility::urlMode();?>
     }?>
     <input type="hidden" id="cnt" value="<?php echo $cnt?>">
     <?php echo '</div>';
-//    echo "<script>var bcnt = $cnt;</script>";
     if ($caneditscore && $haspoints) {
         echo "<div><input type=submit value=\"Save Grades\" /></div>";
         echo "</form>";
     }
 
-    echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
+    echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green; padding-right: 0\">Green: Reply</span></p>";
     ?>
     <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$course->id.'&forum='.$forumId.'&page='.$page); ?> ">Back to Thread List</a></p>
     <?php echo '</div>';

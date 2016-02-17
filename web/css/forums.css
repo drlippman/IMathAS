@@ -111,8 +111,8 @@ table.dataTable thead th, table.dataTable thead td {
     padding: 10px !important;
 }
 .circular-profile-image{
-    width: 47px;
-    height: 47px;
+    width: 60px;
+    height: 62px;
     border-radius: 50%;
     background-image: none;
     background-position: center center;
@@ -523,6 +523,10 @@ table.search-forum tr.tagged {
 
 .white-color{
     color: #ffffff;
+}
+
+.right-align{
+    text-align: right;
 }
 
 

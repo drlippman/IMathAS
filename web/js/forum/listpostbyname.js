@@ -17,7 +17,7 @@ $(document).ready(function ()
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'List Post By Name', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto', resizable: false, draggable: false,
             closeText: "hide",
             buttons: {
                 "Cancel": function () {
@@ -25,8 +25,6 @@ $(document).ready(function ()
                     return false;
                 },
                 "Confirm": function () {
-//                        $(this).dialog("close");
-//                        window.location = "actions?action=delgroup&id="+groupId;
                     $(this).dialog("close");
                     var threadId = threadid;
                     jQuerySubmit('mark-as-remove-ajax',{threadId:threadId},'markAsRemoveSuccess');
@@ -96,13 +94,13 @@ function changeProfileImage(element,id)
 {
     if(flag == 0 )
     {
-        element.style.width = "105px";
-        element.style.height = "120px";
+        element.style.width = "100px";
+        element.style.height = "105px";
         flag =1;
     }else
     {
-        element.style.width = "47px";
-        element.style.height = "47px";
+        element.style.width = "60px";
+        element.style.height = "62px";
         flag=0;
     }
 
@@ -193,7 +191,8 @@ function onenter(e,field) {
 
 function markAsRemoveSuccess(response)
 {
-    console.log(response);
+    $(this).dialog("close");
+    window.location = "list-post-by-name?page=1&cid="+groupId;
 }
 
 
