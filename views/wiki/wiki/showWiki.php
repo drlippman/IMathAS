@@ -84,8 +84,8 @@ if (isset($delAll) && $isTeacher) {
         if ($isGroup) {
             $grpnote = "For this group's wiki: ";
         }?>
-        <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page Contents</button>
-        <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page History</button>
+        <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page Contents</button> &nbsp;
+        <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page History</button> &nbsp;
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id.'&grp='.$groupId.'&snapshot=true'.$framed)?>">Current Version Snapshot</a></div>
     <?php }
     ?>
@@ -232,6 +232,7 @@ if (isset($delAll) && $isTeacher) {
         if (curversion==wikihistory.length-1) {
             document.getElementById("older").className = "grayout";
             document.getElementById("first").className = "grayout";
+            console.log();
         } else {
             document.getElementById("older").className = "";
             document.getElementById("first").className = "";
