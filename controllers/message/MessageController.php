@@ -88,10 +88,10 @@ class MessageController extends AppController
                     $cansendmsgs = true;
                 }
             }
-            if($cansendmsgs == false){
-                $this->setErrorFlash('Message System is "OFF" for ' .$course['name']. ' course');
-                return $this->goHome();
-            }
+//            if($cansendmsgs == false){
+//                $this->setErrorFlash('Message System is "OFF" for ' .$course['name']. ' course');
+//                return $this->goHome();
+//            }
             $userData = User::getById($user['id']);
             $threadsperpage = $userData['listperpage'];
             $filterByCourse = Message::getCoursesForMessage($user['id']);
@@ -635,6 +635,7 @@ class MessageController extends AppController
         $messageId = $this->getParamVal('message');
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
+        $type = $this->getParamVal('type');
         $user = $this->user;
         if ($baseId == AppConstant::ZERO_VALUE) {
             $baseId = $msgId;
@@ -666,7 +667,7 @@ class MessageController extends AppController
             $this->includeJS(["message/viewConversation.js"]);
             $this->includeCSS(['message.css']);
             $this->createChild($this->children[key($this->children)]);
-            $responseData = array('messages' => $this->totalMessages, 'user' => $user, 'messageId' => $messageId, 'course' => $course, 'userRights' => $userRights);
+            $responseData = array('messages' => $this->totalMessages, 'user' => $user, 'type' => $type, 'messageId' => $messageId, 'course' => $course, 'userRights' => $userRights);
             return $this->renderWithData('viewConversation', $responseData);
         }
     }
