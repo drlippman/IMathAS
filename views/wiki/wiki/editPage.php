@@ -14,6 +14,7 @@ $this->title = $wikiName;
         </div>
     </div>
 </div>
+
 <?php if ($groupId > AppConstant::NUMERIC_ZERO) {
     echo "<p>Group: $groupName</p>";
 }
@@ -31,22 +32,20 @@ if (isset($lastEditedBy)) {
     echo "<p class='subheadings'>Last Edited by $lastEditedBy on $lastEditTime</p>";
 }
 ?>
-
 <div class="item-detail-content">
     <?php if($user['rights'] > 10) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'course']);
     } elseif($user['rights'] == 10){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'course', 'userId' => $currentUser]);
-    }?>
+    }
+    ?>
 </div>
 
 <form method="post" action="edit-page?courseId=<?php echo $courseId ?>&wikiId=<?php echo $id?>&grp=<?php echo $groupId?>">
     <input type="hidden" name="baserevision" value="<?php echo $revisionId;?>" />
     <div class="editor">
         <textarea cols=60 rows=30 id="wikicontent" name="wikicontent" style="width: 100%">
-
             <?php echo filter($revisionText);?></textarea>
-
     </div><br/>
 
   <div class="header-btn floatleft">

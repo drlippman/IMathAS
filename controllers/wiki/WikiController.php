@@ -47,6 +47,7 @@ class WikiController extends AppController
         $snapshot = $this->getParamVal('snapshot');
         $toRev = $this->getParamVal('torev');
         $dispRev = $this->getParamVal('disprev');
+
         if (isset($frame)) {
             $flexWidth = true;
             $showNav = false;
@@ -130,7 +131,7 @@ class WikiController extends AppController
                     $groupResult = Stugroups::getStuGrpId($userId, $groupSetId);
                     if (count($groupResult) == AppConstant::NUMERIC_ZERO) {
                         $overWriteBody = AppConstant::NUMERIC_ONE;
-                        $body = "You need to be a member of a group before you can view or edit this wiki";
+                        $body = "You need to be a member of a group before you can view or edit this wiki.";
                         $isGroup = false;
                     } else {
                         $groupId = $groupResult[0]['id'];
@@ -225,7 +226,6 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-//        AppUtility::dump($wikiRevisionData);
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
                 'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);

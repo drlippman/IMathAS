@@ -1570,8 +1570,15 @@ class ShowItemCourse extends Component
                         <?php }
                     }
                     echo "<div class=title> ";
+
+                        if($groupSetId){
+                            $groupId=Stugroups::getByGrpSetId($groupSetId);
+                            $defaultgroupid=$groupId[0]['id'];
+                        }else
+                            $defaultgroupid=0;
+
                     if ($isPublic) { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/view-wiki-public?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
+                         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/view-wiki-public?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
                    <?php } else {
                         if (($isStudent) && !($sessionData['stuview'])) {
                             $rec = "data-base=\"wiki-$typeid\"";
@@ -1579,7 +1586,7 @@ class ShowItemCourse extends Component
                             $rec = '';
                         } ?>
 <!--                        echo "<b><a href=\"#\" $rec>{$line['name']}</a></b>\n";-->
-                        <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid)?>"><?php echo $line['name']?></a>
+                                              <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
                       <?php  if ($hasnew) {
                             echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
                         }

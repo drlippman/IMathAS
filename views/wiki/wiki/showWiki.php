@@ -36,9 +36,9 @@ $editByDate=($wikiTotalData[0]['editbydate']);
     <input type="hidden" class="group-id" value="<?php echo $groupId;?>">
 
 <?php
-//AppUtility::dump($groupId);
 if($overWriteBody==1){
-    echo '<p>'.$Body;
+    echo '<p style="padding-left: 35px; padding-top: 35px;">'.$Body;
+    echo "<br><a href='http://localhost/openmath/web/course/course/course?cid=$courseId'> Back</a> </p>";
 }else{
 if ($isTeacher && $groupId >0 && isset($curGroupName)) {
     $grpnote = $groupNote;
@@ -68,11 +68,16 @@ if (isset($delAll) && $isTeacher) {
     echo '</div>';
 } else { //default page display
     if ($isGroup && $isTeacher) {
-        echo '<p>Viewing page for group: ';
+
+        echo'<div class="col-md-12 col-sm-12 padding-top-fifteen" style="background-color: #f8f8f8">';
+        echo'<div class="col-md-2 col-sm-2 padding-left-twenty padding-right-zero">';
+        echo '<p>Viewing page for group :</div>';
+        echo '<div class="col-md-3 col-sm-3 padding-left-zero">';
         AppUtility::writeHtmlSelect('gfilter',$stugroup_ids,$stugroup_names,$groupId,null,null,'onchange="chgfilter()"');
-        echo '</p>';
+        echo '</p></div>';
+        echo"</div>";
     } else if ($isGroup) {
-        echo "<p>Group: $curGroupName</p>";
+        echo "<p class='padding-left-twenty'>Group: $curGroupName</p>";
     }
     if ($isTeacher) {
         echo '<div class="col-md-12 col-sm-12 print-test-header margin-left-zero padding-top-fifteen">';
@@ -84,8 +89,7 @@ if (isset($delAll) && $isTeacher) {
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id.'&grp='.$groupId.'&snapshot=true'.$framed)?>">Current Version Snapshot</a></div>
     <?php }
     ?>
-
-    <br><br class="form"><p><span id="revisioninfo" class="padding-left">Revision <?php echo $numRevisions; ?>
+    <br class="form"><p><span id="revisioninfo" class="padding-left">Revision <?php echo $numRevisions; ?>
             <?php if ($numRevisions > 0) {
                 echo ".  Last edited by $lastEditedBy on $lastEditTime.";
             }
@@ -126,7 +130,7 @@ if (isset($delAll) && $isTeacher) {
                 ?>
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; overflow: auto'>
                     <?php
-                        echo $text; ?>
+                        echo filter($text); ?>
                 </div></div>
             <?php }?>
         <?php }
@@ -169,11 +173,9 @@ if (isset($delAll) && $isTeacher) {
             original = jsonData.o;
             userinfo = jsonData.u;
             curcontent = original.slice();
-            console.log(curcontent);
             wikihistory = jsonData.h;
-            console.log(wikihistory);
             contentdiv = document.getElementById("wikicontent");
-            contentdiv.innerHTML = original.join(' ');
+            contentdiv.innerHTML = original.join('<p>');
             wikirendermath();
             document.getElementById("prevrev").innerHTML="";
         });
