@@ -2596,11 +2596,13 @@ if (!isset($_POST['embedpostback'])) {
 				//if (false && $showeachscore) {
 				///	echo "<br/><span id=\"embednavcanimp$i\" style=\"margin-left:8px\">$cntcanimp</span> can be improved";
 				//}
+				echo '<span style="margin-left:8px">';
 				if ($showeachscore) {
-					echo " <span id=\"embednavscore$i\" style=\"margin-left:8px\">".round($pgpts,1)." point".(($pgpts==1)?"":"s")."</span> out of $pgposs";
+					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." point".(($pgpts==1)?"":"s")."</span> out of $pgposs";
 				} else {
-					echo " <span id=\"embednavunans$i\" style=\"margin-left:8px\">$cntunans</span> unattempted";
+					echo " <span id=\"embednavunans$i\">$cntunans</span> unattempted";
 				}
+				echo '</span>';
 				$totposs += $pgposs;
 			}
 			echo "</li>\n";

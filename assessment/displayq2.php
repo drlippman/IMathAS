@@ -1073,7 +1073,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else if ($displayformat == "select") {
 				$out .= "<option value=$i ";
 				if (($la!='') && ($la!='NA') && ($la == $i)) { $out .= "selected=1";}
-				$out .= ">{$questions[$randkeys[$i]]}</option>\n";
+				$out .= ">".str_replace('`','',$questions[$randkeys[$i]])."</option>\n";
 			} else if ($displayformat == "inline") {
 				$out .= "<input type=radio name=qn$qn value=$i id=\"qn$qn-$i\" ";
 				if (($la!='') && ($la == $i)) { $out .= "CHECKED";}
@@ -1314,7 +1314,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if ($las[$i]==$letters[$j]) {
 						$out .= 'selected="1"';
 					}
-					$out .= ">{$answers[$randakeys[$j]]}</option>\n";
+					$out .= ">".str_replace('`','',$answers[$randakeys[$j]])."</option>\n";
 				}
 			} else {
 				foreach ($letters as $v) {
