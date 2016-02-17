@@ -2896,6 +2896,10 @@ class GradebookController extends AppController
         $canviewall = false;
         $studentId = $this->getParamVal('studentId');
         $gbMode = $this->getParamVal('gbmode');
+        if (($StudentData)==0) { //shouldn't happen
+        $this->setErrorFlash('Invalid student id');
+//        return $this->redirect('grade-book-student-detail?cid='.$courseId. '&studentId='.$studentId);
+        }
         if (($isTeacher)) {
             $isTeacher = true;
         }
@@ -2935,6 +2939,7 @@ class GradebookController extends AppController
         } else {
             $usersort = AppConstant::NUMERIC_ONE;
         }
+
         $allStudentsData = User::studentGradebookData($courseId, $usersort);
         $allStudentsinformation = array();
         foreach ($allStudentsData as $stud) {
@@ -2945,6 +2950,7 @@ class GradebookController extends AppController
             $tempArray[3] = $stud['section'];
             array_push($allStudentsinformation, $tempArray);
         }
+
         if ($this->isPostMethod()) {
             if ((isset($params['posted']) && $params['posted']=="Make Exception") || isset($params['massexception'])) {
                 $calledfrom='gb';

@@ -231,10 +231,7 @@ if ($studentId>0) {
     }
     $now = time();
     }
-    if (($StudentData)==0) { //shouldn't happen
-//    echo 'Invalid student id';
-//    exit;
-    }
+
 //AppUtility::dump($StudentData);
     $gbcomment = $StudentData['gbcomment'];
     $stuemail = $currentUser['email'];
@@ -320,30 +317,34 @@ echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
     <br/>
     </div>  </div> <?php
 }
-if (trim($gbcomment)!='' || $isteacher) {
-if ($isteacher) { ?>
- <form method=post action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
-    Gradebook Comment <input type=submit value="Update Comment"><br/><br/>
-  <textarea class="text-area-padding max-width-hundred-per" name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
-     </form>
-    <?php
-} else { ?>
- <div style="clear:both;display:inline-block" class="cpmid"><?php echo $gbcomment?></div><br>
- <?php
-}
-}
+if($StudentData > 0){
+
+    if (trim($gbcomment)!='' || $isteacher) {
+        if ($isteacher) { ?>
+            <form method=post action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
+                Gradebook Comment <input type=submit value="Update Comment"><br/><br/>
+                <textarea class="text-area-padding max-width-hundred-per" name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
+            </form>
+        <?php
+        } else { ?>
+            <div style="clear:both;display:inline-block" class="cpmid"><?php echo $gbcomment?></div><br>
+        <?php
+        }
+    }
 //TODO i18n
-if ($showlatepass==1) {
-if ($latepasses==0) { $latepasses = 'No';}
-if ($isteacher || $istutor) {echo '<br/>';}
-$lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
-}
-if (!$isteacher && !$istutor) {
-echo $lpmsg;
+    if ($showlatepass==1) {
+        if ($latepasses==0) { $latepasses = 'No';}
+        if ($isteacher || $istutor) {echo '<br/>';}
+        $lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
+    }
+    if (!$isteacher && !$istutor) {
+        echo $lpmsg;
+    }
 }
 
+
 }
-?>
+if($StudentData > 0){?>
 <br>
  <form method=post id="qform" action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
  <?php if ($isteacher && $studentId>0) {  ?>
@@ -728,8 +729,10 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
         echo '<button type="submit" value="Make Exception" name="massexception" >', _('Make Exception'), '</button> ', _('for selected assessments'), '</p>';
     }
 
-    echo "</form>";
+    echo "</form>"; ?>
 
-echo "<p class='text-area-padding'>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+
+<?php echo "<p class='text-area-padding'>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
                             echo '</div>';?>
 
+<?php } ?>
