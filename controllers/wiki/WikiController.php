@@ -506,7 +506,7 @@ class WikiController extends AppController
                 'pageTitle' => 'Create Wiki',
                 'saveTitle' => 'Create Wiki',
                 'title' => "Enter Wiki Name here",
-              //  'description' => "Enter wiki description here (displays on course page)",
+                'description' => "Enter the description",
                 'sDate' => date("m/d/Y"),
                 'sTime' => time(),
                 'eDate' => date("m/d/Y",strtotime("+1 week")),

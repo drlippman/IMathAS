@@ -12,11 +12,11 @@ $this->params['breadcrumbs'][] = $this->title;
       xmlns="http://www.w3.org/1999/html">
 <?php if($this->title=="Modify Wiki") {?>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Modify Wiki'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
 <?php } else{ ?>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Add Wiki'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
 <?php } ?>
     <div class = "title-container">
@@ -45,13 +45,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2 col-sm-2"><?php AppUtility::t('Description')?></div>
             <div class="col-md-10 col-sm-10">
                 <div class="editor add-wiki-summary-textarea">
-                    <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
-                        <?php $text = "enter data";
-                        if($defaultValue['description'])
+                    <?php $text = " "; ?>
+                    <textarea cols='5' rows='12' id='description' name='description' style="width: 100%;">
+                       <?php if($defaultValue['description'])
                         {
                             $text = $defaultValue['description'];
                         }
-                        echo htmlentities($text);?>
+                        echo $text;?>
                     </textarea>
                 </div>
             </div>

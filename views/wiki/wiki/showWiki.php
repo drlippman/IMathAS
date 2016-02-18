@@ -89,7 +89,7 @@ if (isset($delAll) && $isTeacher) {
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id.'&grp='.$groupId.'&snapshot=true'.$framed)?>">Current Version Snapshot</a></div>
     <?php }
     ?>
-    <br class="form"><p><span id="revisioninfo" class="padding-left">Revision <?php echo $numRevisions; ?>
+    <br class="form"><p><span id="revisioninfo" class="padding-left">&nbsp;Revision <?php echo $numRevisions; ?>
             <?php if ($numRevisions > 0) {
                 echo ".  Last edited by $lastEditedBy on $lastEditTime.";
             }
