@@ -288,6 +288,7 @@ class AppConstant
     const GIA_FORMAT = 'g:i a';
     const MESSAGE_CUSTOMIZE_DATE = 'M d, o g:i a';
     const ERROR_MSG_FOR_LOCLKED_STUDENT = 'You have been locked out of this course by your instructor.  Please see your instructor for more information.';
+    const TUTOR_CAN_NOT_ENROLL = "Tutors can't be enrolled as students.";
     // create a map with current constant being the key and the value being the value
     // start calling the method below
     public static function getConstantVal($key, $lang='en'){

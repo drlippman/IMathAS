@@ -32,12 +32,12 @@ class Teacher extends BaseImasTeachers
         $teacher->delete();
     }
 
-    public static function getTeacherByUserId($userid)
+    public static function getTeacherByUserId($userId)
     {
         $query = new Query();
         $query->select('ic.id,ic.name')->from('imas_courses AS ic')->join('INNER JOIN','imas_teachers','imas_teachers.courseid=ic.id')
             ->where('imas_teachers.userid = :userid')->orderBy('ic.name');
-        return $query->createCommand()->bindValue('userid',$userid)->queryAll();
+        return $query->createCommand()->bindValue('userid',$userId)->queryAll();
     }
 
     public static function getTeachersById($cid)
@@ -122,5 +122,9 @@ class Teacher extends BaseImasTeachers
     }
     public function selectByCourseId($userId){
         return self::find()->select('courseid')->where(['userid' => $userId])->all();
+    }
+    public static function getUserAndCourseId($courseId, $userId)
+    {
+        return self::find()->select('id')->where(['courseid' => $courseId, 'userid' => $userId])->all();
     }
 }

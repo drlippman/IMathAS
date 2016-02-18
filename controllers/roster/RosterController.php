@@ -261,9 +261,12 @@ class RosterController extends AppController
             if (!$user) {
                 $this->setErrorFlash(AppConstant::STUDENT_ERROR_MESSAGE);
             } else {
-                $teacher = Teacher::getTeacherByUserId($user->id);
+                $teacher = Teacher::getUserAndCourseId($courseId,$user->id);
+                $tutor = Tutor::getByUserId($user->id, $courseId);
                 if ($teacher) {
                     $this->setErrorFlash(AppConstant::TEACHER_CANNOT_CHANGE_AS_SRUDENT);
+                } elseif($tutor){
+                    $this->setErrorFlash(AppConstant::TUTOR_CAN_NOT_ENROLL);
                 } else {
                     $studentRecord = Student::getByUserIdentity($user->id, $courseId);
                     if ($studentRecord) {
