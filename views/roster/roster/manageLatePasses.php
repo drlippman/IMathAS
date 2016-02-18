@@ -73,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         foreach($studentInformation as $singleStudentInformation){ ?>
             <tr>
-                <td><?php echo $singleStudentInformation['Name']?></td>
+                <td><?php echo trim($singleStudentInformation['Name'])?></td>
                 <td><?php echo $singleStudentInformation['Section']?> </td>
                 <td><input type="text" class="width-fifteen-per form-control latepass-text-id" size="4" value="<?php echo $singleStudentInformation['Latepass']?>"name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
             </tr>
