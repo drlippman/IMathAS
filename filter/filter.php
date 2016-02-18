@@ -103,8 +103,8 @@ global $AS, $AMT, $imasroot;
 			$str = str_replace(array('http://www.youtube.com','http://youtu.be'),array('https://www.youtube.com','https://youtu.be'), $str);
 		}
 		if (strip_tags($str)==$str) {
-			//$str = str_replace("\n","<br/>\n",$str);
-            //$str = str_replace("<p>"," ",$str);
+			$str = str_replace("\n","<br/>\n",$str);
+            $str = str_replace(" ","<p>",$str);
         }
 		if ($sessiondata['graphdisp']==0) {
 			if (strpos($str,'embed')!==FALSE) {

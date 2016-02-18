@@ -16,7 +16,7 @@ $this->title = $wikiName;
 </div>
 
 <?php if ($groupId > AppConstant::NUMERIC_ZERO) {
-    echo "<p>Group: $groupName</p>";
+    echo "<p style='color: #ffffff'>Group: $groupName</p>";
 }
 if ($inConflict) {
     ?>

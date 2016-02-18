@@ -217,7 +217,7 @@ if (isset($delAll) && $isTeacher) {
         if (showrev==1) {
             contentdiv.innerHTML = colorrevisions(curcontent,curversion);
         } else {
-            contentdiv.innerHTML = curcontent.join(' ');
+            contentdiv.innerHTML = curcontent.join('<p>');
         }
         if (curversion==0) {
             document.getElementById("newer").className = "grayout";
@@ -232,7 +232,6 @@ if (isset($delAll) && $isTeacher) {
         if (curversion==wikihistory.length-1) {
             document.getElementById("older").className = "grayout";
             document.getElementById("first").className = "grayout";
-            console.log();
         } else {
             document.getElementById("older").className = "";
             document.getElementById("first").className = "";
@@ -289,7 +288,7 @@ if (isset($delAll) && $isTeacher) {
             contentdiv.innerHTML = colorrevisions(curcontent,curversion);
             document.getElementById("showrev").value = "Hide Changes";
         } else {
-            contentdiv.innerHTML = curcontent.join(' ');
+            contentdiv.innerHTML = curcontent.join('<p>');
             document.getElementById("showrev").value = "Show Changes";
         }
         wikirendermath();
@@ -297,18 +296,18 @@ if (isset($delAll) && $isTeacher) {
 
 
     function colorrevisions(content,ver) {
-        if (ver==wikihistory.length-1) {return content.join(' ');};
+        if (ver==wikihistory.length-1) {return content.join('<p>');};
         current = content.slice();
         var diff = wikihistory[ver+1].c;
         for (var i=diff.length-1; i>=0; i--) {
             deled = null;  insed = null;
             if (diff[i][0]==2) {
                 deled = diff[i][3].join(' ');
-                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
+                insed = current.splice(diff[i][1], diff[i][2]).join('<p>');
             } else if (diff[i][0]==0) {
                 deled = diff[i][2].join(' ');
             } else if (diff[i][0]==1) {
-                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
+                insed = current.splice(diff[i][1], diff[i][2]).join('<p>');
             }
             if (insed != null) {
                 if (insed) {
@@ -336,7 +335,7 @@ if (isset($delAll) && $isTeacher) {
             }
         }
 
-        return current.join('');
+        return current.join('<p>');
     }
     function rendermathnode(node)
     {
