@@ -27,6 +27,24 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
+
+<?php
+if ($clearattempts=='ask'){
+    echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
+    echo 'This will clear contents for all groups if you are using groups.</p>';?>
+    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?cid=' .$course->id .'&id=' .$wiki->id.'&clearattempts=true'); ?>"
+       class="btn btn-primary btn-sm"><?php AppUtility::t('Confirm');?></a> &nbsp;
+    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?cid=' .$course->id .'&id=' .$wiki->id); ?>"
+       class="btn btn-primary btn-sm"><?php AppUtility::t('Cancel');?></a>
+<?php }
+
+if ($started) {
+    echo '<p style="color: whitesmoke">Revisions have already been made on this wiki.  Changing group settings has been disabled.  If you want to change the ';
+    echo 'group settings, you should clear all existing wiki content.</p>'; ?>
+    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?cid=' .$course->id .'&id=' .$wiki->id.'&clearattempts=ask'); ?>"
+    class="btn btn-primary btn-sm" id="clear-all"><?php AppUtility::t('Clear All Wiki Content');?></a>
+<?php } ?>
+
     <div class="tab-content shadowBox non-nav-tab-item">
         <div class="name-of-item">
             <div class="col-md-2 col-sm-2 padding-top-pt-five-em"><?php AppUtility::t('Name of Wiki')?></div>
@@ -217,3 +235,4 @@ $revisedate=$wiki['editbydate'];
         </div>
     </form>
 </div>
+

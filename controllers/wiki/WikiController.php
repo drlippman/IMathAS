@@ -439,6 +439,7 @@ class WikiController extends AppController
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
         $saveTitle = '';
+        $clearattempts=$params['clearattempts'];
         $teacherId = $this->isTeacher($user['id'], $courseId);
 //        $this->noValidRights($teacherId);
        if (isset($params['tb'])) {
@@ -477,11 +478,13 @@ class WikiController extends AppController
             } else {
                 $revisedate = AppUtility::tzdate($params['rdate'],$params['rtime']);
             }
-            if(count($wiki)>0)
+
+
+            $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
+            if(count($wikiRevisionData)>0)
                 $started=true;
             else
                 $started=false;
-
 
             $saveTitle = "Modify Wiki";
             $saveButtonTitle = "Save Changes";
@@ -532,8 +535,8 @@ class WikiController extends AppController
            $page_groupSelect['val'][$key]=$groups['id'];
            $page_groupSelect['label'][$key]="Use group set: ".$groups['name'];
         }
-
        if ($this->isPost()) {
+           AppUtility::dump(wrong);
            if ($wikiid) {
                $link = new Wiki();
                if($params['rdatetype']=="Always"){
@@ -610,10 +613,20 @@ class WikiController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             }
         }
+
+       if($clearattempts=='ask'){
+           $started=false;
+       }
+       if ($clearattempts=='true') {
+           $wikiId=$this->getParamVal('id');
+           wikiRevision::deleteByWikiId($wikiId);
+           $clearattempts="false";
+           return $this->redirect(AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?courseId=' .$courseId .'&wikiId=' .$wikiId));
+       }
        $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime,'started' => $started,
-                'page_groupSelect'=>$page_groupSelect);
+                'page_groupSelect'=>$page_groupSelect,'clearattempts'=>$params['clearattempts'] );
        return $this->render('addWiki', $returnData);
     }
 

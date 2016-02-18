@@ -48,13 +48,13 @@ if ($isTeacher && $groupId >0 && isset($curGroupName)) {
 if (isset($delAll) && $isTeacher) {
     echo '<p>Are you SURE you want to delete all contents and history for '.$grpnote.' Wiki page?</p>';
     echo "<p><button type=\"button\" onclick=\"window.location.href='show-wiki?courseId=$courseId&wikiId=$id&delall=true$framed'\">Yes, I'm Sure</button> | ";
-    echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+    echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">cancel</button></p>";
 
 } else if($delRev && $isTeacher) {
     echo '<p>Are you SURE you want to delete all revision history for '.$grpnote.' Wiki page?  The current version will be retained.</p>';
 
     echo "<p><button type=\"button\" onclick=\"window.location.href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$id.'&delrev=true')."\">Yes, I'm Sure</button> | ";
-    echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Nevermind</button></p>";
+    echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Cancel</button></p>";
 } else if ($revert) {
     echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 
@@ -130,7 +130,7 @@ if (isset($delAll) && $isTeacher) {
                 ?>
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; overflow: auto'>
                     <?php
-                        echo filter($text); ?>
+                        echo filter($text);?>
                 </div></div>
             <?php }?>
         <?php }
