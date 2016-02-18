@@ -32,7 +32,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"></div>
                 <div class="col-sm-12 col-md-12 padding-left-zero">
                     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-                    <p><?php AppUtility::t('Showing Number of Logins');?> <?php echo "$starttime through $endtime";?></p>
+                    <p><?php AppUtility::t('Showing Number of Logins');?> <?php echo "$starttime through $endtime";
+                        ?></p>
 
                             <?php  if ($end < $now)
                                   { ?>

@@ -27,12 +27,14 @@ function toggleDate( )
     if (endDate=="" || startDate== ""){
         $('#flash-message').show();
         $('#flash-message').html("<div class='alert alert-danger'>Date field can not be blank.</div>");
+        location.reload();
     }
     else
     if( (new Date(startDate).getTime() > new Date(endDate).getTime()) || startDate== "" )
     {
         $('#flash-message').show();
-        $('#flash-message').html("<div class='alert alert-danger'>First date can not be greater then last date.</div>");
+        $('#flash-message').html("<div class='alert alert-danger'>Start date can not be greater than end date.</div>");
+        location.reload();
     }
     else
     {
