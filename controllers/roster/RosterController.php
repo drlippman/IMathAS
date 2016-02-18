@@ -293,7 +293,8 @@ class RosterController extends AppController
         $studentArray = array();
         if ($query) {
             foreach ($query as $student) {
-                $tempArray = array('Name' => ucfirst($student->user->LastName).', '.ucfirst($student->user->FirstName),
+                $tempArray = array('LastName' => trim(ucfirst($student->user->LastName)),
+                    'FirstName' => trim(ucfirst($student->user->FirstName)),
                     'code' => $student->code,
                     'section' => $student->section,
                     'userid' => $student->userid
@@ -329,7 +330,7 @@ class RosterController extends AppController
         $studentArray = array();
         if ($model) {
             foreach ($model as $student) {
-                $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                $tempArray = array('Name' => trim($student->user->LastName) . ' ' . trim($student->user->FirstName),
                     'Section' => $student->section,
                     'Latepass' => $student->latepass,
                     'StudenId' => $student->id,

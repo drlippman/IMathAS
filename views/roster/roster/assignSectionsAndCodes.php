@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 foreach ($studentInformation as $singleStudentInformation) {
                     ?>
                     <tr>
-                        <td><?php echo trim($singleStudentInformation['Name']) ?></td>
+                        <td><?php echo trim(ucfirst($singleStudentInformation['LastName'])).', '.trim(ucfirst($singleStudentInformation['FirstName']))?></td>
                         <td><input class="form-control" type="text" value="<?php echo $singleStudentInformation['section'] ?>"
                                    name='section[<?php echo $singleStudentInformation['userid'] ?>]' maxlength="40"></td>
                         <td class="staticParent"><input class="form-control" type="text" id="child" value="<?php echo $singleStudentInformation['code']   ?>"
