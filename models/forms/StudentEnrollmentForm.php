@@ -16,8 +16,8 @@ class StudentEnrollmentForm extends Model
         return [
 
             [['usernameToEnroll'], 'required', 'message'=>AppUtility::t('Username cannot be blank', false)],
-            [['section'],'string'],
-            [['code'],'string'],
+            [['section'],'string', 'max' => 40],
+            [['code'],'integer', 'max' => 10],
         ];
 
     }

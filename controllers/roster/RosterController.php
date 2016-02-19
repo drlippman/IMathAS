@@ -368,10 +368,12 @@ class RosterController extends AppController
         $course = Course::getById($courseId);
         $teacherId = $this->getUserId();
         $courseDetails = Teacher::getTeacherByUserId($teacherId);
+        $studentList = User::getListOfUserToEnroll($courseId);
         if ($this->isPost())
         {
             $params = $this->getRequestParams();
             $selectedCourseId = isset($params['name']) ? $params['name'] : null;
+
             if ($selectedCourseId) {
                 $this->redirect('enroll-students?cid=' . $courseId . '&courseData=' . $selectedCourseId);
             } else {
@@ -379,7 +381,7 @@ class RosterController extends AppController
             }
         }
         $this->includeCSS( ['roster/roster.css']);
-        $responseData = array('course' => $course, 'data' => $courseDetails, 'model' => $model);
+        $responseData = array('course' => $course, 'data' => $courseDetails, 'model' => $model, 'studentList' => $studentList);
         return $this->render('enrollFromOtherCourse', $responseData);
     }
 

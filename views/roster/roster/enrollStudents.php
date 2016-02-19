@@ -43,9 +43,15 @@ $this->params['breadcrumbs'][] = $this->title;
             foreach ($data as $value) {
                 echo "<tr><div class='checkbox student-enroll override-hidden'><label class='checkbox-size'><td>";
                 if ($value['isCheck'] == 1)
+                {
                     echo "<input type='checkbox' name = 'student[" . $value['id'] . "]' value = '{$value['id']}' class = 'master' checked = 'true'><span class='cr'><i class='cr-icon fa fa-check'></i></span>";
+
+                }
                 else
+                {
                     echo "<input type='checkbox' name = 'student[" . $value['id'] . "]' value = '{$value['id']}' class = 'master'><span class='cr'><i class='cr-icon fa fa-check'></i></span>";
+
+                }
                 echo "</label></td>" . " " . "<td><span>{$value['lastName']}" . ", " . "{$value['firstName']}</span></td></div></tr>";
             }
             ?>
