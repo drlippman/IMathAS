@@ -1576,7 +1576,7 @@ class ShowItemCourse extends Component
                             $defaultgroupid=$groupId[0]['id'];
                         }else
                             $defaultgroupid=0;
-
+                    
                     if ($isPublic) { ?>
                          <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/view-wiki-public?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
                    <?php } else {

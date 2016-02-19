@@ -442,7 +442,6 @@ class WikiController extends AppController
         $clearattempts=$params['clearattempts'];
         $teacherId = $this->isTeacher($user['id'], $courseId);
 //        $this->noValidRights($teacherId);
-//AppUtility::dump($groupNames);
        if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {

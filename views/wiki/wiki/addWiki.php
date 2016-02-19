@@ -235,7 +235,7 @@ $revisedate=$wiki['editbydate'];
         message += '<p>This will clear contents for all groups if you are using groups.';
         var html = '<div><p>' + message + '</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Confirm Page Contents Delete ?', zIndex: 10000, autoOpen: true,
+            modal: true, title: 'Confirm Page Contents Delete ', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {

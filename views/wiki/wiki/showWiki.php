@@ -37,9 +37,9 @@ $editByDate=($wikiTotalData[0]['editbydate']);
 
 <?php
 if($overWriteBody==1){
-    echo '<p style="padding-left: 35px; padding-top: 35px;">'.$Body;
-    echo "<br><a href='http://localhost/openmath/web/course/course/course?cid=$courseId'> Back</a> </p>";
-}else{
+    echo '<p style="padding-left: 35px; padding-top: 35px;">'.$Body; ?><br>
+     <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id)?>">Back</a> </p>
+<?php }else{
 if ($isTeacher && $groupId >0 && isset($curGroupName)) {
     $grpnote = $groupNote;
 } else {

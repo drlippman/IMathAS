@@ -104,7 +104,7 @@ global $AS, $AMT, $imasroot;
 		}
 		if (strip_tags($str)==$str) {
 			$str = str_replace("\n","<br/>\n",$str);
-            $str = str_replace(" ","<p>",$str);
+//            $str = str_replace(" ","<p>",$str);
         }
 		if ($sessiondata['graphdisp']==0) {
 			if (strpos($str,'embed')!==FALSE) {

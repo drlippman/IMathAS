@@ -27,7 +27,6 @@ if ($inConflict) {
 <?php
 }
 
-
 if (isset($lastEditedBy)) {
     echo "<p class='subheadings'>Last Edited by $lastEditedBy on $lastEditTime</p>";
 }
