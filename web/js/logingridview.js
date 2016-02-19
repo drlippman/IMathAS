@@ -5,6 +5,10 @@ $( document ).ready(function() {
 
     var endDate = $("#datepicker-id1 input").val();
     todaysdate = endDate;
+
+    setTimeout(function(){
+        $('#flash-message').remove();
+    }, 10000);
 });
 
 $("#go-button").click(function ()
@@ -27,14 +31,13 @@ function toggleDate( )
     if (endDate=="" || startDate== ""){
         $('#flash-message').show();
         $('#flash-message').html("<div class='alert alert-danger'>Date field can not be blank.</div>");
-        location.reload();
     }
     else
     if( (new Date(startDate).getTime() > new Date(endDate).getTime()) || startDate== "" )
     {
         $('#flash-message').show();
-        $('#flash-message').html("<div class='alert alert-danger'>Start date can not be greater than end date.</div>");
-        location.reload();
+        $('#flash-message').html("<div class='alert alert-danger' style='color: red'>Start date can not be greater than end date.</div>");
+
     }
     else
     {
