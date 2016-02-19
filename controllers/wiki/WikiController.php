@@ -442,6 +442,7 @@ class WikiController extends AppController
         $clearattempts=$params['clearattempts'];
         $teacherId = $this->isTeacher($user['id'], $courseId);
 //        $this->noValidRights($teacherId);
+//AppUtility::dump($groupNames);
        if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -535,8 +536,13 @@ class WikiController extends AppController
            $page_groupSelect['val'][$key]=$groups['id'];
            $page_groupSelect['label'][$key]="Use group set: ".$groups['name'];
         }
+
+       if ($clearattempts=='true') {
+           wikiRevision::deleteByWikiId($wikiId);
+           $started=false;
+       }
+
        if ($this->isPost()) {
-           AppUtility::dump(wrong);
            if ($wikiid) {
                $link = new Wiki();
                if($params['rdatetype']=="Always"){
@@ -613,16 +619,6 @@ class WikiController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             }
         }
-
-       if($clearattempts=='ask'){
-           $started=false;
-       }
-       if ($clearattempts=='true') {
-           $wikiId=$this->getParamVal('id');
-           wikiRevision::deleteByWikiId($wikiId);
-           $clearattempts="false";
-           return $this->redirect(AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?courseId=' .$courseId .'&wikiId=' .$wikiId));
-       }
        $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues, 'page_formActionTag' => $page_formActionTag, 'revisedate' => $revisedate, 'rdate' => $rdate, 'rtime' => $rtime,'started' => $started,

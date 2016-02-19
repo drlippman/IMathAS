@@ -135,8 +135,7 @@ if (isset($delAll) && $isTeacher) {
             <?php }?>
         <?php }
         if($isGroup){
-        echo $GroupMembers; }
-        ?>
+        echo $GroupMembers; } ?>
     </div>
     </div>
     <script>
@@ -424,5 +423,4 @@ if (isset($delAll) && $isTeacher) {
         }
     }
     </script>
-<?php }
-}?>
+<?php } }?>

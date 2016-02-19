@@ -26,26 +26,18 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </div>
-
-
-<?php
-if ($clearattempts=='ask'){
-    echo '<p>Are you SURE you want to delete all contents and history for this Wiki page? ';
-    echo 'This will clear contents for all groups if you are using groups.</p>';?>
-    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?cid=' .$course->id .'&id=' .$wiki->id.'&clearattempts=true'); ?>"
-       class="btn btn-primary btn-sm"><?php AppUtility::t('Confirm');?></a> &nbsp;
-    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?cid=' .$course->id .'&id=' .$wiki->id); ?>"
-       class="btn btn-primary btn-sm"><?php AppUtility::t('Cancel');?></a>
-<?php }
-
-if ($started) {
-    echo '<p style="color: whitesmoke">Revisions have already been made on this wiki.  Changing group settings has been disabled.  If you want to change the ';
-    echo 'group settings, you should clear all existing wiki content.</p>'; ?>
-    <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?cid=' .$course->id .'&id=' .$wiki->id.'&clearattempts=ask'); ?>"
-    class="btn btn-primary btn-sm" id="clear-all"><?php AppUtility::t('Clear All Wiki Content');?></a>
-<?php } ?>
+<input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
+<input type="hidden" class="course-id" value="<?php echo $course->id;?>">
 
     <div class="tab-content shadowBox non-nav-tab-item">
+        <?php
+        if ($started) { ?>
+            <div class="padding-left-fifteen padding-top-bottom-twenty" style="background-color: #E0E0E0";>
+            <?php echo '<p>Revisions have already been made on this wiki.  Changing group settings has been disabled.  If you want to change the ';
+            echo 'group settings, you should clear all existing wiki content.</p><p>' ; ?>
+            <a class="btn btn-primary btn-sm" id="clear-all"><?php AppUtility::t('Clear All Wiki Content');?></a>
+            </div>
+        <?php } ?>
         <div class="name-of-item">
             <div class="col-md-2 col-sm-2 padding-top-pt-five-em"><?php AppUtility::t('Name of Wiki')?></div>
             <div class="col-md-10 col-sm-10">
@@ -178,7 +170,7 @@ if ($started) {
         <div class="col-md-3 col-sm-3 dropdown">
 <?php
 if ($started) {
-    AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],0,"Not group wiki",0,$started);
+    AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],0,"Not group wiki",0,$started?'disabled="disabled"':'');
     echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
 } else {
     AppUtility::writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
@@ -235,4 +227,34 @@ $revisedate=$wiki['editbydate'];
         </div>
     </form>
 </div>
+<script>
+    $('#clear-all').click(function(){
+    var courseId = $('.course-id').val();
+    var wikiId = $('.wiki-id').val();
+    var message = 'Are you SURE you want to delete all contents and history for this Wiki page?';
+        message += '<p>This will clear contents for all groups if you are using groups.';
+        var html = '<div><p>' + message + '</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Confirm Page Contents Delete ?', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "Confirm": function () {
+                    window.location = "add-wiki?cid="+courseId+"&id="+wikiId+"&clearattempts=true";
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            },
+            open: function () {
+                jQuery('.ui-widget-overlay').bind('click', function () {
+                    jQuery('#dialog').dialog('close');
+                })
+            }
+        });        });
 
+</script>
