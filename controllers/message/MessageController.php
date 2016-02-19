@@ -392,7 +392,6 @@ class MessageController extends AppController
      */
     public function actionViewMessage()
     {
-
         $this->layout = "master";
         $this->guestUserHandler();
         $userRights = $this->user;
@@ -418,12 +417,12 @@ class MessageController extends AppController
         if (isset($params['filtercid'])) {
             $filtercid = $params['filtercid'];
         } else {
-            $filtercid = 0;
+            $filtercid = AppConstant::NUMERIC_ZERO;
         }
         if (isset($params['filterstu'])) {
             $filterstu = $params['filterstu'];
         } else {
-            $filterstu = 0;
+            $filterstu = AppConstant::NUMERIC_ZERO;
         }
 
         $cid = $params['cid'];
@@ -437,7 +436,6 @@ class MessageController extends AppController
             $teacherof[$row['courseid']] = true;
         }
 
-
         $course = Course::getById($courseId);
         $msgId = $this->getParamVal('msgid');
         $messageData = Message::getMessageData($courseId,$msgId, $type, $isTeacher, $userRights['id']);
@@ -446,6 +444,7 @@ class MessageController extends AppController
             return $this->redirect('view-message');
         }
         $isTeacher = isset($teacherof[$messageData['courseid']]);
+        $isTeacherChecked = isset($teacherof[$messageData['courseid']]);
         $senddate = AppUtility::tzdate("F j, Y, g:i a",$messageData['senddate']);
         if (isset($teacherof[$messageData['courseid']])) {
             if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$messageData['title'],$matches)) {
@@ -459,16 +458,7 @@ class MessageController extends AppController
                         $due = $exceptionData['enddate'];
                     }
                     $duedate = AppUtility::tzdate('D m/d/Y g:i a',$due);
-
                     $assessmentSessionData = AssessmentSession::getByAssessmentIdAndUserId($assessmentId,$userRights['id']);
-                    if(count($assessmentSessionData) > AppConstant::NUMERIC_ZERO){
-                        $asid = $assessmentSessionData['id'];?>
-                        <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-view-asid?cid='.$messageData['courseid']. '&uid='.$messageData['msgfrom']. '&asid=' .$asid)?>">Assignment</a>
-                        <?php
-                        if($due < 2000000000){
-                            echo ' <span class="small">Due '.$duedate.'</span>';
-                            }
-                        }
                     }
                 }
             }
@@ -508,7 +498,8 @@ class MessageController extends AppController
             $this->includeCSS(['jquery-ui.css', 'message.css', 'forums.css']);
             $this->includeJS(['message/viewmessage.js']);
             $responseData = array('messages' => $messages, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId, 'messageData' => $messageData, 'senddate' => $senddate, 'teacherof' => $teacherof,
-            'isTeacher' => $isTeacher, 'filtercid' => $filtercid, 'filterstu' => $filterstu, 'cansendmsgs' => $cansendmsgs, 'type' => $type, 'cid' => $cid, 'page' => $page);
+            'isTeacher' => $isTeacher, 'filtercid' => $filtercid, 'filterstu' => $filterstu, 'cansendmsgs' => $cansendmsgs, 'type' => $type, 'cid' => $cid, 'page' => $page,
+            'isTeacherChecked' => $isTeacherChecked, 'assessmentSessionData' => $assessmentSessionData, 'due' => $due, 'duedate' => $duedate);
             return $this->renderWithData('viewMessage', $responseData);
 
     }
@@ -743,10 +734,7 @@ class MessageController extends AppController
         {
             $ischanged = true;
         }
-        if ($ischanged) {
-            echo "OK";
-        } else {
-            echo "Error";
-        }
+        $responseData = array('ischanged' => $ischanged);
+        return $this->renderWithData('saveTagged', $responseData);
     }
 }

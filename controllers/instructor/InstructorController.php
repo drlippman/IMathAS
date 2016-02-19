@@ -131,8 +131,8 @@ class InstructorController extends AppController
         $courseId = $eventData['cid'];
         $teacherId = Teacher::getByUserId($user->id, $courseId);
         if (!($teacherId)) {
-//            echo AppConstant::UNAUTHORIZED_ACCESS;
-//            exit;
+            $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);
+            return $this->redirect('manage-events?cid='.$courseId);
         }
         if (isset($eventData['from']) && $eventData['from']=='cal') {
             $from = 'cal';

@@ -212,4 +212,9 @@ $pagetitle =$line['name'];
 </script>
 <?php
 } } }
+
+if (!preg_match($pattern, $params['SID']))
+{
+    echo $html;
+}
 ?>

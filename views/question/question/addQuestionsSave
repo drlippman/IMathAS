@@ -1,0 +1,9 @@
+
+<?php
+use app\components\AppConstant;
+
+if (count($query) > AppConstant::NUMERIC_ZERO) {
+    echo AppConstant::OK;
+} else {
+    echo AppConstant::NOT_SAVE_ERROR;
+}

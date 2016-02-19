@@ -651,7 +651,7 @@ class BlockController extends AppController
                 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconCalendar.png">
                 <a href="'.AppUtility::getURLFromHome('course', 'course/calendar?cid='.$courseId.'"'). 'target="readerframe">Calendar</a></li>';
                 if ($openitem=='' && $foundfirstitem=='') {
-                      $foundfirstitem = 'course/course/calendar.php?cid='.$courseId;
+                      $foundfirstitem = 'course/course/calendar?cid='.$courseId;
                       $isopen = true;
                 }
             }

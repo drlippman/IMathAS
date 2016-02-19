@@ -578,7 +578,6 @@ class ForumController extends AppController
 
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
-//        AppUtility::dump($postInformtion);
 
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);

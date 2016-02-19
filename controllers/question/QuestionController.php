@@ -1197,8 +1197,8 @@ class QuestionController extends AppController
         $sessionData = $this->getSessionData($this->getSessionId());
         $teacherId = $this->isTeacher($userId, $courseId);
         if ($myRights < AppConstant::TEACHER_RIGHT) {
-            echo AppConstant::NO_TEACHER_RIGHTS;
-            exit;
+            $this->setErrorFlash(AppConstant::NO_TEACHER_RIGHTS);
+            return $this->redirect('mod-data-set?cid='.$courseId); //need to check path
         }
         $isAdmin = false;
         $isGrpAdmin = false;
@@ -1478,8 +1478,8 @@ class QuestionController extends AppController
                             $qImage->createQImages($questionSetId, $questImageData);
                             QuestionSet::setHasImage($questionSetId, AppConstant::NUMERIC_ONE);
                         } else {
-                            echo AppConstant::ERROR_IN_IMAGE_UPLOAD;
-                            exit;
+                            $this->setErrorFlash(AppConstant::ERROR_IN_IMAGE_UPLOAD);
+                            return $this->redirect('mod-data-set?cid='.$courseId); //need to check path
                         }
                     }
                 }
@@ -1550,8 +1550,8 @@ class QuestionController extends AppController
                 } else if ($errorMsg == '' && $fromPot == AppConstant::NUMERIC_ZERO) {
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $params['aid']));
                 } else {
-                    echo $errorMsg;
-                    echo $outputMsg;
+                    $errorMsg;
+                    $outputMsg;
                 }
                 exit;
             }
@@ -1701,7 +1701,7 @@ class QuestionController extends AppController
         $renderData = array('course' => $course, 'addMode' => $addMod, 'params' => $params, 'line' => $line, 'myq' => $myq,
             'frompot' => $fromPot, 'author' => $author, 'userId' => $userId, 'groupId' => $groupId, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin,
             'inlibs' => $inLibs, 'locklibs' => $lockLibs, 'lnames' => $lNames, 'twobx' => $twoBox, 'images' => $images, 'extref' => $extRef, 'courseId' => $courseId,
-            'myRights' => $myRights, 'sessionData' => $sessionData,'inUseCount'=> $inUseCount);
+            'myRights' => $myRights, 'sessionData' => $sessionData,'inUseCount'=> $inUseCount, 'errorMsg' => $errorMsg, 'outputMsg' => $outputMsg);
         return $this->renderWithData('modDataSet', $renderData);
     }
 
@@ -2031,7 +2031,8 @@ class QuestionController extends AppController
         $assessmentId = $params['aid'];
         $teacherId = $this->isTeacher($user['id'], $courseId);
         if (!($teacherId)) {
-            echo AppConstant::VALIDATION_MSG;
+            $this->setErrorFlash(AppConstant::VALIDATION_MSG);
+            return $this->redirect('add-questions-save');//need to check
         }
         $query = Assessments::getByAssessmentId($assessmentId);
         $rawItemOrder = $query['itemorder'];
@@ -2137,11 +2138,8 @@ class QuestionController extends AppController
          */
         $query = Assessments::setVidData($params['order'], $vidData, $assessmentId);
 
-        if (count($query) > AppConstant::NUMERIC_ZERO) {
-            echo AppConstant::OK;
-        } else {
-            echo AppConstant::NOT_SAVE_ERROR;
-        }
+        $responseArray = array('query' => $query);
+        return $this->renderWithData('addQuestionsSave', $responseArray);
     }
 
     public function actionSaveLibAssignFlag()
@@ -2157,11 +2155,9 @@ class QuestionController extends AppController
         if ($query > AppConstant::NUMERIC_ZERO) {
             $isChanged = true;
         }
-        if ($isChanged) {
-            echo AppConstant::OK;
-        } else {
-            echo AppConstant::ERROR;
-        }
+
+        $responseArray = array('isChanged' => $isChanged);
+        return $this->renderWithData('saveLibAssignFlag', $responseArray);
     }
 
     public function actionPrintLayout()
@@ -3627,8 +3623,8 @@ class QuestionController extends AppController
             $qText = $query['qtext'];
             if (strpos($code,'//end stored') === false)
             {
-                echo 'This question is not formatted in a way that allows it to be editted with this tool.';
-                exit;
+                $this->setErrorFlash('This question is not formatted in a way that allows it to be editted with this tool.');
+                return $this->redirect('mod-tutorial-question?cid='.$course->id);
             }
             $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
             $allowedmacros = $mathfuncs;
@@ -3794,12 +3790,8 @@ class QuestionController extends AppController
                 }
             }
         }
-
-        if ($ischanged) {
-            echo "OK";
-        } else {
-            echo "Error";
-        }
+        $responseArray = array('ischanged' => $ischanged);
+        return $this->renderWithData('saveBrokenQuestionFlag', $responseArray);
     }
 
     public function actionHelp()

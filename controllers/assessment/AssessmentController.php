@@ -980,8 +980,8 @@ class AssessmentController extends AppController
         $course = Course::getById($courseId);
         $isTeacherId = $this->isTeacher($user['id'], $courseId);
         if (!(isset($isTeacherId))) {
-            echo AppConstant::NO_TEACHER_RIGHTS;
-            exit;
+            $this->setErrorFlash(AppConstant::NO_TEACHER_RIGHTS);
+            return $this->redirect('assessment-message?cid='.$courseId); //need to check path.
         }
         if (isset($params['record'])) {
             $endMessage = array();
@@ -3947,16 +3947,19 @@ class AssessmentController extends AppController
             $doEmbed = true;
             $out = '<iframe width="640" height="510" src="http://player.vimeo.com/video/' . $videoId . '" frameborder="0" allowfullscreen></iframe>';
         }
+        $html = '';
         if ($doEmbed) {
-            echo '<html><head><title>Video</title>';
-            echo '<meta name="viewport" content="width=660, initial-scale=1">';
-            echo '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}</style>';
-            echo '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);</script>';
-            echo '</head>';
-            echo '<body>' . $out . '</body></html>';
+            $html .= '<html><head><title>Video</title>';
+            $html .= '<meta name="viewport" content="width=660, initial-scale=1">';
+            $html .= '<style type="text/css"> html, body {margin: 0px} html {padding:0px} body {padding: 10px;}</style>';
+            $html .= '<script type="text/javascript">childTimer = window.setInterval(function(){try{window.opener.popupwins[\'video\'] = window;} catch(e){}}, 300);</script>';
+            $html .= '</head>';
+            $html .= '<body>' . $out . '</body></html>';
         } else {
             header("Location: $url");
         }
+        $responseArray = array('html' => $html, 'doEmbed' => $doEmbed);
+        return $this->renderWithData('watchVideo', $responseArray);
     }
 
     public function actionShowPrintTest()
@@ -4067,7 +4070,7 @@ class AssessmentController extends AppController
         }else{
             $temp .= ucfirst($user['FirstName'])." ".$user['LastName'];
         }
-        echo"</h4>\n";
+        $temp .= "</h4>\n";
         $temp .= "<h3>".$testSettings['name']."</h3>\n";
         $allowregen = ($testSettings['testtype'] == "Practice" || $testSettings['testtype']=="Homework");
         $showeachscore = ($testSettings['testtype']=="Practice" || $testSettings['testtype']=="AsGo" || $testSettings['testtype']=="Homework");
@@ -4247,7 +4250,7 @@ class AssessmentController extends AppController
         $userId = $user['id'];
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
-
+        $latePass = '';
         $result = Course::getByLatePasshrs($courseId);
         $hours = $result[0]['latepasshrs'];
         $now = time();
@@ -4258,16 +4261,16 @@ class AssessmentController extends AppController
         }
 
         if (isset($undo)) {
-            echo "<div>Un-use LatePass</div>";
+
             $resultExp = Exceptions::getByUIdAndAssId($userId,$assessmentId);
             if (count($resultExp) == AppConstant::NUMERIC_ZERO)
             {
-                echo '<p>Invalid</p>';
+
             } else {
                 $row = $resultExp;
                 if ($row['islatepass'] == AppConstant::NUMERIC_ZERO)
                 {
-                    echo '<p>Invalid</p>';
+
                 }
                 else {
                     $now = time();
@@ -4277,7 +4280,7 @@ class AssessmentController extends AppController
                      * if it's past original due date and latepass is for less than latepasshrs past now, too late
                      */
                     if ($now > $endDate && $row['enddate'] < $now + $hours * 60 * 60) {
-                        echo '<p>Too late to un-use this LatePass</p>';
+
                     } else {
                         if ($now < $endDate) {
                             /*
@@ -4298,16 +4301,12 @@ class AssessmentController extends AppController
                                 $n = $row['islatepass'];
                             }
                         }
-                        echo "<p>Returning $n LatePass".($n > AppConstant::NUMERIC_ONE?"es":"")."</p>";
+                        $latePass .= "<p>Returning $n LatePass".($n > AppConstant::NUMERIC_ONE?"es":"")."</p>";
                         Student::updateLatePass($n, $userId, $courseId);
                     }
                 }
             }
-            if (!$sessionData['ltiitemtype'] || $sessionData['ltiitemtype']!=0) { ?>
-                <a href="<?php AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId)?>"><?php echo 'Continue'?></a>
-            <?php  } else { ?>
-                <a href="<?php AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid='.$courseId.'&id'.$sessionData['ltiitemid'])?>"><?php echo 'Continue'?></a>
-          <?php  }
+
         } else if (isset($confirm)) {
             $addTime = $hours*60*60;
             $result = Assessments::getDateAndAllowById($assessmentId);
@@ -4349,8 +4348,6 @@ class AssessmentController extends AppController
             }
             $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
         } else {
-            echo "Redeem LatePass</div>\n";
-
             $result = Student::getLatePassById($userId, $courseId);
             $numLatepass = $result[0]['latepass'];
 
@@ -4370,16 +4367,10 @@ class AssessmentController extends AppController
                 $thised = $r['enddate'];
             }
 
-            if ($numLatepass == AppConstant::NUMERIC_ZERO)
-            {
-                echo "<p>You have no late passes remaining.</p>";
-            }
-            else if (($allowlate % 10 == AppConstant::NUMERIC_ONE || $allowlate %10-1 > $usedLatepasses) && ($now < $thised || ($allowlate > 10 && ($now - $thised) < $hours*3600 && !in_array($assessmentId,$viewedAssess))))
-            {
 
-            } else {
-                echo "<p>You are not allowed to use additional latepasses on this assessment.</p>";
-            }
         }
+        $responseArray = array('undo' =>$undo, 'latePass' => $latePass, 'resultExp' => $resultExp, 'row' => $row, 'now' => $now, 'numLatepass' => $numLatepass, 'endDate' => $endDate,
+        'hours' => $hours, 'sessionData' => $sessionData, 'courseId' => $courseId);
+        return $this->renderWithData('latePass',$responseArray);
     }
 }

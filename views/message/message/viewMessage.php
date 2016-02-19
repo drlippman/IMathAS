@@ -65,6 +65,19 @@ $now = $currentTime;
                  echo ' <span class="small">(Section: '.$messageData['section'].')</span>';
              }
 
+             if (isset($teacherof[$messageData['courseid']])) {
+                 if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$messageData['title'],$matches)) {
+                         if(count($assessmentSessionData) > AppConstant::NUMERIC_ZERO){
+                             $asid = $assessmentSessionData['id'];?>
+                             <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-view-asid?cid='.$messageData['courseid']. '&uid='.$messageData['msgfrom']. '&asid=' .$asid)?>">Assignment</a>
+                             <?php
+                             if($due < 2000000000){
+                                 echo ' <span class="small">Due '.$duedate.'</span>';
+                             }
+                         }
+                 }
+             }
+
              if (isset($teacherof[$messageData['courseid']])) {?>
              <span class="text-deco-none padding-right-fifteen">
                     <a class="btn1 reply-button white-color" href="mailto:<?php echo $messageData['email']; ?>"><?php echo AppUtility::t('email');?></a>

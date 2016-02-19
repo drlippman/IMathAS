@@ -189,6 +189,8 @@ class SiteController extends AppController
         $sel1 = explode(',',$line['sel1list']);
         $userip = $_SERVER['REMOTE_ADDR'];
         $noproctor = false;
+        $html = '';
+
         if ($line['ips'] != '')
         {
             foreach (explode(',',$line['ips']) as $ip) {
@@ -264,19 +266,19 @@ class SiteController extends AppController
             $pattern .= '$/i';
             if (!preg_match($pattern, $params['SID']))
             {
-                echo "<html><body>", _('Your ID is not valid.  It should contain'), " ";
+                $html .= "<html><body>".('Your ID is not valid.  It should contain')."";
                 if ($entrydig > AppConstant::NUMERIC_ZERO && $entrytype != 'E') {
-                    echo $entrydig.' ';
-                }
+                    $html .= $entrydig.' ';
+                  }
                 if ($entrytype=='C')
                 {
-                    echo _('letters or numbers');
+                    $html .= _('letters or numbers');
                 } else if ($entrytype=='D') {
-                    echo _('numbers');
+                    $html .= _('numbers');
                 } else if ($entrytype=='E') {
-                    echo _('an email address');
+                    $html .= _('an email address');
                 }
-                echo "<a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
+                $html .= "<a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>".('Try Again')."" ."</a>\n";
             }
 
             if ($params['course'] == -1)
@@ -427,7 +429,7 @@ class SiteController extends AppController
             return $this->redirect('assessment', 'assessment/show-assessment?cid='.$pcid.'&id='.$paid);
         }
         $this->includeJS(['jstz_min.js']);
-        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname, 'sel1' => $sel1, 'noproctor' => $noproctor);
+        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname, 'sel1' => $sel1, 'noproctor' => $noproctor, 'html' => $html, 'pattern' => $pattern);
         return $this->renderWithData('diagnostics', $responseData);
     }
 

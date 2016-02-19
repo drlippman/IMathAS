@@ -301,6 +301,8 @@ $urlmode = AppUtility::urlMode();
         <div class="col-md-12 col-sm-12 padding-top-twenty">
            <div class="col-md-10 col-sm-9 col-md-offset-2 col-sm-offset-3"> <textarea class="max-width-hundred-per form-control" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea></div>
         </div>
+    <?php echo $errorMsg;
+               $outputMsg;?>
         <div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
             <div class="col-md-12 col-sm-12 margin-left-sixteen padding-top-twenty">
                 <div class="col-md-2 col-sm-3 select-text-margin padding-left-zero">
