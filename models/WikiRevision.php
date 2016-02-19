@@ -101,8 +101,9 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getByIdWithMaxTime($id)
     {
-        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=':id' GROUP BY stugroupid";
-        return \Yii::$app->db->createCommand($query)->bindValue(':id',$id)->queryAll();
+        $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=:id GROUP BY stugroupid";
+        $command = \Yii::$app->db->createCommand($query)->bindValue(':id',$id);
+        return $command->queryAll();
     }
 
     public static function deleteAllRevision($id, $groupId)

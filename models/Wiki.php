@@ -49,7 +49,7 @@ class Wiki extends BaseImasWikis
         $updateWiki->description = $params['description'];
         $updateWiki->avail = $params['avail'];
         $updateWiki->editbydate=$params['rdatetype'];
-        $updateWiki->groupsetid=$params['ignoregroupsetid'];
+        $updateWiki->groupsetid=$params['groupsetid'];
         if ($params['avail'] == AppConstant::NUMERIC_ONE) {
             if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
                 $startDate = AppConstant::NUMERIC_ZERO;

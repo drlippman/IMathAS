@@ -149,8 +149,9 @@ class WikiController extends AppController
                         $wikiLastViews[$row['stugroupid']] = $row['lastview'];
                     }
                     $wikiRevisionResult = WikiRevision::getByIdWithMaxTime($id);
+
                     foreach($wikiRevisionResult as $key => $row){
-                        if (!isset($wikiLastViews[$row['stugroupid']]) || $wikiLastViews[$row['stugroupid']] < $row['time']) {
+                        if (!isset($wikiLastViews[$row['stugroupid']]) || $wikiLastViews[$row['stugroupid']] < $row['MAX(time)']) {
                             $hasNew[$row['stugroupid']] = AppConstant::NUMERIC_ONE;
                         }
                     }
@@ -159,7 +160,7 @@ class WikiController extends AppController
                     foreach($studGrpResult as $key => $row)
                     {
                         $stugroup_ids[$i] = $row['id'];
-                        $stugroup_names[$i] = $row['name'] . ((isset($hasNew[$row['id']]))?' (New Revisions)':'');
+                        $stugroup_names[$i] = $row['name'] . (($hasNew[$row['id']])?' (New Revisions)':'');
                         if ($row['id'] == $groupId)
                         {
                             $curGroupName = $row['name'];
@@ -485,7 +486,6 @@ class WikiController extends AppController
                 $started=true;
             else
                 $started=false;
-
             $saveTitle = "Modify Wiki";
             $saveButtonTitle = "Save Changes";
             $defaultValues = array(
@@ -500,6 +500,7 @@ class WikiController extends AppController
                 'pageTitle' => $saveTitle,
                 'rdatetype' => $revisedate,
                 'saveTitle' => AppConstant::SAVE_BUTTON,
+                'groupsetid'=>$wiki['groupsetid'],
                 'avail' => $wiki['avail'],
 
             );
@@ -552,7 +553,7 @@ class WikiController extends AppController
                }elseif($params['rdatetype']=="Date"){
                  $params['rdatetype']= Apputility::parsedatetime($params['rdate'],$params['rtime']);
                }
-              $link->updateChange($params, $courseId);
+               $link->updateChange($params, $courseId);
               return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$courseId));
             } else{
                if ($params['avail']== AppConstant::NUMERIC_ONE) {

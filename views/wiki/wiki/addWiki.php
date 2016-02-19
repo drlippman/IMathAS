@@ -170,10 +170,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-3 col-sm-3 dropdown">
 <?php
 if ($started) {
-    AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],0,"Not group wiki",0,$started?'disabled="disabled"':'');
-    echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
+    AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$defaultValue['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
+    echo '<input type="hidden" name="groupsetid" value="'.$defaultValue['groupsetid'].'" />';
 } else {
-    AppUtility::writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
+    AppUtility::writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$defaultValue['groupsetid'],"Not group wiki",0);
 }
 $revisedate=$wiki['editbydate'];
 ?>
