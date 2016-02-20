@@ -148,8 +148,8 @@ class WikiController extends AppController
                     foreach($wikiViewResult as $key => $row){
                         $wikiLastViews[$row['stugroupid']] = $row['lastview'];
                     }
-                    $wikiRevisionResult = WikiRevision::getByIdWithMaxTime($id);
 
+                    $wikiRevisionResult = WikiRevision::getByIdWithMaxTime($id);
                     foreach($wikiRevisionResult as $key => $row){
                         if (!isset($wikiLastViews[$row['stugroupid']]) || $wikiLastViews[$row['stugroupid']] < $row['MAX(time)']) {
                             $hasNew[$row['stugroupid']] = AppConstant::NUMERIC_ONE;
@@ -208,9 +208,10 @@ class WikiController extends AppController
                     $rec = "data-base=\"wikiintext-$id\" ";
                     $text = str_replace('<a ','<a '.$rec, $text);
                 }
+
                 $affectedRow = new WikiView();
-                $affectedRow->updateLastView($userId, $id, $groupId,$now);
-                if ($affectedRow == AppConstant::NUMERIC_ZERO) {
+                $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
+                if ($data) {
                     $wikiView = new WikiView();
                     $wikiView->addWikiView($userId, $id, $groupId, $now);
                 }

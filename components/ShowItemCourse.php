@@ -1531,22 +1531,24 @@ class ShowItemCourse extends Component
                             $wikigroupid = AppConstant::NUMERIC_ZERO;
                         }
                     }
+
                     $wikilastviews = array();
                     $result = WikiView::getByUserIdAndWikiId($userId, $typeid);
-                   foreach($result as $key => $row){
+
+                    foreach($result as $key => $row){
                         $wikilastviews[$row['stugroupid']] = $row['lastview'];
-
                     }
-
                     $groupSetId = $line['groupsetid'];
                     $result = WikiRevision::getMaxTime($typeid, $groupSetId, $canEdit, $wikigroupid);
                     foreach($result as $key => $row){
-                        if (!($wikilastviews[$row['stugroupid']]) || $wikilastviews[$row['stugroupid']] < $row['time']) {
+                        if (!($wikilastviews[$row['stugroupid']]) || $wikilastviews[$row['stugroupid']] < $row['MAX(time)']) {
                             $hasnew = true;
                             break;
                         }
                     }
+
                 }
+
                 if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate'] < $now && $line['enddate'] > $now)) {
                     if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');
@@ -1576,7 +1578,7 @@ class ShowItemCourse extends Component
                             $defaultgroupid=$groupId[0]['id'];
                         }else
                             $defaultgroupid=0;
-                    
+
                     if ($isPublic) { ?>
                          <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/view-wiki-public?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
                    <?php } else {
@@ -1586,7 +1588,7 @@ class ShowItemCourse extends Component
                             $rec = '';
                         } ?>
 <!--                        echo "<b><a href=\"#\" $rec>{$line['name']}</a></b>\n";-->
-                                              <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
+                           <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
                       <?php  if ($hasnew) {
                             echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
                         }

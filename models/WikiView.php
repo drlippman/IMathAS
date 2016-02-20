@@ -45,13 +45,16 @@ class WikiView extends BaseImasWikiViews
     {
         return self::find()->select(['stugroupid','lastview'])->where(['userid' => $userId,'wikiid' => $id])->all();
     }
+
     public static function updateLastView($userId, $id, $groupId,$now)
     {
+        $lastViewupdate=0;
         $lastView = WikiView::find()->where(['userid' => $userId])->andWhere(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->one();
         if($lastView){
             $lastView->lastview = $now;
-            
+            $lastViewupdate=1;
         }
+        return $lastViewupdate;
     }
 
     public function addWikiView($userId, $wikiId, $stuGroupId, $lastView)
