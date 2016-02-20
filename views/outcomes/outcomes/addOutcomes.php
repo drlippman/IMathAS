@@ -72,9 +72,9 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
     function addoutcome() {
-        var html = '<li class="col-md-12 col-sm-12 padding-left-zero" id="new'+ocnt+'"><span class="floatleft padding-top-pt-five-em"><span class=icon style="background-color:#0f0">O</span></span>';
-        html += '<span class="col-md-6 col-sm-6"><input class="form-control outcome" type="text" size="60" id="newo'+ocnt+'" onkeyup="txtchg()"></span>';
-        html += '<span class="floatleft padding-top-pt-five-em"><a href="#" onclick="removeoutcome(this);return false\">Delete</a></span></li>';
+        var html = '<li id="new'+ocnt+'"><span class=icon style="background-color:#0f0">O</span>';
+        html += '<input class="outcome" type="text" size="60" id="newo'+ocnt+'" onkeyup="txtchg()">';
+        html += '<a href="#" onclick="removeoutcome(this);return false\">Delete</a></li>';
         j('#qviewtree').append(html);
         j("#new"+ocnt).focus();
         ocnt++;
@@ -86,12 +86,10 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
     function addoutcomegrp() {
-        var html = '<li class="col-md-12 col-sm-12 padding-left-zero blockli" id="newgrp'+ocnt+'"><span class="floatleft padding-top-pt-five-em">' +
-            '<span class=icon style="background-color:#66f">G</span> </span>';
-        html += '<span class="col-md-6 col-sm-6"><input class="form-control outcome" type="text" size="60" id="newg'+ocnt+'" onkeyup="txtchg()"></span>';
-        html += '<span class="floatleft padding-top-pt-five-em">' +
-            '<a href="#" onclick="removeoutcomegrp(this);return false\">Delete</a>' +
-            '</span></li>';
+        var html = '<li class="blockli" id="newgrp'+ocnt+'">' +
+            '<span class=icon style="background-color:#66f">G</span>';
+        html += '<input class="outcome" type="text" size="60" id="newg'+ocnt+'" onkeyup="txtchg()">';
+        html += '<a href="#" onclick="removeoutcomegrp(this);return false\">Delete</a></li>';
         j("#qviewtree").append(html);
         j("#newgrp"+ocnt).focus();
         ocnt++;

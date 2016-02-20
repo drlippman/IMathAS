@@ -20,7 +20,7 @@ var Nested = new Class({
 	initialize: function(list, options) {
 
 		this.setOptions(this.getOptions(), options);
-		if (!this.options.expandKey.match(/^(control|shift)jQuery/)) {
+		if (!this.options.expandKey.match(/^(control|shift)$/)) {
 			this.options.expandKey = 'shift';
 		}
 		this.list = $(list);
@@ -212,7 +212,7 @@ var Nested = new Class({
 		last = dest.getParent().getLast();
 		while (((move == 'after' && last == dest) || last == el) && dest.getParent() != this.list && event.page.x < dest.getLeft()) {
 			move = 'after';
-			dest = jQuery(dest.parentNode.parentNode);
+			dest = $(dest.parentNode.parentNode);
 			last = dest.getParent().getLast();
 		}
 
@@ -272,7 +272,7 @@ var Nested = new Class({
 		this.list.removeEvent('mousedown', this.bound.end);
 		this.list.addEvent('mousedown', this.bound.start);
 		this.fireEvent('onComplete', el);
-		if (window.ie) jQuery(document.body).removeEvent('drag', this.bound.stop).removeEvent('selectstart', this.bound.stop);
+		if (window.ie) $(document.body).removeEvent('drag', this.bound.stop).removeEvent('selectstart', this.bound.stop);
 	}
 });
 
@@ -311,38 +311,39 @@ function toSimpleJSON(a) {
 }
 
 function submitChanges() {
-  var params = 'order='+toSimpleJSON(sortIt.serialize());
-  var url = AHAHsaveurl;;
-  var els = document.getElementsByTagName("input");
+    var params = 'order='+toSimpleJSON(sortIt.serialize());
+    var url = AHAHsaveurl;
+    var els = document.getElementsByTagName("input");
     for (var i=0; i<els.length; i++) {
-	  if (els[i].type=="hidden" && els[i].value!="") {
-	  	  params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
-	  } else if (els[i].type=="text" && els[i].className=="outcome") {
-		  params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
-	  }
-  }
-  var target = "submitnotice";
-  document.getElementById(target).innerHTML = ' Saving Changes... ';
-  if (window.XMLHttpRequest) {
-    req = new XMLHttpRequest();
-  } else if (window.ActiveXObject) {
-    req = new ActiveXObject("Microsoft.XMLHTTP");
-  }
+        if (els[i].type=="hidden" && els[i].value!="") {
+            params += '&'+els[i].id.substring(5) + '=' + encodeURIComponent(els[i].value);
+        } else if (els[i].type=="text" && els[i].className=="outcome") {
+            params += '&'+els[i].id + '=' + encodeURIComponent(els[i].value);
+        }
+    }
+    var target = "submitnotice";
+    document.getElementById(target).innerHTML = ' Saving Changes... ';
+    if (window.XMLHttpRequest) {
+        req = new XMLHttpRequest();
+    } else if (window.ActiveXObject) {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+    }
     if (typeof req != 'undefined') {
-    req.open("POST", url, true);
-	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	req.setRequestHeader("Content-length", params.length);
-	req.setRequestHeader("Connection", "close");
-    req.onreadystatechange = function() {NestedahahDone(url, target);};
-   	req.send(params);
-  }
+        req.open("POST", url, true);
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        //Note: XMLHttpRequest isn't allowed to set these headers, they are being set automatically by the browser
+        //req.setRequestHeader("Content-length", params.length);
+        //req.setRequestHeader("Connection", "close");
+        req.onreadystatechange = function() {NestedahahDone(url, target);};
+        req.send(params);
+    }
 }
 
 function quickviewexpandAll() {
-	jQuery("#qviewtree li.blockli.nCollapse").removeClass("nCollapse").children("ul").show();
+	$("#qviewtree li.blockli.nCollapse").removeClass("nCollapse").children("ul").show();
 }
 function quickviewcollapseAll() {
-	jQuery("#qviewtree li.blockli:not(.nCollapse)").addClass("nCollapse").children("ul").hide();
+	$("#qviewtree li.blockli:not(.nCollapse)").addClass("nCollapse").children("ul").hide();
 }
 
 function NestedahahDone(url, target)
@@ -350,7 +351,6 @@ function NestedahahDone(url, target)
     if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK"
         if (req.responseText.substring(0,2)=='OK') {
-console.log('jkjkj');
 		    document.getElementById(target).innerHTML='';
 		    document.getElementById('recchg').disabled = true;
 		    window.onbeforeunload = null;

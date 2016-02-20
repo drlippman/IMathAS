@@ -41,7 +41,7 @@ class OutcomesController extends AppController
         $this->courseId = $this->getParamVal('cid');
         $course = Course::getById($this->courseId);
         $this->params = $this->getRequestParams();
-            $this->layout = 'master';
+        $this->layout = 'master';
         if(isset($this->params['order']))
         {
             $query = Outcomes::getByCourseId($this->courseId);
@@ -101,6 +101,7 @@ class OutcomesController extends AppController
             $i++;
         }
         $listArr[] = substr($list,$last);
+
         foreach ($listArr as $it)
         {
             if (strpos($it,'grp')!==false)
@@ -133,7 +134,8 @@ class OutcomesController extends AppController
                 {
                     $oCnt = substr($it,3);
                     $query  = new Outcomes();
-                    $insertId = $query->insertOutcomes($this->courseId, $oCnt);
+                    $name = $this->params['newo'.$oCnt];
+                    $insertId = $query->insertOutcomes($this->courseId, $name);
                     $this->seenOutcomesArr[] = $insertId;
                     $outArr[] = $insertId;
 
@@ -148,7 +150,6 @@ class OutcomesController extends AppController
                     $this->seenOutcomesArr[] = $it;
                 }
             }
-
         }
         return $outArr;
     }
