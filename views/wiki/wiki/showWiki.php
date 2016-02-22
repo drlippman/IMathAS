@@ -16,7 +16,7 @@ $editByDate=($wikiTotalData[0]['editbydate']);
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php print_r($wikiTotalData[0]['name']);?></div>
+                <div class="vertical-align title-page"><?php echo ($wikiTotalData[0]['name']);?></div>
             </div>
         </div>
     </div>
@@ -84,8 +84,8 @@ if (isset($delAll) && $isTeacher) {
         if ($isGroup) {
             $grpnote = "For this group's wiki: ";
         }?>
-        <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page Contents</button> &nbsp;
-        <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>)'>Clear Page History</button> &nbsp;
+        <button type="button" onclick='clearContent(<?php echo $courseId?>,<?php echo $id?>,<?php echo $groupId?>)'>Clear Page Contents</button> &nbsp;
+        <button type="button" onclick='clearHistory(<?php echo $courseId?>,<?php echo $id?>,<?php echo $groupId?>)'>Clear Page History</button> &nbsp;
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' .$courseId. '&wikiId='.$id.'&grp='.$groupId.'&snapshot=true'.$framed)?>">Current Version Snapshot</a></div>
     <?php }
     ?>
@@ -361,15 +361,16 @@ if (isset($delAll) && $isTeacher) {
         }
     }
 
-    function clearContent(courseId,wikiId)
+    function clearContent(courseId,wikiId,groupId)
     {
-        jQuerySubmit('clear-page-content-ajax', {courseId:courseId, wikiId:wikiId}, 'removeResponseSuccess');
+        jQuerySubmit('clear-page-content-ajax', {courseId:courseId, wikiId:wikiId, groupId:groupId}, 'removeResponseSuccess');
     }
 
     function removeResponseSuccess(response) {
         response = JSON.parse(response);
         var wikiId = response.data.wikiId;
         var courseId = response.data.courseId;
+        var groupId = response.data.groupId;
         if (response.status == 0) {
             var message = '';
             message += 'Are you SURE you want to delete all contents and history for this Wiki page?';
@@ -384,7 +385,7 @@ if (isset($delAll) && $isTeacher) {
                         return false;
                     },
                     "Confirm": function () {
-                        window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&delall=true";
+                        window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&grp="+groupId+"&delall=true";
                     }
                 },
                 close: function (event, ui) {
@@ -399,15 +400,17 @@ if (isset($delAll) && $isTeacher) {
         }
     }
 
-    function clearHistory(courseId,wikiId)
+    function clearHistory(courseId,wikiId,groupId)
     {
-        jQuerySubmit('clear-page-history-ajax', {courseId:courseId, wikiId:wikiId}, 'removeHistoryResponseSuccess');
+        jQuerySubmit('clear-page-history-ajax', {courseId:courseId, wikiId:wikiId, groupId:groupId}, 'removeHistoryResponseSuccess');
     }
     function removeHistoryResponseSuccess(response)
     {
         response = JSON.parse(response);
         var wikiId = response.data.wikiId;
         var courseId = response.data.courseId;
+        var groupId = response.data.groupId;
+
         if (response.status == 0) {
             var message = '';
             message += 'Are you SURE you want to delete all revision history for this Wiki page? The current version will be retained.';
@@ -422,7 +425,7 @@ if (isset($delAll) && $isTeacher) {
                         return false;
                     },
                     "Confirm": function () {
-                        window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&delrev=true";
+                        window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&grp="+groupId+"&delrev=true";
                     }
                 },
                 close: function (event, ui) {

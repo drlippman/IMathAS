@@ -44,7 +44,6 @@ if ($overWriteBody) {
 
         $didview = array();
         $notview = array();
-
         foreach ($stus as $stu=>$name) {
 
             if (isset($data[$ident][$stu])) {

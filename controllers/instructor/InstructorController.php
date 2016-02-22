@@ -1272,9 +1272,12 @@ class InstructorController extends AppController
                 } else {
                     $ident = $type;
                 }
+
                 if (!isset($descrips[$ident]))
                 {
+
                     if (in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
+                        AppUtility::dump($type);
                         $parts = explode('::',$row['info']);
                         if (count($parts)>1) {
                             $desc = 'In-item link to <a href="'.$parts[0].'">'.$parts[1].'</a>';
@@ -1294,16 +1297,17 @@ class InstructorController extends AppController
                 if (!isset($data[$ident])) {
                     $data[$ident] = array();
                 }
+
                 if (!isset($data[$ident][$row['userid']])) {
                     $data[$ident][$row['userid']] = 1;
                 } else {
                     $data[$ident][$row['userid']]++;
                 }
+
             }
 
             $row = $q2;
             $itemName = $row['name'];
-
             $stus = array();
 
             $result = User::getDataByCourseId($courseId);
@@ -1312,6 +1316,7 @@ class InstructorController extends AppController
             {
                 $stus[$row['id']] = $row['LastName'].', '.$row['FirstName'];
             }
+
         }
         $responseData = array('overWriteBody' => $overWriteBody, 'itemName' => $itemName, 'body' => $body, 'descrips' => $descrips, 'stus' => $stus, 'data' => $data, 'course' => $course);
         return $this->renderWithData('contentStats', $responseData);

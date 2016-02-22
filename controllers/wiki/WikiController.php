@@ -47,7 +47,6 @@ class WikiController extends AppController
         $snapshot = $this->getParamVal('snapshot');
         $toRev = $this->getParamVal('torev');
         $dispRev = $this->getParamVal('disprev');
-
         if (isset($frame)) {
             $flexWidth = true;
             $showNav = false;
@@ -70,6 +69,7 @@ class WikiController extends AppController
             $wikiName = $row['name'];
             $pageTitle = $wikiName;
             $now = time();
+
             if (!isset($isTeacher) && ($row['avail'] == AppConstant::NUMERIC_ZERO || ($row['avail'] == AppConstant::NUMERIC_ONE && ($now < $row['startdate'] || $now > $row['enddate']))))
             {
                 $overWriteBody = AppConstant::NUMERIC_ONE;
@@ -77,7 +77,7 @@ class WikiController extends AppController
             } else if (isset($delAll) && ($isTeacher)) {
                 if ($delAll == 'true') {
                     WikiRevision::deleteAllRevision($id, $groupId);
-                    return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id);
+                    return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id.'&grp='.$groupId);
                 } else {
                     $pageTitle = "Confirm Page Contents Delete";
                 }
@@ -88,7 +88,7 @@ class WikiController extends AppController
                         $curId = $result[0]['id'];
                         WikiRevision::deleteRevisionHistory($id, $groupId,$curId);
                     }
-                    return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id);
+                    return $this->redirect('show-wiki?courseId='.$courseId.'&wikiId='.$id.'&grp='.$groupId);
                 } else {
                     $pageTitle = "Confirm History Delete";
                 }
@@ -113,6 +113,7 @@ class WikiController extends AppController
                 } else {
                     $pageTitle = "Confirm Wiki Version Revert";
                 }
+
             } else { //just viewing
                 require_once("../filter/filter.php");
                 if ( $now < $row['editbydate']) {
@@ -120,7 +121,6 @@ class WikiController extends AppController
                 } else {
                     $canEdit = false;
                 }
-
                 /**
                  * if is group wiki, get groupid or fail
                  */
@@ -148,7 +148,6 @@ class WikiController extends AppController
                     foreach($wikiViewResult as $key => $row){
                         $wikiLastViews[$row['stugroupid']] = $row['lastview'];
                     }
-
                     $wikiRevisionResult = WikiRevision::getByIdWithMaxTime($id);
                     foreach($wikiRevisionResult as $key => $row){
                         if (!isset($wikiLastViews[$row['stugroupid']]) || $wikiLastViews[$row['stugroupid']] < $row['MAX(time)']) {
@@ -208,8 +207,12 @@ class WikiController extends AppController
                     $rec = "data-base=\"wikiintext-$id\" ";
                     $text = str_replace('<a ','<a '.$rec, $text);
                 }
-
-
+            }
+            $affectedRow = new WikiView();
+            $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
+            if ($data=AppConstant::NUMERIC_ONE) {
+                $wikiView = new WikiView();
+                $wikiView->addWikiView($userId, $id, $groupId, $now);
             }
         }
         $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);
@@ -223,12 +226,6 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-        $affectedRow = new WikiView();
-        $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
-        if ($data) {
-            $wikiView = new WikiView();
-            $wikiView->addWikiView($userId, $id, $groupId, $now);
-        }
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
                 'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);
@@ -240,7 +237,8 @@ class WikiController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $wikiId = $params['wikiId'];
-        $responseData = array('courseId' => $courseId, 'wikiId' => $wikiId);
+        $groupId=$params['groupId'];
+        $responseData = array('courseId' => $courseId, 'wikiId' => $wikiId,'groupId'=>$groupId);
         return $this->successResponse($responseData);
     }
     public function actionClearPageHistoryAjax()
@@ -248,7 +246,8 @@ class WikiController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $wikiId = $params['wikiId'];
-        $responseData = array('courseId' => $courseId, 'wikiId' => $wikiId);
+        $groupId=$params['groupId'];
+        $responseData = array('courseId' => $courseId, 'wikiId' => $wikiId,'groupId'=>$groupId);
         return $this->successResponse($responseData);
     }
 
