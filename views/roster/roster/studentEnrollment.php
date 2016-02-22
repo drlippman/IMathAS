@@ -34,7 +34,7 @@ $this->title = AppUtility::t('Enroll an Existing user', false);
             ]
         ) ?>
         <div class="text-gray-background padding-one-em">
-        <?php echo $form->field($model, 'usernameToEnroll')->textInput(array('placeholder' => AppUtility::t('username', false))); ?>
+        <?php echo $form->field($model, 'usernameToEnroll')->textInput(array('placeholder' => AppUtility::t('Username', false))); ?>
         <?php echo $form->field($model, 'section')->textInput(array('placeholder' => AppUtility::t('Section', false))); ?>
         <?php echo $form->field($model, 'code')->textInput(array('placeholder' => AppUtility::t('Code', false))); ?>
         <div class="form-group">

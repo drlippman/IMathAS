@@ -258,8 +258,10 @@ class RosterController extends AppController
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollmentForm'];
             $user = User::findByUsername($param['usernameToEnroll']);
+            $createNEnroll = ' <a href='.AppUtility::getURLFromHome("roster","roster/create-and-enroll-new-student?cid=".$courseId).'>Create new user</a>';
+
             if (!$user) {
-                $this->setErrorFlash(AppConstant::STUDENT_ERROR_MESSAGE);
+                $this->setErrorFlash(AppConstant::STUDENT_ERROR_MESSAGE. $createNEnroll);
             } else {
                 $teacher = Teacher::getUserAndCourseId($courseId,$user->id);
                 $tutor = Tutor::getByUserId($user->id, $courseId);

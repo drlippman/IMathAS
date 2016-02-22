@@ -106,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
                     <span class="floatleft">New group name</span>
                     <span class="col-md-4 colsm-4">
-                        <input class="form-control-grp" name="grpname" type="text" size="40" />
+                        <input class="form-control-grp" name="grpname" type="text" size="40" maxlength="50"/>
                     </span>
                 </div>
                 <div class="col-md-6 col-sm-6 padding-left-zero padding-top-one-pt-five-em">

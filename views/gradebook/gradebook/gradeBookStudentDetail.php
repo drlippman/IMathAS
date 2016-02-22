@@ -232,7 +232,6 @@ if ($studentId>0) {
     $now = time();
     }
 
-//AppUtility::dump($StudentData);
     $gbcomment = $StudentData['gbcomment'];
     $stuemail = $currentUser['email'];
     $latepasses = $StudentData['latepass'];
@@ -382,7 +381,6 @@ if($StudentData > 0){?>
             $sarr = "'S','N','N','N'";
             }
             if ($studentId>0) {
-//                AppUtility::dump('jhjh');
             echo '<th>', AppUtility::t('Feedback'), '<br/><a href="#" class="Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedback'), '</a></th>';
             $sarr .= ",'N'";
             }
