@@ -38,10 +38,10 @@ class Grades extends BaseImasGrades
         $query = new Query();
         $query->select(['*'])
             ->from('imas_grades')
-            ->where([$sel]);
+            ->where($sel);
         if ($limuser > 0)
         {
-            $query->andWhere('userid = :limuser',[':limuser' => $limuser]);
+            $query->andWhere('userid=:limuser',[':limuser' => $limuser]);
         }
         $command = $query->createCommand();
         $data = $command->queryAll();

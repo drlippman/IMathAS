@@ -125,7 +125,7 @@ class AppConstant
     const New_Item = "Create Item";
     const ALWAYS_TIME = 2000000000;
     const STUDENT_ERROR_MESSAGE = "Student not found please enter correct username.";
-    const TEACHER_CANNOT_CHANGE_AS_SRUDENT = "Teachers can\'t be enrolled as students - use Student View, or create a separate student account.";
+    const TEACHER_CANNOT_CHANGE_AS_SRUDENT = "Teachers can't be enrolled as students - use Student View, or create a separate student account.";
     const UPDATE_STUDENT_SUCCESSFULLY="Student information updated successfully.";
     const USER_EXISTS ="Username already exists";
     const ADD_AT_LEAST_ONE_RECORD = "Add atleast one records in file.";
