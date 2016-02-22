@@ -6,6 +6,7 @@ use app\components\AppConstant;
 
 $this->title = AppUtility::t('Manage Exception', false);
 $this->params['breadcrumbs'][] = $this->title;
+$now = time();
 ?>
 <div class="item-detail-header">
     <?php if ($gradebook != AppConstant::NUMERIC_ONE){
@@ -104,7 +105,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'name' => 'startTime',
                                     'options' => ['placeholder' => 'Select start time ...'],
                                     'convertFormat' => true,
-                                    'value' => date('g:i A'),
+                                    'value' => AppUtility::tzdate("g:i a",$now),
                                     'pluginOptions' => [
                                         'format' => "m/d/Y g:i A",
                                         'todayHighlight' => true,
