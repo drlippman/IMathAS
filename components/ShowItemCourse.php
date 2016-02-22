@@ -1546,9 +1546,7 @@ class ShowItemCourse extends Component
                             break;
                         }
                     }
-
                 }
-
                 if ($line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate'] < $now && $line['enddate'] > $now)) {
                     if ($line['avail'] == AppConstant::NUMERIC_TWO) {
                         $show = _('Showing Always ');

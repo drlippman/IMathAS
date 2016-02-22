@@ -49,7 +49,7 @@ class WikiView extends BaseImasWikiViews
     public static function updateLastView($userId, $id, $groupId,$now)
     {
         $lastViewupdate=0;
-        $lastView = WikiView::find()->where(['userid' => $userId])->andWhere(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->one();
+        $lastView = WikiView::find()->Where(['wikiid' => $id])->andWhere(['stugroupid' => $groupId])->one();
         if($lastView){
             $lastView->lastview = $now;
             $lastViewupdate=1;

@@ -209,12 +209,7 @@ class WikiController extends AppController
                     $text = str_replace('<a ','<a '.$rec, $text);
                 }
 
-                $affectedRow = new WikiView();
-                $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
-                if ($data) {
-                    $wikiView = new WikiView();
-                    $wikiView->addWikiView($userId, $id, $groupId, $now);
-                }
+
             }
         }
         $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);
@@ -227,6 +222,12 @@ class WikiController extends AppController
             $order = AppConstant::DESCENDING;
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
+        }
+        $affectedRow = new WikiView();
+        $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
+        if ($data) {
+            $wikiView = new WikiView();
+            $wikiView->addWikiView($userId, $id, $groupId, $now);
         }
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,

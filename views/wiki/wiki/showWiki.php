@@ -47,18 +47,18 @@ if ($isTeacher && $groupId >0 && isset($curGroupName)) {
 }
 if (isset($delAll) && $isTeacher) {
     echo '<p>Are you SURE you want to delete all contents and history for '.$grpnote.' Wiki page?</p>';
-    echo "<p><button type=\"button\" onclick=\"window.location.href='show-wiki?courseId=$courseId&wikiId=$id&delall=true$framed'\">Yes, I'm Sure</button> | ";
+    echo "<p><button type=\"button\" onclick=\"window.location.href='show-wiki?courseId=$courseId&wikiId=$id&delall=true$framed'\">Confirm</button> | ";
     echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">cancel</button></p>";
 
 } else if($delRev && $isTeacher) {
     echo '<p>Are you SURE you want to delete all revision history for '.$grpnote.' Wiki page?  The current version will be retained.</p>';
 
-    echo "<p><button type=\"button\" onclick=\"window.location.href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$id.'&delrev=true')."\">Yes, I'm Sure</button> | ";
+    echo "<p><button type=\"button\" onclick=\"window.location.href=".AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$id.'&delrev=true')."\">Confirm</button> | ";
     echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Cancel</button></p>";
 } else if ($revert) {
     echo '<p>Are you SURE you want to revert to revision '.$disprev.' of '.$grpnote.' Wiki page?  All changes after that revision will be deleted.</p>';
 
-    echo "<p><button type=\"button\" onclick=\"window.location.href='show-wiki?courseId=$courseId&wikiId=$id&torev=$toRev&revert=true$framed'\">Yes, I'm Sure</button> | ";
+    echo "<p><button type=\"button\" onclick=\"window.location.href='show-wiki?courseId=$courseId&wikiId=$id&torev=$toRev&revert=true$framed'\">Confirm</button> | ";
     echo "<button type=\"button\" class=\"secondarybtn\" onclick=\"window.location.href='viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed'\">Cancel</button></p>";
 
 } else if ($snapshot) {
@@ -103,7 +103,7 @@ if (isset($delAll) && $isTeacher) {
         <?php
         if ($numRevisions > 1) {
             $last = $numRevisions - 1;
-            echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision"/></span>';
+            echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision" onclick="initrevisionview()"/></span>';
             echo '<div class="padding-left"><span id="revcontrol" style="display:none;">'; AppUtility::t('Revision history');
             echo'<a href="#" id="first" onclick="jumpto(1)"> &nbsp;'; AppUtility::t('First'); echo'</a>
             <a id="older" href="#" onclick="seehistory(1); return false;"> &nbsp;'; AppUtility::t('Older'); echo'</a> ';
@@ -187,6 +187,20 @@ if (isset($delAll) && $isTeacher) {
        window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&grp="+gfilter;
     }
 
+    var req = null;
+    function initrevisionview() {
+        document.getElementById("prevrev").innerHTML = "Loading revision history....";
+        if (window.XMLHttpRequest) {
+            req = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            req = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        if (typeof req != 'undefined') {
+            req.onreadystatechange = function() {revloaded();};
+            req.open("GET", AHAHrevurl, true);
+            req.send("");
+        }
+    }
 
 
 
@@ -358,18 +372,18 @@ if (isset($delAll) && $isTeacher) {
         var courseId = response.data.courseId;
         if (response.status == 0) {
             var message = '';
-            message += 'Are you SURE you want to delete all contents and history for this Wiki page??';
+            message += 'Are you SURE you want to delete all contents and history for this Wiki page?';
             var html = '<div><p>' + message + '</p></div>';
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Confirm Page Contents Delete ?', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
+                modal: true, title: 'Confirm Page Contents Delete ', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,draggable:false,
                 closeText: "hide",
                 buttons: {
                     "Cancel": function () {
                         $(this).dialog('destroy').remove();
                         return false;
                     },
-                    "Yes,Delete": function () {
+                    "Confirm": function () {
                         window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&delall=true";
                     }
                 },
@@ -396,18 +410,18 @@ if (isset($delAll) && $isTeacher) {
         var courseId = response.data.courseId;
         if (response.status == 0) {
             var message = '';
-            message += 'Are you SURE you want to delete all revision history for this Wiki page? The current version will be retained.?';
+            message += 'Are you SURE you want to delete all revision history for this Wiki page? The current version will be retained.';
             var html = '<div><p>' + message + '</p></div>';
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Confirm History Delete ?', zIndex: 10000, autoOpen: true,
+                modal: true, title: 'Confirm History Delete', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
-                closeText: "hide",
+                closeText: "hide",draggable:false,
                 buttons: {
                     "Cancel": function () {
                         $(this).dialog('destroy').remove();
                         return false;
                     },
-                    "Yes,Delete": function () {
+                    "Confirm": function () {
                         window.location = "show-wiki?courseId="+courseId+"&wikiId="+wikiId+"&delrev=true";
                     }
                 },
