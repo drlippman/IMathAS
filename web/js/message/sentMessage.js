@@ -162,12 +162,17 @@ function markSentDelete()
                         uncheckAllCheckbox(true);
                         $(this).dialog("close");
                         var readMsg = {checkedMsgs: markArray};
-                        jQuerySubmit('mark-sent-remove-ajax', readMsg, {});
+                        jQuerySubmit('mark-sent-remove-ajax', readMsg, 'successSentDelete');
                         return true;
                     }
                 },
                 close: function (event, ui) {
                     $(this).remove();
+                },
+                open: function(){
+                    jQuery('.ui-widget-overlay').bind('click',function(){
+                        jQuery('#dialog').dialog('close');
+                    })
                 }
 
             });
@@ -177,8 +182,10 @@ function markSentDelete()
             var msg ="Select atleast one message to Remove";
             CommonPopUp(msg);
         }
-
-
+}
+function successSentDelete()
+{
+    location.reload();
 }
 
 function uncheckAllCheckbox(isRemoveMessageRows){
@@ -236,12 +243,17 @@ function markUnsend()
                         uncheckAllCheckbox(true);
                         $(this).dialog("close");
                         var readMsg = {checkedMsgs: markArray};
-                        jQuerySubmit('mark-sent-unsend-ajax', readMsg, {});
+                        jQuerySubmit('mark-sent-unsend-ajax', readMsg, 'unSend');
                         return true;
                     }
                 },
                 close: function (event, ui) {
                     $(this).remove();
+                },
+                open: function(){
+                    jQuery('.ui-widget-overlay').bind('click',function(){
+                        jQuery('#dialog').dialog('close');
+                    })
                 }
             });
         }
@@ -250,6 +262,10 @@ function markUnsend()
             var msg ="Select atleast one message to Delete";
             CommonPopUp(msg);
         }
+}
 
+function unSend()
+{
+    location.reload();
 }
 

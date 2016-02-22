@@ -246,12 +246,17 @@ function markAsDelete() {
                     uncheckAllCheckbox(true);
                     $(this).dialog("close");
                     var readMsg = {checkedMsg: markArray};
-                    jQuerySubmit('mark-as-delete-ajax', readMsg,{});
+                    jQuerySubmit('mark-as-delete-ajax', readMsg, 'deleteMessage');
                     return true;
                 }
             },
             close: function (event, ui) {
                 $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
             }
         });
     }
@@ -260,6 +265,11 @@ function markAsDelete() {
         CommonPopUp(msg);
     }
 
+}
+
+function deleteMessage()
+{
+    location.reload();
 }
 
 function uncheckAllCheckbox(isRemoveMessageRows){

@@ -535,9 +535,9 @@ class Course extends BaseImasCourses {
         $query = new Query();
         $query	->select(['imas_courses.id'])
             ->from(['imas_courses', 'imas_users'])
-            ->where(['imas_courses.id=:courseId',[':courseId' => $params['id']]]);
+            ->where('imas_courses.id=:courseId',[':courseId' => $params['id']]);
         $query->andWhere(['imas_courses.ownerid' => 'imas_users.id']);
-        $query->andWhere(['imas_users.groupid=:groupId',[':groupId' => $groupId]]);
+        $query->andWhere('imas_users.groupid=:groupId',[':groupId' => $groupId]);
         $command = $query->createCommand();
         $data = $command->queryone();
         return $data;
