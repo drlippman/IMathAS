@@ -60,10 +60,12 @@ class WikiController extends AppController
 
         if ($courseId == AppConstant::NUMERIC_ZERO) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
-            $body = "You need to access this page with a course id";
+            $this->setErrorFlash("You need to access this page with a course id");
+            return $this->goHome();
         } else if ($id == AppConstant::NUMERIC_ZERO) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
-            $body = "You need to access this page with a wiki id";
+            $this->setErrorFlash("You need to access this page with a wiki id");
+            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
         }  else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
             $studName = Stugroups::getByName($groupId);
             $groupNote = 'group'.$studName[0]['name']."'s";
@@ -123,7 +125,9 @@ class WikiController extends AppController
                 } else {
                     $canEdit = false;
                 }
+
                 /**
+                 *
                  * if is group wiki, get groupid or fail
                  */
                 if ($row['groupsetid'] > AppConstant::NUMERIC_ZERO && !($isTeacher)) {
@@ -649,8 +653,8 @@ class WikiController extends AppController
         $from = $this->getParamVal('from');
         $id = intval($this->getParamVal('id'));
         if (!isset($courseId)) {
-            echo "Need course id";
-            exit;
+            $this->setErrorFlash('Need course id');
+            return $this->goHome();
         }
 
         if (isset($from)) {
@@ -664,8 +668,8 @@ class WikiController extends AppController
         }
 
         if (!isset($id)) {
-            echo "<html><body>No item specified.</body></html>\n";
-            exit;
+            $this->setErrorFlash("<html><body>No item specified.</body></html>\n");
+            return $this->goHome();
         }
 
         $itemId = Items::getByItemTypeAndIdWiki($id);
