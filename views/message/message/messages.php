@@ -187,7 +187,7 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
                             } else {
                                 echo "<td class=\"message-title-{$line['id']} read-message\">";
                             }
-                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\"class=\"word-break-break-all\">";
+                        echo "<a href=\"view-message?page$page&cid=$course->id&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\" class=\"word-break-break-all\">";
                         echo $line['title'];
                         echo "</a></td><td>";
                         if ($line['replied']==1) {
@@ -233,10 +233,13 @@ $saveTagged = AppUtility::getURLFromHome('message', 'message/save-tagged?cid='.$
     jQuery(document).ready(function (){
          $('.display-message-pagination').DataTable(
             {
-                "bPaginate": true
+                "aoColumnDefs": [ { "bSortable": false, "aTargets": [0,2,3,4] } ],
+                "bPaginate": true,
+                "initComplete": function() {
+                    $("thead").children().children().removeClass("sorting_asc");
+                }
             }
         );
-        $(".checkbox").parent().removeClass('sorting_asc');
     });
 
     function chgfilter() {

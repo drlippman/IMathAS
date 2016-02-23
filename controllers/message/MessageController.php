@@ -405,6 +405,8 @@ class MessageController extends AppController
         $params = $this->getRequestParams();
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
+        $checked = $this->getParamVal('msgid');
+
         if ($courseId != 0 && !($isTeacher) && !($isTutor) && !($isStudent)) {
             $this->setErrorFlash('You are not enrolled in this course.');
             return $this->goHome();
@@ -442,6 +444,10 @@ class MessageController extends AppController
         if(count($messageData) == AppConstant::NUMERIC_ZERO){
             $this->setErrorFlash('Message not found');
             return $this->redirect('view-message');
+        }
+        if($msgId != $messageData['id']){
+           $this->setErrorFlash('This message is already deleted.');
+            return $this->redirect('index?cid='.$courseId);
         }
         $isTeacher = isset($teacherof[$messageData['courseid']]);
         $isTeacherChecked = isset($teacherof[$messageData['courseid']]);

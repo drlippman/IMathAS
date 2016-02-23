@@ -19,20 +19,20 @@ $(document).ready(function () {
             {
                 var receiver = $("#seluid").val();
             }
-            var subject = $(".subject").val();
-            var body = $("#message").val();
+            var subject = $(".subject").val().trim();
+            var body = $("#message").val().trim();
 
             if(receiver == 0 && subject == '')
             {
-                $('#subject-error').html('Please fill out subject field');
-                $('#receiver').html('Please fill out receiver field');
+                $('#subject-error').html('Please fill out subject field.');
+                $('#receiver').html('Please fill out receiver field.');
             }
             if(receiver != 0)
             {
                 if(subject == '')
                 {
                     $('#subject').css('border-color','red');
-                    $('#subject-error').html('Please fill out subject field');
+                    $('#subject-error').html('Please fill out subject field.');
                 } else if(subject != '')
                 {
                     $('.subject-error-message').removeClass("subject-error-message");
@@ -42,7 +42,7 @@ $(document).ready(function () {
             else
             {
                 $('#seluid').css('border-color','red');
-                $('#receiver').html('Please fill out receiver field');
+                $('#receiver').html('Please fill out receiver field.');
             }
         }
     });
@@ -80,6 +80,7 @@ function changeSubject()
 function sendMessage(response)
 {
         var cid = $(".send-msg").val();
+    alert(cid);
         var result = JSON.parse(response);
 
         if(result.status == 0)

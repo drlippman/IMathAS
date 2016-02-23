@@ -4,14 +4,14 @@ $(document).ready(function () {
     $("#msg-btn").click(function () {
         tinyMCE.triggerSave();
         var cid = $(".send-msg").val();
-        var receiver = $(".msg-sender").val();
-        var sender = $(".msg-receiver").val();
-        var body = $("#message").val();
+        var receiver = $(".msg-sender").val().trim();
+        var sender = $(".msg-receiver").val().trim();
+        var body = $("#message").val().trim();
         var parentId = $(".parent-id").val();
         var checkedValue = $('.header-checked:checked').val();
         var baseId = $(".base-id").val();
         var isReplied = $(".is-replied").val();
-        var subject = $(".subject").val();
+        var subject = $(".subject").val().trim();
         if(subject == '')
         {
             $('#subject-error').html('Please fill out subject field');
