@@ -3,6 +3,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasContentTrack;
+use yii\base\Exception;
 use yii\db\Query;
 
 class ContentTrack extends BaseImasContentTrack
@@ -110,6 +111,26 @@ class ContentTrack extends BaseImasContentTrack
     {
         return ContentTrack::find()->select('typeid')->where(['courseid' => $courseId])->andWhere(['userid' => $userId])->andWhere(['type' => $type])->all();
     }
+
+    public function insertfromwiki($userId,$courseId,$type,$typeId,$time,$info)
+    {
+        try{
+        $this->userid = $userId;
+        $this->courseid = $courseId;
+        $this->type = $type;
+        $this->typeid = $typeId;
+        $this->viewtime = $time;
+        $this->info=$info;
+        $this->save();
+            if(!$this->save()){
+            print_r($this->getErrors());die;
+        }
+        }catch(Exception $e){
+            AppUtility::dump($e);
+        }
+
+    }
+
 
     public function insertFromGradebook($userId,$courseId,$type,$typeId,$time)
     {

@@ -37,7 +37,6 @@ class ShowItemCourse extends Component
         } else {
             $itemIcons = $CFG['CPS']['itemicons'];
         }
-
         if($studview>-1){
             $studview=1;
         }

@@ -23,7 +23,7 @@ class WikiRevision extends BaseImasWikiRevisions
         if($this->save()){
             echo("yes");
         }else{
-            print_r($this->getErrors());die;
+            print_r($this->getErrors());
         }
     }
 

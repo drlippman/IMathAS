@@ -13,6 +13,7 @@ use app\models\Wiki;
 use app\models\WikiRevision;
 use app\models\WikiView;
 use app\components\diff;
+use app\models\ContentTrack;
 use Yii;
 class WikiController extends AppController
 {
@@ -113,7 +114,6 @@ class WikiController extends AppController
                 } else {
                     $pageTitle = "Confirm Wiki Version Revert";
                 }
-
             } else { //just viewing
                 require_once("../filter/filter.php");
                 if ( $now < $row['editbydate']) {
@@ -145,6 +145,7 @@ class WikiController extends AppController
                     $hasNew = array();
                     $wikiLastViews = array();
                     $wikiViewResult = WikiView::getByUserIdAndWikiId($userId, $id);
+
                     foreach($wikiViewResult as $key => $row){
                         $wikiLastViews[$row['stugroupid']] = $row['lastview'];
                     }
@@ -154,6 +155,7 @@ class WikiController extends AppController
                             $hasNew[$row['stugroupid']] = AppConstant::NUMERIC_ONE;
                         }
                     }
+
                     $i = AppConstant::NUMERIC_ZERO;
                     $studGrpResult = Stugroups::getByGrpSetOrderByName($groupSetId);
                     foreach($studGrpResult as $key => $row)
@@ -166,6 +168,7 @@ class WikiController extends AppController
                         }
                         $i++;
                     }
+
                     if ($groupId == AppConstant::NUMERIC_ZERO) {
                         if (count($stugroup_ids) == AppConstant::NUMERIC_ZERO) {
                             $overWriteBody = AppConstant::NUMERIC_ONE;
@@ -208,11 +211,17 @@ class WikiController extends AppController
                     $text = str_replace('<a ','<a '.$rec, $text);
                 }
             }
+
+            $info=(AppUtility::getURLFromHome('wiki','wiki/show-wiki?courseId='.$courseId.'&wikiId='.$wikiId.'&grp='.$groupId))."::".$wiki['name'];
             $affectedRow = new WikiView();
             $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
-            if ($data=AppConstant::NUMERIC_ONE) {
+            if ($data==AppConstant::NUMERIC_ZERO) {
                 $wikiView = new WikiView();
                 $wikiView->addWikiView($userId, $id, $groupId, $now);
+                if (!($isTeacher)) {
+                    $rv = new ContentTrack;
+                    $rv->insertfromwiki($userId, $courseId,"wiki",$wikiId, time(),$info);
+                }
             }
         }
         $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);
@@ -226,6 +235,7 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
+//        AppUtility::dump(stop);
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
                 'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);
