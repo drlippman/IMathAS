@@ -1572,9 +1572,13 @@ class ShowItemCourse extends Component
 
                         if($groupSetId){
                             $groupId=Stugroups::getByGrpSetId($groupSetId);
-                            $defaultgroupid=$groupId[0]['id'];
+                            if(count($groupId)==AppConstant::NUMERIC_ZERO){
+                                $defaultgroupid=AppConstant::NUMERIC_ZERO;
+                            }
+                            else
+                            $defaultgroupid=$groupId[AppConstant::NUMERIC_ZERO]['id'];
                         }else
-                            $defaultgroupid=0;
+                            $defaultgroupid=AppConstant::NUMERIC_ZERO;
 
                     if ($isPublic) { ?>
                          <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/view-wiki-public?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
@@ -1583,7 +1587,8 @@ class ShowItemCourse extends Component
                             $rec = "data-base=\"wiki-$typeid\"";
                         } else {
                             $rec = '';
-                        } ?>
+                        }?>
+
 <!--                        echo "<b><a href=\"#\" $rec>{$line['name']}</a></b>\n";-->
                            <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&grp='.$defaultgroupid)?>"><?php echo $line['name']?></a>
                       <?php  if ($hasnew) {

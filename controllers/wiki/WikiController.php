@@ -48,6 +48,7 @@ class WikiController extends AppController
         $snapshot = $this->getParamVal('snapshot');
         $toRev = $this->getParamVal('torev');
         $dispRev = $this->getParamVal('disprev');
+        $isStudent = $this->isStudent($userId, $courseId);
         if (isset($frame)) {
             $flexWidth = true;
             $showNav = false;
@@ -56,6 +57,7 @@ class WikiController extends AppController
             $showNav = true;
             $framed = '';
         }
+
         if ($courseId == AppConstant::NUMERIC_ZERO) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
             $body = "You need to access this page with a course id";
@@ -124,20 +126,19 @@ class WikiController extends AppController
                 /**
                  * if is group wiki, get groupid or fail
                  */
-
                 if ($row['groupsetid'] > AppConstant::NUMERIC_ZERO && !($isTeacher)) {
                     $isGroup = true;
                     $groupSetId = $row['groupsetid'];
                     $groupResult = Stugroups::getStuGrpId($userId, $groupSetId);
                     if (count($groupResult) == AppConstant::NUMERIC_ZERO) {
-                        $overWriteBody = AppConstant::NUMERIC_ONE;
-                        $body = "You need to be a member of a group before you can view or edit this wiki.";
+                        $this->setErrorFlash("You need to be a member of a group before you can view or edit this wiki.");
                         $isGroup = false;
+                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
                     } else {
                         $groupId = $groupResult[0]['id'];
                         $curGroupName = $groupResult[0]['name'];
                     }
-                } else if ($row['groupsetid'] > AppConstant::NUMERIC_ZERO && isset($isTeacher)) {
+                } else if ($row['groupsetid'] > AppConstant::NUMERIC_ZERO && ($isTeacher)) {
                     $isGroup = true;
                     $groupSetId = $row['groupsetid'];
                     $stugroup_ids = array();
@@ -171,9 +172,9 @@ class WikiController extends AppController
 
                     if ($groupId == AppConstant::NUMERIC_ZERO) {
                         if (count($stugroup_ids) == AppConstant::NUMERIC_ZERO) {
-                            $overWriteBody = AppConstant::NUMERIC_ONE;
-                            $body = "No groups exist yet.  There have to be groups before you can view their wikis";
+                            $this->setErrorFlash("No groups exist yet.  There have to be groups before you can view their wikis");
                             $isGroup = false;
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
                         } else {
                             $groupId = $stugroup_ids['id'];
                             $curGroupName = $stugroup_names['id'];
@@ -183,6 +184,7 @@ class WikiController extends AppController
                     $groupId = AppConstant::NUMERIC_ZERO;
                 }
                 if ($groupId > AppConstant::NUMERIC_ZERO) {
+
                     $grpmem = '<p>Group Members: <ul class="nomark">';
                     $studGrpMemResult = StuGroupMembers::getStudAndUserData($groupId);
                     foreach($studGrpMemResult as $key => $row){
@@ -191,7 +193,9 @@ class WikiController extends AppController
                     $grpmem .= '</ul></p>';
                 }
                 $revisionResult = WikiRevision::getRevisionTotalData($id, $groupId);
+
                 $numRevisions = count($revisionResult);
+
                 if ($numRevisions == AppConstant::NUMERIC_ZERO) {
                     $text = '';
                 } else {
@@ -206,7 +210,7 @@ class WikiController extends AppController
                     $lastEditTime = AppUtility::tzdate("F j, Y, g:i a",$row['time']);
                     $lastEditedBy = $row['LastName'].', '.$row['FirstName'];
                 }
-                if (isset($studentid)) {
+                if ($isStudent) {
                     $rec = "data-base=\"wikiintext-$id\" ";
                     $text = str_replace('<a ','<a '.$rec, $text);
                 }
@@ -238,7 +242,7 @@ class WikiController extends AppController
 
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
-                'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);
+                'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);
         return $this->renderWithData('showWiki', $responseData);
     }
 

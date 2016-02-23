@@ -760,18 +760,22 @@ class AppController extends Controller
 
     public function accessForWikiController($user, $courseId, $actionPath)
     {
+
         $isOwner = Course::isOwner($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)) {
             return true;
         } else if($user['rights'] < AppConstant::STUDENT_RIGHT && $actionPath = 'view-wiki-public'){
+
             return true;
         }
+
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $studentId = $this->isStudent($user['id'], $courseId);
-        if (($user['rights'] < AppConstant::STUDENT_RIGHT) || ($user['rights'] == AppConstant::STUDENT_RIGHT && !$studentId) ||
-            ($user['rights'] > AppConstant::STUDENT_RIGHT && $user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && !$teacherId) ||
-            ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'add-wiki')
-        ) {
+//        if (($user['rights'] < AppConstant::STUDENT_RIGHT) || ($user['rights'] == AppConstant::STUDENT_RIGHT ) ||
+//            ($user['rights'] > AppConstant::STUDENT_RIGHT && $user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && !$teacherId) ||
+//            ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'add-wiki'))
+        if($user['rights'] < AppConstant::STUDENT_RIGHT || $user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'add-wiki')
+         {
             return $this->noValidRights($teacherId);
         }
         return true;
