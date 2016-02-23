@@ -213,15 +213,15 @@ class WikiController extends AppController
             }
 
             $info=(AppUtility::getURLFromHome('wiki','wiki/show-wiki?courseId='.$courseId.'&wikiId='.$wikiId.'&grp='.$groupId))."::".$wiki['name'];
+            if (!($isTeacher)) {
+                $rv = new ContentTrack;
+                $rv->insertfromwiki($userId, $courseId,"wiki",$wikiId, time(),$info);
+            }
             $affectedRow = new WikiView();
             $data=$affectedRow->updateLastView($userId, $id, $groupId,$now);
             if ($data==AppConstant::NUMERIC_ZERO) {
                 $wikiView = new WikiView();
                 $wikiView->addWikiView($userId, $id, $groupId, $now);
-                if (!($isTeacher)) {
-                    $rv = new ContentTrack;
-                    $rv->insertfromwiki($userId, $courseId,"wiki",$wikiId, time(),$info);
-                }
             }
         }
         $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);
@@ -235,7 +235,7 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-//        AppUtility::dump(stop);
+
         $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId, 'pageTitle' => $pageTitle, 'groupNote'=> $groupNote, 'isTeacher' => $isTeacher, 'delAll' => $delAll, 'delRev' => $delRev, 'groupId' => $groupId, 'curGroupName' => $curGroupName, 'text' => $text, 'numRevisions' => $numRevisions,
                 'canEdit' => $canEdit,'stugroup_ids'=>$stugroup_ids,'stugroup_names'=>$stugroup_names,'overWriteBody'=>$overWriteBody,'Body'=>$body,'isGroup'=>$isGroup, 'id' => $id, 'framed' => $framed, 'snapshot' => $snapshot, 'lastEditTime' => $lastEditTime, 'lastEditedBy' => $lastEditedBy, 'revert' => $revert, 'dispRev' => $dispRev, 'toRev' => $toRev,'GroupMembers'=>$grpmem);

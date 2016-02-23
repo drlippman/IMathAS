@@ -1277,7 +1277,6 @@ class InstructorController extends AppController
                 {
 
                     if (in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
-                        AppUtility::dump($type);
                         $parts = explode('::',$row['info']);
                         if (count($parts)>1) {
                             $desc = 'In-item link to <a href="'.$parts[0].'">'.$parts[1].'</a>';

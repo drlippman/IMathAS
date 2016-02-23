@@ -114,7 +114,6 @@ class ContentTrack extends BaseImasContentTrack
 
     public function insertfromwiki($userId,$courseId,$type,$typeId,$time,$info)
     {
-        try{
         $this->userid = $userId;
         $this->courseid = $courseId;
         $this->type = $type;
@@ -122,13 +121,6 @@ class ContentTrack extends BaseImasContentTrack
         $this->viewtime = $time;
         $this->info=$info;
         $this->save();
-            if(!$this->save()){
-            print_r($this->getErrors());die;
-        }
-        }catch(Exception $e){
-            AppUtility::dump($e);
-        }
-
     }
 
 

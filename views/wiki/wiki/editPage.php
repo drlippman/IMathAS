@@ -5,7 +5,7 @@ $this->title = $wikiName;
 ?>
 
 <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Wiki',''], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id,AppUtility::getHomeURL().'wiki/wiki/show-wiki?courseId='.$course->id."&wikiId=".$id], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Wiki',''], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id,AppUtility::getHomeURL().'wiki/wiki/show-wiki?courseId='.$course->id."&wikiId=".$id."&grp=".$groupId], 'page_title' => $this->title]); ?>
 </div>
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
