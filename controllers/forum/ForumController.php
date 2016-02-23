@@ -1129,8 +1129,9 @@ class ForumController extends AppController
      */
     public function actionReplyPost()
     {
+        global $parent, $date, $subject,$poster,$message;
         $this->layout = 'master';
-        $this->guestUserHandler();
+        $user = $this->guestUserHandler();
         $isPost = $this->getParamVal('listbypost');
         $courseId = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
@@ -1139,9 +1140,12 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $Id = $this->getParamVal('id');
         $threadId = $this->getParamVal('threadId');
+        $replyTo = $this->getParamVal('replyto');
         $userData = $this->user;
         $isTeacher = $this->isTeacher($userData['id'], $courseId);
-        $threadData = ForumPosts::getbyidpost($Id);
+        $threadDataById = ForumPosts::getbyidpost($Id);
+        $threadData = ForumPosts::getReplyData($threadId);
+
         $contentTrackRecord = new ContentTrack();
         if ($userData->rights == AppConstant::STUDENT_RIGHT) {
             $contentTrackRecord->insertForumData($userData->id, $courseId, $forumId, $Id, $threadId, $type = AppConstant::NUMERIC_ONE);
@@ -1153,12 +1157,17 @@ class ForumController extends AppController
             $result = $forum['points'];
             $hasPoints = ($result > 0);
         }
-
         $forumDetails = Forums::getForumDetailByForumId($forumId);
         $allowanon = ($forumDetails['settings'])%2;
+        $sessionId = $this->getSessionId();
+        $parent = array();
+        $date = array();
+        $subject = array();
+        $poster = array();
+        $message = array();
 
-        foreach ($threadData as $data) {
-
+        $sessionData = $this->getSessionId($sessionId);
+        foreach($threadDataById as $data){
             $tempArray = array
             (
                 'subject' => $data['subject'],
@@ -1171,6 +1180,22 @@ class ForumController extends AppController
             );
 
             array_push($threadArray, $tempArray);
+        }
+
+        foreach ($threadData as $line) {
+            $parent[$line['id']] = $line['parent'];
+            $date[$line['id']] = $line['postdate'];
+            $subject[$line['id']] = $line['subject'];
+            $message[$line['id']] = $line['message'];
+            $posttype[$line['id']] = $line['posttype'];
+            if ($line['isanon']==1) {
+                $poster[$line['id']] = "Anonymous";
+            } else {
+                $poster[$line['id']] = $line['FirstName'] . ' ' . $line['LastName'];
+                if ($isTeacher && $line['userid'] != $user['id']) {
+                    $poster[$line['id']] .= " <a class=\"small\" href=" .AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$data['userid'])." target=\"_popoutgradebook\">[GB]</a>";
+                }
+            }
         }
         if ($this->isPostMethod()) {
             $files = array();
@@ -1247,7 +1272,8 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypost.js']);
-        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id, 'isPost' => $isPost, 'currentUser' => $userData, 'threadData' => $threadData, 'isTeacher' => $isTeacher, 'allowanon' => $allowanon, 'points' => $points, 'hasPoints' => $hasPoints);
+        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id, 'isPost' => $isPost, 'currentUser' => $userData, 'threadData' => $threadData, 'isTeacher' => $isTeacher, 'allowanon' => $allowanon, 'points' => $points, 'hasPoints' => $hasPoints,
+        'replyTo' => $replyTo);
         return $this->renderWithData('replyPost', $responseData);
     }
 

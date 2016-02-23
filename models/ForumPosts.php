@@ -828,4 +828,13 @@ class ForumPosts extends BaseImasForumPosts
     {
         return ForumPosts::find()->select('id')->where(['threadid' => $threadId, 'parent' => AppConstant::NUMERIC_ZERO])->one();
     }
+
+    public static function getReplyData($threadId)
+    {
+        $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName from imas_forum_posts,imas_users ";
+        $query .= "WHERE imas_forum_posts.userid=imas_users.id AND (imas_forum_posts.id=:threadId OR imas_forum_posts.threadid=:threadId)";
+        $command = Yii::$app->db->createCommand($query);
+        $command->bindValue(':threadId', $threadId);
+        return $data = $command->queryAll();
+    }
 }

@@ -32,7 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="tab-content shadowBox">
         <p></p>
-        <br>
         <div class="col-sm-12 col-md-12 padding-top">
             <div class="col-sm-1 col-md-1"><?php echo AppUtility::t('Subject')?></div>
             <div class="col-sm-11 col-md-11">
@@ -77,33 +76,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <a href="#" id="reply-btn" class="btn btn-primary1 btn-color"><i class="fa fa-reply"></i>&nbsp;Post Reply</a>
     </div>
         <div  class="col-sm-12 col-md-12 replyTo padding-top">
-            <div class=""><?php echo AppUtility::t('Replying To'); ?></div>
-            <div class="block col-sm-12 col-md-12">
-                <span class="leftbtns">
-                </span>
-                <span class="right">
-                </span>
-                <b  style="font-family: Times New Roman, Times, serif"><?php echo $reply[0]['subject']?></b>
-                <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;&nbsp;&nbsp;
-
-                   <?php
-                  if ($reply[0]['postanon']==1) {
-                      echo 'Anonymous';
-                    } else {
-                       echo $reply[0]['userName'];
-                      if($isTeacher){
-                          foreach($threadData as $data) {
-                              if($isTeacher && $data['userid'] != $currentUser['id']){?>
-                          <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$data['userid']) ?>" target=\"_popoutgradebook\"><?php echo "[GB]"?></a>
-                    <?php  }
-                      }
-                    }
-                  }
-                   ?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
-            </div>
-            <div class="blockitems col-sm-12 col-md-12" id="item1">
-                <h5><?php echo $reply[0]['message']?></h5></div>
+            <?php
+            $replyParent = new AppUtility();
+            $replyParent->printParents($replyTo);?>
         </div>
-
-</div>
+    </div>
     </form>

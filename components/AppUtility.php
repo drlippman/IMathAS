@@ -3230,7 +3230,7 @@ class AppUtility extends Component
                     <a href="#" name="remove" data-parent="<?php echo $parent[$child] ?>" data-var="<?php echo $child ?>" class="mark-remove"><?php AppUtility::t('Remove')?></a>
                 <?php }
                 if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-                    echo "<a href=\"reply-post?courseid=$courseId&id=$child&threadId=$threadid&forumid=$forumid\">Reply</a>";
+                    echo "<a href=\"reply-post?courseid=$courseId&id=$child&threadId=$threadid&forumid=$forumid&replyto=$child\">Reply</a>";
                 }
 
                 echo "</span>\n";
@@ -3400,5 +3400,19 @@ class AppUtility extends Component
             $out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
         $out .= "<img border=0 src='../../img/assess.png' alt=\"rubric\"></a>";
         return $out;
+    }
+
+    public function printParents($id) {
+
+        global $parent,$date,$subject,$message,$posttype,$poster;
+        echo "<div class=block>";
+        echo "<b>{$subject[$id]}</b><br/>Posted by: {$poster[$id]}, ";
+        echo AppUtility::tzdate("F j, Y, g:i a",$date[$id]);
+        echo "</div><div class=blockitems>";
+        echo filter($message[$id]);
+        echo "</div>\n";
+        if ($parent[$id]!=0) {
+            $this->printParents($parent[$id]);
+        }
     }
 }
