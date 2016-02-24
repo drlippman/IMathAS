@@ -184,7 +184,7 @@ class OutcomesController extends AppController
             $type = AppConstant::NUMERIC_ONE;
         }
         $selectedOutcome = $this->getParamVal('selectedOutcome');
-        $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
+        $courseOutcomeData = Course::getByOutcomes($courseId);
         if(($courseOutcomeData['outcomes']) == '')
         {
             $outcomes = array();

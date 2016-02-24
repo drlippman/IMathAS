@@ -153,7 +153,7 @@ class Course extends BaseImasCourses {
 
     public static function getByCourseIdOutcomes($courseId)
     {
-        return Course::find()->select('outcomes')->where(['id' => $courseId])->one();
+        return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
     }
 
     public static function setBlockCount($itemOrder,$blockCount,$courseId)
@@ -672,5 +672,10 @@ class Course extends BaseImasCourses {
 
     public static function getMsgSet($id){
         return Course::find()->select('msgset')->where(['id' => $id])->one();
+    }
+
+    public static function getByOutcomes($courseId)
+    {
+        return Course::find()->select('outcomes')->where(['id' => $courseId])->one();
     }
 }
