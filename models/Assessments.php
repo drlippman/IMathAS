@@ -222,15 +222,10 @@ class Assessments extends BaseImasAssessments
 
     public static function assessmentDataForOutcomes($courseId)
     {
-        $query = new Query();
-        $query->select(['ia.name', 'ia.gbcategory', 'ia.defoutcome', 'ia.id', 'iq.category'])
-            ->from('imas_assessments AS ia')
-            ->join('JOIN', 'imas_questions AS iq',
-                'ia.id=iq.assessmentid')
-            ->where('ia.courseid = :courseId')
-            ->andWhere(['>', 'ia.defoutcome', AppConstant::ZERO_VALUE])
-            ->orWhere(['<>', 'iq.category', AppConstant::ZERO_VALUE]);
-        $command = $query->createCommand()->bindValue('courseId' , $courseId);
+        $query = "SELECT ia.name,ia.gbcategory,ia.defoutcome,ia.id,iq.category FROM ";
+        $query .= "imas_assessments AS ia JOIN imas_questions AS iq ON ia.id=iq.assessmentid ";
+        $query .= "WHERE ia.courseid=:courseId AND (ia.defoutcome>0 OR iq.category<>'0')";
+        $command = Yii::$app->db->createCommand($query)->bindValue(':courseId',$courseId);
         $data = $command->queryAll();
         return $data;
     }

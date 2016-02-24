@@ -18,11 +18,13 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox padding-two-em">
-    <?php if ($outcomeLinks==0)
+    <?php
+    if ($outcomeLinks==0)
     {
-        echo '<p>No items have been associated with outcomes yet</p>';
+        echo '<p>No items have been associated with outcomes yet.</p>';
     }else{?>
     <?php
+
     echo '<table class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
     foreach ($catNames as $cn)
     {

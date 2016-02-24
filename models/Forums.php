@@ -97,7 +97,7 @@ class Forums extends BaseImasForums {
         $this->rubric = $params['rubric'] ? $params['rubric'] : AppConstant::NUMERIC_ZERO;
         $this->outcomes = isset($params['outcomes']) ? $params['outcomes'] : null;
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function deleteForum($itemId)

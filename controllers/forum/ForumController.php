@@ -1627,6 +1627,7 @@ class ForumController extends AppController
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $block = $this->getParamVal('block');
+        $tb = $this->getParamVal('tb');
         $user = $this->user;
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
@@ -1969,7 +1970,13 @@ class ForumController extends AppController
                 }
                 $finalArray['taglist'] = $tagList;
                 $newForum = new Forums();
-                $forumId = $newForum->addNewForum($finalArray);
+                $forumDataId = $newForum->addNewForum($finalArray);
+                if($forumDataId->errors['name'])
+                {
+                    $this->setWarningFlash('Forum name can not be blank.');
+                    return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/add-forum?cid='.$courseId.'block='.$block.'&tb='.$tb));
+                }
+                $forumId = $forumDataId['id'];
                 $itemType = 'Forum';
                 $itemId = new Items();
                 $lastItemId = $itemId->saveItems($courseId, $forumId, $itemType);
