@@ -1792,16 +1792,11 @@ class CourseController extends AppController
                 $showItems->showItems($items,$folder);
             } else if ($teacherId) {
                 $courseData = new ShowItemCourse();
-                echo $courseData->generateAddItem($folder,'b',1);
-         }
-//            if ($firstLoad) {
-//                echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;</script>\n";
-//            }
-            if (($isTutor) && ($sessionData['ltiitemtype']) && $sessionData['ltiitemtype']==3)
-            {
-                echo '<script type="text/javascript">$(".instrdates").hide();</script>';
-            }
+             }
             $this->includeJS(['course.js']);
+
+            $responseData = array('items' => $items, 'folder' => $folder, 'isTutor' => $isTutor, 'sessionData' => $sessionData, 'teacherId' => $teacherId, 'courseData' => $courseData);
+        return $this->renderWithData('getBlockItems', $responseData);
         }
 
     /*
@@ -2203,8 +2198,8 @@ class CourseController extends AppController
             }
         }
         if (!$blockIsPublic) {
-            echo "Content not public";
-            exit;
+            $this->setErrorFlash("Content not public");
+            return $this->redirect($this->goHome());
         }
 
         $openBlocks = Array(0);
@@ -2226,9 +2221,8 @@ class CourseController extends AppController
             $courseData = new ShowItemCourse();
             $courseData->showitems($items,$folder,$blockIsPublic);
         }
-        if ($firstLoad) {
-            echo "<script>document.cookie = 'openblocks-$courseId=' + oblist;</script>\n";
-        }
+        $responseData = array('firstLoad' => $firstLoad, 'courseId' => $courseId);
+        return $this->renderWithData('getBlockItemsPublic',$responseData);
     }
 
     public function actionShowLinkedTextPublic()
@@ -2281,8 +2275,8 @@ class CourseController extends AppController
         $isPublic = true;
 
         if (!isset($id)) {
-            echo "<html><body>No item specified.</body></html>\n";
-            exit;
+            $this->setErrorFlash("<html><body>No item specified.</body></html>\n");
+            return $this->redirect('show-linked-text-public?cid='.$courseId);
         }
 
         $linkData = LinkedText::getLinkedDataPublicly($id);
@@ -2343,10 +2337,10 @@ class CourseController extends AppController
         }
         $query = Course::getItemOrder($courseId);
         $items = unserialize($query['itemorder']);
-
+        $ok = '';
         $newItems = array();
         $newItems = $this->additems($order);
-        echo "OK";
+        $ok .= "OK";
         $itemList =  serialize($newItems);
 
         $query = new Course();
@@ -2370,6 +2364,8 @@ class CourseController extends AppController
 
         $quickView = new AppUtility();
         $quickView->quickview($newItems,$courseDetail=false,0);
+        $responseData = array('ok' => $ok);
+        return $this->renderWithData('saveQuickReorder', $responseData);
     }
 
     public function additems($list) {

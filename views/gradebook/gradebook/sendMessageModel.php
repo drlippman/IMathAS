@@ -17,7 +17,10 @@ if ($params['sendtype'] == 'msg') {
     $saveButton = 'Send Email';
     $to = "$lastname, $firstname ($email)";
 }
-
+if (!$error == '')
+{
+    echo $error;
+}
 ?>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>

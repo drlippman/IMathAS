@@ -11,6 +11,7 @@ use app\models\ForumPosts;
 use app\models\Forums;
 use app\models\InlineText;
 use app\models\Items;
+use app\models\Libraries;
 use app\models\LinkedText;
 use app\models\QImages;
 use app\models\Questions;
@@ -3413,6 +3414,36 @@ class AppUtility extends Component
         echo "</div>\n";
         if ($parent[$id]!=0) {
             $this->printParents($parent[$id]);
+        }
+    }
+
+    public function getChildLibs($lib)
+    {
+        global $libCnt,$libs,$nonPrivate;
+        $parentData = Libraries::getDataByParent($lib,$nonPrivate);
+        if($parentData)
+        {
+            foreach($parentData as $row)
+            {
+                if (!isset($libs[$row[0]]))
+                {
+                    $libs[$row['id']] = $libCnt;
+                    $parents[$libCnt] = $libs[$lib];
+                    echo "\nSTART LIBRARY\n";
+                    echo "ID\n";
+                    echo rtrim($libCnt) . "\n";
+                    echo "UID\n";
+                    echo rtrim($row['uniqueid']) . "\n";
+                    echo "LASTMODDATE\n";
+                    echo rtrim($row['lastmoddate']) . "\n";
+                    echo "NAME\n";
+                    echo rtrim($row['name']) . "\n";
+                    echo "PARENT\n";
+                    echo rtrim($libs[$lib]) . "\n";
+                    $libCnt++;
+                    $this->getchildlibs($row['id']);
+                }
+            }
         }
     }
 }

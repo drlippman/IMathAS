@@ -100,6 +100,7 @@ function evalqsandbox($seed,$qqqcontrol,$qqqanswer) {
     echo '<div class="padding-top-one-em padding-bottom-one-em">';
     echo '<input type="submit" name="options" value="Export" />';
     echo '</div>';
+    echo $line;
     echo ' Export will be a commas separated values (.CSV) file, which can be opened in Excel ';
     //echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
     echo '</div>';

@@ -415,8 +415,8 @@ class AdminController extends AppController
                 if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
                     $owner = $line['ownerid'];
                 } else if ($line['ownerid'] != $userId) {
-                    echo "Not yours!";
-                    exit;
+                    $this->setErrorFlash("Not yours!");
+                    return $this->redirect('admin', 'admin/diagnostics?id='.$diagnoId);
                 } else {
                     $owner = $userId;
                 }
@@ -1777,7 +1777,8 @@ class AdminController extends AppController
             }
         }
         if ($overwriteBody == AppConstant::NUMERIC_ONE) { //NO AUTHORITY
-            echo $body;
+            $this->setErrorFlash('Not authorized user');
+            return $this->redirect('diag-one-time?id='.$diag);
             } else {
             $nameOfDiag = Diags::getNameById($diag);
         }
@@ -2041,6 +2042,7 @@ class AdminController extends AppController
 
     public function actionExportLib()
     {
+        global $libCnt,$libs,$nonPrivate;
         $this->guestUserHandler();
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
@@ -2132,7 +2134,8 @@ class AdminController extends AppController
                 {
                     foreach ($rootLibs as $k=>$rootLib)
                     {
-                        $this->getchildlibs($rootLib);
+                        $getChild = new AppUtility();
+                        $getChild->getchildlibs($rootLib);
                     }
                 }
                 $library = array_keys($libs);
@@ -2281,36 +2284,6 @@ class AdminController extends AppController
         return $this->renderWithData('exportLibrary',$responseData);
     }
 
-    function getChildLibs($lib)
-    {
-        global $libCnt,$libs,$nonPrivate;
-        $parentData = Libraries::getDataByParent($lib,$nonPrivate);
-        if($parentData)
-        {
-            foreach($parentData as $row)
-            {
-                if (!isset($libs[$row[0]]))
-                {
-                    $libs[$row['id']] = $libCnt;
-                    $parents[$libCnt] = $libs[$lib];
-                    echo "\nSTART LIBRARY\n";
-                    echo "ID\n";
-                    echo rtrim($libCnt) . "\n";
-                    echo "UID\n";
-                    echo rtrim($row['uniqueid']) . "\n";
-                    echo "LASTMODDATE\n";
-                    echo rtrim($row['lastmoddate']) . "\n";
-                    echo "NAME\n";
-                    echo rtrim($row['name']) . "\n";
-                    echo "PARENT\n";
-                    echo rtrim($libs[$lib]) . "\n";
-                    $libCnt++;
-                    $this->getchildlibs($row['id']);
-                }
-            }
-        }
-    }
-
     public function parseLibs($file)
     {
         if (!function_exists('gzopen'))
@@ -2323,8 +2296,7 @@ class AdminController extends AppController
             $handle = gzopen($file,"r");
         }
         if (!$handle) {
-            echo "eek!  handle doesn't exist";
-            exit;
+            $this->setErrorFlash("eek!  handle doesn't exist");
         }
         $line = '';
         while (((!$noGz || !feof($handle)) && ($noGz || !gzeof($handle))) && $line!="START QUESTION") {

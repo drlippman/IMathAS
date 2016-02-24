@@ -2208,9 +2208,9 @@ class GradebookController extends AppController
             }
         } else if (!$isteacher) {
 
-            echo "You need to log in as a teacher to access this page";
+            $this->setErrorFlash("You need to log in as a teacher to access this page");
+            return $this->redirect(AppUtility::getURLFromHome('course','course/course?cid='.$courseId));
 
-            exit;
         }
         $isDelete = true;
         if (isset($params['del']) && $isteacher) {
@@ -3010,14 +3010,11 @@ class GradebookController extends AppController
                     $error = AppUtility::t('Unable to send: Invalid email address');
                 }
             }
-            if (!$error == '')
-            {
-                echo $error;
-            }
+
         }
         $this->includeCSS(['gradebook.css']);
         $this->includeJS(["editor/tiny_mce.js", "forum/addforum.js", "general.js"]);
-        $responseData = array('receiverInformation' => $receiverInformation, 'params' => $params, 'course' => $course);
+        $responseData = array('receiverInformation' => $receiverInformation, 'params' => $params, 'course' => $course, 'error' => $error);
         return $this->renderWithData('sendMessageModel', $responseData);
     }
 
@@ -4211,11 +4208,11 @@ class GradebookController extends AppController
                 # strip the last deliminator
                 $line = substr($line, 0, -1);
                 $line .= "\n";
-                echo $line;
+                $line .= $line;
             }
             exit;
         }
-        $responseData = array('isTeacher' => $isTeacher,'assessmentId' => $assessmentId,'course' => $course);
+        $responseData = array('isTeacher' => $isTeacher,'assessmentId' => $assessmentId,'course' => $course, 'line' => $line);
         return $this->renderWithData('assessmentExport',$responseData);
     }
 

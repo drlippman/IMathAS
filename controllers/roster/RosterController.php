@@ -697,7 +697,7 @@ class RosterController extends AppController
 
                     } else if ($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_THREE) {
                         if (trim($StudentDataArray[6]) == '') {
-                            echo "Password for {$StudentDataArray[0]} is blank; skipping import<br/>";
+                            $this->setErrorFlash("Password for {$StudentDataArray[0]} is blank; skipping import<br/>");
                             continue;
                         }
                         $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
