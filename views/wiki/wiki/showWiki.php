@@ -126,7 +126,7 @@ if (isset($delAll) && $isTeacher) {
                 ?>
                 <div class="col-md-12 col-sm-12 padding-left-zero padding-bottom"><div contenteditable="false" id='wikicontent' class="form-control text-area-alignment" name='wikicontent' style='width: 100%; height: 400px; overflow: auto'>
                     <?php
-                        echo filter($text);?>
+                        echo $text;?>
                 </div></div>
             <?php }?>
         <?php }
@@ -170,7 +170,7 @@ if (isset($delAll) && $isTeacher) {
             curcontent = original.slice();
             wikihistory = jsonData.h;
             contentdiv = document.getElementById("wikicontent");
-            contentdiv.innerHTML = original.join('<p>');
+            contentdiv.innerHTML = original.join(' ');
             wikirendermath();
             document.getElementById("prevrev").innerHTML="";
         });
@@ -191,12 +191,13 @@ if (isset($delAll) && $isTeacher) {
         } else if (window.ActiveXObject) {
             req = new ActiveXObject("Microsoft.XMLHTTP");
         }
-        if (typeof req != 'undefined') {
-            req.onreadystatechange = function() {revloaded();};
+         if (typeof req != 'undefined') {
+            //req.onreadystatechange = function() {revloaded();};
             req.open("GET", AHAHrevurl, true);
             req.send("");
         }
     }
+
 
 
 
@@ -226,7 +227,7 @@ if (isset($delAll) && $isTeacher) {
         if (showrev==1) {
             contentdiv.innerHTML = colorrevisions(curcontent,curversion);
         } else {
-            contentdiv.innerHTML = curcontent.join('<p>');
+            contentdiv.innerHTML = curcontent.join(' ');
         }
         if (curversion==0) {
             document.getElementById("newer").className = "grayout";
@@ -297,7 +298,7 @@ if (isset($delAll) && $isTeacher) {
             contentdiv.innerHTML = colorrevisions(curcontent,curversion);
             document.getElementById("showrev").value = "Hide Changes";
         } else {
-            contentdiv.innerHTML = curcontent.join('<p>');
+            contentdiv.innerHTML = curcontent.join(' ');
             document.getElementById("showrev").value = "Show Changes";
         }
         wikirendermath();
@@ -305,18 +306,18 @@ if (isset($delAll) && $isTeacher) {
 
 
     function colorrevisions(content,ver) {
-        if (ver==wikihistory.length-1) {return content.join('<p>');};
+        if (ver==wikihistory.length-1) {return content.join(' ');};
         current = content.slice();
         var diff = wikihistory[ver+1].c;
         for (var i=diff.length-1; i>=0; i--) {
             deled = null;  insed = null;
             if (diff[i][0]==2) {
                 deled = diff[i][3].join(' ');
-                insed = current.splice(diff[i][1], diff[i][2]).join('<p>');
+                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
             } else if (diff[i][0]==0) {
                 deled = diff[i][2].join(' ');
             } else if (diff[i][0]==1) {
-                insed = current.splice(diff[i][1], diff[i][2]).join('<p>');
+                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
             }
             if (insed != null) {
                 if (insed) {
@@ -336,15 +337,15 @@ if (isset($delAll) && $isTeacher) {
             }
             
             if (diff[i][0]==2) { //replace
-                current.splice(diff[i][1], 0, "<del>"+deled+"</del><p><ins>"+insed+"</ins>");
+                current.splice(diff[i][1], 0, "<del>"+deled+"</del><ins>"+insed+"</ins>");
             } else if (diff[i][0]==0) {//insert
-                current.splice(diff[i][1], 0, "<del>"+deled+"</del><p>");
+                current.splice(diff[i][1], 0, "<del>"+deled+"</del>");
             } else if (diff[i][0]==1) {//delete
-                current.splice(diff[i][1], 0, "<ins>"+insed+"</ins><p>");
+                current.splice(diff[i][1], 0, "<ins>"+insed+"</ins>");
             }
         }
 
-        return current.join('<p>');
+        return current.join(' ');
     }
     function rendermathnode(node)
     {

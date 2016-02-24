@@ -104,6 +104,6 @@ class WikiUtility extends Component
                 $responseBody = $jsonser->encode($out);
             }
         }
-        return strip_tags($responseBody);
+        return $responseBody;
     }
 }
