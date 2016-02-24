@@ -155,7 +155,9 @@ class OutcomesController extends AppController
     }
     public function actionOutcomeReport()
     {
-        $this->guestUserHandler();
+        global $courseId,$isTeacher,$isTutor,$tutorid,$userId,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
+        $user = $this->guestUserHandler();
+        $userId = $user['id'];
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
@@ -163,6 +165,9 @@ class OutcomesController extends AppController
         $studentsOutcome = $this->getParamVal('stud');
         $typeSelected = $this->getParamVal('type');
         $outcomeData = Outcomes::getByCourseId($courseId);
+        $isTeacher = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
+
         if($outcomeData)
         {
             if($studentsOutcome){
@@ -180,13 +185,13 @@ class OutcomesController extends AppController
         }
         $selectedOutcome = $this->getParamVal('selectedOutcome');
         $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
-        if(($courseOutcomeData[0]['outcomes']) == '')
+        if(($courseOutcomeData['outcomes']) == '')
         {
             $outcomes = array();
         }
         else
         {
-            $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
+            $outcomes = unserialize(($courseOutcomeData['outcomes']));
         }
         $outcomeInfo = array();
         foreach($outcomeData as $data)
@@ -388,7 +393,7 @@ class OutcomesController extends AppController
 
      function outcomeTable($courseId)
      {
-        global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
+        global $courseId,$isTeacher,$isTutor,$tutorid,$userId,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
         $canviewall = true;
         $catfilter = AppConstant::NUMERIC_NEGATIVE_ONE;
         $secfilter = AppConstant::NUMERIC_NEGATIVE_ONE;
@@ -397,7 +402,7 @@ class OutcomesController extends AppController
             $limuser = func_get_arg(AppConstant::NUMERIC_ONE);
         }else if (!$canviewall)
         {
-            $limuser = $userid;
+            $limuser = $userId;
         }else
         {
             $limuser = AppConstant::NUMERIC_ZERO;
@@ -431,7 +436,7 @@ class OutcomesController extends AppController
              $hassection = false;
          }
          //Pull Assessment Info
-         $query = Assessments::outcomeData($courseId,$catfilter,$istutor);
+         $query = Assessments::outcomeData($courseId,$catfilter,$isTutor);
          $now = time();
          $kcnt = AppConstant::NUMERIC_ZERO;
          $assessments = array();
@@ -518,7 +523,7 @@ class OutcomesController extends AppController
              $kcnt++;
          }
     //Pull Offline Grade item info
-         $offlineGradeInfo = GbItems::findOfflineGradeItemForOutcomes($courseId,$istutor,$catfilter, $now);
+         $offlineGradeInfo = GbItems::findOfflineGradeItemForOutcomes($courseId,$isTutor,$catfilter, $now);
          foreach($offlineGradeInfo as $offlineInfo)
          {
              $avail[$kcnt] = AppConstant::NUMERIC_ZERO;
