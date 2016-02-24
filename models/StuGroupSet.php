@@ -4,6 +4,7 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use Yii;
 use app\models\_base\BaseImasStugroupset;
 use yii\db\Query;
@@ -42,9 +43,10 @@ class StuGroupSet extends BaseImasStugroupset
 
     public function InsertGroupData($groupName, $courseId)
     {
-        $this->name = $groupName;
+        $this->name = trim(isset($groupName))?$groupName:null;
         $this->courseid = $courseId;
         $this->save();
+        return $this;
     }
 
     public static function getByGrpSetId($renameGrpSetId)

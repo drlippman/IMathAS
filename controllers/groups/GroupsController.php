@@ -71,16 +71,12 @@ class GroupsController extends AppController
             $stuToAdd = $params['stutoadd'];
             if(isset($addGrp) && isset($newGrpName) && isset($grpSetId))
             {
-                if(trim($newGrpName) == '')
-                {
-                    $newGrpName = AppConstant::NEW_GROUP_NAME;
-                }
                 $query = new Stugroups();
                 $insertId = $query->insertStuGrpName($grpSetId,$newGrpName);
 
                 if($insertId->errors['name'])
                 {
-                    $this->setWarningFlash('Group name should contain at most 50 characters.');
+                    $this->setErrorFlash('Group name cannot be blank.');
                     return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addGrp=true');
                 }
                 if(!isset($stuToAdd))
@@ -267,15 +263,16 @@ class GroupsController extends AppController
                 $groupName = $params['grpsetname'];
                 if (isset($groupName))
                 {
-                    if (trim($groupName)=='')
-                    {
-                        $groupName = AppConstant::GROUP_NAME;
-                    }
                     /*
                      * if name is set
                      */
                     $saveGroup  = new StuGroupSet();
-                    $saveGroup->InsertGroupData($groupName,$courseId);
+                    $groupData = $saveGroup->InsertGroupData($groupName,$courseId);
+                    if($groupData->errors['name'])
+                    {
+                        $this->setErrorFlash('Group set name cannot be blank.');
+                        return $this->redirect('manage-student-groups?cid='.$course->id.'&addgrpset=ask');
+                    }
                     return $this->redirect('manage-student-groups?cid='.$course->id);
                 }
             }

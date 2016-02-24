@@ -168,6 +168,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->password = AppUtility::passwordHash($params['password']);
         $this->msgnotify = '0';
         $this->save();
+        return $this;
     }
 
     public static function findByUserId($uid)

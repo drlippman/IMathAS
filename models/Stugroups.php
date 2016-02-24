@@ -82,7 +82,7 @@ class Stugroups extends BaseImasStugroups
     public function insertStuGrpName($grpSetId, $newGrpName)
     {
         $this->groupsetid = $grpSetId;
-        $this->name = $newGrpName;
+        $this->name = trim(isset($newGrpName))?$newGrpName:null;
         $this->save();
         return $this;
     }

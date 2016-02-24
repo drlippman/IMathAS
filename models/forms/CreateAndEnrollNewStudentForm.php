@@ -24,13 +24,16 @@ class CreateAndEnrollNewStudentForm extends Model
             [['password'],'required','message'=>AppUtility::t('Password cannot be blank', false)],
             [['FirstName'],'required','message'=>AppUtility::t('First Name cannot be blank', false)],
             [['LastName'],'required','message'=>AppUtility::t('Last Name cannot be blank', false)],
-            [['FirstName, LastName'],'string','max'=>20],
+            [['username'],'string','max'=>30],
+            [['FirstName', 'LastName'],'string','max'=>30],
             [['email'],'required','message'=>AppUtility::t('Email Address cannot be blank', false)],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => AppUtility::t('Username can contain only alphanumeric characters and Underscore(_).', false)],
             [['FirstName', 'LastName'], 'string'],
             ['email','email'],
-            [['section'],'string'],
-            [['code'],'string'],
+            [['section'],'string', 'max'=>40],
+            [['code'], 'integer'],
+            ['code', 'compare', 'compareValue' => 0, 'operator'=> '>=','message'=>'Code must be of 10 digits.'],
+            ['code', 'compare', 'compareValue' => 9999999999, 'operator' => '<=','message'=>'Code must be of 10 digits.'],
         ];
 
     }
@@ -41,9 +44,9 @@ class CreateAndEnrollNewStudentForm extends Model
             [
                 'username' => AppUtility::t('Username', false),
                 'password' => AppUtility::t('Choose a password', false),
-                'FirstName'=> AppUtility::t('Enter First Name', false),
-                'LastName' => AppUtility::t('Enter Last Name', false),
-                'email'    => AppUtility::t('Enter E-mail address', false),
+                'FirstName'=> AppUtility::t('First Name', false),
+                'LastName' => AppUtility::t('Last Name', false),
+                'email'    => AppUtility::t('E-mail address', false),
                 'section' => AppUtility::t('Section (optional)', false),
                 'code' => AppUtility::t('Code (optional)', false)
             ];

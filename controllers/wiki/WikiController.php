@@ -455,13 +455,13 @@ class WikiController extends AppController
         $course = Course::getById($courseId);
         $wiki = Wiki::getById($wikiId);
         $block  = $this->getParamVal('block');
+        $tb  = $this->getParamVal('tb');
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
         $saveTitle = '';
         $clearattempts=$params['clearattempts'];
         $teacherId = $this->isTeacher($user['id'], $courseId);
-//        $this->noValidRights($teacherId);
        if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -615,7 +615,13 @@ class WikiController extends AppController
                 $finalArray['editbydate']=$canEdit;
                 $finalArray['groupsetid']=$params['groupsetid'];
                 $saveChanges = new Wiki();
-                $lastWikiId = $saveChanges->createItem($finalArray);
+                $lastWikiDataId = $saveChanges->createItem($finalArray);
+               if($lastWikiDataId->errors['name']){
+                   $this->setErrorFlash('Forum name cannot be blank.');
+                   return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?block='.$block.'&cid='.$courseId.'&tb='.$tb));
+               }
+
+                $lastWikiId = $lastWikiDataId['id'];
                 $saveItems = new Items();
                 $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
                 $courseItemOrder = Course::getItemOrder($courseId);

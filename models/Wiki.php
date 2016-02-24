@@ -28,7 +28,7 @@ class Wiki extends BaseImasWikis
     public function createItem($params)
     {
         $this->courseid = $params['courseid'];
-        $this->name = $params['title'];
+        $this->name = trim(isset($params['title']))?$params['title']:null;
         $this->description = $params['description'];
         $this->avail = $params['avail'];
         $this->startdate = $params['startdate'];
@@ -36,7 +36,7 @@ class Wiki extends BaseImasWikis
         $this->editbydate=$params['editbydate'];
         $this->groupsetid=$params['groupsetid'];
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public function updateChange($params)
