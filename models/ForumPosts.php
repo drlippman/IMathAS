@@ -55,27 +55,29 @@ class ForumPosts extends BaseImasForumPosts
         $threadPost = ForumPosts::findOne(['id' => $params['threadId']]);
         $threadPost->subject = trim($params['subject']);
         $threadPost->message = $params['message'];
-
-            if($params['always-replies'] == AppConstant::NUMERIC_THREE)
+        if($params['always-replies'] == 'date')
             {
                 $replyBy = AppUtility::parsedatetime($params['startDate'], $params['startTime']);
                 $threadPost->replyby = $replyBy;
             }
-            else if($params['always-replies'] == AppConstant::NUMERIC_ONE)
+            else if($params['always-replies'] == 'never')
             {
-                $threadPost->replyby = 'null';
+                $threadPost->replyby = AppConstant::NUMERIC_ZERO;
             }
-            else
+            elseif($params['always-replies'] == 'always')
             {
-                $replyBy = $params['always-replies'];
+                $threadPost->replyby=AppConstant::ALWAYS_TIME;
             }
+            elseif($params['always-replies'] == 'null'){
+                $threadPost->replyby=null;
+            }
+
             $isANonValue = AppConstant::NUMERIC_ZERO;
             if($params['post-anonymously'])
             {
                 $isANonValue = $params['post-anonymously'];
             }
             $threadPost->isanon = $isANonValue;
-            $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
             $threadPost->files = $fileName;
             $threadPost->save();
@@ -123,7 +125,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
     }
 
-    public function createThread($params, $userId, $postType, $alwaysReplies, $date, $isNonValue=null,$fileName=null,$tag=null)
+    public function createThread($params, $userId, $postType, $reply, $date, $isNonValue=null,$fileName=null,$tag=null)
     {
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
@@ -140,22 +142,23 @@ class ForumPosts extends BaseImasForumPosts
         $postdate = AppController::dateToString();
         $this->postdate = $postdate;
         $this->posttype = $postType;
-        if ($alwaysReplies == AppConstant::NUMERIC_ONE)
-        {
-            $this->replyby = AppConstant::ALWAYS_TIME;
-        }
-        elseif ($alwaysReplies == AppConstant::NUMERIC_TWO)
-        {
-            $this->replyby = AppConstant::NUMERIC_ZERO;
-        }
-        elseif ($alwaysReplies == AppConstant::NUMERIC_THREE)
-        {
-            $this->replyby = $date;
-        }
-        else
-        {
-            $this->replyby = null;
-        }
+        $this->replyby=$reply;
+//        if ($alwaysReplies == AppConstant::NUMERIC_ONE)
+//        {
+//            $this->replyby = AppConstant::ALWAYS_TIME;
+//        }
+//        elseif ($alwaysReplies == AppConstant::NUMERIC_TWO)
+//        {
+//            $this->replyby = AppConstant::NUMERIC_ZERO;
+//        }
+//        elseif ($alwaysReplies == AppConstant::NUMERIC_THREE)
+//        {
+//            $this->replyby = $date;
+//        }
+//        else
+//        {
+//            $this->replyby = null;
+//        }
         $this->isanon = $isNonValue;
         $this->files = $fileName;
         $this->tag = $tag;

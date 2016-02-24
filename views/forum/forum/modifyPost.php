@@ -98,34 +98,38 @@ $now = $currentTime;
                                  <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Displayed at top and students can only see their own replies ');?></td></div></tr>
             </span>
         </div><br><br>
-        <?php if ($thread[0]['replyBy'] === null) {
+        <?php
+        $date=date("m/d/Y",strtotime("+1 week"));
+        $time=date('g:i A');
+//        AppUtility::dump($thread[0]['replyBy']);
+        if ($thread[0]['replyBy'] == null) {
         $thread[0]['replyBy'] = 0;
         }
-        if ($thread[0]['replyBy'] != 3)
+        elseif ($thread[0]['replyBy'] == 0) {
+            $thread[0]['replyBy'] = 1;
+        }
+        elseif ($thread[0]['replyBy']<AppConstant::ALWAYS_TIME && $thread[0]['replyBy']>AppConstant::NUMERIC_ZERO)
         {
-            $date = date('m/d/y');
-            $time = date("G:i");
+            $date = AppUtility::tzdate("m/d/Y",($thread[0]['replyBy']));
+            $time = AppUtility::tzdate("g:i a",($thread[0]['replyBy']));
+            $thread[0]['replyBy']=3;
         }
-        if ($thread[0]['replyBy'] > 3 && $thread[0]['replyBy'] < AppConstant::ALWAYS_TIME) {
-            $date = date('m/d/y', $thread[0]['replyBy']);
-            $time = date("G:i", $thread[0]['replyBy']);
-            $thread[0]['replyBy'] = 3;
-        }
+
          ?>
         <div>
             <span class="col-sm-2 align-title"><?php echo AppUtility::t('Allow Replies');?></span>
             <span class="col-sm-10" id="always-replies-radio-list">
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                                <input type='radio' checked  name='always-replies' value='1'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],0);?>>
+                                <input type='radio' checked  name='always-replies' value='null'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],0);?>>
                                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Use default');?></td></div></tr>
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                                <input type='radio' name='always-replies' value='1'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], 1);?> >
+                                <input type='radio' name='always-replies' value='always'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::ALWAYS_TIME);?> >
                                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Always');?></td></div></tr>
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                                <input type='radio' name='always-replies' value='2'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::ALWAYS_TIME);?> >
+                                <input type='radio' name='always-replies' value='never'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],1);?> >
                                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Never');?></td></div></tr>
                 <div class='radio student-enroll override-hidden visibility pull-left'><label class='checkbox-size label-visibility pull-left'><td>
-                            <input type=radio name="always-replies" value="3"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::NUMERIC_THREE);?> >
+                            <input type=radio name="always-replies" value="date"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::NUMERIC_THREE);?> >
                             <span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td></div>
                 <?php
                 echo '<div class = "col-md-4 time-input" id="datepicker-id">';
@@ -135,7 +139,7 @@ $now = $currentTime;
                     'value' => $date,
                     'pluginOptions' => [
                         'autoclose' => true,
-                        'format' => 'm/d/yy']
+                        'format' => 'mm/dd/yyyy']
                 ]);
                 echo '</div>';?>
                 <?php
@@ -147,7 +151,7 @@ $now = $currentTime;
                     'convertFormat' => true,
                     'value' => $time,
                     'pluginOptions' => [
-                        'format' => "m/d/Y g:i A",
+                        'format' => "mm/dd/yyyy g:i A",
                         'todayHighlight' => true,
                     ]
                 ]);

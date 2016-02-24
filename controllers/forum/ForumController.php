@@ -299,7 +299,6 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $currentUser = $this->user;
         $threadsperpage = $currentUser['listperpage'];
-
         $forumId = $params['forum'];
         $courseId = $params['cid'];
         $cid = $this->getParamVal('courseid');
@@ -672,8 +671,6 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumId');
         $forumData = Forums::getById($forumId);
         $groupsetid = $forumData['groupsetid'];
-
-
         $teacherId = $this->isTeacher($currentUser['id'], $courseId);
         if ($teacherId) {
             $isteacher = true;
@@ -682,7 +679,6 @@ class ForumController extends AppController
         }
 
         $thread = ThreadForm::thread($forumId);
-
         $threadArray = array();
 
         foreach ($thread as $data) {
@@ -757,7 +753,6 @@ class ForumController extends AppController
 
             if (strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO)
             {
-
                 $threadIdOfPost = ForumPosts::modifyPost($params, $fileName);
                 $contentTrackRecord = new ContentTrack();
                 if ($currentUser->rights == AppConstant::STUDENT_RIGHT) {
@@ -1348,12 +1343,20 @@ class ForumController extends AppController
             }
             $fileName = implode('@@',$files);
             $alwaysReplies = $params['always-replies'];
+            if($alwaysReplies=="never")
+                $reply=AppConstant::NUMERIC_ZERO;
+            elseif($alwaysReplies=="always")
+                $reply=2000000000;
+            elseif($alwaysReplies=="date"){
+                $reply = AppUtility::parsedatetime($params['endDate'], $params['startTime']);
+            }else $reply=null;
+
             if($isNonValue == '')
             {
                 $isNonValue = AppConstant::NUMERIC_ZERO;
             }
             $newThread = new ForumPosts();
-            $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date, $isNonValue, $fileName,$tag);
+            $threadId = $newThread->createThread($params, $user->id, $postType, $reply, $date, $isNonValue, $fileName,$tag);
             if ($groupSetId > AppConstant::NUMERIC_ZERO) {
                 if ($isTeacher) {
                     if (isset($params['stugroup'])) {

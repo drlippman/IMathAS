@@ -101,16 +101,16 @@ $now = $currentTime;
             <span class="col-md-2 col-sm-2 align-title"><?php echo AppUtility::t('Always Replies')?></span>
             <span class="col-md-10 col-sm-10" id="always-replies-radio-list">
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                <input type='radio' checked  name='always-replies' value='0'>
+                <input type='radio' checked  name='always-replies' value='null'>
                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Use default')?></td></div></tr>
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                <input type='radio' name='always-replies' value='1'>
+                <input type='radio' name='always-replies' value='always'>
                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Always')?></td></div></tr>
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                <input type='radio' name='always-replies' value='2'>
+                <input type='radio' name='always-replies' value='never'>
                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Never')?></td></div></tr>
                 <div class='radio padding-right-five student-enroll visibility pull-left override-hidden'><label class='checkbox-size label-visibility pull-left'><td>
-                <input type=radio name="always-replies" value="3" /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td>
+                <input type=radio name="always-replies" value="date" /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td>
                 </div>
                 <?php
                 echo '<div class = "col-sm-4 padding-left-zero col-md-3 time-input" id="datepicker-id">';

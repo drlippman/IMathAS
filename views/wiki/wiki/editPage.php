@@ -11,6 +11,7 @@ $this->title = $wikiName;
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo "Edit Wiki: ".$this->title ?></div>
+
         </div>
     </div>
 </div>

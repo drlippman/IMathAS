@@ -18,8 +18,7 @@ $studview= $sessionData['stuview'];
 if($studview>-1){
     $studview=1;
 }
-
-if (($teacherId && (!$backLink))) {?>
+if ((($myRights>10) && (!$backLink))) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
     </div>
@@ -35,11 +34,10 @@ if (($teacherId && (!$backLink))) {?>
             </div>
         </div>
     </div>
-
     <div class="item-detail-content">
         <?php echo $this->render("_toolbarTeacher", ['course' => $course, 'section' => 'course']);?>
     </div>
-<?php } elseif($isStudent) { ?>
+<?php } elseif($myRights==10) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
     </div>
