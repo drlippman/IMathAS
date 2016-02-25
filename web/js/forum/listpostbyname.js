@@ -1,4 +1,7 @@
 var bcnt = $('#cnt').val()
+var forumid = $('#forumId').val();
+var courseId = $('#courseId').val();
+
 $(document).ready(function ()
 {
     var isData =  $('#isData').val();
@@ -14,9 +17,10 @@ $(document).ready(function ()
     });
     $("a[name=tabs]").on("click", function () {
         var threadid = $(this).attr("data-var");
+        var parentId = $(this).attr("data-parent");
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'List Post By Name', zIndex: 10000, autoOpen: true,
+            modal: true, title: 'Remove Post', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false, draggable: false,
             closeText: "hide",
             buttons: {
@@ -25,9 +29,9 @@ $(document).ready(function ()
                     return false;
                 },
                 "Confirm": function () {
-                    $(this).dialog("close");
                     var threadId = threadid;
-                    jQuerySubmit('mark-as-remove-ajax',{threadId:threadId},'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax',{threadId:threadId,parentId:parentId},'markAsRemoveSuccess');
+                    $(this).dialog("close");
                     return true;
                 }
             },
@@ -191,8 +195,7 @@ function onenter(e,field) {
 
 function markAsRemoveSuccess(response)
 {
-    $(this).dialog("close");
-    window.location = "list-post-by-name?page=1&cid="+groupId;
+    window.location = "list-post-by-name?page=1&cid="+courseId+"&forumid="+forumid;
 }
 
 

@@ -118,7 +118,11 @@ $urlmode = AppUtility::urlMode();?>
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?courseId='.$course->id.'&forumId='.$forumId.'&threadId='.$line['id'] ) ?> ">Modify</a>
     <?php }
         if ($isteacher || ($allowdel && $line['ownerid']==$userId)) {
-            ?><a href="#" name="tabs" data-var="<?php echo $line['id']?>" class="mark-remove" >Remove</a> <?php
+?>
+
+            <input type="hidden" id="courseId" value="<?php echo $course->id;?>">
+            <input type="hidden" id="forumId" value="<?php echo $forumId;?>">
+            <a href="#" name="tabs" data-parent="<?php echo $line['parent'];?>" data-var="<?php echo $line['id'];?>" class="mark-remove" >Remove</a> <?php
         }
         if ($line['posttype']!=2 && $userRights > 5 && $allowreply) { ?>
             <a href="<?php echo AppUtility::getURLFromHome('forum','forum/reply-post?courseid='.$course->id.'&forumid='.$forumId.'&threadId='.$line['threadid'].'&listbypost=1&id='.$line['id'])?>">Reply</a>
