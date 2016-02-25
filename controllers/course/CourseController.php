@@ -402,7 +402,7 @@ class CourseController extends AppController
         $courseId = $this->getParamVal('cid');
         $isLocked = $this->isLocked($user->id, $courseId);
         if($isLocked){
-            $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+            $this->setErrorFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
             return $this->redirect(Yii::$app->getHomeUrl());
         }
         $countPost = $this->getNotificationDataForum($courseId,$user);
@@ -1232,7 +1232,7 @@ class CourseController extends AppController
         if ($line != null) {
             $isLocked = $this->isLocked($userId, $courseId);
             if($isLocked){
-                $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+                $this->setErrorFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
                 return $this->redirect(Yii::$app->getHomeUrl());
             }
             $studentId = $line['id'];

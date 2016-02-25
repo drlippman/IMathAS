@@ -227,7 +227,7 @@ function lockUnlockStudent(lockOrUnlock, studentId) {
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
-                "confirm": function () {
+                "Confirm": function () {
                     $('#searchText').val(null);
                     $(this).dialog('destroy').remove();
                     var data = {lockOrUnlock: lockOrUnlock, studentId: studentId, courseId: courseId};

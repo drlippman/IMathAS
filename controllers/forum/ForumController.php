@@ -64,7 +64,7 @@ class ForumController extends AppController
         $user = $this->user;
         $isLocked = $this->isLocked($user['id'], $cid);
         if($isLocked){
-            $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+            $this->setErrorFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
             return $this->redirect(Yii::$app->getHomeUrl());
         }
         $params = $this->getRequestParams();

@@ -2926,7 +2926,7 @@ class GradebookController extends AppController
             }
         }
         if($isLocked){
-            $this->setWarningFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
+            $this->setErrorFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
             return $this->redirect(Yii::$app->getHomeUrl());
         }
         $totalData = $this->gbtable($currentUser['id'], $course['id'], $userId);

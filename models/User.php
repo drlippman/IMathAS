@@ -942,4 +942,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function getPresentUsersInfo($usernames){
         return User::find()->where(['IN','SID',$usernames])->all();
     }
+
+    public static function getListOfUserToEnroll($courseId)
+    {
+        $query = "SELECT iu.FirstName,iu.LastName,iu.id
+                  FROM imas_users AS iu JOIN imas_students
+                  ON iu.id=imas_students.userid
+                  WHERE imas_students.courseid=:courseId
+                  ORDER BY iu.LastName,iu.FirstName";
+        return Yii::$app->db->createCommand($query)->bindValue(':courseId', $courseId)->query();
+    }
 }

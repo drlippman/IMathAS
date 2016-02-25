@@ -213,6 +213,11 @@ function studLocked()
         },
         close: function (event, ui) {
             jQuery(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
         }
     });
 }
