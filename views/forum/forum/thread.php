@@ -53,7 +53,6 @@ $now = $currentTime;
 <input type="hidden" id="settings" value="<?php echo $forumData['settings'];?>">
 <input type="hidden" id="un-read" value="<?php echo $unRead; ?>">
 <input type="hidden" name="from" value="<?php echo $unRead; ?>">
-
 <div class="tab-content shadowBox ">
     <div class="inner-content col-md-12 col-sm-12 padding-left-right-thirty padding-bottom-eight">
         <form id="myForm">
@@ -63,7 +62,7 @@ $now = $currentTime;
                     <select name="seluid" class="form-control-forum form-control select_option width-fifty-five-per" id="">
                         <option value="-1" selected="selected"><?php echo AppUtility::t('Select')?></option>
                         <option value="0"><?php echo AppUtility::t('List Post by Name')?></option>
-                        <option value="1"><?php echo AppUtility::t('Limit to Flagged ')?></option>
+                        <option value="1"><?php echo AppUtility::t('Limit to Flagged')?></option>
                         <?php if($page < 0)
                         {?>
                             <option value="3"><?php echo AppUtility::t('Show All')?></option>
@@ -71,7 +70,6 @@ $now = $currentTime;
                             if (count($newpost)>0) {?>
                                 <option value="2"><?php echo AppUtility::t('Limit to New ')?></option>
                             <?php } }?>
-
                     </select>
                 </div>
                 <?php if (count($newpost)>0) {?>

@@ -85,7 +85,6 @@ class ForumController extends AppController
         if (!isset($params['cid'])) {
             exit;
         }
-
         if (isset($params['searchsubmit'])) {
             if (trim($params['search'])=='' && $params['tagfiltersel'] == '') {
                 $params['clearsearch'] = true;
@@ -577,7 +576,10 @@ class ForumController extends AppController
 
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
-
+        if(count($postInformtion)==AppConstant::NUMERIC_ZERO){
+            $this->setErrorFlash("No result found for Limit to Flagged");
+            return $this->redirect('thread?page=1&cid='.$courseId.'&forum='.$forumId);
+        }
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
