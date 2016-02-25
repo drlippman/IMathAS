@@ -1165,7 +1165,6 @@ class AdminController extends AppController
                 }
             }
             $params['ltisecret'] = trim($params['ltisecret']);
-
             if ($params['action'] == 'modify') {
                 $available = $this->getSanitizedValue($params['avail'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
                 $toolSet = $this->getSanitizedValue($params['toolSet'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
@@ -1175,7 +1174,6 @@ class AdminController extends AppController
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
                    $courseDataUpdate = $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
-
                 }else{
                     $columnName = 'id'; $columnValue = $params['id'];
                     $updateResult = new Course();

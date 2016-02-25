@@ -52,9 +52,7 @@ class MessageController extends AppController
         $rights = $this->user;
         $isTeacher = $this->isTeacher($user['id'],$courseId);
         $course = Course::getById($courseId);
-
         $cansendmsgs = false;
-
         if ($rights) {
             $model = new MessageForm();
             if (!isset($_GET['page']) || $_GET['page']=='') {
@@ -88,16 +86,15 @@ class MessageController extends AppController
                     $cansendmsgs = true;
                 }
             }
-//            if($cansendmsgs == false){
-//                $this->setErrorFlash('Message System is "OFF" for ' .$course['name']. ' course');
-//                return $this->goHome();
-//            }
+            if($cansendmsgs == false){
+                $this->setErrorFlash('Message System is "OFF" for ' .$course['name']. ' course');
+                return $this->goHome();
+            }
             $userData = User::getById($user['id']);
             $threadsperpage = $userData['listperpage'];
             $filterByCourse = Message::getCoursesForMessage($user['id']);
             $filterByUserName = Message::getMessagesByUserName($user['id'], $filtercid);
             $messageDisplay = Message::displayMessageById($user['id'], $filteruid, $filtercid, $limittotagged,$page, $threadsperpage);
-
             $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
             $limitToTaggedMsg = new Message;
@@ -123,20 +120,30 @@ class MessageController extends AppController
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('userid');
         $userName = User::getById($userId );
+        $isTeacher=AppController::isTeacher($userRights['id'],$courseId);
         if ($this->getAuthenticatedUser())
         {
             $course = Course::getById($courseId);
             $teacher = Teacher::getTeachersById($courseId);
             $users = User::findTeachersToList($courseId);
             $tutors = Tutor::findTutorsToList($courseId);
-            foreach($tutors as $tutor){
+            $students = Student::findStudentsToList($courseId);
+
+            if($course['msgset']==0 || $isTeacher){
+
+                foreach($tutors as $tutor){
                 array_push($users,$tutor);
-            }
-                $students = Student::findStudentsToList($courseId);
+                }
+
                 foreach($students as $student){
                     array_push($users,$student);
                 }
-            $uId = $this->getUserId();
+            }
+            if($course['msgset']==2 ||$isTeacher){
+                if(!$isTeacher)
+                $users=$students;
+             }
+//            $uId = $this->getUserId();
             $this->includeCSS(["message.css"]);
             $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);
             $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId , 'userRights' => $userRights,'newTo' =>  $newTo,'username' => $userName);
@@ -468,7 +475,6 @@ class MessageController extends AppController
                     }
                 }
             }
-
         if ($type!='sent' && $type!='allstu') {
             if ($messageData['courseid'] > AppConstant::NUMERIC_ZERO) {
                 $result = Course::getMsgSet($messageData['courseid']);
