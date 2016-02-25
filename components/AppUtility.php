@@ -3090,21 +3090,26 @@ class AppUtility extends Component
             if ($student) {
                 $isStudent = true;
             }
-            $lockId = $courseStudent['lockaid'];
-            $locked = Student::getStudentData($userId, $data[$i]['id']);
+            $lockId = $courseStudent['lockaid']; ?>
+
+           <?php $locked = Student::getStudentData($userId, $data[$i]['id']);
             echo '<li>';
             if ($type=='take') {
                  ?>
                 <span class="delx" onclick="return hidefromcourselist(<?php echo $data[$i]['id'] ?>,this);" title="Hide from course list">x</span>
            <?php }
-            if ($isStudent && ($lockId > 0)) {
-                ?>
-                <a class="word-wrap-break-word" href="#" onclick="locked()">
-            <?php echo $data[$i]['name'].'</a>';
-            } elseif($locked['locked'] > 0){ ?>
+           if($locked['locked'] > 0){ ?>
                 <a class="word-wrap-break-word" href="#" onclick="studLocked()">
                 <?php echo $data[$i]['name'].'</a>';
-            } else{
+            } elseif ($isStudent && ($lockId > 0)) {
+                $assessmentName = Assessments::getByAssessmentId($lockId);
+                ?>
+                    <input type="hidden" class="lockId" value="<?php echo $lockId?>">
+                    <input type="hidden" class="assessmentName" value="<?php echo $assessmentName['name']?>">
+                    <input type="hidden" class="courseId" value="<?php echo $data[$i]['id']?>">
+                <a class="word-wrap-break-word" href="#" onclick="locked()">
+                <?php echo $data[$i]['name'].'</a>';
+                }else{
             ?>
                 <a class="word-wrap-break-word" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$data[$i]['id'].'&folder=0')?>">
                 <?php echo $data[$i]['name'].'</a>';

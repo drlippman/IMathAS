@@ -7,13 +7,13 @@ $(document).ready(function () {
     {
         tinyMCE.triggerSave();
         var forumId = $("#forumId").val();
-        var subject = $(".subject").val();
+        var subject = $(".subject").val().trim();
         var courseId =$("#courseId").val();
         if(!subject.length > 0)
         {
             $('#flash-message').show();
             $(".subject").css('border-color', 'red');
-            $('#flash-message').html("<div class='alert alert-danger'>Subject cannot be blank");
+            $('#flash-message').html("<div class='alert alert-danger'>Subject cannot be blank.");
         }
         else
         {

@@ -813,10 +813,10 @@ class AppController extends Controller
 
     public function accessForAdminController($rights, $actionPath)
     {
-        if ($rights < AppConstant::STUDENT_RIGHT) {
-            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+        if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
+            $this->setErrorFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
-        } else if ($rights >= AppConstant::TEACHER_RIGHT && ($actionPath == 'index' || $actionPath == 'forms' || $actionPath == 'actions')) {
+        } else if ($rights > AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'index' || $actionPath == 'forms' || $actionPath == 'actions')) {
             return true;
         } else if ($rights >= AppConstant::GROUP_ADMIN_RIGHT && ($actionPath == 'add-new-user' || $actionPath == 'change-rights' || $actionPath == 'import-question-set'
                 || $actionPath == 'export-question-set' || $actionPath == 'manage-lib' || $actionPath == 'export-lib' || $actionPath == 'import-lib' || $actionPath = 'child-libs')

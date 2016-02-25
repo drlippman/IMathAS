@@ -1231,6 +1231,7 @@ class CourseController extends AppController
         $line  = Student::getStudentData($userId, $courseId);
         if ($line != null) {
             $isLocked = $this->isLocked($userId, $courseId);
+
             if($isLocked){
                 $this->setErrorFlash(AppConstant::ERROR_MSG_FOR_LOCLKED_STUDENT);
                 return $this->redirect(Yii::$app->getHomeUrl());

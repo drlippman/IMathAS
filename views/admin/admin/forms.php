@@ -144,7 +144,7 @@ switch ($action) {
     break;
     case "modify":
     case "addcourse":
-        if ($myRights < AppConstant::STUDENT_RIGHT) {
+        if ($myRights < AppConstant::TEACHER_RIGHT) {
             echo AppConstant::NO_ACCESS_RIGHTS;
             break;
         }

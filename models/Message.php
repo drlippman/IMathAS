@@ -116,7 +116,7 @@ class Message extends BaseImasMsgs
                }
                 else{
                     $message->isread = 3;
-                   $message->save();
+                    $message->delete();
                 }
             }
             elseif($message->isread==4)

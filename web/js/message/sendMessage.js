@@ -80,9 +80,7 @@ function changeSubject()
 function sendMessage(response)
 {
         var cid = $(".send-msg").val();
-    alert(cid);
         var result = JSON.parse(response);
-
         if(result.status == 0)
         {
 

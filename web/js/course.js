@@ -199,7 +199,7 @@ function playliststart(id,vidk,el) {
 
 function studLocked()
 {
-    var html = '<div><p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p></div>';
+    var html = '<div><p>You have been locked out of this course by your instructor. Please see your instructor for more information.</p></div>';
     var cancelUrl = jQuery(this).attr('href');
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -224,9 +224,12 @@ function studLocked()
 
 function locked()
 {
-    var name = 'Assessment';
-    var html = '<div><p>This course is currently locked for an assessment.</p>';
-//    html += "<a class=''style='color: #0000ff;font-size: 16px' href='../assessment/assessment/show-test'>"+name+"</a></div>";
+    var lockId = $('.lockId').val();
+    var courseId = $('.courseId').val();
+    var assessmentName = $('.assessmentName').val();
+    var html = '<div><p>This course is currently locked for an assessment.</p></div>';
+    html += '<div><a class=" " style="color: #0000ff;font-size: 16px" href="../assessment/assessment/show-test?id='+lockId+'&cid='+courseId+' ">Go to Assessment</a> | ' +
+        '<a class=" " style="color: #0000ff;font-size: 16px" href="../site/dashboard">Go Back</a></div>';
     var cancelUrl = jQuery(this).attr('href');
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -240,7 +243,11 @@ function locked()
         },
         close: function (event, ui) {
             jQuery(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
         }
     });
 }
-
