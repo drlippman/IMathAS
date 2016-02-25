@@ -487,7 +487,6 @@ class ForumController extends AppController
             $searchlikes3 = $searchterms;
             $searchedPost = ForumPosts::getBySearchText($isteacher, $now, $courseId, $searchlikes, $searchlikes2, $searchlikes3, $forumId, $limthreads, $dofilter, $params);
         }
-
         if (isset($params['markallread'])) {
 
             $readPost = ForumPosts::MarkAllRead($forumId, $dofilter, $limthreads);
@@ -548,8 +547,8 @@ class ForumController extends AppController
         {
             $this->setWarningFlash('No result found for limit to flagged');
 
-//            $page = 1;
-            return $this->redirect('thread?page=-2&cid='.$courseId.'&forum='.$forumId);
+            $page = 1;
+            return $this->redirect('thread?page=1&cid='.$courseId.'&forum='.$forumId);
         }
         $prevnext = '';
         if ($page > 0) {
@@ -573,13 +572,13 @@ class ForumController extends AppController
                 $groupnames[$row['id']] = $row['name'];
             }
         }
-
         $postIds = ForumPosts::getPostIds($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags));
         $postInformtion = ForumPosts::getPostDataForThread($forumId, $dofilter, $page, $limthreads, $newpost, array_keys($flags), $sortby, $threadsperpage);
-        if(count($postInformtion)==AppConstant::NUMERIC_ZERO){
-            $this->setErrorFlash("No result found for Limit to Flagged");
-            return $this->redirect('thread?page=1&cid='.$courseId.'&forum='.$forumId);
-        }
+
+            if(count($postInformtion)==AppConstant::NUMERIC_ZERO && $page == -2){
+                $this->setErrorFlash("No result found for Limit to Flagged");
+                return $this->redirect('thread?cid='.$courseId.'&forumid='.$forumId);
+            }
         $course = Course::getById($courseId);
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
