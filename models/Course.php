@@ -303,7 +303,7 @@ class Course extends BaseImasCourses {
     }
     public static function getBlockCnt($courseId)
     {
-        return self::find()->select('blockcnt')->where('id', $courseId)->one();
+          return self::find()->select('blockcnt')->where(['id'=>$courseId])->one();
     }
 
     public static function getCourseData($myRights, $showcourses, $userId)

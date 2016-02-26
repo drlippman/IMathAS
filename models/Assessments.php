@@ -112,9 +112,12 @@ class Assessments extends BaseImasAssessments
         }
     }
 
-    public function copyAssessment($params)
+    public function copyAssessment($cid,$params)
     {
-        $this->courseid = isset($params['courseid']) ? $params['courseid'] : null;
+//        $data = AppUtility::removeEmptyAttributes($params);
+//        $params['courseid']=$cid;
+//        $this->attributes = $params;
+        $this->courseid = $cid;
         $this->name = isset($params['name']) ? $params['name'] : null;
         $this->summary = isset($params['summary']) ? $params['summary'] : null;
         $this->intro = isset($params['intro']) ? $params['intro'] : null;
@@ -151,7 +154,7 @@ class Assessments extends BaseImasAssessments
         $this->endmsg = isset($params['endmsg']) ? $params['endmsg'] : null;
         $this->deffeedbacktext = isset($params['deffeedbacktext']) ? $params['deffeedbacktext'] : null;
         $this->msgtoinstr = isset($params['msgtoinstr']) ? $params['msgtoinstr'] : null;
-        $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
+//        $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
         $this->istutorial = isset($params['istutorial']) ? $params['istutorial'] : null;
         $this->defoutcome = isset($params['defoutcome']) ? $params['defoutcome'] : null;
         $this->itemorder = isset($params['itemorder']) ? $params['itemorder'] : null;

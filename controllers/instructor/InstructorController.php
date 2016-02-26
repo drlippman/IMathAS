@@ -880,7 +880,8 @@ class InstructorController extends AppController
                              $toCopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,theme,latepasshrs';
                              $query = Course::getDataByCtc($toCopy,$params['ctc']);
                              $toCopyArr = explode(',',$toCopy);
-                             if($query['ancestors'])
+
+                             if($query['ancestors']=="")
                              {
                                  $query['ancestors'] = intval($params['ctc']);
                              }else
@@ -888,9 +889,12 @@ class InstructorController extends AppController
                                  $query['ancestors'] = intval($params['ctc']).','.$query['ancestors'];
                              }
                              $sets = '';
-                             foreach ($toCopy as $copy)
+                             $i=0;
+                             foreach ($toCopyArr as $copy)
                              {
-                                 $sets[$copy]= $query[$copy];
+                                 if($i>0)$sets.=",";
+                                 $sets.=$copy."='". addslashes($query[$copy])."'";
+                                $i++;
                              }
                              Course::updateCourseForCopyCourse($courseId,$sets);
                          }
@@ -1121,7 +1125,7 @@ class InstructorController extends AppController
                      }
                      else
                      {
-                         return $this->redirect('index?cid='.$courseId);
+                         return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
                      }
                  }
                  elseif (isset($action) && $action == "select")

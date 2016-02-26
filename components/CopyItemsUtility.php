@@ -140,7 +140,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             $ForumData['outcomes'] = implode(',', $newoutcomes);
         }
         $forum = new Forums();
-        $newtypeid = $forum->addNewForum($ForumData);
+        $newtype = $forum->addNewForum($ForumData);
+        $newtypeid=$newtype['id'];
         if ($params['ctc'] != $cid)
         {
             $forumtrack[$typeid] = $newtypeid;
@@ -148,6 +149,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         if ($rubric != AppConstant::NUMERIC_ZERO) {
             $frubrictrack[$newtypeid] = $rubric;
         }
+
         if ($copyStickyPosts) {
             //copy instructor sticky posts
             $query = ForumPosts::getByForumId($typeid);
@@ -214,7 +216,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         unset($assessmentData['reqscoreaid']);
         $assessmentData['name'] .= stripslashes($params['append']);
         $assessment = new Assessments();
-        $newtypeid = $assessment->copyAssessment($assessmentData);
+        $newtypeid = $assessment->copyAssessment($params['cid'],$assessmentData);
         if ($reqscoreaid > AppConstant::NUMERIC_ZERO) {
             $reqscoretrack[$newtypeid] = $reqscoreaid;
         }
@@ -307,7 +309,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $newtypeid = AppConstant::NUMERIC_ZERO;
     }
     $items = new Items();
-    $newItemId = $items->saveItems($params['courseId'], $newtypeid, $itemtype);
+    $newItemId = $items->saveItems($params['courseId'],$newtypeid,$itemtype);
     return $newItemId;
 }
 
