@@ -1039,7 +1039,7 @@ class CourseItemsUtility extends Component
                                     </span>
                     <?php } else { ?>
                         <br><?php echo $title ?> Always</span>
-                        <span class="instronly kkkk">
+                        <span class="instronly">
                                           <a class="dropdown-toggle grey-color-link select_button1 floatright"
                                              data-toggle="dropdown" href="javascript:void(0);"><img alt="setting"
                                                                                                     class="floatright course-setting-button"
@@ -1067,7 +1067,7 @@ class CourseItemsUtility extends Component
                     <input type="hidden" id="isHidden" value="1">
                     <span class="instrdates">
                             <br>Hidden</span>
-                    <span class="instronly mmm">
+                    <span class="instronly">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                                src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>

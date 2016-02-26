@@ -197,10 +197,12 @@ function playliststart(id,vidk,el) {
 	}
 }
 
+
 function studLocked()
 {
     var html = '<div><p>You have been locked out of this course by your instructor. Please see your instructor for more information.</p></div>';
     var cancelUrl = jQuery(this).attr('href');
+
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
@@ -211,13 +213,13 @@ function studLocked()
                 return false;
             }
         },
-        close: function (event, ui) {
-            jQuery(this).remove();
-        },
         open: function(){
             jQuery('.ui-widget-overlay').bind('click',function(){
                 jQuery('#dialog').dialog('close');
             })
+        },
+        close: function (event, ui) {
+            jQuery(this).remove();
         }
     });
 }

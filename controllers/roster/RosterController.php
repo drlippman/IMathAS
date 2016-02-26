@@ -396,6 +396,8 @@ class RosterController extends AppController
         $course = Course::getById($courseId);
         $model = new EnrollStudentsForm();
         $query = Student::findByCid($selectedCourseId);
+        $createNEnroll = ' <a href='.AppUtility::getURLFromHome("roster","roster/create-and-enroll-new-student?cid=".$courseId).'>Create & enroll a new student</a>';
+
         $queryCheck = Student::findByCid($courseId);
         $checkedArray = array();
         foreach ($queryCheck as $check) {
@@ -419,6 +421,8 @@ class RosterController extends AppController
                     "isCheck" => $isCheck);
                 array_push($studentDetails, $tempArray);
             }
+        } else{
+            $this->setErrorFlash('No student in this course.'.$createNEnroll);
         }
         $sort_by = array_column($studentDetails, 'lastName');
         array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentDetails);

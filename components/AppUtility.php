@@ -3101,7 +3101,7 @@ class AppUtility extends Component
                 <span class="delx" onclick="return hidefromcourselist(<?php echo $data[$i]['id'] ?>,this);" title="Hide from course list">x</span>
            <?php }
            if($locked['locked'] > 0){ ?>
-                <a class="word-wrap-break-word" href="#" onclick="studLocked()">
+                <a class="word-wrap-break-word"  onclick="studLocked()" href="javascript:void(0)";>
                 <?php echo $data[$i]['name'].'</a>';
             } elseif ($isStudent && ($lockId > 0)) {
                 $assessmentName = Assessments::getByAssessmentId($lockId);
