@@ -857,6 +857,7 @@ class SiteController extends AppController
                     }
                 }
             }
+
             /**
              * get new posts
              * check for new posts in courses being taught.

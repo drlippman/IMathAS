@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]
     ) ?>
-    <div >
+    <div>
         <h4><?php echo AppUtility::t('Select students to enroll') ?> </h4>
        <div class="padding-top-fifteen"> <?php echo AppUtility::t('Check') ?>: <a id="checkAll" class="check-all"
                                                  href="#"><?php echo AppUtility::t('All') ?></a> /

@@ -900,10 +900,11 @@ class AppController extends Controller
         $isOwner = Course::isOwner($user['id'], $courseId);
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $isStudent = $this->isStudent($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])) {
             return true;
         }
-        if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'get-block-items' || $actionPath == 'course' || $actionPath == 'show-linked-text' || $actionPath == 'get-assessment-data-ajax') && ($teacherId || $isStudent)) {
+        if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'get-block-items' || $actionPath == 'course' || $actionPath == 'show-linked-text' || $actionPath == 'get-assessment-data-ajax') && ($teacherId || $isStudent || $isTutor)) {
             return true;
         } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-link' || $actionPath == 'modify-inline-text' || $actionPath == 'copy-items-ajax' || $actionPath == 'delete-items-ajax' || $actionPath == 'save-quick-reorder') && $teacherId) {
             return true;
@@ -914,7 +915,6 @@ class AppController extends Controller
         } elseif($user['rights'] < AppConstant::STUDENT_RIGHT && $actionPath == 'public' || $actionPath == 'show-linked-text-public'){
             return true;
         }else {
-
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
         }

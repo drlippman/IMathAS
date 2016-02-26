@@ -3075,9 +3075,11 @@ class AppUtility extends Component
     public static function printCourses($data,$title,$type=null, $showNewMsgNote = null, $showNewPostNote = null, $stuHasHiddenCourses = null, $myRights = null, $newMsgCnt = null, $newPostCnt = null) {
         global $showNewMsgNote, $showNewPostNote, $stuHasHiddenCourses, $isStudent;
         $isCourseHidden = false;
-        if (count($data) == 0 && $type == 'tutor') {
-            return;
-        }
+//        if (count($data) == 0 && $type == 'tutor') {
+//            AppUtility::dump($data);
+//
+//            return;
+//        }
         global $myRights,$newMsgCnt,$newPostCnt,$user;
         $userId = $user['id'];
         $students = Student::getByUserId($userId);

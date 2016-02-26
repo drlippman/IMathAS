@@ -103,6 +103,7 @@ for ($i=0; $i<3; $i++) {
                     }
 
                     for ($j=0; $j<count($pagelayout[$i]); $j++) {
+
                     switch ($pagelayout[$i][$j]) {
                     case 0:
                     if ($myRights > AppConstant::STUDENT_RIGHT) {
