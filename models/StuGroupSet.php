@@ -43,7 +43,7 @@ class StuGroupSet extends BaseImasStugroupset
 
     public function InsertGroupData($groupName, $courseId)
     {
-        $this->name = trim(isset($groupName))?$groupName:null;
+        $this->name = ($groupName)?trim($groupName):null;
         $this->courseid = $courseId;
         $this->save();
         return $this;
