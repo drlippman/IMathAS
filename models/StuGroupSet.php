@@ -31,7 +31,7 @@ class StuGroupSet extends BaseImasStugroupset
     public function createGroupSet($courseId, $name)
     {
         $this->courseid = $courseId;
-        $this->name = $name;
+        $this->name = ($name)?trim($name):null;
         $this->save();
         return $this->id;
     }
@@ -58,7 +58,7 @@ class StuGroupSet extends BaseImasStugroupset
     {
         $query = StuGroupSet::find('name')->where(['id' => $renameGrpSetId])->one();
         if ($query) {
-            $query->name = $modifiedGrpName;
+            $query->name = trim($modifiedGrpName)?trim($modifiedGrpName):null; ;
             $query->save();
         }
     }
