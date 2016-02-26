@@ -205,7 +205,7 @@ function studLocked()
 
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
+        width: 'auto', resizable: false, draggable: false,
         closeText: "hide",
         buttons: {
             "Ok": function () {
@@ -235,7 +235,7 @@ function locked()
     var cancelUrl = jQuery(this).attr('href');
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
+        width: 'auto', resizable: false, draggable: false,
         closeText: "hide",
         buttons: {
             "Ok": function () {
