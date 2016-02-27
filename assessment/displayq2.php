@@ -2031,7 +2031,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if (strpos($m[0],'target=')===false) {
 						$ret = '<a target="_blank" '.substr($m[0], 2);
 					} else {
-						$ret = $m[0];
+						//force links in the last answer (from attach.js) to open in a new window to prevent manual scores and feedback from being lost
+						$ret = preg_replace("/target=\"_self/","target=\"_new",$m[0]);
 					}
 					$url = $m[1];
 					$extension = substr($url,strrpos($url,'.')+1,3);
