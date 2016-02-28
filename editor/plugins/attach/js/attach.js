@@ -235,7 +235,7 @@ function getTargetListHTML(elm_id, target_form_element) {
 
 	html += '<select id="' + elm_id + '" name="' + elm_id + '" onf2ocus="tinyMCE.addSelectAccessibility(event, this, window);" onchange="this.form.' + target_form_element + '.value=';
 	html += 'this.options[this.selectedIndex].value;">';
-	html += '<option value="_self">' + tinyMCEPopup.getLang('attach_dlg.target_same') + '</option>';
+	//html += '<option value="_self">' + tinyMCEPopup.getLang('attach_dlg.target_same') + '</option>';
 	html += '<option value="_blank">' + tinyMCEPopup.getLang('attach_dlg.target_blank') + ' (_blank)</option>';
 
 	for (var i=0; i<targets.length; i++) {
