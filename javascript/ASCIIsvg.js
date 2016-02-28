@@ -1065,8 +1065,8 @@ function mathjs(st,varlist) {
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
-  st = st.replace(/log_([\d\.]+)\(/g,"nthlog($1,");
-  st = st.replace(/log_\(([\d\.]+)\)\(/g,"nthlog($1,");
+  st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
+  st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
   
   if (st.indexOf("^-1")!=-1) {
@@ -1093,7 +1093,7 @@ function mathjs(st,varlist) {
   st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
   st = st.replace(/([^a-zA-Z])e$/g,"$1(E)");
   
-  st = st.replace(/([^a-zA-Z])e([^a-zA-Z])/g,"$1(E)$2");
+  st = st.replace(/([^a-zA-Z])e(?=[^a-zA-Z])/g,"$1(E)");
   st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
   st = st.replace(/(!)([0-9\(])/g,"$1*$2");
   //want to keep scientific notation

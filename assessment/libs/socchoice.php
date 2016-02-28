@@ -207,7 +207,8 @@ function apportion_info($pop, $seats, $method) {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
 			$other[$s] = sqrt($luq[$s]*($luq[$s]+1));
-			if ($q>$other[$s]) { $luq[$s]++;}
+			//this will never happen in initial allocation.
+			// if ($luq[$s]>$other[$s]) { $luq[$s]++;}
 		}
 		$toadd = $seats - array_sum($luq);
 		if ($toadd==0) {
@@ -277,7 +278,7 @@ function apportion_info($pop, $seats, $method) {
 	} else if ($method=='lowndes') {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
-			$other[$s] = ($q - $luq[$s])/$luq[$s];
+			$other[$s] = ($luq[$s]==0?1e100:($q - $luq[$s])/$luq[$s]);
 		}
 	}
 	return array($divisor, $quotas, $luq, $other, $outdiv);

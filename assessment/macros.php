@@ -2974,6 +2974,7 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 	if (!is_array($words)) {
 		$words = explode(',',$words);
 	}
+	/*
 	foreach ($words as $w) {
 		if (!isset($wc[$w])) {
 			$wc[$w] = 1;
@@ -2982,6 +2983,7 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 		}
 	}
 	$words = array_keys($wc);
+	*/
 	if ($part === null) {
 		$ans = $answer;
 	} else {
@@ -3004,10 +3006,11 @@ function scorestring($answer,$showanswer,$words,$stu,$qn,$part=null,$highlight=t
 
 	if ($stua != null) {
 		foreach ($words as $w) {
-			if (substr_count($stua, $w) != $wc[$w]) {
+			//if (substr_count($stua, $w) != $wc[$w]) {
+			if (strpos($stua, $w) === false) {
 				$iscorrect = false;
 				break;
-			}	
+			}
 		}
 	} else {
 		$iscorrect = false;
