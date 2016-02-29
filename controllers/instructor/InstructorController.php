@@ -1085,7 +1085,8 @@ class InstructorController extends AppController
                              {
                                  foreach($query as $data)
                                  {
-                                     $rubric = array_pop($data);
+                                     $rubric = array_pop($query);
+                                     $rubric =$rubric['rubric'];
                                      if (isset($gbCats[$data['gbcategory']]))
                                      {
                                          $data['gbcategory'] = $gbCats[$data['gbcategory']];
