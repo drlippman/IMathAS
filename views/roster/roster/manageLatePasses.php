@@ -42,8 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
         $isCheck=true;
         ?>
         <span class="col-md-1 col-sm-2">
-                <input class="form-control" type=text size=3 value="<?php echo $singleStudentInformation['latePassHrs']?>" name="passhours"/>
-            </span>
+                <span class="staticParent"><input class="form-control" id="child" type=text size=3 maxlength="5" value="<?php echo $singleStudentInformation['latePassHrs']?>" name="passhours"/></span>
+        </span>
             <span class="floatleft padding-top-pt-five-em">
                 <?php AppUtility::t('hours');?>
             </span>
@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
         <span class="floatleft padding-top-pt-five-em"><?php AppUtility::t('To all students');?></span>
         <span class="col-md-1 col-sm-2">
-            <input class="form-control" type="text" size="3" id="txt_add" name="addpass" value="1"/>
+            <span class="integer-only"><input class="form-control" type="text" size="3" maxlength="10" id="txt_add" name="addpass" value="1"/></span>
         </span>
         <span class="padding-left-pt-five-em"><input type="button" class="btn btn-primary" value="<?php AppUtility::t('Add')?>" onclick="addReplaceMultiplyTextValue(1)"/></span>
         <span class="padding-left-one-em"><input type="button" class="btn btn-primary" value="<?php AppUtility::t('Replace')?>" onclick="addReplaceMultiplyTextValue(2)"/></span>
@@ -75,13 +75,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <tr>
                 <td><?php echo trim($singleStudentInformation['Name'])?></td>
                 <td><?php echo $singleStudentInformation['Section']?> </td>
-                <td><input type="text" class="width-fifteen-per form-control latepass-text-id" size="4" value="<?php echo $singleStudentInformation['Latepass']?>"name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
+                <td class="staticParent"><input type="text" class="form-control latepass-text-id" id="child" size="4" maxlength="4" value="<?php echo $singleStudentInformation['Latepass']?>" name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
             </tr>
         <?php }?>
         <tbody>
     </table>
     <div class="col-md-6 col-sm-6 padding-left-zero">
-        <input type="submit" class="btn btn-primary" id="change-button" value="<?php AppUtility::t('Save Changes')?>">
+        <input type="submit" class="btn btn-primary" id="change-button" value="<?php AppUtility::t('Save Changes')?>" >
     <span class="padding-left-one-em">
         <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?>
         </a></span>
@@ -90,3 +90,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $(function() {
+            $('.staticParent').on('keydown', '#child', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        });
+        $(function() {
+            $('.integer-only').on('keydown', '#txt_add', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        });
+    })
+
+</script>

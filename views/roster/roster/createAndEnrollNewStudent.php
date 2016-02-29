@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = AppUtility::t('Create and Enroll a New Student', false);
+$this->title = AppUtility::t('Enroll a New Student', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
