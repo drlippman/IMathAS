@@ -2277,6 +2277,7 @@ function cleanbytoken($str,$funcs = array()) {
 			$token = $tokens[$i];
 			$lastout = count($out)-1;
 			if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
+				$isone = false;
 				if ($lastout>-1) { //if not first character
 					if ($out[$lastout] != '^') {
 						//( )0, + 0, x0
@@ -2289,6 +2290,7 @@ function cleanbytoken($str,$funcs = array()) {
 						}
 						
 					} else if ($out[$lastout] == '^') {
+						$isone = true;
 						if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
 							//4x+x^0 -> 4x+1
 							array_splice($out,-2);
@@ -2306,6 +2308,13 @@ function cleanbytoken($str,$funcs = array()) {
 					if ($tokens[$i+1][0]=='^') {
 						//0^3
 						$i+=2; //skip over ^ and 3
+					} else if ($isone) {
+						if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
+							array_pop($out);  //pop the 1 we added since it apperears to be multiplying
+							if ($tokens[$i+1][0]=='*') {  //x^0*y
+								$i++;
+							}
+						}
 					} else {
 						while ($i<$lasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
 							$i++;
