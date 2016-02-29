@@ -1504,6 +1504,7 @@ class RosterController extends AppController
                 $forumPostName[$query['id']] = $query['subject'];
             }
         }
+
         $forumName = array();
         if (count($actionsArray['forums']) > AppConstant::NUMERIC_ZERO) {
             $forums = array_unique($actionsArray['fo']);

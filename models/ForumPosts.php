@@ -119,8 +119,8 @@ class ForumPosts extends BaseImasForumPosts
             $this->isanon = $isaNon;
         }
         $this->message = isset($params['post-reply']) ? $params['post-reply'] : null;
-        $postdate = AppController::dateToString();
-        $this->postdate = $postdate;
+        $postdate = time();
+        $this->postdate =$postdate;
         $this->files = $fileName;
         $this->save();
     }

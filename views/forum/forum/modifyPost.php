@@ -101,7 +101,6 @@ $now = $currentTime;
         <?php
         $date=date("m/d/Y",strtotime("+1 week"));
         $time=date('g:i A');
-//        AppUtility::dump($thread[0]['replyBy']);
         if ($thread[0]['replyBy'] == null) {
         $thread[0]['replyBy'] = 0;
         }

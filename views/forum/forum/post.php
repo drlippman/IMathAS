@@ -91,7 +91,6 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
         $printChildren = new AppUtility();
         $printChildren->printchildren(0);
-
         if ($caneditscore && $haspoints) { ?>
             <div><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid)?> " name="save" class="btn btn-primary"> <?php echo "Save Grades"?></a></div><br>
           <?php

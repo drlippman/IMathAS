@@ -827,7 +827,6 @@ class ForumController extends AppController
         $sessionData = $this->getSessionData($sessionId);
         $myrights = $currentUser['rights'];
         $userid = $currentUser['id'];
-
         if (!isset($isTeacher) && !isset($isTutor) && !isset($isStudent)) {
            $this->setErrorFlash("You are not enrolled in this course.");
             $this->goHome();
@@ -1141,11 +1140,6 @@ class ForumController extends AppController
         $isTeacher = $this->isTeacher($userData['id'], $courseId);
         $threadDataById = ForumPosts::getbyidpost($Id);
         $threadData = ForumPosts::getReplyData($threadId);
-
-        $contentTrackRecord = new ContentTrack();
-        if ($userData->rights == AppConstant::STUDENT_RIGHT) {
-            $contentTrackRecord->insertForumData($userData->id, $courseId, $forumId, $Id, $threadId, $type = AppConstant::NUMERIC_ONE);
-        }
         $gradeData = Grades::getGradesData($Id);
         $points = $gradeData['score'];
         $forum = Forums::getForumDetails($forumId);
@@ -1220,6 +1214,7 @@ class ForumController extends AppController
                 }
             }
 
+
             $user = $this->user;
             $fileName = implode('@@', $files);
             $isaNon = $params['postanon'];
@@ -1255,11 +1250,18 @@ class ForumController extends AppController
                     }
 
                     $transaction->commit();
+
                     }catch (\Exception $e){
 
                         $transaction->rollBack();
                         return false;
                 }
+
+            $contentTrackRecord = new ContentTrack();
+            if ($userData->rights == AppConstant::STUDENT_RIGHT) {
+                $contentTrackRecord->insertForumData($userData->id, $courseId, $forumId, $reply['id'], $threadId, $type = AppConstant::NUMERIC_ONE);
+            }
+
             if (isset($isPost)) {
                 return $this->redirect('list-post-by-name?cid=' . $params['courseid'] . '&forumid=' . $params['forumid']);
             } else {
