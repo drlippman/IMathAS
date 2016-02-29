@@ -191,7 +191,9 @@ class RosterController extends AppController
             $students = User::getDataByCourseId($courseId);
             foreach($students as $row )
             {
+                if($row['LastName'] || $row['FirstName']){
                 $stus[] = array($row['LastName'].', '.$row['FirstName'], $row['id']);
+                }
             }
         }
         $this->includeCSS(['jquery-ui.css', 'roster/roster.css', 'dataTables.bootstrap.css']);
@@ -297,15 +299,18 @@ class RosterController extends AppController
         $studentArray = array();
         if ($query) {
             foreach ($query as $student) {
-                $tempArray = array('LastName' => trim(ucfirst($student->user->LastName)),
+                if($student->user['LastName']||$student->user['FirstName']) {
+                    $tempArray = array('LastName' => trim(ucfirst($student->user->LastName)),
                     'FirstName' => trim(ucfirst($student->user->FirstName)),
                     'code' => $student->code,
                     'section' => $student->section,
                     'userid' => $student->userid
                 );
                 array_push($studentArray, $tempArray);
+                }
             }
         }
+
         if ($this->isPost()) {
             $params = $this->getRequestParams();
             if ($params['section'])
@@ -334,6 +339,7 @@ class RosterController extends AppController
         $studentArray = array();
         if ($model) {
             foreach ($model as $student) {
+                if($student->user['LastName']||$student->user['FirstName']) {
                 $tempArray = array('Name' => trim($student->user->LastName) . ' ' . trim($student->user->FirstName),
                     'Section' => $student->section,
                     'Latepass' => $student->latepass,
@@ -341,7 +347,9 @@ class RosterController extends AppController
                     'latePassHrs' => $student->course->latepasshrs,
                     'userid' => $student->userid
                 );
-                array_push($studentArray, $tempArray);
+                    array_push($studentArray, $tempArray);
+                }
+
                 if ($this->isPost()) {
                     $params = $this->getRequestParams();
                     foreach ($params['code'] as $key => $latepass) {
