@@ -712,8 +712,10 @@ class ShowItemCourse extends Component
                     if ($exceptions[$items[$i]][2] > AppConstant::NUMERIC_ZERO && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latePassHrs*AppConstant::NUMERIC_SIXTY*AppConstant::NUMERIC_SIXTY)) {
                         $canundolatepass = true;
                     }
+                    if($latePassHrs != 0){
+                        $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO));
+                    }
 
-                    $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latePassHrs*AppConstant::NUMERIC_THREE_SIX_ZERO_ZERO));
                     $line['startdate'] = $exceptions[$items[$i]][0];
                     $line['enddate'] = $exceptions[$items[$i]][1];
                 }

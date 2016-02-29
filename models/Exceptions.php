@@ -165,7 +165,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function getStartDateEndDate($userId, $assessmentId)
     {
-        return Exceptions::find()->select('startdate,enddate')->where(['assessmentid' => $assessmentId, 'userid' => $userId])->one();
+        return Exceptions::find()->select(['startdate','enddate'])->where(['assessmentid' => $assessmentId, 'userid' => $userId])->one();
     }
 
     public static function updateException($userId, $exceptionId, $startdate, $enddate, $waivereqscore)
@@ -180,7 +180,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function getItemData($userId)
     {
-        return \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=':userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ")->bindValue(':userId',$userId)
-            ->queryAll();
+        $data = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userId AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ")->bindValue(':userId',$userId);
+        return $command = $data->queryAll();
     }
 }

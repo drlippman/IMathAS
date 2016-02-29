@@ -15,7 +15,7 @@ function addReplaceMultiplyTextValue(value)
     text_id = 0;
     var message = " Enter only integer value.";
     CommonPopUp(message);
-}else if(value == 1){
+    }else if(value == 1){
         $( ".latepass-text-id" ).each(function() {
             var oldlatepass = $(this).val();
             if(oldlatepass.length == 0){

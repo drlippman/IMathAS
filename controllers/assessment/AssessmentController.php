@@ -1504,7 +1504,7 @@ class AssessmentController extends AppController
         }
         $testid = $sessiondata['sessiontestid'];
         $asid = $testid;
-        $isteacher = $sessiondata['isteacher'];
+        $isteacher = $teacherid;
         if (isset($sessiondata['actas'])) {
             $userid = $sessiondata['actas'];
         }
@@ -1610,15 +1610,15 @@ class AssessmentController extends AppController
         }
         if (!isset($sessiondata['actas'])) {
             $row = Exceptions::getStartDateEndDate($userid, $line['assessmentid']);
+
             if ($row != null) {
                 if ($now < $row['startdate'] || $row['enddate'] < $now) { //outside exception dates
                     if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                         $isreview = true;
                     } else {
                         if (!$isteacher) {
-                            $temp .= 'Assessment is closed';
-                            $this->leavetestmsg($sessiondata);
-                            return $temp;
+                            $this->setErrorFlash('Assessment is closed.');
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']));
                         }
                     }
                 } else { //in exception
