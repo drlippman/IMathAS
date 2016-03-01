@@ -391,7 +391,7 @@ class ForumController extends AppController
         $enddate = $forumData['enddate'];
         $avail = $forumData['avail'];
         if (($studentId) && ($avail == 0 || ($avail == 1 && time() > $enddate))) {
-            $this->setWarningFlash('This forum is closed.');
+            $this->setErrorFlash('This forum is closed.');
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
         }
         $sessionId = $this->getSessionId();
@@ -545,7 +545,7 @@ class ForumController extends AppController
 
         } else if ($page == -2 && count($flags) == 0)
         {
-            $this->setWarningFlash('No result found for limit to flagged');
+            $this->setErrorFlash('No result found for limit to flagged.');
 
             $page = 1;
             return $this->redirect('thread?page=1&cid='.$courseId.'&forum='.$forumId);
@@ -1529,7 +1529,7 @@ class ForumController extends AppController
             $forumPost = ForumPosts::checkLeastOneThread($forumId,$userId);
             if (count($forumPost) == 0)
             {
-                $this->setWarningFlash(AppConstant::BLOCK_POST);
+                $this->setErrorFlash(AppConstant::BLOCK_POST);
                 return $this->redirect($this->goHome());
             }
         }
@@ -1979,7 +1979,7 @@ class ForumController extends AppController
                 $forumDataId = $newForum->addNewForum($finalArray);
                 if($forumDataId->errors['name'])
                 {
-                    $this->setWarningFlash('Forum name can not be blank.');
+                    $this->setErrorFlash('Forum name can not be blank.');
                     return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/add-forum?cid='.$courseId.'block='.$block.'&tb='.$tb));
                 }
                 $forumId = $forumDataId['id'];
@@ -2068,7 +2068,7 @@ class ForumController extends AppController
                     }
                 }
                 if ($count == AppConstant::NUMERIC_ZERO) {
-                    $this->setWarningFlash(AppConstant::NO_SETTING);
+                    $this->setErrorFlash(AppConstant::NO_SETTING);
                     return $this->redirect('change-forum?cid=' . $courseId);
                 }
                 $checked = $params['checked'];
@@ -2220,10 +2220,10 @@ class ForumController extends AppController
                         }
                     }
                 }
-                $this->setWarningFlash(AppConstant::FORUM_UPDATED);
+                $this->setErrorFlash(AppConstant::FORUM_UPDATED);
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
             } else {
-                $this->setWarningFlash(AppConstant::NO_FORUM_SELECTED);
+                $this->setErrorFlash(AppConstant::NO_FORUM_SELECTED);
                 return $this->redirect('change-forum?cid=' . $courseId);
             }
         }
@@ -2323,7 +2323,7 @@ class ForumController extends AppController
         $user = User::userDataUsingForum($userId, $forumId);
         $tutorEdit = $user['tutoredit'];
         if ($isTutor && $tutorEdit == AppConstant::NUMERIC_TWO) {
-            $this->setWarningFlash(AppConstant::NO_FORUM_ACCESS);
+            $this->setErrorFlash(AppConstant::NO_FORUM_ACCESS);
             return $this->goBack();
         }
         $forumInformation = Grades::getForumDataUsingUserId($userId, $forumId);

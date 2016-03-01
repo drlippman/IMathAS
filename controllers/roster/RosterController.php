@@ -165,11 +165,11 @@ class RosterController extends AppController
             $sdate = AppUtility::tzdate("m/d/Y",$start);
             $edate = AppUtility::tzdate("m/d/Y",$end);
 
-                if( $start > $end)
-                {
-                    $this->setWarningFlash('First date can not be greater then last date.');
-                    return $this->redirect('login-grid-view?cid='.$courseId);
-                }
+//                if( $start > $end)
+//                {
+//                    $this->setErrorFlash('First date can not be greater then last date.');
+//                    return $this->redirect('login-grid-view?cid='.$courseId);
+//                }
 
             $logins = array();
             $loginData = LoginLog::getLoginData($courseId,$start,$end);

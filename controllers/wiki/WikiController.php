@@ -617,7 +617,7 @@ class WikiController extends AppController
                 $saveChanges = new Wiki();
                 $lastWikiDataId = $saveChanges->createItem($finalArray);
                if($lastWikiDataId->errors['name']){
-                   $this->setErrorFlash('Forum name cannot be blank.');
+                   $this->setErrorFlash('Wiki name cannot be blank.');
                    return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?block='.$block.'&cid='.$courseId.'&tb='.$tb));
                }
 

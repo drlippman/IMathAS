@@ -669,7 +669,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($count == AppConstant::NUMERIC_ZERO && !isset($params['removeperq']) && !isset($params['chgendmsg'])) {
-                    $this->setWarningFlash(AppConstant::NO_SETTING);
+                    $this->setErrorFlash(AppConstant::NO_SETTING);
                     return $this->redirect('change-assessment?cid=' . $courseId);
                 }
                 $sets = array();
@@ -891,11 +891,11 @@ class AssessmentController extends AppController
                         return $this->redirect('assessment-message?cid=' . $courseId . '&aid=' . $checkedList);
                     }
                 } else {
-                    $this->setWarningFlash(AppConstant::CHANGE_ASSESSMENT_SUCCESSFULLY);
+                    $this->setSuccessFlash(AppConstant::CHANGE_ASSESSMENT_SUCCESSFULLY);
                     return $this->redirect(AppUtility::getHomeURL() . 'course/course/course?cid=' . $courseId);
                 }
             } else {
-                $this->setWarningFlash(AppConstant::NO_ASSESSMENT);
+                $this->setErrorFlash(AppConstant::NO_ASSESSMENT);
                 return $this->redirect('change-assessment?cid=' . $courseId);
             }
         }
@@ -1014,7 +1014,7 @@ class AssessmentController extends AppController
         } else {
             $endMessage = '';
             if (count($params['checked']) == AppConstant::NUMERIC_ZERO) {
-                $this->setWarningFlash(AppConstant::NO_ASSESSEMENT_SELECTED);
+                $this->setErrorFlash(AppConstant::NO_ASSESSEMENT_SELECTED);
                 exit;
             }
         }

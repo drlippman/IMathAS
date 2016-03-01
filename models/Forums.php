@@ -75,7 +75,7 @@ class Forums extends BaseImasForums {
 
     public function addNewForum($params)
     {
-        $this->name = trim(isset($params['name']))?$params['name']:null;
+        $this->name = trim(isset($params['name']))?trim($params['name']):null;
         $this->description = isset($params['description']) ? $params['description'] : null;
         $this->courseid = isset($params['courseid']) ? $params['courseid'] : null;
         $this->settings = isset($params['settings']) ? $params['settings'] : null;

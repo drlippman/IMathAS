@@ -566,17 +566,17 @@ class AdminController extends AppController
 
                    if($saveExternalTool->errors['name'])
                    {
-                       $this->setWarningFlash($saveExternalTool->errors['name'][0]);
+                       $this->setErrorFlash($saveExternalTool->errors['name'][0]);
                        return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
                    }
                    if($saveExternalTool->errors['ltikey'])
                    {
-                       $this->setWarningFlash("Key should contains 100 characters.");
+                       $this->setErrorFlash("Key should contains 100 characters.");
                        return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
                    }
                    if($saveExternalTool->errors['secret'])
                    {
-                       $this->setWarningFlash($saveExternalTool->errors['secret'][0]);
+                       $this->setErrorFlash($saveExternalTool->errors['secret'][0]);
                        return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id=new'));
                    }
                } else {
@@ -589,17 +589,17 @@ class AdminController extends AppController
                        $attrValue = $courseId;
                        $externalTool =  ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
                        if($externalTool->errors['name']){
-                           $this->setWarningFlash($externalTool->errors['name'][0]);
+                           $this->setErrorFlash($externalTool->errors['name'][0]);
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
                        if($externalTool->errors['ltikey'])
                        {
-                           $this->setWarningFlash("Key should contains 100 characters.");
+                           $this->setErrorFlash("Key should contains 100 characters.");
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
                        if($externalTool->errors['secret'])
                        {
-                           $this->setWarningFlash($externalTool->errors['secret'][0]);
+                           $this->setErrorFlash($externalTool->errors['secret'][0]);
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
 
@@ -609,17 +609,17 @@ class AdminController extends AppController
                        $attrValue = $groupId;
                        $externalTool = ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
                        if($externalTool->errors['name']){
-                           $this->setWarningFlash($externalTool->errors['name'][0]);
+                           $this->setErrorFlash($externalTool->errors['name'][0]);
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
                        if($externalTool->errors['ltikey'])
                        {
-                           $this->setWarningFlash("Key should contains 100 characters.");
+                           $this->setErrorFlash("Key should contains 100 characters.");
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
                        if($externalTool->errors['secret'])
                        {
-                           $this->setWarningFlash($externalTool->errors['secret'][0]);
+                           $this->setErrorFlash($externalTool->errors['secret'][0]);
                            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                        }
 
@@ -631,34 +631,34 @@ class AdminController extends AppController
                            {
                                $externalTool = ExternalTools::updateExternalTool($params,0,$privacy);
                                if($externalTool->errors['name']){
-                                   $this->setWarningFlash($externalTool->errors['name'][0]);
+                                   $this->setErrorFlash($externalTool->errors['name'][0]);
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                                if($externalTool->errors['ltikey'])
                                {
-                                   $this->setWarningFlash("Key should contains 100 characters.");
+                                   $this->setErrorFlash("Key should contains 100 characters.");
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                                if($externalTool->errors['secret'])
                                {
-                                   $this->setWarningFlash($externalTool->errors['secret'][0]);
+                                   $this->setErrorFlash($externalTool->errors['secret'][0]);
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
 
                            } else{
                                $externalTool = ExternalTools::updateExternalTool($params,$params['groupId'],$privacy);
                                if($externalTool->errors['name']){
-                                   $this->setWarningFlash($externalTool->errors['name'][0]);
+                                   $this->setErrorFlash($externalTool->errors['name'][0]);
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                                if($externalTool->errors['ltikey'])
                                {
-                                   $this->setWarningFlash("Key should contains 100 characters.");
+                                   $this->setErrorFlash("Key should contains 100 characters.");
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                                if($externalTool->errors['secret'])
                                {
-                                   $this->setWarningFlash($externalTool->errors['secret'][0]);
+                                   $this->setErrorFlash($externalTool->errors['secret'][0]);
                                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.'&id='.$params['id']));
                                }
                            }
@@ -758,14 +758,14 @@ class AdminController extends AppController
             case "deladmin":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
             case "chgpwd":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
@@ -773,13 +773,13 @@ class AdminController extends AppController
             case "chgrights":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
             case "newadmin":
                 if($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 if ($getAction == "newadmin") {
@@ -881,21 +881,21 @@ class AdminController extends AppController
             case "importmacros":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
             case "importqimages":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
             case "importcoursefiles":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
@@ -905,14 +905,14 @@ class AdminController extends AppController
             case "deloldusers":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
             case "listltidomaincred": // access for admin
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $users = User::getByRights();
@@ -921,7 +921,7 @@ class AdminController extends AppController
             case "modltidomaincred": // // access for admin
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                  $user = User::getById($params['id']);
@@ -930,7 +930,7 @@ class AdminController extends AppController
             case "listgroups": // access for admin
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $groupsName = Groups::getIdAndName();
@@ -938,7 +938,7 @@ class AdminController extends AppController
             case "modgroup": // access for admin
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $groupsName = Groups::getById($params['id']);
@@ -946,7 +946,7 @@ class AdminController extends AppController
             case "removediag": //// access for admin,gadmin,diagnostic
                 if ($myRights < AppConstant::DIAGNOSTIC_CREATOR_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 break;
@@ -995,7 +995,7 @@ class AdminController extends AppController
             case "emulateuser":
                 if ($myRights < AppConstant::ADMIN_RIGHT )
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $sessionId = $this->getSessionId();
@@ -1005,12 +1005,12 @@ class AdminController extends AppController
             case "chgrights":
                 if ($myRights < AppConstant::ADMIN_RIGHT && $params['newrights'] > AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $group = $params['group'];
@@ -1024,7 +1024,7 @@ class AdminController extends AppController
             case "resetpwd":
                 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $id = $this->getParamVal('id');
@@ -1049,7 +1049,7 @@ class AdminController extends AppController
             case "deladmin":
                 if ($myRights < 75)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 if ($myRights < AppConstant::ADMIN_RIGHT)
@@ -1074,7 +1074,7 @@ class AdminController extends AppController
             case "newadmin":
                 if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 if ($myRights < AppConstant::ADMIN_RIGHT && $params['newrights'] > AppConstant::GROUP_ADMIN_RIGHT)
@@ -1111,17 +1111,17 @@ class AdminController extends AppController
                 $newUser = $user->addUserFromAdmin($adminName, $md5pw, $firstName, $lastName,$rights, $email, $newGroup,$homelayout);
                 if($newUser->errors['SID'])
                 {
-                    $this->setWarningFlash("User name should contain at most 50 characters.");
+                    $this->setErrorFlash("User name should contain at most 50 characters.");
                     return $this->redirect('forms?action=newadmin');
                 }
                 if($newUser->errors['FirstName'])
                 {
-                    $this->setWarningFlash("FirstName should contain at most 100 characters.");
+                    $this->setErrorFlash("FirstName should contain at most 100 characters.");
                     return $this->redirect('forms?action=newadmin');
                 }
                 if($newUser->errors['LastName'])
                 {
-                    $this->setWarningFlash("LastName should contain at most 100 characters.");
+                    $this->setErrorFlash("LastName should contain at most 100 characters.");
                     return $this->redirect('forms?action=newadmin');
                 }
                 $newUserid = $newUser['id'];
@@ -1143,7 +1143,7 @@ class AdminController extends AppController
             case "addcourse":
             if ($myRights < AppConstant::STUDENT_RIGHT)
             {
-                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                 return $this->redirect($this->goHome());
             }
             $avail = AppConstant::NUMERIC_THREE - $params['stuavail'] - $params['teachavail'];
@@ -1189,17 +1189,17 @@ class AdminController extends AppController
 
                 if($courseData['name'] == '')
                 {
-                    $this->setWarningFlash("Course Name can not be blanck.");
+                    $this->setErrorFlash("Course Name can not be blanck.");
                     return $this->redirect('forms?action=addcourse');
                 }
                 if($courseData->errors['name'])
                 {
-                    $this->setWarningFlash("Course Name should contain at most 150 characters.");
+                    $this->setErrorFlash("Course Name should contain at most 150 characters.");
                     return $this->redirect('forms?action=addcourse');
                 }
                 if($courseData->errors['enrollkey'])
                 {
-                    $this->setWarningFlash("Enrollkey should contain at most 50 characters.");
+                    $this->setErrorFlash("Enrollkey should contain at most 50 characters.");
                     return $this->redirect('forms?action=addcourse');
                 }
                 $cid = $courseData['id'];
@@ -1215,7 +1215,7 @@ class AdminController extends AppController
             case "delete":
                 if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $connection = $this->getDatabase();
@@ -1370,7 +1370,7 @@ class AdminController extends AppController
                 exit;
             case "importmacros":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'macro/';
@@ -1427,12 +1427,12 @@ class AdminController extends AppController
                     }
                     break;
                 } else {
-                    $this->setWarningFlash(AppConstant::ERROR_UPLOADING_FILE);
+                    $this->setErrorFlash(AppConstant::ERROR_UPLOADING_FILE);
                     return $this->redirect('forms?action=importmacros');
                 }
             case "importqimages":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'qimages/';
@@ -1451,19 +1451,19 @@ class AdminController extends AppController
                             echo "<p>Extracted $n files.  <a href='".AppUtility::getURLFromHome('admin','admin/index')."'>Continue</a></p>\n";
                             exit;
                         } else {
-                            $this->setWarningFlash(AppConstant::EMPTY_FILE);
+                            $this->setErrorFlash(AppConstant::EMPTY_FILE);
                             return $this->redirect('forms?action=importqimages');
                         }
                     }
                     unlink($uploadfile);
                     break;
                 } else {
-                    $this->setWarningFlash(AppConstant::ERROR_UPLOADING_FILE);
+                    $this->setErrorFlash(AppConstant::ERROR_UPLOADING_FILE);
                     return $this->redirect('forms?action=importqimages');
                 }
             case "importcoursefiles":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'coursefile/';
@@ -1484,23 +1484,23 @@ class AdminController extends AppController
                                     $ne++;
                                 }
                             }
-                            $this->setWarningFlash('Extracted '.$ne.' files.');
+                            $this->setErrorFlash('Extracted '.$ne.' files.');
                             return $this->redirect('index');
                         } else {
-                            $this->setWarningFlash(AppConstant::EMPTY_FILE);
+                            $this->setErrorFlash(AppConstant::EMPTY_FILE);
                             return $this->redirect('forms?action=importcoursefiles');
                         }
                     }
                     unlink($uploadfile);
                     break;
                 } else {
-                     $this->setWarningFlash(AppConstant::ERROR_UPLOADING_FILE);
+                     $this->setErrorFlash(AppConstant::ERROR_UPLOADING_FILE);
                      return $this->redirect('forms?action=importcoursefiles');
                 }
             case "transfer":
                 if($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
                 {
-                   $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                   $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                    return $this->redirect($this->goHome());
                 }
                 $exec = false;
@@ -1538,7 +1538,7 @@ class AdminController extends AppController
             case "deloldusers":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $old = time() - AppConstant::SECONDS * AppConstant::SECONDS * AppConstant::HOURS * AppConstant::NUMERIC_THIRTY * $params['months'];
@@ -1564,13 +1564,13 @@ class AdminController extends AppController
             case "addgroup":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
                 if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO)
                 {
-                    $this->setWarningFlash('Group name already exists.');
+                    $this->setErrorFlash('Group name already exists.');
                     return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
                 }else
                 {
@@ -1580,19 +1580,19 @@ class AdminController extends AppController
                         $newGroup->insertNewGroup($params['gpname']);
                     }else
                     {
-                        $this->setWarningFlash('Group name should not blank.');
+                        $this->setErrorFlash('Group name should not blank.');
                         return $this->redirect('forms?action=listgroups');
                     }
                 }
                 break;
             case "modgroup":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
                 if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO) {
-                    $this->setWarningFlash('Group name already exists.');
+                    $this->setErrorFlash('Group name already exists.');
                     return $this->redirect('forms?action=modgroup&id='.$existingGroupData['id']);
                 }else
                 {
@@ -1601,14 +1601,14 @@ class AdminController extends AppController
                         Groups::updateGroup($params);
                     }else
                     {
-                        $this->setWarningFlash('Group name should not blank.');
+                        $this->setErrorFlash('Group name should not blank.');
                         return $this->redirect('forms?action=modgroup&id='.$params['id']);
                     }
                 }
                 break;
             case "delgroup":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 Groups::deleteById($params['id']);
@@ -1617,7 +1617,7 @@ class AdminController extends AppController
                 break;
             case "modltidomaincred":
                 if ($myRights < AppConstant::ADMIN_RIGHT) {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->goHome();
                 }
                 if ($params['id']=='new') {
@@ -1634,39 +1634,39 @@ class AdminController extends AppController
                     $resultLTI = $user->createLTIDomainCredentials($LTIDomain);
                     if($resultLTI->errors['email'])
                     {
-                        $this->setWarningFlash($resultLTI->errors['email'][0]);
+                        $this->setErrorFlash($resultLTI->errors['email'][0]);
                         return $this->redirect('forms?action=listltidomaincred');
                     }
                     if($resultLTI->errors['SID'])
                     {
-                        $this->setWarningFlash($resultLTI->errors['SID'][0]);
+                        $this->setErrorFlash($resultLTI->errors['SID'][0]);
                         return $this->redirect('forms?action=listltidomaincred');
                     }
                     if($resultLTI->errors['password'])
                     {
-                        $this->setWarningFlash($resultLTI->errors['password'][0]);
+                        $this->setErrorFlash($resultLTI->errors['password'][0]);
                         return $this->redirect('forms?action=listltidomaincred');
                     }
 
                 } else {
                     if($params['ltikey'] == ''){
-                        $this->setWarningFlash('Please enter the Key.');
+                        $this->setErrorFlash('Please enter the Key.');
                         return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                     }else{
                         $resultUpdate = User::updateLTIDomainCredentials($params);
                         if($resultUpdate->errors['email'])
                         {
-                            $this->setWarningFlash($resultUpdate->errors['email'][0]);
+                            $this->setErrorFlash($resultUpdate->errors['email'][0]);
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                         if($resultUpdate->errors['SID'])
                         {
-                            $this->setWarningFlash($resultUpdate->errors['SID'][0]);
+                            $this->setErrorFlash($resultUpdate->errors['SID'][0]);
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                         if($resultUpdate->errors['password'])
                         {
-                            $this->setWarningFlash($resultUpdate->errors['password'][0]);
+                            $this->setErrorFlash($resultUpdate->errors['password'][0]);
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                     }
@@ -1675,7 +1675,7 @@ class AdminController extends AppController
             case "delltidomaincred":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());
                 }
                 User::deleteUserById($params['id']);

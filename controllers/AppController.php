@@ -788,7 +788,8 @@ class AppController extends Controller
             return true;
         }
         $teacherId = $this->isTeacher($user['id'], $courseId);
-        if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+        $isTutor = $this->isTutor($user['id'], $courseId);
+        if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId || !$isTutor))) {
             return $this->noValidRights($teacherId);
         }
         return true;
@@ -801,12 +802,18 @@ class AppController extends Controller
             return true;
         }
         $teacherId = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
         $studentId = $this->isStudent($user['id'], $courseId);
         if ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'grade-book-student-detail' && $studentId) {
             return true;
-        } else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
+        }
+//        else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && $actionPath == 'gradebook' && ($teacherId || $isTutor)) {
+//            return true;
+//        }
+        else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId))) {
             return $this->noValidRights($teacherId);
-        } else {
+        }
+        else {
             return true;
         }
     }

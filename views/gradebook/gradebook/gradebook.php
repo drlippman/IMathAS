@@ -41,7 +41,7 @@ $stu = $data['defaultValuesArray']['studentId']
             <div class = "pull-right">
                 <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-settings?cid=' . $course->id); ?>" class="btn btn-primary">
                     <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
-                     Gradebook Settings</a>
+                    Gradebook Settings</a>
                 <div class="btn-group">
                     <a class="btn btn-primary green-btn disable-btn" href="#"><span class="glyphicon glyphicon-export"></span> Export</a>
                     <a class="btn btn-primary dropdown-toggle green-carret" data-toggle="dropdown" href="#">
@@ -59,12 +59,12 @@ $stu = $data['defaultValuesArray']['studentId']
 
 <div class="item-detail-content">
     <?php if($user['rights'] > 10) {
-    echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
-} elseif($user['rights'] == 10){
-    echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
-}?>
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
+    } elseif($user['rights'] == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
+    }?>
 </div>
-    <?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
+<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
 <div class="tab-content shadowBox col-md-12 col-sm-12">
 <div class="inner-content-gradebook">
 <div class="button-container col-md-12 col-sm-12 padding-zero">
@@ -76,7 +76,7 @@ $stu = $data['defaultValuesArray']['studentId']
     <span class="inner-page-options col-md-5 padding-zero pull-left col-sm-12">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
-                 <?php echo '<select  class="form-control export-to-height" id="colorsel" onchange="updateColors(this)">';
+                <?php echo '<select  class="form-control export-to-height" id="colorsel" onchange="updateColors(this)">';
                 echo '<option value="0">', _('Color'), '</option>';
                 echo '<option value="0">', _('None'), '</option>';
                 for ($j=50;$j<90;$j+=($j<70?10:5)) {
@@ -97,12 +97,12 @@ $stu = $data['defaultValuesArray']['studentId']
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('Category'); ?><span class="caret right-aligned"></span></a>
                 <ul id="filtersel" class="dropdown-menu with-selected ">
- <li  value='1'><a  href="javascript: chgfilter(-1)" ><?php AppUtility::t('All') ?></a></li>
- <li  value='0'><a href="javascript: chgfilter(0)"  ><?php AppUtility::t('Default') ?> </a></li>
+                    <li  value='1'><a  href="javascript: chgfilter(-1)" ><?php AppUtility::t('All') ?></a></li>
+                    <li  value='0'><a href="javascript: chgfilter(0)"  ><?php AppUtility::t('Default') ?> </a></li>
                     <?php foreach($data['gbCatsData'] as $category){ ?>
-     <li><a href="javascript: chgfilter(<?php echo $category['id']?>)"><?php echo $category['name']?></a></li>
-<?php } ?>
- <li><a href="javascript: chgfilter(-2)"><?php AppUtility::t('Category Totals')?></a></li>
+                        <li><a href="javascript: chgfilter(<?php echo $category['id']?>)"><?php echo $category['name']?></a></li>
+                    <?php } ?>
+                    <li><a href="javascript: chgfilter(-2)"><?php AppUtility::t('Category Totals')?></a></li>
 
                 </ul>
             </li>
@@ -169,9 +169,9 @@ $stu = $data['defaultValuesArray']['studentId']
 
 
 <div class="gradebook-div">
-    <table id="gradebook-table" class="gradebook-table table table-bordered table-striped table-hover data-table">
-        <thead>
-        <?php
+<table id="gradebook-table" class="gradebook-table table table-bordered table-striped table-hover data-table">
+<thead>
+<?php
 if ($data['availShow'] == 4) {
     $data['availShow'] = 1;
     $hidepast = true;
@@ -182,35 +182,35 @@ if ($data['defaultValuesArray']['avgontop']) {
 }
 $sortarr = array();
 for ($i = 0; $i < count($gradebook[0][0]); $i++) { //biographical headers
-    if ($i == 1) {
-        echo '<th id="grade"><div>&nbsp;</div></th>';
-        $sortarr[] = 'false';
-    } //for pics
-    if ($i == 1 && $gradebook[0][0][1] != 'ID') {
-        continue;
+if ($i == 1) {
+    echo '<th id="grade"><div>&nbsp;</div></th>';
+    $sortarr[] = 'false';
+} //for pics
+if ($i == 1 && $gradebook[0][0][1] != 'ID') {
+    continue;
+}
+if ($gradebook[0][0][$i] == 'Section' || $gradebook[0][0][$i] == 'Code' || $gradebook[0][0][$i] == 'Last Login') {
+    echo '<th class="nocolorize"><div>';
+} else {
+    echo '<th><div>';
+}
+echo $gradebook[0][0][$i];
+if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$data['isTutor'] || $data['tutorSection'] == ' ')) { ?>
+<br/><select id="secfiltersel" style="color: #000000" onchange="chgsecfilter()"><option value="-1"
+    <?php if ($secfilter==-1) {echo  'selected=1';}
+    echo  '>All</option>';
+    foreach($data['sectionQuery'] as $row){
+        if ($row['section']=='') { continue;}
+        echo  "<option value=\"{$row['section']}\" ";
+        if ($row['section']==$secfilter) {
+            echo  'selected=1';
+        }
+        echo  ">{$row['section']}</option>";
     }
-    if ($gradebook[0][0][$i] == 'Section' || $gradebook[0][0][$i] == 'Code' || $gradebook[0][0][$i] == 'Last Login') {
-        echo '<th class="nocolorize"><div>';
-    } else {
-        echo '<th><div>';
-    }
-        echo $gradebook[0][0][$i];
-        if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$data['isTutor'] || $data['tutorSection'] == ' ')) { ?>
-        <br/><select id="secfiltersel" style="color: #000000" onchange="chgsecfilter()"><option value="-1"
-            <?php if ($secfilter==-1) {echo  'selected=1';}
-            echo  '>All</option>';
-            foreach($data['sectionQuery'] as $row){
-                if ($row['section']=='') { continue;}
-                echo  "<option value=\"{$row['section']}\" ";
-                if ($row['section']==$secfilter) {
-                    echo  'selected=1';
-                }
-                echo  ">{$row['section']}</option>";
-            }
-            echo  "</select>";
+    echo  "</select>";
 
 
-        } else if ($gradebook[0][0][$i] == 'Name') {?>
+    } else if ($gradebook[0][0][$i] == 'Name') {?>
         <div class="checkbox pull-left override-hidden">
             <label>
                 <input type="checkbox" name="header-checked" value="">
@@ -225,162 +225,162 @@ for ($i = 0; $i < count($gradebook[0][0]); $i++) { //biographical headers
     } else if ($i != 1) {
         $sortarr[] = "'S'";
     }
-}
-
-$n = 0;
-//get collapsed gb cat info
-if (count($gradebook[0][2]) > 1)
-{
-    $collapsegbcat = array();
-    for ($i = 0; $i < count($gradebook[0][2]); $i++) {
-
-        if (isset($overridecollapse[$gradebook[0][2][$i][10]])) {
-            $collapsegbcat[$gradebook[0][2][$i][1]] = $overridecollapse[$gradebook[0][2][$i][10]];
-        } else {
-            $collapsegbcat[$gradebook[0][2][$i][1]] = $gradebook[0][2][$i][12];
-        }
     }
-}
-if ($data['totOnLeft'] && !$hidepast) {
-    //total totals
-    if ($data['catFilter'] < 0) {
-        if (isset($gradebook[0][3][0])) { //using points based
-            echo '<th><div><span class="cattothdr">' . AppUtility::t('Total', false) . '<br/>' . $gradebook[0][3][$data['availShow']] . '&nbsp;' . AppUtility::t('pts', false) . '</span></div></th>';
-            echo '<th><div>%</div></th>';
-            $n += 2;
-        } else {
-            echo '<th><div><span class="cattothdr">' . AppUtility::t('Weighted Total %', false) . '</span></div></th>';
-            $n++;
-        }
-    }
-    if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
-        for ($i = 0; $i < count($gradebook[0][2]); $i++) { //category headers
-            if (($data['availShow'] < 2 || $data['availShow'] == 3) && $gradebook[0][2][$i][2] > 1) {
-                continue;
-            } else if ($data['availShow'] == 2 && $gradebook[0][2][$i][2] == 3) {
-                continue;
+
+    $n = 0;
+    //get collapsed gb cat info
+    if (count($gradebook[0][2]) > 1)
+    {
+        $collapsegbcat = array();
+        for ($i = 0; $i < count($gradebook[0][2]); $i++) {
+
+            if (isset($overridecollapse[$gradebook[0][2][$i][10]])) {
+                $collapsegbcat[$gradebook[0][2][$i][1]] = $overridecollapse[$gradebook[0][2][$i][10]];
+            } else {
+                $collapsegbcat[$gradebook[0][2][$i][1]] = $gradebook[0][2][$i][12];
             }
-            echo '<th class="cat' . $gradebook[0][2][$i][1] . '"><div><span class="cattothdr">';
-            if ($data['availShow'] < 3) {
-                echo $gradebook[0][2][$i][0] . '<br/>';
-                if (isset($gradebook[0][3][0])) { //using points based
-                    echo $gradebook[0][2][$i][3 + $data['availShow']] . '&nbsp;' . AppUtility::t('pts', false);
-                } else {
-                    echo $gradebook[0][2][$i][11] . '%';
-                }
-            } else if ($data['availShow'] == 3) { //past and attempted
-                echo $gradebook[0][2][$i][0];
-                if (isset($gradebook[0][2][$i][11])) {
-                    echo '<br/>' . $gradebook[0][2][$i][11] . '%';
-                }
-            }
-            if ($collapsegbcat[$gradebook[0][2][$i][1]] == 0) { ?>
-                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=2');?>"> <?php AppUtility::t('[Collapse]') ?> </a>
-          <?php } else { ?>
-                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=0');?>"><?php AppUtility::t('[Expand]') ?></a>
-            <?php }
-            echo '</span></div></th>';
-            $n++;
         }
     }
+    if ($data['totOnLeft'] && !$hidepast) {
+        //total totals
+        if ($data['catFilter'] < 0) {
+            if (isset($gradebook[0][3][0])) { //using points based
+                echo '<th><div><span class="cattothdr">' . AppUtility::t('Total', false) . '<br/>' . $gradebook[0][3][$data['availShow']] . '&nbsp;' . AppUtility::t('pts', false) . '</span></div></th>';
+                echo '<th><div>%</div></th>';
+                $n += 2;
+            } else {
+                echo '<th><div><span class="cattothdr">' . AppUtility::t('Weighted Total %', false) . '</span></div></th>';
+                $n++;
+            }
+        }
+        if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
+            for ($i = 0; $i < count($gradebook[0][2]); $i++) { //category headers
+                if (($data['availShow'] < 2 || $data['availShow'] == 3) && $gradebook[0][2][$i][2] > 1) {
+                    continue;
+                } else if ($data['availShow'] == 2 && $gradebook[0][2][$i][2] == 3) {
+                    continue;
+                }
+                echo '<th class="cat' . $gradebook[0][2][$i][1] . '"><div><span class="cattothdr">';
+                if ($data['availShow'] < 3) {
+                    echo $gradebook[0][2][$i][0] . '<br/>';
+                    if (isset($gradebook[0][3][0])) { //using points based
+                        echo $gradebook[0][2][$i][3 + $data['availShow']] . '&nbsp;' . AppUtility::t('pts', false);
+                    } else {
+                        echo $gradebook[0][2][$i][11] . '%';
+                    }
+                } else if ($data['availShow'] == 3) { //past and attempted
+                    echo $gradebook[0][2][$i][0];
+                    if (isset($gradebook[0][2][$i][11])) {
+                        echo '<br/>' . $gradebook[0][2][$i][11] . '%';
+                    }
+                }
+                if ($collapsegbcat[$gradebook[0][2][$i][1]] == 0) { ?>
+                    <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=2');?>"> <?php AppUtility::t('[Collapse]') ?> </a>
+                <?php } else { ?>
+                    <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=0');?>"><?php AppUtility::t('[Expand]') ?></a>
+                <?php }
+                echo '</span></div></th>';
+                $n++;
+            }
+        }
 
-}
-if ($data['catFilter'] > -2) {
+    }
+    if ($data['catFilter'] > -2) {
     for ($i = 0; $i < count($gradebook[0][1]); $i++) { //assessment headers
-        if (!$data['isTeacher'] && !$data['isTutor'] && $gradebook[0][1][$i][4] == 0) { //skip if hidden
-            continue;
+    if (!$data['isTeacher'] && !$data['isTutor'] && $gradebook[0][1][$i][4] == 0) { //skip if hidden
+        continue;
+    }
+    if ($data['hideNC'] == 1 && $gradebook[0][1][$i][4] == 0) { //skip NC
+        continue;
+    } else if ($data['hideNC'] == 2 && ($gradebook[0][1][$i][4] == 0 || $gradebook[0][1][$i][4] == 3)) {//skip all NC
+        continue;
+    }
+    if ($gradebook[0][1][$i][3] > $data['availShow']) {
+        continue;
+    }
+    if ($hidepast && $gradebook[0][1][$i][3] == 0) {
+        continue;
+    }
+    if ($collapsegbcat[$gradebook[0][1][$i][1]] == 2) {
+        continue;
+    }
+    //name and points
+    echo '<th class="cat' . $gradebook[0][1][$i][1] . '"><div>' . $gradebook[0][1][$i][0] . '<br/>';
+    if ($gradebook[0][1][$i][4] == 0 || $gradebook[0][1][$i][4] == 3) {
+        echo $gradebook[0][1][$i][2] . '&nbsp;' . AppUtility::t('pts', false) . ' ' . AppUtility::t('(Not Counted)', false);
+    } else {
+        echo $gradebook[0][1][$i][2] . '&nbsp;' . AppUtility::t('pts', false);
+        if ($gradebook[0][1][$i][4] == 2) {
+            echo ' (EC)';
         }
-        if ($data['hideNC'] == 1 && $gradebook[0][1][$i][4] == 0) { //skip NC
-            continue;
-        } else if ($data['hideNC'] == 2 && ($gradebook[0][1][$i][4] == 0 || $gradebook[0][1][$i][4] == 3)) {//skip all NC
-            continue;
-        }
-        if ($gradebook[0][1][$i][3] > $data['availShow']) {
-            continue;
-        }
-        if ($hidepast && $gradebook[0][1][$i][3] == 0) {
-            continue;
-        }
-        if ($collapsegbcat[$gradebook[0][1][$i][1]] == 2) {
-            continue;
-        }
-        //name and points
-        echo '<th class="cat' . $gradebook[0][1][$i][1] . '"><div>' . $gradebook[0][1][$i][0] . '<br/>';
-        if ($gradebook[0][1][$i][4] == 0 || $gradebook[0][1][$i][4] == 3) {
-            echo $gradebook[0][1][$i][2] . '&nbsp;' . AppUtility::t('pts', false) . ' ' . AppUtility::t('(Not Counted)', false);
-        } else {
-            echo $gradebook[0][1][$i][2] . '&nbsp;' . AppUtility::t('pts', false);
-            if ($gradebook[0][1][$i][4] == 2) {
-                echo ' (EC)';
-            }
-        }
-        if ($gradebook[0][1][$i][5] == 1 && $gradebook[0][1][$i][6] == 0) {
-            echo ' (PT)';
-        }
-        if ($data['includeDueDate'] && $gradebook[0][1][$i][11] < 2000000000 && $gradebook[0][1][$i][11] > 0) {
-            echo '<br/><span class="small">' . AppUtility::tzdate('n/j/y&\n\b\s\p;g:ia', $gradebook[0][1][$i][11]) . '</span>';
-        } ?>
+    }
+    if ($gradebook[0][1][$i][5] == 1 && $gradebook[0][1][$i][6] == 0) {
+        echo ' (PT)';
+    }
+    if ($data['includeDueDate'] && $gradebook[0][1][$i][11] < 2000000000 && $gradebook[0][1][$i][11] > 0) {
+        echo '<br/><span class="small">' . AppUtility::tzdate('n/j/y&\n\b\s\p;g:ia', $gradebook[0][1][$i][11]) . '</span>';
+    } ?>
 
-        <div class="floatright dropdown">
-            <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
-               href="javascript:void(0);">
-                <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
-            </a>
-            <ul class="dropdown-menu">
+    <div class="floatright dropdown">
+        <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
+           href="javascript:void(0);">
+            <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
+        </a>
+        <ul class="dropdown-menu">
 
-       <?php //links
-       if ($gradebook[0][1][$i][6] == 0) { //online
-            if ($data['isTeacher'])
-            { ?>
-                 <li>
-                     <a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?> "> <?php AppUtility::t('[Settings]') ?> </a>
-                 </li>
-                 <li>
-                     <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]' ) ?></a>
-                 </li>
-<!--                --><?php //if ($gradebook[0][1][$i][10] == true)
+            <?php //links
+            if ($gradebook[0][1][$i][6] == 0) { //online
+                if ($data['isTeacher'])
+                { ?>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?> "> <?php AppUtility::t('[Settings]') ?> </a>
+                    </li>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]' ) ?></a>
+                    </li>
+                    <!--                --><?php //if ($gradebook[0][1][$i][10] == true)
 //                { ?>
-                     <li>
-                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7])?>"><?php AppUtility::t('[By Group]' )?></a>
-                     </li>
-<!--                --><?php //}
-            } else { ?>
-                 <li>
-                     <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>"><?php AppUtility::t('[Isolate]')?></a>
-                 </li>
-            <?php }
-        } else if ($gradebook[0][1][$i][6] == 1 && ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$i][8] == 1))) { //offline
-            if ($data['isTeacher'])
-            {  ?>
-                 <li>
-                     <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
-                 </li>
-                 <li>
-                     <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
-                 </li>
-            <?php } else { ?>
-                 <li>
-                     <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
-                 </li>
-            <?php }
-        } else if ($gradebook[0][1][$i][6] == 2 && $data['isTeacher'])
-        { //discussion ?>
-             <li>
-                 <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
-             </li>
-        <?php } else if ($gradebook[0][1][$i][6] == 3 && $data['isTeacher'])
-        { //exttool ?>
-             <li>
-                 <a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?PHP AppUtility::t('[Settings]')?></a>
-             </li>
-             <li>
-                 <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$i][7].'&isolate=true')?>"> <?php AppUtility::t('[Isolate]') ?></a>
-             </li>
-        <?php } ?>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7])?>"><?php AppUtility::t('[By Group]' )?></a>
+                    </li>
+                    <!--                --><?php //}
+                } else { ?>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>"><?php AppUtility::t('[Isolate]')?></a>
+                    </li>
+                <?php }
+            } else if ($gradebook[0][1][$i][6] == 1 && ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$i][8] == 1))) { //offline
+                if ($data['isTeacher'])
+                {  ?>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
+                    </li>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
+                    </li>
+                <?php } else { ?>
+                    <li>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
+                    </li>
+                <?php }
+            } else if ($gradebook[0][1][$i][6] == 2 && $data['isTeacher'])
+            { //discussion ?>
+                <li>
+                    <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
+                </li>
+            <?php } else if ($gradebook[0][1][$i][6] == 3 && $data['isTeacher'])
+            { //exttool ?>
+                <li>
+                    <a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?PHP AppUtility::t('[Settings]')?></a>
+                </li>
+                <li>
+                    <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$i][7].'&isolate=true')?>"> <?php AppUtility::t('[Isolate]') ?></a>
+                </li>
+            <?php } ?>
 
         </ul> </div></div></th>
-     <?php   $n++;
-    }
+<?php   $n++;
+}
 }
 if (!$data['totOnLeft'] && !$hidepast) {
     if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
@@ -403,10 +403,10 @@ if (!$data['totOnLeft'] && !$hidepast) {
             }
             if ($collapsegbcat[$gradebook[0][2][$i][1]] == 0)
             { ?>
-                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=2');?>"><?php AppUtility::t('[Collapse]')?></a>
+                <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=2');?>"><?php AppUtility::t('[Collapse]')?></a>
             <?php } else
-                { ?>
-                 <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=0');?> \"><?php AppUtility::t('[Expand]')?></a>
+            { ?>
+                <br/><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id.'&cat='.$gradebook[0][2][$i][10].'&catcollapse=0');?> \"><?php AppUtility::t('[Expand]')?></a>
             <?php }
             echo '</span></div></th>';
             $n++;
@@ -425,395 +425,395 @@ if (!$data['totOnLeft'] && !$hidepast) {
     }
 }
 ?>
-        </thead>
-        <tbody class='gradebook-table-body'>
-        <?php
+</thead>
+<tbody class='gradebook-table-body'>
+<?php
 for ($i = 1; $i < count($gradebook); $i++) {
-    if ($i == 1) {
-        $insdiv = "<div>";
-        $enddiv = "</div>";
-    } else {
-        $insdiv = '';
-        $enddiv = '';
-    }
-    if ($i % 2 != 0) {
-        echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
-    } else {
-        echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
-    }
-    echo '<td class="locked" scope="row"><div class="trld">';
-    if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) { ?>
-        <div class="checkbox override-hidden">
-            <label>
-                <input type="checkbox" name='checked' value='<?php echo $gradebook[$i][4][0] ?>'/>
-                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-            </label>
-        </div>
-    <?php
-    } ?>
-    <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$gradebook[$i][4][0])?>" >
+if ($i == 1) {
+    $insdiv = "<div>";
+    $enddiv = "</div>";
+} else {
+    $insdiv = '';
+    $enddiv = '';
+}
+if ($i % 2 != 0) {
+    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
+} else {
+    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
+}
+echo '<td class="locked" scope="row"><div class="trld">';
+if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) { ?>
+    <div class="checkbox override-hidden">
+        <label>
+            <input type="checkbox" name='checked' value='<?php echo $gradebook[$i][4][0] ?>'/>
+            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+        </label>
+    </div>
+<?php
+} ?>
+<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$gradebook[$i][4][0])?>" >
 
-    <?php
-    if ($gradebook[$i][4][1] > 0) {
-        echo '<span class="greystrike">' . $gradebook[$i][0][0] . '</span>';
-    } else {
-        echo $gradebook[$i][0][0];
-    }
-    echo '</a>';
-    if ($gradebook[$i][4][3] == 1) {
-        echo '<sup>*</sup>';
-    }
-    echo '</div></td>';
-    if ($data['defaultValuesArray']['showpics'] == 1 && $gradebook[$i][0][0] !== 'Averages') { ?>
-        <?php $fileName = AppUtility::getHomeURL().'Uploads/'.$gradebook[$i][4][0].'.jpg';
-         if($gradebook[$i][4][2] == 1){ ?>
-             <td><?php echo $insdiv ?><div class="trld"><img class='circular-image' src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $gradebook[$i][4][0] ?>.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
-        <?php  }else{ ?>
-             <td><?php echo $insdiv ?><div class="trld"><img  class='circular-image' src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
-        <?php }
+<?php
+if ($gradebook[$i][4][1] > 0) {
+    echo '<span class="greystrike">' . $gradebook[$i][0][0] . '</span>';
+} else {
+    echo $gradebook[$i][0][0];
+}
+echo '</a>';
+if ($gradebook[$i][4][3] == 1) {
+    echo '<sup>*</sup>';
+}
+echo '</div></td>';
+if ($data['defaultValuesArray']['showpics'] == 1 && $gradebook[$i][0][0] !== 'Averages') { ?>
+    <?php $fileName = AppUtility::getHomeURL().'Uploads/'.$gradebook[$i][4][0].'.jpg';
+    if($gradebook[$i][4][2] == 1){ ?>
+        <td><?php echo $insdiv ?><div class="trld"><img class='circular-image' src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $gradebook[$i][4][0] ?>.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
+    <?php  }else{ ?>
+        <td><?php echo $insdiv ?><div class="trld"><img  class='circular-image' src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
+    <?php }
 
-    }else {
-        echo '<td>' . $insdiv . '<div class="trld">&nbsp;</div></td>';
-    }
-    for ($j = ($gradebook[0][0][1] == 'ID' ? 1 : 2); $j < count($gradebook[0][0]); $j++) {
-        echo '<td class="">' . $insdiv . $gradebook[$i][0][$j] . $enddiv . '</td>';
-    }
-    if ($data['totOnLeft'] && !$hidepast) {
-        //total totals
-        if ($data['catFilter'] < 0) {
-            if ($data['availShow'] == 3) {
-                if ($gradebook[$i][0][0] == 'Averages') {
-                    if (isset($gradebook[$i][3][8])) { //using points based
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
-                    }
+}else {
+    echo '<td>' . $insdiv . '<div class="trld">&nbsp;</div></td>';
+}
+for ($j = ($gradebook[0][0][1] == 'ID' ? 1 : 2); $j < count($gradebook[0][0]); $j++) {
+    echo '<td class="">' . $insdiv . $gradebook[$i][0][$j] . $enddiv . '</td>';
+}
+if ($data['totOnLeft'] && !$hidepast) {
+    //total totals
+    if ($data['catFilter'] < 0) {
+        if ($data['availShow'] == 3) {
+            if ($gradebook[$i][0][0] == 'Averages') {
+                if (isset($gradebook[$i][3][8])) { //using points based
                     echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
-                } else {
-                    if (isset($gradebook[$i][3][8])) { //using points based
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '/' . $gradebook[$i][3][7] . $enddiv . '</td>';
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][8] . '%' . $enddiv . '</td>';
-                    } else {
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
-                    }
                 }
+                echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
             } else {
-                if (isset($gradebook[0][3][0])) { //using points based
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . $enddiv . '</td>';
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow'] + 3] . '%' . $enddiv . '</td>';
+                if (isset($gradebook[$i][3][8])) { //using points based
+                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '/' . $gradebook[$i][3][7] . $enddiv . '</td>';
+                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][8] . '%' . $enddiv . '</td>';
                 } else {
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . '%' . $enddiv . '</td>';
+                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
                 }
             }
-        }
-        //category totals
-        if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
-            for ($j = 0; $j < count($gradebook[0][2]); $j++) { //category headers
-                if (($data['availShow'] < 2 || $data['availShow'] == 3) && $gradebook[0][2][$j][2] > 1) {
-                    continue;
-                } else if ($data['availShow'] == 2 && $gradebook[0][2][$j][2] == 3) {
-                    continue;
-                }
-                if ($data['catFilter'] != -1 && $data['availShow'] < 3 && $gradebook[0][2][$j][$data['availShow'] + 3] > 0) {
-                    echo '<td class="c">' . $insdiv;
-                    if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
-                        echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
-                    }
-                    echo $gradebook[$i][2][$j][$data['availShow']] . ' (' . round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][$data['availShow'] + 3]) . '%)';
-
-                    if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
-                        echo '</span>';
-                    }
-                    echo $enddiv . '</td>';
-                } else {
-                    echo '<td class="c">' . $insdiv;
-                    if ($gradebook[$i][0][0] == 'Averages') {
-                        echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
-                    }
-                    if ($data['availShow'] == 3) {
-                        if ($gradebook[$i][0][0] == 'Averages') {
-                            echo $gradebook[$i][2][$j][3] . '%';//echo '-';
-                        } else {
-                            echo $gradebook[$i][2][$j][3] . '/' . $gradebook[$i][2][$j][4];
-                        }
-                    } else {
-                        if (isset($gradebook[$i][3][8])) { //using points based
-                            echo $gradebook[$i][2][$j][$data['availShow']];
-                        } else {
-                            if ($gradebook[0][2][$j][3 + $data['availShow']] > 0) {
-                                echo round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][3 + $data['availShow']], 1) . '%';
-                            } else {
-                                echo '0%';
-                            }
-                        }
-                    }
-                    if ($gradebook[$i][0][0] == 'Averages') {
-                        echo '</span>';
-                    }
-                    echo $enddiv . '</td>';
-                }
-
+        } else {
+            if (isset($gradebook[0][3][0])) { //using points based
+                echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . $enddiv . '</td>';
+                echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow'] + 3] . '%' . $enddiv . '</td>';
+            } else {
+                echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . '%' . $enddiv . '</td>';
             }
         }
     }
-    //assessment values
-    if ($data['catFilter'] > -2) {
-        for ($j = 0; $j < count($gradebook[0][1]); $j++) {
-            if (!$data['isTeacher'] && !$data['isTutor'] && $gradebook[0][1][$j][4] == 0) { //skip if hidden
+    //category totals
+    if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
+        for ($j = 0; $j < count($gradebook[0][2]); $j++) { //category headers
+            if (($data['availShow'] < 2 || $data['availShow'] == 3) && $gradebook[0][2][$j][2] > 1) {
+                continue;
+            } else if ($data['availShow'] == 2 && $gradebook[0][2][$j][2] == 3) {
                 continue;
             }
-            if ($data['hideNC'] == 1 && $gradebook[0][1][$j][4] == 0) { //skip NC
-                continue;
-            } else if ($data['hideNC'] == 2 && ($gradebook[0][1][$j][4] == 0 || $gradebook[0][1][$j][4] == 3)) {//skip all NC
-                continue;
-            }
-            if ($gradebook[0][1][$j][3] > $data['availShow']) {
-                continue;
-            }
-            if ($hidepast && $gradebook[0][1][$j][3] == 0) {
-                continue;
-            }
-            if ($collapsegbcat[$gradebook[0][1][$j][1]] == 2) {
-                continue;
-            }
+            if ($data['catFilter'] != -1 && $data['availShow'] < 3 && $gradebook[0][2][$j][$data['availShow'] + 3] > 0) {
+                echo '<td class="c">' . $insdiv;
+                if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
+                    echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
+                }
+                echo $gradebook[$i][2][$j][$data['availShow']] . ' (' . round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][$data['availShow'] + 3]) . '%)';
 
-            //if online, not average, and either score exists and active, or score doesn't exist and assess is current,
-            if ($gradebook[0][1][$j][6] == 0 && $gradebook[$i][1][$j][4] != 'average' && ((isset($gradebook[$i][1][$j][3]) && $gradebook[$i][1][$j][3] > 9) || (!isset($gradebook[$i][1][$j][3]) && $gradebook[0][1][$j][3] == 1))) {
-                echo '<td class="c isact">' . $insdiv;
+                if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
+                    echo '</span>';
+                }
+                echo $enddiv . '</td>';
             } else {
                 echo '<td class="c">' . $insdiv;
+                if ($gradebook[$i][0][0] == 'Averages') {
+                    echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
+                }
+                if ($data['availShow'] == 3) {
+                    if ($gradebook[$i][0][0] == 'Averages') {
+                        echo $gradebook[$i][2][$j][3] . '%';//echo '-';
+                    } else {
+                        echo $gradebook[$i][2][$j][3] . '/' . $gradebook[$i][2][$j][4];
+                    }
+                } else {
+                    if (isset($gradebook[$i][3][8])) { //using points based
+                        echo $gradebook[$i][2][$j][$data['availShow']];
+                    } else {
+                        if ($gradebook[0][2][$j][3 + $data['availShow']] > 0) {
+                            echo round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][3 + $data['availShow']], 1) . '%';
+                        } else {
+                            echo '0%';
+                        }
+                    }
+                }
+                if ($gradebook[$i][0][0] == 'Averages') {
+                    echo '</span>';
+                }
+                echo $enddiv . '</td>';
             }
-            if (isset($gradebook[$i][1][$j][5]) && ($gradebook[$i][1][$j][5] & (1 << $data['availShow'])) && !$hidepast) {
-                echo '<span style="font-style:italic">';
-            }
-            if ($gradebook[0][1][$j][6] == 0) {//online
-                if (isset($gradebook[$i][1][$j][0])) {
-                    if ($data['isTutor'] && $gradebook[$i][1][$j][4] == 'average') {
-                    } else if ($gradebook[$i][1][$j][4] == 'average') { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?stu='.$stu.'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&aid='.$gradebook[0][1][$j][7]);?>"
+
+        }
+    }
+}
+//assessment values
+if ($data['catFilter'] > -2) {
+for ($j = 0; $j < count($gradebook[0][1]); $j++) {
+if (!$data['isTeacher'] && !$data['isTutor'] && $gradebook[0][1][$j][4] == 0) { //skip if hidden
+    continue;
+}
+if ($data['hideNC'] == 1 && $gradebook[0][1][$j][4] == 0) { //skip NC
+    continue;
+} else if ($data['hideNC'] == 2 && ($gradebook[0][1][$j][4] == 0 || $gradebook[0][1][$j][4] == 3)) {//skip all NC
+    continue;
+}
+if ($gradebook[0][1][$j][3] > $data['availShow']) {
+    continue;
+}
+if ($hidepast && $gradebook[0][1][$j][3] == 0) {
+    continue;
+}
+if ($collapsegbcat[$gradebook[0][1][$j][1]] == 2) {
+    continue;
+}
+
+//if online, not average, and either score exists and active, or score doesn't exist and assess is current,
+if ($gradebook[0][1][$j][6] == 0 && $gradebook[$i][1][$j][4] != 'average' && ((isset($gradebook[$i][1][$j][3]) && $gradebook[$i][1][$j][3] > 9) || (!isset($gradebook[$i][1][$j][3]) && $gradebook[0][1][$j][3] == 1))) {
+    echo '<td class="c isact">' . $insdiv;
+} else {
+    echo '<td class="c">' . $insdiv;
+}
+if (isset($gradebook[$i][1][$j][5]) && ($gradebook[$i][1][$j][5] & (1 << $data['availShow'])) && !$hidepast) {
+    echo '<span style="font-style:italic">';
+}
+if ($gradebook[0][1][$j][6] == 0) {//online
+if (isset($gradebook[$i][1][$j][0])) {
+if ($data['isTutor'] && $gradebook[$i][1][$j][4] == 'average') {
+} else if ($gradebook[$i][1][$j][4] == 'average') { ?>
+    <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?stu='.$stu.'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&aid='.$gradebook[0][1][$j][7]);?>"
                     <?php echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
                         echo ">";
                     } else {   ?>
-                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&uid='.$gradebook[$i][4][0])?>">
-                    <?php }
-                    if ($gradebook[$i][1][$j][3] > 9) {
-                        $gradebook[$i][1][$j][3] -= 10;
-                    }
-                    echo $gradebook[$i][1][$j][0];
-                    if ($gradebook[$i][1][$j][3] == 1) {
-                        echo ' (NC)';
-                    } else if ($gradebook[$i][1][$j][3] == 2) {
-                        echo ' (IP)';
-                    } else if ($gradebook[$i][1][$j][3] == 3) {
-                        echo ' (OT)';
-                    } else if ($gradebook[$i][1][$j][3] == 4) {
-                        echo ' (PT)';
-                    }
-                    if ($data['isTutor'] && $gradebook[$i][1][$j][4] == 'average') {
-                    } else {
-                        echo '</a>';
-                    }
-                    if ($gradebook[$i][1][$j][1] == 1) {
-                        echo '<sup>*</sup>';
-                    }
+<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&uid='.$gradebook[$i][4][0])?>">
+<?php }
+if ($gradebook[$i][1][$j][3] > 9) {
+    $gradebook[$i][1][$j][3] -= 10;
+}
+echo $gradebook[$i][1][$j][0];
+if ($gradebook[$i][1][$j][3] == 1) {
+    echo ' (NC)';
+} else if ($gradebook[$i][1][$j][3] == 2) {
+    echo ' (IP)';
+} else if ($gradebook[$i][1][$j][3] == 3) {
+    echo ' (OT)';
+} else if ($gradebook[$i][1][$j][3] == 4) {
+    echo ' (PT)';
+}
+if ($data['isTutor'] && $gradebook[$i][1][$j][4] == 'average') {
+} else {
+    echo '</a>';
+}
+if ($gradebook[$i][1][$j][1] == 1) {
+    echo '<sup>*</sup>';
+}
 
-                } else { //no score
-                    if ($gradebook[$i][0][0] == 'Averages') {
-                        echo '-';
-                    } else if ($data['isTeacher']) { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid=new&aid='.$gradebook[0][1][$j][7].'&uid='.$gradebook[$i][4][0])?>">-</a>
-                    <?php } else {
-                        echo '-';
-                    }
-                }
-                if (isset($gradebook[$i][1][$j][6])) {
-                    if ($gradebook[$i][1][$j][6] > 1) {
-                        if ($gradebook[$i][1][$j][6] > 2) {
-                            echo '<sup>LP (' . ($gradebook[$i][1][$j][6] - 1) . ')</sup>';
-                        } else {
-                            echo '<sup>LP</sup>';
-                        }
-                    } else {
-                        echo '<sup>e</sup>';
-                    }
-                }
-            } else if ($gradebook[0][1][$j][6] == 1) { //offline
-                if ($data['isTeacher']) {
-                    if ($gradebook[$i][0][0] == 'Averages') { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>" <?php
+} else { //no score
+    if ($gradebook[$i][0][0] == 'Averages') {
+        echo '-';
+    } else if ($data['isTeacher']) { ?>
+        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid=new&aid='.$gradebook[0][1][$j][7].'&uid='.$gradebook[$i][4][0])?>">-</a>
+    <?php } else {
+        echo '-';
+    }
+}
+if (isset($gradebook[$i][1][$j][6])) {
+    if ($gradebook[$i][1][$j][6] > 1) {
+        if ($gradebook[$i][1][$j][6] > 2) {
+            echo '<sup>LP (' . ($gradebook[$i][1][$j][6] - 1) . ')</sup>';
+        } else {
+            echo '<sup>LP</sup>';
+        }
+    } else {
+        echo '<sup>e</sup>';
+    }
+}
+} else if ($gradebook[0][1][$j][6] == 1) { //offline
+if ($data['isTeacher']) {
+if ($gradebook[$i][0][0] == 'Averages') { ?>
+    <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>" <?php
                           echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
 							echo ">";
                     } else { ?>
-                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
-                    <?php }
-                } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
-                    if ($gradebook[$i][0][0] == 'Averages') { ?>
-                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>">
-                    <?php } else { ?>
-                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades??stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
-                    <?php }
+<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
+    <?php }
+    } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
+    if ($gradebook[$i][0][0] == 'Averages') { ?>
+    <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>">
+        <?php } else { ?>
+        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades??stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
+            <?php }
+            }
+            if (isset($gradebook[$i][1][$j][0])) {
+                echo $gradebook[$i][1][$j][0];
+                if ($gradebook[$i][1][$j][3] == 1) {
+                    echo ' (NC)';
                 }
-                if (isset($gradebook[$i][1][$j][0])) {
-                    echo $gradebook[$i][1][$j][0];
-                    if ($gradebook[$i][1][$j][3] == 1) {
-                        echo ' (NC)';
-                    }
+            } else {
+                echo '-';
+            }
+            if ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$j][8] == 1)) {
+                echo '</a>';
+            }
+            if ($gradebook[$i][1][$j][1] == 1) {
+                echo '<sup>*</sup>';
+            }
+            } else if ($gradebook[0][1][$j][6] == 2) { //discuss
+            if (isset($gradebook[$i][1][$j][0])) {
+            if ($gradebook[$i][0][0] != 'Averages')
+            { ?>
+            <a href="<?php echo AppUtility::getURLFromHome('forum','forum/view-forum-grade?cid='.$course->id.'&stu='.$stu.'&uid='.$gradebook[$i][4][0].'&fid='.$gradebook[0][1][$j][7]);?>">
+                <?php echo $gradebook[$i][1][$j][0];
+                echo '</a>';
                 } else {
-                    echo '-';
-                }
-                if ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$j][8] == 1)) {
-                    echo '</a>';
+                    echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\"> ";
+                    echo $gradebook[$i][1][$j][0];
+                    echo '</span>';
                 }
                 if ($gradebook[$i][1][$j][1] == 1) {
                     echo '<sup>*</sup>';
                 }
-            } else if ($gradebook[0][1][$j][6] == 2) { //discuss
-                if (isset($gradebook[$i][1][$j][0])) {
-                    if ($gradebook[$i][0][0] != 'Averages')
-                    { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/view-forum-grade?cid='.$course->id.'&stu='.$stu.'&uid='.$gradebook[$i][4][0].'&fid='.$gradebook[0][1][$j][7]);?>">
-                        <?php echo $gradebook[$i][1][$j][0];
-                        echo '</a>';
-                    } else {
-                        echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\"> ";
-                        echo $gradebook[$i][1][$j][0];
-                        echo '</span>';
-                    }
-                    if ($gradebook[$i][1][$j][1] == 1) {
-                        echo '<sup>*</sup>';
-                    }
                 } else {
                     if ($data['isTeacher'] && $gradebook[$i][0][0] != 'Averages') { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/view-forum-grade?cid='.$course->id.'&stu='.$stu.'&uid='.$gradebook[$i][4][0].'&fid='.$gradebook[0][1][$j][7]);?>">-</a>
+                        <a href="<?php echo AppUtility::getURLFromHome('forum','forum/view-forum-grade?cid='.$course->id.'&stu='.$stu.'&uid='.$gradebook[$i][4][0].'&fid='.$gradebook[0][1][$j][7]);?>">-</a>
                     <?php } else {
                         echo '-';
                     }
                 }
-            } else if ($gradebook[0][1][$j][6] == 3) { //exttool
+                } else if ($gradebook[0][1][$j][6] == 3) { //exttool
                 if ($data['isTeacher']) {
-                    if ($gradebook[$i][0][0] == 'Averages') { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$j][7]);?>"
+                if ($gradebook[$i][0][0] == 'Averages') { ?>
+                    <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$j][7]);?>"
                         <?php echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
                         echo ">";
                     } else { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
+                <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
                     <?php }
-                } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
+                    } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
                     if ($gradebook[$i][0][0] == 'Averages')
                     { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$j][7]);?>">
-                    <?php } else
-                    { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edittoolscore?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
-                    <?php }
-                }
-                if (isset($gradebook[$i][1][$j][0])) {
-                    echo $gradebook[$i][1][$j][0];
-                    if ($gradebook[$i][1][$j][3] == 1) {
-                        echo ' (NC)';
-                    }
-                } else {
-                    echo '-';
-                }
-                if ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$j][8] == 1)) {
-                    echo '</a>';
-                }
-                if ($gradebook[$i][1][$j][1] == 1) {
-                    echo '<sup>*</sup>';
-                }
-            }
-            if (isset($gradebook[$i][1][$j][5]) && ($gradebook[$i][1][$j][5] & (1 << $data['availShow'])) && !$hidepast) {
-                echo '<sub>d</sub></span>';
-            }
-            echo $enddiv . '</td>';
-        }
-    }
-    if (!$data['totOnLeft'] && !$hidepast) {
-        //category totals
-        if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
-            for ($j = 0; $j < count($gradebook[0][2]); $j++) { //category headers
-                if (($data['availShow'] < 2 || $data['availShow'] == 3) && $gradebook[0][2][$j][2] > 1) {
-                    continue;
-                } else if ($data['availShow'] == 2 && $gradebook[0][2][$j][2] == 3) {
-                    continue;
-                }
-                if ($data['catFilter'] != -1 && $data['availShow'] < 3 && $gradebook[0][2][$j][$data['availShow'] + 3] > 0) {
-                    echo '<td class="c">' . $insdiv;
-                    if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
-                        echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
-                    }
-                    echo $gradebook[$i][2][$j][$data['availShow']] . ' (' . round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][$data['availShow'] + 3]) . '%)';
-
-                    if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
-                        echo '</span>';
-                    }
-                    echo $enddiv . '</td>';
-                } else {
-                    echo '<td class="c">' . $insdiv;
-                    if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] < 3) {
-                        echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
-                    }
-                    if ($data['availShow'] == 3) {
-                        if ($gradebook[$i][0][0] == 'Averages') {
-                            echo $gradebook[$i][2][$j][3] . '%';
-                        } else {
-                            echo $gradebook[$i][2][$j][3] . '/' . $gradebook[$i][2][$j][4];
-                        }
-                    } else {
-                        if (isset($gradebook[$i][3][8])) { //using points based
-                            echo $gradebook[$i][2][$j][$data['availShow']];
-                        } else {
-                            if ($gradebook[0][2][$j][3 + $data['availShow']] > 0) {
-                                echo round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][3 + $data['availShow']], 1) . '%';
-                            } else {
-                                echo '0%';
+                    <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$j][7]);?>">
+                        <?php } else
+                        { ?>
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edittoolscore?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
+                            <?php }
                             }
-                        }
-                    }
-                    if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] < 3) {
-                        echo '</span>';
-                    }
-                    echo $enddiv . '</td>';
-                }
-            }
-        }
+                            if (isset($gradebook[$i][1][$j][0])) {
+                                echo $gradebook[$i][1][$j][0];
+                                if ($gradebook[$i][1][$j][3] == 1) {
+                                    echo ' (NC)';
+                                }
+                            } else {
+                                echo '-';
+                            }
+                            if ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$j][8] == 1)) {
+                                echo '</a>';
+                            }
+                            if ($gradebook[$i][1][$j][1] == 1) {
+                                echo '<sup>*</sup>';
+                            }
+                            }
+                            if (isset($gradebook[$i][1][$j][5]) && ($gradebook[$i][1][$j][5] & (1 << $data['availShow'])) && !$hidepast) {
+                                echo '<sub>d</sub></span>';
+                            }
+                            echo $enddiv . '</td>';
+                            }
+                            }
+                            if (!$data['totOnLeft'] && !$hidepast) {
+                                //category totals
+                                if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
+                                    for ($j = 0; $j < count($gradebook[0][2]); $j++) { //category headers
+                                        if (($data['availShow'] < 2 || $data['availShow'] == 3) && $gradebook[0][2][$j][2] > 1) {
+                                            continue;
+                                        } else if ($data['availShow'] == 2 && $gradebook[0][2][$j][2] == 3) {
+                                            continue;
+                                        }
+                                        if ($data['catFilter'] != -1 && $data['availShow'] < 3 && $gradebook[0][2][$j][$data['availShow'] + 3] > 0) {
+                                            echo '<td class="c">' . $insdiv;
+                                            if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
+                                                echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
+                                            }
+                                            echo $gradebook[$i][2][$j][$data['availShow']] . ' (' . round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][$data['availShow'] + 3]) . '%)';
 
-        //total totals
-        if ($data['catFilter'] < 0) {
-            if ($data['availShow'] == 3) {
-                if ($gradebook[$i][0][0] == 'Averages') {
-                    if (isset($gradebook[$i][3][8])) { //using points based
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
-                    }
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
-                } else {
-                    if (isset($gradebook[$i][3][8])) { //using points based
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '/' . $gradebook[$i][3][7] . $enddiv . '</td>';
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][8] . '%' . $enddiv . '</td>';
+                                            if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] != 3) {
+                                                echo '</span>';
+                                            }
+                                            echo $enddiv . '</td>';
+                                        } else {
+                                            echo '<td class="c">' . $insdiv;
+                                            if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] < 3) {
+                                                echo "<span onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][2][$j][6+$data['availShow']]}')\" onmouseout=\"tipout()\" >";
+                                            }
+                                            if ($data['availShow'] == 3) {
+                                                if ($gradebook[$i][0][0] == 'Averages') {
+                                                    echo $gradebook[$i][2][$j][3] . '%';
+                                                } else {
+                                                    echo $gradebook[$i][2][$j][3] . '/' . $gradebook[$i][2][$j][4];
+                                                }
+                                            } else {
+                                                if (isset($gradebook[$i][3][8])) { //using points based
+                                                    echo $gradebook[$i][2][$j][$data['availShow']];
+                                                } else {
+                                                    if ($gradebook[0][2][$j][3 + $data['availShow']] > 0) {
+                                                        echo round(100 * $gradebook[$i][2][$j][$data['availShow']] / $gradebook[0][2][$j][3 + $data['availShow']], 1) . '%';
+                                                    } else {
+                                                        echo '0%';
+                                                    }
+                                                }
+                                            }
+                                            if ($gradebook[$i][0][0] == 'Averages' && $data['availShow'] < 3) {
+                                                echo '</span>';
+                                            }
+                                            echo $enddiv . '</td>';
+                                        }
+                                    }
+                                }
 
-                    } else {
-                        echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
-                    }
-                }
-            } else {
-                if (isset($gradebook[0][3][0])) { //using points based
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . $enddiv . '</td>';
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow'] + 3] . '%' . $enddiv . '</td>';
-                } else {
-                    echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . '%' . $enddiv . '</td>';
-                }
-            }
-        }
-    }
-    echo '</tr>';
-}
+                                //total totals
+                                if ($data['catFilter'] < 0) {
+                                    if ($data['availShow'] == 3) {
+                                        if ($gradebook[$i][0][0] == 'Averages') {
+                                            if (isset($gradebook[$i][3][8])) { //using points based
+                                                echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
+                                            }
+                                            echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
+                                        } else {
+                                            if (isset($gradebook[$i][3][8])) { //using points based
+                                                echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '/' . $gradebook[$i][3][7] . $enddiv . '</td>';
+                                                echo '<td class="c">' . $insdiv . $gradebook[$i][3][8] . '%' . $enddiv . '</td>';
+
+                                            } else {
+                                                echo '<td class="c">' . $insdiv . $gradebook[$i][3][6] . '%' . $enddiv . '</td>';
+                                            }
+                                        }
+                                    } else {
+                                        if (isset($gradebook[0][3][0])) { //using points based
+                                            echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . $enddiv . '</td>';
+                                            echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow'] + 3] . '%' . $enddiv . '</td>';
+                                        } else {
+                                            echo '<td class="c">' . $insdiv . $gradebook[$i][3][$data['availShow']] . '%' . $enddiv . '</td>';
+                                        }
+                                    }
+                                }
+                            }
+                            echo '</tr>';
+                            }
+                            ?>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<?php
 ?>
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
- <?php
-?>
- <!-- jQuery --><!--
+<!-- jQuery --><!--
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>

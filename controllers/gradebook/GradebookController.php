@@ -64,7 +64,7 @@ class GradebookController extends AppController
         return $this->accessForTeacherAndStudent($this->user,$courseId,$actionPath);
     }
 
-     public function actionGradebook()
+    public function actionGradebook()
     {
         global $get;
         $this->guestUserHandler();
@@ -2079,14 +2079,14 @@ class GradebookController extends AppController
         }
         if ($gbItems['rubric'] != 0) {
             $rubricData = Rubrics::getById($gbItems['rubric']);
-           if(count($rubricData) > 0)
-           {
-               $rubricFinalData = array(
-                   '0' => $rubricData['id'],
-                   '1' => $rubricData['rubrictype'],
-                   '2' => $rubricData['rubric'],
-               );
-           }
+            if(count($rubricData) > 0)
+            {
+                $rubricFinalData = array(
+                    '0' => $rubricData['id'],
+                    '1' => $rubricData['rubrictype'],
+                    '2' => $rubricData['rubric'],
+                );
+            }
         }
         $count = 0;
         $hassection = false;
@@ -2355,7 +2355,7 @@ class GradebookController extends AppController
             }
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'course/items.css','gradebook.css']);
-        $this->includeJS(['jquery.dataTables.min.js', 'tablesorter.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js', 'gradebook/manageaddgrades.js', 'roster/managelatepasses.js']);
+        $this->includeJS(['jquery.dataTables.min.js', 'tablesorter.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js', 'gradebook/manageaddgrades.js']);
         $responseData = array('studentInformation' => $studentArray, 'course' => $course, 'assessmentData' => $assessmentData, 'assessmentLabel' => $assessmentLabel, 'assessmentId' => $assessmentId
         , 'gradeData' => $gradeData, 'finalStudentArray' => $finalStudentArray, 'gbcatsLabel' => $gbcatsLabel, 'sortorder' => $sortorder, 'hassection' => $hassection, 'defaultValuesArray' => $defaultValuesArray, 'gbcatsId' => $gbcatsId, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
             'isDelete' => $isDelete, 'pageOutcomes' => $pageOutcomes, 'isteacher' => $isteacher, 'istutor' => $istutor, 'isTutorEdit' => $isTutorEdit, 'rubricFinalData' => $rubricFinalData, 'params' => $params, 'gbItems' => $gbItems);
@@ -2897,7 +2897,7 @@ class GradebookController extends AppController
         $studentId = $this->getParamVal('studentId');
         $gbMode = $this->getParamVal('gbmode');
         if (($StudentData)==0) { //shouldn't happen
-        $this->setErrorFlash('Invalid student id');
+            $this->setErrorFlash('Invalid student id');
 //        return $this->redirect('grade-book-student-detail?cid='.$courseId. '&studentId='.$studentId);
         }
         if (($isTeacher)) {
@@ -2954,7 +2954,7 @@ class GradebookController extends AppController
         if ($this->isPostMethod()) {
             if ((isset($params['posted']) && $params['posted']=="Make Exception") || isset($params['massexception'])) {
                 $calledfrom='gb';
-                 $assesschk = $params['assesschk'];
+                $assesschk = $params['assesschk'];
                 $_SESSION['assesschk']= $assesschk;
                 $stusection = $params['stusection'];
                 return $this->redirect(AppUtility::getURLFromHome('roster','roster/make-exception?cid=' . $courseId.'&gradebook='.$calledfrom.'&studentId='.$params['studentId'].'&section-data='.$stusection));
@@ -3207,21 +3207,21 @@ class GradebookController extends AppController
         }
         $exceptionData = Exceptions::getByAssessmentIdAndUserId($params['uid'], $assessmentData['assessmentid']);
         $questions = Questions::getByQuestionsIdAndAssessmentId($assessmentData['assessmentid']);
-            $questionsData = array();
-            foreach ($questions as $question) {
-                $tempArray = array(
-                    '0' => $question['id'],
-                    '1' => $question['points'],
-                    '2' => $question['withdrawn'],
-                    '3' => $question['qtype'],
-                    '4' => $question['control'],
-                    '5' => $question['rubric'],
-                    '6' => $question['showhints'],
-                    '7' => $question['extref'],
-                    '8' => $question['ownerid'],
-                );
-                array_push($questionsData, $tempArray);
-            }
+        $questionsData = array();
+        foreach ($questions as $question) {
+            $tempArray = array(
+                '0' => $question['id'],
+                '1' => $question['points'],
+                '2' => $question['withdrawn'],
+                '3' => $question['qtype'],
+                '4' => $question['control'],
+                '5' => $question['rubric'],
+                '6' => $question['showhints'],
+                '7' => $question['extref'],
+                '8' => $question['ownerid'],
+            );
+            array_push($questionsData, $tempArray);
+        }
         $questionIdArray = explode(',', $assessmentData['questions']);
         $librariesName = array();
         foreach ($questionIdArray as $questionId) {
@@ -3300,7 +3300,7 @@ class GradebookController extends AppController
         if (isset($params['breakfromgroup']) && isset($params['asid']) && $isteacher) {
             if ($params['breakfromgroup'] == "confirmed")
             {
-                 StuGroupMembers::removeGrpMember($assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
+                StuGroupMembers::removeGrpMember($assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
                 //update any assessment sessions using this group
                 AssessmentSession::updateAssSessionForGrpByGrpIdAndUid($assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
                 $now = time();
@@ -4530,8 +4530,8 @@ class GradebookController extends AppController
         {
             if (isset($params['confirm']))
             {
-                   Grades::deleteByGradeTypeId($lid);
-                   $this->redirect('gradebook?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid']);
+                Grades::deleteByGradeTypeId($lid);
+                $this->redirect('gradebook?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid']);
             }
         }
         if (isset($params['newscore']))
@@ -4811,7 +4811,7 @@ class GradebookController extends AppController
         $student = Student::getByCourseId($course->id,$userId);
         $latepasses = $student['latepass'];
         $responseData = array('body' => $body,'addr' => $addr,'latepasses' => $latepasses,'savetitle' => $savetitle,'etime' => $etime,'stime' => $sdate,'sdate' => $sdate,'edate' => $edate,'overwriteBody' => $overwriteBody,'pagetitle' => $pagetitle,'course' => $course,
-           'from' => $from, 'params' => $params,'stuname' => $stuname,'page_isExceptionMsg' => $page_isExceptionMsg,'page_courseSelect' => $page_courseSelect,'asid' => $assessmentId,'isTeacher' => $isTeacher);
+            'from' => $from, 'params' => $params,'stuname' => $stuname,'page_isExceptionMsg' => $page_isExceptionMsg,'page_courseSelect' => $page_courseSelect,'asid' => $assessmentId,'isTeacher' => $isTeacher);
         return $this->renderWithData('exception',$responseData);
     }
 
