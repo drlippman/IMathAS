@@ -371,7 +371,7 @@ if ($params['gbitem'] == 'new') { ?>
             </div>"; ?>
     <div class="header-btn col-sm-9 col-md-10 padding-top-twenty padding-bottom-ten col-md-offset-2 col-sm-offset-3">
         <button class="btn btn-primary page-settings" type="submit" value="Submit">
-            <i class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?>
+            <i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?>
         </button>
     </div>
     <?php if ($hassection) {

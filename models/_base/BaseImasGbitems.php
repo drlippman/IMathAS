@@ -37,6 +37,7 @@ class BaseImasGbitems extends \yii\db\ActiveRecord
     {
         return [
 //            [['courseid', 'name', 'showdate', 'gbcategory', 'outcomes'], 'required'],
+            [['name'], 'required'],
             [['courseid', 'points', 'showdate', 'gbcategory', 'rubric', 'cntingb', 'tutoredit'], 'integer'],
             [['outcomes'], 'string'],
             [['name'], 'string', 'max' => 254]

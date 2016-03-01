@@ -2241,8 +2241,12 @@ class GradebookController extends AppController
             $params['outcomes'] = implode(',', $outcomes);
             if ($params['gbitem'] == 'new') {
                 $gbItems = new GbItems();
-                $gbItemsId = $gbItems->createGbItemsByCourseId($courseId, $params);
-                $params['gbitem'] = $gbItemsId;
+                $gbItemsIdData = $gbItems->createGbItemsByCourseId($courseId, $params);
+                if($gbItemsIdData->errors['name']){
+                    $this->setErrorFlash('Name can not be blank.');
+                    return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$courseId.'&gbitem=new&grades=all'));
+                }
+                $params['gbitem'] = $gbItemsIdData['id'];
                 $isnewitem = true;
             } else {
                 GbItems::updateGbItemsByCourseId($params['gbitem'], $params);

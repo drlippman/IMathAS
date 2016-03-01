@@ -15,7 +15,7 @@ class GbItems extends BaseImasGbitems
     public function createGbItemsByCourseId($courseId,$params)
     {
         $this->courseid = $courseId;
-        $this->name = $params['name'] ? $params['name'] : ' ';
+        $this->name = $params['name'] ? trim($params['name']) : ' ';
         $this->points = $params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO;
         $this->showdate = $params['showdate'];
         $this->gbcategory = $params['gradebook-category'];
@@ -24,7 +24,7 @@ class GbItems extends BaseImasGbitems
         $this->tutoredit = $params['tutoredit'];
         $this->outcomes = isset($params['outcomes']) ? $params['outcomes']:' ' ;
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now){
