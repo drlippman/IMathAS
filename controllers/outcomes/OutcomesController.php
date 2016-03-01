@@ -156,6 +156,8 @@ class OutcomesController extends AppController
     public function actionOutcomeReport()
     {
         global $courseId,$isTeacher,$isTutor,$tutorid,$userId,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
+        global $outcomeInfo,$type;
+
         $user = $this->guestUserHandler();
         $userId = $user['id'];
         $this->layout = 'master';
@@ -203,7 +205,7 @@ class OutcomesController extends AppController
         $this->includeJS('tablesorter.js');
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
-        return $this->render('outcomeReport',['courseId' => $courseId,'finalData' => $finalData,'outc' => $outc,'headerData' => $outcomeInfo,'report' => $report,'report' => $report,'selectedOutcome' => $selectedOutcome,'outcomesData' => $outcomes,'type' => $type,'course' => $course]);
+        return $this->render('outcomeReport',['courseId' => $courseId,'finalData' => $finalData,'outc' => $outc,'headerData' => $outcomeInfo,'report' => $report,'selectedOutcome' => $selectedOutcome,'outcomesData' => $outcomes,'type' => $type,'course' => $course]);
     }
 
     public function actionOutcomeMap()

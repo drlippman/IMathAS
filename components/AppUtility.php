@@ -2098,6 +2098,7 @@ class AppUtility extends Component
 
     public function printOutcomes($arr, $individual, $finalData = null, $cnt = null, $n = null, $type = null, $outcomeInfo = null)
     {
+        global $outcomeInfo,$type;
         foreach ($arr as $oi) {
             if ($cnt % AppConstant::NUMERIC_TWO == AppConstant::NUMERIC_ZERO) {
                 $class = "even";
@@ -2131,7 +2132,6 @@ class AppUtility extends Component
             }
 
         }
-
     }
 
     public function printItems($items, $assessNames, $forumNames, $offNames, $linkNames, $inlineNames)
