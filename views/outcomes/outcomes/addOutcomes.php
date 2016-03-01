@@ -100,28 +100,81 @@ $this->params['breadcrumbs'][] = $this->title;
             window.onbeforeunload = function() {return unsavedmsg;}
         }
     }
+
+
     function removeoutcome(el) {
-        if (confirm("Are you sure you want to delete this outcome?")) {
-            j(el).parent().parent().remove();
-            if (!sortIt.haschanged) {
-                sortIt.haschanged = true;
-                sortIt.fireEvent('onFirstChange', null);
-                window.onbeforeunload = function() {return unsavedmsg;}
+        var message = '';
+        message += "Are you sure you want to delete this outcome";
+        var html = '<div><p>' + message + '</p></div>';
+        console.log(message);
+        j('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Outcome Delete', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",draggable:false,
+            buttons: {
+                "Cancel": function () {
+                    j(this).dialog('destroy').remove();
+                    return false;
+                },
+                "Confirm": function () {
+                    j(el).parent().remove();
+                    j(this).remove();
+                }
+            },
+            close: function (event, ui) {
+                j(this).remove();
+            },
+            open: function () {
+                j('.ui-widget-overlay').bind('click', function () {
+                    j('#dialog').dialog('close');
+                })
             }
+        });
+        if (!sortIt.haschanged) {
+            sortIt.haschanged = true;
+            sortIt.fireEvent('onFirstChange', null);
+            window.onbeforeunload = function() {return unsavedmsg;}
         }
     }
+
+
+
     function removeoutcomegrp(el) {
-        if (confirm("Are you sure you want to delete this outcome group?  This will not delete the included outcomes.")) {
-            var curloc = j(el).parent().parent();
-            curloc.find("li").each(function() {
-                curloc.before($(this));
-            });
-            curloc.remove();
+        var curloc = j(el).parent();
+        var message = '';
+        message += "Are you sure you want to delete this outcome group?"+"<p>"+"This will not delete the included outcomes.";
+        var html = '<div><p>' + message + '</p></div>';
+        console.log(message);
+        j('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Outcome Group Delete', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",draggable:false,
+            buttons: {
+                "Cancel": function () {
+                    j(this).dialog('destroy').remove();
+                    return false;
+                },
+                "Confirm": function () {
+                    curloc.find("li").each(function() {
+                        curloc.before(j(this));
+                    });
+                    curloc.remove();
+                    j(this).remove();
+                }
+            },
+            close: function (event, ui) {
+                j(this).remove();
+            },
+            open: function () {
+                j('.ui-widget-overlay').bind('click', function () {
+                    j('#dialog').dialog('close');
+                })
+            }
+        });
             if (!sortIt.haschanged) {
                 sortIt.haschanged = true;
                 sortIt.fireEvent('onFirstChange', null);
                 window.onbeforeunload = function() {return unsavedmsg;}
             }
-        }
     }
 </script>

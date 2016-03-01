@@ -118,7 +118,12 @@ class RosterController extends AppController
         {
             $sectionsort = false;
         }
-        $resultDefaultUserList = Student::defaultUserList($courseId,$sectionsort,$secfilter);
+        $UserList = Student::defaultUserList($courseId,$sectionsort,$secfilter);
+        foreach($UserList as $key=>$user){
+            if($user['FirstName'] || $user['LastName']){
+                $resultDefaultUserList[$key]=$user;
+            }
+        }
         $hasSectionRowHeader = ($hassection)? "<th class='width-eight-per'>Section$sectionselect</th>" : "";
         $hasCodeRowHeader = ($hascode) ? "<th class='width-eight-per'>Code</th>" : "";
         $hasSectionSortTable = ($hassection) ? "'S'," : "";
