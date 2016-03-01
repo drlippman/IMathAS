@@ -977,7 +977,10 @@ class RosterController extends AppController
     public function actionUnenroll(){
         $this->guestUserHandler();
         $this->layout = "master";
+        $users = $this->getAuthenticatedUser();
+        $userId = $users['id'];
         $params = $this->getRequestParams();
+
         if(isset($params['lockinstead'])){
             $toLock = array_unique(explode(',', $params['studentData']));
             foreach ($toLock as $student) {
@@ -992,7 +995,7 @@ class RosterController extends AppController
             $connection = $this->getDatabase();
             $transaction = $connection->beginTransaction();
             try {
-            StudentUnenrollUtility::unenrollStudent($params);
+                StudentUnenrollUtility::unenrollStudent($params);
                 $transaction->commit();
             }catch (Exception $e){
                 $transaction->rollBack();
@@ -1014,8 +1017,11 @@ class RosterController extends AppController
             $query = User::findAllById($student);
             array_push($students, $query[0]);
         }
-        $sort_by = array_column($students, 'LastName');
-        array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $students);
+        if(!empty($students)){
+            $sort_by = array_column($students, 'LastName');
+            array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $students);
+        }
+
         $users = Student::findByCid($courseId);
         if(count($students) == count($users)){
             $studentId = 'all';
@@ -1035,6 +1041,7 @@ class RosterController extends AppController
         if(isset($params['gradebook'])){
             $gradebook = 1;
         }
+
         $responseData = array('students' => $students, 'studentId' => $studentId, 'course' => $course, 'delForumMsg' => $delForumMsg, 'delWikiMsg' =>  $delWikiMsg, 'gradebook' => $gradebook);
         $this->includeCSS(['roster/roster.css']);
         return $this->renderWithData('unenroll', $responseData);

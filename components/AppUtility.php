@@ -502,10 +502,10 @@ class AppUtility extends Component
             $callength = $_COOKIE['callength' . $cid];
         }
         $today = $today + $pageshift * AppConstant::NUMERIC_SEVEN * $callength * AppConstant::HOURS * AppConstant::MINUTE * AppConstant::SECONDS;
-        $dayofweek = tzdate('w', $today);
-        $curmonum = tzdate('n', $today);
-        $dayofmo = tzdate('j', $today);
-        $curyr = tzdate('Y', $today);
+        $dayofweek = AppUtility::tzdate('w', $today);
+        $curmonum = AppUtility::tzdate('n', $today);
+        $dayofmo = AppUtility::tzdate('j', $today);
+        $curyr = AppUtility::tzdate('Y', $today);
         if ($tzname == '') {
             $serveroffset = date('Z') + $tzoffset * AppConstant::SECONDS;
         } else {

@@ -125,10 +125,27 @@ $rubric_names[] = $rubricsLabel;
 </div>
 <div class="col-sm-12 col-md-12 padding-top-twenty">
     <div class="col-sm-3 col-md-2 select-text-margin">
-        <?php AppUtility::t('Gradebook Category');?>
+        <span><?php AppUtility::t('Gradebook Category');?></span>
     </div>
     <div class="col-sm-4 col-md-4">
-        <?php AssessmentUtility::writeHtmlSelect("gradebook-category", $gbcatsId, $gbcatsLabel, 0, "Default", 0); ?>
+        <span class=formright><select name=gbcat id=gbcat class='form-control'>
+               <?php echo "<option value=\"0\" ";
+                if ($gbcat==0) {
+                echo "selected=1 ";
+                }
+                echo ">Default</option>\n";
+                if (count($gbcatsData)>0) {
+
+                foreach($gbcatsData as $row){
+                echo "<option value=\"{$row['id']}\" ";
+                if ($gbcat==$row['id']) {
+                echo "selected=1 ";
+                }
+                echo ">{$row['name']}</option>\n";
+                }
+
+                }
+                echo "</select></span><br class=form>\n"; ?>
     </div>
 </div>
 <div class="col-sm-12 col-md-12 padding-top-twenty">

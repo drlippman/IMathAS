@@ -2153,11 +2153,11 @@ class GradebookController extends AppController
 
         $key = AppConstant::NUMERIC_ZERO;
         $gbcatsData = GbCats::getByCourseId($courseId);
-        foreach ($gbcatsData as $singleGbcatsData) {
-            $gbcatsId[$key] = $singleGbcatsData['id'];
-            $gbcatsLabel[$key] = $singleGbcatsData['name'];
-            $key++;
-        }
+//        foreach ($gbcatsData as $singleGbcatsData) {
+//            $gbcatsId[$key] = $singleGbcatsData['id'];
+//            $gbcatsLabel[$key] = $singleGbcatsData['name'];
+//            $key++;
+//        }
         $keyValue = AppConstant::NUMERIC_ONE;
         $rubricsId = array(0);
         $rubricsLabel = array('None');
@@ -2249,7 +2249,7 @@ class GradebookController extends AppController
                 $params['gbitem'] = $gbItemsIdData['id'];
                 $isnewitem = true;
             } else {
-                GbItems::updateGbItemsByCourseId($params['gbitem'], $params);
+                $updateGBItem = GbItems::updateGbItemsByCourseId($params['gbitem'], $params);
                 $isnewitem = false;
             }
         }
@@ -2362,7 +2362,7 @@ class GradebookController extends AppController
         $this->includeJS(['jquery.dataTables.min.js', 'tablesorter.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js', 'gradebook/manageaddgrades.js']);
         $responseData = array('studentInformation' => $studentArray, 'course' => $course, 'assessmentData' => $assessmentData, 'assessmentLabel' => $assessmentLabel, 'assessmentId' => $assessmentId
         , 'gradeData' => $gradeData, 'finalStudentArray' => $finalStudentArray, 'gbcatsLabel' => $gbcatsLabel, 'sortorder' => $sortorder, 'hassection' => $hassection, 'defaultValuesArray' => $defaultValuesArray, 'gbcatsId' => $gbcatsId, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
-            'isDelete' => $isDelete, 'pageOutcomes' => $pageOutcomes, 'isteacher' => $isteacher, 'istutor' => $istutor, 'isTutorEdit' => $isTutorEdit, 'rubricFinalData' => $rubricFinalData, 'params' => $params, 'gbItems' => $gbItems);
+            'isDelete' => $isDelete, 'pageOutcomes' => $pageOutcomes, 'isteacher' => $isteacher, 'istutor' => $istutor, 'isTutorEdit' => $isTutorEdit, 'rubricFinalData' => $rubricFinalData, 'params' => $params, 'gbItems' => $gbItems, 'gbcatsData' => $gbcatsData);
         return $this->renderWithData('addGrades', $responseData);
     }
 

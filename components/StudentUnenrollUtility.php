@@ -165,10 +165,14 @@ class StudentUnenrollUtility extends Component
         if ($withwithdraw == 'remove' || $usereplaceby) {
             $msg = UpdateAssessUtility::updateassess($cid, $withwithdraw == 'remove', $usereplaceby);
         }
+
         if (count($tounenroll) > AppConstant::NUMERIC_ZERO) {
             foreach ($tounenroll as $studentId) {
                 Student::deleteStudent($studentId, $cid);
             }
+//            if($cid != $checkedCourseId){
+//                print_r('Flash message');
+//            }
             LoginLog::deleteCourseLog($tounenroll, $cid);
             ContentTrack::deleteUsingCourseAndUid($tounenroll, $cid);
         }

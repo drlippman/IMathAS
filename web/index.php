@@ -1,6 +1,8 @@
 
 
 <?php
+ini_set('session.cache_limiter','public');
+session_cache_limiter(false);
 
 // comment out the following two lines when deployed to production
 

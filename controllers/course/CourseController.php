@@ -1240,13 +1240,17 @@ class CourseController extends AppController
             $studentInfo['timelimitmult'] = $line['timelimitmult'];
             $studentInfo['section'] = $line['section'];
         }
-        if (!isset($teacherId) && !isset($isTutor) && !isset($isStudent))
+
+        if (!($teacherId) && !($isTutor) && !($isStudent))
         {
             /*
              * loaded by a NON-teacher
              */
-            $overwriteBody = AppConstant::NUMERIC_ONE;
-            $body = _("You are not enrolled in this course.  Please return to the <a href=\"#\">Home Page</a> and enroll\n");
+//            $overwriteBody = AppConstant::NUMERIC_ONE;
+//            $body = _("You are not enrolled in this course.  Please return to the <a href=\"#\">Home Page</a> and enroll\n");
+
+//            $this->setErrorFlash('You are not enrolled in this course.');
+            return $this->goHome();
         } else {
             /*
              * PERMISSIONS ARE OK, PROCEED WITH PROCESSING

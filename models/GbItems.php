@@ -155,6 +155,7 @@ class GbItems extends BaseImasGbitems
         $GbItems->tutoredit = $params['tutoredit'];
         $GbItems->outcomes = isset($params['outcomes']) ? $params['outcomes']:null ;
         $GbItems->save();
+        return $GbItems;
     }
 
     public static function getDataForCopyCourse($ctc)
