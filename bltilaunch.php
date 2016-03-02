@@ -540,7 +540,7 @@ if (isset($_GET['launch'])) {
 	$_SESSION['ltiuserid'] = $ltiuserid;
 	$_SESSION['ltiorg'] = $ltiorg;
 	$ltirole = strtolower($_REQUEST['roles']);          
-	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false) {
+	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false || strpos($ltirole,'contentdeveloper')!== false) {
 		$ltirole = 'instructor';
 	} else {
 		$ltirole = 'learner';
@@ -1744,7 +1744,7 @@ if (isset($_GET['launch'])) {
 	$_SESSION['ltiuserid'] = $ltiuserid;
 	$_SESSION['ltiorg'] = $ltiorg;
 	$ltirole = strtolower($_REQUEST['roles']);          
-	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false) {
+	if (strpos($ltirole,'instructor')!== false || strpos($ltirole,'administrator')!== false || strpos($ltirole,'contentdeveloper')!== false) {
 		$ltirole = 'instructor';
 	} else {
 		$ltirole = 'learner';
