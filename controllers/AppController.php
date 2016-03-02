@@ -810,7 +810,7 @@ class AppController extends Controller
         else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && $actionPath == 'gradebook' && ($teacherId || $isTutor)) {
             return true;
         }
-        else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId))) {
+        else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId || $isTutor))) {
             return $this->noValidRights($teacherId);
         }
         else {

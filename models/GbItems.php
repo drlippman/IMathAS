@@ -18,11 +18,11 @@ class GbItems extends BaseImasGbitems
         $this->name = $params['name'] ? trim($params['name']) : ' ';
         $this->points = $params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO;
         $this->showdate = $params['showdate'];
-        $this->gbcategory = $params['gradebook-category'];
+        $this->gbcategory = $params['gbcat'];
         $this ->rubric = $params['rubric'];
         $this->cntingb = $params['cntingb'];
         $this->tutoredit = $params['tutoredit'];
-        $this->outcomes = isset($params['outcomes']) ? $params['outcomes']:' ' ;
+        $this->outcomes = isset($params['outcomes']) ? $params['outcomes']: '' ;
         $this->save();
         return $this;
     }
