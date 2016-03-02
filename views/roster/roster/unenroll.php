@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course]);?>
 </div>
-<div class="tab-content shadowBox"">
+<div class="tab-content shadowBox">
 <?php
 if($gradebook != AppConstant::NUMERIC_ONE) {
     echo $this->render("_toolbarRoster", ['course' => $course]);

@@ -2248,6 +2248,7 @@ class ForumController extends AppController
 
     public function actionViewForumGrade()//only for teacher
     {
+        $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = intval($params['cid']);
         $course = Course::getById($courseId);
@@ -2258,9 +2259,11 @@ class ForumController extends AppController
         $userId = $currentUser['id'];
         if ($isTeacher || $isTutor) {
             $userId = intval($params['uid']);
+        } else{
+            $userId = $userId;
         }
-        $forumId = intval($params['fid']);
 
+        $forumId = intval($params['fid']);
         if (($isTeacher || $isTutor) && (isset($params['score']) || isset($params['newscore']))) {
             if ($isTutor) {
                 $forumData = Forums::getById($forumId);
@@ -2268,9 +2271,11 @@ class ForumController extends AppController
                     exit; //not auth for score change
                 }
             }
+
             //check for grades marked as newscore that aren't really new
             //shouldn't happen, but could happen if two browser windows open
             if (isset($params['newscore'])) {
+
                 $keys = array_keys($params['newscore']);
                 foreach ($keys as $k => $v) {
                     if (trim($v) == '') {
@@ -2298,7 +2303,7 @@ class ForumController extends AppController
                     }
                 }
             }
-            if (isset($params['newscore'])) {
+            if (($params['newscore'])) {
                 foreach ($params['newscore'] as $scoreKey => $score) {
                     if (trim($scoreKey) == '') {
                         continue;
@@ -2318,9 +2323,11 @@ class ForumController extends AppController
                     }
                 }
             }
-            return $this->redirect('gradebook?stu=' . $studentId . '&cid=' . $courseId);
+            return $this->redirect(AppUtility::getURLFromHome('gradebook','gradebook/gradebook?stu=' . $studentId . '&cid=' . $courseId));
         }
+
         $user = User::userDataUsingForum($userId, $forumId);
+
         $tutorEdit = $user['tutoredit'];
         if ($isTutor && $tutorEdit == AppConstant::NUMERIC_TWO) {
             $this->setErrorFlash(AppConstant::NO_FORUM_ACCESS);
@@ -2328,7 +2335,7 @@ class ForumController extends AppController
         }
         $forumInformation = Grades::getForumDataUsingUserId($userId, $forumId);
         $forumPostData = ForumPosts::getbyForumIdAndUserID($forumId, $userId);
-        $responseData = array('user' => $user, 'forumPostData' => $forumPostData, 'forumInformation' => $forumInformation, 'course' => $course, 'forumId' => $forumId, 'studentId' => $studentId, 'userId' => $userId);
+        $responseData = array('user' => $user, 'forumPostData' => $forumPostData, 'forumInformation' => $forumInformation, 'course' => $course, 'forumId' => $forumId, 'studentId' => $studentId, 'userId' => $userId, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor);
         return $this->renderWithData('viewForumGrade', $responseData);
     }
 

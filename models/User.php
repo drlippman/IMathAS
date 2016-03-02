@@ -752,11 +752,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function userDataUsingForum($userId,$forumId)
     {
-        $data = User::find()->select(['iu.LastName','iu.FirstName','i_f.name','i_f.points','i_f.tutoredit','i_f.enddate'])
-            ->from(['imas_users AS iu','imas_forums as i_f'])
-            ->where(['iu.id' => $userId])
-            ->andWhere(['i_f.id' => $forumId])->one();
-        return $data;
+//        $data = User::find()->select(['iu.LastName','iu.FirstName','i_f.name','i_f.points','i_f.tutoredit','i_f.enddate'])
+//            ->from(['imas_users AS iu','imas_forums as i_f'])
+//            ->where(['iu.id' => $userId])
+//            ->andWhere(['i_f.id' => $forumId])->one();
+//        return $data;
+        $query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit,i_f.enddate FROM imas_users AS iu, imas_forums as i_f ";
+        $query .= "WHERE iu.id=$userId AND i_f.id=$forumId";
+        return Yii::$app->db->createCommand($query)->queryOne();
     }
      public static function getDataById($id)
      {

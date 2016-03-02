@@ -94,7 +94,9 @@ class Student extends BaseImasStudents
     public static function deleteStudent($userid, $courseid)
     {
         $student = Student::findOne(['userid' => $userid, 'courseid' => $courseid]);
-        $student->delete();
+        if(!empty($student)){
+            $student->delete();
+        }
     }
 
     public function assignSectionAndCode($newEntry, $id)
@@ -196,6 +198,11 @@ class Student extends BaseImasStudents
     public static function getByCourse($cId)
     {
         return static::find()->where(['courseid' => $cId])->all();
+    }
+
+    public static function getByCourseByOne($cId)
+    {
+        return static::find()->where(['courseid' => $cId])->one();
     }
 
     public static function findCount($courseId)
