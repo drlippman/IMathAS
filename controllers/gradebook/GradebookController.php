@@ -77,7 +77,7 @@ class GradebookController extends AppController
         $this->setSessionData('messageCount', $msgList);
         $this->setSessionData('postCount', $countPost);
         $course = Course::getById($courseId);
-
+        $isTeacher = $this->isTeacher($user['id'], $courseId);
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
         if (isset($params['refreshdef']) && isset($sessionData[$courseId.'catcollapse'])) {
@@ -98,7 +98,8 @@ class GradebookController extends AppController
         $gradebookData = $this->gbtable($user->id, $courseId);
         $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
         $this->includeJS(['general.js', 'gradebook/gradebook.js','gradebook/tablescroller2.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        $responseData = array('course' => $course,'overridecollapse' => $overridecollapse, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
+        $responseData = array('course' => $course,'overridecollapse' => $overridecollapse, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData,
+        'isTeacher' => $isTeacher);
         return $this->renderWithData('gradebook', $responseData);
     }
 
@@ -111,7 +112,7 @@ class GradebookController extends AppController
         $tutorsection = trim($tutorid->section);
         $sectionQuery = Student::findDistinctSection($courseId);
         $istutor = false;
-        if (isset($teacherid)) {
+        if (($teacherid)) {
             $isteacher = true;
         }
         if ($tutorid) {

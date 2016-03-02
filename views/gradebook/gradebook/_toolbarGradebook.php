@@ -3,6 +3,7 @@ use app\components\AppUtility;
 ?>
 <div class="roster-nav-tab">
     <ul class="nav nav-tabs aligned sub-menu-bar-nav">
+        <?php if($isTeacher){?>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Offline Grades');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width">
@@ -13,15 +14,18 @@ use app\components\AppUtility;
                 <li>     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a> </li>
                 <?php } ?>
             </ul>
+
         </li>
         <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' . $course->id.'&studentId=-1'); ?>"><?php AppUtility::t('Averages');?></a></li>
         <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid=' . $course->id . "&stu=0"); ?>"><?php AppUtility::t('Comments');?></a></li>
+        <?php }?>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Filter');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width dropdown-scroll">
-                <li class="divider"></li>
+                <?php if($isTeacher){?>
                 <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/new-flag?cid='.$course->id)?>"><?php AppUtility::t('New Flag');?></a>
                 <li class="divider"></li>
+                <?php }?>
                 <li class="dropdown-header"><?php AppUtility::t('Show');?></li>
                 <li><a href="javascript:chgtoggle(2)"><?php AppUtility::t('All');?></a>
                 <li><a href="javascript:chgtoggle(4)"><?php AppUtility::t('Available only');?></a></li>

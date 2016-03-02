@@ -37,6 +37,7 @@ $stu = $data['defaultValuesArray']['studentId']
         <div class = "pull-left page-heading">
             <div class = "vertical-align title-page"><?php echo $this->title ?></div>
         </div>
+        <?php if($isTeacher){?>
         <div class = "pull-left header-btn gradebook-header-links">
             <div class = "pull-right">
                 <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-settings?cid=' . $course->id); ?>" class="btn btn-primary">
@@ -54,6 +55,7 @@ $stu = $data['defaultValuesArray']['studentId']
                 </div>
             </div>
         </div>
+        <?php }?>
     </div>
 </div>
 
@@ -64,7 +66,7 @@ $stu = $data['defaultValuesArray']['studentId']
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
     }?>
 </div>
-<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
+<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data, 'isTeacher' => $isTeacher]); ?>
 <div class="tab-content shadowBox col-md-12 col-sm-12">
 <div class="inner-content-gradebook">
 <div class="button-container col-md-12 col-sm-12 padding-zero">
@@ -73,9 +75,10 @@ $stu = $data['defaultValuesArray']['studentId']
  Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit
     <sup>*</sup>Has feedback,<sub> d</sub>Dropped score,<sup> e</sup>Has exception,<sup> LP</sup>Used latepass
         </span>
-    <span class="inner-page-options col-md-5 padding-zero pull-left col-sm-12">
+        <span class="inner-page-options col-md-5 padding-zero pull-left col-sm-12">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
-            <li class="dropdown">
+            <?php if($isTeacher) {?>
+                <li class="dropdown">
                 <?php echo '<select  class="form-control export-to-height" id="colorsel" onchange="updateColors(this)">';
                 echo '<option value="0">', _('Color'), '</option>';
                 echo '<option value="0">', _('None'), '</option>';
@@ -93,6 +96,7 @@ $stu = $data['defaultValuesArray']['studentId']
                 echo '>', _('Active'), '</option>';
                 echo '</select>';?>
             </li>
+            <?php } ?>
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('Category'); ?><span class="caret right-aligned"></span></a>
@@ -106,6 +110,7 @@ $stu = $data['defaultValuesArray']['studentId']
 
                 </ul>
             </li>
+            <?php if($isTeacher){?>
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
@@ -165,6 +170,7 @@ $stu = $data['defaultValuesArray']['studentId']
             </li>
         </ul>
     </span>
+    <?php }?>
 </div><br/>
 
 

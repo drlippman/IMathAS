@@ -28,6 +28,5 @@
 			$AS->outputimage($imgdir.$fn.'.png');
 		}
 	}
-\app\components\AppUtility::dump($urlmode);
 	header("Location: $urlmode$host$uri/$imgdir$fn.png");
 ?>

@@ -748,7 +748,14 @@ class AppController extends Controller
         }
         return true;
     }
-
+    public function noValidRightsForTeacherAndTutor($isTeacher, $isTutor)
+    {
+        if (!$isTeacher && !$isTutor) {
+            $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
+            return $this->redirect(Yii::$app->getHomeUrl());
+        }
+        return true;
+    }
     public function accessForAdmin($rights)
     {
         if ($rights != AppConstant::ADMIN_RIGHT) {
@@ -806,16 +813,12 @@ class AppController extends Controller
         $studentId = $this->isStudent($user['id'], $courseId);
         if ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'grade-book-student-detail' && $studentId) {
             return true;
-        }
-        else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && $actionPath == 'gradebook' && ($teacherId || $isTutor)) {
+        } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && $actionPath == 'gradebook' && ($teacherId || $isTutor)) {
             return true;
+        } else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId || !$isTutor))) {
+            return $this->noValidRightsForTeacherAndTutor($teacherId, $isTutor);
         }
-        else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId || $isTutor))) {
-            return $this->noValidRights($teacherId);
-        }
-        else {
             return true;
-        }
     }
 
     public function accessForAdminController($rights, $actionPath)
