@@ -2888,7 +2888,8 @@ class GradebookController extends AppController
 
     public function actionGradeBookStudentDetail()
     {
-        global $get;
+        global $get,$courseId;
+        global $get, $sel1name, $sel2name, $canviewall,$courseId,$isTeacher, $isTutor,$userId;
 
         $params = $this->getRequestParams();
         $get = $params;

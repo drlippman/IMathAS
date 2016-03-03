@@ -1117,7 +1117,6 @@ class SiteController extends AppController
         $action = $this->getParamVal('action');
         $groupId = AppConstant::NUMERIC_ZERO;
         $params = $this->getRequestParams();
-//        AppUtility::dump($params);
         if($action == 'chguserinfo')
         {
             if (($params['msgnot'])) {
