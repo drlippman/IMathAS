@@ -80,21 +80,87 @@ function ungroupitem(from) {
 	submitChanges();
 	return false;
 }
+
 function removeitem(loc) {
-	if (confirm("Are you sure you want to remove this question?")) {
-		doremoveitem(loc);
-		submitChanges();
-	}
-	return false;
+    var message = '';
+    message += "Are you sure you want to remove this question";
+    var html = '<div><p>' + message + '</p></div>';
+    j('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Question Delete', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",draggable:false,
+        buttons: {
+            "Cancel": function () {
+                j(this).dialog('destroy').remove();
+                return false;
+            },
+            "Confirm": function () {
+                doremoveitem(loc);
+                submitChanges();
+                j(this).remove();
+
+            }
+        },
+        close: function (event, ui) {
+            j(this).remove();
+        },
+        open: function () {
+            j('.ui-widget-overlay').bind('click', function () {
+                j('#dialog').dialog('close');
+            })
+        }
+    });
 }
 
+
+//function removeitem(loc) {
+//	if (confirm("Are you sure you want to remove this question?")) {
+//		doremoveitem(loc);
+//		submitChanges();
+//	}
+//	return false;
+//}
+
+
 function removegrp(loc) {
-	if (confirm("Are you sure you want to remove ALL questions in this group?")) {
-		doremoveitem(loc);
-		submitChanges();
-	}
-	return false;
+    var message = '';
+    message += "Are you sure you want to remove ALL questions in this group";
+    var html = '<div><p>' + message + '</p></div>';
+    j('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Group Question Delete', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",draggable:false,
+        buttons: {
+            "Cancel": function () {
+                j(this).dialog('destroy').remove();
+                return false;
+            },
+            "Confirm": function () {
+                doremoveitem(loc);
+                submitChanges();
+                j(this).remove();
+
+            }
+        },
+        close: function (event, ui) {
+            j(this).remove();
+        },
+        open: function () {
+            j('.ui-widget-overlay').bind('click', function () {
+                j('#dialog').dialog('close');
+            })
+        }
+    });
 }
+
+
+//function removegrp(loc) {
+//	if (confirm("Are you sure you want to remove ALL questions in this group?")) {
+//		doremoveitem(loc);
+//		submitChanges();
+//	}
+//	return false;
+//}
 
 function doremoveitem(loc) {
 	if (loc.indexOf("-")>-1) {
@@ -113,22 +179,47 @@ function doremoveitem(loc) {
 }
 
 function removeSelected() {
-	if (confirm("Are you sure you want to remove these questions?")) {
-		var form = document.getElementById("curqform");
-		var chgcnt = 0;
-		for (var e = form.elements.length-1; e >-1 ; e--) {
-			var el = form.elements[e];
-			if (el.type == 'checkbox' && el.checked && el.value != 'ignore') {
-				val = el.value.split(":");
-				doremoveitem(val[0]); 
-				chgcnt++;
-			}
-		}
-		if (chgcnt>0) {
-			submitChanges();
-		}
-	}
+    var message = '';
+    message += "Are you sure you want to remove these questions";
+    var html = '<div><p>' + message + '</p></div>';
+    var form = document.getElementById("curqform");
+    var chgcnt = 0;
+    j('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Question Delete', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",draggable:false,
+        buttons: {
+            "Cancel": function () {
+                j(this).dialog('destroy').remove();
+                return false;
+            },
+            "Confirm": function () {
+                for (var e = form.elements.length-1; e >-1 ; e--) {
+                    var el = form.elements[e];
+                    if (el.type == 'checkbox' && el.checked && el.value != 'ignore') {
+                        val = el.value.split(":");
+                        doremoveitem(val[0]);
+                        chgcnt++;
+                    }
+                }
+                if (chgcnt>0) {
+                    submitChanges();
+                }
+                j(this).remove();
+
+            }
+        },
+        close: function (event, ui) {
+            j(this).remove();
+        },
+        open: function () {
+            j('.ui-widget-overlay').bind('click', function () {
+                j('#dialog').dialog('close');
+            })
+        }
+    });
 }
+
 
 function groupSelected() {
 	var grplist = new Array;
@@ -426,29 +517,18 @@ function submitChanges() {
     req = new XMLHttpRequest(); 
   } else if (window.ActiveXObject) { 
     req = new ActiveXObject("Microsoft.XMLHTTP"); 
-  } 
-  if (typeof req != 'undefined') { 
-    req.onreadystatechange = function() {ahahDone(url, target);}; 
-    req.open("GET", url, true); 
-    req.send(""); 
-  } 
+  }
+
+  if (typeof req != 'undefined') {
+    req.onreadystatechange = function() {ahahDone(url, target);};
+    req.open("GET", url, true);
+    req.send("");
+  }
 }  
 
-function ahahDone(url, target) { 
-  if (req.readyState == 4) { // only if req is "loaded"
-    if (req.status == 200) { // only if "OK" 
-	    if (req.responseText.trim()=='OK') {
+function ahahDone(url, target) {
 		    document.getElementById(target).innerHTML='';
 		    refreshTable();
-	    } else {
-		    document.getElementById(target).innerHTML=req.responseText.trim();
-		    itemarray = olditemarray;
-	    }
-    } else {
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText;
-	    itemarray = olditemarray;
-    } 
-  }
 }
 
 function changeSetting(){

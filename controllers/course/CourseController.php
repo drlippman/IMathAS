@@ -1649,7 +1649,6 @@ class CourseController extends AppController
             Course::setItemOrder($itemOrder, $courseId);
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id.'&folder=0'));
         }
-
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js', 'mootools.js', 'nested1.js','course/instructor.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,

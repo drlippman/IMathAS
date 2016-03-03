@@ -48,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </script>
           <?php } else { ?>
                 <script type="text/javascript">
+                    var j=jQuery.noConflict();
                     var curcid = <?php echo $courseId ?>;
                     var curaid = <?php echo $assessmentId ?>;
                     var defpoints = <?php echo $defpoints ?>;

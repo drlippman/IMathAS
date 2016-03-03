@@ -106,7 +106,6 @@ $this->params['breadcrumbs'][] = $this->title;
         var message = '';
         message += "Are you sure you want to delete this outcome";
         var html = '<div><p>' + message + '</p></div>';
-        console.log(message);
         j('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Outcome Delete', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
