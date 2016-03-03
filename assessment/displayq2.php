@@ -210,7 +210,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			} else {
 				if (count($anstypes)>1) {
 					if ($qnpointval==0) {$qnpointval=1;}
-					$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),2));
+					$answeights = array_fill(0,count($anstypes)-1,round($qnpointval/count($anstypes),3));
 					$answeights[] = $qnpointval-array_sum($answeights);
 					foreach ($answeights as $kidx=>$vval) {
 						$answeights[$kidx] = $vval/$qnpointval;
@@ -221,6 +221,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}
 		$laparts = explode("&",$la);
+		
 		foreach ($anstypes as $kidx=>$anstype) {
 			$qcol = ($qdata['qtype']=="multipart" && isset($qcolors[$kidx]))?(is_numeric($qcolors[$kidx])?rawscoretocolor($qcolors[$kidx],$answeights[$kidx]):$qcolors[$kidx]):'';
 			list($answerbox[$kidx],$entryTips[$kidx],$shanspt[$kidx],$previewloc[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qnidx+1,$qcol);
@@ -718,7 +719,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
-
+	
 	if (isset($choices) && !isset($questions)) {
 		$questions =& $choices;
 	}
@@ -731,6 +732,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 		$anstypes = array_map('trim', $anstypes);
 	}
+	
 	if (isset($reqdecimals)) {
 		if (is_array($reqdecimals)) {  
 			foreach ($reqdecimals as $kidx=>$vval) {
