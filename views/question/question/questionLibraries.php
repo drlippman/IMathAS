@@ -1,10 +1,10 @@
 <?php
 use app\components\AppConstant;
 use app\models\Libraries;
+use app\components\AppUtility;
 global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
 $libtreeshowchecks = false;
-
-if (isset($params['libtree']) && $params['libtree']=="popup") {
+if ($params['libtree'] && $params['libtree']=="popup") {
     $isAdmin = false;
     $isGrpAdmin = false;
     if (isset($params['cid']) && $params['cid'] == "admin") {
@@ -47,7 +47,7 @@ echo "var select = '$select';\n";
 if (isset($_GET['type'])) {
     echo "var treebox = '{$_GET['type']}';\n";
 } else {
-    echo "var treebox = 'checkbox';\n";
+    echo "var treebox = 'radio';\n";
 }
 
 
@@ -57,7 +57,6 @@ if (isset($params['selectrights'])) {
     $selectrights = 0;
 }
 $allsrights = 2+3*$selectrights;
-$libraryData = Libraries::getAllLibrariesByJoin();
 
 $rights = array();
 $sortorder = array();
@@ -104,17 +103,23 @@ if (isset($params['locklibs']) && $params['locklibs']!='') {
 $checked = array_merge($checked,$locked);
 $toopen = array();
 
+
+//[
+//    [0,8,"Unassigned",0,0]],[1,8,'Examples',,],[2,8,'Examples123',,],[5,8,'abc',,1]]
+
 echo "var tree = {\n";
 echo " 0:[\n";
 $donefirst[0] = 2;
 if ($params['type']=="radio" && $select == "child") {
     echo "[0,8,\"Unassigned\",0,";
-    if (in_array(0,$checked)) { echo "1";} else {echo "0";}
-    echo "]";
+    if (in_array(0,$checked)) {
+        echo "1]";
+    } else {
+        echo "0]";
+    }
 } else {
     echo "[0,8,\"Unassigned\",0,0]";
 }
-echo "]";
 
 if (isset($ltlibs[0])) {
     if (isset($base)) {
@@ -231,6 +236,7 @@ if (isset($base)) {
         echo "<div class='r8 col-md-12 margin-top-ten padding-left-zero'>Root</div>";
     }
 }
+
 echo "<div class='col-md-12 padding-left-zero' id=tree></div>";
 echo "<script type=\"text/javascript\">\n";
 echo "function initlibtree(showchecks) {";
@@ -275,11 +281,6 @@ for ($i=0;$i<count($expand);$i++) {
 }
 echo "}";
 
-if (isset($libtreeshowchecks) && $libtreeshowchecks == false) {
-    echo "addLoadEvent(function() {initlibtree(false);})";
-} else {
-    echo "addLoadEvent(function() {initlibtree(true);})";
-}
 echo "}";
 echo "</script>\n";
 
@@ -292,7 +293,7 @@ $colorcode .= "<div class='margin-top-five'><span class=r1>Closed to group, priv
 $colorcode .= "<div class='margin-top-five'><span class=r0>Private</span></div></div>";
 if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
     echo <<<END
-<input type=button value="Use Libraries" onClick="setlib(this.form)">
+<input type=button value="Use Libraries" onClick="setlib(this.form);">
 $colorcode
 </form>
 END;
@@ -300,6 +301,10 @@ END;
     echo $colorcode;
 }
 ?>
+
 <script>
+    $(window).load(function() {
+        initlibtree(true);
+    });
     var itemarray = <?php echo 0; ?>;
 </script>

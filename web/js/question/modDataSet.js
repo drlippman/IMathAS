@@ -1,4 +1,5 @@
 function libselect() {
+    console.log('udhar');
     window.open('library-tree?libtree=popup&cid=<?php echo $course->id;?>&selectrights=1&libs='+curlibs+'&locklibs='+locklibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }
 function setlib(libs) {

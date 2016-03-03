@@ -18,28 +18,26 @@ var tree = {
 var treebox = "checkbox";
 var select = "child";
 */
-
 var showlibtreechecks = true;
 
-function buildbranch(parentid) { 
-        var outnode = document.createElement("ul"); 
-	if (parentid==0) {
+function buildbranch(parentid) {
+    var outnode = document.createElement("ul");
+    if (parentid==0) {
 		outnode.className = "base";
 	} else {
 		outnode.className = 'show'; 
 	}
-	outnode.id = parentid;
+    outnode.id = parentid;
         for (var i=0; i<tree[parentid].length; i++) { 
                 node = document.createElement("li"); 
                 node.id = 'li'+tree[parentid][i][0]; 
-		dashspan = document.createElement("span"); 
-		if (tree[tree[parentid][i][0]]==null && (select=="parent" || treebox=="radio"))  {
+		dashspan = document.createElement("span");
+            if (tree[tree[parentid][i][0]]==null && (select=="parent" || treebox=="radio"))  {
 			dashspan.appendChild(document.createTextNode('---'));
 		} else {
 			dashspan.appendChild(document.createTextNode('-'));
 		}
-		 
-		dashspan.className = 'dd'; 
+		dashspan.className = 'dd';
 		node.appendChild(dashspan);
 		
                 if (treebox == "checkbox") { 
@@ -120,12 +118,13 @@ function addbranch(id) {
 		document.getElementById('b'+id).innerHTML = '-';
 		addtoli.appendChild(buildbranch(id));
 	} catch (er) {}
-} 
+}
+
 function setlib() {
-	var frm = document.getElementById("libselectform");
-	var cnt = 0;
+   	var frm = document.getElementById("libselectform");
+    var cnt = 0;
 	var chlibs = new Array();
-	var chlibsn = new Array();
+	var chlibsn = new Array()
 	for (i = 0; i <= frm.elements.length; i++) {
 		try{
 			if(frm.elements[i].name == 'libs[]' || frm.elements[i].name=='libs') {
@@ -137,16 +136,15 @@ function setlib() {
 			}
 		} catch(er) {}
 	}
-	if (opener) {
-	opener.setlib(chlibs.join(","));
-	opener.setlibnames(chlibsn.join(", "));
-	self.close();
+    if (opener) {
+    opener.setlib(chlibs.join(","));
+    opener.setlibnames(chlibsn.join(", "));
+    self.close();
 	} else {
 		top.setlib(chlibs.join(","));
 		top.setlibnames(chlibsn.join(", "));
 		top.GB_hide();
 	}
-	
 }
 
 function uncheckall(frm) {

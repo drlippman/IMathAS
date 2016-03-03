@@ -815,7 +815,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->listperpage = $perpage;
             $user->hasuserimg = $chguserimg;
             $user->save();
-            return $user;
+           return $user;
         }
     }
 

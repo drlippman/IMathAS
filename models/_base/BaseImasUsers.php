@@ -53,7 +53,7 @@ use Yii;
  * @property ImasWikiViews[] $imasWikiViews
  * @property McMsgs[] $mcMsgs
  */
-class BaseImasUsers extends \yii\db\ActiveRecord
+class   BaseImasUsers extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc

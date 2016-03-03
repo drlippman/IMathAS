@@ -227,6 +227,7 @@ switch ($action) {
             echo "  window.open('$imasroot/course/libtree2.php?libtree=popup&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));";
             echo " }";
             echo "function setlib(libs) {";
+            echo "console.log(libs);";
             echo "  document.getElementById(\"libs\").value = libs;";
             echo "  curlibs = libs;";
             echo "}";
@@ -239,7 +240,7 @@ switch ($action) {
                 <div class='col-md-2 col-sm-3 padding-top-pt-five-em padding-right-zero'>Default question library</div>
                 <div class='col-md-9 col-sm-8'>
                     <span class='col-md-2 col-sm-3 padding-top-pt-five-em padding-left-zero' id="libnames"> <?php echo $lName ?> </span>
-                    <input type=hidden name=\"libs\" id=\"libs\"  value="<?php echo $line['deflib'] ?>" >
+                    <input type=hidden name="libs" id="libs"  value="<?php echo $line['deflib']; ?>" >
                     <div class='col-md-2 col-sm-4 padding-left-zero'>
                         <input type=button value="Select Library" onClick="libselect()">
                     </div>

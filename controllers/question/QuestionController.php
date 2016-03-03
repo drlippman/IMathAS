@@ -1138,10 +1138,8 @@ class QuestionController extends AppController
         $params = $this->getRequestParams();
         $myRights = $user['rights'];
         $libraryData = Libraries::getAllLibrariesByJoin();
-
         $libraryTree = array();
         foreach($libraryData as $singleLibrary){
-
             if(!empty($singleLibrary['id'])){
 
 //                [id] => 4
@@ -1172,13 +1170,11 @@ class QuestionController extends AppController
                 else{
                     array_push($libraryTree[$singleLibrary['parent']]['branch'], $singleLibrary);
                 }
-//                $libraryTree[$singleLibrary['parent']]['branch'] = $singleLibrary;
+                $libraryTree[$singleLibrary['parent']]['branch'] = $singleLibrary;
             }
         }
-
-        //
-//        $this->includeCSS(['question/libtree.css']);
-//        $this->includeJS(['general.js', 'question/libtree2.js']);
+        $this->includeCSS(['question/libtree.css']);
+        $this->includeJS(['general.js', 'question/libtree2.js']);
         $renderData = array('myRights' => $myRights, 'params' => $params, 'libraryData' => $libraryData);
         return $this->renderWithData('questionLibraries', $renderData);
     }
@@ -3084,7 +3080,7 @@ class QuestionController extends AppController
             }
         }
         $this->includeCSS(['question/question.css', 'question/libtree.css', 'dataTables.bootstrap.css']);
-        $this->includeJS(['general.js', 'tablesorter.js', 'question/junkflag.js', 'question/libtree2.js', 'question/manageQuestionSet.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
+        $this->includeJS(['general.js', 'tablesorter.js', 'question/junkflag.js','question/libtree2.js', 'question/manageQuestionSet.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
         $renderData = array('params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchLibs, 'curBreadcrumb' => $curBreadcrumb,
             'pagetitle' => $pageTitle, 'helpicon' => $helpIcon, 'cid' => $cid, 'tlist' => $tList, 'page_transferUserList' => $pageTransferUserList,
             'clist' => $cList, 'page_adminMsg' => $pageAdminMsg, 'lnames' => $lNames, 'search' => $search, 'searchall' => $searchAll, 'searchmine' => $searchMine,
