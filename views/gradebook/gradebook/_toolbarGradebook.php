@@ -3,18 +3,17 @@ use app\components\AppUtility;
 ?>
 <div class="roster-nav-tab">
     <ul class="nav nav-tabs aligned sub-menu-bar-nav">
+        <?php
+        if ($data['isDiagnostic']) { ?>
+            <li>     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a> </li>
+        <?php } ?>
         <?php if($isTeacher){?>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Offline Grades');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width">
                 <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id.'&gbitem=new&grades=all'); ?>"><?php AppUtility::t('Add Offline Grades');?></a></li>
                 <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/manage-offline-grades?cid=' . $course->id); ?>"><?php AppUtility::t('Manage Offline Grades');?></a></li>
-                 <?php
-                if ($data['isDiagnostic']) { ?>
-                <li>     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a> </li>
-                <?php } ?>
             </ul>
-
         </li>
         <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' . $course->id.'&studentId=-1'); ?>"><?php AppUtility::t('Averages');?></a></li>
         <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid=' . $course->id . "&stu=0"); ?>"><?php AppUtility::t('Comments');?></a></li>

@@ -66,7 +66,7 @@ $stu = $data['defaultValuesArray']['studentId']
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
     }?>
 </div>
-<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data, 'isTeacher' => $isTeacher]); ?>
+<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor]); ?>
 <div class="tab-content shadowBox col-md-12 col-sm-12">
 <div class="inner-content-gradebook">
 <div class="button-container col-md-12 col-sm-12 padding-zero">
@@ -289,7 +289,6 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                 $n++;
             }
         }
-
     }
     if ($data['catFilter'] > -2) {
     for ($i = 0; $i < count($gradebook[0][1]); $i++) { //assessment headers
@@ -355,21 +354,26 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>"><?php AppUtility::t('[Isolate]')?></a>
                     </li>
                 <?php }
-            } else if ($gradebook[0][1][$i][6] == 1 && ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$i][8] == 1))) { //offline
-                if ($data['isTeacher'])
-                {  ?>
-                    <li>
-                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
-                    </li>
-                    <li>
-                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
-                    </li>
-                <?php } else { ?>
-                    <li>
-                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
-                    </li>
-                <?php }
-            } else if ($gradebook[0][1][$i][6] == 2 && $data['isTeacher'])
+            } else if ($gradebook[0][1][$i][6] == 1 ) {
+                if($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1)) { //offline
+                    if ($stu == -1)
+                    {
+                        if (isset($gradebook[1][1][$i][0])) {?>
+                        <li>
+                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
+                        </li>
+                        <li>
+                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
+                        </li>
+                    <?php }
+                    } else { ?>
+                        <li>
+                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
+                        </li>
+                    <?php }
+                }
+            }
+          else if ($gradebook[0][1][$i][6] == 2 && $data['isTeacher'])
             { //discussion ?>
                 <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>

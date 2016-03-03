@@ -135,7 +135,7 @@ $urlmode = AppUtility::urlMode();
         <?php
         $alt = 0;
         $numstu = 0;
-
+if(!empty($resultDefaultUserList)) {
         foreach($resultDefaultUserList as $line) {
 
             if ($line['section']==null) {
@@ -219,6 +219,7 @@ $urlmode = AppUtility::urlMode();
             </td>
 			</tr>
 <?php
+        }
         }
         ?>
 

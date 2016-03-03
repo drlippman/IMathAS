@@ -66,18 +66,20 @@ class GradebookController extends AppController
 
     public function actionGradebook()
     {
-        global $get;
+        global $get, $sel1name, $sel2name, $canviewall,$courseId,$isTeacher, $isTutor,$userId;
         $this->guestUserHandler();
         $this->layout = "master";
         $user = $this->user;
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
+        $stu = $this->getParamVal('stu');
         $countPost = $this->getNotificationDataForum($courseId, $user);
         $msgList = $this->getNotificationDataMessage($courseId, $user);
         $this->setSessionData('messageCount', $msgList);
         $this->setSessionData('postCount', $countPost);
         $course = Course::getById($courseId);
         $isTeacher = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
         if (isset($params['refreshdef']) && isset($sessionData[$courseId.'catcollapse'])) {
@@ -99,13 +101,13 @@ class GradebookController extends AppController
         $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
         $this->includeJS(['general.js', 'gradebook/gradebook.js','gradebook/tablescroller2.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course,'overridecollapse' => $overridecollapse, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData,
-        'isTeacher' => $isTeacher);
+        'isTeacher' => $isTeacher, 'stu' => $stu, 'isTutor' => $isTutor);
         return $this->renderWithData('gradebook', $responseData);
     }
 
     public function gbtable($userId, $courseId, $studentId = null)
     {
-        global $get,$timefilter,$lnfilter,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport;
+        global $get,$timefilter,$lnfilter,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport,$sel1name, $sel2name, $canviewall, $courseId,$isTutor, $isTeacher, $userId,$catfilter;
         $params = $get;
         $teacherid = Teacher::getByUserId($userId, $courseId);
         $tutorid = Tutor::getByUserId($userId, $courseId);
@@ -176,7 +178,7 @@ class GradebookController extends AppController
                 $catfilter = -1;
             }
 
-            if (isset($tutorsection) && $tutorsection!='') {
+            if (($tutorsection) && $tutorsection!='') {
                 $secfilter = $tutorsection;
             } else {
                 if (isset($params['secfilter'])) {
