@@ -191,7 +191,7 @@ $page_tutorSelect['val'] = array(2, 0, 1);
     </div>
     <div class="col-sm-4 col-md-4">
         <div class="col-sm-12 col-md-12 padding-zero">
-            <?php AssessmentUtility::writeHtmlSelect('rubric', $rubricsId, $rubricsLabel, 0, 'None', 0); ?>
+            <?php AssessmentUtility::writeHtmlSelect('rubric', $rubricsId, $rubricsLabel, $rubric); ?>
         </div>
 
         <div class="col-sm-12 col-md-12 padding-zero padding-top-fifteen">

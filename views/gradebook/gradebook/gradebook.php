@@ -201,7 +201,7 @@ if ($gradebook[0][0][$i] == 'Section' || $gradebook[0][0][$i] == 'Code' || $grad
     echo '<th><div>';
 }
 echo $gradebook[0][0][$i];
-if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$data['isTutor'] || $data['tutorSection'] == ' ')) { ?>
+if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$isTutor || $data['tutorSection'] == ' ')) { ?>
 <br/><select id="secfiltersel" style="color: #000000" onchange="chgsecfilter()"><option value="-1"
     <?php if ($secfilter==-1) {echo  'selected=1';}
     echo  '>All</option>';
@@ -250,7 +250,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
     if ($data['totOnLeft'] && !$hidepast) {
         //total totals
         if ($data['catFilter'] < 0) {
-            if (isset($gradebook[0][3][0])) { //using points based
+            if (($gradebook[0][3][0])) { //using points based
                 echo '<th><div><span class="cattothdr">' . AppUtility::t('Total', false) . '<br/>' . $gradebook[0][3][$data['availShow']] . '&nbsp;' . AppUtility::t('pts', false) . '</span></div></th>';
                 echo '<th><div>%</div></th>';
                 $n += 2;
@@ -276,7 +276,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                     }
                 } else if ($data['availShow'] == 3) { //past and attempted
                     echo $gradebook[0][2][$i][0];
-                    if (isset($gradebook[0][2][$i][11])) {
+                    if (($gradebook[0][2][$i][11])) {
                         echo '<br/>' . $gradebook[0][2][$i][11] . '%';
                     }
                 }
@@ -292,7 +292,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
     }
     if ($data['catFilter'] > -2) {
     for ($i = 0; $i < count($gradebook[0][1]); $i++) { //assessment headers
-    if (!$data['isTeacher'] && !$data['isTutor'] && $gradebook[0][1][$i][4] == 0) { //skip if hidden
+    if (!$isTeacher && !$isTutor && $gradebook[0][1][$i][4] == 0) { //skip if hidden
         continue;
     }
     if ($data['hideNC'] == 1 && $gradebook[0][1][$i][4] == 0) { //skip NC
@@ -335,63 +335,59 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
 
             <?php //links
             if ($gradebook[0][1][$i][6] == 0) { //online
-                if ($data['isTeacher'])
+                if ($isTeacher)
                 { ?>
                     <li>
                         <a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?> "> <?php AppUtility::t('[Settings]') ?> </a>
                     </li>
                     <li>
-                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]' ) ?></a>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
-                    <!--                --><?php //if ($gradebook[0][1][$i][10] == true)
-//                { ?>
+                                    <?php if ($gradebook[0][1][$i][10] == true)
+                { ?>
                     <li>
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7])?>"><?php AppUtility::t('[By Group]' )?></a>
                     </li>
-                    <!--                --><?php //}
+                <?php }
                 } else { ?>
                     <li>
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>"><?php AppUtility::t('[Isolate]')?></a>
                     </li>
                 <?php }
-            } else if ($gradebook[0][1][$i][6] == 1 ) {
-                if($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1)) { //offline
-                    if ($stu == -1)
-                    {
-                        if (isset($gradebook[1][1][$i][0])) {?>
+            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) {
+               //offline
+                    if ($isTeacher)
+                    { ?>
+
                         <li>
                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
                         </li>
                         <li>
                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
                         </li>
-                    <?php }
-                    } else { ?>
+                  <?php  } else { ?>
                         <li>
                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
                         </li>
                     <?php }
-                }
-            }
-          else if ($gradebook[0][1][$i][6] == 2 && $data['isTeacher'])
-            { //discussion ?>
+            } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher) { //discussion ?>
                 <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
                 </li>
-            <?php } else if ($gradebook[0][1][$i][6] == 3 && $data['isTeacher'])
+            <?php } else if ($gradebook[0][1][$i][6] == 3 && $isTeacher)
             { //exttool ?>
                 <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?PHP AppUtility::t('[Settings]')?></a>
                 </li>
                 <li>
-                    <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$i][7].'&isolate=true')?>"> <?php AppUtility::t('[Isolate]') ?></a>
+                    <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$i][7].'&isolate=true', false)?>"> <?php AppUtility::t('[Isolate]') ?></a>
                 </li>
             <?php } ?>
 
         </ul> </div></div></th>
 <?php   $n++;
-}
-}
+        }
+    }
 if (!$data['totOnLeft'] && !$hidepast) {
     if (count($gradebook[0][2]) > 1 || $data['catFilter'] != -1) { //want to show cat headers?
         for ($i = 0; $i < count($gradebook[0][2]); $i++) { //category headers
@@ -452,7 +448,7 @@ if ($i % 2 != 0) {
     echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 }
 echo '<td class="locked" scope="row"><div class="trld">';
-if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) { ?>
+if ($gradebook[$i][0][0] != "Averages" && $isTeacher) { ?>
     <div class="checkbox override-hidden">
         <label>
             <input type="checkbox" name='checked' value='<?php echo $gradebook[$i][4][0] ?>'/>
