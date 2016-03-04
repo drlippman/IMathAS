@@ -331,7 +331,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
            href="javascript:void(0);">
             <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" style="position: relative">
 
             <?php //links
             if ($gradebook[0][1][$i][6] == 0) { //online
@@ -343,15 +343,15 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                     <li>
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
-                                    <?php if ($gradebook[0][1][$i][10] == true)
-                { ?>
+                    <?php if ($gradebook[0][1][$i][10] == true) { ?>
                     <li>
-                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7])?>"><?php AppUtility::t('[By Group]' )?></a>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-group?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "><?php AppUtility::t('[By Group]')?></a>
                     </li>
                 <?php }
-                } else { ?>
+                } else {
+                    ?>
                     <li>
-                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?>"><?php AppUtility::t('[Isolate]')?></a>
+                        <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
                 <?php }
             } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) {
@@ -367,7 +367,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         </li>
                   <?php  } else { ?>
                         <li>
-                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?>"> <?php AppUtility::t('[Scores]')?>
+                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "> <?php AppUtility::t('[Scores]')?>
                         </li>
                     <?php }
             } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher) { //discussion ?>
@@ -377,10 +377,10 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
             <?php } else if ($gradebook[0][1][$i][6] == 3 && $isTeacher)
             { //exttool ?>
                 <li>
-                    <a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?PHP AppUtility::t('[Settings]')?></a>
+                    <a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?php AppUtility::t('[Settings]')?></a>
                 </li>
                 <li>
-                    <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$i][7].'&isolate=true', false)?>"> <?php AppUtility::t('[Isolate]') ?></a>
+                    <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$i][7].'&isolate=true')?> "> <?php AppUtility::t('[Isolate]') ?></a>
                 </li>
             <?php } ?>
 

@@ -114,6 +114,8 @@ class GradebookController extends AppController
         $tutorsection = trim($tutorid->section);
         $sectionQuery = Student::findDistinctSection($courseId);
         $istutor = false;
+        $isteacher = $isTeacher;
+        $istutor = $isTutor;
         if (($teacherid)) {
             $isteacher = true;
         }
@@ -2431,7 +2433,11 @@ class GradebookController extends AppController
                     Rubrics::updateRubrics($params,$rubgrp,$rubricstring, $params['id']);
                 } else {
                     $rubricEntry = new Rubrics();
-                    $rubricEntry->insertInToRubric($currentUser['id'],$params,$rubgrp,$rubricstring);
+                    $createdRubric = $rubricEntry->insertInToRubric($currentUser['id'],$params,$rubgrp,$rubricstring);
+                    if($createdRubric->errors['name']){
+                        $this->setErrorFlash('Name cannot be blank.');
+                        return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid='.$courseId.'&id=new'));
+                    }
                 }
                 $fromString = str_replace('&amp;','&',$fromString);
                 return $this->redirect('add-rubric?cid='.$courseId.$fromString);
