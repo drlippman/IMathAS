@@ -1140,7 +1140,6 @@ class AssessmentController extends AppController
         $userfullname = $user['FirstName'] . ' ' . $user['LastName'];
         global $temp, $CFG, $questions, $seeds, $showansduring, $testsettings, $qi, $rawscores, $timesontask, $isdiag, $courseId, $attempts, $scores, $bestscores, $noindivscores, $showeachscore, $reattempting, $bestrawscores, $firstrawscores, $bestattempts, $bestseeds, $bestlastanswers, $lastanswers, $bestquestions;
         $myrights = $user['rights'];
-
         if (!isset($CFG['TE']['navicons'])) {
             $CFG['TE']['navicons'] = array(
                 'untried' => 'te_blue_arrow.png',
@@ -1190,17 +1189,7 @@ class AssessmentController extends AppController
             if ($adata['avail'] == 0 && !($teacherid) && !($tutorid)) {
                 $assessmentclosed = true;
             }
-
             if (!$actas) {
-                if (($studentid)) {
-                    $contentArray['userid'] = $userid;
-                    $contentArray['courseid'] = $courseId;
-                    $contentArray['type'] = 'assess';
-                    $contentArray['typeid'] = $aid;
-                    $contentArray['viewtime'] = $now;
-                    $content = new ContentTrack();
-                    $content->createTrack($contentArray);
-                }
                 $row = Exceptions::getStartDateEndDate($userid, $aid);
                 if ($row != null) {
                     if ($now < $row['startdate'] || $row['enddate'] < $now) { //outside exception dates
@@ -1310,9 +1299,21 @@ class AssessmentController extends AppController
             $line = AssessmentSession::getAssessmentSessionData($userid, $getId);
 
             if ($line == null) {
+
                 /*
                  * starting test and get question set
                  */
+                if (($studentid)) {
+                    $contentArray['userid'] = $userid;
+                    $contentArray['courseid'] =$getCid;
+                    $contentArray['type'] = 'assess';
+                    $contentArray['typeid'] = $aid;
+                    $contentArray['info'] = '0';
+                    $contentArray['viewtime'] = $now;
+                    $content = new ContentTrack();
+                    $content->createTrack($contentArray);
+                }
+
                 if (trim($adata['itemorder']) == '') {
                     $this->setErrorFlash(AppConstant::NO_QUESTIONS);
                     return $this->redirect($this->previousPage());
@@ -1427,12 +1428,10 @@ class AssessmentController extends AppController
                 } else {
                     $sessiondata['timelimitmult'] = 1.0;
                 }
-
                 $this->writesessiondata($sessiondata, $sessionId);
                 session_write_close();
                 return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-test'));
             } else { //returning to test
-
                 $deffeedback = explode('-', $adata['deffeedback']);
                 if ($myrights < 6 || isset($teacherid) || isset($tutorid)) {  // is teacher or guest - delete out out assessment session
                     filehandler::deleteasidfilesbyquery2('userid', $userid, $aid, 1);
