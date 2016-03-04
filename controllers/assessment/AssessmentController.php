@@ -1138,7 +1138,7 @@ class AssessmentController extends AppController
         $studentid = $this->isStudent($user['id'], $courseId);
         $tutorid = $this->isTutor($user['id'], $courseId);
         $userfullname = $user['FirstName'] . ' ' . $user['LastName'];
-        global $temp, $CFG, $questions, $seeds, $showansduring, $testsettings, $qi, $rawscores, $timesontask, $isdiag, $courseId, $attempts, $scores, $bestscores, $noindivscores, $showeachscore, $reattempting, $bestrawscores, $firstrawscores, $bestattempts, $bestseeds, $bestlastanswers, $lastanswers, $bestquestions;
+        global $temp, $CFG, $questions, $seeds, $showansduring, $testsettings, $qi, $rawscores, $timesontask, $isdiag, $courseId, $attempts, $scores, $bestscores, $noindivscores, $showeachscore, $reattempting, $bestrawscores, $firstrawscores, $bestattempts, $bestseeds, $bestlastanswers, $lastanswers, $bestquestions,$testid;
         $myrights = $user['rights'];
         if (!isset($CFG['TE']['navicons'])) {
             $CFG['TE']['navicons'] = array(

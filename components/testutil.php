@@ -529,7 +529,7 @@ function recordtestdata($limit=false) {
 	
 	$now = time();
     $connection = Yii::$app->getDb();
-	if ($isreview) {
+    if ($isreview) {
 		if ($limit) {
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
 		} else {
@@ -544,7 +544,7 @@ function recordtestdata($limit=false) {
 			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
 			$query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist',questions='$questionlist' ";
 		}
-		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) { 
+        if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) {
 			//update lti record.  We only do this for single assessment placements
 			
 //			require_once("../components/ltioutcomes.php");
@@ -564,8 +564,9 @@ function recordtestdata($limit=false) {
 	} else {
 		$query .= "WHERE id='$testid' LIMIT 1";
 	}
-
     $connection->createCommand($query)->execute();
+
+
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
