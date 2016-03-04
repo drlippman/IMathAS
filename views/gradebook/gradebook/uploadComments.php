@@ -62,7 +62,7 @@ if (count($failures)>0) {
         <?php echo $form->field($model, 'fileHeaderRow')->radioList([AppConstant::NUMERIC_ZERO => AppUtility::t('No header', false),AppConstant::NUMERIC_ONE => AppUtility::t('Has 1 row header', false),AppConstant::NUMERIC_TWO => AppUtility::t('Has 2 row header', false)],['class' => 'file-has-header-row']);?>
     </div>
     <div class="col-md-12 col-sm-12 padding-bottom-fifteen comments-in-columns">
-        <?php echo $form->field($model, 'commentsColumn')->textInput(['class' => 'form-control width-twenty-per']);?>
+        <?php echo $form->field($model, 'commentsColumn')->textInput(['class' => 'form-control width-twenty-per','value' => '2']);?>
     </div>
 
     <div class="col-md-12 col-sm-12">
@@ -72,11 +72,11 @@ if (count($failures)>0) {
         <div class="col-md-9 col-sm-8 padding-left-zero">
             <div class="col-md-12 col-sm-12 padding-left-zero">
                 <div class="col-sm-8 col-md-5 padding-left-zero select-text-margin">
-                    <input type="radio" name="userIdType" value="0" checked="1">&nbsp;<b>
+                    <input type="radio" name="userIdType" value="2" checked="1">&nbsp;<b>
                     <?php AppUtility::t('Username (login name) in column')?></b>
                 </div>
                 <div class="col-sm-3 col-md-3 padding-left-zero padding-bottom-ten margin-left-minus-twenty">
-                    <input class="form-control" type="text" size="4" name="userNameCol">
+                    <input class="form-control" type="text" size="4" name="userNameCol" value="2">
                 </div>
             </div>
             <div class="col-md-12 col-sm-12 padding-left-zero padding-top-fifteen">
@@ -85,7 +85,7 @@ if (count($failures)>0) {
                     <span class="padding-left-five"><b><?php AppUtility::t('Lastname, Firstname in column')?></b></span>
                 </div>
                 <div class="col-sm-3 col-md-3 padding-left-zero margin-left-minus-twenty">
-                    <input class="form-control" type="text" size="4" name="fullNameCol">
+                    <input class="form-control" type="text" size="4" name="fullNameCol" value="1">
                 </div>
             </div>
         </div>

@@ -29,13 +29,13 @@ class ImportStudentForm extends Model
     public function rules()
     {
         return [
-            [['lastName'],'required','message' => AppUtility::t('Last name field cannot be blank', false)],
-            [['firstName'],'required','message' => AppUtility::t('First name field cannot be blank', false)],
-            [['emailAddress'],'required','message' => AppUtility::t('Email field cannot be blank', false)],
-            [['lastName'],'number','message' => AppUtility::t('Last name is in column  must be integer value', false)],
-            [['firstName'],'number','message' => AppUtility::t('First name is in column  must be integer value', false)],
-            [['emailAddress'],'number','message' => AppUtility::t('Email address is in column  must be integer value', false)],
-            ['file', 'required', 'message' => AppUtility::t('Upload the CSV file', false)],
+            [['lastName'],'required','message' => AppUtility::t('Last name field cannot be blank.', false)],
+            [['firstName'],'required','message' => AppUtility::t('First name field cannot be blank.', false)],
+            [['emailAddress'],'required','message' => AppUtility::t('Email field cannot be blank.', false)],
+            [['lastName'],'number','message' => AppUtility::t('Last name is in column  must be integer value.', false)],
+            [['firstName'],'number','message' => AppUtility::t('First name is in column  must be integer value.', false)],
+            [['emailAddress'],'number','message' => AppUtility::t('Email address is in column  must be integer value.', false)],
+            ['file', 'required', 'message' => AppUtility::t('Upload the CSV file.', false)],
             ['file', 'safe'],
             [['file'], 'file', 'extensions' => 'csv'],
         ];
