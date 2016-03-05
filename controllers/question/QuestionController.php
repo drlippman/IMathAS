@@ -1779,11 +1779,11 @@ class QuestionController extends AppController
                         $attempts = intval($params['attempts']);
                     }
                     if (trim($params['penalty']) == "") {
-                        $penalty = AppConstant::QUARTER_NINE;
+                        $penalty = AppConstant::QUARTER_NINE_STRING;
                     } else {
                         $penalty = intval($params['penalty']);
                     }
-                    if ($penalty != AppConstant::QUARTER_NINE) {
+                    if ($penalty != AppConstant::QUARTER_NINE_STRING) {
                         if ($params['skippenalty'] == AppConstant::NUMERIC_TEN) {
                             $penalty = 'L' . $penalty;
                         } else if ($params['skippenalty'] > AppConstant::NUMERIC_ZERO) {
@@ -1870,7 +1870,7 @@ class QuestionController extends AppController
                     if ($line['attempts'] == AppConstant::QUARTER_NINE) {
                         $line['attempts'] = '';
                     }
-                    if ($line['penalty'] == AppConstant::QUARTER_NINE) {
+                    if ($line['penalty'] == AppConstant::QUARTER_NINE_STRING) {
                         $line['penalty'] = '';
                     }
                 } else {
