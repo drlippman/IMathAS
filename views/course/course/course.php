@@ -65,7 +65,8 @@ if ((($myRights>10) && (!$backLink))) {?>
 
 <?php }
 ?>
-<?php if($user['rights'] == AppConstant::STUDENT_RIGHT){?>
+<?php if($user['rights'] == AppConstant::STUDENT_RIGHT){
+?>
 <div class="tab-content shadowBox student-course-setting">
     <?php } elseif($user['rights'] >= AppConstant::STUDENT_RIGHT) {?>
     <div class="tab-content shadowBox">

@@ -3095,7 +3095,7 @@ class AppUtility extends Component
            <?php $locked = Student::getStudentData($userId, $data[$i]['id']);
             echo '<li>';
             if ($type=='take') {
-                 ?>
+                ?>
                 <span class="delx" onclick="return hidefromcourselist(<?php echo $data[$i]['id'] ?>,this);" title="Hide from course list">x</span>
            <?php }
            if($locked['locked'] > 0){ ?>
@@ -3145,7 +3145,8 @@ class AppUtility extends Component
             ?>
 
         <?php echo '</div>';
-        } else if ($type=='teach' && $myRights > 39) { ?>
+        } else if ($type=='teach' && $myRights > 39) {
+        ?>
             <div class="center">
                 <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index') ?>">Admin
                     Page</a><br/><br/>

@@ -86,7 +86,7 @@ $now = $currentTime;
                         </span>
                         <span class="checkbox checkbox-thread override-hidden col-md-5 col-sm-5 padding-left-right-zero margin-left-right-zero">
                             <label class="margin-top-zero floatright padding-left-zero">
-                                <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forum in Courses?')?>
+                                <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forums in Courses?')?>
 
                                 <span class="cr"><i class="cr-icon fa fa-check"></i></span>
                             </label>

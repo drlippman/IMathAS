@@ -826,13 +826,13 @@ class AppController extends Controller
         if ($rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
             $this->setErrorFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
-        } else if ($rights > AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'index' || $actionPath == 'forms' || $actionPath == 'actions')) {
+        } else if ($rights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'index' || $actionPath == 'forms' || $actionPath == 'actions')) {
             return true;
         } else if ($rights >= AppConstant::GROUP_ADMIN_RIGHT && ($actionPath == 'add-new-user' || $actionPath == 'change-rights' || $actionPath == 'import-question-set'
                 || $actionPath == 'export-question-set' || $actionPath == 'manage-lib' || $actionPath == 'export-lib' || $actionPath == 'import-lib' || $actionPath = 'child-libs')
         ) {
             return true;
-        } else if ($rights > AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'diagnostics' || $actionPath == 'diag-one-time')) {
+        } else if ($rights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'diagnostics' || $actionPath == 'diag-one-time')) {
             return true;
         } else if ($rights == AppConstant::ADMIN_RIGHT && ($actionPath == 'external-tool')) {
             return true;
@@ -911,12 +911,12 @@ class AppController extends Controller
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $isStudent = $this->isStudent($user['id'], $courseId);
         $isTutor = $this->isTutor($user['id'], $courseId);
-        if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])) {
-            return true;
-        }
         if (($user['rights'] >= AppConstant::STUDENT_RIGHT) && ($actionPath == 'get-block-items' || $actionPath == 'course' || $actionPath == 'show-linked-text' || $actionPath == 'get-assessment-data-ajax') && ($teacherId || $isStudent || $isTutor)) {
             return true;
-        } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-link' || $actionPath == 'modify-inline-text' || $actionPath == 'copy-items-ajax' || $actionPath == 'delete-items-ajax' || $actionPath == 'save-quick-reorder') && $teacherId) {
+        }else if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])) {
+            return true;
+        }
+         else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-link' || $actionPath == 'modify-inline-text' || $actionPath == 'copy-items-ajax' || $actionPath == 'delete-items-ajax' || $actionPath == 'save-quick-reorder') && $teacherId) {
             return true;
         } else if (($user['rights'] >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && ($actionPath == 'add-remove-course'))) {
             return true;
