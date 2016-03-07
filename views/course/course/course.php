@@ -18,7 +18,21 @@ $studview= $sessionData['stuview'];
 if($studview>-1){
     $studview=1;
 }
-if ((($myRights>10) && (!$backLink))) {?>
+if($isStudent || $isTutor) {?>
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
+    </div>
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+        </div>
+    </div>
+    <div class="item-detail-content">
+        <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students, 'userId' => $user]);?>
+    </div>
+<?php }else if ((($teacherId)  && (!$backLink))) {?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
     </div>
@@ -36,20 +50,6 @@ if ((($myRights>10) && (!$backLink))) {?>
     </div>
     <div class="item-detail-content">
         <?php echo $this->render("_toolbarTeacher", ['course' => $course, 'section' => 'course']);?>
-    </div>
-<?php } elseif($myRights==10) {?>
-    <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
-    </div>
-    <div class = "title-container">
-        <div class="row">
-            <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?></div>
-            </div>
-        </div>
-    </div>
-    <div class="item-detail-content">
-        <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students, 'userId' => $user]);?>
     </div>
 <?php } elseif($teacherId && $backLink) { ?>
 <div class="item-detail-header">
@@ -71,7 +71,7 @@ if ((($myRights>10) && (!$backLink))) {?>
     <?php } elseif($user['rights'] >= AppConstant::STUDENT_RIGHT) {?>
     <div class="tab-content shadowBox">
     <?php }?>
-<?php if($teacherId){
+<?php if($teacherId && !$isStudent){
   ?>
     <div class="row course-copy-export col-md-12 col-sm-12 padding-left-right-zero">
         <div class="col-md-2 col-sm-2 course-top-menu">

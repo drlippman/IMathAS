@@ -62,7 +62,7 @@ class ShowItemCourse extends Component
                 $blocklist[] = $i+AppConstant::NUMERIC_ONE;
             }
         }
-        if ($canEdit)
+        if ($canEdit && !$isStudent)
         {
             echo ShowItemCourse::generateAddItem($parent,'t',$studview);
         }
@@ -91,7 +91,7 @@ class ShowItemCourse extends Component
                 }
 
                 $items[$i]['name'] = stripslashes($items[$i]['name']);
-                if ($canEdit && !$studview) {
+                if ($canEdit && !$studview && !$isStudent) {
                     echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
                 }
                 if ($items[$i]['startdate'] == AppConstant::NUMERIC_ZERO) {
@@ -185,7 +185,7 @@ class ShowItemCourse extends Component
                             echo "<br>$show ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) { ?>
+                        if ($canEdit && !$studview && !$isStudent) { ?>
                             <span class="instronly common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright"
                                data-toggle="dropdown" href="javascript:void(0);">
@@ -253,7 +253,7 @@ class ShowItemCourse extends Component
                             echo "<br>$show ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview ) { ?>
+                        if ($canEdit && !$studview && !$isStudent ) { ?>
 
                             <span class="instronly common-setting">
 
@@ -329,7 +329,7 @@ class ShowItemCourse extends Component
                             echo "<br>$show ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) {
+                        if ($canEdit && !$studview && !$isStudent) {
                            ?>
                             <span class="instronly common-setting margin-right-minus-fifteen">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright"
@@ -436,7 +436,7 @@ class ShowItemCourse extends Component
                             echo "<br><i>$show</i> ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) {
+                        if ($canEdit && !$studview && !$isStudent) {
                             ?>
                             <span class="instronly common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright"
@@ -494,7 +494,7 @@ class ShowItemCourse extends Component
                             echo "<br><i>$show</i> ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) {
+                        if ($canEdit && !$studview && !$isStudent) {
                              ?>
                             <span class="instronly common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright"
@@ -567,7 +567,7 @@ class ShowItemCourse extends Component
                             echo "<br><i>$show</i> ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) {
+                        if ($canEdit && !$studview && !$isStudent) {
                             ?>
                             <span class="instronly common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright"
@@ -638,7 +638,7 @@ class ShowItemCourse extends Component
              */
             $line = Items::getByItem($items[$i]);
 
-            if ($canEdit && !$studview) {
+            if ($canEdit && !$studview && !$isStudent) {
                 echo ShowItemCourse::generatemoveselect($i,count($items),$parent,$blocklist);
             }
             if ($line['itemtype'] == "Calendar") {
@@ -647,7 +647,7 @@ class ShowItemCourse extends Component
                 if ($isPublic) { continue;}
                 ShowItemCourse::beginitem($canEdit); ?>
 
-            <?php   if ($canEdit && !$studview) {
+            <?php   if ($canEdit && !$studview && !$isStudent) {
                     ?>
                     <a href="#" onclick="deleteItem('<?php echo $items[$i] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $courseId ;?>')"><?php AppUtility::t('Delete')?></a> |
                     <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $courseId); ?>">Manage Events</a>
@@ -834,7 +834,7 @@ class ShowItemCourse extends Component
                     if ($line['enddate'] != AppConstant::ALWAYS_TIME) {
                         echo "<BR> $endname $endDate \n";
                     }
-                    if ($canEdit && !$studview ) {
+                    if ($canEdit && !$studview  && !$isStudent) {
                         echo '<span class="instronly">';
                         if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
@@ -897,7 +897,7 @@ class ShowItemCourse extends Component
                        echo " <a href=\"#\">", _('Use LatePass'), "</a>"; ?>
                         <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' .$typeid.'&cid=' .$courseId. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $line['id']?>"> Use Late Pass</a>
                     <?php }
-                    if ($canEdit && !$studview) {
+                    if ($canEdit && !$studview && !$isStudent) {
                         echo '<span class="instronly">';
                         if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">LP</span> |';
@@ -955,7 +955,7 @@ class ShowItemCourse extends Component
                   <?php  echo '<span class="instrdates">';
                     echo "<br/><i>$show</i>\n";
                     echo '</span>';
-                    if ($canEdit && !$studview) {
+                    if ($canEdit && !$studview && !$isStudent) {
                         echo '<span class="instronly">';
                         if ($line['allowlate'] > AppConstant::NUMERIC_ZERO) {
                             echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
@@ -1079,7 +1079,7 @@ class ShowItemCourse extends Component
                             echo "<br/>$show ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) { ?>
+                        if ($canEdit && !$studview && !$isStudent) { ?>
                             <div class=" floatright common-setting">
                                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                    href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -1101,7 +1101,7 @@ class ShowItemCourse extends Component
                             echo "<br/>$show ";
                             echo '</span>';
                         }
-                        if ($canEdit && !$studview) { ?>
+                        if ($canEdit && !$studview && !$isStudent) { ?>
                             <div class=" floatright common-setting">
                                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                    href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -1161,7 +1161,7 @@ class ShowItemCourse extends Component
                     echo '<span class="instrdates">';
                     echo "<i>$show</i> ";
                     echo '</span>';
-                    if ($canEdit && !$studview) { ?>
+                    if ($canEdit && !$studview && !$isStudent) { ?>
                         <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -1306,7 +1306,7 @@ class ShowItemCourse extends Component
                         echo "<br/>$show ";
                         echo '</span>';
                     }
-                    if ($canEdit && !$studview) { ?>
+                    if ($canEdit && !$studview && !$isStudent) { ?>
 
                         <div class="floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
@@ -1348,7 +1348,7 @@ class ShowItemCourse extends Component
                     echo '<span class="instrdates">';
                     echo "<br/><i>$show</i> ";
                     echo '</span>';
-                    if ($canEdit && !$studview) { ?>
+                    if ($canEdit && !$studview && !$isStudent) { ?>
                         <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -1430,7 +1430,7 @@ class ShowItemCourse extends Component
                         echo "<br/>$show ";
                         echo '</span>';
                     }
-                    if ($canEdit && !$studview) { ?>
+                    if ($canEdit && !$studview && !$isStudent) { ?>
                         <div class="floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -1476,7 +1476,7 @@ class ShowItemCourse extends Component
                     echo "<br/><i>$show </i>";
                     echo '</span>';
 
-                    if ($canEdit && !$studview) { ?>
+                    if ($canEdit && !$studview && !$isStudent) { ?>
                         <div class=" floatright common-setting">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                                href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -1602,7 +1602,7 @@ class ShowItemCourse extends Component
                         echo "<br/>$show ";
                         echo '</span>';
                     }
-                    if ($canEdit && !$studview) {
+                    if ($canEdit && !$studview && !$isStudent) {
                         echo '<span class="instronly">';
                         $itemsTypeId = $items['typeid'];
                         ?>
@@ -1652,7 +1652,7 @@ class ShowItemCourse extends Component
                     echo '<span class="instrdates">';
                     echo "<br/><i>$show </i>";
                     echo '</span>';
-                    if ($canEdit && !$studview) {
+                    if ($canEdit && !$studview && !$isStudent) {
                         echo '<span class="instronly">';
                         ?>
                         <div class=" floatright common-setting">
@@ -1685,7 +1685,7 @@ class ShowItemCourse extends Component
             }
         }
         if (count($items) > AppConstant::NUMERIC_ZERO) {
-            if ($canEdit && !$studview)
+            if ($canEdit && !$studview && !$isStudent)
             {
                 echo ShowItemCourse::generateAddItem($parent,'b',$studview);
             }

@@ -54,6 +54,7 @@ class GbCats extends BaseImasGbcats
         $query->hidden = $hide;
         $query->calctype = $calcType;
         $query->save();
+        return $query;
     }
 
     public static function getByCourseIdAndOrderByName($courseId)
@@ -78,19 +79,10 @@ class GbCats extends BaseImasGbcats
         return self::find()->select(['id'])->where(['courseid'=>$courseId, 'name' => $name])->all();
     }
 
-    public function insertData($courseId,$data)
+    public static function insertData($courseId,$data)
     {
-        $this->courseid = $courseId;
-        $this->name = $data['name'];
-        $this->scale = $data['scale'];
-        $this->scaletype = $data['scaletype'];
-        $this->chop = $data['chop'];
-        $this->dropn = $data['dropn'];
-        $this->weight = $data['weight'];
-        $this->hidden = $data['hidden'];
-        $this->calctype = $data['calctype'];
-        $this->save();
-        return $this->id;
+        $obj = GbCats::createGbCat($courseId, $data['name'], $data['scale'], $data['scaletype'], $data['chop'], $data['dropn'], $data['weight'], $data['hidden'], $data['calctype']);
+        return $obj;
     }
 
     public static function updateData($rpId,$data)

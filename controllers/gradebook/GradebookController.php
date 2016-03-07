@@ -2811,7 +2811,6 @@ class GradebookController extends AppController
                     }
                 }
                 $hide = intval($params['hide'][$id]);
-
                 if (substr($id, 0, 3) == 'new') {
                     if (trim($name) != '') {
                         GbCats::createGbCat($course['id'], $name, $scale, $scaleType, $chop, $weight, $hide, $calcType);

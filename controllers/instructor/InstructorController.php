@@ -913,10 +913,12 @@ class InstructorController extends AppController
                                      $gbData= GbCats::getData($courseId,$data['name']);
                                      if(count($gbData) == AppConstant::NUMERIC_ZERO)
                                      {
-                                         $frId = array_shift($data);
-                                         $putValue = new GbCats();
-                                         $insertId = $putValue->insertData($courseId,$data);
-                                         $gbCats[$frId] = $insertId;
+                                         $frId = array_shift($query);
+                                         $gbCatsResult = GbCats::insertData($courseId,$data);
+                                         $insertId = $gbCatsResult->id;
+                                         if($insertId){
+                                             $gbCats[$frId['id']] = $insertId;
+                                         }
                                      }
                                      else
                                      {

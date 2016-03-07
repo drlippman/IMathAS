@@ -86,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?php
                     if ($params['ekey']=='')
                     {?>
-                        &nbsp;<a class="small" target="_blank" href="<?php echo AppUtility::getURLFromHome('course','course/index?cid='.$params['ctc'])?>"><?php AppUtility::t('Preview source course');?></a>
+                        &nbsp;<a class="small" target="_blank" href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$params['ctc'])?>"><?php AppUtility::t('Preview source course');?></a>
                    <?php }?>
                     <div id="allitemsnote">
                         <p><input type=checkbox name="copyofflinewhole"  value="1"/><?php AppUtility::t('Copy offline grade items');?></p>
