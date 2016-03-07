@@ -115,7 +115,7 @@ class GradebookController extends AppController
         $sectionQuery = Student::findDistinctSection($courseId);
         $istutor = false;
         $isteacher = $isTeacher;
-        $istutor = $isTutor;
+//        $istutor = $isTutor;
         if (($teacherid)) {
             $isteacher = true;
         }
@@ -458,7 +458,7 @@ class GradebookController extends AppController
         }
 
 //Pull Offline Grade item info
-        $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
+        $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $catfilter, $now);
         if ($gbItems) {
             foreach ($gbItems as $item) {
                 $grades[$kcnt] = $item['id'];

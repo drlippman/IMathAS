@@ -27,11 +27,11 @@ class GbItems extends BaseImasGbitems
         return $this;
     }
 
-    public static function findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now){
+    public static function findAllOfflineGradeItem($courseId, $canviewall, $istutor, $catfilter, $now){
         $query = new Query();
         $query->select(['*'])
             ->from('imas_gbitems')
-            ->where('courseid = :courseId');
+            ->where('courseid =:courseId');
         if (!$canviewall) {
             $query->andWhere(['<','showdate', $now]);
         }
@@ -47,7 +47,8 @@ class GbItems extends BaseImasGbitems
         }
         $query->orderBy('showdate');
         $command = $query->createCommand();
-        $data = $command->bindValue(':courseId',$courseId)->queryAll();
+        $data = $command->bindValue(':courseId',$courseId);
+        $data = $data->queryAll();
         return $data;
     }
 

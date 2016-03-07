@@ -238,23 +238,29 @@ if ($params['gbitem'] == 'new') { ?>
         <?php AppUtility::t('Assessment snapshot?')?>
     </div>
     <div class="col-sm-9 col-md-10 padding-left-zero">
-        <?php echo '<input class="margin-left-sixteen" type="checkbox" name="assesssnapaid" onclick="if(this.checked){this.nextSibling.style.display=\'\';document.getElementById(\'gradeboxes\').style.display=\'none\';}else{this.nextSibling.style.display=\'none\';document.getElementById(\'gradeboxes\').style.display=\'\';}"/>';
-        echo '<span style="display:none;"> <div class="col-sm-12 col-md-12 padding-top-twenty"><span class="assessment-name">';
+        <?php echo '<input class="margin-left-sixteen" type="checkbox" name="assesssnapaid" onclick="
+        if(this.checked){
+            this.nextSibling.style.display=\'\';
+            document.getElementById(\'gradeboxes\').style.display=\'none\';
+            }else{
+            this.nextSibling.style.display=\'none\';
+            document.getElementById(\'gradeboxes\').style.display=\'\';
+            }"/>';
+        echo '<span style="display:none;"> <div class="col-sm-12 col-md-12 padding-top-twenty"><span>Assessment to snapshot: </span><span class="assessment-name">';
         AssessmentUtility::writeHtmlSelect('assessment', $assessmentId, $assessmentLabel, 0);
         echo '</span></div>';
         ?>
         <div class="col-sm-12 col-md-12 padding-top-twenty">
-            <?php AppUtility::t('Grade type:')?>
+            <?php AppUtility::t('Grade type:')?><br/>
             <input class="margin-left-five" type="radio" name="assesssnaptype" value="0" checked="checked">
-        </div>
-        <div class="col-sm-12 col-md-12 padding-top-twenty">
-            <?php AppUtility::t('Current score')?>
+            <?php AppUtility::t('Current score')?><br/>
             <input class="margin-left-five" type="radio" name="assesssnaptype" value="1">
-        </div>
-        <div class="col-sm-12 col-md-12 padding-top-twenty">
-            <?php AppUtility::t('Participation give full credit if')?>
-            <input class="width-six-per form-control display-inline-block margin-left-five" type="text" name="assesssnapatt" value="100" size="3"><span class="margin-left-five"> % </span> <?php AppUtility::t('of problems attempted and')?>
-            <input class="width-six-per form-control display-inline-block margin-left-five" type="text" name="assesssnappts" value="0" size="3"><span class="margin-left-five"> <?php AppUtility::t('points earned')?></span>
+            <?php AppUtility::t('Participation give full credit if &ge;')?>
+            <div class="grade">
+            <input class="width-six-per form-control display-inline-block margin-left-five" id="grade-type" type="text" name="assesssnapatt" value="100" size="3">
+                <span class="margin-left-five"> % </span> <?php AppUtility::t('of problems attempted and &ge;')?>
+            <input id="grade-type" class="width-six-per form-control display-inline-block margin-left-five" type="text" name="assesssnappts" value="0" size="3">
+                <span class="margin-left-five"> <?php AppUtility::t('points earned')?></span></div>
         </div>
         <div class="col-sm-12 col-md-12 padding-top-twenty"><input type=submit value="Submit"/></div>
         </span>
@@ -283,7 +289,7 @@ if ($params['gbitem'] == 'new') { ?>
         </div>
     <?php }
 
-    echo '<div id="gradeboxes col-md-12 col-sm-12 padding-left-zero padding-right-zero">';
+    echo '<div id="gradeboxes" class="col-md-12 col-sm-12 padding-left-zero padding-right-zero">';
     echo '<div class="col-sm-12 col-md-12 padding-top-twenty">';
     echo '<div class="col-md-offset-2 col-sm-offset-3 col-sm-8 col-md-8 padding-left-six"><input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/><button class="margin-left-twenty" type="button" id="useqa" onclick="togglequickadd(this)">' . "Use Quicksearch Entry" . '</button> </div>';
     echo '</div>';
@@ -458,6 +464,9 @@ function printrubriclink($rubricid, $points, $scorebox, $feedbackbox, $qn = 'nul
     $(document).ready(function(){
         $(function() {
             $('.staticParent').on('keydown', '#child', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        })
+        $(function() {
+            $('.grade').on('keydown', '#grade-type', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
         })
     })
 
