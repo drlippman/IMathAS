@@ -96,7 +96,7 @@ function studentLock() {
                 width: 'auto', resizable: false,
                 closeText: "hide",
                 buttons: {
-                    "Yes, Lock Out Student": function () {
+                    "Confirm": function () {
                         $('#student-information-table input[name="student-information-check"]:checked, input[name = "header-checked"]:checked').each(function () {
                             $(this).prop('checked', false);
                         });
