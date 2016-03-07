@@ -694,6 +694,7 @@ class QuestionController extends AppController
                     /*
                      * list questions
                      */
+
                     $query = Assessments::getByAssessmentIds($sessionData['aidstolist' . $assessmentId]);
                     foreach ($query as $row) {
                         $aidNames[$row['id']] = $row['name'];
@@ -725,7 +726,6 @@ class QuestionController extends AppController
                             $queResult = Questions::getQuestionCount($row['qid']);
                             $times[$row['id']] = $queResult[COUNT('id')];
                         }
-
                         $pageAssessmentQuestions['desc'][$x] = $aidNames[$aidQuestion];
                         $y = AppConstant::NUMERIC_ZERO;
                         foreach ($aidItems[$aidQuestion] as $qid) {

@@ -143,13 +143,11 @@ class Questions extends BaseImasQuestions
 
     public static function getByAssessmentIdJoin($aidq)
     {
-        $query  = new Query();
-        $query->select('imas_questions.id,imas_questionset.id AS qid,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid')
-            ->from('imas_questionset,imas_questions,imas_users')
-            ->where('imas_questionset.id=imas_questions.questionsetid')
-            ->andWhere('imas_questionset.ownerid=imas_users.id')
-            ->where('imas_questions.assessmentid = :aidq');
-        $data = $query->createCommand()->bindValue(':aidq',$aidq)->queryAll();
+
+        $query = "SELECT imas_questions.id,imas_questionset.id AS qid,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid
+        FROM imas_questionset,imas_questions,imas_users";
+        $query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
+        $data=\Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
 
