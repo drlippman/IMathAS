@@ -114,7 +114,7 @@ switch ($action) {
 
         <div class="col-md-12 col-sm-12 col-xs-12 padding-left-zero padding-top-one-em">
             <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9">
-                <input type=checkbox id=msgnot name=msgnot <?php if ($line['msgnotify']==1) {echo "checked=1";} ?> />
+                <input type=checkbox id="msgnot" name="msgnot" <?php if ($line['msgnotify']==1) {echo "checked=1";} ?> />
                 <label for="msgnot"><?php AppUtility::t('Notify me by email when I receive a new message') ?></label>
             </div>
         </div>

@@ -747,13 +747,13 @@ class SiteController extends AppController
                     $pagelayout[$k] = explode(',',$v);
                 }
             }
+
             $showNewMsgNote = in_array(0,$pagelayout[3]);
 
             $showNewPostNote = in_array(1,$pagelayout[3]);
 
             $showMessagesGadget = (in_array(10,$pagelayout[1]) || in_array(10,$pagelayout[0]) || in_array(10,$pagelayout[2]));
             $showPostsGadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) || in_array(11,$pagelayout[2]));
-
             $twoColumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
             /**
              * check for new posts in courses being taken
@@ -769,27 +769,34 @@ class SiteController extends AppController
              * check for new message in courses being taken
              */
             $newMsgCnt = array();
-            if ($showMessagesGadget) {
-
-                $result = Message::getNewMessageData($user->id);
-                foreach($result as $key => $line) {
-                    if (!($newMsgCnt[$line['courseid']])) {
-                        $newMsgCnt[$line['courseid']] = 1;
-                    } else {
-                        $newMsgCnt[$line['courseid']]++;
-                    }
-                    $page_newmessagelist[] = $line;
+//            if ($showMessagesGadget) {
+//                $result = Message::getNewMessageData($user->id);
+//                foreach($result as $key => $line) {
+//                    if (!($newMsgCnt[$line['courseid']])) {
+//                        $newMsgCnt[$line['courseid']] = 1;
+//                    } else {
+//                        $newMsgCnt[$line['courseid']]++;
+//                    }
+//                    $page_newmessagelist[] = $line;
+//                }
+//            } else {
+//                /**
+//                 * check for new messages
+//                 */
+//                $result = Message::getUserById($user->id);
+//                foreach($result as $key => $row){
+//                    $newMsgCnt[$row['courseid']] = $row['COUNT(id)'];
+//                }
+//            }
+            $result = Message::getNewMessageData($user->id);
+            foreach($result as $key => $line) {
+                if (!($newMsgCnt[$line['courseid']])) {
+                    $newMsgCnt[$line['courseid']] = 1;
+                } else {
+                    $newMsgCnt[$line['courseid']]++;
                 }
-            } else {
-                /**
-                 * check for new messages
-                 */
-                $result = Message::getUserById($user->id);
-                foreach($result as $key => $row){
-                    $newMsgCnt[$row['courseid']] = $row['COUNT(id)'];
-                }
+                $page_newmessagelist[] = $line;
             }
-
             $page_studentCourseData = array();
 
             /**
@@ -865,7 +872,7 @@ class SiteController extends AppController
             $postcidlist = $postcheckcids;
             $postThreads = array();
 
-            if ($showPostsGadget && count($postcheckcids) > AppConstant::NUMERIC_ZERO) {
+            if (count($postcheckcids) > AppConstant::NUMERIC_ZERO) {
                 $newPost = ForumThread::getNewPost($postcidlist, $user->id);
                 foreach($newPost as $key => $line) {
                     if (!isset($newPostCnt[$line['courseid']])) {
@@ -892,7 +899,7 @@ class SiteController extends AppController
             $poststucidlist = $postcheckstucids;
             $now = time();
 
-            if ($showPostsGadget && count($postcheckstucids) > AppConstant::NUMERIC_ZERO) {
+            if (count($postcheckstucids) > AppConstant::NUMERIC_ZERO) {
                 $result = ForumThread::getNewPostData($poststucidlist, $now, $user->id);
                 foreach($result as $key => $line) {
                     if (!isset($newPostCnt[$line['courseid']])) {
@@ -1124,7 +1131,6 @@ class SiteController extends AppController
             } else {
                 $msgNot = AppConstant::NUMERIC_ZERO;
             }
-
             if (isset($params['qrd']) || $myRights < AppConstant::TEACHER_RIGHT) {
                 $qRightsDef = AppConstant::NUMERIC_ZERO;
             } else {

@@ -211,10 +211,14 @@ $pagetitle =$line['name'];
     }
 </script>
 <?php
-} } }
-
-if (!preg_match($pattern, $params['SID']))
-{
-    echo $html;
+        }
+    }
 }
+if(!empty($params['SID'])){
+    if (!preg_match($pattern, $params['SID']))
+    {
+        echo $html;
+    }
+}
+
 ?>

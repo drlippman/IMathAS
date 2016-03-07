@@ -80,10 +80,11 @@ class Rubrics extends BaseImasRubrics
     {
         $this->ownerid = $currentUserId;
         $this->name = $params['rubname'];
-        $this->rubrictype = $params['rubtype'];
+        $this->rubrictype = isset($params['rubtype']) ? $params['rubtype']: null;
         $this->groupid = $rubgrp;
         $this->rubric = $rubricstring;
         $this->save();
+        return $this;
     }
 
     public static function getByOwnerId($userId,$groupId)

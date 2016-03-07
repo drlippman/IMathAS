@@ -34,9 +34,6 @@ use app\components\AssessmentUtility;
             </div>
         </div>
     </div>
-    <div class="item-detail-content">
-        <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']); ?>
-    </div>
 <div class="tab-content shadowBox">
 
 
@@ -84,7 +81,8 @@ if ($overwriteBody==1) {
 
             <?php echo '<div class="col-sm-12 col-md-12">
             <div class="col-sm-2 col-md-2 select-text-margin">Name</div>
-            <div class="col-sm-6 col-md-4"> <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
+            <div class="col-sm-6 col-md-4">
+                <input class="form-control" maxlength="40" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
 
         echo '<div class="col-sm-12 col-md-12 padding-top-fifteen">
         <div class="col-sm-2 col-md-2 select-text-margin">Rubric Type</div>
