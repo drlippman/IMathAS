@@ -4368,7 +4368,7 @@ class GradebookController extends AppController
     }
     public function actionGradebookTesting()
     {
-        global $get,$lnfilter,$timefilter;
+        global $get,$lnfilter,$timefilter,$courseId;
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $params = $this->getRequestParams();

@@ -934,6 +934,7 @@ class AppController extends Controller
     {
         $isOwner = Course::isOwner($user['id'], $courseId);
         $teacherId = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
         $isStudent = $this->isStudent($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner['ownerid'] == $user['id'])) {
             return true;
@@ -941,9 +942,13 @@ class AppController extends Controller
         if (($user['rights'] < AppConstant::TEACHER_RIGHT) && ($actionPath == 'add-assessment' || $actionPath == 'change-assessment' || $actionPath == 'assessment-message' && !$isStudent)) {
             $this->setWarningFlash(AppConstant::UNAUTHORIZED);
             return $this->redirect(Yii::$app->getHomeUrl());
-        } else if (($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId)) {
-            return $this->noValidRights($teacherId);
-        } else {
+        } elseif ($user['rights'] >= AppConstant::STUDENT_RIGHT && ($actionPath == 'show-test')){
+            return true;
+        }
+        else if (($user['rights'] > AppConstant::STUDENT_RIGHT && (!$teacherId || !$isTutor))) {
+            return $this->noValidRightsForTeacherAndTutor($teacherId, $isTutor);
+        }
+        else {
             return true;
         }
     }

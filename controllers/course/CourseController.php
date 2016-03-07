@@ -1228,6 +1228,7 @@ class CourseController extends AppController
         $previewshift = $this->getParamVal('stuview');
         $useviewButtons = false;
         $student = Student::getByCId($courseId);
+
         $line  = Student::getStudentData($userId, $courseId);
         if ($line != null) {
             $isLocked = $this->isLocked($userId, $courseId);
