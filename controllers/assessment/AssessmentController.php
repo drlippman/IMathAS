@@ -1717,7 +1717,8 @@ class AssessmentController extends AppController
             $nocolormark = true;
         }
         $reloadqi = false;
-        if (isset($getReattempt)) {
+        $getReattempt=$params['reattempt'];
+        if (count($getReattempt)!=0) {
             if ($getReattempt == "all") {
                 for ($i = 0; $i < count($questions); $i++) {
                     if ($attempts[$i] < $qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts'] == 0) {
@@ -2457,6 +2458,7 @@ class AssessmentController extends AppController
                     }
                 }
             } else if ($getAction == "skip") {
+
                 if (isset($getScore)) { //score a problem
                     $qn = $getScore;
                     if ($_POST['verattempts'] != $attempts[$qn]) {
@@ -2593,7 +2595,7 @@ class AssessmentController extends AppController
                             }
                             $temp .= "</form>\n";
                         }
-                        $temp .= "<br/><p>When you are done, <a href='show-test?action=Skip&amp;done=true'>click here to see a summary of your scores</a>.</p>\n";
+                        $temp .= "<br/><p>When you are done, <a href='show-test?action=skip&amp;done=true'>click here to see a summary of your scores</a>.</p>\n";
                         $temp .= "</div>\n";
                     }
                 } else if (isset($getTo)) { //jump to a problem
@@ -2678,11 +2680,11 @@ class AssessmentController extends AppController
                         $temp .= "</div>\n";
                     }
                 }
-                if (isset($getDone)) { //are all done
+                if ($params['done']=="true") { //are all done
                     $shown = $this->showscores($questions, $attempts, $testsettings);
                     $this->endtest($testsettings);
                     if ($shown) {
-                        $this->leavetestmsg($sessiondata);
+                        $this->leavetestmsg();
                     }
                 }
             } else if ($getAction == "seq") {
