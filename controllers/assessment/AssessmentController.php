@@ -1299,7 +1299,6 @@ class AssessmentController extends AppController
             $line = AssessmentSession::getAssessmentSessionData($userid, $getId);
 
             if ($line == null) {
-
                 /*
                  * starting test and get question set
                  */
@@ -1432,8 +1431,9 @@ class AssessmentController extends AppController
                 session_write_close();
                 return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-test'));
             } else { //returning to test
+
                 $deffeedback = explode('-', $adata['deffeedback']);
-                if ($myrights < 6 || isset($teacherid) || isset($tutorid)) {  // is teacher or guest - delete out out assessment session
+                if ($myrights> 10 || $teacherid|| $tutorid) {  // is teacher or guest - delete out out assessment session
                     filehandler::deleteasidfilesbyquery2('userid', $userid, $aid, 1);
                     AssessmentSession::deleteData($userid, $aid);
                     return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid=' . $getCid . '&id=' . $aid));
@@ -1497,6 +1497,7 @@ class AssessmentController extends AppController
             }
         }
         //already started test
+
         if (!isset($sessiondata['sessiontestid'])) {
             $temp .= 'Error.  Access test from course page';
             return $temp;
@@ -2592,7 +2593,7 @@ class AssessmentController extends AppController
                             }
                             $temp .= "</form>\n";
                         }
-                        $temp .= "<br/><p>When you are done, <a href='#'>click here to see a summary of your scores</a>.</p>\n";
+                        $temp .= "<br/><p>When you are done, <a href='show-test?action=Skip&amp;done=true'>click here to see a summary of your scores</a>.</p>\n";
                         $temp .= "</div>\n";
                     }
                 } else if (isset($getTo)) { //jump to a problem
@@ -3072,8 +3073,9 @@ class AssessmentController extends AppController
                 if ($i == count($questions)) {
                     $temp .= "<div class=inset><br/>\n";
                     $temp .= "<a name=\"beginquestions\"></a>\n";
-                    $temp .= startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
-                    $this->leavetestmsg($sessiondata);
+                    $temp = startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
+                    $this->leavetestmsg();
+
                 } else {
                     $temp .= "<div class=inset>\n";
                     if (isset($intropieces)) {
@@ -3099,6 +3101,7 @@ class AssessmentController extends AppController
                     $temp .= "</form>\n";
                     $temp .= "</div>\n";
                 }
+
             } else if ($testsettings['displaymethod'] == "Seq") {
                 for ($i = 0; $i < count($questions); $i++) {
                     if ($canimproveq[$i]) {
@@ -3340,7 +3343,7 @@ class AssessmentController extends AppController
         return $this->renderWithData('showTest', $renderData);
     }
 
-    function leavetestmsg($sessiondata)
+    function leavetestmsg()
     {
         global $isdiag, $diagid, $isltilimited, $testsettings, $temp;
         if ($isdiag) {

@@ -529,6 +529,7 @@ function recordtestdata($limit=false) {
 	
 	$now = time();
     $connection = Yii::$app->getDb();
+    $transaction= $connection->beginTransaction();
     if ($isreview) {
 		if ($limit) {
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
@@ -565,8 +566,7 @@ function recordtestdata($limit=false) {
 		$query .= "WHERE id='$testid' LIMIT 1";
 	}
     $connection->createCommand($query)->execute();
-
-
+    $transaction->commit();
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
