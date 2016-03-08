@@ -1133,8 +1133,6 @@ function assessbackgsubmit(qn,noticetgt) {
 		}
 		req.open("POST", assesspostbackurl, true);
 		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		req.setRequestHeader("Content-length", params.length);
-		req.setRequestHeader("Connection", "close");
 		req.onreadystatechange = function() {assessbackgsubmitCallback(qn,noticetgt);}; 
 		req.send(params);  
 	} else {
