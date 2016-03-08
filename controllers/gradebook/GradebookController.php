@@ -1150,7 +1150,6 @@ class GradebookController extends AppController
                 } else {
                     $gradebook[$row][1][$col][1] = AppConstant::NUMERIC_ZERO; //no comment
                 }
-
             }
         }
 
@@ -2143,7 +2142,6 @@ class GradebookController extends AppController
                 );
                 array_push($finalStudentArray, $finalArray);
             }
-
         }
         $studentArray = array();
         if ($studentData) {
@@ -2284,10 +2282,11 @@ class GradebookController extends AppController
         if (isset($params['assesssnapaid'])) {
             //doing assessment snapshot
             $assessmentSessionData = AssessmentSession::getByAssessmentId($params['assessment']);
+
             if ($assessmentSessionData) {
                 foreach ($assessmentSessionData as $assessmentSession) {
                     $sp = explode(';', $assessmentSession['bestscores']);
-                    $sc = explode(',', $sp['userid']);
+                    $sc = explode(',', $sp[0]);
                     $tot = 0;
                     $att = 0;
                     foreach ($sc as $v) {
@@ -2309,7 +2308,7 @@ class GradebookController extends AppController
                     $updateGrades['score'] = $score;
                     $updateGrades['gradetype'] = 'offline';
                     $updateGrades['gradetypeid'] = $params['gbitem'];
-                    $updateGrades['feedback'] = ' ';
+                    $updateGrades['feedback'] = '';
                     $updateGrades['userid'] = $assessmentSession['userid'];
                     $grades = new Grades;
                     $createdGrade = $grades->createGradesByUserId($updateGrades);

@@ -196,7 +196,13 @@ function playliststart(id,vidk,el) {
 		bar.find('.vidff,.vidffI').removeClass("vidffI").addClass("vidff");
 	}
 }
+function showBodyScroll() {
+    jQuery('html, body').css('overflow', 'auto');
+}
 
+function hideBodyScroll() {
+    jQuery('html, body').css('overflow', 'hidden');
+}
 
 function studLocked()
 {
@@ -209,16 +215,19 @@ function studLocked()
         closeText: "hide",
         buttons: {
             "Ok": function () {
+                showBodyScroll();
                 jQuery(this).dialog('destroy').remove();
                 return false;
             }
         },
         open: function(){
+            hideBodyScroll();
             jQuery('.ui-widget-overlay').bind('click',function(){
                 jQuery('#dialog').dialog('close');
             })
         },
         close: function (event, ui) {
+            showBodyScroll();
             jQuery(this).remove();
         }
     });
