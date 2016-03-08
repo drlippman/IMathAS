@@ -1194,6 +1194,7 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    for (var i=0; i<initstack.length; i++) {
 		    	    var foo = initstack[i]();
 		    }
+		    $(window).trigger("ImathasEmbedReload");
 		    initcreditboxes();
 		    
 		    var pagescroll = 0;
