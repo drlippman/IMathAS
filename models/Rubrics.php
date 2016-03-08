@@ -111,4 +111,12 @@ class Rubrics extends BaseImasRubrics
     {
         return Rubrics::find()->select('id,rubrictype,rubric')->where(['id',$rubric])->all();
     }
+
+    public static function getRubrics($userId, $gropuId){
+        $query = "SELECT id,name FROM imas_rubrics WHERE ownerid=:userId OR groupid=:gropuId ORDER BY name";
+        $command = Yii::$app->db->createCommand($query);
+        $data = $command->bindValues([':userId' => $userId,':gropuId' => $gropuId]);
+        return $data = $data->queryAll();
+
+    }
 }

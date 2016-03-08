@@ -9,7 +9,8 @@ if($user['rights']!=100)
 $isTeacher= false;
 else
 $isTeacher=true;
-
+$groupAdmin = $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
+$currentUser = $user['id'];
 ?>
 
 <input type="hidden" class="user-rights" value="<?php echo $user['rights']?>">
@@ -26,10 +27,12 @@ $isTeacher=true;
 </div>
 
 <div class="item-detail-content">
-    <?php if($user['rights'] > 10) {
+    <?php if($user['rights'] > 10 && ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
-    } elseif($user['rights'] == 10){
+    } elseif($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'calendar', 'userId' => $currentUser]);
+    } else if($user['rights'] > 10){
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
     }?>
 </div>
 

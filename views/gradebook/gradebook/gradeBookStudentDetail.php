@@ -7,6 +7,7 @@ use app\components\AppConstant;
 
 use app\components\AssessmentUtility;
 $urlmode = AppUtility::urlMode();
+$groupAdmin = $currentUser['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
 if($defaultValuesArray['studentId'] > 0){
     $this->title = AppUtility::t('Grade Book Student Detail', false);
 }else{
@@ -58,9 +59,9 @@ $studentId = $studentId;
 <div class="item-detail-header">
 <?php if(!isset($params['from']))
 { ?>
-    <?php  if($currentUser['rights'] > 10){
+    <?php  if($currentUser['rights'] > 10 && ($isTutor && ($currentUser['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))){
     echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]);
-}else{
+}else if($isStudent || (($isTutor && ($currentUser['rights'] != $groupAdmin)))){
     echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/grade-book-student-detail?cid=' . $course->id. '&studentId='.$currentUser['id']]]);
 }?>
 <?php }else{ ?>
@@ -80,11 +81,11 @@ $studentId = $studentId;
 </div>
 
 <div class="item-detail-content">
-    <?php if($currentUser['rights'] > 10) {
+    <?php if($currentUser['rights'] > 10 && ($isTutor && ($currentUser['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))){
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
-    } elseif($currentUser['rights'] == 10){
+    } elseif($isStudent || (($isTutor && ($currentUser['rights'] != $groupAdmin)))){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
-    }?>
+    } ?>
 </div>
 
 <div class="tab-content shadowBox col-md-12 col-sm-12">

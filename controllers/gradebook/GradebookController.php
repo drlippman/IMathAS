@@ -2023,6 +2023,8 @@ class GradebookController extends AppController
         $this->guestUserHandler();
         $currentUser = $this->user;
         $courseId = $this->getParamVal('cid');
+
+        $gropuId = 0;
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $studentData = Student::findByCid($courseId);
@@ -2036,7 +2038,6 @@ class GradebookController extends AppController
         }
 
         if ($params['grades'] == 'all') {
-
             if (!($params['isolate'])) {
 
                 if ($params['gbitem'] == 'new') {
@@ -2167,7 +2168,7 @@ class GradebookController extends AppController
         $keyValue = AppConstant::NUMERIC_ONE;
         $rubricsId = array(0);
         $rubricsLabel = array('None');
-        $rubrics = Rubrics::getByUserId($currentUser['id']);
+        $rubrics = Rubrics::getRubrics($currentUser['id'], $gropuId);
         foreach ($rubrics as $rubric) {
             $rubricsId[$keyValue] = $rubric['id'];
             $rubricsLabel[$keyValue] = $rubric['name'];
@@ -2908,6 +2909,7 @@ class GradebookController extends AppController
         $StudentData = Student::getDataForGradebook($userId,$courseId);
         $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
         $isTutor = $this->isTutor($currentUser['id'],$courseId);
+        $isStudent = $this->isStudent($currentUser['id'],$courseId);
         $isLocked = $this->isLocked($currentUser['id'], $courseId);
         $canviewall = false;
         $studentId = $this->getParamVal('studentId');
@@ -2983,7 +2985,8 @@ class GradebookController extends AppController
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css','gradebook.css']);
         $this->includeJS(['general.js', 'jquery.dataTables.min.js','dataTables.bootstrap.js','gradebook/manageofflinegrades.js', 'gradebook/gradebookstudentdetail.js']);
-        $responseData = array('isteacher' => $isTeacher,'studentId' => $studentId,'gbmode' => $gbmode,'canviewall'=> $canviewall, 'isTutor' => $isTutor, 'totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData, 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
+        $responseData = array('isteacher' => $isTeacher,'studentId' => $studentId,'gbmode' => $gbmode,'canviewall'=> $canviewall, 'isTutor' => $isTutor, 'totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData, 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation,
+        'isStudent' => $isStudent);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
     }
 

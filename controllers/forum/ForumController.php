@@ -237,7 +237,7 @@ class ForumController extends AppController
         $this->setReferrer();
         $this->includeCSS(['course/course.css']);
         $responseData = array('searchedPost' => $searchedPost,'threadids' => $threadids,'forums' => $forums,'threaddata' => $threaddata,'searchtag' => $searchtag,'newcnt' => $newcnt,'threadcount' => $threadcount,'postcount' => $postcount,'maxdate' => $maxdate,'forumdata' => $forumdata,'isteacher' => $isteacher,
-            'itemsassoc' => $itemsassoc,'itemsimporder' => $itemsimporder,'cid' => $cid, 'users' => $user, 'course' => $course,'searchtype' => $searchtype);
+            'itemsassoc' => $itemsassoc,'itemsimporder' => $itemsimporder,'cid' => $cid, 'users' => $user, 'course' => $course,'searchtype' => $searchtype, 'teacherid' => $teacherid, 'tutorid' => $tutorid, 'studentid' => $studentid);
         return $this->renderWithData('forum',$responseData);
     }
 
