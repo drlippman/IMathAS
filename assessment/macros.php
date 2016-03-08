@@ -2841,12 +2841,18 @@ function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=30
 function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	if ($type=='line') { 
 		$code = 5;
+	} else if ($type=='lineseg') {
+		$code = 5.3;
+	} else if ($type=='ray') {
+		$code = 5.2;
 	} else if ($type=='parab') {
 		$code = 6;
 	} else if ($type=='sqrt') {
 		$code = 6.5;
 	} else if ($type=='abs') {
 		$code = 8;
+	} else if ($type=='rational') {
+		$code = 8.2;
 	} else if ($type=='exp') {
 		$code = 8.3;
 	} else if ($type=='circle') {
