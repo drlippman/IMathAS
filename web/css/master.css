@@ -654,3 +654,7 @@ div.vidsegblock
 .error-message{
     color: red;
 }
+
+.navbar-fixed-top{
+    z-index: 100;
+}

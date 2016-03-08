@@ -2129,7 +2129,6 @@ class GradebookController extends AppController
                 );
                 array_push($finalStudentArray, $finalArray);
             }
-
         } else {
             $gradeData = Grades::getByGradeTypeIdAndUserId($params['gbitem'], $params['grades']);
             $studentsData = Student::getByCourseAndGrades($params['cid'], $params['grades'], $hassection, $sortorder);
@@ -2249,7 +2248,6 @@ class GradebookController extends AppController
             if ($params['gbitem'] == 'new') {
                 $gbItems = new GbItems();
                 $gbItemsIdData = $gbItems->createGbItemsByCourseId($courseId, $params);
-
                 if($gbItemsIdData->errors['name']){
                     $this->setErrorFlash('Name can not be blank.');
                     return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$courseId.'&gbitem=new&grades=all'));
@@ -2314,7 +2312,7 @@ class GradebookController extends AppController
                     $updateGrades['feedback'] = ' ';
                     $updateGrades['userid'] = $assessmentSession['userid'];
                     $grades = new Grades;
-                    $grades->createGradesByUserId($updateGrades);
+                    $createdGrade = $grades->createGradesByUserId($updateGrades);
                 }
             }
         } else {
@@ -2431,7 +2429,11 @@ class GradebookController extends AppController
                 }
                 $rubricstring =  serialize($rubric);
                 if ($params['id']!='new') { //MODIFY
-                    Rubrics::updateRubrics($params,$rubgrp,$rubricstring, $params['id']);
+                    $rubricUpdate = Rubrics::updateRubrics($params,$rubgrp,$rubricstring, $params['id']);
+                    if($rubricUpdate->errors['name']){
+                        $this->setErrorFlash('Name cannot be blank.');
+                        return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid='.$courseId.'&id='.$params['id']));
+                    }
                 } else {
                     $rubricEntry = new Rubrics();
                     $createdRubric = $rubricEntry->insertInToRubric($currentUser['id'],$params,$rubgrp,$rubricstring);

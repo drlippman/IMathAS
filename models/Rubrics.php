@@ -63,11 +63,12 @@ class Rubrics extends BaseImasRubrics
     {
 
         $rubricsData = Rubrics::find()->where(['id' => $rubricId])->one();
-        $rubricsData ->name = $params['rubname'];
+        $rubricsData ->name = trim($params['rubname']);
         $rubricsData ->rubrictype = $params['rubtype'];
         $rubricsData ->groupid = $rubgrp;
         $rubricsData ->rubric = $rubricstring;
         $rubricsData ->save();
+        return $rubricsData;
     }
 
     public static function getIdAndName($userId, $groupId){

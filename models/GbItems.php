@@ -16,7 +16,7 @@ class GbItems extends BaseImasGbitems
     {
         $this->courseid = $courseId;
         $this->name = $params['name'] ? trim($params['name']) : ' ';
-        $this->points = $params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO;
+        $this->points = round($params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO);
         $this->showdate = $params['showdate'];
         $this->gbcategory = $params['gbcat'];
         $this ->rubric = $params['rubric'];
@@ -148,7 +148,7 @@ class GbItems extends BaseImasGbitems
     {
         $GbItems = GbItems::find()->where(['id' => $gbItemId])->one();
         $GbItems->name = $params['name'] ? $params['name'] : null;
-        $GbItems->points = $params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO;
+        $GbItems->points = round($params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO);
         $GbItems->showdate = $params['showdate'];
         $GbItems->gbcategory = $params['gradebook-category'];
         $GbItems->rubric = $params['rubric'];

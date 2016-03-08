@@ -19,6 +19,7 @@ class Grades extends BaseImasGrades
             $this->feedback = $grade['feedback'];
             $this->gradetype = $grade['gradetype'];
             $this->save();
+            return $this;
     }
 
     public static function GetOtherGrades($gradetypeselects, $limuser){
