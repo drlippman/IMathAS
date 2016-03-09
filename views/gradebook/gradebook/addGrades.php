@@ -291,7 +291,9 @@ if ($params['gbitem'] == 'new') { ?>
 
     echo '<div id="gradeboxes" class="col-md-12 col-sm-12 padding-left-zero padding-right-zero">';
     echo '<div class="col-sm-12 col-md-12 padding-top-twenty">';
-    echo '<div class="col-md-offset-2 col-sm-offset-3 col-sm-8 col-md-8 padding-left-six"><input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/><button class="margin-left-twenty" type="button" id="useqa" onclick="togglequickadd(this)">' . "Use Quicksearch Entry" . '</button> </div>';
+    echo '<div class="col-md-offset-2 col-sm-offset-3 col-sm-8 col-md-8 padding-left-six">
+          <input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/>
+          <button class="margin-left-twenty" type="button" id="useqa" onclick="togglequickadd(this)">' . "Use Quicksearch Entry" . '</button> </div>';
     echo '</div>';
 
     if ($hassection) {
@@ -301,8 +303,8 @@ if ($params['gbitem'] == 'new') { ?>
         echo '<div class="col-sm-12 col-md-12 padding-top-twenty padding-left-zero">';
         echo "<div class='col-sm-3 col-md-2 padding-right-zero'>Add/Replace to all grades</div>
                                         <div class='col-sm-9 col-md-10 padding-left-seventeen'>
-                                            <div class='floatleft'>
-                                                <input class='width-seventy-seven form-control' type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>
+                                            <div class='floatleft all-grade'>
+                                                <input class='width-seventy-seven form-control to-all-grade' type=text size=3 id=\"toallgrade\" maxlength='15' onblur=\"this.value = doonblur(this.value);\"/>
                                             </div>";
         echo '<div class="floatleft margin-left-twenty">';
         echo ' <input class="width-seventy-seven" type=button value="Add" onClick="sendtoall(0,0);"/>
@@ -319,7 +321,8 @@ if ($params['gbitem'] == 'new') { ?>
         echo '<div class="col-sm-12 col-md-12 padding-top-twenty padding-left-zero">';
         echo "<div class='col-sm-3 col-md-2'> Add/Replace to all feedback</div>
                                     <div class='col-sm-5 col-md-5 padding-left-seventeen'>
-                                         <div class='col-sm-10 col-md-10 padding-left-zero'> <input class='floatleft form-control' type=text size=40 id=\"toallfeedback\"/></div>";
+                                         <div class='col-sm-10 col-md-10 padding-left-zero'>
+                                         <input class='floatleft form-control' type=text size=40 id=\"toallfeedback\"/></div>";
         echo '<div class="col-sm-12 col-md-12 clear-both padding-top-twenty padding-left-zero"><input class="floatleft margin-right-fifteen" type=button value="Append" onClick="sendtoall(1,0);"/>
                                           <input class="floatleft margin-right-fifteen" type=button value="Prepend" onclick="sendtoall(1,1)"/>
                                           <input class="floatleft" type=button value="Replace" onclick="sendtoall(1,2)"/>
@@ -341,11 +344,11 @@ if ($params['gbitem'] == 'new') { ?>
                                     </thead>
                                     <tbody>";
     echo '<tr id="quickadd" style="display:none;">
-                                                        <td><input class="form-control" type="text" id="qaname" /></td>';
+               <td><input class="form-control" maxlength="40" type="text" id="qaname" /></td>';
     if ($hassection) {
         echo '<td></td>';
     }
-    echo '<td><input class="form-control" type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
+    echo '<td class="quick-score"><input class="form-control quick-score-class" type="text" id="qascore" size="3" maxlength="15" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
     echo '<td><textarea class="form-control floatleft width-sixty-per max-width-three-hundread" id="qafeedback" rows="1" cols="40"></textarea>';
     echo '<input class="form-control floatleft width-ten-per margin-left-twenty"  type="button" value="Next" onfocus="addsuggest()" /></td></tr>';
     if ($params['gbitem'] != "new") {
@@ -371,10 +374,10 @@ if ($params['gbitem'] == 'new') { ?>
             echo "<td>{$studentInfo[3]}</td>";
         }
         if (isset($score[$studentInfo[0]])) {
-            echo "<td class='col-md-2'><input class='form-control'  type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
+            echo "<td class='col-md-2 staticField'><input class='form-control score'  type=\"text\" size=\"3\" autocomplete=\"off\" maxlength='15' name=\"score[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
             echo $score[$studentInfo[0]];
         } else {
-            echo "<td class='col-md-2'><input class='form-control'  type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
+            echo "<td class='col-md-2 staticField'><input class='form-control score'  type=\"text\" size=\"3\" autocomplete=\"off\" maxlength='15' name=\"newscore[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
         }
 
         echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
@@ -383,7 +386,7 @@ if ($params['gbitem'] == 'new') { ?>
         }
         echo "</td>";
         echo "<td class='col-md-8'>
-                  <textarea class='form-control col-md-12 max-width-six-hundread-ten mobile-text-area-max-width'  cols=60 rows=1 id=\"feedback{$studentInfo[0]}\" name=\"feedback[{$studentInfo[0]}]\">{$feedback[$studentInfo[0]]}</textarea>
+                  <textarea class='form-control col-md-12 max-width-six-hundread-ten mobile-text-area-max-width' cols=60 rows=1 id=\"feedback{$studentInfo[0]}\" name=\"feedback[{$studentInfo[0]}]\">{$feedback[$studentInfo[0]]}</textarea>
               </td>";
         echo "</tr>";
     }
@@ -466,6 +469,15 @@ function printrubriclink($rubricid, $points, $scorebox, $feedbackbox, $qn = 'nul
         })
         $(function() {
             $('.grade').on('keydown', '#grade-type', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        })
+        $(function() {
+            $('.staticField').on('keydown', '.score', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        })
+        $(function() {
+            $('.all-grade').on('keydown', '.to-all-grade', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        })
+        $(function() {
+            $('.quick-score').on('keydown', '.quick-score-class', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
         })
     })
 

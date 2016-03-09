@@ -556,7 +556,7 @@ function sendtoall(w,type) {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "confirm": function () {
+                "Confirm": function () {
 
                     $(this).dialog("close");
                     for (var e = 0; e<form.elements.length; e++) {
@@ -564,7 +564,9 @@ function sendtoall(w,type) {
                         if (w==0) {
                             if (document.getElementById("toallgrade").value.match(/\d/)) {
                                 if (el.type=="text" && el.id.match(/score/)) {
-                                    if (type==2) { el.value = document.getElementById("toallgrade").value;}
+                                    if (type==2) {
+                                        el.value = document.getElementById("toallgrade").value.length;
+                                    }
                                 }
                             } else if (document.getElementById("toallgrade").value == "") {
                                 if (el.type=="text" && el.id.match(/score/) && type==2) {
@@ -595,7 +597,7 @@ function sendtoall(w,type) {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "confirm": function () {
+                "Confirm": function () {
 
                     $(this).dialog("close");
                     for (var e = 0; e<form.elements.length; e++) {
