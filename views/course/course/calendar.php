@@ -38,7 +38,7 @@ $currentUser = $user['id'];
 
 <div class="tab-content col-md-12">
         <div class="col-md-12 padding-alignment calendar-container">
-            <?php if($user->rights == AppConstant::ADMIN_RIGHT || $user->rights >= AppConstant::TEACHER_RIGHT) {
+            <?php if(!$isStudent) {
                 ?>
             <pre><a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>"><?php AppUtility::t('Manage Events')?></a></pre>
             <?php }?>

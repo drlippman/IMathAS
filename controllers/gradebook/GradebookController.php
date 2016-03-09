@@ -1202,6 +1202,7 @@ class GradebookController extends AppController
                             $gradebook[$row][1][$col][1] = AppConstant::NUMERIC_ZERO; //no feedback
                         }
 
+
                         if ($cntingb[$i] == 1) {
                             if ($gradebook[0][1][$col][3] < 1) { //past
                                 $cattotpast[$row][$category[$i]][$col] = 1 * $gradeSelect['score'];
@@ -1299,7 +1300,6 @@ class GradebookController extends AppController
                 }
             }
         }
-
         //fill out cattot's with zeros
         for ($ln = 1; $ln < count($sturow) + 1; $ln++) {
             $cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
@@ -2317,7 +2317,6 @@ class GradebookController extends AppController
         } else {
             ///regular submit
             if (isset($params['score'])) {
-
                 foreach ($params['score'] as $k => $sc) {
                     if (trim($k) == '') {
                         continue;

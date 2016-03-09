@@ -87,6 +87,7 @@ class Grades extends BaseImasGrades
     public static function updateGradeToStudent($score,$feedback,$userid,$gbItemsId)
     {
         $grade = Grades::find()->where(['userid' => $userid])->andWhere(['gradetypeid'=> $gbItemsId])->andWhere(['gradetype' => 'offline'])->one();
+
         if($grade){
             $grade->score = $score;
             $grade->feedback = $feedback;

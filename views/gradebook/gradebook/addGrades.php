@@ -356,7 +356,6 @@ if ($params['gbitem'] == 'new') { ?>
                 $score[$row['userid']] = '';
             }
             $feedback[$row['userid']] = $row['feedback'];
-
         }
     }
     foreach ($finalStudentArray as $studentInfo) {
@@ -384,8 +383,8 @@ if ($params['gbitem'] == 'new') { ?>
         }
         echo "</td>";
         echo "<td class='col-md-8'>
-                                            <textarea class='form-control col-md-12 max-width-six-hundread-ten mobile-text-area-max-width'  cols=60 rows=1 id=\"feedback{$studentInfo[0]}\" name=\"feedback[{$studentInfo[0]}]\">{$feedback[$studentInfo[0]]}</textarea>
-                                            </td>";
+                  <textarea class='form-control col-md-12 max-width-six-hundread-ten mobile-text-area-max-width'  cols=60 rows=1 id=\"feedback{$studentInfo[0]}\" name=\"feedback[{$studentInfo[0]}]\">{$feedback[$studentInfo[0]]}</textarea>
+              </td>";
         echo "</tr>";
     }
 
