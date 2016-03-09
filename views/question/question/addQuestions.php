@@ -171,6 +171,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 </div>
+<?php if(!$beentaken){?>
 <div class="tab-content shadowBox margin-top-fifteen">
     <?php
     /*
@@ -535,4 +536,4 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<?php } ?>
+<?php } }?>

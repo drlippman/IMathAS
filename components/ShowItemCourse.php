@@ -167,7 +167,7 @@ class ShowItemCourse extends Component
                             if ($isPublic) {
                                 echo "<span class=left><a href=\"public?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             } else {
-                                echo "<span class=left><a href=\"course?cid=$courseId&folder=$parent-$bnum\" border=0>";
+                                echo "<span class=left><a href=\"courssse?cid=$courseId&folder=$parent-$bnum\" border=0>";
                             }
                                 echo "<img alt=\"folder\" src=\"$imasroot"."img/folder.gif\"></a></span>";
                             echo "<div class=title>";

@@ -18,7 +18,6 @@ $studview= $sessionData['stuview'];
 if($studview>-1){
     $studview=1;
 }
-
 $groupAdmin = $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
 if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
     ?>
@@ -35,7 +34,7 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
     <div class="item-detail-content">
         <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students, 'userId' => $user, 'isTutor'=> $isTutor]);?>
     </div>
-<?php }else if (((($teacherId)  && (!$backLink)) || ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)))) {
+<?php }else if ((($teacherId) || ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)))) {
     ?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>

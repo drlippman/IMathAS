@@ -97,7 +97,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}
-//	eval(interpret('control',$qdata['qtype'],$qdata['control']));
+	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
 	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
