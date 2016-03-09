@@ -811,7 +811,8 @@ class AppController extends Controller
         $teacherId = $this->isTeacher($user['id'], $courseId);
         $isTutor = $this->isTutor($user['id'], $courseId);
         $studentId = $this->isStudent($user['id'], $courseId);
-        if ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'grade-book-student-detail' && $studentId) {
+
+        if ($user['rights'] == AppConstant::STUDENT_RIGHT && $actionPath == 'grade-book-student-detail' || $studentId) {
             return true;
         } else if (($user['rights'] >= AppConstant::TEACHER_RIGHT) && $actionPath == 'gradebook' && ($teacherId || $isTutor)) {
             return true;

@@ -10,13 +10,18 @@ use app\components\AppUtility;
             <?php } else { ?>
             <li class="master-tabs"><a class="grey-color-link" href = "<?php echo AppUtility::getURLFromHome('course/course', 'course?cid='.$course->id); ?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/course.png"/><span class="margin-left-fifteen"><?php AppUtility::t('Course'); ?></span></a></li>
             <?php } ?>
-            <?php if($section == 'gradebook'){
-                ?>
+            <?php if(!$isTutor){?>
+            <?php if($section == 'gradebook'){?>
             <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' .$course->id. '&studentId=' .$userId->id);?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><span class="margin-left-fifteen"><?php AppUtility::t(' Gradebook'); ?></span></a></li>
-            <?php } else {
-             ?>
+            <?php } else { ?>
             <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' .$course->id. '&studentId=' .$userId->id);?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><span class="margin-left-fifteen"><?php AppUtility::t(' Gradebook'); ?></span></a></li>
             <?php } ?>
+            <?php }else{?>
+            <?php if($section == 'gradebook'){ ?>
+                <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><span class="margin-left-fifteen"><?php AppUtility::t(' Gradebook'); ?></span></a></li>
+            <?php } else { ?>
+                <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><span class="margin-left-fifteen"><?php AppUtility::t(' Gradebook'); ?></span></a></li>
+            <?php } }?>
             <?php if($section == 'calendar'){ ?>
             <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('course/course', 'calendar?cid='.$course->id); ?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/iconCalendar.png"/><span class="margin-left-fifteen"><?php AppUtility::t('Calendar'); ?></span></a></li>
             <?php } else { ?>

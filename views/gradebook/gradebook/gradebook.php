@@ -58,12 +58,11 @@ $stu = $data['defaultValuesArray']['studentId']
         <?php }?>
     </div>
 </div>
-
 <div class="item-detail-content">
-    <?php if($user['rights'] > 10) {
+    <?php if($isTeacher) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
-    } elseif($user['rights'] == 10){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser]);
+    } elseif($isTutor || $isStudent){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $isTutor]);
     }?>
 </div>
 <?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor]); ?>

@@ -5,10 +5,6 @@ use app\components\AppConstant;
 $this->title = 'Calendar';
 $this->params['breadcrumbs'][] = $this->title;
 $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
-if($user['rights']!=100)
-$isTeacher= false;
-else
-$isTeacher=true;
 $groupAdmin = $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
 $currentUser = $user['id'];
 ?>
@@ -27,13 +23,14 @@ $currentUser = $user['id'];
 </div>
 
 <div class="item-detail-content">
-    <?php if($user['rights'] > 10 && ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))) {
+    <?php if($isStudent || ($isTutor && ($user['rights'] != AppConstant::GROUP_ADMIN_RIGHT) && !$isTeacher)){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'calendar', 'userId' => $currentUser,'isTutor'=> $isTutor]);
+    } else if($user['rights'] > 10 && ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
-    } elseif($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'calendar', 'userId' => $currentUser]);
-    } else if($user['rights'] > 10){
+      }elseif($user['rights'] > 10){
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
-    }?>
+    }
+    ?>
 </div>
 
 <div class="tab-content col-md-12">

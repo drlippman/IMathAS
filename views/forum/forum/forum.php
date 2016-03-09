@@ -70,11 +70,13 @@ if (count($taginfo)==0) {
         </div>
     </div>
 </div>
+
 <div class="item-detail-content">
-    <?php if($users->rights > 10 && ($tutorid && ($users['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))) {
+    <?php if($studentid || (($tutorid || ($users['rights']<$groupAdmin))) && !$isteacher){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums','userId' => $users, 'isTutor'=> $tutorid]);
+    }
+    elseif($users->rights > 10 && (($isteacher || $tutorid) && ($users['rights']>= $groupAdmin))) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
-    } elseif($studentid || (($tutorid && ($users['rights'] != $groupAdmin)))){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
 <input type="hidden" id="courseid" value="<?php echo $course->id; ?>">

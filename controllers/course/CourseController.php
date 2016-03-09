@@ -409,6 +409,7 @@ class CourseController extends AppController
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $isTutor = $this->isTutor($user['id'], $courseId);
         $isStudent = $this->isStudent($user['id'], $courseId);
+        $isTeacher = $this->isTeacher($user['id'], $courseId);
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
@@ -420,7 +421,7 @@ class CourseController extends AppController
 
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-        $responseData = array('course' => $course, 'user' => $user, 'items' => $items, 'typeid' => $typeid, 'parent' => $parent, 'isTutor' => $isTutor, 'isStudent' => $isStudent);
+        $responseData = array('course' => $course, 'user' => $user, 'items' => $items, 'typeid' => $typeid, 'parent' => $parent, 'isTutor' => $isTutor, 'isStudent' => $isStudent,'isTeacher' => $isTeacher);
         return $this->render('calendar', $responseData);
     }
     /*
