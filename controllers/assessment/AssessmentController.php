@@ -3886,7 +3886,7 @@ class AssessmentController extends AppController
 
     public function actionRecTrackAjax()
     {
-        return $this->redirect('site', 'work-in-progress ');
+//        return $this->redirect('show-test', 'work-in-progress ');
     }
 
     public function actionWatchVideo()

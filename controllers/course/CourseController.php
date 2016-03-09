@@ -1546,7 +1546,7 @@ class CourseController extends AppController
 
                     if (count($backTrack) > $depth)
                     {
-                        $backLink = "<span class='right back-link'><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+                        $backLink = "<span class='right back-link '><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
                     }
                     $_SESSION['backtrack'] = array($sendcrumb,$backTrack[count($backTrack)-1][1]);
                 } else {
@@ -1569,7 +1569,7 @@ class CourseController extends AppController
                     {
                         $backLink =  "<span class='right back-link'><a href=\"course?cid=$courseId&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
                     } else {
-                        $backLink = "<spanclass='right back-link'><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
+                        $backLink = "<span class='right back-link'><a href=\"course?cid=$courseId&folder=".$backTrack[count($backTrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
                     }
                 }
             } else {

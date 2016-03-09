@@ -97,7 +97,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['scores'])) {
 		$scorenonzero = getscorenonzero();
 	}
-	eval(interpret('control',$qdata['qtype'],$qdata['control']));
+//	eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
 	$toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
 	$toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
@@ -386,10 +386,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	}
 	if ($showhints && ($qdata['extref']!='' || (($qdata['solutionopts']&2)==2 && $qdata['solution']!=''))) {
         $temp .= '<div><p class="tips">'.AppUtility::t('Get help',false);
-		if ($qdata['extref']!= '') {
+      	if ($qdata['extref']!= '') {
 			$extref = explode('~~',$qdata['extref']);
-
-			if (isset($GLOBALS['questions']) && (!isset($GLOBALS['sessiondata']['isteacher']) || $GLOBALS['sessiondata']['isteacher']==false) && !isset($GLOBALS['sessiondata']['stuview'])) {
+            if (isset($GLOBALS['questions']) && (!isset($GLOBALS['sessiondata']['isteacher']) || $GLOBALS['sessiondata']['isteacher']==false) && !isset($GLOBALS['sessiondata']['stuview'])) {
 				$qref = $GLOBALS['questions'][$qnidx].'-'.($qnidx+1);
 			} else {
 				$qref = '';
