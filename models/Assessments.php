@@ -235,17 +235,14 @@ class Assessments extends BaseImasAssessments
 
     public static function getByCourseIdJoinWithSessionData($assessmentId, $userId, $isteacher, $istutor)
     {
-        $query = new Query();
-        $query->select(['imas_assessments.name', 'imas_assessments.timelimit', 'imas_assessments.defpoints', 'imas_assessments.tutoredit', 'imas_assessments.defoutcome',
-            'imas_assessments.showhints', 'imas_assessments.deffeedback', 'imas_assessments.enddate', 'imas_assessment_sessions.*'])
-            ->from('imas_assessments')
-            ->join('INNER JOIN',
-                'imas_assessment_sessions',
-                'imas_assessments.id=imas_assessment_sessions.assessmentid'
-            )
-            ->where('imas_assessment_sessions.id = :assessmentId');
-        (!$isteacher && !$istutor) ? $query->andWhere('imas_assessment_sessions.userid = :userId') : $query->andWhere(':userId = :userId');
-        $command = $query->createCommand()->bindValues([':assessmentId' => $assessmentId,':userId' => $userId]);
+        $query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,imas_assessments.defoutcome,";
+        $query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
+        $query .= "FROM imas_assessments,imas_assessment_sessions ";
+        $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id=$assessmentId ";
+        if (!$isteacher && !$istutor) {
+            $query .= " AND imas_assessment_sessions.userid=$userId";
+        }
+        $command = Yii::$app->db->createCommand($query);
         $data = $command->queryOne();
         return $data;
     }

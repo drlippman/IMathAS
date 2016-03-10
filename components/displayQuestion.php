@@ -19,7 +19,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
     $path = AppUtility::getHomeURL()."Uploads";
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
-
 	srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;

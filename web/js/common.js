@@ -56,7 +56,7 @@ function CommonPopUp(message)
     var html = '<div><p>'+message+'</p></div>';
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: '', zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
+        width: 'auto', resizable: false,draggable:false,
         closeText: "hide",
         buttons: {
             "Ok": function () {

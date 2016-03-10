@@ -116,11 +116,11 @@ function removeSuccess(response) {
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
-                "Nevermind": function () {
+                "Cancel": function () {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "Yes,Delete": function () {
+                "Confirm": function () {
                     window.location = "actions?action=delete&id=" + id;
                 }
             },

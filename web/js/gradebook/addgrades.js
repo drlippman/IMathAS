@@ -548,16 +548,10 @@ function sendtoall(w,type) {
         var html ='<div><p> "Text" field should not be empty.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto', resizable: false,draggable: false,
             closeText: "hide",
             buttons: {
-                "Cancel": function () {
-
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "Confirm": function () {
-
+                "Ok": function () {
                     $(this).dialog("close");
                     for (var e = 0; e<form.elements.length; e++) {
                         var el = form.elements[e];
@@ -578,26 +572,33 @@ function sendtoall(w,type) {
                     return true;
                 }
             },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
+            },
             close: function (event, ui) {
-                $(this).remove();
+                jQuery(this).remove();
             }
         });
         return;
     }
+    b =document.getElementById("toallfeedback").value;
+    if(w==1 && b.length== 0 && type!=2)
+    {
+        var message = " 'Text' field should not be empty.";
+        CommonPopUp(message);
+        return;
+    }
     if (type==2 && w==1 && document.getElementById("toallfeedback").value == "" )
     {
-        var html ='<div><p> Are you sure, You want to remove all feedback?</p></div>';
+        var html ='<div><p> "Text" field should not be empty.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
-                "Cancel": function () {
-
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "Confirm": function () {
+                "Ok": function () {
 
                     $(this).dialog("close");
                     for (var e = 0; e<form.elements.length; e++) {
@@ -612,6 +613,11 @@ function sendtoall(w,type) {
                     document.getElementById("toallgrade").value = '';
                     return true;
                 }
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
             },
             close: function (event, ui) {
                 $(this).remove();

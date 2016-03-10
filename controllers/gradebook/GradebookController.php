@@ -1189,7 +1189,6 @@ class GradebookController extends AppController
                         $i = $gradeidx[$gradeSelect['gradetypeid']];
                         $row = $sturow[$gradeSelect['userid']];
                         $col = $gradecol[$gradeSelect['gradetypeid']];
-
                         $gradebook[$row][1][$col][2] = $gradeSelect['id'];
                         if ($gradeSelect['score'] != null) {
                             $gradebook[$row][1][$col][0] = 1 * $gradeSelect['score'];
@@ -2116,7 +2115,6 @@ class GradebookController extends AppController
         }
         if ($params['gbitem'] == "new") {
             $studentsData = Student::getByCourseAndGradesToAllStudents($params['cid'], $params['grades'], $hassection, $sortorder);
-
             $finalStudentArray = array();
             foreach ($studentsData as $singleStudent) {
                 $finalArray = array(
@@ -3167,9 +3165,8 @@ class GradebookController extends AppController
         } else {
             $assessmentId = $params['asid'];
         }
-        $assessmentData = Assessments::getByCourseIdJoinWithSessionData($assessmentId, $currentUser['id'], $isTeacher, $isTutor);
-
-        if (!$isteacher && !$istutor) {
+        $assessmentData = Assessments::getByCourseIdJoinWithSessionData($assessmentId, $params['uid'], $isTeacher, $isTutor);
+        if (!$isTeacher && !$isTutor) {
             $rv = new ContentTrack;
             $rv->insertFromGradebook($currentUser->id, $courseId, 'gbviewasid', $assessmentData['assessmentid'], time());
         }
@@ -3185,7 +3182,7 @@ class GradebookController extends AppController
         } else {
             $canedit = 0;
         }
-        if ($asid=="new" && $isteacher)
+        if ($asid=="new" && $isTeacher)
         {
             //student could have started, so better check to make sure it still doesn't exist
             $aid = $params['aid'];
@@ -3219,7 +3216,7 @@ class GradebookController extends AppController
             $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
         }
 
-        if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
+        if (($isTeacher || $isTutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
             if ($assessmentData['agroupid']>0)
             {
                 $groupMembers = AssessmentSession::getUserForGradebook($aid,$assessmentData['agroupid']);
