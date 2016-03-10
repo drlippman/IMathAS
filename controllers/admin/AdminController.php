@@ -871,13 +871,12 @@ class AdminController extends AppController
 
                 break;
             case "chgteachers":
+                $pageTitle = 'Manage Teacher';
                 $courseChangeTeacher = Course::getById($params['id']);
                 $CourseName = $courseChangeTeacher['name'];
                 $currentTeacher = User::getUserTeacherData($params['id']);
-                $potentialUserLessThanAdmin = User::getPotentialTeacherLessThanAdmin($groupId);
-                $potentialUser = User::getPotentialTeacher();
-
-                 break;
+                $potentialUserLessThanAdmin = User::getAllTeacher($myRights,$groupId);
+                break;
             case "importmacros":
                 if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
@@ -1365,8 +1364,67 @@ class AdminController extends AppController
                 }
                 break;
             case "remteacher":
+                $groupId = AppConstant::NUMERIC_ZERO;
+                if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT || !$allowmacroinstall) {
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
+                $tids = array();
+                if (isset($_GET['tid'])) {
+                    $tids = array($_GET['tid']);
+                } else if (isset($params['tid'])) {
+                    $tids = $params['tid'];
+                    if (count($tids)==$_GET['tot']) {
+                        array_shift($tids);
+                    }
+                }
+                foreach ($tids as $tid) {
+                    if ($myRights < 100) {
+
+                        $result = Teacher::getRemoveTeacher($tid,$groupId);
+                        if (count($result)>0) {
+                           Teacher::deleteId($tid);
+                        } else {
+                            //break;
+                        }
+                    } else {
+                        Teacher::deleteId($tid);
+                    }
+                }
+                return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/forms?action=chgteachers&id='.$params['cid']));
                 exit;
             case "addteacher":
+                $groupId = AppConstant::NUMERIC_ZERO;
+                if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT || !$allowmacroinstall) {
+                    $this->setErrorFlash(AppConstant::UNAUTHORIZED);
+                    return $this->redirect($this->goHome());
+                }
+                if ($myRights < 100) {
+                    $result = User::getTeacherAdd($params['cid']);
+                    if ($result['groupid'] != $groupId) {
+                        break;
+                    }
+                }
+                $tids = array();
+                if (isset($params['tid'])) {
+                    $tids = array($params['tid']);
+                } else if (isset($params['atid'])) {
+                    $tids = $params['atid'];
+                }
+                $insTids = array();
+                $ins = array();
+                foreach ($tids as $tid) {
+                    $insTids[] = $tid;
+                }
+
+                if (count($insTids)>0) {
+                    foreach($insTids as $insTid){
+                        $teacher = new Teacher();
+                        $returnId = $teacher->create($insTid, $params['cid']);
+                    }
+
+                }
+                return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/forms?action=chgteachers&id='.$params['cid']));
                 exit;
             case "importmacros":
                 if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {

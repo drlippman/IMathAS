@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </a>
                         <ul class='dropdown-menu'>
                             <li>
-                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid=' . $page_courseList[$i]['id']); ?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=chgteachers&id='.$page_courseList[$i]['id']); ?>">
                                     <i class="fa fa-pencil"></i>&nbsp;<?php AppUtility::t('Add/Remove'); ?></a>
                             </li>
                             <li>

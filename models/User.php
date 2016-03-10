@@ -895,7 +895,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             ->join('INNER JOIN',
                 'imas_teachers',
                 'imas_teachers.userid=imas_users.id'
-            )->where('imas_teachers.courseid=:courseId',[':course'=> $courseId]);
+            )->where('imas_teachers.courseid=:courseId',[':courseId'=> $courseId]);
         $query->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -954,5 +954,22 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
                   WHERE imas_students.courseid=:courseId
                   ORDER BY iu.LastName,iu.FirstName";
         return Yii::$app->db->createCommand($query)->bindValue(':courseId', $courseId)->query();
+    }
+
+    public static function getAllTeacher($myRights,$groupid){
+        if ($myRights<100) {
+            $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid='$groupid' ORDER BY LastName;";
+        } else if ($myRights==100) {
+            $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;";
+
+        }
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getTeacherAdd($courseId)
+    {
+        $query = "SELECT imas_users.groupid FROM imas_users,imas_courses WHERE imas_courses.ownerid=imas_users.id AND imas_courses.id=:courseId";
+        $command = Yii::$app->db->createCommand($query)->bindValue(':courseId', $courseId);
+        return $data = $command->queryOne();
     }
 }

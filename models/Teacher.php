@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
 use Yii;
 use app\models\_base\BaseImasTeachers;
 use yii\db\Query;
@@ -126,5 +127,21 @@ class Teacher extends BaseImasTeachers
     public static function getUserAndCourseId($courseId, $userId)
     {
         return self::find()->select('id')->where(['courseid' => $courseId, 'userid' => $userId])->all();
+    }
+
+    public static function getRemoveTeacher($tid,$groupid)
+    {
+        $query = "SELECT imas_teachers.id FROM imas_teachers,imas_users WHERE imas_teachers.id=:tid AND imas_teachers.userid=imas_users.id AND imas_users.groupid=:groupid";
+        $command = Yii::$app->db->createCommand($query)->bindValues([':tid' => $tid, ':groupid' => $groupid]);
+        $data = $command->queryOne();
+        return $data;
+    }
+
+    public static function deleteId($tId)
+    {
+        $deleteId = Teacher::find()->where(['id' => $tId])->one();
+        if ($deleteId) {
+            $deleteId->delete();
+        }
     }
 }

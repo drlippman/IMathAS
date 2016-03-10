@@ -159,6 +159,7 @@ class AppConstant
     const BLOCK = 'Block';
     const MESSAGE_SUCCESS = 'Message sent successfully.';
     const FIRST_NAME = 'FirstName';
+    const LAST_NAME = 'LastName';
     const ENROLL_SUCCESS = 'You have been enrolled in course ';
     const ALREADY_ENROLLED = 'You are already enrolled in the course.';
     const TEACHER_CANNOT_ENROLL_AS_STUDENT = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';

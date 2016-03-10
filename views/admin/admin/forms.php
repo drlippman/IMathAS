@@ -16,7 +16,11 @@ if (isset($params['cid'])) {
     <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
     </div>
-<?php } else{?>
+<?php } elseif($action == 'chgteachers'){?>
+    <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+    </div>
+<?php } else {?>
 
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin','Course Creation Confirmation'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
@@ -454,9 +458,9 @@ switch ($action) {
         <?php echo "</div>";
         break;
     case "chgteachers":
-        echo '<div id="headerforms" class="pagetitle">';
-		echo "<h2>{$CourseName}</h2>\n";
-		echo '</div>';
+        echo '<div id="" class="col-md-12 col-sm-12">';
+
+
 
         echo "<h4>Current Teachers:</h4>\n";
         $num = count($currentTeacher);
@@ -466,7 +470,7 @@ switch ($action) {
         echo "<table cellpadding=5>\n";
         $onlyOne = ($num == 1);
 
-            	foreach($courseChangeTeacher as $key=> $line) {
+            	foreach($currentTeacher as $key=> $line) {
 
                     if ($onlyOne) {
                         echo '<tr><td></td>';
@@ -482,16 +486,25 @@ switch ($action) {
                     }
                     $used[$line['userid']] = true;
                 }
-        echo "</table></form>\n";
+        echo "</table></form><br/>";
 
         echo "<h4>Potential Teachers:</h4>\n";
-        if($myRights < AppConstant::ADMIN_RIGHT)
-        {
-            $potentialUserLessThanAdmin;
-        } elseif($myRights == AppConstant::ADMIN_RIGHT){
-            $potentialUser;
+        echo '<form method="post" action="actions?action=addteacher&cid='.$_GET['id'].'">';
+        echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
+        echo "<table cellpadding=5>\n";
+        foreach($potentialUserLessThanAdmin as $line) {
+            if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
+            if ($used[$line['id']]!=true) {
+                echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
+                echo "<td>{$line['LastName']}, {$line['FirstName']} </td> ";
+                echo "<td><a href=\"actions?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
+            }
         }
+        echo "</table></form><br/>";
+        echo "<p><input type=button value=\"Done\" onclick=\"window.location='index'\" /></p>\n";
+        echo '</div>';
         break;
+
     case "importmacros":
         ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importmacros">
