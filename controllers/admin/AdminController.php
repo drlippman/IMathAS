@@ -1105,22 +1105,42 @@ class AdminController extends AppController
                 $firstName = $params['firstname'];
                 $lastName = $params['lastname'];
                 $rights = $params['newrights'];
-                $email = $params['email'];
+                $email = $params["email"];
+                if (empty($_POST["email"])) {
+                    $this->setErrorFlash("Email can not be blank.");
+                    return $this->redirect('forms?action=newadmin');
+                } else {
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $this->setErrorFlash("Invalid email format.");
+                    return $this->redirect('forms?action=newadmin');
+                    }
+                }
                 $user = new User();
                 $newUser = $user->addUserFromAdmin($adminName, $md5pw, $firstName, $lastName,$rights, $email, $newGroup,$homelayout);
                 if($newUser->errors['SID'])
                 {
-                    $this->setErrorFlash("User name should contain at most 50 characters.");
+                    $this->setErrorFlash("User name can not be blank.");
                     return $this->redirect('forms?action=newadmin');
                 }
                 if($newUser->errors['FirstName'])
                 {
-                    $this->setErrorFlash("FirstName should contain at most 100 characters.");
+                    $this->setErrorFlash("FirstName can not be blank.");
                     return $this->redirect('forms?action=newadmin');
                 }
                 if($newUser->errors['LastName'])
                 {
-                    $this->setErrorFlash("LastName should contain at most 100 characters.");
+                    $this->setErrorFlash("LastName can not be blank.");
+                    return $this->redirect('forms?action=newadmin');
+                }
+                if($newUser->errors['email'])
+                {
+                    $this->setErrorFlash("Email can not be blank.");
+                    return $this->redirect('forms?action=newadmin');
+                }
+
+                if($newUser->errors['password'])
+                {
+                    $this->setErrorFlash("Password can not be blank.");
                     return $this->redirect('forms?action=newadmin');
                 }
                 $newUserid = $newUser['id'];

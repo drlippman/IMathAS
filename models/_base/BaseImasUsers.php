@@ -69,7 +69,8 @@ class   BaseImasUsers extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-       //     [['SID', 'password', 'FirstName', 'LastName', 'email', 'hideonpostswidget'], 'required'],
+//            [['SID', 'password', 'FirstName', 'LastName', 'email', 'hideonpostswidget'], 'required'],
+            [['SID', 'password', 'FirstName', 'LastName', 'email'], 'required'],
             [['rights', 'lastaccess', 'groupid', 'msgnotify', 'qrightsdef', 'deflib', 'usedeflib', 'hasuserimg', 'listperpage'], 'integer'],
             [['hideonpostswidget'], 'string'],
 //            [['SID'], 'string', 'max' => 50],

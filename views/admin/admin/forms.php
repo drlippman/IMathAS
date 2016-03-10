@@ -20,7 +20,11 @@ if (isset($params['cid'])) {
     <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
     </div>
-<?php } else {?>
+<?php } elseif($action == 'newadmin'){?>
+    <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+    </div>
+<?php }else {?>
 
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin','Course Creation Confirmation'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
@@ -79,12 +83,12 @@ switch ($action) {
             echo "\">";
             if ($getAction == "newadmin") {
                 echo "<div class='col-md-2 col-sm-2'>New User username</div>
-                <input class='form form-control-1' type=text size=40 name=adminname><BR class=form>\n";
+                <input class='form form-control-1' type=text size=40 name=adminname maxlength='30'><BR class=form>\n";
                 echo "<div class='col-md-2 col-sm-2'>First Name</div>
-                <input class='form form-control-1' required='' type=text size=40 name=firstname><BR class=form>\n";
+                <input class='form form-control-1'  type=text size=40 name=firstname maxlength='30'><BR class=form>\n";
                 echo "<div class='col-md-2 col-sm-2'>Last Name</div>
-                <input class='form form-control-1'  required='' type=text size=40 name=lastname><BR class=form>\n";
-                echo "<div class='col-md-2 col-sm-2'>Email</div> <input class='form form-control-1' type=email size=40 name=email><BR class=form>\n";
+                <input class='form form-control-1'  type=text size=40 name=lastname maxlength='30'><BR class=form>\n";
+                echo "<div class='col-md-2 col-sm-2'>Email</div> <input class='form form-control-1' type=text size=40 name=email><BR class=form>\n";
                 echo '<div class="col-md-2 col-sm-2">Password</div> <input class="form form-control-1" type="password" size="40" name="password"/><br class="form"/>';
                 $oldGroup = 0;
                 $oldRights = 10;
@@ -137,10 +141,9 @@ switch ($action) {
                 }
                 echo "</select></div><br class=form /><br/>";
             }
-//            echo "<br/><div class=submit><input type=submit value=Save></div></form><br/>";
             ?>
-    <div class="header-btn col-md-6 col-sm-6 col-sm-offset-2 col-md-offset-2 padding-bottom-ten padding-left-zero">
-                <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save' ?></button>
+            <div class="header-btn col-md-6 col-sm-6 padding-bottom-ten padding-left-zero">
+               <br/> <button class="btn btn-primary" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Save' ?></button>
             </div><br class="form">
 
             <?php
