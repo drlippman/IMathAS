@@ -2342,7 +2342,7 @@ class GradebookController extends AppController
                         $grades = new Grades;
                         $grades->createGradesByUserId($updateGrades);
                     } else if (trim($params['feedback'][$k]) != '') {
-                        $updateGrades['score'] = 'NULL';
+                        $updateGrades['score'] = NULL;
                         $updateGrades['gradetype'] = 'offline';
                         $updateGrades['gradetypeid'] = $params['gbitem'];
                         $updateGrades['feedback'] = $params['feedback'][$k];
