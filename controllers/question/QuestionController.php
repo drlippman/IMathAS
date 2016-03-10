@@ -540,6 +540,7 @@ class QuestionController extends AppController
 
                     if (isset($search)) {
                         $result = QuestionSet::getByUserIdJoin($searchAll, $userId, $lList, $searchMine, $searchLikes);
+
                         if ($search == 'recommend' && count($existingQuestion) > AppConstant::NUMERIC_ZERO) {
                             $existingQList = implode(',', $existingQuestion);  //pulled from database, so no quotes needed
                             $result = QuestionSet::getByUserId($assessmentId, $userId, $existingQList);
