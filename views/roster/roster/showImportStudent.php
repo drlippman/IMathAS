@@ -90,15 +90,14 @@ $this->title = 'Show imported students details';
                 </thead>
                 <tbody class="user-table-body" >
                 <?php
-                if (isset($duplicateStudents)) {
-                    foreach ($duplicateStudents as $singleRecord) {
-
+                if (isset($existingStudent)) {
+                    foreach ($existingStudent as $singleRecord) {
                         ?>
                         <tr>
-                            <td class="word-break-break-all"><?php echo $singleRecord[0] ?></td>
-                            <td class="word-break-break-all"><?php echo $singleRecord[1] ?></td>
-                            <td class="word-break-break-all"><?php echo $singleRecord[2] ?></td>
-                            <td class="word-break-break-all"><?php echo $singleRecord[3] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord['userName'] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord['firstName'] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord['lastName'] ?></td>
+                            <td class="word-break-break-all"><?php echo $singleRecord['email'] ?></td>
                             <?php if ($isCodePresent == 1) {
                                 ?>
                                 <th class="word-break-break-all"><?php echo $singleRecord[4] ?></th>
@@ -115,7 +114,7 @@ $this->title = 'Show imported students details';
             </table>
         <div class="form-group col-sm-12 col-md-12 padding-bottom-one-em padding-top-one-em">
             <div class="roster-submit col-sm-12 col-md-12 padding-left-zero">
-                <span class="padding-right-one-em"><input type="button" onclick="saveStudentData()" value="Submit" class ="btn btn-primary"></span>
+                <span class="padding-right-one-em"><input type="button" onclick="saveStudentData()" value="Accept and Enroll" class ="btn btn-primary"></span>
                 <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$courseId)  ?>"><i class="fa fa-share header-right-btn"></i>Back</a>
             </div>
         </div>

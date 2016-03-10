@@ -1631,14 +1631,7 @@ class AssessmentController extends AppController
                 if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
                     if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                         $isreview = true;
-                    } else {
-                        if (!$isteacher) {
-                            $temp .= 'Assessment is closed';
-                            $this->leavetestmsg($sessiondata);
-                            return $temp;
-                        }
-                    }
-                }
+                    }                 }
             }
         } else {
             $row = Exceptions::getStartDateEndDate($sessiondata['actas'], $line['assessmentid']);
@@ -4044,9 +4037,8 @@ class AssessmentController extends AppController
                         $isReview = true;
                     } else {
                         if (!$isTeacher) {
-                            $temp .= "Assessment is closed";
-                            $temp .= "<br/><a href=\"../course/course?cid={$testSettings['courseid']}\">Return to course page</a>";
-                            exit;
+                            $this->setErrorFlash('Assessment is closed.');
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']));
                         }
                     }
                 }
@@ -4055,9 +4047,8 @@ class AssessmentController extends AppController
                     $isReview = true;
                 } else {
                     if (!$isTeacher) {
-                        $temp .= "Assessment is closed";
-                        $temp .=  "<br/><a href=\"../course/course?cid={$testSettings['courseid']}\">Return to course page</a>";
-                        exit;
+                        $this->setErrorFlash('Assessment is closed.');
+                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']));
                     }
                 }
             }

@@ -622,7 +622,6 @@ class RosterController extends AppController
             {
                 $courseId = $params['courseId'];
             }
-
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
                 $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
@@ -691,6 +690,7 @@ class RosterController extends AppController
             {
                 $data = fgetcsv($handle, 2096);
             }
+
             while (($data = fgetcsv($handle, 2096)) !== false)
             {
                 $StudentDataArray = $this->parsecsv($data, $params);
@@ -849,7 +849,7 @@ class RosterController extends AppController
             $this->setSuccessFlash(AppConstant::STUDENT_EXISTS);
             return $this->redirect('import-student?cid='.$courseId);
         }
- 
+
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/importstudent.js', 'general.js']);
         $responseData = array( 'uniqueStudents' => $uniqueStudentsForNewStudent,'existingStudent' => $uniqueStudentsForExistingStudent, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'duplicateStudents' => $duplicateStudentsForNewStudent,'course' => $course);
