@@ -1191,12 +1191,13 @@ class SiteController extends AppController
             $email = $params['email'];
 
             if (empty($params["email"])) {
-                $emailErr = "Email is required";
+                $this->setErrorFlash("Email is required.");
+                return $this->redirect('form?action=chguserinfo');
             } else {
                 $email = ($params["email"]);
-                // check if e-mail address is well-formed
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $emailErr = "Invalid email format";
+                    $this->setErrorFlash("Invalid email format.");
+                    return $this->redirect('form?action=chguserinfo');
                 }
             }
             $userDetails = User::updateUserDetails($userId, $firstName, $lastName, $email, $msgNot, $qRightsDef, $defLib, $useDefLib, $layoutStr, $perpage,$chgUserImg);
@@ -1206,9 +1207,15 @@ class SiteController extends AppController
              $this->setWarningFlash($userDetails->errors['FirstName'][0]);
              return $this->redirect('form?action=chguserinfo');
             }
+
             if($userDetails->errors['LastName'])
             {
                 $this->setWarningFlash($userDetails->errors['LastName'][0]);
+                return $this->redirect('action?action=chguserinfo');
+            }
+            if($userDetails->errors['email'])
+            {
+                $this->setWarningFlash($userDetails->errors['email'][0]);
                 return $this->redirect('action?action=chguserinfo');
             }
             if ($params['dochgpw']) {

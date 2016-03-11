@@ -108,7 +108,7 @@ switch ($action) {
                 <label for="email"><?php AppUtility::t('E-mail address'); ?></label>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-6">
-                <input class="form form-control" type=email size=60 id="email" name=email value="<?php echo $line['email'] ?>" >
+                <input class="form form-control" type=text size=60 id="email" name=email value="<?php echo $line['email'] ?>" >
             </div>
         </div>
 
