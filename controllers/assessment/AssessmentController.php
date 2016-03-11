@@ -1259,30 +1259,35 @@ class AssessmentController extends AppController
             /*
              * check for password
              */
-//            $pwfail = false;
-
-            if (trim($adata['password']) != '' && !($teacherid) && !($tutorid)) { //has passwd
+            if ((trim($adata['password']) != '') && !($teacherid) && !($tutorid)) { //has passwd
                 $pwfail = true;
                 if (isset($_POST['password'])) {
                     if (trim($_POST['password']) == trim($adata['password'])) {
-                        $pwfail = false;
+            //                        $pwfail = false;
+                        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = generateAssessmentData($adata['itemorder'], $adata['shuffle'], $aid);
+                        if ($qlist == '') {  //assessment has no questions!
+                            $this->setErrorFlash(AppConstant::NO_QUESTIONS);
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
+                        }
                     } else {
-//                        $this->setWarningFlash('Password incorrect.  Try again.');
-//                        return $this->redirect('show-test?cid='.$courseId.'&id='.$aid);
-                        $out = '<p>' . _('Password incorrect.  Try again.') . '<p>';
+                        $this->setWarningFlash('Password incorrect.  Try again.');
+                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
                     }
                 }
-                if ($pwfail) {
-                    $temp .= $out;
+                else if ($pwfail) {
+                    $temp .= " ";
                     $temp .= '<h2>' . $adata['name'] . '</h2>';
                     $temp .= '<p>' . "Password required for access" . '</p>';
                     $temp .= "<form method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?cid={$getCid}&amp;id={$getId}\">";
                     $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
+                    $temp.='<input type="hidden" name="check" value="check" />';
                     $temp .= '<input type=submit class="btn btn-primary" value="' . 'Submit' . '" />';
                     $temp .= "</form>";
                     return $temp;
                 }
             }
+
+
             /*
              * get latepass info
              */
@@ -1431,9 +1436,9 @@ class AssessmentController extends AppController
                 session_write_close();
                 return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-test'));
             } else { //returning to test
-
+                $groupAdmin = $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
                 $deffeedback = explode('-', $adata['deffeedback']);
-                if ($myrights> 10 || $teacherid|| $tutorid) {  // is teacher or guest - delete out out assessment session
+                if ($teacherid|| $tutorid ||$groupAdmin || $myrights<6) {  // is teacher or guest - delete out out assessment session
                     filehandler::deleteasidfilesbyquery2('userid', $userid, $aid, 1);
                     AssessmentSession::deleteData($userid, $aid);
                     return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid=' . $getCid . '&id=' . $aid));
