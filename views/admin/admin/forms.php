@@ -99,7 +99,7 @@ switch ($action) {
 
             }
             ?>
-             <div class="col-md-2 col-sm-2 padding-left-zero"><a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'help.php?section=rights' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
+             <div class="col-md-2 col-sm-2 padding-left-zero"><a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=rights' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
                  <?php AppUtility::t('Set User rights to')?></div>
 
             <?php  echo "<div class='col-md-4 col-sm-4 padding-left-zero'><input type=radio name=\"newrights\" value=\"5\" ";

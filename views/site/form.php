@@ -44,19 +44,19 @@ switch ($action) {
 
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
             <div class="col-md-2 col-sm-3 padding-top-pt-five-em">
-                <label for="firstname"><?php AppUtility::t('Enter First Name'); ?></label>
+                <label for="firstname"><?php AppUtility::t('First Name'); ?></label>
             </div>
             <div class="col-md-8 col-sm-8">
-                <input class='form form-control-1' required="" type=text size=20 id="firstname" name=firstname  value="<?php echo $line['FirstName'] ?>" />
+                <input class='form form-control-1' required="" type=text size=20 maxlength='30' id="firstname" name=firstname  value="<?php echo $line['FirstName'] ?>" />
             </div>
         </div>
 
         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-em">
             <div class="col-md-2 col-sm-3 padding-top-pt-five-em">
-                <label for="lastname"><?php AppUtility::t('Enter Last Name'); ?></label>
+                <label for="lastname"><?php AppUtility::t('Last Name'); ?></label>
             </div>
             <div class="col-md-6 col-sm-6">
-            <input class='form form-control'required="" type=text size=20 id=lastname name=lastname value="<?php echo $line['LastName'] ?>" >
+            <input class='form form-control'required="" type=text size=20 id=lastname maxlength='30' name=lastname value="<?php echo $line['LastName'] ?>" >
             </div>
         </div>
 

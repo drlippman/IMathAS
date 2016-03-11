@@ -11,7 +11,7 @@ class UpdateAssessUtility extends Component
     public static function updateassess($aidarr, $removewithdrawn, $doreplaceby)
     {
         if (!$removewithdrawn && !$doreplaceby) {
-            return 'No changes reqested';
+            return 'No changes requested';
         }
         if (is_array($aidarr)) {
             foreach ($aidarr as $k => $v) {
@@ -20,10 +20,10 @@ class UpdateAssessUtility extends Component
         }
 
         if ($doreplaceby) {
-            Questions::updateQuestionSetId($aidarr);
+            Questions::updateQuestionSetId(is_array($aidarr));
         }
         if ($removewithdrawn) {
-            $query = Questions::FindAssessmentAndWithdrawn($aidarr);
+            $query = Questions::FindAssessmentAndWithdrawn(is_array($aidarr));
             $todoaid = array();
             $withdrawn = array();
             if ($query) {
