@@ -2996,56 +2996,9 @@ class AppUtility extends Component
         }
         if (isset($teacherId) && count($topBar[1])>0 && $topBar[2] == 0) {
 
-            echo '<div class=breadcrumb>';
-            if (in_array(0,$topBar[1]) && $msgSet<4) { //messages
-                echo "<a href=\"$imasroot/msgs/msglist.php?cid=$courseId\">", _('Messages'), "</a>$newMsgs &nbsp; ";
-            }
-            if (in_array(6,$topBar[1])) { //Calendar
-                echo "<a href=\"$imasroot/forums/forums.php?cid=$courseId\">", _('Forums'), "</a>$newPostsCnt &nbsp; ";
-            }
-            if (in_array(1,$topBar[1])) {
-                //Stu view
-                echo "<a href=\"course.php?cid=$courseId&stuview=0\">", _('Student View'), "</a> &nbsp; ";
-            }
-            if (in_array(3,$topBar[1])) { //List stu
-                echo "<a href=\"listusers.php?cid=$courseId\">", _('Roster'), "</a> &nbsp; \n";
-            }
-            if (in_array(2,$topBar[1])) { //Gradebook
-                echo "<a href=\"gradebook.php?cid=$courseId\">", _('Gradebook'), "</a>$gbnewflag &nbsp; ";
-            }
-            if (in_array(7,$topBar[1])) { //List stu
-                echo "<a href=\"managestugrps.php?cid=$courseId\">", _('Groups'), "</a> &nbsp; \n";
-            }
-            if (in_array(4,$topBar[1])) { //Calendar
-                echo "<a href=\"showcalendar.php?cid=$courseId\">", _('Calendar'), "</a> &nbsp; \n";
-            }
-            if (in_array(5,$topBar[1])) { //Calendar
 
-                echo "<a href=\"course.php?cid=$courseId&quickview=on\">", _('Quick View'), "</a> &nbsp; \n";
-            }
-
-            if (in_array(9,$topBar[1])) { //Log out
-                echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
-            }
-            echo '<div class=clear></div></div>';
         } else if (!isset($teacherId) && ((count($topBar[0])>0 && $topBar[2]==0) || ($previewShift>-1 && !$useViewButtons))) {
-            echo '<div class=breadcrumb>';
             if ($topBar[2]==0) {
-                if (in_array(0,$topBar[0]) && $msgSet<4) { //messages
-                    echo "<a href=\"$imasroot/msgs/msglist.php?cid=$courseId\">", _('Messages'), "</a>$newMsgs &nbsp; ";
-                }
-                if (in_array(3,$topBar[0])) { //forums
-                    echo "<a href=\"$imasroot/forums/forums.php?cid=$courseId\">", _('Forums'), "</a>$newPostsCnt &nbsp; ";
-                }
-                if (in_array(1,$topBar[0])) { //Gradebook
-                    echo "<a href=\"gradebook.php?cid=$courseId\">", _('Show Gradebook'), "</a>$gbnewflag &nbsp; ";
-                }
-                if (in_array(2,$topBar[0])) { //Calendar
-                    echo "<a href=\"showcalendar.php?cid=$courseId\">", _('Calendar'), "</a> &nbsp; \n";
-                }
-                if (in_array(9,$topBar[0])) { //Log out
-                    echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
-                }
                 if ($previewShift>-1 && count($topBar[0])>0) { echo '<br />';}
             }
             if ($previewShift>-1 && !$useViewButtons) {

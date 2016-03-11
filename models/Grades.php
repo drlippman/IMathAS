@@ -21,7 +21,6 @@ class Grades extends BaseImasGrades
             if(!$this->save()){
                 AppUtility::dump($this->getErrors());
             }
-//                AppUtility::dump("wow");
             return $this;
     }
 
