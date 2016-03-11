@@ -1867,23 +1867,7 @@ public static function makeTopMenu($studview) {
 <?php    /*if (($teacherId) && count($topBar[1]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) {
 
     } else*/ if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || $studview)) {
-        echo '<div class=breadcrumb>';
         if ($topBar[2] == AppConstant::NUMERIC_ZERO) {
-            if (in_array(0,$topBar[0]) && $msgSet < AppConstant::NUMERIC_FOUR) { //messages
-                echo "<a href=\"#\">", _('Messages'), "</a>$newMsgs &nbsp; ";
-            }
-            if (in_array(3,$topBar[0])) { //forums
-                echo "<a href=\"#\">", _('Forums'), "</a>$newMsgs &nbsp; ";
-            }
-            if (in_array(1,$topBar[0])) { //Gradebook
-                echo "<a href=\"#\">", _('Show Gradebook'), "</a>$gbnewflag &nbsp; ";
-            }
-            if (in_array(2,$topBar[0])) { //Calendar
-                echo "<a href=\"#\">", _('Calendar'), "</a> &nbsp; \n";
-            }
-            if (in_array(9,$topBar[0])) { //Log out
-                echo "<a href=\"#\">", _('Log Out'), "</a>";
-            }
             if ($previewshift>-1 && count($topBar[0]) > AppConstant::NUMERIC_ZERO) { echo '<br/>';}
         }
     if ($previewshift>-1 || $studview) {
