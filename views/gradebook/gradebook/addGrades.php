@@ -27,11 +27,7 @@ if ($params['gbitem'] == 'new') {
 <div class="tab-content shadowBox">
 <div class="col-sm-12 col-md-12 add-offline-grades-form">
 <?php
-if ($istutor) {
-    if($isTutorEdit) {
-        echo AppConstant::NO_AUTHORITY;
-    }
-} else if (!$isteacher) {
+ if (!$isteacher) {
     echo AppConstant::NO_TEACHER_RIGHTS;
 }
 if (isset($params['del']) && $isteacher) {
@@ -43,7 +39,7 @@ if (isset($params['del']) && $isteacher) {
     <?php }
 }
 if ($params['grades'] == 'all') {
-if (!isset($params['isolate'])) {
+    if (!($_GET['isolate'])) {
 $name = $defaultValuesArray[0];
 $points = $defaultValuesArray[1];
 $showdate = $defaultValuesArray[2];
@@ -266,10 +262,11 @@ if ($params['gbitem'] == 'new') { ?>
         </span>
     </div>
     <?php }
-    } else { ?>
+    } else {
+        ?>
         <div class="margin-left-twenty-eight"> <h3><?php echo $gbItems['name'];?></h3> </div>
         <?php     $rubric = $gbItems['rubric'];
-        $points = $gbItems['points'];
+                  $points = $gbItems['points'];
     }
     } else { ?>
         <h3 class="padding-left-thirty margin-top-minus-ten"><?php echo $gbItems['name']; ?></h3>

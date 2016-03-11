@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
-
+$this->title = AppUtility::t('Make Start/Due Date Exception', false);
 if ($overwriteBody == 1) {
     echo $body;
 
@@ -16,8 +16,23 @@ if ($overwriteBody == 1) {
         window.location = togo;
     }
 </script>
-<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-<div id="headerexception" class="pagetitle"><h2>Make Start/Due Date Exception</h2></div>
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
+    </div>
+    <div class = "title-container padding-bottom-two-em">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page word-wrap-break-word"><?php echo $this->title ?></div>
+            </div>
+        </div>
+    </div>
+    <div class="item-detail-content">
+        <?php if($isTeacher) {
+            echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
+        } elseif($isTutor || $isStudent){
+            echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $isTutor]);
+        }?>
+    </div>
 <div class="tab-content shadowBox col-md-12 col-sm-12 padding-bottom-two-em">
     <?php
     echo '<div class="col-md-12"><h3 class="col-md-12 col-sm-12">' . $stuname . '</h3></div>';

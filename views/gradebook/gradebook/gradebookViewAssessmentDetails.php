@@ -4,7 +4,9 @@ use \app\components\interpretUtility;
 use app\models\Assessments;
 use \app\components\CategoryScoresUtility;
 
-global $isteacher, $istutor, $temp;
+$this->title = AppUtility::t('Grade Book Detail', false);
+
+global $isTeacher, $isTutor, $temp;
 $isteacher = $defaultValuesArray['isteacher'];
 $gbmode = $defaultValuesArray['gbmode'];
 $istutor = $defaultValuesArray['istutor'];
@@ -18,7 +20,7 @@ $pers = $defaultValuesArray['pers'];
 $stu = $params['stu'];
 
 //PROCESS ANY TODOS
-if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
+if (isset($params['clearattempt']) && isset($params['asid']) && $isTeacher) {
 
     if ($params['clearattempt'] == "true") {
         $isgroup = $defaultValuesArray['groupId'];
@@ -40,7 +42,7 @@ if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
     }
 }
 
-if (isset($params['breakfromgroup']) && isset($params['asid']) && $isteacher) {
+if (isset($params['breakfromgroup']) && isset($params['asid']) && $isTeacher) {
     if ($params['breakfromgroup'] == "confirmed") {
     } else {
         echo $defaultValuesArray['studentNameWithAssessmentName'];
@@ -56,7 +58,7 @@ if (isset($params['breakfromgroup']) && isset($params['asid']) && $isteacher) {
     }
 }
 
-if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
+if (isset($params['clearscores']) && isset($params['asid']) && $isTeacher) {
     if ($_GET['clearscores'] == "true") {
         $isgroup = $defaultValuesArray['groupId'];
         if ($isgroup) {
@@ -112,9 +114,9 @@ if ($links == 0) { //View/Edit full assessment
 $coursetheme = 'default.css';
 $useeditor = 'review';
 $sessiondata['coursetheme'] = $coursetheme;
-$sessiondata['isteacher'] = $isteacher;
+$sessiondata['isteacher'] = $isTeacher;
 
-if ($isteacher || $istutor) {
+if ($isTeacher || $isTutor) {
     $placeinhead = '<script type="text/javascript" src="' . AppUtility::getBasePath() . '/web/js/gradebook/rubric.js?v=070113"></script>';
 
 }
@@ -127,35 +129,31 @@ echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 //    exit;
 //}
 $line = $assessmentData;
-echo "<div class=breadcrumb>$breadcrumbbase ";
-if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype'] != 0) {
-    echo "<a href=\"course?cid={$_GET['cid']}\">$coursename</a> &gt; ";
 
-    if ($stu > 0) {
-        echo "<a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> ";
-        echo "&gt; <a href=\"gradebook?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
-        $backurl = "gradebook?stu=$stu&cid=$cid";
-    } else if ($_GET['from'] == "isolate") {
-        echo " <a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> ";
-        echo "&gt; <a href=\"isolate-assess-grade?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";
-        $backurl = "isolateassessgrade?cid=$cid&aid={$line['assessmentid']}";
-    } else if ($_GET['from'] == "gisolate") {
-        echo "<a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> ";
-        echo "&gt; <a href=\"isolate-assessby-group?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";
-        $backurl = "isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}";
-    } else if ($_GET['from'] == 'stugrp') {
-        echo "<a href=\"manage-stu-grps?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
-        $backurl = "manage-stu-grps?cid=$cid&aid={$line['assessmentid']}";
-    } else {
-        echo "<a href=\"gradebook?stu=0&cid=$cid\">Gradebook</a> &gt; ";
-        $backurl = "gradebook?stu=0&cid=$cid";
-    }
-}
-echo "Detail</div>";
+?>
+
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, '>>'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container padding-bottom-two-em">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page word-wrap-break-word"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php if($isTeacher) {
+        echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
+    } elseif($isTutor || $isStudent){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $isTutor]);
+    }?>
+</div>
+<?php
 /*
  * start shadow-box
  */
-echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
+
 echo '<div class="col-md-12 col-sm-12 padding-left-right-zero tab-content shadowBox padding-bottom-two-em">';
 
 echo "<div class='col-md-12 col-sm-12 padding-bottom-fifteen'>";
@@ -182,14 +180,14 @@ if ($canedit) {
 }
 
 list($testtype, $showans) = explode('-', $line['deffeedback']);
-if ($showans == 'N' && !$isteacher && !$istutor) {
+if ($showans == 'N' && !$isTeacher && !$isTutor) {
     echo "You shouldn't be here";
     exit;
 }
 echo "<h4 class='col-md-12 col-sm-12 margin-top-zero'>{$line['name']}</h4>\n";
 $aid = $line['assessmentid'];
 
-if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
+if (($isTeacher || $isTutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
     if ($line['agroupid'] > 0) {
 
         echo "<p>Group members: <ul>";
@@ -227,8 +225,8 @@ if ($exceptionData['enddate']) {
     }
 }
 
-if ($isteacher) {
-    if (isset($exped) && $exped != $line['enddate']) {
+if ($isTeacher) {
+    if (($exped) && $exped != $line['enddate']) {
         echo "<div>Has exception, with due date: " . AppUtility::tzdate("F j, Y, g:i a", $exped);
         echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
         echo "<br/>Original Due Date: " . AppUtility::tzdate("F j, Y, g:i a", $line['enddate']);
@@ -238,7 +236,7 @@ if ($isteacher) {
     }
     echo "</div>";
 }
-if ($isteacher) {
+if ($isTeacher) {
     if ($line['agroupid'] > 0) {
         echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. "; ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&breakfromgroup=true'); ?> ">Separate
@@ -252,7 +250,7 @@ if ($isteacher) {
 <form id="mainform" method=post
       action="gradebook-view-assessment-details?stu=<?php echo $stu ?>&cid=<?php echo $course->id ?>&from=<?php echo $from ?>&asid=<?php echo $asid ?>&update=true">
 
-<?php if ($isteacher) { ?>
+<?php if ($isTeacher) { ?>
 
     <div class="col-md-12 col-sm-12 gradebook-view-assessment-link mobile-padding-bottom-one-pt-five-em">
         <div class="col-md-2 col-sm-3 padding-top-one-pt-five-em">
@@ -279,7 +277,7 @@ if ($isteacher) {
             </a>
         </div>
         <div class="col-md-2 col-sm-4 padding-top-one-pt-five-em">
-            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/print-test?cid=' . $course->id . '&asid=' . $params['asid']); ?>"
+            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-print-test?cid=' . $course->id . '&asid=' . $params['asid']); ?>"
                target="_blank" onmouseover="tipshow(this,'Pull up a print version of this student\'s assessment')"
                onmouseout="tipout()">Print Version
             </a>
@@ -297,7 +295,7 @@ if (($line['timelimit'] > 0) && ($line['endtime'] - $line['starttime'] > $line['
     }
     echo "$over seconds.<BR>\n";
     $reset = $line['endtime'] - $line['timelimit'];
-    if ($isteacher) {
+    if ($isTeacher) {
         ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&starttime=' . $reset . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid']) ?>">
             Clear overtime and accept grade </a> </p>
@@ -560,7 +558,7 @@ for ($i = 0; $i < count($questions); $i++) {
         }
     }
 
-    if ($isteacher || $istutor || ($testtype == "Practice" && $showans != "V") || ($testtype != "Practice" && (($showans == "I" && !in_array(-1, $scores)) || ($showans != "V" && time() > $saenddate)))) {
+    if ($isTeacher || $isTutor || ($testtype == "Practice" && $showans != "V") || ($testtype != "Practice" && (($showans == "I" && !in_array(-1, $scores)) || ($showans != "V" && time() > $saenddate)))) {
         $showa = true;
     } else {
         $showa = false;
@@ -634,7 +632,7 @@ for ($i = 0; $i < count($questions); $i++) {
         echo ')';
     }
     echo "in {$attempts[$i]} attempt(s)\n";
-    if ($isteacher || $istutor) {
+    if ($isTeacher || $isTutor) {
         if ($canedit && getpts($scores[$i]) == $pts[$questions[$i]]) {
             echo '<div class="iscorrect isperfect">';
         } else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i]) == $pts[$questions[$i]])) {
@@ -749,7 +747,7 @@ for ($i = 0; $i < count($questions); $i++) {
             echo '<br/>';
         }
 
-        if ($isteacher) {
+        if ($isTeacher) {
             ?>
 
             <br><a target="_blank"
@@ -847,7 +845,7 @@ if (count($countOfQuestion) > 0) {
     echo "<h4>{$line['name']}</h4>\n";
     echo "<p>Started: " . AppUtility::tzdate("F j, Y, g:i a", $line['starttime']) . "<BR>\n";
     if ($line['endtime'] == 0) {
-        echo "lllllll Not Submitted</p>\n";
+        echo "Not Submitted</p>\n";
     } else {
         echo "Last change: " . AppUtility::tzdate("F j, Y, g:i a", $line['endtime']) . "</p>\n";
     }

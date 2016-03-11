@@ -2035,9 +2035,8 @@ class GradebookController extends AppController
             $key++;
         }
 
-        if ($params['grades'] == 'all') {
-            if (!($params['isolate'])) {
-
+        if ($_GET['grades'] == 'all') {
+            if (!($_GET['isolate'])) {
                 if ($params['gbitem'] == 'new') {
                     $defaultValuesArray = array(
                         $name = '',
@@ -2076,7 +2075,7 @@ class GradebookController extends AppController
                     $defaultValuesArray['sdate'] = AppUtility::tzdate("m/d/Y", time() + 60 * 60);
                     $defaultValuesArray['stime'] = AppUtility::tzdate("g:i a", time() + 60 * 60);
                 }
-            }else{
+            } else{
                 $gbItems = GbItems::getById($params['gbitem']);
             }
         } else {
@@ -2210,7 +2209,7 @@ class GradebookController extends AppController
             }
         } else if (!$isteacher) {
 
-            $this->setErrorFlash("You need to log in as a teacher to access this page");
+            $this->setErrorFlash("You need to log in as a teacher to access this page.");
             return $this->redirect(AppUtility::getURLFromHome('course','course/course?cid='.$courseId));
 
         }
@@ -2365,7 +2364,7 @@ class GradebookController extends AppController
         $responseData = array('studentInformation' => $studentArray, 'course' => $course, 'assessmentData' => $assessmentData, 'assessmentLabel' => $assessmentLabel, 'assessmentId' => $assessmentId
         , 'gradeData' => $gradeData, 'finalStudentArray' => $finalStudentArray, 'sortorder' => $sortorder, 'hassection' => $hassection, 'defaultValuesArray' => $defaultValuesArray,'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
             'isDelete' => $isDelete, 'pageOutcomes' => $pageOutcomes, 'isteacher' => $isteacher, 'istutor' => $istutor, 'isTutorEdit' => $isTutorEdit, 'rubricFinalData' => $rubricFinalData, 'params' => $params, 'gbItems' => $gbItems, 'gbcatsData' => $gbcatsData,
-        'rubric' => $rubric);
+        'rubric' => $rubric, 'tutoredit' => $tutoredit);
         return $this->renderWithData('addGrades', $responseData);
     }
 
@@ -3160,7 +3159,7 @@ class GradebookController extends AppController
             $from = 'gb';
             $now = time();
         }
-        if(isset($params['aid'])){
+        if(($params['aid'])){
             $assessmentId = $params['aid'];
         } else {
             $assessmentId = $params['asid'];
@@ -3570,7 +3569,7 @@ class GradebookController extends AppController
         $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion, 'groupMembers' =>$groupMembers, 'librariesName' => $librariesName,
             'questionsData' => $questionsData,'questionsInformation' => $questionsInformation, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
             'assessmentData' => $assessmentData,';assessmentAndAssessmentSessionData' => $assessmentAndAssessmentSessionData,'canedit' => $canedit,'rubricsData' => $rubrics,
-            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds);
+            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor);
         return $this->renderWithData('gradebookViewAssessmentDetails', $resposeData);
     }
 
@@ -4777,7 +4776,7 @@ class GradebookController extends AppController
                     }
 
                 }
-                return $this->redirect('gradebook-view-assessment-details?cid='.$cid.'&asid='.$assessmentSessionData['id'].'&uid='.$userId.'&stu='.$stu.'&from='.$from);
+                return $this->redirect('gradebook-view-assessment-details?cid='.$cid.'&asid='.$assessmentId.'&uid='.$userId.'&stu='.$stu.'&from='.$from);
             } else if (isset($params['clear']))
             {
                 $assessmentSessionData = AssessmentSession::getAssessmentSession($params['uid'], $params['aid']);

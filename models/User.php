@@ -105,6 +105,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->hideonpostswidget = '0';
         $this->FirstName = $params['firstName'];
         $this->LastName = $params['lastName'];
+        $this->email = $params['email'];
 //        $user = new User();
 //        $user->attributes = $params;
 
