@@ -38,7 +38,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			}
 		}
 	}
-	if (isset($GLOBALS['lastanswers'])) {
+    if (isset($GLOBALS['lastanswers'])) {
 		foreach ($GLOBALS['lastanswers'] as $iidx=>$ar) {
 			$arv = explode('##',$ar);
 			$arv = $arv[count($arv)-1];

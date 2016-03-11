@@ -3961,7 +3961,7 @@ class AssessmentController extends AppController
 
     public function actionShowPrintTest()
     {
-        global $seeds, $questions, $temp;
+        global $seeds, $questions, $temp,$lastanswers;
         $user = $this->user;
         $this->layout = 'master';
         $userId = $user['id'];
@@ -3973,7 +3973,10 @@ class AssessmentController extends AppController
         $sessionData = $this->getSessionData($sessionId);
         $scored = $this->getParamVal('scored');
         $asId = $this->getParamVal('asid');
+        $studentid = $this->isStudent($user['id'], $courseId);
         $isTeacher = (isset($teacherId) || $sessionData['isteacher'] == true);
+        $params=$this->getRequestParams();
+
         if (isset($teacherId) && ($scored)) {
             $scoredType = $scored;
             $scoredView = true;
@@ -3982,6 +3985,7 @@ class AssessmentController extends AppController
             $scoredType = 'last';
             $scoredView = false;
         }
+
         include("../components/displayQuestion.php");
         include("../components/testutil.php");
         if ($isTeacher && isset($asId)) {
@@ -4015,6 +4019,7 @@ class AssessmentController extends AppController
             $lastanswers = explode("~", $line['bestlastanswers']);
             $questions = $bestQuestions;
         }
+
         $timesontask = explode("~", $line['timeontask']);
         if ($isTeacher) {
             if ($line['userid'] != $userId) {
@@ -4025,8 +4030,9 @@ class AssessmentController extends AppController
             $userId = $line['userid'];
         }
         $testSettings = Assessments::getAssessmentDataId($line['assessmentid']);
-        list($testsettings['testtype'], $testsettings['showans']) = explode('-', $testSettings['deffeedback']);
+        list($testSettings['testtype'], $testSettings['showans']) = explode('-', $testSettings['deffeedback']);
         $qi = getquestioninfo($questions, $testSettings);
+
         $now = time();
         $isReview = false;
         if (!$scoredView && ($now < $testSettings['startdate'] || $testSettings['enddate'] < $now)) { //outside normal range for test
@@ -4038,7 +4044,7 @@ class AssessmentController extends AppController
                     } else {
                         if (!$isTeacher) {
                             $this->setErrorFlash('Assessment is closed.');
-                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']));
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testSettings['courseid']));
                         }
                     }
                 }
@@ -4048,11 +4054,12 @@ class AssessmentController extends AppController
                 } else {
                     if (!$isTeacher) {
                         $this->setErrorFlash('Assessment is closed.');
-                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testsettings['courseid']));
+                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$testSettings['courseid']));
                     }
                 }
             }
         }
+
         if ($isReview) {
             $seeds = explode(",", $line['reviewseeds']);
             $scores = explode(",", $line['reviewscores']);
@@ -4060,16 +4067,18 @@ class AssessmentController extends AppController
             $lastanswers = explode("~", $line['reviewlastanswers']);
         }
         $temp .= "<h4 style=\"float:right; \">Name: ";
+
         if(isset($teacherId)){
-            $temp .= $userFullName;
+            $temp .= ($user['FirstName']." ".$user['LastName']);
         }else{
-            $temp .= ucfirst($user['FirstName'])." ".$user['LastName'];
+            $temp .= $user['FirstName']." ".$user['LastName'];
         }
         $temp .= "</h4>\n";
         $temp .= "<h3>".$testSettings['name']."</h3>\n";
         $allowregen = ($testSettings['testtype'] == "Practice" || $testSettings['testtype']=="Homework");
         $showeachscore = ($testSettings['testtype']=="Practice" || $testSettings['testtype']=="AsGo" || $testSettings['testtype']=="Homework");
         $showansduring = (($testSettings['testtype']=="Practice" || $testSettings['testtype']=="Homework") && $testSettings['showans']!='N');
+
         $GLOBALS['useeditor']='reviewifneeded';
         $temp .= "<div class=breadcrumb style='color: black'>Print Ready Version</div>";
 
@@ -4095,10 +4104,10 @@ class AssessmentController extends AppController
                 $intropieces[$p[0]] = $introsplit[$i + 1];
             }
         }
-        $temp .= '<div class=intro>' . $testsettings['intro'] . '</div>';
-        if (($isTeacher) && !$scoredView) {
+        $temp .= '<div class=intro>' . $testSettings['intro'] . '</div>';
+        if (($teacherId) && !$scoredView) {
             $temp .= '<p>' . _('Showing Current Versions') . '<br/><button type="button" class="btn" onclick="rendersa()">' . _("Show Answers") . '</button> <a href="show-print-test?cid=' . $courseId . '&asid=' . $testId . '&scored=best">' . _('Show Scored View') . '</a> <a href="show-print-test?cid=' . $courseId . '&asid=' . $testId . '&scored=last">' . _('Show Last Attempts') . '</a></p>';
-        } else if ($isTeacher) {
+        } else if ($teacherId) {
             if ($scoredType == 'last') {
                 $temp .= '<p>' . _('Showing Last Attempts') . ' <a href="show-print-test?cid=' . $courseId . '&asid=' . $testId . '&scored=best">' . _('Show Scored View') . '</a></p>';
             } else {
@@ -4109,11 +4118,13 @@ class AssessmentController extends AppController
         if ($testSettings['showans'] == 'N') {
             $lastanswers = array_fill(0, count($questions), '');
         }
+
         $descr = $this->getParamVal('descr');
+
         for ($i = 0; $i < count($questions); $i++) {
             $qsetid = $qi[$questions[$i]]['questionsetid'];
             $cat = $qi[$questions[$i]]['category'];
-            $showa = $isTeacher;
+            $showa = $teacherId;
             if (isset($intropieces[$i + 1])) {
                 $temp .= '<div class="intro">' . $intropieces[$i + 1] . '</div>';
             }
@@ -4230,7 +4241,8 @@ class AssessmentController extends AppController
         if ($endtext != '') {
             $temp .= '<div class="intro">' . $endtext . '</div>';
         }
-        $response = array('scoredView' => $scoredView, 'testSettings' => $testSettings, 'isTeacher' => $isTeacher, 'scoredType' => $scoredType, 'testId' => $testId, 'cid' => $courseId, 'temp' => $temp);
+        $this->includeJS(['AMhelpers.js','ASCIIMathTeXImg_min.js']);
+        $response = array('scoredView' => $scoredView, 'testSettings' => $testSettings, 'isTeacher' => $teacherId, 'scoredType' => $scoredType, 'testId' => $testId, 'cid' => $courseId, 'temp' => $temp);
         return $this->renderWithData('showPrintTest', $response);
     }
 
