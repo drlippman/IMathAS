@@ -25,6 +25,7 @@ function setlib(frm) {
 			}
 		} catch(er) {}
 	}
+ console.log(chlibsn.join(","));
 	opener.setlib(chlibs.join(","));
 	opener.setlibnames(chlibsn.join(", "));
 	self.close();

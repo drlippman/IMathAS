@@ -146,7 +146,7 @@ function chkAll(frm, arr, mark) {
   }
 }
 
-function libselect() {
+function    libselect() {
     var basePath = $('.home-path').val();
     window.open(basePath+'question/question/library-tree?libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
 }

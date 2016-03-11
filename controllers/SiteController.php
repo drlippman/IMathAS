@@ -1084,7 +1084,7 @@ class SiteController extends AppController
                 if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {
                     $r = Groups::getName($groupId);
                 }
-                if ($myRights > AppConstant::TEACHER_RIGHT)
+                if ($myRights >= AppConstant::TEACHER_RIGHT)
                 {
                    $lName = Libraries::getByName($line['deflib']);
                    $lName = $lName[0]['name'];

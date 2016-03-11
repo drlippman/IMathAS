@@ -865,13 +865,17 @@ class AppController extends Controller
                 return true;
             }
         }
+
         $teacherId = $this->isTeacher($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) && ($actionPath == 'manage-question-set' || $actionPath == 'add-questions-save' ||
                 $actionPath == 'mod-data-set' || $actionPath == 'mod-tutorial-question' || $actionPath == 'test-question' || $actionPath == 'help' || $actionPath == 'micro-lib-help'
                 || $actionPath == 'save-broken-question-flag' || $actionPath == 'save-lib-assign-flag')
         ) {
             return true;
-        } else if (($user['rights'] < AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId) || ($user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && $courseId != 'admin')) {
+        } else if (($user['rights'] <= AppConstant::TEACHER_RIGHT) || ($user['rights'] > AppConstant::STUDENT_RIGHT && !$teacherId) || ($user['rights'] < AppConstant::GROUP_ADMIN_RIGHT && $courseId != 'admin')) {
+            if($courseId['libtree']=="popup"){
+                return true;
+            }
             if ($courseId == 'admin') {
                 $this->setWarningFlash(AppConstant::UNAUTHORIZED);
                 return $this->redirect(Yii::$app->getHomeUrl());

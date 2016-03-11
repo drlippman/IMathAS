@@ -2222,7 +2222,6 @@ class GradebookController extends AppController
                 return $this->redirect('gradebook?stu=' . $params['stu'] . '&gbmode=' . $params['gbmode'] . '&cid=' . $params['cid']);
             }
         }
-
         if (isset($params['name']) && $isteacher) {
             if ($params['available-after'] == '0') {
                 $params['showdate'] = 0;

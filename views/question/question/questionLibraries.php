@@ -8,7 +8,6 @@ if ($params['libtree'] && $params['libtree']=="popup") {
     $isAdmin = false;
     $isGrpAdmin = false;
     if (isset($params['cid']) && $params['cid'] == "admin") {
-
         if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
             echo AppConstant::REQUIRED_ADMIN_ACCESS;
             exit;
