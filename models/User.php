@@ -586,7 +586,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getByUserRight($myRight, $groupId)
     {
-        $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
+        $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>39";
 
         if ($myRight < AppConstant::ADMIN_RIGHT) {
             $query .= " AND groupid=:groupId";
