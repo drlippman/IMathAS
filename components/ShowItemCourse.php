@@ -1868,6 +1868,7 @@ public static function makeTopMenu($studview) {
 
     } else*/ if (((count($topBar[0]) > AppConstant::NUMERIC_ZERO && $topBar[2] == AppConstant::NUMERIC_ZERO) || $studview)) {
         if ($topBar[2] == AppConstant::NUMERIC_ZERO) {
+
             if ($previewshift>-1 && count($topBar[0]) > AppConstant::NUMERIC_ZERO) { echo '<br/>';}
         }
     if ($previewshift>-1 || $studview) {
@@ -1890,7 +1891,7 @@ public static function makeTopMenu($studview) {
             echo '</select>';
             echo " <a href=\"course?cid=$courseId&teachview=1\">", _('Back to instructor view'), "</a>";
         }
-        echo '<div class=clear></div></div>';
+        echo '<div class=clear></div>';
     }
   }
 }
