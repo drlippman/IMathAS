@@ -433,7 +433,7 @@ if (!$data['totOnLeft'] && !$hidepast) {
 </thead>
 <tbody class='gradebook-table-body'>
 <?php
-for ($i = 0; $i < count($gradebook); $i++) {
+for ($i = 1; $i < count($gradebook); $i++) {
 if ($i == 1) {
     $insdiv = "<div>";
     $enddiv = "</div>";

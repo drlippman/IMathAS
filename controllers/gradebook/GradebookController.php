@@ -70,6 +70,7 @@ class GradebookController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $user = $this->user;
+        $userId = $user->id;
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $stu = $this->getParamVal('stu');
@@ -457,7 +458,7 @@ class GradebookController extends AppController
             }
         }
 
-//Pull Offline Grade item info
+        //Pull Offline Grade item info
         $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $catfilter, $now);
         if ($gbItems) {
             foreach ($gbItems as $item) {
@@ -1183,7 +1184,7 @@ class GradebookController extends AppController
                 foreach ($query as $gradeSelect) {
 
                     if ($gradeSelect['gradetype'] == 'offline') {
-                        if (!($gradeidx[$gradeSelect['gradetypeid']]) || !($sturow[$gradeSelect['userid']]) || !($gradecol[$gradeSelect['gradetypeid']])) {
+                        if (!isset($gradeidx[$gradeSelect['gradetypeid']]) || !isset($sturow[$gradeSelect['userid']]) || !isset($gradecol[$gradeSelect['gradetypeid']])) {
                             continue;
                         }
                         $i = $gradeidx[$gradeSelect['gradetypeid']];
@@ -1299,6 +1300,7 @@ class GradebookController extends AppController
                 }
             }
         }
+
         //fill out cattot's with zeros
         for ($ln = 1; $ln < count($sturow) + 1; $ln++) {
             $cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
@@ -1376,6 +1378,7 @@ class GradebookController extends AppController
                 }
             }
         }
+
         //create category totals
         for ($ln = 1; $ln < count($sturow) + 1; $ln++) { //foreach student calculate category totals and total totals
 
@@ -1488,6 +1491,7 @@ class GradebookController extends AppController
                 } else { //no items in category yet?
                     $gradebook[$ln][2][$pos][0] = 0;
                 }
+
                 if (isset($cattotcur[$ln][$cat])) {  //cur items
                     //cats: name,scale,scaletype,chop,drop,weight,calctype
                     //if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
@@ -1844,7 +1848,6 @@ class GradebookController extends AppController
             //create averages
             $gradebook[$ln][0][0] = "Averages";
             $avgs = array();
-
             for ($j = 0; $j < count($gradebook[0][1]); $j++) { //foreach assessment
                 $avgs[$j] = array();
 
@@ -2035,8 +2038,8 @@ class GradebookController extends AppController
             $key++;
         }
 
-        if ($_GET['grades'] == 'all') {
-            if (!($_GET['isolate'])) {
+        if ($params['grades'] == 'all') {
+            if (!($params['isolate'])) {
                 if ($params['gbitem'] == 'new') {
                     $defaultValuesArray = array(
                         $name = '',
@@ -2049,6 +2052,7 @@ class GradebookController extends AppController
                         $gradeoutcomes = array(),
                     );
                 } else {
+
                     $gbItems = GbItems::getById($params['gbitem']);
                     $gradeoutcomes = $gbItems['outcomes'];
                     if ($gradeoutcomes != '') {
@@ -2222,6 +2226,7 @@ class GradebookController extends AppController
                 return $this->redirect('gradebook?stu=' . $params['stu'] . '&gbmode=' . $params['gbmode'] . '&cid=' . $params['cid']);
             }
         }
+
         if (isset($params['name']) && $isteacher) {
             if ($params['available-after'] == '0') {
                 $params['showdate'] = 0;
@@ -2470,7 +2475,6 @@ class GradebookController extends AppController
     {
         $courseId = $this->getRequestParams();
         $params = $this->getRequestParams();
-
         $likeStudentName = User::getByUserName($params['keyword']);
         $finalArray = array();
         foreach ($likeStudentName as $like) {
@@ -2491,7 +2495,9 @@ class GradebookController extends AppController
         $model->fileHeaderRow = AppConstant::NUMERIC_ZERO;
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-            $gbItemsId = $params['gbItems'];
+            // TODO: need to revisite this and decide what to use $params['gbItems']/$params['gbitem']
+            // $gbItemsId = $params['gbItems'];
+            $gbItemsId = $params['gbitem'];
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
                 $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
