@@ -21,10 +21,9 @@ $currentUser = $user['id'];
         </div>
     </div>
 </div>
-
 <div class="item-detail-content">
     <?php if($isStudent || ($isTutor && ($user['rights'] != AppConstant::GROUP_ADMIN_RIGHT) && !$isTeacher)){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'calendar', 'userId' => $currentUser,'isTutor'=> $isTutor]);
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'calendar', 'userId' => $user,'isTutor'=> $isTutor]);
     } else if($user['rights'] > 10 && ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
       }elseif($user['rights'] > 10){

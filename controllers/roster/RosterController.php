@@ -615,6 +615,7 @@ class RosterController extends AppController
         $currentUser = $this->user;
         $studentRecords = '';
         $this->includeCSS(['roster/roster.css']);
+
         if ($model->load($this->isPostMethod()))
         {
             $params = $this->getRequestParams();

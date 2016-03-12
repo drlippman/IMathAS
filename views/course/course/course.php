@@ -213,7 +213,8 @@ if ($overwriteBody == 1) {
         }
 
     } else {
-        if (($teacherId) && $quickView!='on') {
+
+        if (($teacherId) && $quickView!='on' && !$isStudent) {
             if ($folder == '0') {
                 echo '<p class="padding-left-fifteen"><b>Welcome to your course!</b></p>';
                 echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
