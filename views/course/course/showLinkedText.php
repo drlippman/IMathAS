@@ -17,7 +17,7 @@ $this->title = $course->name;
 <div class="tab-content shadowBox non-nav-tab-item">
     <div class="padding-left padding-top-fifteen">
             <h3><b><?php echo $links->title ?></b></h3>
-            <div class="col-md-3 col-sm-3">
+            <div class="col-md-12 col-sm-12">
                 <h5><?php echo $links->text?></h5>
             </div>
     </div>
