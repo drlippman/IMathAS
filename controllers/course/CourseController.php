@@ -474,7 +474,6 @@ class CourseController extends AppController
         }  else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
             $page_formActionTag = "modify-inline-text?block=$block&cid=$cid&folder=" . $params['folder'];
             $page_formActionTag .= "&tb=$filter";
-
             $calTag = $params['calTag'];
             if ($params['title'] != null || $params['text'] != null || $params['sdate'] != null) { //if the form has been submitted
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {
@@ -526,7 +525,6 @@ class CourseController extends AppController
                     }
                 }
                 $outcomes = implode(',', $outcomes);
-
                 $filestoremove = array();
                 if (isset($params['id'])) {  //already have id; update
                     $tempArray = array();
@@ -538,7 +536,7 @@ class CourseController extends AppController
                     $tempArray['isplaylist'] = $isplaylist;
                     $tempArray['oncal'] = $oncal;
                     $tempArray['title'] = $params['title'];
-                    $tempArray['text'] = $params['text'];
+                    $tempArray['text'] = $params['description'];
                     $tempArray['avail'] = $params['avail'];
                     $updateResult = new InlineText();
                     $result = $updateResult->updateChanges($tempArray, $params['id']);
@@ -571,7 +569,7 @@ class CourseController extends AppController
                     $tempArray['isplaylist'] = $isplaylist;
                     $tempArray['oncal'] = $params['oncal'];
                     $tempArray['title'] = $params['title'];
-                    $tempArray['text'] = $params['text'];
+                    $tempArray['text'] = $params['description'];
                     $tempArray['avail'] = $params['avail'];
 
                     $newInline = new InlineText();
@@ -661,8 +659,7 @@ class CourseController extends AppController
             if ($params['submitbtn'] == 'Submit') {
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$cid));
             }
-
-            if (isset($params['id'])) {
+            if ($params['id']) {
                 $line = InlineText::getById($params['id']);
                 if ($line['title']=='##hidden##') {
                     $hidetitle = true;
@@ -759,7 +756,7 @@ class CourseController extends AppController
             }
             $page_formActionTag .= (isset($params['id'])) ? "&id=" . $params['id'] : "";
         }
-        $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);
+        $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js"]);
         $this->includeCSS(['course/items.css']);
         $responseData = array('page_formActionTag' => $page_formActionTag, 'filter' => $filter,'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes, 'block' => $block, 'altoncal' => $altoncal);
         return $this->renderWithData('modifyInlineText', $responseData);

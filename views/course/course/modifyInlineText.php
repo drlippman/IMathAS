@@ -54,8 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="col-md-10 col-sm-9">
                         <div class="editor summary-inline-text">
                             <textarea class="col-md-12" cols=5 rows=12 id=description name=description style="width: 100%;">
-                                <?php $text = AppUtility::t('Enter text here');
-                                echo htmlentities($text);?>
+                                <?php if(!$line['text'])
+                                    $text = AppUtility::t('Enter text here');
+                                 else
+                                   echo htmlentities($line['text']);?>
                             </textarea>
                         </div>
                     </div>
