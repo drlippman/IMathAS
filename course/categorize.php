@@ -96,6 +96,42 @@ END;
 		$questionlibs[$row[0]][] = $row[1];
 		$libnames[$row[1]] = $row[2];
 	}
+
+	//add assessment names as options
+	//find the names of assessments these questionsetids appear in
+	$query = "SELECT imas_questions.id AS qid,imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
+	$query .= "FROM imas_questions, imas_assessments ";
+	$query .= "WHERE imas_questions.assessmentid=imas_assessments.id ";
+	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid='$aid') ";
+	$query .= "AND imas_assessments.courseid=$cid ";
+	$query .= "ORDER BY imas_questions.id";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$assessmentnames = array();
+	$questionassessments = array();
+	while ($row = mysql_fetch_row($result)) {
+		//store the relevent assessment names
+		$assessmentnames[$row[2]] = $row[3];
+		//the following will include questions from other assignments
+		//we'll append the other assignments later after all the rows are fetched
+		if ($row[2]==$aid) {
+			//create an array for this question but
+			//don't include a reference to this same assessment
+			if (!array_key_exists($row[0],$questionassessments)) $questionassessments[$row[0]]= array();
+			//remember which questionsetid corresponds to this question
+			// (allows repeat questions)
+			$qsetid_question[$row[1]][]=$row[0];
+		} else {
+			//another assignment uses this same questionsetid-- save it for later
+			$qsetidassessment[$row[1]][] = $row[2];
+		}
+	}
+	//merge the other assessments into $questionsassessments[]
+	foreach ($qsetidassessment as $qsetid=>$assessmentids) {
+		foreach ($qsetid_question[$qsetid] as $question) { //handle repeat questions
+			$questionassessments[$question]=array_merge($questionassessments[$question], $qsetidassessment[$qsetid]);
+		}
+	}
+
 	$query = "SELECT iq.id,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 	$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -159,7 +195,17 @@ END;
 			if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
 			echo ">{$libnames[$qlibid]}</option>\n";
 		}
-		echo '</optgroup><optgroup label="Custom">';
+		echo '</optgroup>\n';
+		echo '<optgroup label="Assessments">';
+		//add assessment names as options
+		foreach ($questionassessments[$qid] as $qaid) {
+			echo '<option value="&lt;a href=\'../assessment/showtest.php?id='.$qaid.'&cid='.$cid.'\'&gt;'.$assessmentnames[$qaid].'&lt;/a&gt;" ';
+			if ($category[$qid] == $assessmentnames[$qaid] && !$issel) { echo "selected=1"; $issel= true;}
+			echo ">{$assessmentnames[$qaid]}</option>\n";
+		}
+		echo '</optgroup>\n';
+
+		echo '<optgroup label="Custom">';
 		foreach ($extracats as $cat) {
 			echo "<option value=\"$cat\" ";
 			if ($category[$qid] == $cat && !$issel) { echo "selected=1";$issel = true;}
