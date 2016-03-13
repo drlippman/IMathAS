@@ -9,6 +9,7 @@ ini_set("memory_limit", "104857600");
 //IMathAS:  Copy Items utility functions
 //(c) 2008 David Lippman
 $reqscoretrack = array();
+$categoryassessmenttrack = array();
 $posttoforumtrack = array();
 $forumtrack = array();
 $qrubrictrack = array();
@@ -27,7 +28,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 
 
 function copyitem($itemid,$gbcats,$sethidden=false) {
-	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+	global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
 	global $posttoforumtrack, $forumtrack;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
@@ -277,6 +278,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				}
 				$toins = array($row['questionsetid'],$row['points'],$row['attempts'],$row['penalty'],$row['category'],$row['regen'],$row['showans'],$row['showhints']);
 				$rubric[$row['id']] = $row['rubric'];
+				//check for a category that's set to an assessment e.g. AID-1234
+				if (0==strncmp($row['category'],"AID-",4)) {
+					//temporarily save the old assessment id
+					$categoryassessmentold[$row['id']]=substr($row['category'],4);
+				}
 				$inss[] = "('$newtypeid','".implode("','",addslashes_deep($toins))."')";
 				$insorder[] = $row['id'];
 			}
@@ -296,6 +302,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						if ($rubric[$aitem]!=0) {
 							$qrubrictrack[$firstnewid+$idtoorder[$aitem]] = $rubric[$aitem];
 						}
+						//check for a category that's set to an assessment
+						if (isset($categoryassessmentold[$aitem])) {
+							//track by new questionid but still using old assessmentid
+							$categoryassessmenttrack[$firstnewid+$idtoorder[$aitem]] = $categoryassessmentold[$aitem];
+						}
 						$newaitems[] = $firstnewid+$idtoorder[$aitem];
 					} else {
 						$sub = explode('~',$aitem);
@@ -309,6 +320,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 							if (isset($thiswithdrawn[$subi])) { continue;}
 							if ($rubric[$subi]!=0) {
 								$qrubrictrack[$firstnewid+$idtoorder[$subi]] = $rubric[$subi];
+							}
+							//check for a category that's set to an assessment
+							if (isset($categoryassessmentold[$subi])) {
+								//track by new questionid but still using old assessmentid
+								$categoryassessmenttrack[$firstnewid+$idtoorder[$subi]] = $categoryassessmentold[$subi];
 							}
 							$newsub[] = $firstnewid+$idtoorder[$subi];
 						}
@@ -442,7 +458,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 }	
 
 function doaftercopy($sourcecid) {
-	global $cid,$reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack;
+	global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack,$posttoforumtrack;
 	if (intval($cid)==intval($sourcecid)) {
 		$samecourse = true;
 	} else {
@@ -461,6 +477,20 @@ function doaftercopy($sourcecid) {
 			}
 		}
 	}
+	//update any assessment ids in categories
+	if (count($categoryassessmenttrack)>0) {
+		foreach ($categoryassessmenttrack as $newqid=>$oldcategoryaid) {
+			//is oldcategoryaid in copied list?
+			if (isset($assessnewid[$oldcategoryaid])) {
+				$query = "UPDATE imas_questions SET category='AID-{$assessnewid[$oldcategoryaid]}' WHERE id='$newqid'";	
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			} else if (!$samecourse) { //since that assessment isn't being copied, unclear what category should be
+				$query = "UPDATE imas_assessments SET category=0 WHERE id='$newqid'";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			}
+		}
+	}
+
 	if (count($posttoforumtrack)>0) {
 		foreach ($posttoforumtrack as $newaid=>$oldforumid) {
 			if (isset($forumtrack[$oldforumid])) {
