@@ -90,6 +90,7 @@ class Assessments extends BaseImasAssessments
             $assessment->attributes = $data;
             $assessment->save();
         }
+        return $assessment;
     }
 
     public static function deleteAssessmentById($assessmentId)

@@ -325,16 +325,16 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
         echo '<br/><span class="small">' . AppUtility::tzdate('n/j/y&\n\b\s\p;g:ia', $gradebook[0][1][$i][11]) . '</span>';
     } ?>
 
-    <div class="floatright dropdown">
-        <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
-           href="javascript:void(0);">
-            <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
-        </a>
-        <ul class="dropdown-menu" style="position: relative">
-
+        <div class="floatright dropdown">
             <?php //links
-            if ($gradebook[0][1][$i][6] == 0) { //online
-                if ($isTeacher)
+            if ($gradebook[0][1][$i][6] == 0) { //online ?>
+            <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
+               href="javascript:void(0);">
+                <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
+            </a>
+            <ul class="dropdown-menu" style="position: relative">
+
+            <?php if ($isTeacher)
                 { ?>
                     <li>
                         <a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?> "> <?php AppUtility::t('[Settings]') ?> </a>
@@ -353,9 +353,15 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
                 <?php }
-            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) {
+            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) { ?>
                //offline
-                    if ($isTeacher)
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
+                   href="javascript:void(0);">
+                    <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
+                </a>
+                <ul class="dropdown-menu" style="position: relative">
+
+                <?php  if ($isTeacher)
                     { ?>
 
                         <li>
@@ -370,12 +376,23 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         </li>
                     <?php }
             } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher) { //discussion ?>
-                <li>
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
+                       href="javascript:void(0);">
+                        <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
+                    </a>
+                    <ul class="dropdown-menu" style="position: relative">
+
+                    <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
-                </li>
+                    </li>
             <?php } else if ($gradebook[0][1][$i][6] == 3 && $isTeacher)
             { //exttool ?>
-                <li>
+                        <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
+                           href="javascript:void(0);">
+                            <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
+                        </a>
+                        <ul class="dropdown-menu" style="position: relative">
+                        <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('course','course/add-link?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?>"> <?php AppUtility::t('[Settings]')?></a>
                 </li>
                 <li>

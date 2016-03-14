@@ -52,7 +52,6 @@ class QuestionController extends AppController
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = '';
         $course = Course::getById($courseId);
-
         $this->checkSession($params);
         /*
          * Loaded by a NON-teacher
@@ -71,7 +70,6 @@ class QuestionController extends AppController
             $assessmentId = $this->getParamVal('aid');
             $sessionId = $this->getSessionId();
             $sessionData = $this->getSessionData($sessionId);
-
             if (isset($params['grp'])) {
                 $sessionData['groupopt' . $assessmentId] = $params['grp'];
                 $this->writesessiondata($sessionData, $sessionId);
@@ -80,12 +78,12 @@ class QuestionController extends AppController
                 $sessionData['selfrom' . $assessmentId] = $params['selfrom'];
                 $this->writesessiondata($sessionData, $sessionId);
             } else {
-
                 if (!isset($sessionData['selfrom' . $assessmentId])) {
                     $sessionData['selfrom' . $assessmentId] = 'lib';
                     $this->writesessiondata($sessionData, $sessionId);
                 }
             }
+
             if (($teacherId) && isset($params['addset'])) {
                 if (!isset($params['nchecked']) && !isset($params['qsetids'])) {
                     $this->setErrorFlash(AppConstant::NO_QUESTION_SELECTED);

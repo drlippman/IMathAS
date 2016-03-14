@@ -348,7 +348,11 @@ class AssessmentController extends AppController
                               */
                     }
                     $assessmentArray['id'] = intval($params['id']);
-                    Assessments::updateAssessment($assessmentArray);
+                    $assessment=Assessments::updateAssessment($assessmentArray);
+                    if($assessment->errors['name']){
+                        $this->setErrorFlash('Assessment name can not be blank.');
+                        return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?cid='.$courseId.'block='.$block.'&tb='.$filter));
+                    }
                     if ($from == 'gb') {
                         return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $courseId));
                     } else if ($from == 'mcd') {
@@ -361,6 +365,10 @@ class AssessmentController extends AppController
                 } else { //add new
                     $assessment = new Assessments();
                     $newAssessmentId = $assessment->createAssessment($assessmentArray);
+                    if(!$newAssessmentId){
+                        $this->setErrorFlash('Assessment name can not be blank.');
+                        return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?cid='.$courseId.'block='.$block.'&tb='.$filter));
+                    }
                     $itemAssessment = new Items();
                     $itemId = $itemAssessment->saveItems($courseId, $newAssessmentId, 'Assessment');
                     $courseItemOrder = Course::getItemOrder($courseId);
@@ -379,7 +387,7 @@ class AssessmentController extends AppController
                     Course::setItemOrder($itemList, $courseId);
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $course->id . '&aid=' . $newAssessmentId));
                 }
-            } else {
+            } else{
                 if (isset($params['id'])) {//page load in modify mode
                     $title = AppConstant::MODIFY_ASSESSMENT;
                     $pageTitle = AppConstant::MODIFY_ASSESSMENT;
@@ -602,6 +610,15 @@ class AssessmentController extends AppController
                     $pageAllowLateSelect['val'][] = $key + AppConstant::NUMERIC_ONE;
                     $pageAllowLateSelect['label'][] = "Up to $key";
                 }
+            }
+        }
+        if($params['name']=="" && $_POST){
+            if(!$params['id']){
+        $this->setErrorFlash('Assessment name can not be blank.');
+        return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?cid='.$courseId.'&block='.$block.'&tb='.$filter));
+            }else{
+                $this->setErrorFlash('Assessment name can not be blank.');
+                return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$params['id'].'&cid='.$courseId.'&block='.$block.'&tb='));
             }
         }
         $this->includeCSS(['course/items.css', 'course/course.css', 'gradebook.css', 'assessment.css']);

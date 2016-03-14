@@ -78,7 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="name-of-item">
         <div class='col-sm-2 select-text-margin'><?php AppUtility::t('Name of Assessment')?></div>
         <div class='col-sm-10'>
-            <input class="form-control input-item-title" type=text size=0 name=name value="<?php echo str_replace('"','&quot;',$assessmentData['name']);?>">
+            <input class="form-control input-item-title" maxlength='60' type=text size=0 name=name value="<?php echo str_replace('"','&quot;',$assessmentData['name']);?>">
         </div>
     </div> <BR class=form>
 

@@ -18,10 +18,7 @@ class Grades extends BaseImasGrades
             $this->score = $grade['score'];
             $this->feedback = $grade['feedback'];
             $this->gradetype = $grade['gradetype'];
-        if(!$this->save()){
-            AppUtility::dump($this->getErrors());
-        }
-        else
+            $this->save();
             return $this;
     }
 
