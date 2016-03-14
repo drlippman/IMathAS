@@ -90,7 +90,7 @@ $studentId = $studentId;
 
 <div class="tab-content shadowBox col-md-12 col-sm-12">
 
-<?php if ($canviewall) {  ?>
+<?php if ($canviewall && !$isStudent) {  ?>
     <br>
     <div class="col-md-12 col-sm-12 display-inline-block padding-right-zero">
         <div class="display-inline-block col-md-3 col-sm-4 padding-right-zero padding-left-zero">
@@ -173,7 +173,7 @@ if ($studentId>0) {
 
  <div style="font-size:1.1em;font-weight:bold">
 
-   <?php  if ($isteacher || $istutor) {
+   <?php  if (($isteacher || $istutor) && !$isStudent) {
     if ($gradebook[1][0][1] != '') {
         $usersort = $stugbmode['usersort'];
     } else {
@@ -247,7 +247,7 @@ if ($studentId>0) {
     </div>
     </div>
 <?php
-if ($isteacher) {
+if ($isteacher && !$isStudent) {
 ?>
     <span class="inner-page-options col-md-3 col-sm-3 padding-zero pull-right">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
@@ -306,7 +306,7 @@ if ($isteacher) {
         </ul>
     </span>
     </div>
-<?php } else if ($istutor) { ?>
+<?php } else if ($istutor && !$isStudent) { ?>
     <?php
 echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
      <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId.'&from=gb');?> "><?php AppUtility::t('Login Log');?></a> |
@@ -319,8 +319,8 @@ echo '<div style="clear:both;display:inline-block" class="cpmid">'; ?>
 }
 if($StudentData > 0){
 
-    if (trim($gbcomment)!='' || $isteacher) {
-        if ($isteacher) { ?>
+    if (trim($gbcomment)!='' || $isteacher && !$isStudent) {
+        if ($isteacher && !$isStudent) { ?>
             <form method=post action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
                 Gradebook Comment <input type=submit value="Update Comment"><br/><br/>
                 <textarea class="text-area-padding max-width-hundred-per" name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
@@ -347,7 +347,7 @@ if($StudentData > 0){
 if($StudentData > 0){?>
 <br>
  <form method=post id="qform" action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
- <?php if ($isteacher && $studentId>0) {  ?>
+ <?php if ($isteacher && $studentId>0 && !$isStudent) {  ?>
         <input type="hidden" name="stusection" value="<?php echo $stusection?>">
      <?php echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
@@ -388,7 +388,7 @@ if($StudentData > 0){?>
             echo '</thead><tbody>';
         if ($catfilter>-2) {
 
-for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
+    for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
 
         if (!$isteacher && !$istutor && $gradebook[0][1][$i][4]==0) { //skip if hidden
 
@@ -452,7 +452,7 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
 
                 $haslink = false;
 
-                if ($isteacher || $istutor || $gradebook[1][1][$i][2]==1) { //show link
+                if (($isteacher || $istutor || $gradebook[1][1][$i][2]==1) && !$studentId) { //show link
                 if ($gradebook[0][1][$i][6]==0) {//online
                 if ($studentId==-1) { //in averages
                 if (isset($gradebook[1][1][$i][0])) { //has score ?>
@@ -467,7 +467,7 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
                     }
                     echo ">";
                     $haslink = true;
-                    } else if ($isteacher) {
+                    } else if (($isteacher || $isTutor)&& !$studentId) {
                     echo "<a href=\"gradebook-view-assessment-details?stu=$studentId&cid=$course->id&asid=new&aid={$gradebook[0][1][$i][7]}&uid={$gradebook[1][4][0]}\">";
                         $haslink = true;
                         }

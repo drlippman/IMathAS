@@ -293,7 +293,7 @@ class ShowItemCourse extends Component
                         if ($canEdit) {
                             echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
                         }
-                        echo "<div class='block item'";
+                        echo "<div class='block item block-item-name'";
                         if ($titlebg!='') {
                             echo "style=\"background-color:$titlebg;color:$titletxt;\"";
                             $astyle = "style=\"color:$titletxt;\"";
@@ -575,7 +575,7 @@ class ShowItemCourse extends Component
                                 <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                             <ul class="select1 dropdown-menu selected-options pull-right">
                                 <li><a class="modify"
-                                       href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><?php AppUtility::t('Isolate'); ?></a></li>
+                                       href="<?php echo AppUtility::getURLFromHome('course','course/course?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><?php AppUtility::t('Isolate1'); ?></a></li>
                                 <li><a class="modify"
                                        href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?cid='.$courseId.'&id='.$parent.'-'.$bnum.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                 </li>

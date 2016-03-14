@@ -65,6 +65,14 @@ function getAddItem(blk,tb) {
         });
 }
 
+function showBodyScroll() {
+    jQuery('html, body').css('overflow', 'auto');
+}
+
+function hideBodyScroll() {
+    jQuery('html, body').css('overflow', 'hidden');
+}
+
 function deleteItem(id,type,block,courseId) {
      if(type == 'Block')
      {
@@ -80,11 +88,13 @@ function deleteItem(id,type,block,courseId) {
              {
                  "Cancel": function ()
                  {
+                     showBodyScroll();
                      jQuery(this).dialog('destroy').remove();
                      return false;
                  },
                  "Confirm": function ()
                  {
+                     showBodyScroll();
                      var sel = jQuery("#post-type-radio-list input[type='radio']:checked");
                      var selected = sel.val();
                      jQuerySubmit('delete-items-ajax', {id:id,itemType:type,block:block,courseId:courseId,selected:selected},'responseSuccess');
@@ -93,9 +103,11 @@ function deleteItem(id,type,block,courseId) {
                  }
              },
              close: function (event, ui) {
+                 showBodyScroll();
                  jQuery(this).remove();
              },
              open: function(){
+                 hideBodyScroll();
                  jQuery('.ui-widget-overlay').bind('click',function(){
                      jQuery('#dialog').dialog('close');
                  })
@@ -127,20 +139,24 @@ function deleteItem(id,type,block,courseId) {
             {
                 "Cancel": function ()
                 {
+                    showBodyScroll();
                     jQuery(this).dialog('destroy').remove();
                     return false;
                 },
                 "Confirm": function ()
                 {
+                    showBodyScroll();
                     jQuerySubmit('delete-items-ajax',{id:id, itemType:type, block:block, courseId:courseId},'responseSuccess');
                     jQuery(this).dialog('destroy').remove();
                     return true;
                 }
             },
             close: function (event, ui) {
+                showBodyScroll();
                 jQuery(this).remove();
             },
             open: function(){
+                hideBodyScroll();
                 jQuery('.ui-widget-overlay').bind('click',function(){
                     jQuery('#dialog').dialog('close');
                 })

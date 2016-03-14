@@ -241,3 +241,8 @@ div.breadcrumbPrintVersion {
     height: 30px;
     padding-top: 5px;
 }
+
+.block-item-name {
+    overflow: unset !important;
+    margin: 0px 0px 0px 80px;
+}

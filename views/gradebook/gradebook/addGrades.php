@@ -175,8 +175,8 @@ $page_tutorSelect['val'] = array(2, 0, 1);
     <div class="col-sm-3 col-md-2 select-text-margin">Tutor Access</div>
     <div class="col-sm-4 col-md-4">
         <?php
-        AssessmentUtility::writeHtmlSelect("tutoredit", $page_tutorSelect['val'], $page_tutorSelect['label'], $checkboxesValues['tutoredit']);
-        echo '<input type="hidden" name="gradesecret" value="' . $checkboxesValues['gradesecret'] . '"/>';
+        AssessmentUtility::writeHtmlSelect("tutoredit", $page_tutorSelect['val'], $page_tutorSelect['label'], $tutoredit);
+        echo '<input type="hidden" name="gradesecret" value="' . $tutoredit . '"/>';
         ?>
     </div>
 </div>

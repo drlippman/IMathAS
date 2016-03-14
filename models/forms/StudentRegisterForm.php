@@ -30,7 +30,8 @@ class StudentRegisterForm extends Model
     {
         return [
 
-            [['username', 'password', 'rePassword', 'firstName', 'lastName','email'], 'required'],
+//            [['username', 'password', 'rePassword', 'firstName', 'lastName','email'], 'required'],
+            [['username', 'password', 'firstName', 'lastName','email'], 'required'],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only [a-zA-Z0-9_].'],
             ['rePassword', 'compare', 'compareAttribute' => 'password','message'=>'Confirm password does not match with password.'],
             [['firstName', 'lastName'], 'string', 'max' => 20, 'tooLong'=>'{attribute} contains maximum 20 characters.'],
