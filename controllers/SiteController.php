@@ -739,7 +739,11 @@ class SiteController extends AppController
             } else {
                 $hideOnPostsWidget = array();
             }
+            if(($from == 'msg' || $from == 'forum') && $user['rights'] == AppConstant::GUEST_RIGHT){
+                $this->setErrorFlash('Guest user can\'t access this page.');
+                return $this->redirect($this->goHome());
 
+            }
             foreach($pagelayout as $k=>$v) {
                 if ($v=='') {
                     $pagelayout[$k] = array();
@@ -1079,6 +1083,10 @@ class SiteController extends AppController
         $groupId = AppConstant::NUMERIC_ZERO;
         switch($action) {
             case "chguserinfo":
+                if($myRights == AppConstant::GUEST_RIGHT){
+//                    $this->setErrorFlash('Guest user can\'t access this page.');
+                    return $this->redirect($this->goHome());
+                }
                 $pageTitle = 'Modify User Profile';
                 $line = User::getById($userId);
                 if ($myRights > AppConstant::STUDENT_RIGHT && $groupId > AppConstant::NUMERIC_ZERO) {

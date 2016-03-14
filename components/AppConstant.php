@@ -14,7 +14,7 @@ class AppConstant
     const MAX_SESSION_TIME = 86400;
     const GIVE_OLD_SESSION_TIME = 90000;
     const LOGIN_FIRST = 'Please login into the system.';
-    const FORGOT_PASS_MAIL_SUBJECT = 'Password Reset Request';
+    const FORGOT_PASS_MAIL_SUBJECT = 'Password Reset Request.';
     const FORGOT_USER_MAIL_SUBJECT = 'User Name Request';
     const INVALID_EMAIL = 'User does not exist with this email.';
     const INVALID_USER_NAME = 'User does not exist.';
@@ -27,7 +27,7 @@ class AppConstant
     const DIAGNOSTIC_CREATOR_RIGHT = 60;
     const GROUP_ADMIN_RIGHT = 75;
     const INSTALL_NAME = 'OpenMath';
-    const UNAUTHORIZED = 'You are not authorized to view this page';
+    const UNAUTHORIZED = 'You are not authorized to view this page.';
     const NORESULT = 'No results found';
     const INSTRUCTOR_REQUEST_SUCCESS = 'Your new account request has been sent.';
     const ADD_NEW_USER = 'Added new user.';
@@ -94,7 +94,7 @@ class AppConstant
     const RETURN_SUCCESS = 0;
     const RETURN_ERROR = -1;
     const UNAUTHORIZED_ACCESS = 'Unauthorized access, please login with correct credentials.';
-    const WRONG_OPTION = 'You need to access this page from the link on the course page';
+    const WRONG_OPTION = 'You need to access this page from the link on the course page.';
 
     const ASSET_TYPE_CSS = "css";
     const ASSET_TYPE_JS = "js";

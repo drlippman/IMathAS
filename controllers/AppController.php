@@ -985,8 +985,14 @@ class AppController extends Controller
         {
             return true;
         } else {
-            $this->setWarningFlash(AppConstant::UNAUTHORIZED);
-            return $this->redirect(Yii::$app->getHomeUrl());
+            if($user['rights'] == AppConstant::GUEST_RIGHT){
+                $this->setErrorFlash("Guest user can't access this page.");
+                return $this->goHome();
+            }else{
+                $this->setWarningFlash(AppConstant::UNAUTHORIZED);
+                return $this->redirect(Yii::$app->getHomeUrl());
+            }
+
         }
     }
 
