@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
 use app\components\HtmlUtility;
+use app\components\AppConstant;
 if (($course['newflag']&1)==1) {
     $this->title = AppUtility::t('Gradebook'.' <span class="small" style="color: red;"> New </span>', false);
 }else{
@@ -59,7 +60,7 @@ $stu = $data['defaultValuesArray']['studentId']
     </div>
 </div>
 <div class="item-detail-content">
-    <?php if($isTeacher) {
+    <?php if($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
     } elseif($isTutor || $isStudent){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $isTutor]);

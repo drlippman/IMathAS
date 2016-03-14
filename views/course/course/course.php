@@ -13,6 +13,7 @@ $imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid=
 <input type="hidden" class="user-rights" value="<?php echo $myRights?>">
 
 <?php
+
 $studview= $sessionData['stuview'];
 
 if($studview>-1){
@@ -74,7 +75,7 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
     <?php } elseif($user['rights'] >= AppConstant::STUDENT_RIGHT) {?>
     <div class="tab-content shadowBox">
     <?php }?>
-<?php if($teacherId && !$isStudent){
+<?php if($teacherId && !$isStudent || ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))){
   ?>
     <div class="row course-copy-export col-md-12 col-sm-12 padding-left-right-zero">
         <div class="col-md-2 col-sm-2 course-top-menu">
@@ -142,7 +143,6 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
 if ($overwriteBody == 1) {
     echo $body;
 } else {
-
     if (isset($teacherId)) {
         ?>
         <script type="text/javascript">
@@ -186,7 +186,6 @@ if ($overwriteBody == 1) {
         }
         exit;
     }
-
     ?>
 
     <?php
@@ -213,8 +212,7 @@ if ($overwriteBody == 1) {
         }
 
     } else {
-
-        if (($teacherId) && $quickView!='on' && !$isStudent) {
+        if (($teacherId) && $quickView!='on' && !$isStudent || ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))) {
             if ($folder == '0') {
                 echo '<p class="padding-left-fifteen"><b>Welcome to your course!</b></p>';
                 echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
@@ -230,14 +228,13 @@ if ($overwriteBody == 1) {
     if (($useLeftBar && ($teacherId)) || ($useLeftStuBar && !($teacherId))) {
         echo "</div>";
     } else if (!($nocoursenav)) {
-
         ?>
         <?php
         if ($teacherId) {
             ?>
             <div class=cp>
             <span class=column>
-			<?php echo ShowItemCourse::generateAddItem($folder, 'BB',$studview) ?>
+			<?php echo ShowItemCourse::generateAddItem($folder, 'BB',$studview); ?>
             <?php
         }
     }

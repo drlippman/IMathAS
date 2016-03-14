@@ -23,6 +23,7 @@ class ShowItemCourse extends Component
         global $teacherId,$isTutor,$isStudent,$courseId,$userId,$openBlocks,$firstLoad,$sessionData,$previewShift,$myRights;
         global $hideIcons,$exceptions,$latePasses,$graphicalIcons,$isPublic,$studentInfo,$newPostCnts,$CFG,$latePassHrs,$hasStats,$toolSet,$readLinkedItems, $haveCalcedViewedAssess, $viewedAssess, $courseStudent;
         $studview = $sessionData['stuview'];
+        $groupAdmin = $myRights >= AppConstant::GROUP_ADMIN_RIGHT;
 
         $imasroot = AppUtility::getHomeURL();
         if (!($CFG['CPS']['itemicons'])) {
@@ -40,7 +41,7 @@ class ShowItemCourse extends Component
         if($studview>-1){
             $studview=1;
         }
-        if ($teacherId) {
+        if ($teacherId || ($isTutor && $groupAdmin)) {
             $canEdit = true;
             $viewAll = true;
         } else if($isTutor) {
