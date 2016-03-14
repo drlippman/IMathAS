@@ -37,8 +37,8 @@ class InlineText extends BaseImasInlinetext
         $updateIdArray = InlineText::getById($inlineTextId);
         if($updateIdArray)
         {
-            $data = AppUtility::removeEmptyAttributes($params);
-            $updateIdArray->attributes = $data;
+//            $data = AppUtility::removeEmptyAttributes($params);
+            $updateIdArray->attributes = $params;
             $updateIdArray->save();
             return $updateIdArray->id;
         }

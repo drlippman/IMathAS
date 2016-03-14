@@ -261,7 +261,7 @@ class CourseController extends AppController
         if (!isset($id)) {
             return array('status'=> false, 'message'=>"No item specified"); ?>
 
-       <?php }
+        <?php }
         if (substr($text,0,8)=='exttool:') {
             $param = "cid={$courseId}&id=$id";
             if ($target==0) {
@@ -395,9 +395,9 @@ class CourseController extends AppController
         return $this->successResponse($responseData);
     }
 
-/*
- *   Display calendar on click of menuBars
- */
+    /*
+     *   Display calendar on click of menuBars
+     */
     public function actionCalendar()
     {
         $this->layout = "master";
@@ -460,6 +460,7 @@ class CourseController extends AppController
         $tb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
         $moveFile = $this->getParamVal('movefile');
+
         if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -515,7 +516,7 @@ class CourseController extends AppController
                 }
 
                 $params['title'] =  htmlentities(stripslashes($params['title']));
-                $params['text'] =  stripslashes($params['text']);
+                $params['description'] =  stripslashes($params['description']);
                 $outcomes = array();
                 if (isset($params['outcomes'])) {
                     foreach ($params['outcomes'] as $o) {
@@ -524,6 +525,7 @@ class CourseController extends AppController
                         }
                     }
                 }
+
                 $outcomes = implode(',', $outcomes);
                 $filestoremove = array();
                 if (isset($params['id'])) {  //already have id; update
@@ -544,10 +546,10 @@ class CourseController extends AppController
                     //update attached files
                     $resultFile = InstrFiles::getFileName($params['id']);
 
-                   foreach($resultFile as $key => $row) {
+                    foreach($resultFile as $key => $row) {
                         if (isset($params['delfile-'.$row['id']])) {
                             $filestoremove[] = $row['id'];
-                             InstrFiles::deleteByItemId($row['id']);
+                            InstrFiles::deleteByItemId($row['id']);
                             $r2 = InstrFiles::getByIdForFile($row['filename']);
                             if (count($r2) == 0) {
                                 //$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
@@ -739,7 +741,7 @@ class CourseController extends AppController
             $resultOutCome = Outcomes::getByCourseId($cid);
 
             $outcomenames = array();
-           foreach($resultOutCome as $key => $row) {
+            foreach($resultOutCome as $key => $row) {
                 $outcomenames[$row['id']] = $row['name'];
             }
             $result = Course::getOutComeByCourseId($cid);
@@ -802,7 +804,7 @@ class CourseController extends AppController
             $query = $course['outcomes'];
             $outcomeArray = unserialize($query);
             global $outcomesList;
-             $this->flatArray($outcomeArray);
+            $this->flatArray($outcomeArray);
             if ($outcomesList) {
                 foreach ($outcomesList as $singlePage) {
                     array_push($pageOutcomesList, $singlePage);
@@ -1657,7 +1659,7 @@ class CourseController extends AppController
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js', 'mootools.js', 'nested1.js','course/instructor.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,
-        'items' => $items, 'folder' => $folder, 'parent' => $parent, 'isTutor' => $isTutor, 'firstLoad' => $firstLoad, 'jsAddress1' => $jsAddress1, 'jsAddress2' => $jsAddress2, 'curName' => $curName, 'curBreadcrumb' => $curBreadcrumb, 'isStudent' => $isStudent, 'students' => $student, 'newPostsCnt' => $newPostsCnt, 'backLink' => $backLink, 'type' => $type, 'user' => $user, 'lockAId' => $lockAId);
+            'items' => $items, 'folder' => $folder, 'parent' => $parent, 'isTutor' => $isTutor, 'firstLoad' => $firstLoad, 'jsAddress1' => $jsAddress1, 'jsAddress2' => $jsAddress2, 'curName' => $curName, 'curBreadcrumb' => $curBreadcrumb, 'isStudent' => $isStudent, 'students' => $student, 'newPostsCnt' => $newPostsCnt, 'backLink' => $backLink, 'type' => $type, 'user' => $user, 'lockAId' => $lockAId);
         return $this->renderWithData('course', $responseData);
     }
 
@@ -1722,35 +1724,35 @@ class CourseController extends AppController
             $result = Exceptions::getExceptionDataLatePass($userId);
             foreach($result as $key => $line)
             {
-               $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
             }
         }
-            if (count($exceptions)>0) {
+        if (count($exceptions)>0) {
 //                upsendexceptions($items);
-            }
+        }
 
-            if (strpos($folder,'-') !== false)
+        if (strpos($folder,'-') !== false)
+        {
+            $now = time() + $previewShift;
+            $blockTree = explode('-',$folder);
+            $backTrack = array();
+            for ($i = 1; $i < count($blockTree); $i++)
             {
-                $now = time() + $previewShift;
-                $blockTree = explode('-',$folder);
-                $backTrack = array();
-                for ($i = 1; $i < count($blockTree); $i++)
+                $backTrack[] = array($items[$blockTree[$i]-1]['name'],implode('-',array_slice($blockTree,0,$i+1)));
+
+                if (!($teacherId) && !($isTutor) && $items[$blockTree[$i]-1]['avail'] < 2 && $items[$blockTree[$i]-1]['SH'][0] != 'S' &&($now<$items[$blockTree[$i]-1]['startdate'] || $now>$items[$blockTree[$i]-1]['enddate'] || $items[$blockTree[$i]-1]['avail']=='0'))
                 {
-                    $backTrack[] = array($items[$blockTree[$i]-1]['name'],implode('-',array_slice($blockTree,0,$i+1)));
-
-                    if (!($teacherId) && !($isTutor) && $items[$blockTree[$i]-1]['avail'] < 2 && $items[$blockTree[$i]-1]['SH'][0] != 'S' &&($now<$items[$blockTree[$i]-1]['startdate'] || $now>$items[$blockTree[$i]-1]['enddate'] || $items[$blockTree[$i]-1]['avail']=='0'))
-                    {
-                        $folder = 0;
-                        $items = unserialize($line['itemorder']);
-                        unset($backTrack);
-                        unset($blockTree);
-                        break;
-                    }
-                    $items = $items[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                    $folder = 0;
+                    $items = unserialize($line['itemorder']);
+                    unset($backTrack);
+                    unset($blockTree);
+                    break;
                 }
+                $items = $items[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
             }
+        }
 
-            $openBlocks = Array(0);
+        $openBlocks = Array(0);
 //            if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
 //            {
 //                $openBlocks = explode(',',$_COOKIE['openblocks-'.$courseId]);}
@@ -1768,45 +1770,45 @@ class CourseController extends AppController
 //                $firstLoad = true;
 //            }
 
-            if (!($teacherId) && !($isTutor) && $previewShift == -1)
-            {
-                $result = Student::getLatePassById($userId, $courseId);
-                $latePasses = $result[0]['latepass'];
-            } else {
-                $latePasses = 0;
-            }
-            /*
-             * get new forum posts info
-             */
-            $result = ForumThread::getDataByUserId($teacherId, $courseId, $userId, $now);
-            $newPostCnts = array();
-            foreach($result as $key => $row) {
-                $newPostCnts[$row['forumid']] = $row['id'];
-            }
-            /*
-             * get items with content views, for enabling stats link
-             */
-            if (($teacherId) || ($$isTutor)) {
-                $hasStats = array();
-                $result = ContentTrack::getStatsData($courseId);
-                foreach($result as $key => $row) {
-                    $hasStats[$row['typeid']] = true;
-                }
-            }
-        if (count($items) > 0) {
-                /*
-                 * update block start/end dates to show blocks containing items with exceptions
-                 */
-                $showItems = new ShowItemCourse();
-                $showItems->showItems($items,$folder);
-            } else if ($teacherId) {
-                $courseData = new ShowItemCourse();
-             }
-            $this->includeJS(['course.js']);
-
-            $responseData = array('items' => $items, 'folder' => $folder, 'isTutor' => $isTutor, 'sessionData' => $sessionData, 'teacherId' => $teacherId, 'courseData' => $courseData);
-        return $this->renderWithData('getBlockItems', $responseData);
+        if (!($teacherId) && !($isTutor) && $previewShift == -1)
+        {
+            $result = Student::getLatePassById($userId, $courseId);
+            $latePasses = $result[0]['latepass'];
+        } else {
+            $latePasses = 0;
         }
+        /*
+         * get new forum posts info
+         */
+        $result = ForumThread::getDataByUserId($teacherId, $courseId, $userId, $now);
+        $newPostCnts = array();
+        foreach($result as $key => $row) {
+            $newPostCnts[$row['forumid']] = $row['id'];
+        }
+        /*
+         * get items with content views, for enabling stats link
+         */
+        if (($teacherId) || ($$isTutor)) {
+            $hasStats = array();
+            $result = ContentTrack::getStatsData($courseId);
+            foreach($result as $key => $row) {
+                $hasStats[$row['typeid']] = true;
+            }
+        }
+        if (count($items) > 0) {
+            /*
+             * update block start/end dates to show blocks containing items with exceptions
+             */
+            $showItems = new ShowItemCourse();
+            $showItems->showItems($items,$folder);
+        } else if ($teacherId) {
+            $courseData = new ShowItemCourse();
+        }
+        $this->includeJS(['course.js']);
+
+        $responseData = array('items' => $items, 'folder' => $folder, 'isTutor' => $isTutor, 'sessionData' => $sessionData, 'teacherId' => $teacherId, 'courseData' => $courseData);
+        return $this->renderWithData('getBlockItems', $responseData);
+    }
 
     /*
      * Ajax method to copy course items
@@ -1977,7 +1979,7 @@ class CourseController extends AppController
                     $blockCnt='';
                     $blockId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
                     $sub =& $blockData;
-                    
+
                     if (count($blockTree)>AppConstant::NUMERIC_ONE)
                     {
                         for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++)
@@ -2268,7 +2270,7 @@ class CourseController extends AppController
         $itemId = Items::getByItemTypeAndId($id);
         $courseData = Course::getIdPublicly($courseId);
 
-         $items = unserialize($courseData['itemorder']);
+        $items = unserialize($courseData['itemorder']);
 
         $courseName = $courseData['name'];
         if ($fcid == 0) {
