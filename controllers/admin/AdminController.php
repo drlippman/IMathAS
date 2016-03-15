@@ -1192,11 +1192,44 @@ class AdminController extends AppController
                 {
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
-                   $courseDataUpdate = $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
+                    $courseDataUpdate = $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
+                    if($courseDataUpdate['name'] == '')
+                    {
+                        $this->setErrorFlash("Course Name can not be blank.");
+                        return $this->redirect('forms?action=modify&cid='.$params['id']);
+                    }
+                    if($courseDataUpdate->errors['name'])
+                    {
+                        $this->setErrorFlash("Course Name should contain at most 150 characters.");
+                        return $this->redirect('forms?action=modify&cid='.$params['id']);
+                    }
+                    if($courseDataUpdate->errors['enrollkey'])
+                    {
+                        $this->setErrorFlash("Enrollkey should contain at most 50 characters.");
+                        return $this->redirect('forms?action=modify&cid='.$params['id']);
+                    }
+
+
                 }else{
                     $columnName = 'id'; $columnValue = $params['id'];
                     $updateResult = new Course();
-                    $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
+                    $updatedResult = $updateResult->updateCourse($params, $avail, $toolSet, $defTime, $columnName, $columnValue);
+                    if($updatedResult['name'] == '')
+                    {
+                        $this->setErrorFlash("Course Name can not be blanck.");
+                        return $this->redirect('forms?action=modify&cid='.$params['id']);
+                    }
+                    if($updatedResult->errors['name'])
+                    {
+                        $this->setErrorFlash("Course Name should contain at most 150 characters.");
+                        return $this->redirect('forms?action=modify&cid='.$params['id']);
+                    }
+                    if($updatedResult->errors['enrollkey'])
+                    {
+                        $this->setErrorFlash("Enrollkey should contain at most 50 characters.");
+                        return $this->redirect('forms?action=modify&cid='.$params['id']);
+                    }
+
                 }
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$params['id']));
             } else {
@@ -1205,7 +1238,6 @@ class AdminController extends AppController
                 $itemorder =  serialize(array());
                 $query = new Course();
                 $courseData = $query->create($userId, $params,$blockcnt);
-
                 if($courseData['name'] == '')
                 {
                     $this->setErrorFlash("Course Name can not be blanck.");

@@ -506,7 +506,7 @@ class Course extends BaseImasCourses {
     {
         $updateCourse = Course::find()->where(['id' => $params['id']])->andWhere([$columnName => $columnValue])->one();
         if($updateCourse){
-            $updateCourse->name = $params['coursename'];
+            $updateCourse->name = trim($params['coursename']);
             $updateCourse->enrollkey = $params['ekey'];
             $updateCourse->available = $available;
             $updateCourse->copyrights = $params['copyrights'];

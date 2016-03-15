@@ -3060,7 +3060,7 @@ class AppUtility extends Component
                     <input type="hidden" class="lockId" value="<?php echo $lockId?>">
                     <input type="hidden" class="assessmentName" value="<?php echo $assessmentName['name']?>">
                     <input type="hidden" class="courseId" value="<?php echo $data[$i]['id']?>">
-                <a class="word-wrap-break-word" href="#" onclick="locked()">
+                <a class="word-wrap-break-word" href="javascript:void(0)" onclick="locked()">
                 <?php echo $data[$i]['name'].'</a>';
                 }else{
             ?>
