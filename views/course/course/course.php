@@ -45,11 +45,13 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page word-wrap-break-word"><?php echo $this->title ?></div>
             </div>
+            <?php if($user['rights'] >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT){?>
             <div class="pull-left header-btn">
                 <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
                  class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Settings
                 </a>
             </div>
+            <?php }?>
         </div>
     </div>
     <div class="item-detail-content">
