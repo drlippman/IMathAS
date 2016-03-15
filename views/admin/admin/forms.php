@@ -736,7 +736,7 @@ switch ($action) {
                     <?php AppUtility::t('Domain') ?>
                 </span>
                         <div class='col-md-6 col-sm-6 padding-left-zero'>
-                            <input class='form-control' type=text name="ltidomain" id="domain-char-limitation" size=40>
+                            <input class='form-control' type=text name="ltidomain" id="domain-char-limitation" size=40 maxlength="40">
                         </div>
                     </div>
                     <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
@@ -745,7 +745,7 @@ switch ($action) {
                 </span>
 
                         <div class='col-md-6 col-sm-6 padding-left-zero'>
-                            <input class='form-control' type=text name="ltikey" size=20 required="">
+                            <input class='form-control' type=text name="ltikey" size=20>
                         </div>
                     </div>
                     <div class='margin-top-twenty col-md-12 col-sm-12 padding-left-zero'>
