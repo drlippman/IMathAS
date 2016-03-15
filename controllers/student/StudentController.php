@@ -22,6 +22,7 @@ class StudentController extends AppController
             $this->setErrorFlash("Guest user can't access this page.");
             return $this->goHome();
         }
+
         $this->guestUserHandler();
         $this->layout = 'master';
         $model = new StudentEnrollCourseForm();

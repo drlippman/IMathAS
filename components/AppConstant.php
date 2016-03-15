@@ -162,8 +162,8 @@ class AppConstant
     const LAST_NAME = 'LastName';
     const ENROLL_SUCCESS = 'You have been enrolled in course ';
     const ALREADY_ENROLLED = 'You are already enrolled in the course.';
-    const TEACHER_CANNOT_ENROLL_AS_STUDENT = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
-    const TUTOR_CANNOT_ENROLL_AS_STUDENT = 'You are a tutor for this course, and can not enroll as a student.';
+    const TEACHER_CANNOT_ENROLL_AS_STUDENT = 'You are a teacher for this course.';
+    const TUTOR_CANNOT_ENROLL_AS_STUDENT = 'You are a tutor for this course.';
     const INVALID_COMBINATION = 'Invalid combination of enrollment key and course id.';
     const INLINE_TEXT_MODIFY_TITLE = 'Modify Inline Text';
     const INLINE_TEXT_ADD_TITLE = 'Add Inline Text';
@@ -290,6 +290,8 @@ class AppConstant
     const MESSAGE_CUSTOMIZE_DATE = 'M d, o g:i a';
     const ERROR_MSG_FOR_LOCLKED_STUDENT = 'You have been locked out of this course by your instructor.  Please see your instructor for more information.';
     const TUTOR_CAN_NOT_ENROLL = "Tutors can't be enrolled as students.";
+    const TEACHER_CANNOT_STUDENT = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
+    const TUTOR_CANNOT_TEACHER_OR_STUDENT = 'You are a tutor for this course, and can not enroll as a student.';
     // create a map with current constant being the key and the value being the value
     // start calling the method below
     public static function getConstantVal($key, $lang='en'){

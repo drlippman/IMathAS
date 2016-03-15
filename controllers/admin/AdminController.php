@@ -1447,6 +1447,10 @@ class AdminController extends AppController
                 exit;
             case "addteacher":
                 $groupId = AppConstant::NUMERIC_ZERO;
+                $teacher = Teacher::getByUserId($userId, $params['cid']);
+                $tutor = Tutor::getByUserId($userId, $params['cid']);
+                $student = $this->isStudent($userId, $params['cid']);
+
                 if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT || !$allowmacroinstall) {
                     $this->setErrorFlash(AppConstant::UNAUTHORIZED);
                     return $this->redirect($this->goHome());

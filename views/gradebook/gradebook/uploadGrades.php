@@ -87,11 +87,10 @@ if (count($failures)>0) {
                 </div>
             </span>
         </div>
-
+<div class="clear"></div><br/>
         <div class="col-md-12 col-sm-12 padding-right-zero">
             <div class="padding-left-zero  col-sm-5 col-sm-offset-4 col-sm-4 col-md-offset-3">
-                <?php echo Html::submitButton('Submit', ['class' => 'btn btn-primary   upload-grade-submit-btn']) ?>
-                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id)  ?>">Back</a>
+                <?php echo Html::submitButton('Upload Grades', ['class' => 'btn btn-primary   upload-grade-submit-btn']) ?>
             </div>
         </div>
     </div>

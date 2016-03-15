@@ -355,7 +355,6 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                     </li>
                 <?php }
             } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) { ?>
-               //offline
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                    href="javascript:void(0);">
                     <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
