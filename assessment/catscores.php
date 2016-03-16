@@ -88,7 +88,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 			continue;
 		} elseif (0==strncmp($category,"AID-",4)) { //category is another assessment
 			$categoryaid=substr($category,4);
-			$query = "SELECT name FROM imas_assessments WHERE id='$categoryaid' LIMIT 1";
+			$query = "SELECT name FROM imas_assessments WHERE id='$categoryaid' AND courseid='$cid' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$assessmentname = mysql_result($result, 0, 0);
 			//link to the other assessment
