@@ -2277,6 +2277,7 @@ function cleanbytoken($str,$funcs = array()) {
 			$token = $tokens[$i];
 			$lastout = count($out)-1;
 			if ($token[1]==3 && $token[0]==='0') { //is the number 0 by itself
+				$isone = 0;
 				if ($lastout>-1) { //if not first character
 					if ($out[$lastout] != '^') {
 						//( )0, + 0, x0
@@ -2289,11 +2290,13 @@ function cleanbytoken($str,$funcs = array()) {
 						}
 						
 					} else if ($out[$lastout] == '^') {
+						$isone = 2;
 						if ($lastout>=2 && ($out[$lastout-2]=='+'|| $out[$lastout-2]=='-')) {
 							//4x+x^0 -> 4x+1
 							array_splice($out,-2);
 							$out[] = 1;
 						} else if ($lastout>=2) {
+							$isone = 1;
 							//4x^0->4, 5(x+3)^0 -> 5
 							array_splice($out,-2);
 						} else if ($lastout==1) {
@@ -2306,6 +2309,15 @@ function cleanbytoken($str,$funcs = array()) {
 					if ($tokens[$i+1][0]=='^') {
 						//0^3
 						$i+=2; //skip over ^ and 3
+					} else if ($isone) {
+						if ($tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-' && $tokens[$i+1][0]!= '/') {
+							if ($isone==2) {
+								array_pop($out);  //pop the 1 we added since it apperears to be multiplying
+							}
+							if ($tokens[$i+1][0]=='*') {  //x^0*y
+								$i++;
+							}
+						}
 					} else {
 						while ($i<$lasti && $tokens[$i+1][0]!= '+' && $tokens[$i+1][0]!= '-') {
 							$i++;
@@ -2832,12 +2844,18 @@ function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=30
 function gettwopointdata($str,$type,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	if ($type=='line') { 
 		$code = 5;
+	} else if ($type=='lineseg') {
+		$code = 5.3;
+	} else if ($type=='ray') {
+		$code = 5.2;
 	} else if ($type=='parab') {
 		$code = 6;
 	} else if ($type=='sqrt') {
 		$code = 6.5;
 	} else if ($type=='abs') {
 		$code = 8;
+	} else if ($type=='rational') {
+		$code = 8.2;
 	} else if ($type=='exp') {
 		$code = 8.3;
 	} else if ($type=='circle') {

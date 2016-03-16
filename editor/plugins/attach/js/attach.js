@@ -3,7 +3,7 @@
 tinyMCEPopup.requireLangPack();
 
 var templates = {
-	"window.open" : "window.open('${url}','${target}','${options}')"
+	"window.open" : "window.open('${url}','${options}')"
 };
 
 function preinit() {
@@ -29,7 +29,6 @@ function init() {
 	var html;
 
 	document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','attach');
-	document.getElementById('targetlistcontainer').innerHTML = getTargetListHTML('targetlist','target');
 
 	// Resize some elements
 	if (isVisible('hrefbrowser')) {
@@ -52,7 +51,6 @@ function init() {
 		setFormValue('href', href);
 		setFormValue('title', elm.innerHTML);
 
-		selectByValue(formObj, 'targetlist', inst.dom.getAttrib(elm, 'target'), true);
 	} 
 }
 
@@ -188,7 +186,7 @@ function insertAction() {
 
 	// Create new anchor elements
 	if (elm == null) {
-		tinyMCEPopup.editor.execCommand('mceInsertContent', false, '<a class="attach" href="'+document.forms[0].elements['href'].value+'" target="'+document.forms[0].elements['targetlist'].value+'">'+document.forms[0].elements['title'].value+'</a>');
+		tinyMCEPopup.editor.execCommand('mceInsertContent', false, '<a class="attach" href="'+document.forms[0].elements['href'].value+'" target="_blank">'+document.forms[0].elements['title'].value+'</a>');
 	} else {
 		setAllAttribs(elm);
 		inst.dom.setHTML(elm,document.forms[0].elements['title'].value);
@@ -209,10 +207,8 @@ function insertAction() {
 function setAllAttribs(elm) {
 	var formObj = document.forms[0];
 	var href = formObj.href.value.replace(/ /g, '%20');
-	var target = getSelectValue(formObj, 'targetlist');
 
 	setAttrib(elm, 'href', href);
-	setAttrib(elm, 'target', target == '_self' ? '' : target);
 
 	// Refresh in old MSIE
 	if (tinyMCE.isMSIE5)
@@ -228,32 +224,6 @@ function getSelectValue(form_obj, field_name) {
 	return elm.options[elm.selectedIndex].value;
 }
 
-
-function getTargetListHTML(elm_id, target_form_element) {
-	var targets = tinyMCEPopup.getParam('theme_advanced_link_targets', '').split(';');
-	var html = '';
-
-	html += '<select id="' + elm_id + '" name="' + elm_id + '" onf2ocus="tinyMCE.addSelectAccessibility(event, this, window);" onchange="this.form.' + target_form_element + '.value=';
-	html += 'this.options[this.selectedIndex].value;">';
-	html += '<option value="_self">' + tinyMCEPopup.getLang('attach_dlg.target_same') + '</option>';
-	html += '<option value="_blank">' + tinyMCEPopup.getLang('attach_dlg.target_blank') + ' (_blank)</option>';
-
-	for (var i=0; i<targets.length; i++) {
-		var key, value;
-
-		if (targets[i] == "")
-			continue;
-
-		key = targets[i].split('=')[0];
-		value = targets[i].split('=')[1];
-
-		html += '<option value="' + key + '">' + value + ' (' + key + ')</option>';
-	}
-
-	html += '</select>';
-
-	return html;
-}
 
 // While loading
 preinit();

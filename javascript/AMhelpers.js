@@ -1133,8 +1133,6 @@ function assessbackgsubmit(qn,noticetgt) {
 		}
 		req.open("POST", assesspostbackurl, true);
 		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		req.setRequestHeader("Content-length", params.length);
-		req.setRequestHeader("Connection", "close");
 		req.onreadystatechange = function() {assessbackgsubmitCallback(qn,noticetgt);}; 
 		req.send(params);  
 	} else {
@@ -1196,6 +1194,7 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    for (var i=0; i<initstack.length; i++) {
 		    	    var foo = initstack[i]();
 		    }
+		    $(window).trigger("ImathasEmbedReload");
 		    initcreditboxes();
 		    
 		    var pagescroll = 0;

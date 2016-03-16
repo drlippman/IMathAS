@@ -44,10 +44,22 @@ if (isset($_REQUEST["action"]))
 		$badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p",".exe");
 		if (in_array($extension,$badextensions)) {
 			unset($_REQUEST["action"]);
-		} else if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public")) {
-			
 		} else {
-			unset($_REQUEST["action"]);
+			if (!isset($_REQUEST["overwrite"])) { //check if file exists, change filename if needed
+				$ncnt = 1;
+				$filenamepts = explode('.',$filename);
+				$filename0 = $filenamepts[0];
+				while (doesfileexist('ufiles', "ufiles/$userid/".$filename)) {
+					$filenamepts[0] = $filename0.'_'.$ncnt;
+					$filename = implode('.',$filenamepts);
+					$ncnt++;
+				}
+			}
+			if (storeuploadedfile("uploaded_file","ufiles/$userid/".$filename,"public")) {
+			
+			} else {
+				unset($_REQUEST["action"]);
+			}
 		}
 	}
 	else if ($_REQUEST["action"] == "delete_file")
@@ -176,7 +188,7 @@ if (isset($_REQUEST['showfiles'])) {
 	}
 } else {
 	echo '<div class="upload">';
-	echo '<p><a href="file_manager.php?showfiles=true">Show previously uploaded files</a></p>';	
+	echo '<p><a href="file_manager.php?showfiles=true&amp;type='.$type.'">Show previously uploaded files</a></p>';	
 }
 ?>
 </div>
@@ -189,7 +201,8 @@ if (isset($_REQUEST['showfiles'])) {
 		<input type="hidden" name="MAX_FILE_SIZE" value="10485760" /> <!-- ~10mb -->
 		<input type="file" name="uploaded_file" id="uploaded_file">
 		<input type="hidden" name="uploaded_file_name" id="uploaded_file_name" />
-		<input type="submit" value="<?php echo $strings["upload_file_submit"]; ?>">
+		<input type="submit" value="<?php echo $strings["upload_file_submit"]; ?>"><br/>
+		<input type="checkbox" name="overwrite"/> <?php echo $strings["upload_overwrite"]; ?>
 	</form>
 	</div>
 	<div id="uploading_div" style="display: none; padding: 0px;">
@@ -197,8 +210,7 @@ if (isset($_REQUEST['showfiles'])) {
 	</div>
 </div>
 <div class="notice">
-Files uploaded are not secured, and can be accessed by anyone who can guess the address.  Do not
-upload files with private information.
+<?php echo $strings["notice"]; ?>
 </div>
 <script>
 

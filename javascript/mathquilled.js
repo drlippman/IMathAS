@@ -232,6 +232,7 @@ function showee() {
 		lasteepos.scroll = $(window).scrollTop();
 	}
 	mqee.css('left',lasteepos.left).css('top',lasteepos.top).show();
+	//console.log(AMtoMQ($("#"+cureedd.id).val()));
 	mqarea.mathquill('latex', AMtoMQ($("#"+cureedd.id).val()));
 	mqarea.find('input,textarea').focus();
 	
