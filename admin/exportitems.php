@@ -12,6 +12,7 @@ ini_set("post_max_size", "10485760");
                                         
 /*** master php includes *******/
 require("../validate.php");
+include("../includes/filehandler.php");
 
 /*** pre-html data manipulation, including function code *******/
 function copysub($items,$parent,&$addtoarr) {
@@ -132,12 +133,34 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo $row[0] . "\n";
 		switch ($row[0]) {
 			case ($row[0]==="InlineText"):
+				$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
+				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$filenames = array();
+				$filedescr = array();
+				if (mysql_num_rows($r2)>0) {
+					   while ($frow = mysql_fetch_row($r2)) {
+						   $filedescr[$frow[0]] = $frow[1];
+						   if ($GLOBALS['filehandertypecfiles'] == 's3') {
+						   	   $filenames[$frow[0]] = getcoursefileurl($frow[2]);
+						   } else {
+						   	   $filenames[$frow[0]] = basename($frow[2]);
+						   	   $coursefiles[] = $frow[2];
+						   }
+					   }
+				}
 				$query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
 				echo "TEXT\n";
+				if ($GLOBALS['filehandertypecfiles'] == 's3' && count($filenames)>0) {
+					$line['text'] .= '<ul>';
+					foreach (explode(',',$line['fileorder']) as $fid) {
+						$line['text'] .= '<li><a href="'.$filenames[$fid].'">'.$filedescr[$fid].'</a></li>';
+					}
+					$line['text'] .= '</ul>';
+				}
 				echo $line['text'] . "\n";
 				echo "AVAIL\n";
 				echo $line['avail'] . "\n";
@@ -149,16 +172,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo $line['oncal'] . "\n";
 				echo "CALTAG\n";
 				echo $line['caltag'] . "\n";
-				$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($r2)>0) {
-					   $filenames = array();
-					   $filedescr = array();
-					   while ($row = mysql_fetch_row($r2)) {
-						   $filenames[$row[0]] = basename($row[2]);
-						   $filedescr[$row[0]] = $row[1];
-						   $coursefiles[] = $row[2];
-					   }
+				if ((!isset($GLOBALS['filehandertypecfiles']) || $GLOBALS['filehandertypecfiles'] != 's3') && count($filenames)>0) {
 					   echo "INSTRFILES\n";
 					   foreach (explode(',',$line['fileorder']) as $fid) {
 						  echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
@@ -172,8 +186,12 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
 				if (substr($line['text'],0,5)=='file:') {
-					$coursefiles[] = substr($line['text'],5);
-					$line['text'] = 'file:'.basename(substr($line['text'],5));
+					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($line['text']),0,5)=="file:") {
+						$line['text'] = getcoursefileurl(trim(substr(strip_tags($line['text']),5)));
+					} else {
+						$coursefiles[] = substr($line['text'],5);
+						$line['text'] = 'file:'.basename(substr($line['text'],5));
+					}
 				}
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
@@ -404,7 +422,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			echo "END QSET\n";
 		}
 		
-		include("../includes/filehandler.php");
+		
 		
 		$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());

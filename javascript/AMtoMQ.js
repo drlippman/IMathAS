@@ -78,6 +78,7 @@ var AMQsymbols = [
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"U",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 //{input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"sum", tag:"mo", output:"\u2211", tex:null, ttype:UNDEROVER},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
@@ -94,12 +95,12 @@ var AMQsymbols = [
 //{input:">-",  tag:"mo", output:"\u227B", tex:"succ", ttype:CONST},
 //{input:"-<=", tag:"mo", output:"\u2AAF", tex:"preceq", ttype:CONST},
 //{input:">-=", tag:"mo", output:"\u2AB0", tex:"succeq", ttype:CONST},
-//{input:"in",  tag:"mo", output:"\u2208", tex:null, ttype:CONST},
-//{input:"!in", tag:"mo", output:"\u2209", tex:"notin", ttype:CONST},
-//{input:"sub", tag:"mo", output:"\u2282", tex:"subset", ttype:CONST},
-//{input:"sup", tag:"mo", output:"\u2283", tex:"supset", ttype:CONST},
-//{input:"sube", tag:"mo", output:"\u2286", tex:"subseteq", ttype:CONST},
-//{input:"supe", tag:"mo", output:"\u2287", tex:"supseteq", ttype:CONST},
+{input:"in",  tag:"mo", output:"\u2208", tex:null, ttype:CONST},
+{input:"!in", tag:"mo", output:"\u2209", tex:"notin", ttype:CONST},
+{input:"sub", tag:"mo", output:"\u2282", tex:"subset", ttype:CONST},
+{input:"sup", tag:"mo", output:"\u2283", tex:"supset", ttype:CONST},
+{input:"sube", tag:"mo", output:"\u2286", tex:"subseteq", ttype:CONST},
+{input:"supe", tag:"mo", output:"\u2287", tex:"supseteq", ttype:CONST},
 
 //grouping brackets
 {input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET},
@@ -118,13 +119,16 @@ var AMQsymbols = [
 //{input:":}", tag:"mo", output:":}", tex:null, ttype:RIGHTBRACKET, invisible:true},
 
 //miscellaneous symbols
+{input:"int",  tag:"mo", output:"\u222B", tex:null, ttype:CONST},
 {input:"+-",   tag:"mo", output:"\u00B1", tex:"pm", ttype:CONST},
 {input:"O/",   tag:"mo", output:"\u2205", tex:"emptyset", ttype:CONST},
 {input:"oo",   tag:"mo", output:"\u221E", tex:"infty", ttype:CONST},
+{input:"del",  tag:"mo", output:"\u2202", tex:"partial", ttype:CONST},
+{input:"grad", tag:"mo", output:"\u2207", tex:"nabla", ttype:CONST},
 //{input:"CC",  tag:"mo", output:"\u2102", tex:"mathbb{C}", ttype:CONST, notexcopy:true},
 //{input:"NN",  tag:"mo", output:"\u2115", tex:"mathbb{N}", ttype:CONST, notexcopy:true},
 //{input:"QQ",  tag:"mo", output:"\u211A", tex:"mathbb{Q}", ttype:CONST, notexcopy:true},
-{input:"RR",  tag:"mo", output:"\u211D", tex:"mathbb{R}", ttype:CONST, notexcopy:true},
+{input:"RR",  tag:"mo", output:"\u211D", tex:"real", ttype:CONST},
 //{input:"ZZ",  tag:"mo", output:"\u2124", tex:"mathbb{Z}", ttype:CONST, notexcopy:true},
 {input:"f",   tag:"mi", output:"f",      tex:null, ttype:UNARY, func:true, val:true},
 //{input:"g",   tag:"mi", output:"g",      tex:null, ttype:UNARY, func:true, val:true},
@@ -134,6 +138,8 @@ var AMQsymbols = [
 
 
 //standard functions
+{input:"lim",  tag:"mo", output:"lim", tex:null, ttype:UNDEROVER},
+{input:"Lim",  tag:"mo", output:"Lim", tex:null, ttype:UNDEROVER},
 {input:"sin",  tag:"mo", output:"sin", tex:null, ttype:UNARY, func:true},
 {input:"cos",  tag:"mo", output:"cos", tex:null, ttype:UNARY, func:true},
 {input:"tan",  tag:"mo", output:"tan", tex:null, ttype:UNARY, func:true},
@@ -173,8 +179,8 @@ var AMQsymbols = [
 AMQsqrt, AMQroot, AMQfrac, AMQdiv, AMQover, AMQsub, AMQsup,
 {input:"Sqrt", tag:"msqrt", output:"sqrt", tex:null, ttype:UNARY},
 //{input:"hat", tag:"mover", output:"\u005E", tex:null, ttype:UNARY, acc:true},
-//{input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
-//{input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
+{input:"bar", tag:"mover", output:"\u00AF", tex:"overline", ttype:UNARY, acc:true},
+{input:"vec", tag:"mover", output:"\u2192", tex:null, ttype:UNARY, acc:true},
 //{input:"tilde", tag:"mover", output:"~", tex:null, ttype:UNARY, acc:true}, 
 //{input:"dot", tag:"mover", output:".",      tex:null, ttype:UNARY, acc:true},
 //{input:"ddot", tag:"mover", output:"..",    tex:null, ttype:UNARY, acc:true},
@@ -732,6 +738,7 @@ function MQtoAM(tex) {
 	}
 	tex = tex.replace(/\\text{\s*or\s*}/g,' or ');
 	tex = tex.replace(/\\text{all\s+real\s+numbers}/g,'all real numbers');
+	tex = tex.replace(/\\Re/g,'RR');
 	tex = tex.replace(/\\le(?!f)/g,'<=');
 	tex = tex.replace(/\\ge/g,'>=');
 	tex = tex.replace(/\\cup/g,'U');
@@ -744,6 +751,9 @@ function MQtoAM(tex) {
 	tex = tex.replace(/\\infty/g,'oo');
 	tex = tex.replace(/\\nthroot/g,'root');
 	tex = tex.replace(/\\varnothing/g,'DNE');
+	tex = tex.replace(/\\overline/g,'bar');
+	tex = tex.replace(/\\nabla/g,'grad');
+	tex = tex.replace(/\\partial/g,'del');
 	tex = tex.replace(/\\/g,'');
 	tex = tex.replace(/sqrt\[(.*?)\]/g,'root($1)');
 	tex = tex.replace(/(\d)frac/g,'$1 frac');

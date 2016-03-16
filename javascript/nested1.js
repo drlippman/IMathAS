@@ -339,8 +339,6 @@ function submitChanges() {
   if (typeof req != 'undefined') { 
 	req.open("POST", url, true);
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	req.setRequestHeader("Content-length", params.length);
-	req.setRequestHeader("Connection", "close");
 	req.onreadystatechange = function() {NestedahahDone(url, target);}; 
 	req.send(params); 
   } 
