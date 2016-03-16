@@ -3,6 +3,7 @@ use app\components\AppUtility;
 use \app\components\interpretUtility;
 use app\models\Assessments;
 use \app\components\CategoryScoresUtility;
+use app\components\AppConstant;
 
 $this->title = AppUtility::t('Grade Book Detail', false);
 
@@ -129,11 +130,10 @@ echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 //    exit;
 //}
 $line = $assessmentData;
-
 ?>
 
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, '>>'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
@@ -143,7 +143,7 @@ $line = $assessmentData;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php if($isTeacher) {
+    <?php if($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
     } elseif($isTutor || $isStudent){
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $isTutor]);
@@ -225,7 +225,7 @@ if ($exceptionData['enddate']) {
     }
 }
 
-if ($isTeacher) {
+if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
     if (($exped) && $exped != $line['enddate']) {
         echo "<div>Has exception, with due date: " . AppUtility::tzdate("F j, Y, g:i a", $exped);
         echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
@@ -236,7 +236,7 @@ if ($isTeacher) {
     }
     echo "</div>";
 }
-if ($isTeacher) {
+if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
     if ($line['agroupid'] > 0) {
         echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. "; ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&breakfromgroup=true'); ?> ">Separate
@@ -250,7 +250,7 @@ if ($isTeacher) {
 <form id="mainform" method=post
       action="gradebook-view-assessment-details?stu=<?php echo $stu ?>&cid=<?php echo $course->id ?>&from=<?php echo $from ?>&asid=<?php echo $asid ?>&update=true">
 
-<?php if ($isTeacher) { ?>
+<?php if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
 
     <div class="col-md-12 col-sm-12 gradebook-view-assessment-link mobile-padding-bottom-one-pt-five-em">
         <div class="col-md-2 col-sm-3 padding-top-one-pt-five-em">
@@ -295,7 +295,7 @@ if (($line['timelimit'] > 0) && ($line['endtime'] - $line['starttime'] > $line['
     }
     echo "$over seconds.<BR>\n";
     $reset = $line['endtime'] - $line['timelimit'];
-    if ($isTeacher) {
+    if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
         ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&starttime=' . $reset . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid']) ?>">
             Clear overtime and accept grade </a> </p>
@@ -747,7 +747,7 @@ for ($i = 0; $i < count($questions); $i++) {
             echo '<br/>';
         }
 
-        if ($isTeacher) {
+        if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
             ?>
 
             <br><a target="_blank"
@@ -780,7 +780,7 @@ for ($i = 0; $i < count($questions); $i++) {
 }
 
 echo "<p></p><div class='col-md-12 col-sm-12'><div class='review question-form-control'>Total: $total/$totalpossible</div></div>";
-if ($canedit && !isset($params['lastver']) && !isset($params['reviewver'])) {
+if ($canedit && !($params['lastver']) && !($params['reviewver'])) {
     echo "<div class='col-md-12 col-sm-12 padding-left-zero'>
     <span class='col-md-12 col-sm-12'>Feedback to student</span>
     <div class='col-md-12 col-sm-12'>
@@ -797,7 +797,8 @@ if ($canedit && !isset($params['lastver']) && !isset($params['reviewver'])) {
         ?>
         <span class="padding-left-one-em"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid=' . $course->id); ?>">
             Return to GradeBook without saving
-        </a></span>
+            </a>
+        </span>
     <?php
     }
     echo"</div>";

@@ -3181,7 +3181,7 @@ class GradebookController extends AppController
             '1' => $studentUserData->LastName,
             '2' => $student->timelimitmult,
         );
-        if ($isTeacher || ($isTutor && $assessmentData['tutoredit'] == 1)) {
+        if ($isTeacher || ($isTutor && $assessmentData['tutoredit'] == 1) || ($isTutor && $currentUser['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
             $canedit = 1;
         } else {
             $canedit = 0;
@@ -3574,7 +3574,7 @@ class GradebookController extends AppController
         $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion, 'groupMembers' =>$groupMembers, 'librariesName' => $librariesName,
             'questionsData' => $questionsData,'questionsInformation' => $questionsInformation, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
             'assessmentData' => $assessmentData,';assessmentAndAssessmentSessionData' => $assessmentAndAssessmentSessionData,'canedit' => $canedit,'rubricsData' => $rubrics,
-            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor);
+            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor, 'user' => $currentUser);
         return $this->renderWithData('gradebookViewAssessmentDetails', $resposeData);
     }
 
@@ -4504,7 +4504,6 @@ class GradebookController extends AppController
 
     public function actionEditToolScore()
     {
-
         $isTutor = false;
         $isTeacher = false;
         $params = $this->getRequestParams();
@@ -4663,7 +4662,7 @@ class GradebookController extends AppController
         }
         $this->includeJS(['gradebook/manageaddgrades.js','gradebook/addgrades.js' ]);
 
-        $responseData = array('studentData' => $studentData,'course' => $course,'externalToolData' => $externalToolData,'linkData' => $linkData,'params' => $params,'hassection' => $hasSection);
+        $responseData = array('studentData' => $studentData,'course' => $course,'externalToolData' => $externalToolData,'linkData' => $linkData,'params' => $params,'hassection' => $hasSection, 'isTutor' => $isTutor, 'currentUser' => $currentUser, 'isTeacher' => $isTeacher);
         return $this->renderWithData('editToolScore',$responseData);
     }
 
