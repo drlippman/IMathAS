@@ -99,9 +99,9 @@ END;
 
 	//add assessment names as options
 	//find the names of assessments these questionsetids appear in
-	$query = "SELECT imas_questions.id AS qid,imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
-	$query .= "FROM imas_questions, imas_assessments ";
-	$query .= "WHERE imas_questions.assessmentid=imas_assessments.id ";
+	$query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
+	$query .= "FROM imas_questions INNER JOIN imas_assessments ";
+	$query .= "ON imas_questions.assessmentid=imas_assessments.id ";
 	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid='$aid') ";
 	$query .= "AND imas_assessments.courseid='$cid' ";
 	$query .= "ORDER BY aid";
@@ -112,10 +112,8 @@ END;
 		//store the relevent assessment names
 		$assessmentnames[$row['aid']] = $row['name'];
 		if ($row['aid']!=$aid) {
-			//remember this other assignment which uses this same questionsetid but don't add duplicate entries
-			if (!is_array($qsetidassessment[$row['qsetid']]) || !in_array($row['aid'],$qsetidassessment[$row['qsetid']])) {
+			//remember this other assignment which uses this same questionsetid
 				$qsetidassessment[$row['qsetid']][] = $row['aid'];
-			}
 		}
 	}
 
