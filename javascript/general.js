@@ -306,6 +306,10 @@ function initeditor(edmode,edids,css) {
 	    ASdloc : imasroot+'/javascript/d.svg',
 	    file_browser_callback : fileBrowserCallBackFunc
 	}
+	if (document.documentElement.clientWidth<600) {
+		edsetup.theme_advanced_buttons1 = "fontsizeselect,formatselect,bold,italic,underline,separator,sub,sup,separator,asciimath,asciimathcharmap,asciisvg";
+		edsetup.theme_advanced_buttons2 = "justifyleft,justifycenter,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,link,unlink,charmap,image,"+((fileBrowserCallBackFunc != null)?"attach,":"") + "table";
+	} 
 	if (edmode=="exact") {
 		edsetup.elements = edids
 	} else if (edmode=="textareas") {
