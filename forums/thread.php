@@ -175,7 +175,7 @@
 	
 		echo "<h2>Forum Search Results</h2>";
 		
-		if (!isset($_GET['allforums'])) {
+		if (!isset($_GET['allforums']) && $postbeforeview && !$canviewall) {
 			$query = "SELECT id FROM imas_forum_posts WHERE forumid='$forumid' AND parent=0 AND userid='$userid' LIMIT 1";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$oktoshow = (mysql_num_rows($result)>0);
@@ -195,7 +195,7 @@
 		if (isset($_GET['allforums'])) {
 			$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
 			$query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
-			if (!$isteacher) {
+			if (!$canviewall) {
 				$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) AND (imas_forums.settings&16)=0 ";
 			}
 			$query .= "AND imas_users.id=imas_forum_posts.userid AND imas_forums.courseid='$cid' AND ($searchlikes OR $searchlikes2 OR $searchlikes3)";
