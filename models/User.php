@@ -530,7 +530,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function updateLTIDomainCredentials($params)
     {
         $user = User::find()->where(['id' => $params['id']])->one();
-        $user->email = $params['ltidomain'];
+        $user->email = trim($params['ltidomain']);
         $user->FirstName = $params['ltidomain'];
         $user->LastName = 'LTIcredential';
         $user->SID = $params['ltikey'];

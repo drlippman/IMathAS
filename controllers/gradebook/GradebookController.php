@@ -2326,7 +2326,7 @@ class GradebookController extends AppController
                     if ($sc != '') {
                         Grades::updateGradeToStudent($sc, $params['feedback'][$k], $k, $params['gbitem']);
                     } else {
-                        Grades::updateGradeToStudent('NULL', $params['feedback'][$k], $k, $params['gbitem']);
+                        Grades::updateGradeToStudent(NULL, $params['feedback'][$k], $k, $params['gbitem']);
                     }
                 }
             }
@@ -4585,7 +4585,7 @@ class GradebookController extends AppController
                     Grades::updateScoreToStudent($sc,$params['feedback'][$k],$k,$lid);
                 } else
                 {
-                    Grades::updateScoreToStudent('NULL',$params['feedback'][$k],$k,$lid);
+                    Grades::updateScoreToStudent(NULL,$params['feedback'][$k],$k,$lid);
                 }
             }
         }
@@ -4614,7 +4614,7 @@ class GradebookController extends AppController
                         'gradetype' => 'exttool',
                         'gradetypeid' => $lid,
                         'userid' => $k,
-                        'score' => 'NULL',
+                        'score' => NULL,
                         'feedback' => $params['feedback'][$k]
                     );
                     $insertGrade = new Grades();
