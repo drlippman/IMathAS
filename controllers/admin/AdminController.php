@@ -1736,7 +1736,7 @@ class AdminController extends AppController
                 }
                 if ($params['id']=='new') {
                     $LTIDomain = array();
-                    $LTIDomain['email'] = $params['ltidomain'];
+                    $LTIDomain['email'] = trim($params['ltidomain']);
                     $LTIDomain['FirstName'] = $params['ltidomain'];
                     $LTIDomain['LastName'] = 'LTIcredential';
                     $LTIDomain['SID'] = $params['ltikey'];
@@ -1748,17 +1748,17 @@ class AdminController extends AppController
                     $resultLTI = $user->createLTIDomainCredentials($LTIDomain);
                     if($resultLTI->errors['email'])
                     {
-                        $this->setErrorFlash($resultLTI->errors['email'][0]);
+                        $this->setErrorFlash('Domain can not be blank.');
                         return $this->redirect('forms?action=listltidomaincred');
                     }
                     if($resultLTI->errors['SID'])
                     {
-                        $this->setErrorFlash($resultLTI->errors['SID'][0]);
+                        $this->setErrorFlash('Key can not be blank.');
                         return $this->redirect('forms?action=listltidomaincred');
                     }
                     if($resultLTI->errors['password'])
                     {
-                        $this->setErrorFlash($resultLTI->errors['password'][0]);
+                        $this->setErrorFlash('Secret can not be blank.');
                         return $this->redirect('forms?action=listltidomaincred');
                     }
 
@@ -1770,17 +1770,17 @@ class AdminController extends AppController
                         $resultUpdate = User::updateLTIDomainCredentials($params);
                         if($resultUpdate->errors['email'])
                         {
-                            $this->setErrorFlash($resultUpdate->errors['email'][0]);
+                            $this->setErrorFlash('Domain can not be blank.');
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                         if($resultUpdate->errors['SID'])
                         {
-                            $this->setErrorFlash($resultUpdate->errors['SID'][0]);
+                            $this->setErrorFlash('Key can not be blank.');
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                         if($resultUpdate->errors['password'])
                         {
-                            $this->setErrorFlash($resultUpdate->errors['password'][0]);
+                            $this->setErrorFlash('Secret can not be blank.');
                             return $this->redirect('forms?action=modltidomaincred&id=' .$params['id']);
                         }
                     }
