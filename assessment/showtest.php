@@ -2420,8 +2420,8 @@ if (!isset($_POST['embedpostback'])) {
 				$quesout .= '</div>';
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
-			$intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p>\s*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
-			echo $intro;
+			$intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p>(\s|&nbsp;)*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
+			echo $intro;		
 			
 			if ($dopage==true) {
 				echo '<p>';
