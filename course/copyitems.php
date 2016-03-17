@@ -218,7 +218,7 @@ if (!(isset($teacherid))) {
 					$row = mysql_fetch_row($result);
 					function updateoutcomes(&$arr) {
 						global $outcomes;
-						foreach ($arr as $k=>$v) {
+						foreach (is_array($arr)?$arr:array() as $k=>$v) {
 							if (is_array($v)) {
 								updateoutcomes($arr[$k]['outcomes']);
 							} else {
