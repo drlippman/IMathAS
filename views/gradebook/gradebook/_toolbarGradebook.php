@@ -1,5 +1,6 @@
 <?php
 use app\components\AppUtility;
+use app\components\AppConstant;
 ?>
 <div class="roster-nav-tab">
     <ul class="nav nav-tabs aligned sub-menu-bar-nav">
@@ -7,7 +8,8 @@ use app\components\AppUtility;
         if ($data['isDiagnostic']) { ?>
             <li>     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a> </li>
         <?php } ?>
-        <?php if($isTeacher){?>
+        <?php if($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)){
+            ?>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Offline Grades');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width">
@@ -21,7 +23,7 @@ use app\components\AppUtility;
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Filter');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width dropdown-scroll">
-                <?php if($isTeacher){?>
+                <?php if($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)){?>
                 <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/new-flag?cid='.$course->id)?>"><?php AppUtility::t('New Flag');?></a>
                 <li class="divider"></li>
                 <?php }?>
