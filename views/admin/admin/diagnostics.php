@@ -224,7 +224,7 @@ echo '<form>';
     <div class="col-md-2 col-sm-3 padding-top-five">
         <?php AppUtility::t('Enter IP address')?></div>
     <div class="col-md-8 col-sm-8">
-        <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
+        <input type=text id="ipin" onkeypress="return onenterip(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additemIpAddress('ipin','ipout')"/>
         <table>
             <tbody id="ipout">
@@ -266,7 +266,7 @@ echo '<form>';
 
     <div class="col-md-2 col-sm-2 padding-top-five"><?php AppUtility::t('')?>Enter Password</div>
     <div class="col-md-8 col-sm-8"><input type=password id="pwin" class="form-control-1"
-                                 onkeypress="return onenter(event,'pwin','pwout')">
+                                 onkeypress="return onenterpassword(event,'pwin','pwout')">
         <input type=button value="Add" onclick="additem('pwin','pwout')"/>
 
         <table>
@@ -309,7 +309,7 @@ echo '<form>';
 
     <div class="col-md-2 col-sm-2 padding-top-five"><?php AppUtility::t('')?>Enter Password</div>
     <div class="col-md-8 col-sm-8"><input type=password id="pwsin" class="form-control-1"
-                                 onkeypress="return onenter(event,'pwsin','pwsout')">
+                                 onkeypress="return onenterpassword(event,'pwsin','pwsout')">
         <input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
 
         <table>
@@ -365,7 +365,7 @@ echo '<form>';
 
     <div class="col-md-2 col-sm-2"><?php AppUtility::t('Enter new selector option')?></div>
     <div class="col-md-8 col-sm-8"><input type=text id="sellist" class="form-control-1"
-                                 onkeypress="return onenter(event,'sellist','selout')">
+                                 onkeypress="return onenterpassword(event,'sellist','selout')">
         <input type=button value="Add" onclick="additem('sellist','selout')"/>
         <table>
             <tbody id="selout">

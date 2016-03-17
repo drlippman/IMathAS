@@ -8,7 +8,7 @@ jQuery(document).ready(function(){
 function additemIpAddress(inloc,outloc)
 {
     var text = document.getElementById(inloc).value;
-    ValidateIPaddress(text);
+
     if(ValidateIPaddress(text) == true)
     {
     document.getElementById(inloc).value = '';
@@ -30,18 +30,41 @@ function additemIpAddress(inloc,outloc)
     newtd.innerHTML = html;
     newn.appendChild(newtd);
     outn.appendChild(newn);
-    } else {
-        alert("Enter valid IP address.")
+    }
+    else {
+        document.getElementById(inloc).value="";
     }
 }
 
 function additem(inloc,outloc) {
     var text = document.getElementById(inloc).value;
+    if(text.length==0){
+        message = 'Field cant be blank..!!';
+        var html = '<div><p>' + message + '</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: '', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,draggable:false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            },
+            open: function () {
+                jQuery('.ui-widget-overlay').bind('click', function () {
+                    jQuery('#dialog').dialog('close');
+                })
+            }
+        });
+    }else{
     document.getElementById(inloc).value = '';
     var outn = document.getElementById(outloc);
     var newn = document.createElement("tr");
     var newid = outloc+'-'+cnt[outloc];
-    console.log(cnt);
     cnt[outloc] += 1;
         newn.id = 'tr'+newid;
         var newtd = document.createElement("td");
@@ -56,32 +79,68 @@ function additem(inloc,outloc) {
         newtd.innerHTML = html;
         newn.appendChild(newtd);
         outn.appendChild(newn);
-
+    }
 }
+
 function ValidateIPaddress(ipaddress)
 {
     if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress))
     {
         return (true)
     }
-    alert("You have entered an invalid IP address!")
+    message = 'You have entered an invalid IP address!';
+    var html = '<div><p>' + message + '</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: '', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,draggable:false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        },
+        open: function () {
+            jQuery('.ui-widget-overlay').bind('click', function () {
+                jQuery('#dialog').dialog('close');
+            })
+        }
+    });
     return (false)
 }
 
 
-function onenter(e,inloc,outloc) {
+function onenterip(e,inloc,outloc) {
 	if (window.event) {
 		var key = window.event.keyCode;
 	} else if (e.which) {
 		var key = e.which;
 	}
 	if (key==13) {
-		additem(inloc,outloc);
+        additemIpAddress(inloc,outloc);
 		return false;
 	} else {
 		return true;
 	}
 }
+
+function onenterpassword(e,inloc,outloc) {
+    if (window.event) {
+        var key = window.event.keyCode;
+    } else if (e.which) {
+        var key = e.which;
+    }
+    if (key==13) {
+        additem(inloc,outloc);
+        return false;
+    } else {
+        return true;
+    }
+}
+
 function removeitem(id,outloc) {
 	var outn = document.getElementById(outloc);
 	outn.removeChild(document.getElementById('tr'+id));
