@@ -128,7 +128,8 @@ class ShowItemCourse extends Component
                 } else {
                     list($titlebg,$titletxt,$bicolor) = explode(',',$items[$i]['colors']);
                 }
-                if (!($items[$i]['avail'])) { //backwards compat
+
+                if (!isset($items[$i]['avail'])) { //backwards compat
                     $items[$i]['avail'] = AppConstant::NUMERIC_ONE;
                 }
 
@@ -232,14 +233,15 @@ class ShowItemCourse extends Component
                             $astyle = '';
                         }
                         echo ">";
-                        $treeReaderLink = AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId.'&folder='.$parent-$bnum);
+
+                        $treeReaderLink = AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId.'&folder='.$parent.'-'.$bnum);
                         if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
                             if ($isPublic) {
                             } else {
                                 echo "<span class=left>";?>
-                                <a href="<?php AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId. '&folder='.$parent-$bnum)?>" border="0"><img src="<?php AppUtility::getAssetURL()?>img/folder_tree.png"></a>
+                                <a href="<?php echo $treeReaderLink;?>" border="0">
+                                <img alt="folder" src="<?php echo $imasroot; ?>img/folder_tree.png"></a></span>
                             <?php }
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></span>";
                             echo "<div class=title>";
                         }
                         if ($isPublic) {
@@ -480,9 +482,11 @@ class ShowItemCourse extends Component
                             $astyle = '';
                         }
                         echo ">";
-                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) {
-                            echo "<span class=left><a href=\"#\" border=0>";
-                                echo "<img alt=\"folder\" src=\"$imasroot"."img/folder_tree.png\"></a></span>";
+                        $treeReaderLink = AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId.'&folder='.$parent.'-'.$bnum);
+                        if (($hideIcons&16) == AppConstant::NUMERIC_ZERO) { ?>
+                            <span class=left><a href="<?php echo $treeReaderLink ;?>" border= "0">
+                               <img alt="folder" src="<?php echo $imasroot;?>img/folder_tree.png"></a></span>
+                        <?php
                             echo "<div class=title>";
                         } ?>
                         <a href="<?php echo AppUtility::getURLFromHome('block','block/tree-reader?cid='.$courseId.'&folder='.$parent.'-'.$bnum)?>"><b><?php echo $items[$i]['name'];?></b></a>

@@ -66,6 +66,7 @@ class BlockController extends AppController
             $title = str_replace('"','&quot;',$title);
             $startDate = $blockItems[$existingId]['startdate'];
             $endDate = $blockItems[$existingId]['enddate'];
+
             if (isset($blockItems[$existingId]['avail'])) { //backwards compat
                 $avail = $blockItems[$existingId]['avail'];
             } else {
@@ -84,6 +85,7 @@ class BlockController extends AppController
             }
             $fixedHeight = $blockItems[$existingId]['fixedheight'];
             $groupLimit = $blockItems[$existingId]['grouplimit'];
+
            $defaultBlockData = array
            (
                 'title' =>  $title,
@@ -115,20 +117,20 @@ class BlockController extends AppController
          'pageTitle' => AppConstant::ADD_BLOCK,
         );
         }
-//        if ($startDate != 0) {
-//            $sdate = AppUtility::tzdate("m/d/Y",$startDate);
-//            $stime = AppUtility::tzdate("g:i a",$startDate);
-//        } else {
-//            $sdate = AppUtility::tzdate("m/d/Y",time());
-//            $stime = AppUtility::tzdate("g:i a",time());
-//        }
-//        if ($endDate != 2000000000) {
-//            $edate = AppUtility::tzdate("m/d/Y",$endDate);
-//            $etime = AppUtility::tzdate("g:i a",$endDate);
-//        } else {
-//            $edate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
-//            $etime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
-//        }
+        if ($startDate != 0) {
+            $sdate = AppUtility::tzdate("m/d/Y",$startDate);
+            $stime = AppUtility::tzdate("g:i a",$startDate);
+        } else {
+            $sdate = AppUtility::tzdate("m/d/Y",time());
+            $stime = AppUtility::tzdate("g:i a",time());
+        }
+        if ($endDate > 0 && $endDate<2000000000) {
+            $edate = AppUtility::tzdate("m/d/Y",$endDate);
+            $etime = AppUtility::tzdate("g:i a",$endDate);
+        } else {
+            $edate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
+            $etime = AppUtility::tzdate("g:i a",time());
+        }
 
         $page_sectionListVal = array("none");
         $page_sectionListLabel = array("No restriction");
@@ -139,7 +141,7 @@ class BlockController extends AppController
             $page_sectionListLabel[] = 'Section '.$data->section;
         }
         $this->includeCSS(['course/items.css']);
-        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId,'courseName' => $courseName]);
+        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId,'courseName' => $courseName,'sdate'=>$sdate,'stime'=>$stime,'etime'=>$etime,'edate'=>$edate]);
     }
 
     public function actionCreateBlock()
@@ -180,6 +182,7 @@ class BlockController extends AppController
         else{
             $fixedHeight  = AppConstant::NUMERIC_ZERO;
         }
+
         if ($params['avail']==AppConstant::NUMERIC_ONE)
         {
             if ($params['available-after']==AppConstant::ZERO_VALUE) {
@@ -199,6 +202,7 @@ class BlockController extends AppController
             $startDate = AppConstant::NUMERIC_ZERO;
             $endDate = AppConstant::ALWAYS_TIME;
         }
+
         if(isset($existingId))
         {
             $sub[$existingId]['name'] = htmlentities(stripslashes($params['title']));
@@ -414,7 +418,6 @@ class BlockController extends AppController
         $foundopenitem = '';
         $now = time();
         $value = Bookmark::getValue($userId, $courseId, $folder);
-
         if(count($value) == AppConstant::NUMERIC_ZERO) {
             $openitem = '';
         } else{

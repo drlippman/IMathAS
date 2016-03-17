@@ -9,7 +9,6 @@ $this->title = $defaultBlockData['pageTitle'];
 $this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/course/course/course?cid=' . $courseId]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
 <form method=post action="create-block?cid=<?php echo $courseId;
 if (isset($block)) {
     echo "&block=$block";
@@ -56,7 +55,7 @@ if (isset($id)) {
                             <span class="padding-left-pt-five-em"><?php AppUtility::t('Hide') ?></span>
                     </span>
                     <span class="col-md-3 col-sm-3 padding-left-zero non-bold">
-                        <input type=radio name="avail" value="2" <?php AssessmentUtility:: writeHtmlChecked($defaultBlockData['avail '], 2); ?>
+                        <input type=radio name="avail" value="2" <?php AssessmentUtility:: writeHtmlChecked($defaultBlockData['avail'], 2); ?>
                                                        onclick="document.getElementById('datediv').style.display='none'; "/>
                         <span class="padding-left-pt-five-em"><?php AppUtility::t('Show Always') ?></span>
                     </span>
@@ -80,7 +79,6 @@ if (isset($id)) {
                             </label>
 
                         </div>
-
                         <div class="col-md-12 col-sm-12 padding-left-zero padding-top-one-pt-five-em">
                             <label class="pull-left padding-top-pt-five-em">
                                 <input type=radio name="available-after" class="pull-left" value="sdate" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '0', 1) ?>/>
@@ -100,7 +98,7 @@ if (isset($id)) {
                             <div class="pull-left col-md-4 col-sm-5 padding-right-zero">
                                 <?php    echo TimePicker::widget([
                                     'name' => 'stime',
-                                    'value' => time(),
+                                    'value' => $stime,
                                     'pluginOptions' => [
                                         'showSeconds' => false,
                                         'class' => 'time'
@@ -125,7 +123,7 @@ if (isset($id)) {
                         <?php   echo DatePicker::widget([
                             'name' => 'edate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                            'value' => date("m/d/Y"),
+                            'value' => $edate,
                             'removeButton' => false,
                             'pluginOptions' => [
                                 'autoclose' => true,
@@ -136,7 +134,7 @@ if (isset($id)) {
                     <div class="pull-left col-md-4 col-sm-5">
                         <?php   echo TimePicker::widget([
                             'name' => 'etime',
-                            'value' => time(),
+                            'value' => $etime,
                             'pluginOptions' => [
                                 'showSeconds' => false,
                                 'class' => 'time'

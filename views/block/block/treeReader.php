@@ -21,7 +21,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <img id="navtoggle" src="<?php echo $imasroot1;?>img/collapse.gif"  onclick="toggletreereadernav()"/>
 <ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
 <?php
-
 $ul = $printList;
 echo $ul[0];
 
