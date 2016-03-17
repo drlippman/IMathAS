@@ -227,6 +227,9 @@ if (!(isset($teacherid))) {
 						}
 					}
 					$outcomesarr = unserialize($row[0]);
+					if (!is_array($outcomearr)) {
+						$outcomearr = array();
+					}
 					updateoutcomes($outcomesarr);
 				}
 				$newoutcomearr = addslashes(serialize($outcomesarr));
