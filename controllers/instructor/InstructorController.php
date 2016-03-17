@@ -372,27 +372,28 @@ class InstructorController extends AppController
                 $itemorder = serialize($items);
                 Course::setItemOrder($itemorder, $courseId);
                 $itemsData = Items::getByCourseId($courseId);
-                foreach ($itemsData as $item) {
-                    if ($item['itemtype'] == "InlineText") {
-                        InlineText::setStartDate($this->shift, $item['typeid']);
-                        InlineText::setEndDate($this->shift, $item['typeid']);
-                    } else if ($item['itemtype'] == "LinkedText") {
-                        LinkedText::setStartDate($this->shift, $item['typeid']);
-                        LinkedText::setEndDate($this->shift, $item['typeid']);
-                    } else if ($item['itemtype'] == "Forum") {
-                        Forums::setReplyBy($this->shift, $item['typeid']);
-                        Forums::setPostBy($this->shift, $item['typeid']);
-                    } else if ($item['itemtype'] == "Assessment") {
-                        Assessments::setStartDate($this->shift, $item['typeid']);
-                        Assessments::setEndDate($this->shift, $item['typeid']);
-                    } else if ($item['itemtype'] == "Calendar") {
-                        continue;
-                    } else if ($item['itemtype'] == "Wiki") {
-                        Wiki::setEditByDate($this->shift, $item['typeid']);
+                if($itemsData){
+                    foreach ($itemsData as $item) {
+                        if ($item['itemtype'] == "InlineText") {
+                            InlineText::setStartDate($this->shift, $item['typeid']);
+                            InlineText::setEndDate($this->shift, $item['typeid']);
+                        } else if ($item['itemtype'] == "LinkedText") {
+                            LinkedText::setStartDate($this->shift, $item['typeid']);
+                            LinkedText::setEndDate($this->shift, $item['typeid']);
+                        } else if ($item['itemtype'] == "Forum") {
+                            Forums::setReplyBy($this->shift, $item['typeid']);
+                            Forums::setPostBy($this->shift, $item['typeid']);
+                        } else if ($item['itemtype'] == "Assessment") {
+                            Assessments::setStartDate($this->shift, $item['typeid']);
+                            Assessments::setEndDate($this->shift, $item['typeid']);
+                        } else if ($item['itemtype'] == "Calendar") {
+                            continue;
+                        } else if ($item['itemtype'] == "Wiki") {
+                            Wiki::setEditByDate($this->shift, $item['typeid']);
+                        }
+                        CalItem::setDateByCourseId($this->shift, $courseId);
                     }
-                    CalItem::setDateByCourseId($this->shift, $courseId);
                 }
-                $this->setSuccessFlash('Time shift data update successfully');
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $courseId));
             } else { //DEFAULT DATA MANIPULATION
                 $sdate = AppUtility::tzdate("m/d/Y", time());
