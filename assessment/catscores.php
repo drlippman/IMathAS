@@ -86,6 +86,13 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 	foreach (array_keys($catscore) as $category) {
 		if (is_numeric($category)) {
 			continue;
+		} elseif (0==strncmp($category,"AID-",4)) { //category is another assessment
+			$categoryaid=intval(substr($category,4));
+			$query = "SELECT name FROM imas_assessments WHERE id='$categoryaid' AND courseid='$cid' LIMIT 1";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$assessmentname = mysql_result($result, 0, 0);
+			//link to the other assessment
+			$catname="<a href='../assessment/showtest.php?cid=$cid&aid=$categoryaid' >$assessmentname</a>";
 		} else {
 			$catname = $category;
 		}
