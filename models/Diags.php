@@ -40,7 +40,7 @@ class Diags extends BaseImasDiags
     public function saveDiagnostic($params, $userId)
     {
         $this->ownerid = $userId;
-        $this->name = $params['diagname'];
+        $this->name = trim($params['diagname']);
         $this->term = $params['term'];
         $this->cid = $params['cid'];
         $this->public = $params['public'];
@@ -52,7 +52,7 @@ class Diags extends BaseImasDiags
         $this->entryformat = $params['entryformat'];
         $this->reentrytime = $params['reentrytime'];
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function getByDiagnoId($id)
@@ -64,7 +64,7 @@ class Diags extends BaseImasDiags
     {
         $updateDiagno = Diags::findOne(['id' => $params['id']]);
         $updateDiagno->cid = $params['cid'];
-        $updateDiagno->name = $params['diagname'];
+        $updateDiagno->name = trim($params['diagname']);
         $updateDiagno->term = $params['term'];
         $updateDiagno->public = $params['public'];
         $updateDiagno->idprompt = $params['idprompt'];
@@ -79,7 +79,7 @@ class Diags extends BaseImasDiags
         $updateDiagno->forceregen = $params['forceregen'];
         $updateDiagno->reentrytime = $params['reentrytime'];
         $updateDiagno->save();
-        return $updateDiagno->id;
+        return $updateDiagno;
     }
 
     public static function getNameById($id)

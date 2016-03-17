@@ -131,7 +131,7 @@ echo '<form>';
 
     <div class="col-md-2 col-sm-2 padding-top-five"><?php AppUtility::t('Diagnostic Name')?></div>
     <div class="col-md-6 col-sm-6"><input type=text size=60 name="diagname" class="form-control" maxlength="60"
-                                 required="Please fill out this field" value="<?php echo $diagname; ?>"/></div>
+                                 value="<?php echo $diagname; ?>"/></div>
     <BR class=form><br>
 
     <div class="col-md-2 col-sm-2"><?php AppUtility::t('Term designator (e.g. F06)')?></div>
@@ -223,7 +223,7 @@ echo '<form>';
 
     <div class="col-md-2 col-sm-3 padding-top-five">
         <?php AppUtility::t('Enter IP address')?></div>
-    <div class="col-md-8 col-sm-8">
+    <div class="col-md-8 col-sm-8 staticParent">
         <input type=text id="ipin" onkeypress="return onenterip(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additemIpAddress('ipin','ipout')"/>
         <table>
@@ -414,3 +414,11 @@ echo '<form>';
 }
 ?>
 </div>
+<script>
+    $(document).ready(function(){
+        $(function() {
+            $('.staticParent').on('keydown', '#ipin', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        })
+    })
+
+</script>

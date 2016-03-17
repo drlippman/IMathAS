@@ -387,11 +387,22 @@ class AdminController extends AppController
 
             if (isset($params['id']) && $params['id'] != 0) {
                 $query = new Diags();
-                $id = $query->updateDiagnostics($params);
+                $updateDiagnostics = $query->updateDiagnostics($params);
+                $id = $updateDiagnostics['id'];
+
+                if($updateDiagnostics->errors['name']){
+                    $this->setErrorFlash('Name can not be blank.');
+                    return $this->redirect('diagnostics?id='. $id);
+                }
                 $page_successMsg = "<br/><div class='col-md-12'>Diagnostic Updated</div><br/>";
             } else {
                 $query = new Diags();
-                $id = $query->saveDiagnostic($params, $userId);
+                $newDiagnostics = $query->saveDiagnostic($params, $userId);
+                $id = $newDiagnostics['id'];
+                if($newDiagnostics->errors['name']){
+                    $this->setErrorFlash('Name can not be blank.');
+                    return $this->redirect('diagnostics');
+                }
                 $page_successMsg = "<BR class=form><div class='col-md-2'>Diagnostic Added</div><br class='form'>";
             }
             $page_diagLink = "<BR/><div class=col-md-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
@@ -416,7 +427,7 @@ class AdminController extends AppController
                     $owner = $line['ownerid'];
                 } else if ($line['ownerid'] != $userId) {
                     $this->setErrorFlash("Not yours!");
-                    return $this->redirect('admin', 'admin/diagnostics?id='.$diagnoId);
+                    return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$diagnoId));
                 } else {
                     $owner = $userId;
                 }
