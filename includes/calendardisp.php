@@ -366,7 +366,7 @@ $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 $itemorder = unserialize(mysql_result($result,0,0));
 $itemsimporder = array();
 $itemfolder = array();
-$hiddenitems = array()
+$hiddenitems = array();
 
 flattenitems($itemorder,$itemsimporder,$itemfolder,$hiddenitems,'0');
 
