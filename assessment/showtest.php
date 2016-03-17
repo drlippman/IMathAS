@@ -2301,7 +2301,9 @@ if (!isset($_POST['embedpostback'])) {
 				$intropages = preg_split('/\[PAGE\s*([^\]]*)\]/',$intro,-1,PREG_SPLIT_DELIM_CAPTURE); //main pagetitle cont 1 pagetitle
 				if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 				if ($_GET['page']==0) {
-					echo $intropages[0];	
+					if (!preg_match('/^<div\s*class="intro">(\s|&nbsp;|<p>(\s*|&nbsp;)*<\/p>)*<\/div>$/', $intropages[0])) {
+						echo $intropages[0];
+					}
 				} 
 				$intro =  $intropages[2*$_GET['page']+2];
 				preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$intro,$matches,PREG_PATTERN_ORDER);
