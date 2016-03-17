@@ -767,12 +767,10 @@ class AppController extends Controller
 
     public function accessForWikiController($user, $courseId, $actionPath)
     {
-
         $isOwner = Course::isOwner($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)) {
             return true;
         } else if($user['rights'] < AppConstant::STUDENT_RIGHT && $actionPath = 'view-wiki-public'){
-
             return true;
         }
 
@@ -788,8 +786,11 @@ class AppController extends Controller
         return true;
     }
 
-    public function accessForTeacher($user, $courseId)
+    public function accessForTeacher($user, $courseId, $actionpath)
     {
+        if($actionpath="tree-reader"){
+            return true;
+        }
         $isOwner = Course::isOwner($user['id'], $courseId);
         if (($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT) || ($user['rights'] > AppConstant::TEACHER_RIGHT && $isOwner)) {
             return true;

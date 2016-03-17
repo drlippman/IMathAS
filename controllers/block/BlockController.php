@@ -14,6 +14,8 @@ use app\models\Items;
 use app\models\LinkedText;
 use app\models\Student;
 use app\models\Wiki;
+use Yii;
+
 
 class BlockController extends AppController
 {
@@ -24,9 +26,10 @@ class BlockController extends AppController
     public $user = null;
     public function beforeAction($action)
     {
+        $actionPath = Yii::$app->controller->action->id;
         $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($this->user,$courseId);
+        return $this->accessForTeacher($this->user,$courseId,$actionPath);
     }
 
     public function actionAddBlock()
@@ -509,7 +512,6 @@ class BlockController extends AppController
 
         }
         $printList = $this->printlist($items);
-
         $this->includeCSS(['libtree.css']);
         $this->includeJS(['general.js']);
         $responseData = array('course' => $course, 'printList' => $printList, 'openitem' => $openitem, 'foundfirstitem' => $foundfirstitem, 'foundopenitem' => $foundopenitem, 'item'=> $items, 'blockName' => $blockName, 'backlink' => $backlink);
@@ -557,10 +559,10 @@ class BlockController extends AppController
                     }
                     if ($viewall || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
                         if ($openitem=='' && $foundfirstitem=='') {
-                            $foundfirstitem = 'assessment/assessment/show-test?cid='.$courseId.'&id='.$typeid; $isopen = true;
+                            $foundfirstitem = AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid='.$courseId.'&id='.$typeid); $isopen = true;
                         }
                         if ($itemtype.$typeid===$openitem) {
-                            $foundopenitem = 'assessment/assessment/show-test?cid='.$courseId.'&id='.$typeid; $isopen = true;
+                            $foundopenitem = AppUtility::getURLFromHome('assessment', 'assessment/show-test?cid='.$courseId.'&id='.$typeid); $isopen = true;
                         }
                         $out .= '<li>';
 
@@ -613,7 +615,7 @@ class BlockController extends AppController
                         } else {
                             $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
                         }
-                        $out .= '<a href="'.AppUtility::getURLFromHome("assessment", "assessment/show-assessment?cid=".$courseId."&id=".$typeid).'"onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['name'].'</a></li>';
+                        $out .= '<a href="'.AppUtility::getURLFromHome("assessment", "assessment/show-test?cid=".$courseId."&id=".$typeid).'"onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['name'].'</a></li>';
                     }
                 } else if ($line['itemtype']=='LinkedText') {
                     //TODO check availability, etc.
@@ -633,30 +635,32 @@ class BlockController extends AppController
                     $line = Wiki::getById($typeid);
                     if ($viewall || $line['avail']== AppConstant::NUMERIC_TWO || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && $line['enddate']>$now)) {
                         if ($openitem=='' && $foundfirstitem=='') {
-                            $foundfirstitem = 'wiki/wikis/show-wiki?cid='.$courseId.'id='.$typeid.'&framed=true'; $isopen = true;
+                            $foundfirstitem = AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&framed=true');
+                            $isopen = true;
                         }
                         if ($itemtype.$typeid===$openitem) {
-                            $foundopenitem = 'wiki/wikis/show-wiki?cid='.$courseId.'id='.$typeid.'&framed=true'; $isopen = true;
+                            $foundopenitem = AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&framed=true');
+                            $isopen = true;
                         }
-                        $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconWiki.png"> <a href="'.AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?cid='.$courseId.'id='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+                        $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconWiki.png"> <a href="'.AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&framed=true'." ").'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
                     }
                 } else if ($line['itemtype']=='Forum') {
 				//TODO check availability.
-				 $line = Forums::getById($typeid);
-				 if ($openitem=='' && $foundfirstitem=='') {
-				 	 $foundfirstitem = 'forum/forums/thread?cid='.$courseId.'&forum='.$typeid; $isopen = true;
-				 }
-				 if ($itemtype.$typeid===$openitem) {
-				 	 $foundopenitem = 'forum/forums/thread?cid='.$courseId.'&forum='.$typeid; $isopen = true;
-				 }
-				 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconForum.png"> <a href="'.AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+//				 $line = Forums::getById($typeid);
+//				 if ($openitem=='' && $foundfirstitem=='') {
+//				 	 $foundfirstitem = 'forum/forums/thread?cid='.$courseId.'&forum='.$typeid; $isopen = true;
+//				 }
+//				 if ($itemtype.$typeid===$openitem) {
+//				 	 $foundopenitem = 'forum/forums/thread?cid='.$courseId.'&forum='.$typeid; $isopen = true;
+//				 }
+//				 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconForum.png"> <a href="'.AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 			} else if ($line['itemtype']=="Calendar") {
-                $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconCalendar.png">
-                <a href="'.AppUtility::getURLFromHome('course', 'course/calendar?cid='.$courseId.'"'). 'target="readerframe">Calendar</a></li>';
-                if ($openitem=='' && $foundfirstitem=='') {
-                      $foundfirstitem = 'course/course/calendar?cid='.$courseId;
-                      $isopen = true;
-                }
+//                $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconCalendar.png">
+//                <a href="'.AppUtility::getURLFromHome('course', 'course/calendar?cid='.$courseId.'"'). 'target="readerframe">Calendar</a></li>';
+//                if ($openitem=='' && $foundfirstitem=='') {
+//                      $foundfirstitem = 'course/course/calendar?cid='.$courseId;
+//                      $isopen = true;
+//                }
             }
             }
         }

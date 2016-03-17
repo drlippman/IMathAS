@@ -23,14 +23,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 $ul = $printList;
 echo $ul[0];
-
-
 ?>
 </ul>
 <div id="bmrecout" style="display:none;"></div>
 </div>
 <div id="centercontent" style="margin-left: 260px;">
-    <iframe id="readerframe" name="readerframe" style="width:100%; border:1px solid #ccc;" src="<?php echo AppUtility::getHomeURL() . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
+    <iframe id="readerframe" name="readerframe" style="width:100%; border:1px solid #ccc;" src="<?php echo ($openitem=='')?$foundfirstitem:$foundopenitem; ?>"></iframe>
 </div>
 
 
