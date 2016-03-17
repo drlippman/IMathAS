@@ -355,16 +355,16 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
                 <?php }
-            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1)) || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
+            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) { ?>
+
+
+                <?php  if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
+                    { ?>
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                    href="javascript:void(0);">
                     <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
                 </a>
                 <ul class="dropdown-menu" style="position: relative">
-
-                <?php  if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
-                    { ?>
-
                         <li>
                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7]);?>"> <?php AppUtility::t('[Settings]')?></a>
                         </li>
@@ -372,22 +372,30 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "><?php AppUtility::t('[Isolate]')?></a>
                         </li>
                   <?php  } else { ?>
-                        <li>
-                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "> <?php AppUtility::t('[Scores]')?>
-                        </li>
-                    <?php }
-            } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { //discussion ?>
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);">
                         <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
                     </a>
                     <ul class="dropdown-menu" style="position: relative">
+                        <li>
+                            <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "> <?php AppUtility::t('[Scores]')?>
+                        </li>
+                    <?php }
+            } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+            //discussion
+                ?>
 
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
+                       href="javascript:void(0);">
+                        <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
+                    </a>
+                    <ul class="dropdown-menu" style="position: relative">
                     <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
                     </li>
             <?php } else if ($gradebook[0][1][$i][6] == 3 && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
-            { //exttool ?>
+            { //exttool
+            ?>
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                            href="javascript:void(0);">
                             <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">

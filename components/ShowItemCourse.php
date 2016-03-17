@@ -939,7 +939,7 @@ class ShowItemCourse extends Component
                     } else {
                         $show = sprintf(_('Available %1$s until %2$s'), $startDate, $endDate);
                         if ($line['reviewdate'] > AppConstant::NUMERIC_ZERO && $line['enddate'] != AppConstant::ALWAYS_TIME) {
-                            $show = sprintf(', Review until %s', $reviewdate);
+                            $show .= sprintf(', Review until %s', $reviewdate);
                         }
                     }
                     ShowItemCourse::beginitem($canEdit,$items[$i]); //echo "<div class=item>\n"; 4 assessment
