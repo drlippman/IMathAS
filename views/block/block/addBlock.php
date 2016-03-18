@@ -26,7 +26,7 @@ if (isset($id)) {
         <div class="row">
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?>
-                    <a href="#" onclick="window.open('/math/web/docs/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
+                      <a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'question/question/add-question-help?section=blocks'?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
                 </div>
             </div>
         </div>
