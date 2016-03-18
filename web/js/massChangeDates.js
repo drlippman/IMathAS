@@ -130,7 +130,6 @@ Date.prototype.getWeekDays = function(d) {
  	$('img[src*="swap.gif"]').css("cursor","pointer");	
  	$('span[id^="availname"]').css("cursor","pointer").each(function(i,el) {
  		$(el).on('click',function() {
-            alert('jjj');
  		//	MCDtoggle("a",el.id.substring(9));
  		});
  	});

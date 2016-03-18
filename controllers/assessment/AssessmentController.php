@@ -101,7 +101,7 @@ class AssessmentController extends AppController
                     $body = "<h3>$assessmentName</h3>";
                     $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
                     $body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='" . AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?cid=' . $params['cid'] . '&id=' . $params['id'] . '&clearattempts=confirmed') . "'\">\n";
-                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='" . AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?cid=' . $params['cid'] . '&id=' . $params['id']) . "'\"></p>\n";
+                    $body .= "<input type=button value=\"Cancel\" class=\"secondarybtn\" onClick=\"window.location='" . AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?cid=' . $params['cid'] . '&id=' . $params['id']) . "'\"></p>\n";
                 }
             } elseif ($params['name'] != null) {//if the form has been submitted
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {

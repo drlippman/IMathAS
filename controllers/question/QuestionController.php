@@ -164,7 +164,7 @@ class QuestionController extends AppController
                     $body .= "<div class='col-md-12 padding-top-five padding-left-thirty'><h3>$assessmentName</h3>";
                     $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
                     $body .= "<p class='padding-top-ten'><input type=button value=\"Yes, Clear\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId . '&clearattempts=confirmed') . "'\">\n";
-                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn margin-left-ten\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId) . "';\"></p></div>";
+                    $body .= "<input type=button value=\"Cancel\" class=\"secondarybtn margin-left-ten\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId) . "';\"></p></div>";
                 }
             }
 
@@ -284,7 +284,7 @@ class QuestionController extends AppController
                     }
                     $body .= '<p>This action can <b>not</b> be undone.</p>';
                     $body .= '<p><input type=submit value="Withdraw Question">';
-                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId) . "'\"></p>\n";
+                    $body .= "<input type=button value=\"Cancel\" class=\"secondarybtn\" onClick=\"window.location='" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId) . "'\"></p>\n";
                     $body .= '</form>';
                 }
             }

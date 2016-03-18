@@ -184,7 +184,7 @@ if ($overwriteBody == 1) {
                 case 'Assessment': echo $CFG['CPS']['miniicons']['assess']; break;
                 case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
             }
-            echo '"/><div>';
+            echo '/><div>';
         }
         echo "{$names[$i]}<input type=hidden id=\"id$cnt\" value=\"{$ids[$i]}\"/></div>";
         echo "<script> basesdates[$cnt] = ";
@@ -210,8 +210,10 @@ if ($overwriteBody == 1) {
         <input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
        ?>
 
-       <?php echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot2/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
-        if ($startdates[$i]==0) {
+       <?php echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">"; ?>
+<!--       <img src=\"$imasroot2/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";-->
+        <img src="<?php echo AppUtility::getAssetURL()?>img/swap.gif" onclick="MCDtoggle('s',<?php echo $cnt ?>)">
+       <?php if ($startdates[$i]==0) {
             echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
         } else {
             echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"1\"/>";
@@ -266,8 +268,10 @@ if ($overwriteBody == 1) {
 
         echo '</span></td>';
 
-        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
-        if ($enddates[$i]==2000000000) {
+        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">"; ?>
+        <img src="<?php echo AppUtility::getAssetURL()?>img/swap.gif" onclick="MCDtoggle('e',<?php echo $cnt ?>)">
+<!--        <img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>-->
+      <?php   if ($enddates[$i]==2000000000) {
             echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
         } else {
             echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"1\"/>";
@@ -322,9 +326,10 @@ if ($overwriteBody == 1) {
         echo '</span></td>';
 
         echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')." \" style=\"width:40%;\">";
-        if ($types[$i]=='Assessment') {
-            echo "<img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
-            if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
+        if ($types[$i]=='Assessment') { ?>
+<!--            echo "<img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";-->
+            <img src="<?php echo AppUtility::getAssetURL()?>img/swap.gif" onclick="MCDtoggle('r',<?php echo $cnt ?>)">
+            <?php if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
                 echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
             } else {
                 echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"1\"/>";

@@ -77,7 +77,7 @@ function removeResponseSuccess(response) {
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
-                "Nevermind": function () {
+                "Cancel": function () {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
@@ -161,7 +161,7 @@ function removeUserSuccess(response) {
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
-                "Nevermind": function () {
+                "Cancel": function () {
                     $(this).dialog('destroy').remove();
                     return false;
                 },

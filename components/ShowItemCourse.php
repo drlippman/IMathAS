@@ -937,7 +937,7 @@ class ShowItemCourse extends Component
                     }
                     echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i></div><div class=itemsum>{$line['summary']}</div>\n");
                     ShowItemCourse::enditem($canEdit); //echo "</div>\n";
-                } else if ($viewAll && !$studview) { //not avail to stu
+                } else if ($viewAll && !$studview && !$isStudent) { //not avail to stu
                     if ($line['avail'] == AppConstant::NUMERIC_ZERO) {
                         $show = _('Hidden');
                     } else {

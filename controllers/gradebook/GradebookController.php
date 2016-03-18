@@ -66,7 +66,7 @@ class GradebookController extends AppController
 
     public function actionGradebook()
     {
-        global $get, $sel1name, $sel2name, $canviewall,$courseId,$isTeacher, $isTutor,$userId;
+        global $get, $sel1name, $sel2name, $canviewall,$courseId,$isTeacher, $isTutor,$userId, $user;
         $this->guestUserHandler();
         $this->layout = "master";
         $user = $this->user;
@@ -457,7 +457,6 @@ class GradebookController extends AppController
 
             }
         }
-
         //Pull Offline Grade item info
         $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $catfilter, $now);
         if ($gbItems) {

@@ -96,9 +96,9 @@ if($gradebook != AppConstant::NUMERIC_ONE) {
         </span>
         <?php
         if($gradebook == AppConstant::NUMERIC_ONE) {
-            echo "<input type=button value='".AppUtility::t('Nevermind', false)."' class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."gradebook/gradebook/gradebook?cid=$course->id'\">";
+            echo "<input type=button value='".AppUtility::t('Cancel', false)."' class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."gradebook/gradebook/gradebook?cid=$course->id'\">";
     }else{
-            echo "<input type=button value='".AppUtility::t('Nevermind', false)."' class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."roster/roster/student-roster?cid=$course->id'\">";
+            echo "<input type=button value='".AppUtility::t('Cancel', false)."' class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."roster/roster/student-roster?cid=$course->id'\">";
         }
         ?>
     </p>

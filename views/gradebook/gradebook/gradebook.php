@@ -473,7 +473,7 @@ if ($i % 2 != 0) {
     echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 }
 echo '<td class="locked" scope="row"><div class="trld">';
-if ($gradebook[$i][0][0] != "Averages" && $isTeacher) { ?>
+if ($gradebook[$i][0][0] != "Averages" && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
     <div class="checkbox override-hidden">
         <label>
             <input type="checkbox" name='checked' value='<?php echo $gradebook[$i][4][0] ?>'/>
@@ -667,7 +667,7 @@ if (isset($gradebook[$i][1][$j][6])) {
     }
 }
 } else if ($gradebook[0][1][$j][6] == 1) { //offline
-if ($data['isTeacher']) {
+if ($data['isTeacher'] || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
 if ($gradebook[$i][0][0] == 'Averages') { ?>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>" <?php
                           echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";

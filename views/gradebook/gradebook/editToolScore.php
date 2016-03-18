@@ -18,7 +18,7 @@ if (isset($params['clear']) && $isteacher)
     {
         echo "<p>Are you SURE you want to clear all associated grades on this item from the gradebook?</p>";
         echo "<p><a href=\"edittoolscores.php?stu={$params['stu']}&gbmode={$params['gbmode']}&cid=$cid&lid=$lid&confirm=true\">Clear Scores</a>";
-        echo " <a href=\"gradebook.php?stu={$params['stu']}&gbmode={$params['gbmode']}&cid=$cid\">Nevermind</a>";
+        echo " <a href=\"gradebook.php?stu={$params['stu']}&gbmode={$params['gbmode']}&cid=$cid\">Cancel</a>";
         exit;
     }
 }

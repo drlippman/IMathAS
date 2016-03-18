@@ -330,7 +330,7 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
             closeText: "hide",
             buttons:
             {
-                "Nevermind": function ()
+                "Cancel": function ()
                 {
                     $(this).dialog('destroy').remove();
                     return false;
