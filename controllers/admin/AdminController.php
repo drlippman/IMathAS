@@ -1250,7 +1250,7 @@ class AdminController extends AppController
                 $courseData = $query->create($userId, $params,$blockcnt);
                 if($courseData['name'] == '')
                 {
-                    $this->setErrorFlash("Course Name can not be blanck.");
+                    $this->setErrorFlash("Course Name can not be blank.");
                     return $this->redirect('forms?action=addcourse');
                 }
                 if($courseData->errors['name'])

@@ -779,6 +779,7 @@ class CourseController extends AppController
         $course = Course::getById($courseId);
         $modifyLinkId = $params['id'];
         $block = $this->getParamVal('block');
+        $folder = $this->getParamVal('folder');
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $model = new ThreadForm();
         $teacherId = $this->isTeacher($user['id'], $courseId);
@@ -1062,10 +1063,19 @@ class CourseController extends AppController
             if ($modifyLinkId) {
                 $finalArray['id'] = $params['id'];
                 $link = new LinkedText();
-                $link->updateLinkData($finalArray);
+                $updatedLink = $link->updateLinkData($finalArray);
+                if($updatedLink->errors['title']){
+                    $this->setErrorFlash('Name of Link can not be blank.');
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId.'&id='.$modifyLinkId.'&block='.$block));
+                }
             } else {
                 $linkText = new LinkedText();
-                $linkTextId = $linkText->AddLinkedText($finalArray);
+                $linkTextCreated = $linkText->AddLinkedText($finalArray);
+                $linkTextId = $linkTextCreated['id'];
+                if($linkTextCreated->errors['title']){
+                    $this->setErrorFlash('Name of Link can not be blank.');
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?block='.$block.'&cid='.$courseId.'&folder='.$folder.'&tb='.$filter));
+                }
                 $itemType = AppConstant::LINK;
                 $itemId = new Items();
                 $lastItemId = $itemId->saveItems($courseId, $linkTextId, $itemType);

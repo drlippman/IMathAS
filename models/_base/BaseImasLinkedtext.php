@@ -40,6 +40,7 @@ class BaseImasLinkedtext extends \yii\db\ActiveRecord
     {
         return [
 //            [['courseid', 'title', 'summary', 'text', 'startdate', 'enddate', 'outcomes'], 'required'],
+            [['title'], 'required'],
             [['courseid', 'startdate', 'enddate', 'avail', 'oncal', 'target', 'points'], 'integer'],
             [['summary', 'text', 'outcomes'], 'string'],
             [['title', 'caltag'], 'string', 'max' => 254]

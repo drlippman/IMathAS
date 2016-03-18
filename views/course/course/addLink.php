@@ -38,7 +38,7 @@ $this->title = $defaultValues['saveTitle'];
     <div class="name-of-item col-md-12 col-sm-12">
         <div class="col-md-2 col-sm-2 select-text-margin"><?php AppUtility::t('Name of Link') ?></div>
         <div class="col-md-10 col-sm-10">
-            <input class="form-control input-item-title" type=text size=0 name=name maxlength="60" required=" "
+            <input class="form-control input-item-title" type=text size=0 name=name maxlength="60"
                    value="<?php echo str_replace('"', '&quot;', $defaultValues['title']);  ?>">
         </div>
     </div>

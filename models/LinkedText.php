@@ -27,7 +27,7 @@ class LinkedText extends BaseImasLinkedtext
     public function addLinkedText($params)
     {
         $this->courseid = $params['courseid'];
-        $this->title = $params['title'];
+        $this->title = trim($params['title']);
         $this->summary = $params['summary'];
         $this->text = $params['text'];
         $this->avail = $params['avail'];
@@ -39,7 +39,7 @@ class LinkedText extends BaseImasLinkedtext
         $this->startdate = $params['startdate'];
         $this->enddate = $params['enddate'];
         $this->save();
-        return $this->id;
+        return $this;
     }
 
     public static function getById($id)
@@ -52,7 +52,7 @@ class LinkedText extends BaseImasLinkedtext
     {
         $updaateLink = LinkedText::findOne(['id' => $params['id']]);
         $updaateLink->courseid = $params['courseid'];
-        $updaateLink->title = $params['title'];
+        $updaateLink->title = trim($params['title']);
         $updaateLink->summary = $params['summary'];
         $updaateLink->text = $params['text'];
         $updaateLink->avail = $params['avail'];
@@ -64,6 +64,7 @@ class LinkedText extends BaseImasLinkedtext
         $updaateLink->enddate = $params['enddate'];
         $updaateLink->outcomes = $params['outcomes'];
         $updaateLink->save();
+        return $updaateLink;
     }
     public static function findByCourseId($cid)
     {
