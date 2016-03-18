@@ -1184,8 +1184,16 @@ class SiteController extends AppController
             }
             $layoutStr = implode('|',$homeLayout);
             if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
-                UserPics::processImage($_FILES['stupic'],$userId,200,200);
-                UserPics::processImage($_FILES['stupic'],'sm'.$userId,40,40);
+               $imageReturn =  UserPics::processImage($_FILES['stupic'],$userId,200,200);
+                $imageReturnWidth = UserPics::processImage($_FILES['stupic'],'sm'.$userId,40,40);
+                if($imageReturn){
+                    $this->setErrorFlash($imageReturn);
+                    return $this->redirect('form?action=chguserinfo');
+                }
+                if($imageReturnWidth){
+                    $this->setErrorFlash($imageReturn);
+                    return $this->redirect('form?action=chguserinfo');
+                }
                 $chgUserImg = AppConstant::NUMERIC_ONE;
             } else if (isset($params['removepic'])) {
                 filehandler::deletecoursefile($userId.'.jpg');

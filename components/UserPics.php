@@ -13,15 +13,16 @@ class UserPics extends Component
     {
         $type = $image[ 'type' ];
         $galleryPath = AppConstant::UPLOAD_DIRECTORY;
-
-        if ( strpos( $type, 'image/' ) === FALSE )
+        if (strpos($type,'image/') === FALSE || strpos($type,'image/') === '')
         {
             /**
              * not an image
              */
-            return FALSE;
+            $a = 'Invalid image format. Image with (.jpeg,.png,.gif) are allowed.';
+            return $a;
         }
         $type = str_replace( 'image/', '', $type );
+
         if ($type=='pjpeg') {
         /*
          * stupid IE6
@@ -29,10 +30,12 @@ class UserPics extends Component
             $type = 'jpeg';
         }
         if ($type!='jpeg' && $type!='png' && $type!='gif') {
+
             /*
              * invalid image type
              */
-            return FALSE;
+            $a = 'Invalid image format. Image with (.jpeg,.png,.gif) are allowed.';
+            return $a;
         }
         $createFunc = 'imagecreatefrom' . $type;
         $im = @$createFunc( $image[ 'tmp_name' ] );
