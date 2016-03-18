@@ -30,9 +30,10 @@ class OutcomesController extends AppController
     public $user;
     public function beforeAction($action)
     {
+        $actionPath = Yii::$app->controller->action->id;
         $this->user = $this->getAuthenticatedUser();
         $courseId =  ($this->getParamVal('cid') || $this->getParamVal('courseId')) ? ($this->getParamVal('cid')?$this->getParamVal('cid'):$this->getParamVal('courseId') ): AppUtility::getDataFromSession('courseId');
-        return $this->accessForTeacher($this->user,$courseId);
+        return $this->accessForTeacher($this->user,$courseId,$actionPath);
     }
 
     public function actionAddOutcomes()

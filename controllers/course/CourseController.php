@@ -460,7 +460,6 @@ class CourseController extends AppController
         $tb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
         $moveFile = $this->getParamVal('movefile');
-
         if (isset($params['tb'])) {
             $filter = $params['tb'];
         } else {
@@ -545,7 +544,6 @@ class CourseController extends AppController
 
                     //update attached files
                     $resultFile = InstrFiles::getFileName($params['id']);
-
                     foreach($resultFile as $key => $row) {
                         if (isset($params['delfile-'.$row['id']])) {
                             $filestoremove[] = $row['id'];
@@ -617,7 +615,6 @@ class CourseController extends AppController
                             if (trim($params['newfiledescr'])=='') {
                                 $params['newfiledescr'] = $filename;
                             }
-
                             $addedfileOne = new InstrFiles();
                             $addedfile = $addedfileOne->saveFile($params,$filename, $newtextid);
                             $params['id'] = $newtextid;
@@ -632,12 +629,13 @@ class CourseController extends AppController
                 $resultFileOrder = InlineText::getFileOrder($params['id']);
                 $fileorder = explode(',', $resultFileOrder['fileorder']);
 
-                if ($fileorder['fileorder'] == '') {
+                if ($resultFileOrder['fileorder'] == '') {
                     $fileorder = array();
                 }
-                if (($addedfile)) {
+                if ($addedfile) {
                     $fileorder[] = $addedfile;
                 }
+
                 if (count($filestoremove) > 0) {
                     for ($i=0; $i<count($filestoremove); $i++) {
                         $k = array_search($filestoremove[$i],$fileorder);
@@ -721,16 +719,15 @@ class CourseController extends AppController
                 $i = 0;
                 $page_FileLinks = array();
                 if (count($result) > 0) {
-
                     foreach($result as $key => $row) {
                         $filedescr[$row['id']] = $row['description'];
-                        $filenames[$row['id']] = rawurlencode($row['filename']);
+                        $filenames[$row['id']] = $row['filename'];
                     }
+
                     foreach ($fileorder as $k=>$fid) {
                         $page_FileLinks[$k]['link'] = $filenames[$fid];
                         $page_FileLinks[$k]['desc'] = $filedescr[$fid];
                         $page_FileLinks[$k]['fid'] = $fid;
-
                     }
                 }
             } else {
@@ -758,6 +755,7 @@ class CourseController extends AppController
             }
             $page_formActionTag .= (isset($params['id'])) ? "&id=" . $params['id'] : "";
         }
+
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js"]);
         $this->includeCSS(['course/items.css']);
         $responseData = array('page_formActionTag' => $page_formActionTag, 'filter' => $filter,'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes, 'block' => $block, 'altoncal' => $altoncal);

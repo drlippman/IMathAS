@@ -642,7 +642,7 @@ class BlockController extends AppController
                             $foundopenitem = AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&framed=true');
                             $isopen = true;
                         }
-                        $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconWiki.png"> <a href="'.AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&framed=true'." ").'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+                        $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'img/iconWiki.png"> <a href="'.AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId='.$courseId.'&wikiId='.$typeid.'&framed=true'." ").'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
                     }
                 } else if ($line['itemtype']=='Forum') {
 				//TODO check availability.

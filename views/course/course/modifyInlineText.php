@@ -65,21 +65,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--File Attachment -->
                 <div class="col-sm-12 col-sm-12 padding-top-two-em">
                 <div class='col-md-2 col-sm-3 padding-left-zero'><?php AppUtility::t('Attached Files') ?></div>
+                <div class='col-md-10 col-sm-9 padding-left-zero'>
                 <?php
 
                 if (isset($params['id'])) {
                     foreach ($page_FileLinks as $k => $arr) {
                         AppUtility::generatemoveselect($page_fileorderCount, $k);
                         ?>
+                        <div class="margin-bottom-three">
                         <a href="<?php echo filehandler::getcoursefileurl($arr['link']); ?>" target="_blank"> <?php AppUtility::t('View')?> </a>
                         <input class="form-control-1" type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
                         <?php AppUtility::t('Delete?')?> <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>
+                        </div>
                     <?php
                     }
                 }
                 ?>
                 <div class='col-md-10 col-sm-9 padding-left-zero'>
-                    <div class="col-md-12 col-sm-12 padding-left-zero">
+                    <div class="col-md-12 col-sm-12 padding-left-zero padding-top-five">
                         <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
                         <span class="floatleft"><?php AppUtility::t('New file') ?><sup>*</sup></span>
                         <span class="col-md-3 col-sm-3"><input type="file" name="userfile"/></span>
@@ -92,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="col-md-12 col-sm-12 padding-left-zero padding-top-two-em">
                         <input type=submit name="submitbtn" class="btn btn-primary" value="Add / Update Files"/>
                     </div>
-
+                </div>
                 </div>
                 </div>
 
@@ -277,6 +280,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </form>
         </div>
         <?php $urlmode = \app\components\AppUtility::urlMode();?>
+
+
         <script type="text/javascript">
             function movefile(from) {
                 var to = document.getElementById('ms-' + from).value;
