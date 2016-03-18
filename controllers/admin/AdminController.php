@@ -532,7 +532,6 @@ class AdminController extends AppController
        } else {
            $ltfrom = '';
        }
-
        if (isset($params['tname']))
        {
            $privacy = AppConstant::NUMERIC_ZERO;
@@ -687,8 +686,7 @@ class AdminController extends AppController
            }
            $ltfrom = str_replace('&amp;','&',$ltfrom);
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
-       } else
-       {
+       } else {
            if (isset($params['delete']))
            {
 
@@ -732,7 +730,8 @@ class AdminController extends AppController
                }
            }
        }
-       $this->includeCSS(['course/items.css']);
+
+        $this->includeCSS(['course/items.css']);
        $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
        'name' => $name,'pageTitle' => $pageTitle, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course, 'id' => $id, 'buttonTitle' => $buttonTitle);
        return $this->renderWithData('externalTool', $responseData);

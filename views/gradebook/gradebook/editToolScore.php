@@ -39,14 +39,14 @@ $this->title = AppUtility::t('External Tool Grades', false);
 //echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$params['cid']}\">$coursename</a> ";
 //echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 if ($params['stu'] > AppConstant::NUMERIC_ZERO) {
-    echo "&gt; <a href=\"gradebook.php?stu={$params['stu']}&cid=$cid\">Student Detail</a> ";
+    echo "&gt; <a href=\"gradebook?stu={$params['stu']}&cid=$cid\">Student Detail</a> ";
 } else if ($params['stu']==-1) {
-    echo "&gt; <a href=\"gradebook.php?stu={$params['stu']}&cid=$cid\">Averages</a> ";
+    echo "&gt; <a href=\"gradebook?stu={$params['stu']}&cid=$cid\">Averages</a> ";
 }
 //echo "&gt; External Tool Grades</div>";
 //echo "<div id=\"headerexttoolgrades\" class=\"pagetitle\"><h2>Modify External Tool Grades</h2></div>";
 echo '<h3>'.$name.'</h3>'; ?>
- <form id="mainform" method=post action="edit-tool-score?stu=<?php echo $params['stu']?>&gbmode=<?php echo $params['gbmode']?>&cid=<?php echo $course-> id?>&lid=<?php echo $lid?>&uid=<?php echo $params['uid']?>">
+ <form id="mainform" method=post action="edit-tool-score?stu=<?php echo $params['stu']?>&gbmode=<?php echo $params['gbmode']?>&cid=<?php echo $course-> id?>&lid=<?php echo $params['lid']?>&uid=<?php echo $params['uid']?>">
  <div id="gradeboxes ">
  <input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)">
 <?php

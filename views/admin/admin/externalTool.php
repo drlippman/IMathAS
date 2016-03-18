@@ -5,6 +5,7 @@ $this->title =  $pageTitle;
 if (isset($params['id'])) {
     echo '<form method="post" action="external-tool?cid=' . $courseId . $ltfrom . '&amp;id=' . $params['id'] . '">';
 }
+
 ?>
 <div class="item-detail-header">
     <?php
@@ -113,7 +114,7 @@ if (isset($params['id'])) {
         </form>
 
     <?php } else {
-        echo '<div class="col-md-12  col-sm-12 padding-twenty">
+            echo '<div class="col-md-12  col-sm-12 padding-twenty">
             <div class="col-md-12 col-sm-12 padding-top-twenty text-gray-background padding-left-thirty">';
         $str = "<p><b>";
         if ($isAdmin) {
@@ -123,7 +124,7 @@ if (isset($params['id'])) {
         } else {
             echo '<p><b>Course Tools</b></p>';
         }
-        $str .= '</b></p>';
+            $str .= '</b></p>';
 
             if($resultFirst)
             {
@@ -145,10 +146,10 @@ if (isset($params['id'])) {
             <tr>
             <?php
 
-             foreach ($resultFirst as $key => $row) { ?>
+             foreach ($resultFirst as $key => $row) {
+                ?>
                 <td class="word-break-break-all">
-               <?php echo  $row['nm'];
-
+               <?php echo  $row['name'];
                if ($isAdmin) {
                     if ($row['name'] == null) {
                         echo ' (System-wide)';
@@ -156,14 +157,16 @@ if (isset($params['id'])) {
                         echo ' (for group ' . $row['name'] . ')';
                     }
                 }
-                ?>
+               ?>
                 </td>
-                <input type="hidden" id="id" value="<?php echo $row['nm'] ?>">
+                <input type="hidden" id="id" value="<?php echo $row['name'] ?>">
                 <td>
                 <?php
-                echo ' <a href=' . AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $courseId . $ltfrom . '&amp;id=' . $row['id']) . '>Edit</a> ';
+                echo '<a href='.AppUtility::getURLFromHome('admin','admin/external-tool?cid=' .$courseId .$ltfrom . '&amp;id=' . $row['id']) . '>Edit</a> ';
                 $ExternalToolId = $row['id'];
-                $cid = $courseId . $ltfrom;?>
+                $cid = $courseId . $ltfrom;
+
+                ?>
                 </td>
                 <td>
                 <input type="hidden" id="admin" value="<?php echo $cid ?>">

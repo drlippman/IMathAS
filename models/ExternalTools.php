@@ -128,7 +128,7 @@ class ExternalTools extends BaseImasExternalTools
     public static function getByCourseId($courseId)
     {
         $query = new Query();
-        $query->select(['imas_external_tools.id', 'imas_external_tools.name AS nm', 'imas_groups.name'])
+        $query->select(['imas_external_tools.id', 'imas_external_tools.name AS name', 'imas_groups.name AS group_name'])
             ->from('imas_external_tools')
             ->Join('LEFT JOIN',
                 'imas_groups',
@@ -147,7 +147,7 @@ class ExternalTools extends BaseImasExternalTools
     }
     public static function getByCourseAndOrderByName($courseId)
     {
-        return self::find()->select(['id', 'name AS nm'])->where(['courseid' => $courseId])->orderBy('name')->all();
+        return self::find()->select(['id', 'name'])->where(['courseid' => $courseId])->orderBy('name')->all();
     }
 
     public static function getById($id)

@@ -4506,20 +4506,22 @@ class GradebookController extends AppController
         $isTutor = false;
         $isTeacher = false;
         $params = $this->getRequestParams();
+
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $currentUser = $this->user;
         $isTutor = $this->isTutor($currentUser['id'],$courseId);
         $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+
         $this->layout = 'master';
         $lid = intval($params['lid']);
         $linkData = LinkedText::getLinkDataByIdAndCourseID($lid,$courseId);
-        if (!$linkData)
+
+        if (count($linkData) == AppConstant::NUMERIC_ZERO)
         {
-            $this->setWarningFlash('invalid item');
+            $this->setWarningFlash('Invalid item.');
             return $this->goBack();
         }
-
         $name = $linkData['title'];
         $text = $linkData['text'];
         $points = $linkData['points'];
@@ -4528,11 +4530,13 @@ class GradebookController extends AppController
             $gbCat = $toolParts[3];
             $countInGb = $toolParts[4];
             $tutorEdit = $toolParts[5];
-        } else
+        }
+        else
         {
             $this->setWarningFlash(AppConstant::INVALID_PARAMETERS);
             return $this->goBack();
         }
+
         if ($isTutor) {
             $isOk = ($tutorEdit == 1);
             if (!$isOk)
@@ -4556,6 +4560,7 @@ class GradebookController extends AppController
         }
         if (isset($params['newscore']))
         {
+
             $keys = array_keys($params['newscore']);
             foreach ($keys as $k=>$v) {
                 if (trim($v)=='') {unset($keys[$k]);}
@@ -4587,8 +4592,7 @@ class GradebookController extends AppController
                 }
             }
         }
-
-        if (isset($params['newscore']))
+        if (($params['newscore']))
         {
             foreach($params['newscore'] as $k=>$sc)
             {
