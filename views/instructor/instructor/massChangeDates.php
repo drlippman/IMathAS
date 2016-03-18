@@ -112,7 +112,9 @@ if ($overwriteBody == 1) {
     echo "<div class='col-md-12 col-sm-12'>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
     echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
     echo "If you click the checkboxes on the left, you can limit the update to those items. ";
-    echo "Click the <img src=\"$imasroot2/img/swap.gif\"> icon in each cell to swap from ";
+    echo "Click the";?>
+    <img src="<?php echo AppUtility::getAssetURL()?>img/swap.gif">
+    <?php echo "icon in each cell to swap from ";
     echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</div>";
     echo "<form id=\"qform\">";?>
 
