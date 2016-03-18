@@ -559,7 +559,7 @@ class CourseController extends AppController
                         }
                     }
                     $newtextid = $params['id'];
-                } else { //add new
+                }else{ //add new
                     $tempArray = array();
                     $tempArray['cid'] = $cid;
                     $tempArray['startdate'] = $startDate;
@@ -601,7 +601,6 @@ class CourseController extends AppController
                     $uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
                     $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
                     $filename = $userfilename;
-//                    print_r($filename); die;
 
                     $extension = strtolower(strrchr($userfilename,"."));
                     $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
@@ -609,7 +608,6 @@ class CourseController extends AppController
                         $overWriteBody = 1;
                         $body = "<p>File type is not allowed</p>";
                     } else {
-//                        print_r(filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)); die;
                         if (($filename = filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)) !== false) {
 
                             if (trim($params['newfiledescr'])=='') {
@@ -628,14 +626,13 @@ class CourseController extends AppController
             if (($addedfile) || count($filestoremove) > 0 || ($params['movefile'])) {
                 $resultFileOrder = InlineText::getFileOrder($params['id']);
                 $fileorder = explode(',', $resultFileOrder['fileorder']);
-
                 if ($resultFileOrder['fileorder'] == '') {
                     $fileorder = array();
                 }
+
                 if ($addedfile) {
                     $fileorder[] = $addedfile;
                 }
-
                 if (count($filestoremove) > 0) {
                     for ($i=0; $i<count($filestoremove); $i++) {
                         $k = array_search($filestoremove[$i],$fileorder);
@@ -654,6 +651,10 @@ class CourseController extends AppController
                 }
                 $fileorder = implode(',',$fileorder);
                 InlineText::setFileOrder($params['id'],$fileorder);
+            }
+
+            if($params['submitbtn'] == 'Add / Update Files'){
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/modify-inline-text?cid=' .$cid.'&id='.$newtextid));
             }
 
             if ($params['submitbtn'] == 'Submit') {
