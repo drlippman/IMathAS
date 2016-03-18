@@ -366,8 +366,9 @@ $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 $itemorder = unserialize(mysql_result($result,0,0));
 $itemsimporder = array();
 $itemfolder = array();
+$hiddenitems = array();
 
-flattenitems($itemorder,$itemsimporder,$itemfolder,'0');
+flattenitems($itemorder,$itemsimporder,$itemfolder,$hiddenitems,'0');
 
 $itemsassoc = array();
 $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
@@ -381,6 +382,10 @@ $colors = array();
 $tags = array();
 $k = 0;
 foreach ($itemsimporder as $item) {
+	if (isset($hiddenitems[$item]) && !isset($teacherid)) {
+		//skip over any items in a hidden folder or future not-yet-open folder if it's a student
+		continue;
+	}
 	if ($itemsassoc[$item][0]=='Assessment') {
 		if (isset($byid['A'.$itemsassoc[$item][1]])) {
 			$moday = $byid['A'.$itemsassoc[$item][1]][0];
@@ -516,16 +521,22 @@ if ($pageshift==0) {
 }
 
 }
-function flattenitems($items,&$addto,&$folderholder,$folder,$avail=true) {
+function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,$folder,$avail=true,$ishidden=false) {
+	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			$now = time();
-			$avail = ($avail && ($item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)));
-			flattenitems($item['items'],$addto,$folderholder,$folder.'-'.($k+1),$avail);
+			$avail = ($avail && ($item['avail']==2 || ($item['avail']==1 && ($item['SH'][0]=='S' || ($item['startdate']<$now && $item['enddate']>$now)))));
+			//set as hidden if explicitly hidden or opens in future.  We won't count past folders that aren't showing as hidden
+			//  to allow students with latepasses to access old assignments even if the folder is gone.
+			$ishidden = ($ishidden || $item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$folder.'-'.($k+1),$avail,$ishidden);
 		} else {
 			$addto[] = $item;
 			if ($avail) {
 				$folderholder[$item] = $folder;
+			}
+			if ($ishidden) {
+				$hiddenholder[$item] = true;
 			}
 		}
 	}

@@ -70,6 +70,9 @@ END;
 		$outcomearr = array();
 	} else {
 		$outcomearr = unserialize($row[0]);
+		if (!is_array($outcomearr)) {
+			$outcomearr = array();
+		}
 	}
 	
 	$outcomes = array();
