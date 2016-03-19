@@ -1150,12 +1150,12 @@ class AssessmentController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $sessionId = $this->getSessionId();
-        $sessiondata = $this->getSessionData($sessionId);;
+        $sessiondata = $this->getSessionData($sessionId);
         $teacherid = $this->isTeacher($user['id'], $courseId);
         $studentid = $this->isStudent($user['id'], $courseId);
         $tutorid = $this->isTutor($user['id'], $courseId);
         $userfullname = $user['FirstName'] . ' ' . $user['LastName'];
-        global $temp, $CFG, $questions, $seeds, $showansduring, $testsettings, $qi, $rawscores, $timesontask, $isdiag, $courseId, $attempts, $scores, $bestscores, $noindivscores, $showeachscore, $reattempting, $bestrawscores, $firstrawscores, $bestattempts, $bestseeds, $bestlastanswers, $lastanswers, $bestquestions,$testid;
+        global $temp, $CFG, $questions, $seeds, $showansduring, $testsettings, $qi, $rawscores, $timesontask, $isdiag, $courseId, $attempts, $scores, $bestscores, $noindivscores, $showeachscore, $reattempting, $bestrawscores, $firstrawscores, $bestattempts, $bestseeds, $bestlastanswers, $lastanswers, $bestquestions,$testid,$superdone,$timelimitkickout;
         $myrights = $user['rights'];
         if (!isset($CFG['TE']['navicons'])) {
             $CFG['TE']['navicons'] = array(
@@ -1519,7 +1519,6 @@ class AssessmentController extends AppController
             }
         }
         //already started test
-
         if (!isset($sessiondata['sessiontestid'])) {
             $temp .= 'Error.  Access test from course page';
             return $temp;
@@ -1704,7 +1703,7 @@ class AssessmentController extends AppController
             }
             //check for past time limit, with some leniency for javascript timing.
             //want to reject if javascript was bypassed
-            if ($timelimitremaining < -1 * max(0.05 * $testsettings['timelimit'], 5)) {
+            if ($timelimitremaining < (-1 * max(0.05 * $testsettings['timelimit'], 5))) {
                 $temp .= 'Time limit has expired.  Submission rejected. ';
                 $this->leavetestmsg($sessiondata);
                 return $temp;
@@ -2261,6 +2260,8 @@ class AssessmentController extends AppController
                     if ($totremaining < 300) {
                         $temp .= 'style="color:#f00;" ';
                     }
+//                    $home=AppUtility::getHomeURL();
+//                    $home.="assessment/assessment/show-test?action=skip&superdone=true";
                     $temp .= ">$hours:$minutes:$seconds</span> " . 'remaining' . ".</span></span> <span onclick=\"toggletimer()\" style=\"color:#aaa;\" class=\"clickable\" id=\"timerhide\" title=\"" . 'Hide' . "\">[x]</span></div>\n";
                     $temp .= "<script type=\"text/javascript\">\n";
                     $temp .= " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";
@@ -2273,7 +2274,9 @@ class AssessmentController extends AppController
                         $temp .= "		document.getElementById('timelimitholder').innerHTML = \"" . 'Time limit expired - submitting now' . "\";";
                         $temp .= " 		document.getElementById('timelimitholder').style.fontSize=\"300%\";";
                         $temp .= "		if (document.getElementById(\"qform\") == null) { ";
-                        $temp .= "			setTimeout(\"window.location.pathname='show-test?action=skip&superdone=true'\",2000); return;";
+//                        $temp .= "			setTimeout(\"window.location.pathname='show-test?action=skip&superdone=true'\",2000); return;";
+                        $temp .= "			setTimeout(\"window.location.href='?action=skip&superdone=true'\",2000); return;";
+
                         $temp .= "		} else {";
                         $temp .= "		var theform = document.getElementById(\"qform\");";
                         $temp .= " 		var action = theform.getAttribute(\"action\");";
@@ -2695,7 +2698,8 @@ class AssessmentController extends AppController
                         $temp .= "</div>\n";
                     }
                 }
-                if ($params['done']=="true") { //are all done
+
+                if ($params['done']=="true" || $params['superdone']=="true") { //are all done
                     $shown = $this->showscores($questions, $attempts, $testsettings);
                     $this->endtest($testsettings);
                     if ($shown) {
@@ -3055,7 +3059,7 @@ class AssessmentController extends AppController
                     $temp .= '<input type="submit" class="btn margin-left-twenty" name="saveforlater" value="' . 'Save answers' . '" onclick="return confirm(\'' . 'This will save your answers so you can come back later and finish, but not submit them for grading. Be sure to come back and submit your answers before the due date.' . '\');" />';
                     $temp .= "</form>\n";
                 } else {
-                    $temp .= startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
+                    $temp = startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
                     $temp .= "</form>\n";
                     $this->leavetestmsg($sessiondata);
                 }
@@ -3453,7 +3457,7 @@ class AssessmentController extends AppController
         }
         global $testid;
         recordtestdata();
-        if ($testtype != "NoScores") {
+        if ($testsettings['testtype']!= "NoScores") {
             $temp .= "<p>" . sprintf('Total Points on Last Attempts:  %d out of %d possible', $lastattempttotal, $totpossible) . "</p>\n";
             if (($testsettings['minscore'] < 10000 && $total < $testsettings['minscore']) || ($testsettings['minscore'] > 10000 && $total < ($testsettings['minscore'] - 10000) / 100 * $totpossible)) {
                 $temp .= "<p><b>" . sprintf(_('Total Points Earned:  %d out of %d possible: '), $total, $totpossible);
