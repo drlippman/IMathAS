@@ -34,7 +34,7 @@ function addcategory() {
 function quickpick() {
 	$('select.qsel').each(function() {
 		if ($(this).val()==0) {
-			$(this).find('optgroup[label=Libraries] option:first').prop('selected',true);
+			$(this).find('optgroup[label='+document.getElementById("label").value+'] option:first').prop('selected',true);
 		}
 	});
 }
@@ -223,7 +223,11 @@ END;
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
 		
 	}
-	echo "<p>Select first listed library for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+echo "<p>Select first listed <select id=\"label\">\n";
+echo "<option value=\"Libraries\">Libraries</option>";
+echo "<option value=\"Assessments\">Assessments</option>";
+echo "</select>\n";
+echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
 	
 	echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
