@@ -277,6 +277,11 @@ class CourseController extends AppController
                 header('Location: '.AppUtility::getHomeURL(). '/filter/basiclti/post.?'.$param);
             }
         }
+
+//        if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
+//            $contentTrackRecord = new ContentTrack();
+//            $contentTrackRecord->insertForumData($user->id, $courseId, $params['forumid'], $threadId, $threadIdOfPost = null, $type = AppConstant::NUMERIC_ZERO);
+//        }
         $this->includeCSS(['course/items.css']);
         $returnData = array('course' => $course, 'links' => $link, 'user' => $user);
         return $this->renderWithData('showLinkedText', $returnData);
@@ -2468,4 +2473,11 @@ class CourseController extends AppController
         }
         return false;
     }
+
+//    public function actionRecTrack(){
+//        $now = time();
+//        $this->layout = 'master';
+//        $user = $this->user;
+//        $courseId = $this->getParamVal('cid');
+//    }
 }

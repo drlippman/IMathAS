@@ -320,9 +320,11 @@ class ForumController extends AppController
         } else {
             $isteacher = false;
         }
+        if($this->isPostMethod()){
 
         $forumData = Forums::getById($forumId);
-        if (($isteacher || ($tutorId)) && ($params['score'])) {
+        if (($isteacher || isset($tutorId)) && isset($params['score'])) {
+
             if (($tutorId))
             {
                 if ($forumData['tutoredit'] != 1) {
@@ -337,19 +339,18 @@ class ForumController extends AppController
                 $existingscores[$grade['refid']] = $grade['id'];
             }
             $postuserids = array();
-
             $forumPosts = ForumPosts::getByRefIds(array_keys($params['score']));
             foreach ($forumPosts as $forumPost) {
                 $postuserids[$forumPost['id']] = $forumPost['userid'];
             }
 
             foreach ($params['score'] as $k => $v) {
+
                 if (($params['feedback'][$k])) {
                     $feedback = $params['feedback'][$k];
                 } else {
                     $feedback = '';
                 }
-
                 if (is_numeric($v)) {
                     if (($existingscores[$k])) {
                         Grades::updateById($v, $feedback, $existingscores[$k]);
@@ -371,6 +372,7 @@ class ForumController extends AppController
                     }
                 }
             }
+
             if (($params['save']) && $params['save'] == 'Save Grades and View Previous')
             {
                 return $this->redirect('post?page=' .$page . '&courseid=' .$courseId . '&forumid=' .$forumId . '&threadid=' .$params['prevth']);
@@ -382,6 +384,7 @@ class ForumController extends AppController
             }
         }
 
+        }
         $forumname = $forumData['name'];
         $postby = $forumData['postby'];
         $forumsettings = $forumData['settings'];
@@ -714,7 +717,6 @@ class ForumController extends AppController
 
                 }
                 for ($i = count($files) / 2 - 1; $i >= 0; $i--) {
-                    print_r($i);
                     if (isset($params['fileDel'][$i])) {
                         if ($this->deleteForumFile($files[2 * $i + 1])) {
                             array_splice($files, 2 * $i, 2);

@@ -179,4 +179,15 @@ class ContentTrack extends BaseImasContentTrack
     {
         return ContentTrack::find()->select('id')->where(['courseid' => $coursId, 'userid' => $userId, 'linkedlink' => $type, 'typeid' => $tId])->orderBy(['viewtime'=> SORT_DESC])->limit(1);
     }
+
+    public function insertLinked($currentUserId,$type, $courseId, $typeId){
+        $now = time();
+        $this->userid =  $currentUserId;
+        $this->courseid = $courseId;
+        $this->type = $type;
+        $this->typeid = $typeId;
+        $this->viewtime = $now;
+        $this->info = $now;
+        $this->save();
+    }
 }

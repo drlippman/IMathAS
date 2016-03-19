@@ -29,3 +29,23 @@ $this->title = $course->name;
         <br><br>
     </div>
 </div>
+<?php
+if (isset($studentid)) {
+$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
+$text = str_replace('<a ','<a '.$rec, $text);
+$placeinhead = '<script type="text/javascript">
+    function recunload() {
+        if (!recordedunload) {
+            $.ajax({
+                type: "POST",
+                url: "'.$imasroot.'/course/rectrack.php?cid='.$cid.'",
+                data: "unloadinglinked='.$_GET['id'].'",
+                async: false
+            });
+            recordedunload = true;
+        }
+    }
+    window.onunload = window.onbeforeunload = recunload;
+</script>';
+}
+?>

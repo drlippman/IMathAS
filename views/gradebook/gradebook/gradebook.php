@@ -336,7 +336,8 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
             <ul class="dropdown-menu" style="position: relative">
 
             <?php if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
-                { ?>
+                {
+                    ?>
                     <li>
                         <a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb'); ?> "> <?php AppUtility::t('[Settings]') ?> </a>
                     </li>
@@ -355,10 +356,10 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
                 <?php }
-            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) { ?>
+            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1)) || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
 
 
-                <?php  if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
+                <?php  if ($isTeacher )
                     { ?>
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                    href="javascript:void(0);">

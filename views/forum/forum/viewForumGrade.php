@@ -73,19 +73,19 @@ if ($canEditScore) {
             if ($canEditScore) {
                 if (($scores[$forumPost['id']])) {
                     echo "<td class='staticScore'><input type=text size=3 class='child' name=\"score[{$forumPost['id']}]\" id=\"score{$forumPost['id']}\" value=\"";
-                    echo $scores[$forumPost['id']]['id'];
+                    echo $scores[$forumPost['id']]['score'];
                 } else {
                     echo "<td class='staticScore'><input type=text size=3 class='child' name=\"newscore[{$forumPost['id']}]\" id=\"score{$forumPost['id']}\" value=\"";
                 }
                 echo "\" /> </td>";
-                echo "<td><textarea cols=40 rows=1 id=\"feedback{$forumPost['id']}\" name=\"feedback[{$forumPost['id']}]\">{$scores[$forumPost['id']]['gradetype']}</textarea></td>";
+                echo "<td><textarea cols=40 rows=1 id=\"feedback{$forumPost['id']}\" name=\"feedback[{$forumPost['id']}]\">{$scores[$forumPost['id']]['feedback']}</textarea></td>";
             } else {
                 if (($scores[$forumPost['id']])) {
-                    echo '<td>'.$scores[$forumPost['id']]['id'].'</td>';
+                    echo '<td>'.$scores[$forumPost['id']]['score'].'</td>';
                 } else {
                     echo "<td>-</td>";
                 }
-                echo '<td>'.$scores[$forumPost['id']]['gradetype'].'</td>';
+                echo '<td>'.$scores[$forumPost['id']]['feedback'].'</td>';
             }
             echo "</tr>";
         }

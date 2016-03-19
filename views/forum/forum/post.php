@@ -88,19 +88,22 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
       <?php 
         echo "<br/>";echo "<br/>";
-
+        if ($caneditscore && $haspoints) {
+            echo "<form method=post action=\"thread?cid=$courseId&forum=$forumid&score=true\">";
+        }
         $printChildren = new AppUtility();
         $printChildren->printchildren(0);
         if ($caneditscore && $haspoints) { ?>
-            <div><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid)?> " name="save" class="btn btn-primary"> <?php echo "Save Grades"?></a></div><br>
+<!--            <div><a href="--><?php //echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid.'&score=true')?><!-- " name="save" class="btn btn-primary"> --><?php //echo "Save Grades"?><!--</a></div><br>-->
+            <div><input type=submit name="save" value="Save Grades" /></div>
           <?php
             if ($prevth!='' && $page!=-3) {
                 echo '<input type="hidden" name="prevth" value="'.$prevth.'"/>'; ?>
-                <div><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid)?> " name="save" class="btn btn-primary"> <?php echo "Save Grades and View Previous"?></a></div><br>
+                <div><input type="submit" name="save" value="Save Grades and View Previous"/></div><br>
             <?php }
             if ($nextth!='' && $page!=-3) {
                 echo '<input type="hidden" name="nextth" value="'.$nextth.'"/>'; ?>
-                <div><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forum='.$forumid)?> " name="save" class="btn btn-primary"> <?php echo "Save Grades and View Next"?></a></div><br>
+                <div><input type="submit" name="save" value="Save Grades and View Next"/></div><br>
            <?php }
             echo "</form>";
         }
