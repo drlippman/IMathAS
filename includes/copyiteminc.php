@@ -123,29 +123,29 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_forums (courseid,name,summary,startdate,enddate) ";
 		//$query .= "SELECT '$cid',name,summary,startdate,enddate FROM imas_forums WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,rubric FROM imas_forums WHERE id='$typeid'";
+		$query = "SELECT name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,rubric FROM imas_forums WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
-		if ($sethidden) {$row[8] = 0;}
-		if (isset($gbcats[$row[11]])) {
-			$row[11] = $gbcats[$row[11]];
+		if ($sethidden) {$row[10] = 0;}
+		if (isset($gbcats[$row[13]])) {
+			$row[13] = $gbcats[$row[13]];
 		} else if ($_POST['ctc']!=$cid) {
-			$row[11] = 0;
+			$row[13] = 0;
 		}
 		$rubric = array_pop($row);
 		$row[0] .= stripslashes($_POST['append']);
-		if ($row[14]!='') {
-			$curoutcomes = explode(',',$row[14]);
+		if ($row[16]!='') {
+			$curoutcomes = explode(',',$row[16]);
 			$newoutcomes = array();
 			foreach ($curoutcomes as $o) {
 				if (isset($outcomes[$o])) {
 					$newoutcomes[] = $outcomes[$o];
 				}
 			}
-			$row[14] = implode(',',$newoutcomes);
+			$row[16] = implode(',',$newoutcomes);
 		}
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag) ";
+		$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
