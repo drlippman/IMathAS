@@ -7,6 +7,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $possiblePoints = $user['points'];
 $tutorEdit = $user['tutoredit'];
 $canEditScore = (($isTeacher) || (($isTutor) && $tutorEdit == AppConstant::NUMERIC_ONE));
+
 $showLink = ($canEditScore || time() < $user['enddate']);
 ?>
 <div class="item-detail-header">
@@ -40,7 +41,7 @@ if(!empty($forumInformation)){
 }
 
 if ($possiblePoints == AppConstant::NUMERIC_ZERO) { ?>
-     <div class="col-md-12 col-sm-12"><?php AppUtility::t('This forum is not a graded forum'); ?></div>
+     <div class="col-md-12 col-sm-12"><?php AppUtility::t('This forum is not a graded forum.'); ?></div>
 <?php } else { ?>
      <div class="col-md-12 col-sm-12"><?php AppUtility::t('Total')?>: <?php echo $totalPoints  ?> <?php AppUtility::t('out of '); echo $possiblePoints; ?></div>
 <?php }
@@ -112,8 +113,9 @@ if ($canEditScore || ($scores[0]))
     echo "</tr>";
 }
 echo '</tbody></table>';
-if ($canEditScore) { ?>
-     <div class="col-md-12 col-sm-12"><input type="submit" value="<?php AppUtility::t('Save Scores')?>" /></div>
+if ($canEditScore) {
+?>
+     <div class="col-md-12 col-sm-12"><input type="submit" value="<?php AppUtility::t('Save Scores')?>" /></div><br/>
      </form>
 <?php }
 ?>

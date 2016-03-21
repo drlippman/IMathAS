@@ -1643,7 +1643,7 @@ class ForumController extends AppController
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ZERO;
         $teacherId = $this->isTeacher($user['id'], $courseId);
-        $this->noValidRights($teacherId);
+//        $this->noValidRights($teacherId);
         foreach ($groupNames as $group) {
             $groupNameId[$key] = $group['id'];
             $groupNameLabel[$key] = AppConstant::USE_GROUP_SET . $group['name'];
@@ -2256,7 +2256,7 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $currentUser = $this->user;
         $isTeacher = $this->isTeacher($currentUser['id'], $courseId);
-        $isTutor = $this->isTutor($currentUser['id'], $courseId);;
+        $isTutor = $this->isTutor($currentUser['id'], $courseId);
         $studentId = intval($params['stu']);
         $userId = $currentUser['id'];
         if ($isTeacher || $isTutor) {
@@ -2264,10 +2264,10 @@ class ForumController extends AppController
         } else{
             $userId = $userId;
         }
-
         $forumId = intval($params['fid']);
         if (($isTeacher || $isTutor) && (isset($params['score']) || isset($params['newscore']))) {
-            if ($isTutor) {
+
+            if ($isTutor && !$isTeacher) {
                 $forumData = Forums::getById($forumId);
                 if ($forumData['tutoredit'] != AppConstant::NUMERIC_ONE) {
                     exit; //not auth for score change
@@ -2277,7 +2277,6 @@ class ForumController extends AppController
             //check for grades marked as newscore that aren't really new
             //shouldn't happen, but could happen if two browser windows open
             if (isset($params['newscore'])) {
-
                 $keys = array_keys($params['newscore']);
                 foreach ($keys as $k => $v) {
                     if (trim($v) == '') {

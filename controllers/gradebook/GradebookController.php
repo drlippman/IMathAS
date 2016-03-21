@@ -97,6 +97,17 @@ class GradebookController extends AppController
             $sessionData[$courseId.'catcollapse'] = $overridecollapse;
             AppUtility::writesessiondata($sessionData,$sessionId);
         }
+        if (isset($isTeacher)) {
+            $isTeacher = true;
+        }
+        if (isset($isTutor)) {
+            $isTutor = true;
+        }
+        if ($isTeacher || $isTutor) {
+            $canviewall = true;
+        } else {
+            $canviewall = false;
+        }
         $get = $params;
         $gradebookData = $this->gbtable($user->id, $courseId);
         $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
@@ -110,23 +121,19 @@ class GradebookController extends AppController
     {
         global $get,$timefilter,$lnfilter,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport,$sel1name, $sel2name, $canviewall, $courseId,$isTutor, $isTeacher, $userId,$catfilter;
         $params = $get;
-        $teacherid = Teacher::getByUserId($userId, $courseId);
-        $tutorid = Tutor::getByUserId($userId, $courseId);
+//        $teacherid = Teacher::getByUserId($userId, $courseId);
+        $teacherid = $this->isTeacher($userId, $courseId);
+//        $tutorid = Tutor::getByUserId($userId, $courseId);
+        $tutorid = $this->isTutor($userId, $courseId);
         $tutorsection = trim($tutorid->section);
         $sectionQuery = Student::findDistinctSection($courseId);
         $istutor = false;
-        $isteacher = $isTeacher;
-//        $istutor = $isTutor;
-        if (($teacherid)) {
-            $isteacher = true;
-        }
-        if ($tutorid) {
-            $istutor = true;
-        }
+        $isteacher = false;
+        if (($teacherid)) { $isteacher = true;}
+        if (($tutorid)) { $istutor = true;}
         /*
          * Assign tutor value false temparary
          */
-
         $sessionId = $this->getSessionId();
         if ($isteacher || $istutor) {
             $canviewall = true;
@@ -4537,7 +4544,7 @@ class GradebookController extends AppController
             return $this->goBack();
         }
 
-        if ($isTutor) {
+        if ($isTutor && !$isTeacher) {
             $isOk = ($tutorEdit == 1);
             if (!$isOk)
             {

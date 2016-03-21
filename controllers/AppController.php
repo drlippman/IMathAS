@@ -712,7 +712,7 @@ class AppController extends Controller
         $isTeacher = false;
         $teacher = Teacher::getByUserId($userId, $courseId);
         $user = User::getById($userId);
-        if ($teacher || $user['rights'] == AppConstant::ADMIN_RIGHT )
+        if ($teacher || $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)
         {
             $isTeacher = true;
         }

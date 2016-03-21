@@ -214,8 +214,6 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
         echo  ">{$row['section']}</option>";
     }
     echo  "</select>";
-
-
     } else if ($gradebook[0][0][$i] == 'Name') {?>
         <div class="checkbox pull-left override-hidden">
             <label>
@@ -239,7 +237,6 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
     {
         $collapsegbcat = array();
         for ($i = 0; $i < count($gradebook[0][2]); $i++) {
-
             if (isset($overridecollapse[$gradebook[0][2][$i][10]])) {
                 $collapsegbcat[$gradebook[0][2][$i][1]] = $overridecollapse[$gradebook[0][2][$i][10]];
             } else {
@@ -335,7 +332,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
             </a>
             <ul class="dropdown-menu" style="position: relative">
 
-            <?php if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
+            <?php if ($isTeacher)
                 {
                     ?>
                     <li>
@@ -356,11 +353,10 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                         <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$course->id.'&aid='.$gradebook[0][1][$i][7]);?> "> <?php AppUtility::t('[Isolate]') ?></a>
                     </li>
                 <?php }
-            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1)) || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
-
-
-                <?php  if ($isTeacher )
-                    { ?>
+            } else if ($gradebook[0][1][$i][6] == 1 && ($isTeacher || ($isTutor && $gradebook[0][1][$i][8] == 1))) { ?>
+                <?php  if ($isTeacher)
+                    {
+                ?>
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                    href="javascript:void(0);">
                     <img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">
@@ -382,7 +378,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$i][7].'&isolate=true');?> "> <?php AppUtility::t('[Scores]')?>
                         </li>
                     <?php }
-            } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+            } else if ($gradebook[0][1][$i][6] == 2 && $isTeacher) {
             //discussion
                 ?>
 
@@ -394,7 +390,7 @@ if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$
                     <li>
                     <a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/add-forum?id='.$gradebook[0][1][$i][7].'&cid='.$course->id.'&from=gb');?> "><?php AppUtility::t('[Settings]')?> </a>
                     </li>
-            <?php } else if ($gradebook[0][1][$i][6] == 3 && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT))
+            <?php } else if ($gradebook[0][1][$i][6] == 3 && $isTeacher)
             { //exttool
             ?>
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
@@ -474,7 +470,7 @@ if ($i % 2 != 0) {
     echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 }
 echo '<td class="locked" scope="row"><div class="trld">';
-if ($gradebook[$i][0][0] != "Averages" && $isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
+if ($gradebook[$i][0][0] != "Averages" && $isTeacher) { ?>
     <div class="checkbox override-hidden">
         <label>
             <input type="checkbox" name='checked' value='<?php echo $gradebook[$i][4][0] ?>'/>
@@ -589,7 +585,7 @@ if ($data['totOnLeft'] && !$hidepast) {
 //assessment values
 if ($data['catFilter'] > -2) {
 for ($j = 0; $j < count($gradebook[0][1]); $j++) {
-if (!$data['isTeacher'] && !$data['isTutor'] && $gradebook[0][1][$j][4] == 0) { //skip if hidden
+if (!$isTeacher && !$isTutor && $gradebook[0][1][$j][4] == 0) { //skip if hidden
     continue;
 }
 if ($data['hideNC'] == 1 && $gradebook[0][1][$j][4] == 0) { //skip NC
@@ -618,7 +614,7 @@ if (isset($gradebook[$i][1][$j][5]) && ($gradebook[$i][1][$j][5] & (1 << $data['
 }
 if ($gradebook[0][1][$j][6] == 0) {//online
 if (isset($gradebook[$i][1][$j][0])) {
-if ($data['isTutor'] && $gradebook[$i][1][$j][4] == 'average') {
+if ($isTutor && $gradebook[$i][1][$j][4] == 'average') {
 } else if ($gradebook[$i][1][$j][4] == 'average') { ?>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?stu='.$stu.'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&aid='.$gradebook[0][1][$j][7]);?>"
                     <?php echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
@@ -639,7 +635,7 @@ if ($gradebook[$i][1][$j][3] == 1) {
 } else if ($gradebook[$i][1][$j][3] == 4) {
     echo ' (PT)';
 }
-if ($data['isTutor'] && $gradebook[$i][1][$j][4] == 'average') {
+if ($isTutor && $gradebook[$i][1][$j][4] == 'average') {
 } else {
     echo '</a>';
 }
@@ -650,7 +646,7 @@ if ($gradebook[$i][1][$j][1] == 1) {
 } else { //no score
     if ($gradebook[$i][0][0] == 'Averages') {
         echo '-';
-    } else if ($data['isTeacher']) { ?>
+    } else if ($isTeacher) { ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid=new&aid='.$gradebook[0][1][$j][7].'&uid='.$gradebook[$i][4][0])?>">-</a>
     <?php } else {
         echo '-';
@@ -668,7 +664,7 @@ if (isset($gradebook[$i][1][$j][6])) {
     }
 }
 } else if ($gradebook[0][1][$j][6] == 1) { //offline
-if ($data['isTeacher'] || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+if ($isTeacher) {
 if ($gradebook[$i][0][0] == 'Averages') { ?>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>" <?php
                           echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
@@ -676,7 +672,7 @@ if ($gradebook[$i][0][0] == 'Averages') { ?>
                     } else { ?>
 <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$course->id.'&grades='.$gradebook[$i][4][0].'&gbitem='.$gradebook[0][1][$j][7]);?>">
     <?php }
-    } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
+    } else if ($isTutor && $gradebook[0][1][$j][8] == 1) {
     if ($gradebook[$i][0][0] == 'Averages') { ?>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'cid='.$course->id.'&grades=all&gbitem='.$gradebook[0][1][$j][7]);?>">
         <?php } else { ?>
@@ -691,7 +687,7 @@ if ($gradebook[$i][0][0] == 'Averages') { ?>
             } else {
                 echo '-';
             }
-            if ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$j][8] == 1)) {
+            if ($isTeacher || ($isTutor && $gradebook[0][1][$j][8] == 1)) {
                 echo '</a>';
             }
             if ($gradebook[$i][1][$j][1] == 1) {
@@ -713,14 +709,14 @@ if ($gradebook[$i][0][0] == 'Averages') { ?>
                     echo '<sup>*</sup>';
                 }
                 } else {
-                    if ($data['isTeacher'] && $gradebook[$i][0][0] != 'Averages') { ?>
+                    if ($isTeacher && $gradebook[$i][0][0] != 'Averages') { ?>
                         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/view-forum-grade?cid='.$course->id.'&stu='.$stu.'&uid='.$gradebook[$i][4][0].'&fid='.$gradebook[0][1][$j][7]);?>">-</a>
                     <?php } else {
                         echo '-';
                     }
                 }
                 } else if ($gradebook[0][1][$j][6] == 3) { //exttool
-                if ($data['isTeacher']) {
+                if ($isTeacher) {
                 if ($gradebook[$i][0][0] == 'Averages') { ?>
                     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$j][7]);?>"
                         <?php echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
@@ -728,13 +724,13 @@ if ($gradebook[$i][0][0] == 'Averages') { ?>
                     } else { ?>
                 <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
                     <?php }
-                    } else if ($data['isTutor'] && $gradebook[0][1][$j][8] == 1) {
+                    } else if ($isTutor && $gradebook[0][1][$j][8] == 1) {
                     if ($gradebook[$i][0][0] == 'Averages')
                     { ?>
                     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid=all&lid='.$gradebook[0][1][$j][7]);?>">
                         <?php } else
                         { ?>
-                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edittoolscore?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/edit-tool-score?stu='.$stu.'&cid='.$course->id.'&uid='.$gradebook[$i][4][0].'&lid='.$gradebook[0][1][$j][7]);?>">
                             <?php }
                             }
                             if (isset($gradebook[$i][1][$j][0])) {
@@ -745,7 +741,7 @@ if ($gradebook[$i][0][0] == 'Averages') { ?>
                             } else {
                                 echo '-';
                             }
-                            if ($data['isTeacher'] || ($data['isTutor'] && $gradebook[0][1][$j][8] == 1)) {
+                            if ($isTeacher || ($isTutor && $gradebook[0][1][$j][8] == 1)) {
                                 echo '</a>';
                             }
                             if ($gradebook[$i][1][$j][1] == 1) {

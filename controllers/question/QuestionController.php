@@ -45,6 +45,7 @@ class QuestionController extends AppController
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $teacherId = $this->isTeacher($userId, $courseId);
+        $isTutor = $this->isTutor($userId, $courseId);
         if ($user['rights'] == AppConstant::ADMIN_RIGHT) {
             $teacherId = $userId;
             $adminAsTeacher = true;
@@ -56,7 +57,7 @@ class QuestionController extends AppController
         /*
          * Loaded by a NON-teacher
          */
-        if (!$teacherId) {
+        if (!$teacherId && !$isTutor) {
             $overwriteBody = AppConstant::NUMERIC_ONE;
             $body = AppConstant::NO_TEACHER_RIGHTS;
         } elseif (!(isset($params['cid'])) || !(isset($params['aid']))) {

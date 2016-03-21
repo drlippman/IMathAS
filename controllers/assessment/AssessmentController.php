@@ -78,7 +78,7 @@ class AssessmentController extends AppController
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $teacherId = $this->isTeacher($user['id'], $courseId);
-        $this->noValidRights($teacherId);
+//        $this->noValidRights($teacherId);
         $block = $this->getParamVal('block');
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
@@ -536,7 +536,6 @@ class AssessmentController extends AppController
                 }
                 $page_formActionTag .= "&folder=" . $getFolder . "&from=" . $getFrom;
                 $page_formActionTag .= "&tb=$filter";
-
                 $query = Assessments::getByCourse($courseId);
                 $pageCopyFromSelect = array();
                 $key = AppConstant::NUMERIC_ZERO;
@@ -628,6 +627,7 @@ class AssessmentController extends AppController
 
     public function flatArray($outcomesData)
     {
+
         global $pageOutcomesList;
         if ($outcomesData) {
             foreach ($outcomesData as $singleData) {
@@ -3560,7 +3560,8 @@ class AssessmentController extends AppController
         $todo = 0;
         $earned = 0;
         $poss = 0;
-        $temp .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"" . 'Skip Navigation' . "\" /></a>\n";
+        $temp .= "<a href=\"#beginquestions\">
+        <img class=skipnav src=\"$imasroot/"."img/blank.gif\" alt=\"" . 'Skip Navigation' . "\" /></a>\n";
         $temp .= "<div class='navbar' style='background-color: #f8f8f8 !important;'>";
         $temp .= "<h4>" . 'Questions' . "</h4>\n";
         $temp .= "<ul class=qlist>\n";
@@ -3739,7 +3740,7 @@ class AssessmentController extends AppController
         4: provide a link to watch directly after Q (T/F),
         5: title for the part immediately following the Q]
         */
-        $temp .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"" . 'Skip Navigation' . "\" /></a>\n";
+        $temp .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/"."img/blank.gif\" alt=\"" . 'Skip Navigation' . "\" /></a>\n";
         $temp .= '<div class="navbar" style="width:175px">';
         $temp .= '<ul class="qlist" style="margin-left:-10px">';
         $timetoshow = 0;
@@ -3767,7 +3768,7 @@ class AssessmentController extends AppController
     function showembednavbar($pginfo, $curpg)
     {
         global $imasroot, $scores, $bestscores, $showeachscore, $qi, $questions, $testsettings, $temp;
-        $temp .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"" . 'Skip Navigation' . "\" /></a>\n";
+        $temp .= "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/"."img/blank.gif\" alt=\"" . 'Skip Navigation' . "\" /></a>\n";
         $temp .= '<div class="navbar fixedonscroll" style="width:125px">';
         $temp .= "<h4>" . 'Pages' . "</h4>\n";
         $temp .= '<ul class="qlist" style="margin-left:-10px">';

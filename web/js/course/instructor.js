@@ -53,7 +53,7 @@ function getAddItem(blk,tb) {
             '</div>';
         jQuery('<div class="dialog-items close-box" id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true, width: '410px',height: '419px', title: 'Add an Item...',
-            closeText: "show",
+            closeText: "show", draggable: false,
             close: function (event, ui) {
                 jQuery(this).remove();
             },
