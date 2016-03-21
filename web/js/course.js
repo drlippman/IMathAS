@@ -262,3 +262,30 @@ function locked()
         }
     });
 }
+
+function pass(){
+    var html="<input type='text' class='pass1' placeholder='noting'>"
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Enter the password', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,draggable:false,
+        buttons: {
+            "Confirm": function () {
+                var pas= $(".pass1").val();
+                if (password==pas) {
+                    $(this).remove();
+                }
+                else{
+
+                }
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        },
+        open: function () {
+            jQuery('.ui-widget-overlay').bind('click', function () {
+                jQuery('#dialog').dialog('close');
+            })
+        }
+    });
+}

@@ -1202,7 +1202,6 @@ class AssessmentController extends AppController
             $adata = Assessments::getAssessmentData($aid);
             $now = time();
             $assessmentclosed = false;
-
             if ($adata['avail'] == 0 && !($teacherid) && !($tutorid)) {
                 $assessmentclosed = true;
             }
@@ -1236,7 +1235,7 @@ class AssessmentController extends AppController
                 }
             }
             if ($assessmentclosed) {
-                $temp .= '<p>' . 'This assessment is closed' . '</p>';
+                $temp .= '<p>' . 'This assessment is closed2' . '</p>';
                 if ($adata['avail'] > 0) {
                     $viewedassess = array();
                     if ($adata['enddate'] < $now && $adata['allowlate'] > 10 && !$actas && !isset($sessiondata['stuview'])) {
@@ -1276,32 +1275,40 @@ class AssessmentController extends AppController
             /*
              * check for password
              */
+
             if ((trim($adata['password']) != '') && !($teacherid) && !($tutorid)) { //has passwd
+//                jQuery.(document).ready(function(){});
+//                $temp="<script>";
+//                $temp.="var message='kkkkkkk';";
+//                $temp.="JQuery('<div id=\"dialog\">ABCDEFGH</div>').appendTo('body').html(html).dialog({ });";
+//                $temp.="</script>";
+//                AppUtility::dump($temp);
+//                return $temp;
                 $pwfail = true;
-                if (isset($_POST['password'])) {
-                    if (trim($_POST['password']) == trim($adata['password'])) {
-            //                        $pwfail = false;
-                        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = generateAssessmentData($adata['itemorder'], $adata['shuffle'], $aid);
-                        if ($qlist == '') {  //assessment has no questions!
-                            $this->setErrorFlash(AppConstant::NO_QUESTIONS);
-                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
-                        }
-                    } else {
-                        $this->setWarningFlash('Password incorrect.  Try again.');
-                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
-                    }
-                }
-                else if ($pwfail) {
-                    $temp .= " ";
-                    $temp .= '<h2>' . $adata['name'] . '</h2>';
-                    $temp .= '<p>' . "Password required for access" . '</p>';
-                    $temp .= "<form method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?cid={$getCid}&amp;id={$getId}\">";
-                    $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
-                    $temp.='<input type="hidden" name="check" value="check" />';
-                    $temp .= '<input type=submit class="btn btn-primary" value="' . 'Submit' . '" />';
-                    $temp .= "</form>";
-                    return $temp;
-                }
+//                if (isset($_POST['password'])) {
+//                    if (trim($_POST['password']) == trim($adata['password'])) {
+//            //                        $pwfail = false;
+//                        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = generateAssessmentData($adata['itemorder'], $adata['shuffle'], $aid);
+//                        if ($qlist == '') {  //assessment has no questions!
+//                            $this->setErrorFlash(AppConstant::NO_QUESTIONS);
+//                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
+//                        }
+//                    } else {
+//                        $this->setWarningFlash('Password incorrect.  Try again.');
+//                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
+//                    }
+//                }
+//                else if ($pwfail) {
+//                    $temp .= " ";
+//                    $temp .= '<h2>' . $adata['name'] . '</h2>';
+//                    $temp .= '<p>' . "Password required for access" . '</p>';
+//                    $temp .= "<form method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?cid={$getCid}&amp;id={$getId}\">";
+//                    $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
+//                    $temp.='<input type="hidden" name="check" value="check" />';
+//                    $temp .= '<input type=submit class="btn btn-primary" value="' . 'Submit' . '" />';
+//                    $temp .= "</form>";
+//                    return $temp;
+//                }
             }
 
 
@@ -2402,10 +2409,8 @@ class AssessmentController extends AppController
                     }
                 }
             } else if ($getAction == "shownext") {
-
                 if (isset($getScore)) {
                     $last = $getScore;
-
                     if ($_POST['verattempts'] != $attempts[$last]) {
                         $temp .= "<p>" . 'The last question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.' . "</p>";
                     } else {
@@ -3070,7 +3075,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    $temp .= startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
+                    $temp = startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
                     $this->leavetestmsg($sessiondata);
                 } else {
                     $temp .= filter("<div class='test-etting-intro'>{$testsettings['intro']}</div>\n");
@@ -3130,7 +3135,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($i == count($questions)) {
-                    $temp .= startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
+                    $temp = startoftestmessage($perfectscore, $hasreattempts, $allowregen, $noindivscores, $testsettings['testtype'] == "NoScores");
                     $this->leavetestmsg($sessiondata);
                 } else {
                     $curq = $i;
@@ -3360,7 +3365,7 @@ class AssessmentController extends AppController
         }
         $this->includeJS(['general.js', 'eqntips.js', 'editor/tiny_mce.js', 'AMhelpers.js', 'confirmsubmit.js', 'assessment/showQuestion.js', 'drawing.js']);
         $this->includeCSS(['mathquill.css', 'mathtest.css']);
-        $renderData = array('displayQuestions' => $temp, 'sessiondata' => $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead, 'testsettings' => $testsettings, 'sessiondata' => $sessiondata, 'userfullname' => $userfullname, 'testid' => $testid, 'studentid' => $studentid, 'isdiag' => $isdiag);
+        $renderData = array('displayQuestions' => $temp, 'sessiondata' => $sessiondata, 'quesout' => $quesout, 'placeinhead' => $placeinhead, 'testsettings' => $testsettings, 'sessiondata' => $sessiondata, 'userfullname' => $userfullname, 'testid' => $testid, 'studentid' => $studentid, 'isdiag' => $isdiag,'pwfail'=>$pwfail );
         return $this->renderWithData('showTest', $renderData);
     }
 
