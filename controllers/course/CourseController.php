@@ -277,11 +277,11 @@ class CourseController extends AppController
                 header('Location: '.AppUtility::getHomeURL(). '/filter/basiclti/post.?'.$param);
             }
         }
-
-//        if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
-//            $contentTrackRecord = new ContentTrack();
-//            $contentTrackRecord->insertForumData($user->id, $courseId, $params['forumid'], $threadId, $threadIdOfPost = null, $type = AppConstant::NUMERIC_ZERO);
-//        }
+        $info="show-linked-text?cid=".$courseId."&id=".$id;
+        if ($user->rights == AppConstant::STUDENT_RIGHT) {
+            $rv = new ContentTrack;
+            $rv->insertfromlink($user['id'], $courseId,"linkedlink",$id, time(),$info);
+        }
         $this->includeCSS(['course/items.css']);
         $returnData = array('course' => $course, 'links' => $link, 'user' => $user);
         return $this->renderWithData('showLinkedText', $returnData);
@@ -2303,7 +2303,6 @@ class CourseController extends AppController
             $this->setErrorFlash("<html><body>No item specified.</body></html>\n");
             return $this->redirect('show-linked-text-public?cid='.$courseId);
         }
-
         $linkData = LinkedText::getLinkedDataPublicly($id);
         $text = $linkData['text'];
         $title = $linkData['title'];

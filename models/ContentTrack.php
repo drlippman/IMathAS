@@ -123,6 +123,17 @@ class ContentTrack extends BaseImasContentTrack
         $this->save();
     }
 
+    public function insertfromlink($userId,$courseId,$type,$typeId,$time,$info)
+    {
+        $this->userid = $userId;
+        $this->courseid = $courseId;
+        $this->type = $type;
+        $this->typeid = $typeId;
+        $this->viewtime = $time;
+        $this->info=$info;
+        $this->save();
+    }
+
 
     public function insertFromGradebook($userId,$courseId,$type,$typeId,$time)
     {
