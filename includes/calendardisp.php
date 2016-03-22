@@ -369,7 +369,7 @@ $itemfolder = array();
 $hiddenitems = array();
 
 flattenitems($itemorder,$itemsimporder,$itemfolder,$hiddenitems,'0');
-
+	
 $itemsassoc = array();
 $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -525,11 +525,11 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,$folder,$avai
 	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
-			$avail = ($avail && ($item['avail']==2 || ($item['avail']==1 && ($item['SH'][0]=='S' || ($item['startdate']<$now && $item['enddate']>$now)))));
+			$thisavail = ($avail && ($item['avail']==2 || ($item['avail']==1 && ($item['SH'][0]=='S' || ($item['startdate']<$now && $item['enddate']>$now)))));
 			//set as hidden if explicitly hidden or opens in future.  We won't count past folders that aren't showing as hidden
 			//  to allow students with latepasses to access old assignments even if the folder is gone.
-			$ishidden = ($ishidden || $item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
-			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$folder.'-'.($k+1),$avail,$ishidden);
+			$thisishidden = ($ishidden || $item['avail']==0 || ($item['avail']==1 && $item['SH'][0]=='H' && $item['startdate']>$now));
+			flattenitems($item['items'],$addto,$folderholder,$hiddenholder,$folder.'-'.($k+1),$thisavail,$thisishidden);
 		} else {
 			$addto[] = $item;
 			if ($avail) {
