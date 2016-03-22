@@ -34,7 +34,7 @@ function addcategory() {
 function quickpick() {
 	$('select.qsel').each(function() {
 		if ($(this).val()==0) {
-			$(this).find('optgroup[label=Libraries] option:first').prop('selected',true);
+			$(this).find('optgroup[label='+document.getElementById("label").value+'] option:first').prop('selected',true);
 		}
 	});
 }
@@ -70,6 +70,9 @@ END;
 		$outcomearr = array();
 	} else {
 		$outcomearr = unserialize($row[0]);
+		if (!is_array($outcomearr)) {
+			$outcomearr = array();
+		}
 	}
 	
 	$outcomes = array();
@@ -96,16 +99,40 @@ END;
 		$questionlibs[$row[0]][] = $row[1];
 		$libnames[$row[1]] = $row[2];
 	}
-	$query = "SELECT iq.id,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
+
+	//add assessment names as options
+	//find the names of assessments these questionsetids appear in
+	$query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
+	$query .= "FROM imas_questions INNER JOIN imas_assessments ";
+	$query .= "ON imas_questions.assessmentid=imas_assessments.id ";
+	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid='$aid') ";
+	$query .= "AND imas_assessments.courseid='$cid' ";
+	$query .= "ORDER BY aid";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$assessmentnames = array();
+	$qsetidassessment = array();
+	while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
+		//store the relevent assessment names
+		$assessmentnames[$row['aid']] = $row['name'];
+		if ($row['aid']!=$aid) {
+			//remember this other assignment which uses this same questionsetid
+				$qsetidassessment[$row['qsetid']][] = $row['aid'];
+		}
+	}
+
+	$query = "SELECT iq.id,iqs.id AS qsetid,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 	$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$descriptions = array();
 	$category = array();
 	$extracats = array();
+	$qsetids = array();
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$descriptions[$line['id']] = $line['description'];
 		$category[$line['id']] = $line['category'];
-		if (!is_numeric($line['category']) && trim($line['category'])!='' && !in_array($line['category'],$extracats)) {
+		//remember which questionsetid corresponds to this question
+		$qsetids[$line['id']]=$line['qsetid'];
+		if (!is_numeric($line['category']) && 0!=strncmp($line['category'],"AID-",4) && trim($line['category'])!='' && !in_array($line['category'],$extracats)) {
 			$extracats[] = $line['category'];
 		}
 	}
@@ -159,7 +186,17 @@ END;
 			if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
 			echo ">{$libnames[$qlibid]}</option>\n";
 		}
-		echo '</optgroup><optgroup label="Custom">';
+		echo '</optgroup>\n';
+		echo '<optgroup label="Assessments">';
+		//add assessment names as options
+		foreach ($qsetidassessment[$qsetids[$qid]] as $qaid) {
+			echo '<option value="AID-'.$qaid.'" ';
+			if ($category[$qid] == "AID-$qaid" && !$issel) { echo "selected=1"; $issel= true;}
+			echo ">{$assessmentnames[$qaid]}</option>\n";
+		}
+		echo '</optgroup>\n';
+
+		echo '<optgroup label="Custom">';
 		foreach ($extracats as $cat) {
 			echo "<option value=\"$cat\" ";
 			if ($category[$qid] == $cat && !$issel) { echo "selected=1";$issel = true;}
@@ -186,7 +223,11 @@ END;
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
 		
 	}
-	echo "<p>Select first listed library for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+echo "<p>Select first listed <select id=\"label\">\n";
+echo "<option value=\"Libraries\">Libraries</option>";
+echo "<option value=\"Assessments\">Assessments</option>";
+echo "</select>\n";
+echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
 	
 	echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";

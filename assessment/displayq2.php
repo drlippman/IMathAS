@@ -2444,7 +2444,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if (count($answerformat)>1 && $answerformat[1]=='abs') { $out .= 'class="sel" '; $def = 8;}
 					$out .= '/>';
 				}
-				if (count($answerformat)==1 || in_array('rational',$answerformat)) {
+				if (in_array('rational',$answerformat)) {
 					$out .= "<img src=\"$imasroot/img/tprat.png\" onclick=\"settool(this,$qn,8.2)\" ";
 					if (count($answerformat)>1 && $answerformat[1]=='rational') { $out .= 'class="sel" '; $def = 8.2;}
 					$out .= '/>';

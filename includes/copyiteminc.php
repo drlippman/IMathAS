@@ -9,6 +9,7 @@ ini_set("memory_limit", "104857600");
 //IMathAS:  Copy Items utility functions
 //(c) 2008 David Lippman
 $reqscoretrack = array();
+$categoryassessmenttrack = array();
 $posttoforumtrack = array();
 $forumtrack = array();
 $qrubrictrack = array();
@@ -27,7 +28,7 @@ if (isset($removewithdrawn) && $removewithdrawn) {
 
 
 function copyitem($itemid,$gbcats,$sethidden=false) {
-	global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
+	global $cid, $reqscoretrack, $categoryassessmenttrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts,$userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
 	global $posttoforumtrack, $forumtrack;
 	if (!isset($copystickyposts)) { $copystickyposts = false;}
 	if ($gbcats===false) {
@@ -122,29 +123,29 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//$query = "INSERT INTO imas_forums (courseid,name,summary,startdate,enddate) ";
 		//$query .= "SELECT '$cid',name,summary,startdate,enddate FROM imas_forums WHERE id='$typeid'";
 		//mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$query = "SELECT name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,rubric FROM imas_forums WHERE id='$typeid'";
+		$query = "SELECT name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag,rubric FROM imas_forums WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$row = mysql_fetch_row($result);
-		if ($sethidden) {$row[8] = 0;}
-		if (isset($gbcats[$row[11]])) {
-			$row[11] = $gbcats[$row[11]];
+		if ($sethidden) {$row[10] = 0;}
+		if (isset($gbcats[$row[13]])) {
+			$row[13] = $gbcats[$row[13]];
 		} else if ($_POST['ctc']!=$cid) {
-			$row[11] = 0;
+			$row[13] = 0;
 		}
 		$rubric = array_pop($row);
 		$row[0] .= stripslashes($_POST['append']);
-		if ($row[14]!='') {
-			$curoutcomes = explode(',',$row[14]);
+		if ($row[16]!='') {
+			$curoutcomes = explode(',',$row[16]);
 			$newoutcomes = array();
 			foreach ($curoutcomes as $o) {
 				if (isset($outcomes[$o])) {
 					$newoutcomes[] = $outcomes[$o];
 				}
 			}
-			$row[14] = implode(',',$newoutcomes);
+			$row[16] = implode(',',$newoutcomes);
 		}
 		$row = "'".implode("','",addslashes_deep($row))."'";
-		$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag) ";
+		$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,avail,points,cntingb,gbcategory,forumtype,taglist,outcomes,caltag) ";
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
@@ -277,6 +278,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				}
 				$toins = array($row['questionsetid'],$row['points'],$row['attempts'],$row['penalty'],$row['category'],$row['regen'],$row['showans'],$row['showhints']);
 				$rubric[$row['id']] = $row['rubric'];
+				//check for a category that's set to an assessment e.g. AID-1234
+				if (0==strncmp($row['category'],"AID-",4)) {
+					//temporarily save the old assessment id
+					$categoryassessmentold[$row['id']]=substr($row['category'],4);
+				}
 				$inss[] = "('$newtypeid','".implode("','",addslashes_deep($toins))."')";
 				$insorder[] = $row['id'];
 			}
@@ -296,6 +302,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						if ($rubric[$aitem]!=0) {
 							$qrubrictrack[$firstnewid+$idtoorder[$aitem]] = $rubric[$aitem];
 						}
+						//check for a category that's set to an assessment
+						if (isset($categoryassessmentold[$aitem])) {
+							//track by new questionid but still using old assessmentid
+							$categoryassessmenttrack[$firstnewid+$idtoorder[$aitem]] = $categoryassessmentold[$aitem];
+						}
 						$newaitems[] = $firstnewid+$idtoorder[$aitem];
 					} else {
 						$sub = explode('~',$aitem);
@@ -309,6 +320,11 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 							if (isset($thiswithdrawn[$subi])) { continue;}
 							if ($rubric[$subi]!=0) {
 								$qrubrictrack[$firstnewid+$idtoorder[$subi]] = $rubric[$subi];
+							}
+							//check for a category that's set to an assessment
+							if (isset($categoryassessmentold[$subi])) {
+								//track by new questionid but still using old assessmentid
+								$categoryassessmenttrack[$firstnewid+$idtoorder[$subi]] = $categoryassessmentold[$subi];
 							}
 							$newsub[] = $firstnewid+$idtoorder[$subi];
 						}
@@ -442,7 +458,7 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 }	
 
 function doaftercopy($sourcecid) {
-	global $cid,$reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack;
+	global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack,$posttoforumtrack;
 	if (intval($cid)==intval($sourcecid)) {
 		$samecourse = true;
 	} else {
@@ -461,6 +477,20 @@ function doaftercopy($sourcecid) {
 			}
 		}
 	}
+	//update any assessment ids in categories
+	if (count($categoryassessmenttrack)>0) {
+		foreach ($categoryassessmenttrack as $newqid=>$oldcategoryaid) {
+			//is oldcategoryaid in copied list?
+			if (isset($assessnewid[$oldcategoryaid])) {
+				$query = "UPDATE imas_questions SET category='AID-{$assessnewid[$oldcategoryaid]}' WHERE id='$newqid'";	
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			} else if (!$samecourse) { //since that assessment isn't being copied, unclear what category should be
+				$query = "UPDATE imas_assessments SET category=0 WHERE id='$newqid'";
+				mysql_query($query) or die("Query failed : $query" . mysql_error());
+			}
+		}
+	}
+
 	if (count($posttoforumtrack)>0) {
 		foreach ($posttoforumtrack as $newaid=>$oldforumid) {
 			if (isset($forumtrack[$oldforumid])) {
