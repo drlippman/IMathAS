@@ -92,3 +92,21 @@ ul#navlist a {
 #homelinkbox {
 	font-size: 90%;
 }
+div#logo img {
+	max-width: 100%;
+}
+div#loginbox td {
+	display: block;
+}
+span.form {
+	width: auto;
+	float: none;
+	text-align: left;
+	margin-bottom: 5px;
+	padding-right: 0px;
+}
+span.formright {
+	width: auto;
+	float: none;
+}
+	

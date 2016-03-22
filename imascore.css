@@ -169,6 +169,9 @@ span.wideformright {
 	margin-bottom: 10px;
 	text-align: left;
 }
+div.editor {
+	margin-bottom: 10px;
+}
 
 span.column {
 	display: block;
