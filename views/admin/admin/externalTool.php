@@ -55,13 +55,13 @@ if (isset($params['id'])) {
 ?>
             <br/><div class="col-md-2 col-sm-2"><?php AppUtility::t('Tool Name')?></div>
             <div class="col-md-10 col-sm-10">
-                <input class="form-control-1" required=" " size="10" type="text" name="tname" value="<?php echo $name;?>" />
+                <input class="form-control-1" size="10" type="text" maxlength="100" name="tname" value="<?php echo $name;?>" required="" />
             </div>
             <br class="form" /><br/>
 
         <div class="col-md-2 col-sm-2"><?php AppUtility::t('Launch URL') ?></div>
         <div class="col-md-10 col-sm-10">
-            <input type="url" class="form-control-1" size="40" name="url" pattern="https?://.+"
+            <input type="text" class="form-control-1" size="40" name="url"
                    value="<?php echo $url; ?>"/>
         </div>
         <br class="form"/><br/>
@@ -151,7 +151,7 @@ if (isset($params['id'])) {
                 <td class="word-break-break-all">
                <?php echo  $row['name'];
                if ($isAdmin) {
-                    if ($row['name'] == null) {
+                    if (!empty($row['name'])) {
                         echo ' (System-wide)';
                     } else {
                         echo ' (for group ' . $row['name'] . ')';

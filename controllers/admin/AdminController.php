@@ -552,8 +552,7 @@ class AdminController extends AppController
                     * Create tool
                     */
                    $LTIDomain = array();
-                   $LTIDomain['name'] = trim($params['tname']);
-                   $LTIDomain['url'] = $params['url'];
+                   $LTIDomain['name'] = ($params['tname']);
                    $LTIDomain['ltikey'] = $params['key'];
                    $LTIDomain['secret'] = $params['secret'];
                    $LTIDomain['custom'] = $params['custom'];
@@ -570,6 +569,12 @@ class AdminController extends AppController
                        $LTIDomain['groupid'] = AppConstant::NUMERIC_ZERO;
                        $LTIDomain['courseid'] = AppConstant::NUMERIC_ZERO;
                    }
+                   $url = $params["url"];
+                   if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                       $this->setErrorFlash("Invalid url format.");
+                       return $this->redirect('external-tool?cid=admin&id=new');
+                   }
+                   $LTIDomain['url'] = $url;
 
                    $external = new ExternalTools();
                    $saveExternalTool = $external->saveExternalTool($LTIDomain);

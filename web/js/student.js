@@ -1004,12 +1004,9 @@ function ShowAll() {
 
     jQuery.each(events, function (index, dateEvent) {
         var selectedDate = formatDate(dateEvent.start);
-                if(selectedDate.length==10)
-                    var selected_month =selectedDate.substr(5,2);
-                else
-                    var selected_month =selectedDate.substr(5,1);
+        var selected_month = selectedDate.split('-');
 
-                if(selected_month == moment_month) {
+        if(selected_month[1] == moment_month) {
                     var dateH = "Due "+ selectedDate+" | "+ dateEvent.dueTime + "";
             if(dateEvent.reviewMode == false){
                 var title = "<a class='' style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-test?id="+dateEvent.assessmentId+"&cid="+dateEvent.courseId+" '>"+dateEvent.title+"</a>";
