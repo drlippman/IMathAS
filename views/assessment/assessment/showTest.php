@@ -15,7 +15,6 @@ $this->title = $testsettings['name'];
 <script type="javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>
 <style type="text/css">span.MathJax { font-size: 105%;}</style>
 <?php
-
 if ($pwfail) {
     if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
         $temp .= "<div class=breadcrumb>$breadcrumbbase <a href=\"../../course/course/course?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";

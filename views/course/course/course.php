@@ -13,9 +13,7 @@ $imasRoot = AppUtility::getURLFromHome('course', 'course/save-quick-reorder?cid=
 <input type="hidden" class="user-rights" value="<?php echo $myRights?>">
 
 <?php
-
 $studview= $sessionData['stuview'];
-
 if($studview>-1){
     $studview=1;
 }

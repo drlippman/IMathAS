@@ -80,6 +80,8 @@ $this->title = 'Manage Offline Grades';
                             <input type="checkbox" name="header-check-box" value="">
                             <span class="cr"><i class="cr-icon fa fa-check"></i></span>
                         </label>
+                        <?php AppUtility::t('Check')?>
+
                     </div>
                 </th>
                 <th class="col-sm-2 col-md-2 padding-left-twenty-five"><?php AppUtility::t('Option')?></th>

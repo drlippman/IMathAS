@@ -1275,40 +1275,32 @@ class AssessmentController extends AppController
             /*
              * check for password
              */
-
             if ((trim($adata['password']) != '') && !($teacherid) && !($tutorid)) { //has passwd
-//                jQuery.(document).ready(function(){});
-//                $temp="<script>";
-//                $temp.="var message='kkkkkkk';";
-//                $temp.="JQuery('<div id=\"dialog\">ABCDEFGH</div>').appendTo('body').html(html).dialog({ });";
-//                $temp.="</script>";
-//                AppUtility::dump($temp);
-//                return $temp;
                 $pwfail = true;
-//                if (isset($_POST['password'])) {
-//                    if (trim($_POST['password']) == trim($adata['password'])) {
-//            //                        $pwfail = false;
-//                        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = generateAssessmentData($adata['itemorder'], $adata['shuffle'], $aid);
-//                        if ($qlist == '') {  //assessment has no questions!
-//                            $this->setErrorFlash(AppConstant::NO_QUESTIONS);
-//                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
-//                        }
-//                    } else {
-//                        $this->setWarningFlash('Password incorrect.  Try again.');
-//                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
-//                    }
-//                }
-//                else if ($pwfail) {
-//                    $temp .= " ";
-//                    $temp .= '<h2>' . $adata['name'] . '</h2>';
-//                    $temp .= '<p>' . "Password required for access" . '</p>';
-//                    $temp .= "<form method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?cid={$getCid}&amp;id={$getId}\">";
-//                    $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
-//                    $temp.='<input type="hidden" name="check" value="check" />';
-//                    $temp .= '<input type=submit class="btn btn-primary" value="' . 'Submit' . '" />';
-//                    $temp .= "</form>";
-//                    return $temp;
-//                }
+                if (isset($_POST['password'])) {
+                    if (trim($_POST['password']) == trim($adata['password'])) {
+            //                        $pwfail = false;
+                        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = generateAssessmentData($adata['itemorder'], $adata['shuffle'], $aid);
+                        if ($qlist == '') {  //assessment has no questions!
+                            $this->setErrorFlash(AppConstant::NO_QUESTIONS);
+                            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
+                        }
+                    } else {
+                        $this->setWarningFlash('Password incorrect.  Try again.');
+                        return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' . $course['id']));
+                    }
+                }
+                else if ($pwfail) {
+                    $temp .= " ";
+                    $temp .= '<h2>' . $adata['name'] . '</h2>';
+                    $temp .= '<p>' . "Password required for access" . '</p>';
+                    $temp .= "<form method=\"post\" enctype=\"multipart/form-data\" action=\"show-test?cid={$getCid}&amp;id={$getId}\">";
+                    $temp .= "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
+                    $temp.='<input type="hidden" name="check" value="check" />';
+                    $temp .= '<input type=submit class="btn btn-primary" value="' . 'Submit' . '" />';
+                    $temp .= "</form>";
+                    return $temp;
+                }
             }
 
 

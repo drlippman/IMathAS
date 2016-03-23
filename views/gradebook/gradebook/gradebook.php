@@ -620,7 +620,7 @@ if ($isTutor && $gradebook[$i][1][$j][4] == 'average') {
                     <?php echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
                         echo ">";
                     } else {   ?>
-<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&uid='.$gradebook[$i][4][0])?>">
+<a class="a" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid='.$gradebook[$i][1][$j][4].'&uid='.$gradebook[$i][4][0])?>">
 <?php }
 if ($gradebook[$i][1][$j][3] > 9) {
     $gradebook[$i][1][$j][3] -= 10;
@@ -646,9 +646,11 @@ if ($gradebook[$i][1][$j][1] == 1) {
 } else { //no score
     if ($gradebook[$i][0][0] == 'Averages') {
         echo '-';
-    } else if ($isTeacher) { ?>
-        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid=new&aid='.$gradebook[0][1][$j][7].'&uid='.$gradebook[$i][4][0])?>">-</a>
-    <?php } else {
+    } elseif($isTeacher) {
+        ?>
+        <a class="b" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$data['defaultValuesArray']['studentId'].'&cid='.$course->id.'&asid=new&aid='.$gradebook[0][1][$j][7].'&uid='.$gradebook[$i][4][0])?>">-</a>
+    <?php
+     } else {
         echo '-';
     }
 }

@@ -286,6 +286,28 @@ class CourseController extends AppController
         $returnData = array('course' => $course, 'links' => $link, 'user' => $user);
         return $this->renderWithData('showLinkedText', $returnData);
     }
+
+    public function actionGetAssessmentPassAjax()
+    {
+        /**
+         * Ajax
+         */
+        $this->guestUserHandler();
+        $user = $this->user;
+        $params = $this->getRequestParams();
+        $cid = $params['cid'];
+        $assessments = Assessments::getByCourseId($cid);
+        foreach ($assessments as $assess)
+        {
+            $assessmentArray[] = array(
+                'password' => $assess['password']
+
+            );
+        }
+        $responseData = array('assessmentArray' => $assessmentArray);
+        return $this->successResponse($responseData);
+    }
+
     /**
      * To handle event on calendar.
      */
@@ -1209,7 +1231,6 @@ class CourseController extends AppController
         $courseStudent = Course::getByCourseAndUser($courseId);
         $lockAId = $courseStudent['lockaid']; //ysql_result($result,0,2);
         $type = $this->getParamVal('type');
-
         if ($teacherData != null) {
             if ($myRights>AppConstant::STUDENT_RIGHT) {
                 $teacherId = $teacherData['id'];
@@ -1669,6 +1690,7 @@ class CourseController extends AppController
             Course::setItemOrder($itemOrder, $courseId);
             return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid=' .$course->id.'&folder=0'));
         }
+
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','course/course.css', 'instructor.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js','course.js','student.js', 'general.js', 'question/addquestions.js', 'mootools.js', 'nested1.js','course/instructor.js']);
         $responseData = array('teacherId' => $teacherId, 'course' => $course,'courseId' => $courseId, 'usernameInHeader' => $usernameInHeader, 'useLeftBar' => $useLeftBar, 'newMsgs' => $newMsgs, 'newPostCnts' => $newPostCnts, 'useViewButtons' => $useViewButtons, 'useLeftStuBar' => $useLeftStuBar, 'toolSet' => $toolSet, 'sessionData' => $sessionData, 'allowUnEnroll' => $allowUnEnroll, 'quickView' => $quickView, 'noCourseNav' => $noCourseNav, 'overwriteBody' => $overwriteBody, 'body' => $body, 'myRights' => $myRights,

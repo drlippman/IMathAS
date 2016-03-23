@@ -7,7 +7,7 @@ use app\components\AppConstant;
 
 $this->title = AppUtility::t('Grade Book Detail', false);
 
-global $isTeacher, $isTutor, $temp;
+global $isTeacher, $isTutor, $temp,$lastanswers;
 $isteacher = $defaultValuesArray['isteacher'];
 $gbmode = $defaultValuesArray['gbmode'];
 $istutor = $defaultValuesArray['istutor'];
@@ -244,7 +244,6 @@ if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT
     <?php
     }
 }
-
 ?>
 </div>
 <form id="mainform" method=post
@@ -316,8 +315,7 @@ if ($line['timeontask'] == '') {
 } else {
     $timesontask = explode(',', $line['timeontask']);
 }
-
-if (isset($params['lastver'])) {
+if ($params['lastver']){
     $seeds = explode(",", $line['seeds']);
     $sp = explode(";", $line['scores']);
     $scores = explode(",", $sp[0]);
@@ -342,7 +340,7 @@ if (isset($params['lastver'])) {
     </div>
 </div>
 <?php
-} else if (isset($params['reviewver'])) {
+} else if ($params['reviewver']) {
     $seeds = explode(",", $line['reviewseeds']);
     $sp = explode(";", $line['reviewscores']);
     $scores = explode(",", $sp[0]);
@@ -531,17 +529,18 @@ echo ' <button class="margin-top-five margin-left-ten" type="button" id="hnatogg
 echo ' <button class="margin-top-five margin-left-ten margin-right-ten" type="button" id="showanstoggle" onclick="showallans()">' . _('Show All Answers') . '</button>';
 echo ' <button class="margin-top-five" type="button" id="prevtoggle" onclick="previewall()">' . _('Preview All') . '</button></div>';
 $total = 0;
-
 for ($i = 0; $i < count($questions); $i++) {
+    $temp = " ";
     echo "<div ";
-    if ($canedit && getpts($scores[$i]) == $pts[$questions[$i]]) {
+    if($canedit && (getpts($scores[$i]) == $pts[$questions[$i]])){
         echo 'class="col-md-12 col-sm-12 iscorrect isperfect"';
-    } else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i]) == $pts[$questions[$i]])) {
-        echo 'class="iscorrect"';
-    } else if ($scores[$i] == -1) {
+        print_r($i);
+    }elseif($canedit && (($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i]) == $pts[$questions[$i]]) {
+        echo 'class="iscorrect col-md-12 col-sm-12"';
+    }elseif($scores[$i] == -1) {
         echo 'class="notanswered col-md-12 col-sm-12"';
-    } else {
-        echo 'class="iswrong question-form-control col-md-12 col-sm-12" ';
+    }else{
+        echo 'class="iswrong col-md-12 col-sm-12"';
     }
     $totalpossible += $pts[$questions[$i]];
 
@@ -585,6 +584,7 @@ for ($i = 0; $i < count($questions); $i++) {
     $qtypes = displayq($i, $qsetid, $seeds[$i], $showa, false, $attempts[$i], false, false, false, $colors);
     echo $temp;
     echo '</div>';
+
     if ($scores[$i] == -1) {
         $scores[$i] = "N/A";
     } else {
@@ -774,6 +774,7 @@ for ($i = 0; $i < count($questions); $i++) {
         }
         echo '</div>';
         echo '</div>';
+
     }
     echo "</div>\n";
 

@@ -1,4 +1,14 @@
 var path = jQuery('.home-path').val();
+
+//
+//$(document).ready(function () {
+//pass();
+//});
+
+
+
+
+
 function ahah(url, target) {
   document.getElementById(target).innerHTML = ' Fetching data... ';
   if (window.XMLHttpRequest) {
@@ -264,8 +274,17 @@ function locked()
 }
 
 function pass(){
+    var courseId = jQuery('.courseId').val();
+    alert(courseId);
+    jQuerySubmit('get-assessment-pass-ajax', {cid:courseId}, 'removePassSuccess');
+}
+    function removePassSuccess(response) {
+    response=JSON.parse(response);
+   if (response.status == 0) {
+       var passwords=response.assessmentArray;
+       console.log(passwords);
     var html="<input type='text' class='pass1' placeholder='noting'>"
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+    jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Enter the password', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,draggable:false,
         buttons: {
@@ -275,7 +294,6 @@ function pass(){
                     $(this).remove();
                 }
                 else{
-
                 }
             }
         },
@@ -288,4 +306,6 @@ function pass(){
             })
         }
     });
+   }
+
 }

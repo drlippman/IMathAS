@@ -97,10 +97,10 @@ class GradebookController extends AppController
             $sessionData[$courseId.'catcollapse'] = $overridecollapse;
             AppUtility::writesessiondata($sessionData,$sessionId);
         }
-        if (isset($isTeacher)) {
+        if ($isTeacher) {
             $isTeacher = true;
         }
-        if (isset($isTutor)) {
+        if ($isTutor) {
             $isTutor = true;
         }
         if ($isTeacher || $isTutor) {
@@ -2597,7 +2597,7 @@ class GradebookController extends AppController
             $gbcatsLabel[$key] = $singleGbcatsData['name'];
             $key++;
         }
-        if ($this->isPostMethod()) {
+        if ($this->isPostMethod())   {
 
             $tempArray = array();
             if ($params['grade-name-check']) {
@@ -2608,7 +2608,8 @@ class GradebookController extends AppController
                         if ($params['Show-after']) {
                             $showdate = 0;
                             if ($params['Show-after'] == 2) {
-                                $showdate = strtotime(date('F d, o g:i a'));
+                                $enddate=$params['endDate'];
+                                $showdate = strtotime($enddate);
                             }
                             $temp = 1;
                             GbItems::updateGrade($gradeId, $showdate, $temp);
@@ -3122,7 +3123,7 @@ class GradebookController extends AppController
 
     public function actionGradebookViewAssessmentDetails()
     {
-        global $isTeacher, $isTutor;
+        global $isTeacher, $isTutor,$lastanswers;
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $currentUser = $this->user;
@@ -3130,16 +3131,17 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $teacherid = Teacher::getByUserId($currentUser['id'], $courseId);
         $tutorid = Tutor::getByUserId($currentUser['id'], $courseId);
-        if (($teacherid)) {
+        if ($teacherid) {
             $isTeacher = true;
         }
         if ($tutorid) {
             $isTutor = true;
         }
         $asid = intval($params['asid']);
-        if (!isset($params['uid']) && !$isTeacher && !$isTutor) {
+        if (!($params['uid']) && !$isTeacher && !$isTutor) {
             $params['uid'] = $currentUser['id'];
         }
+
         if ($isTeacher || $isTutor) {
             if (isset($sessionData[$courseId . 'gbmode'])) {
                 $gbmode = $sessionData[$courseId . 'gbmode'];
@@ -3392,9 +3394,11 @@ class GradebookController extends AppController
             'studentNameWithAssessmentName' => $studentNameWithAssessmentName,
             'pers' => $pers
         );
-        $oktorec = false;
-        if ($isteacher) {
-            $oktorec = true;
+
+
+        $oktorec = 2;
+        if ($isTeacher) {
+            $oktorec = 1;
         } else if ($istutor) {
             $tutorEdit = Assessments::getByAssessmentId($assessmentSessionData['assessmentid']);
             if ($tutorEdit['tutoredit'] == 1)
