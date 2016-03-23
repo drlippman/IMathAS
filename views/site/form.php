@@ -292,8 +292,8 @@ switch ($action) {
     <?php break;
 
     case "enroll":
-        echo "<form method=post action=\"actions?action=enroll$gb\">";
-        if (count($selfStudy)>0) {//if (isset($CFG['GEN']['selfenrolluser'])) {
+        echo "<form method=post action=\"action?action=enroll$gb\">";
+        if (count($selfStudy)>0) {//if (isset($CG['GEN']['selfenrolluser'])) {
             $doselfenroll = true;
             echo '<p>Select the course you\'d like to enroll in</p>';
             echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
@@ -310,8 +310,13 @@ switch ($action) {
         } else {
             echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
         }
-        echo '<div class="col-md-12 col-sm-12"><div class="form col-md-2 col-sm-2"><label for="cid">Course ID:</label></div><input class="form" type="text" size="20" name="cid"/></div><br class="form"/>';
-        echo '<div class="col-md-12 col-sm-12"><div class="form col-md-2 col-sm-2"><label for="ekey">Enrollment Key:</label></div><input class="form" type="text" size="20" name="ekey"/></div><br class="form"/>';
+        echo '<div class="col-md-12 col-sm-12">
+            <div class="form col-md-2 col-sm-2"><label for="cid">Course ID:</label></div>
+            <div class="col-md-4 col-sm-4 static"><input class="form" type="text" id="course-id" size="20" name="cid"/></div>
+        </div><br class="form"/>';
+        echo '<div class="col-md-12 col-sm-12"><div class="form col-md-2 col-sm-2"><label for="ekey">Enrollment Key:</label></div>
+                <div class="col-md-4 col-sm-4 static"><input class="form" type="text" size="20" name="ekey"/></div>
+            </div><br class="form"/>';
         if ($doselfenroll) {
             $installname = "OpenMath";
             echo '</div>';
@@ -381,3 +386,11 @@ echo '<p><b>Courses you\'re teaching:</b> Check: <a href="#" onclick="$(\'.teach
     </div>
     <?php } ?>
 
+<script>
+    $(document).ready(function(){
+        $(function() {
+            $('.static').on('keydown', '#course-id', function(e){-1!==$.inArray(e.keyCode,[46,8,9,27,13,110,190])||/65|67|86|88/.test(e.keyCode)&&(!0===e.ctrlKey||!0===e.metaKey)||35<=e.keyCode&&40>=e.keyCode||(e.shiftKey||48>e.keyCode||57<e.keyCode)&&(96>e.keyCode||105<e.keyCode)&&e.preventDefault()});
+        })
+    })
+
+</script>

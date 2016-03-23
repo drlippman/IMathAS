@@ -686,6 +686,8 @@ class Course extends BaseImasCourses {
 
     public static function getCourse($courseId){
         $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = $courseId AND (available=0 OR available=2)";
-        return Yii::$app->db->createCommand($query)->queryOne();
+        $command = Yii::$app->db->createCommand($query);
+        $data = $command->queryOne();
+        return $data;
     }
 }

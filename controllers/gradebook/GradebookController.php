@@ -227,6 +227,15 @@ class GradebookController extends AppController
             $includelastchange = false;
 
         }
+        $isdiag = false;
+        if ($canviewall) {
+            $query = Diags::findByCourseID($courseId);
+            if ($query) {
+                $isdiag = true;
+                $sel1name = $query->sel1name;
+                $sel2name = $query->sel2name;
+            }
+        }
         if(($lastloginfromexport)){
             $lastlogin = $lastloginfromexport;
         }

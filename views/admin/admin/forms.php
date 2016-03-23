@@ -24,7 +24,13 @@ if (isset($params['cid'])) {
     <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
     </div>
-<?php }else {?>
+<?php } elseif($action == 'enroll'){
+    $pageTitle = "Enroll in a course";
+    $this->title = $pageTitle;?>
+    <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home'], 'link_url' => [AppUtility::getHomeURL() . 'site/index'], 'page_title' => $this->title]); ?>
+    </div>
+<?php } else {?>
 
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin','Course Creation Confirmation'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
