@@ -381,7 +381,7 @@ class AssessmentController extends AppController
                     if ($filter == 'b') {
                         $sub[] = intval($itemId);
                     } else if ($filter == 't') {
-                        array_unshift($sub, ($itemId));
+                        array_unshift($sub,$itemId);
                     }
                     $itemList = serialize($items);
                     Course::setItemOrder($itemList, $courseId);

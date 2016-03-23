@@ -515,6 +515,7 @@ class CourseController extends AppController
                         $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                     }
                     $oncal = $params['oncal'];
+
                 } else if ($params['avail'] == AppConstant::NUMERIC_TWO) {
                     if ($params['altoncal'] == AppConstant::NUMERIC_ZERO)
                     {
@@ -531,6 +532,7 @@ class CourseController extends AppController
                     $endDate = AppConstant::ALWAYS_TIME;
                     $oncal = AppConstant::NUMERIC_ZERO;
                 }
+
                 if (isset($params['hidetitle'])) {
                     $params['title'] = '##hidden##';
                 }
@@ -587,7 +589,7 @@ class CourseController extends AppController
                     $newtextid = $params['id'];
                 }else{ //add new
                     $tempArray = array();
-                    $tempArray['cid'] = $cid;
+                    $tempArray['courseid'] = $cid;
                     $tempArray['startdate'] = $startDate;
                     $tempArray['enddate'] = $endDate;
                     $tempArray['caltag'] = $calTag;
@@ -597,7 +599,6 @@ class CourseController extends AppController
                     $tempArray['title'] = $params['title'];
                     $tempArray['text'] = $params['description'];
                     $tempArray['avail'] = $params['avail'];
-
                     $newInline = new InlineText();
                     $newtextid = $newInline->saveInlineText($tempArray);
                     $itemType = 'InlineText';
@@ -1503,8 +1504,8 @@ class CourseController extends AppController
 //            if (count($exceptions) > 0) {
 //                upsendexceptions($items);
 //            }
-
-            if ($folder != '0')
+            
+            if (isset($folder))
             {
                 $now = time() + $previewShift;
                 $blockTree = explode('-',$folder);

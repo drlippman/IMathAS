@@ -116,6 +116,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         if ($istool) {
             $exttooltrack[$newtypeid] = intval($tool[0]);
         }
+        $newtypeid=$newtypeid['id'];
+
     } elseif ($itemtype == "Forum") {
         $ForumData = Forums::getById($typeid);
         if ($sethidden) {
@@ -216,7 +218,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         unset($assessmentData['reqscoreaid']);
         $assessmentData['name'] .= stripslashes($params['append']);
         $assessment = new Assessments();
-        $newtypeid = $assessment->copyAssessment($params['cid'],$assessmentData);
+        $newtypeid = $assessment->copyAssessment($params['courseId'],$assessmentData);
         if ($reqscoreaid > AppConstant::NUMERIC_ZERO) {
             $reqscoretrack[$newtypeid] = $reqscoreaid;
         }

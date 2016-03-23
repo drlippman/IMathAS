@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/c
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<?php echo $page_isTakenMsg ?>
+<?php echo $page_isTakenMsg ;?>
     <form method=post action="<?php echo $page_formActionTag ?>">
 <p></p>
 <div class="item-detail-header">
