@@ -135,7 +135,7 @@
 			//$headers .= "From: $self\r\n";
 			$headers .= "From: $sendfrom\r\n";
 			$headers .= "Reply-To: $self\r\n";
-			$message = "<p><b>Note:</b>This email was sent by $self from $installname. If you need to reply, make sure your reply goes to their email address.</p><p></p>".$message;
+			$message = "<p><b>Note:</b>This email was sent by ".htmlentities($self)." from $installname. If you need to reply, make sure your reply goes to their email address.</p><p></p>".$message;
 			$teacheraddys = array();
 			if ($_POST['self']!="none") {
 				$teacheraddys[] = $self;
