@@ -723,7 +723,8 @@ class AppController extends Controller
     {
         $isTutor = false;
         $tutor = Tutor::getByUserId($userId, $courseId);
-        if ($tutor) {
+        $user = User::getById($userId);
+        if ($tutor && $user['rights'] != AppConstant::ADMIN_RIGHT) {
             $isTutor = true;
         }
         return $isTutor;

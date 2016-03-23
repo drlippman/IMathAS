@@ -1229,12 +1229,12 @@ class SiteController extends AppController
             if($userDetails->errors['LastName'])
             {
                 $this->setWarningFlash($userDetails->errors['LastName'][0]);
-                return $this->redirect('action?action=chguserinfo');
+                return $this->redirect('form?action=chguserinfo');
             }
             if($userDetails->errors['email'])
             {
                 $this->setWarningFlash($userDetails->errors['email'][0]);
-                return $this->redirect('action?action=chguserinfo');
+                return $this->redirect('form?action=chguserinfo');
             }
             if ($params['dochgpw']) {
                 $line = User::getUserPassword($userId);
@@ -1314,7 +1314,6 @@ class SiteController extends AppController
                     $this->setErrorFlash($errorMessage);
                     return $this->redirect('form?action=enroll');
                 } else {
-
                     $keylist = array_map('strtolower',array_map('trim',explode(';',$line['ekey'])));
                     if (!in_array(strtolower(trim($params['ekey'])), $keylist)) {
                         $this->setErrorFlash(AppConstant::INCORRECT_ENROLLMENT_KEY);
