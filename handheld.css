@@ -92,6 +92,10 @@ ul#navlist a {
 #homelinkbox {
 	font-size: 90%;
 }
+div#logo {
+	margin-left:0px;
+	margin-rigth:0px;
+}
 div#logo img {
 	max-width: 100%;
 }
