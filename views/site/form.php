@@ -291,6 +291,38 @@ switch ($action) {
         </form>
     <?php break;
 
+    case "enroll":
+        echo "<form method=post action=\"actions?action=enroll$gb\">";
+        if (count($selfStudy)>0) {//if (isset($CFG['GEN']['selfenrolluser'])) {
+            $doselfenroll = true;
+            echo '<p>Select the course you\'d like to enroll in</p>';
+            echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
+            echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
+            echo '<optgroup label="Self-study courses">';
+            foreach($selfStudy as $row) {
+                echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+            }
+            echo '</optgroup>';
+            echo '</select></p>';
+            echo '<div id="courseinfo">';
+            echo '<script type="text/javascript"> function courseselectupdate(el) { var c = document.getElementById("courseinfo"); var c2 = document.getElementById("selfenrollwarn"); ';
+            echo 'if (el.value==0) {c.style.display="";c2.style.display="none";} else {c.style.display="none";c2.style.display="";}}</script>';
+        } else {
+            echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
+        }
+        echo '<div class="col-md-12 col-sm-12"><div class="form col-md-2 col-sm-2"><label for="cid">Course ID:</label></div><input class="form" type="text" size="20" name="cid"/></div><br class="form"/>';
+        echo '<div class="col-md-12 col-sm-12"><div class="form col-md-2 col-sm-2"><label for="ekey">Enrollment Key:</label></div><input class="form" type="text" size="20" name="ekey"/></div><br class="form"/>';
+        if ($doselfenroll) {
+            $installname = "OpenMath";
+            echo '</div>';
+            echo '<div id="selfenrollwarn" style="color:red;display:none;">Warning: You have selected a non-credit self-study course. ';
+            echo 'If you are using '.$installname.' with an instructor-led course, this is NOT what you want; nothing you do in the self-study ';
+            echo 'course will be viewable by your instructor or count towards your course.  For an instructor-led ';
+            echo 'course, you need to enter the course ID and key provided by your instructor.</div>';
+        }
+        echo '<div class=submit><input type=submit value="Sign Up"></div></form>';
+    break;
+
     case "forumwidgetsettings":
         echo '<p>The most recent 10 posts from each course show in the New Forum Posts widget.  Select the courses you want to show in the widget.</p>';
         echo "<form method=post action=\"action?action=forumwidgetsettings$gb\">\n";
@@ -343,6 +375,7 @@ echo '<p><b>Courses you\'re teaching:</b> Check: <a href="#" onclick="$(\'.teach
         </div>
        <?php echo '</form>';
         break;
+
 ?>
 
     </div>

@@ -472,7 +472,7 @@ class SiteController extends AppController
                 $message .= 'Last Name: ' . $user->LastName . "<br/>\n";
                 $message .= 'Email Name: ' . $user->email . "<br/>\n";
                 $message .= 'User Name: ' . $user->SID . "<br/>\n";
-                $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
+                $message .= "</p>This is an automated message from OpenMath. Do not respond to this email <br><br></p>";
                 $message .= "</p>Best Regards,<br></p>";
                 $message .= "</p>OpenMath Team<br></p>";
                 AppUtility::sendMail(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT, $message, $toEmail);
@@ -1102,14 +1102,17 @@ class SiteController extends AppController
                 $pageTitle = 'Forum Widget Settings';
                 $result = User::getUserHideOnPostInfo($user->id);
                 $hideList = explode(',',($result['hideonpostswidget']));
-
                 $coursesTeaching = Teacher::getDataByUserId($userId);
                 $coursesTutoring = Tutor::getDataByUserId($userId);
                 $coursesTaking = Student::getStudentByUserId($userId);
                 break;
+            case "enroll":
+                $doselfenroll = false;
+                $selfStudy = Course::getSelfStudy();
+
         }
         $this->includeJS(['jquery.min.js','question/addquestions.js', 'tablesorter.js', 'general.js']);
-        $responseData = array('action' => $action, 'line' => $line, 'myRights' => $myRights, 'groupId' => $groupId, 'groupResult' => $r, 'lName' => $lName, 'tzname' => $tzname, 'userId' => $userId, 'hideList' => $hideList, 'coursesTaking' => $coursesTaking, 'coursesTeaching' => $coursesTeaching, 'coursesTutoring' => $coursesTutoring, 'pageTitle' => $pageTitle);
+        $responseData = array('action' => $action, 'line' => $line, 'myRights' => $myRights, 'groupId' => $groupId, 'groupResult' => $r, 'lName' => $lName, 'tzname' => $tzname, 'userId' => $userId, 'hideList' => $hideList, 'coursesTaking' => $coursesTaking, 'coursesTeaching' => $coursesTeaching, 'coursesTutoring' => $coursesTutoring, 'pageTitle' => $pageTitle, 'selfStudy' => $selfStudy, 'doselfenroll' => $doselfenroll);
         return $this->renderWithData('form',$responseData);
     }
 
@@ -1266,6 +1269,67 @@ class SiteController extends AppController
             $hideList = implode(',', $toHide);
             User::updateHideOnPost($userId, $hideList);
             return $this->redirect('dashboard');
+        } else if ($action == "enroll") {
+            if ($myRights < 6) {
+                $this->setErrorFlash("Guests can't enroll in courses");
+            }
+            if (isset($params['courseselect']) && $params['courseselect']>0) {
+                $params['cid'] = $params['courseselect'];
+                $params['ekey'] = '';
+            }
+            $pagetopper = '';
+            if ($gb == '') {
+                $pagetopper .= "<div class=breadcrumb><a href=\"index\">Home</a> &gt; Enroll in a Course</div>\n";
+            }
+            $pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
+            if ($params['cid']=="" || !is_numeric($params['cid'])) {
+                echo $pagetopper;
+                echo "Please include Course ID.  <a href=\"forms?action=enroll$gb\">Try Again</a>\n";
+            }
+
+            $line = Course::getCourse($params['cid']);
+            if ($line == null) {
+               $this->setErrorFlash("Course not found.");
+            } else if (($line['allowunenroll']&2)==2) {
+                $this->setErrorFlash("Course is closed for self enrollment.  Contact your instructor for access.");
+            } else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
+                $this->setErrorFlash("Please include Enrollment Key.");
+            }  else {
+                $teacher = Teacher::getByUserId($user->id, $params['cid']);
+                $tutor = Tutor::getByUserId($user->id, $params['cid']);
+
+                if ($teacher) {
+                    $errorMessage = AppConstant::TEACHER_CANNOT_ENROLL_AS_STUDENT;
+                    $this->setErrorFlash($errorMessage);
+                    return $this->redirect('action?enroll');
+                } elseif ($tutor) {
+                    $errorMessage = AppConstant::TUTOR_CANNOT_ENROLL_AS_STUDENT;
+                    $this->setErrorFlash($errorMessage);
+                    return $this->redirect('action?enroll');
+                }
+
+                $alreadyEnroll = Student::getByCourseId($params['cid'], $user->id);
+                if ($alreadyEnroll > 0) {
+                    $errorMessage = AppConstant::ALREADY_ENROLLED;
+                    $this->setErrorFlash($errorMessage);
+                    return $this->redirect('action?enroll');
+                } else {
+                    $keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
+                    if (!in_array(strtolower(trim($params['ekey'])), $keylist)) {
+                        $this->setErrorFlash(AppConstant::INCORRECT_ENROLLMENT_KEY);
+                        return $this->redirect('action?enroll');
+                    } else {
+                        if (count($keylist)>1) {
+                            $student = new Student();
+                            $student->insertGreaterThanOne($userId,$params['cid'],$params['ekey'],$line['deflatepass']);
+                        } else {
+                            $student = new Student();
+                            $student->insertNotEnrollKey($userId,$params['cid'],$line['deflatepass']);
+                        }
+                        $this->setSuccessFlash("You have been enrolled in course ID".$params['cid']."");
+                    }
+                }
+            }
         }
     }
 }

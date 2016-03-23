@@ -638,5 +638,22 @@ class Student extends BaseImasStudents
         return $command->queryAll();
     }
 
+    public function insertGreaterThanOne($userId,$courseId,$section,$latePass){
+        $this->userid = $userId;
+        $this->courseid = $courseId;
+        $this->section = $section;
+        $this->latepass = $latePass;
+        $this->save();
+        return $this;
+    }
+
+    public function insertNotEnrollKey($userId,$courseId,$latePass){
+        $this->userid = $userId;
+        $this->courseid = $courseId;
+        $this->latepass = $latePass;
+        $this->save();
+        return $this;
+    }
+
 }
 

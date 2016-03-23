@@ -678,4 +678,14 @@ class Course extends BaseImasCourses {
     {
         return Course::find()->select('outcomes')->where(['id' => $courseId])->one();
     }
+
+    public static function getSelfStudy(){
+        $query = "SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getCourse($courseId){
+        $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = $courseId AND (available=0 OR available=2)";
+        return Yii::$app->db->createCommand($query)->queryOne();
+    }
 }
