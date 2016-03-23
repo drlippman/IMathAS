@@ -43,12 +43,12 @@ function deleteGrade() {
             markArray.push($(this).val());
         });
         if (markArray.length != 0) {
-            var html = '<div><p>Are you sure? This will delete your Grade.</p></div>';
+            var html = '<div><p>Are you SURE you want to delete these offline grade items and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first..</p></div>';
             var cancelUrl = $(this).attr('href');
             e.preventDefault();
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
+                width: 'auto', resizable: false, draggable: false,
                 closeText: "hide",
                 buttons: {
                     "Cancel": function () {
@@ -71,6 +71,12 @@ function deleteGrade() {
                 },
                 close: function (event, ui) {
                     $(this).remove();
+                },
+                open: function(){
+                    hideBodyScroll();
+                    jQuery('.ui-widget-overlay').bind('click',function(){
+                        jQuery('#dialog').dialog('close');
+                    })
                 }
             });
         }

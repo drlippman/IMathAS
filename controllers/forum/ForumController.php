@@ -1643,7 +1643,13 @@ class ForumController extends AppController
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ZERO;
         $teacherId = $this->isTeacher($user['id'], $courseId);
-//        $this->noValidRights($teacherId);
+        $getId = Forums::getById($params['id']);
+        $id = $this->getParamVal('id');
+
+//        if($id != $getId){
+//            $this->setErrorFlash('This forum is already deleted.');
+//            return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
+//        }
         foreach ($groupNames as $group) {
             $groupNameId[$key] = $group['id'];
             $groupNameLabel[$key] = AppConstant::USE_GROUP_SET . $group['name'];
@@ -1726,6 +1732,11 @@ class ForumController extends AppController
             $pageTitle = 'Modify Forum';
             $saveTitle = AppConstant::SAVE_BUTTON;
             $forumData = Forums::getById($modifyForumId);
+            if($forumData == '')
+            {
+                $this->setErrorFlash('Forum is already deleted.');
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$courseId));
+            }
             if ($forumData['groupsetid'] > AppConstant::NUMERIC_ZERO) {
                 $threadData = Thread::getByForumId($modifyForumId);
                 if (count($threadData) > AppConstant::NUMERIC_ZERO) {
@@ -1880,6 +1891,7 @@ class ForumController extends AppController
                 $settingValue = $params['allow-anonymous-posts'] + $params['allow-students-to-modify-posts'] + $params['allow-students-to-delete-own-posts'] + $params['like-post'] + $params['viewing-before-posting'];
                 $updateForum = new Forums();
                 $updateForum->UpdateForum($params, $endDate, $startDate, $postDate, $replyByDate, $settingValue,$cntingb);
+                
                 if (isset($params['Get-email-notify-of-new-posts'])) {
                     $subscriptionEntry = new ForumSubscriptions();
                     $subscriptionEntry->AddNewEntry($params['modifyFid'], $user['id']);
