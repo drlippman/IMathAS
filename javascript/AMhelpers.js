@@ -613,11 +613,24 @@ function AMpreview(inputId,outputId) {
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
    var dispstr = str;
-   
+  var foundaltcap = false; 
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
 		  str = str.replace("E","varE");	
-	  } else if (vars[i].charCodeAt(0)>96) { //lowercase
+	  } else {
+	  	foundaltcap = false;
+	  	for (var j=0; j<vars.length; j++) {
+	  		if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+	  			foundaltcap = true;
+	  			break;
+	  		}
+	  		if (!foundaltcap) {
+	  			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+	  		}
+	  	}
+	  }
+	  
+	  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
 		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
 			//vars[i] = vars[i].toLowerCase();
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
@@ -628,6 +641,7 @@ function AMpreview(inputId,outputId) {
 		   	str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 		  }
 	  }
+	  */
   }
  
   //quote out multiletter variables
@@ -1007,24 +1021,36 @@ function doonsubmit(form,type2,skipconfirm) {
 		varlist = vlist[qn];
 		
 		vars = varlist.split("|");
-		for (var j=0; j<vars.length; j++) {
-			 if (vars[j].length>2 && vars[j].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
-				var varpts = vars[j].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
+		for (var i=0; i<vars.length; i++) {
+			  if (vars[i].length>2 && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
+				var varpts = vars[i].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
 				str = str.replace(varpts[0], "repvars"+i);
-				vars[j] = "repvars"+i;
-			  } else if (vars[j] == "varE") {
-			  	  str = str.replace("E","varE");	
-			  } else if (vars[j].charCodeAt(0)>96) { //lowercase
-				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
-					 // vars[j] = vars[j].toLowerCase();
-					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+				vars[i] = "repvars"+i;
+			  } else if (vars[i] == "varE") {
+				  str = str.replace("E","varE");	
+			  } else {
+				foundaltcap = false;
+				if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+					foundaltcap = true;
+					break;
+				}
+				if (!foundaltcap) {
+					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+				}
+			  }
+			  
+			  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
+				  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
+					//vars[i] = vars[i].toLowerCase();
+					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 				  }
 			  } else {
-				  if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
-					//vars[j] = vars[j].toLowerCase();
-					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);
+				  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+					//vars[i] = vars[i].toLowerCase();
+					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 				  }
 			  }
+			  */
 		}
 		varlist = vars.join("|");
 		

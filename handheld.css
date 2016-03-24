@@ -34,7 +34,7 @@ div#centercontent {
 	padding-left: 0px;
 }
 
-div.navbar {
+div.navbar, div.navbar.fixedonscroll {
 	float:none;
 	position:relative;
 	width: auto;
@@ -42,6 +42,7 @@ div.navbar {
 	left: 0px;
 	margin-left: 0px;
 }
+
 div.navbar h4 {
 	margin-bottom: 5px;
 }
@@ -55,6 +56,14 @@ ul.qlist li {
 	margin-left: 0px;
 	margin-top: 0px;
 }
+
+div.navbar.fixedonscroll {
+	padding-left: 20px;
+}
+div.navbar.fixedonscroll ul.qlist li {
+	display: list-item;
+}
+
 div.inset {
 	position: relative;
 	overflow: visible;

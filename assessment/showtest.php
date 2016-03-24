@@ -2292,16 +2292,17 @@ if (!isset($_POST['embedpostback'])) {
 					}
 				}
 			} else {
-				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$intro);
+				$intro = preg_replace('/<p[^>]*>((<span|<strong|<em)[^>]*>)*?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)*?<\/p>/','[QUESTION $3]',$intro);
 				$intro = preg_replace('/\[QUESTION\s+(\d+)\s*\]/','</div>[QUESTION $1]<div class="intro">',$intro);
 			}
 			if (strpos($intro,'[PAGE')!==false) {
-				$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[PAGE\s*([^\]]*)\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[PAGE $3]',$intro);
+				$intro = preg_replace('/<p[^>]*>((<span|<strong|<em)[^>]*>)?\[PAGE\s*([^\]]*)\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[PAGE $3]',$intro);
 				$intro = preg_replace('/\[PAGE\s*([^\]]*)\]/','</div>[PAGE $1]<div class="intro">',$intro);
 				$intropages = preg_split('/\[PAGE\s*([^\]]*)\]/',$intro,-1,PREG_SPLIT_DELIM_CAPTURE); //main pagetitle cont 1 pagetitle
 				if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 				if ($_GET['page']==0) {
-					if (!preg_match('/^<div\s*class="intro">(\s|&nbsp;|<p>(\s*|&nbsp;)*<\/p>)*<\/div>$/', $intropages[0])) {
+					$intropages[0] = preg_replace('/<span[^>]*>(&nbsp;|\s)*<\/span>/','',$intropages[0]);
+					if (!preg_match('/^<div\s*class="intro">(\s|&nbsp;|<p[^>]*>(\s*|&nbsp;)*<\/p>)*<\/div>$/', $intropages[0])) {
 						echo $intropages[0];
 					}
 				} 
@@ -2420,7 +2421,8 @@ if (!isset($_POST['embedpostback'])) {
 				$quesout .= '</div>';
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
-			$intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p>(\s|&nbsp;)*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
+			$intro = preg_replace('/<span[^>]*>(&nbsp;|\s)*<\/span>/','',$intro);
+			$intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p[^>]*>(\s|&nbsp;)*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
 			echo $intro;		
 			
 			if ($dopage==true) {
@@ -2548,7 +2550,7 @@ if (!isset($_POST['embedpostback'])) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
 		
-		echo '<div class="navbar fixedonscroll" style="width:125px">';
+		echo '<div class="navbar fixedonscroll">';
 		echo "<h4>", _('Pages'), "</h4>\n";
 		echo '<ul class="qlist" style="margin-left:-10px">';
 		$jsonbits = array();
