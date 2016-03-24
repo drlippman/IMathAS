@@ -612,12 +612,25 @@ function AMpreview(inputId,outputId) {
   var str = document.getElementById(inputId).value;
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
-   var dispstr = str;
-   
+  var dispstr = str;
+  var foundaltcap = false; 
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
 		  str = str.replace("E","varE");	
-	  } else if (vars[i].charCodeAt(0)>96) { //lowercase
+	  } else {
+	  	foundaltcap = false;
+	  	for (var j=0; j<vars.length; j++) {
+	  		if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+	  			foundaltcap = true;
+	  			break;
+	  		}
+	  		if (!foundaltcap) {
+	  			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+	  		}
+	  	}
+	  }
+	  
+	  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
 		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
 			//vars[i] = vars[i].toLowerCase();
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
@@ -628,6 +641,7 @@ function AMpreview(inputId,outputId) {
 		   	str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 		  }
 	  }
+	  */
   }
   vl = vars.join("|");
  
@@ -997,20 +1011,34 @@ function doonsubmit(form,type2,skipconfirm) {
 		varlist = vlist[qn];
 		
 		vars = varlist.split("|");
-		for (var j=0; j<vars.length; j++) {
-			  if (vars[j] == "varE") {
-			  	  str = str.replace("E","varE");	
-			  } else if (vars[j].charCodeAt(0)>96) { //lowercase
-				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
-					 // vars[j] = vars[j].toLowerCase();
-					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
+		for (var i=0; i<vars.length; i++) {
+			  if (vars[i] == "varE") {
+				  str = str.replace("E","varE");	
+			  } else {
+				foundaltcap = false;
+				for (var j=0; j<vars.length; j++) {
+					if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+						foundaltcap = true;
+						break;
+					}
+					if (!foundaltcap) {
+						str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+					}
+				}
+			  }
+			  
+			  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
+				  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
+					//vars[i] = vars[i].toLowerCase();
+					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 				  }
 			  } else {
-				  if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
-					//vars[j] = vars[j].toLowerCase();
-					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);
+				  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+					//vars[i] = vars[i].toLowerCase();
+					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 				  }
 			  }
+			  */
 		  }
 		varlist = vars.join("|");
 		
