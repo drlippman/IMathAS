@@ -9,7 +9,7 @@ function normalizemathunicode(str) {
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
 	str = str.replace(/\bOO\b/i,"oo");
-	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu");
+	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu").replace(/Δ/,"Delta");
 	return str;
 }
 
@@ -629,7 +629,6 @@ function AMpreview(inputId,outputId) {
 		  }
 	  }
   }
-  vl = vars.join("|");
  
   //quote out multiletter variables
   var varstoquote = new Array();
@@ -642,15 +641,23 @@ function AMpreview(inputId,outputId) {
 				break;
 			  }
 		  }
+		  if (!isgreek && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
+		  	var varpts = vars[i].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
+		  	dispstr = dispstr.replace(varpts[0], '"'+varpts[1]+'"_"'+varpts[2]+'"');
+		  	str = str.replace(varpts[0], "repvars"+i);
+		  	vars[i] = "repvars"+i;
+		  }
 		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/) && vars[i]!="varE") {
 			  varstoquote.push(vars[i]);
 		  }
 	  }
   }
+  vl = vars.join("|");
+  
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
 	  var reg = new RegExp("("+vltq+")","g");
-	  dispstr = str.replace(reg,"\"$1\"");
+	  dispstr = dispstr.replace(reg,"\"$1\"");
   }
   dispstr = dispstr.replace("varE","E");
   
@@ -682,10 +689,13 @@ function AMpreview(inputId,outputId) {
 	  str = str.replace(reg,"$1*sin($1+");
   }
   vars = vl.split('|');
+
   var totesteqn = mathjs(str,vl);
+
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
+
 	  for (var j=0; j<vars.length; j++) {
 		totest += "var " + vars[j] + "="+testvals[j]+";"; 
 	  }
@@ -998,7 +1008,11 @@ function doonsubmit(form,type2,skipconfirm) {
 		
 		vars = varlist.split("|");
 		for (var j=0; j<vars.length; j++) {
-			  if (vars[j] == "varE") {
+			 if (vars[j].length>2 && vars[j].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
+				var varpts = vars[j].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
+				str = str.replace(varpts[0], "repvars"+i);
+				vars[j] = "repvars"+i;
+			  } else if (vars[j] == "varE") {
 			  	  str = str.replace("E","varE");	
 			  } else if (vars[j].charCodeAt(0)>96) { //lowercase
 				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
@@ -1011,7 +1025,7 @@ function doonsubmit(form,type2,skipconfirm) {
 					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);
 				  }
 			  }
-		  }
+		}
 		varlist = vars.join("|");
 		
 		if (fl!='') {
