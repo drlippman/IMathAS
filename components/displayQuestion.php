@@ -5608,15 +5608,14 @@ function getcolormark($c,$wrongformat=false) {
 	global $imasroot;
 
 	if (isset($GLOBALS['nocolormark'])) { return '';}
-
 	if ($c=='ansred') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/redx.gif" width="6" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'img/redx.gif" width="6" height="6"/>';
 	} else if ($c=='ansgrn') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/gchk.gif" width="8" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'img/gchk.gif" width="8" height="6"/>';
 	} else if ($c=='ansorg') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/orgx.gif" width="6" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'img/orgx.gif" width="6" height="6"/>';
 	} else if ($c=='ansyel') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/ychk.gif" width="8" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'img/ychk.gif" width="8" height="6"/>';
 	} else {
 		return '';
 	}

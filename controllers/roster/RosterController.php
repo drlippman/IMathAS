@@ -636,7 +636,7 @@ class RosterController extends AppController
 
             if ($studentRecords)
             {
-            foreach($studentRecords['allUsers'] as $key=>$StudentDataArray)
+                foreach($studentRecords['allUsers'] as $key=>$StudentDataArray)
             {
                 $userData = User::getByName($StudentDataArray[0]);
                 if ($userData)
@@ -654,7 +654,14 @@ class RosterController extends AppController
                         array_push($existingUser, $tempArray);
                     }else
                     {
-                        array_push($newUser, $StudentDataArray);
+                        $tempArray = array(
+                            'userName' => $userData->SID,
+                            'firstName' => $userData->FirstName,
+                            'lastName' => $userData->LastName,
+                            'email' => $userData->email,
+                        );
+                        array_push($existingUser, $tempArray);
+
                     }
                 } else
                 {
@@ -663,6 +670,7 @@ class RosterController extends AppController
             }
                 if ($filename)
                 {
+
                     $this->redirect(array('show-import-student', 'courseId' => $courseId,'newUser' => $newUser,'existingUser' => $existingUser));
                 }
             } else {
@@ -1386,6 +1394,7 @@ class RosterController extends AppController
         else {
             $this->setSuccessFlash(AppConstant::STUDENT_EXISTS);
         }
+
         return $this->successResponse();
     }
 

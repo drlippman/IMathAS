@@ -46,7 +46,9 @@ class Student extends BaseImasStudents
         if (isset($params['latepass'])) {
             $this->latepass = $params['latepass'];
         }
-        $this->save();
+        if(!$this->save()){
+            AppUtility::dump($this->getErrors());
+        }
         return Student::find()->max('id');
     }
 

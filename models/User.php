@@ -666,7 +666,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->LastName = $lastname;
         $this->email = $eclass;
         $this->lastaccess = $now;
-        $this->save();
+        if(!$this->save()){
+//            AppUtility::dump($this->getErrors());
+        }
         return $this->id;
     }
 

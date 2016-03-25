@@ -38,7 +38,7 @@ $stu = $data['defaultValuesArray']['studentId']
         <div class = "pull-left page-heading">
             <div class = "vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <?php if($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)){?>
+        <?php if($isTeacher || ($isTutor || $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)){?>
         <div class = "pull-left header-btn gradebook-header-links">
             <div class = "pull-right">
                 <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-settings?cid=' . $course->id); ?>" class="btn btn-primary">

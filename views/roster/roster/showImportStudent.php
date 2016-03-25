@@ -168,10 +168,9 @@ $this->title = 'Show imported students details';
     function saveCsvFileSuccess(response)
     {
         var courseId = $("#course-id").val();
-
         if(status == 0)
         {
-             window.location = "student-roster?cid="+courseId;
+            window.location = "student-roster?cid="+courseId;
         }
     }
 
