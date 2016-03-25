@@ -209,7 +209,7 @@ if ($line['endtime'] == 0) {
     echo "<div class='col-md-12 col-sm-12 padding-top-five'>Last change: " . AppUtility::tzdate("F j, Y, g:i a", $line['endtime']) . "</div>";
     $timespent = round(($line['endtime'] - $line['starttime']) / 60);
     if ($timespent < 250) {
-        echo "Time spent: " . $timespent . " minutes<br/>\n";
+        echo "<div class='col-md-12 col-sm-12 padding-top-five'>Time spent: " . $timespent . " minutes<br/></div>\n";
     }
     $timeontask = array_sum(explode(',', str_replace('~', ',', $line['timeontask'])));
     if ($timeontask > 0) {
@@ -225,7 +225,7 @@ if ($exceptionData['enddate']) {
     }
 }
 
-if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+if ($isteacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
     if (($exped) && $exped != $line['enddate']) {
         echo "<div>Has exception, with due date: " . AppUtility::tzdate("F j, Y, g:i a", $exped);
         echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
@@ -249,7 +249,7 @@ if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT
 <form id="mainform" method=post
       action="gradebook-view-assessment-details?stu=<?php echo $stu ?>&cid=<?php echo $course->id ?>&from=<?php echo $from ?>&asid=<?php echo $asid ?>&update=true">
 
-<?php if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
+<?php if ($isteacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
 
     <div class="col-md-12 col-sm-12 gradebook-view-assessment-link mobile-padding-bottom-one-pt-five-em">
         <div class="col-md-2 col-sm-3 padding-top-one-pt-five-em">

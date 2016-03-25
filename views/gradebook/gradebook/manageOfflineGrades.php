@@ -153,19 +153,19 @@ $this->title = 'Manage Offline Grades';
                      <td>
                          <div class="col-sm-12 col-md-12 padding-left-zero" id="always-replies-radio-list">
                              <span class="col-sm-12 col-md-12 padding-left-zero margin-left-ten padding-top-ten">
-                                 <input type="radio" name="count" checked value="1">
+                                 <input type="radio" name="cntingb" checked value="1">
                                  <span class="margin-left-five"><?php AppUtility::t('Count in Gradebook')?></span>
                              </span>
                              <span class="col-sm-12 col-md-12 padding-left-zero margin-left-ten margin-top-ten">
-                                <input type="radio" name="count" value="2">
+                                <input type="radio" name="cntingb" value="0">
                                  <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total and hide from students")?></span>
                              </span>
                              <span class="col-sm-12 col-md-12 padding-left-zero margin-left-ten margin-top-ten">
-                                <input type="radio" name="count" value="3">
+                                <input type="radio" name="cntingb" value="3">
                                  <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total")?></span>
                              </span>
                              <span class="col-sm-12 col-md-12 padding-left-zero margin-left-ten margin-top-ten padding-bottom-ten">
-                                 <input type="radio" name="count" value="4">
+                                 <input type="radio" name="cntingb" value="2">
                                  <span class="margin-left-five"><?php AppUtility::t('Count as Extra Credit')?></span>
                              </span>
                          </div>

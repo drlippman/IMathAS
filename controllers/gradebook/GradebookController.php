@@ -2032,7 +2032,6 @@ class GradebookController extends AppController
         $this->guestUserHandler();
         $currentUser = $this->user;
         $courseId = $this->getParamVal('cid');
-
         $gropuId = 0;
         $this->layout = 'master';
         $params = $this->getRequestParams();
@@ -2619,8 +2618,8 @@ class GradebookController extends AppController
                         $isCheckBoxChecked = true;
                     }
                     if ($params['count-check'] == 1) {
-                        $countValue = $params['count'];
-                        if ($countValue) {
+                        $countValue = $params['cntingb'];
+                        if (count($countValue)>0){
                             $temp = 2;
                             GbItems::updateGrade($gradeId, $countValue, $temp);
                         }
