@@ -2,7 +2,8 @@
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
-$this->title = AppUtility::t('Diagnostic Grade Book', false); ?>
+$this->title = AppUtility::t('Diagnostic Grade Book', false);
+?>
 
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
@@ -174,7 +175,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
         }
         echo '<td class="locked" scope="row">'; ?>
-         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$cid.'&studentId='.$gbt[$i][4][0]);?> ">
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$cid.'&studentId='.$gbt[$i][4][0]);?> "></a>
         <?php echo $gbt[$i][0][0];
         echo '</a></td>';
         for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
@@ -197,7 +198,7 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
             if ($gbt[0][1][$j][6]==0) {//online
                 if (isset($gbt[$i][1][$j][0])) {
                     if ($gbt[$i][1][$j][4]=='average') { ?>
-                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/itemanalysis?stu='.$stu.'&cid='.$cid.'&asid='.$gbt[$i][1][$j][4].'&aid='.$gbt[0][1][$j][7]);?>">
+                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/itemanalysis?stu='.$stu.'&cid='.$cid.'&asid='.$gbt[$i][1][$j][4].'&aid='.$gbt[0][1][$j][7]);?>"></a>
                   <?php  } else { ?>
                          <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$cid.'&asid='.$gbt[$i][1][$j][4].'&uid='.$gbt[$i][4][0]);?> ">
                     <?php }
@@ -227,10 +228,10 @@ function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
                 if ($isteacher) {
                     if ($gbt[$i][0][0]=='Averages') { ?>
                         <br>
-                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$j][7]); ?>" >
+                             <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$j][7]); ?>" ></a>
                     <?php } else { ?>
                         <br>
-                                 <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7]);?>" >
+                                 <a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7]);?>" ></a>
                     <?php }
                 }
                 if (isset($gbt[$i][1][$j][0])) {

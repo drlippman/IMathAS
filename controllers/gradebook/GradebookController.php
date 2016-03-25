@@ -79,8 +79,8 @@ class GradebookController extends AppController
         $this->setSessionData('messageCount', $msgList);
         $this->setSessionData('postCount', $countPost);
         $course = Course::getById($courseId);
-        $isTeacher = $this->isTeacher($user['id'], $courseId);
-        $isTutor = $this->isTutor($user['id'], $courseId);
+        $isteacher = $this->isTeacher($user['id'], $courseId);
+        $istutor = $this->isTutor($user['id'], $courseId);
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
         if (isset($params['refreshdef']) && isset($sessionData[$courseId.'catcollapse'])) {
@@ -97,13 +97,13 @@ class GradebookController extends AppController
             $sessionData[$courseId.'catcollapse'] = $overridecollapse;
             AppUtility::writesessiondata($sessionData,$sessionId);
         }
-        if ($isTeacher) {
-            $isTeacher = true;
+        if ($isteacher) {
+            $isteacher = true;
         }
-        if ($isTutor) {
-            $isTutor = true;
+        if ($istutor) {
+            $istutor = true;
         }
-        if ($isTeacher || $isTutor) {
+        if ($isteacher || $istutor) {
             $canviewall = true;
         } else {
             $canviewall = false;
@@ -113,13 +113,12 @@ class GradebookController extends AppController
         $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
         $this->includeJS(['general.js', 'gradebook/gradebook.js','gradebook/tablescroller2.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course,'overridecollapse' => $overridecollapse, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData,
-        'isTeacher' => $isTeacher, 'stu' => $stu, 'isTutor' => $isTutor);
+        'isTeacher' => $isteacher, 'stu' => $stu, 'isTutor' => $istutor);
         return $this->renderWithData('gradebook', $responseData);
     }
 
-    public function gbtable($userId, $courseId, $studentId = null)
-    {
-        global $get,$timefilter,$lnfilter,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport,$sel1name, $sel2name, $canviewall, $courseId,$isTutor, $isTeacher, $userId,$catfilter;
+    public function gbtable($userId, $courseId, $studentId = null) {
+        global $get,$timefilter,$lnfilter,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport,$sel1name, $sel2name, $canviewall, $courseId,$istutor, $isteacher, $userId,$catfilter, $isdiag;
         $params = $get;
 //        $teacherid = Teacher::getByUserId($userId, $courseId);
         $teacherid = $this->isTeacher($userId, $courseId);
@@ -127,13 +126,14 @@ class GradebookController extends AppController
         $tutorid = $this->isTutor($userId, $courseId);
         $tutorsection = trim($tutorid->section);
         $sectionQuery = Student::findDistinctSection($courseId);
-        $istutor = false;
-        $isteacher = false;
+//        $istutor = false;
+//        $isteacher = false;
         if (($teacherid)) { $isteacher = true;}
         if (($tutorid)) { $istutor = true;}
         /*
          * Assign tutor value false temparary
          */
+
         $sessionId = $this->getSessionId();
         if ($isteacher || $istutor) {
             $canviewall = true;
@@ -144,6 +144,7 @@ class GradebookController extends AppController
         } else {
             $canviewall = false;
         }
+
         if ($canviewall)
         {
             $sessionData = $this->getSessionData($sessionId);
@@ -228,6 +229,7 @@ class GradebookController extends AppController
 
         }
         $isdiag = false;
+
         if ($canviewall) {
             $query = Diags::findByCourseID($courseId);
             if ($query) {
@@ -248,15 +250,6 @@ class GradebookController extends AppController
             $stu = AppConstant::NUMERIC_ZERO;
         }
 
-        $isdiag = false;
-        if ($canviewall) {
-            $query = Diags::findByCourseID($courseId);
-            if ($query) {
-                $isdiag = true;
-                $sel1name = $query->sel1name;
-                $sel2name = $query->sel2name;
-            }
-        }
         if ($canviewall && func_num_args() > AppConstant::NUMERIC_TWO) {
             $limuser = $studentId;
         } else if (!$canviewall) {
@@ -2607,7 +2600,6 @@ class GradebookController extends AppController
             $key++;
         }
         if ($this->isPostMethod())   {
-
             $tempArray = array();
             if ($params['grade-name-check']) {
                 $c = 0;
@@ -2915,7 +2907,7 @@ class GradebookController extends AppController
     public function actionGradeBookStudentDetail()
     {
         global $get,$courseId;
-        global $get, $sel1name, $sel2name, $canviewall,$courseId,$isTeacher, $isTutor,$userId;
+        global $get, $sel1name, $sel2name, $canviewall,$courseId,$isteacher, $istutor,$userId;
 
         $params = $this->getRequestParams();
         $get = $params;
@@ -2925,8 +2917,8 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $currentUser = $this->user;
         $StudentData = Student::getDataForGradebook($userId,$courseId);
-        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
-        $isTutor = $this->isTutor($currentUser['id'],$courseId);
+        $isteacher = $this->isTeacher($currentUser['id'],$courseId);
+        $istutor = $this->isTutor($currentUser['id'],$courseId);
         $isStudent = $this->isStudent($currentUser['id'],$courseId);
         $isLocked = $this->isLocked($currentUser['id'], $courseId);
         $canviewall = false;
@@ -2936,13 +2928,13 @@ class GradebookController extends AppController
             $this->setErrorFlash('Invalid student id');
 //        return $this->redirect('grade-book-student-detail?cid='.$courseId. '&studentId='.$studentId);
         }
-        if (($isTeacher)) {
-            $isTeacher = true;
+        if (($isteacher)) {
+            $isteacher = true;
         }
-        if (($isTutor)) {
-            $isTutor = true;
+        if (($istutor)) {
+            $istutor = true;
         }
-        if ($isTeacher || $isTutor) {
+        if ($isteacher || $istutor) {
             $canviewall = true;
         } else {
             $canviewall = false;
@@ -3003,7 +2995,7 @@ class GradebookController extends AppController
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css','gradebook.css']);
         $this->includeJS(['general.js', 'jquery.dataTables.min.js','dataTables.bootstrap.js','gradebook/manageofflinegrades.js', 'gradebook/gradebookstudentdetail.js']);
-        $responseData = array('isteacher' => $isTeacher,'studentId' => $studentId,'gbmode' => $gbmode,'canviewall'=> $canviewall, 'isTutor' => $isTutor, 'totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData, 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation,
+        $responseData = array('isteacher' => $isteacher,'studentId' => $studentId,'gbmode' => $gbmode,'canviewall'=> $canviewall, 'isTutor' => $istutor, 'totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData, 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation,
         'isStudent' => $isStudent);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
     }
@@ -3132,7 +3124,7 @@ class GradebookController extends AppController
 
     public function actionGradebookViewAssessmentDetails()
     {
-        global $isTeacher, $isTutor,$lastanswers;
+        global $isteacher, $istutor,$lastanswers;
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $currentUser = $this->user;
@@ -3141,17 +3133,17 @@ class GradebookController extends AppController
         $teacherid = Teacher::getByUserId($currentUser['id'], $courseId);
         $tutorid = Tutor::getByUserId($currentUser['id'], $courseId);
         if ($teacherid) {
-            $isTeacher = true;
+            $isteacher = true;
         }
         if ($tutorid) {
-            $isTutor = true;
+            $istutor = true;
         }
         $asid = intval($params['asid']);
-        if (!($params['uid']) && !$isTeacher && !$isTutor) {
+        if (!($params['uid']) && !$isteacher && !$istutor) {
             $params['uid'] = $currentUser['id'];
         }
 
-        if ($isTeacher || $isTutor) {
+        if ($isteacher || $istutor) {
             if (isset($sessionData[$courseId . 'gbmode'])) {
                 $gbmode = $sessionData[$courseId . 'gbmode'];
             } else {
@@ -3186,8 +3178,8 @@ class GradebookController extends AppController
         } else {
             $assessmentId = $params['asid'];
         }
-        $assessmentData = Assessments::getByCourseIdJoinWithSessionData($assessmentId, $params['uid'], $isTeacher, $isTutor);
-        if (!$isTeacher && !$isTutor) {
+        $assessmentData = Assessments::getByCourseIdJoinWithSessionData($assessmentId, $params['uid'], $isteacher, $istutor);
+        if (!$isteacher && !$istutor) {
             $rv = new ContentTrack;
             $rv->insertFromGradebook($currentUser->id, $courseId, 'gbviewasid', $assessmentData['assessmentid'], time());
         }
@@ -3198,12 +3190,12 @@ class GradebookController extends AppController
             '1' => $studentUserData->LastName,
             '2' => $student->timelimitmult,
         );
-        if ($isTeacher || ($isTutor && $assessmentData['tutoredit'] == 1) || ($isTutor && $currentUser['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+        if ($isteacher || ($istutor && $assessmentData['tutoredit'] == 1) || ($isTutor && $currentUser['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
             $canedit = 1;
         } else {
             $canedit = 0;
         }
-        if ($asid=="new" && $isTeacher)
+        if ($asid=="new" && $isteacher)
         {
             //student could have started, so better check to make sure it still doesn't exist
             $aid = $params['aid'];
@@ -3237,7 +3229,7 @@ class GradebookController extends AppController
             $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
         }
 
-        if (($isTeacher || $isTutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
+        if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
             if ($assessmentData['agroupid']>0)
             {
                 $groupMembers = AssessmentSession::getUserForGradebook($aid,$assessmentData['agroupid']);
@@ -3277,12 +3269,12 @@ class GradebookController extends AppController
         $countOfQuestion = Questions::numberOfQuestionByIdAndCategory($assessmentData['assessmentid']);
         if ($assessmentSessionData['agroupid']) {
             $pers = 'group';
-            $studentNameWithAssessmentName = $this->getconfirmheader(true, $isTeacher, $isTutor, $currentUser, $params);
+            $studentNameWithAssessmentName = $this->getconfirmheader(true, $isteacher, $istutor, $currentUser, $params);
         } else {
             $pers = 'student';
-            $studentNameWithAssessmentName = $this->getconfirmheader(false, $isTeacher, $isTutor, $currentUser, $params);
+            $studentNameWithAssessmentName = $this->getconfirmheader(false, $isteacher, $istutor, $currentUser, $params);
         }
-        if (isset($_GET['starttime']) && $isTeacher)
+        if (isset($_GET['starttime']) && $isteacher)
         {
             $agroupid = $assessmentSessionData['agroupid'];
             $aid= $assessmentSessionData['assessmentid'];
@@ -3335,7 +3327,7 @@ class GradebookController extends AppController
                 }
             }
         }
-        if (isset($params['breakfromgroup']) && isset($params['asid']) && $isTeacher) {
+        if (isset($params['breakfromgroup']) && isset($params['asid']) && $isteacher) {
             if ($params['breakfromgroup'] == "confirmed")
             {
                 StuGroupMembers::removeGrpMember($assessmentSessionData['userid'], $assessmentSessionData['agroupid']);
@@ -3350,7 +3342,7 @@ class GradebookController extends AppController
                 return $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$courseId.'&uid='.$params['uid']);
             }
         }
-        if (isset($params['clearscores']) && isset($params['asid']) && $isTeacher) {
+        if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
             if ($_GET['clearscores'] == "confirmed")
             {
 
@@ -3406,7 +3398,7 @@ class GradebookController extends AppController
 
 
         $oktorec = 2;
-        if ($isTeacher) {
+        if ($isteacher) {
             $oktorec = 1;
         } else if ($istutor) {
             $tutorEdit = Assessments::getByAssessmentId($assessmentSessionData['assessmentid']);
@@ -3415,7 +3407,7 @@ class GradebookController extends AppController
                 $oktorec = true;
             }
         }
-        if (isset($params['update']) && ($isTeacher || $isTutor) && $links==0)
+        if (isset($params['update']) && ($isteacher || $istutor) && $links==0)
         {
             if ($oktorec)
             {
@@ -3489,7 +3481,7 @@ class GradebookController extends AppController
             }
         }
 
-        if (isset($params['clearq']) && isset($params['asid']) && $isTeacher) {
+        if (isset($params['clearq']) && isset($params['asid']) && $isteacher) {
 
             if ($params['confirmed'] == "true")
             {
@@ -3581,7 +3573,7 @@ class GradebookController extends AppController
         if($links == 1){
             $currentData = User::getById($params['uid']);
             $assessmentAndAssessmentSessionData = AssessmentSession::getAssessmentData($params['asid']);
-            if (!$isTeacher && !$isTutor) {
+            if (!$isteacher && !$istutor) {
                 $contentTrack = new ContentTrack;
                 $contentTrack->insertFromGradebook($params['uid'],$course->id,'gbviewasid',$assessmentAndAssessmentSessionData['assessmentid'],time());
                 $questionIds = Questions::numberOfQuestionByIdAndCategory($assessmentAndAssessmentSessionData['assessmentid']);
@@ -3593,7 +3585,7 @@ class GradebookController extends AppController
         $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion, 'groupMembers' =>$groupMembers, 'librariesName' => $librariesName,
             'questionsData' => $questionsData,'questionsInformation' => $questionsInformation, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
             'assessmentData' => $assessmentData,';assessmentAndAssessmentSessionData' => $assessmentAndAssessmentSessionData,'canedit' => $canedit,'rubricsData' => $rubrics,
-            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds, 'isTeacher' => $isTeacher, 'isTutor' => $isTutor, 'user' => $currentUser);
+            'currentData' => $currentData, 'defaultValuesArray' => $defaultValuesArray,'questionIds' => $questionIds, 'isTeacher' => $isteacher, 'isTutor' => $istutor, 'user' => $currentUser);
         return $this->renderWithData('gradebookViewAssessmentDetails', $resposeData);
     }
 
@@ -4390,7 +4382,7 @@ class GradebookController extends AppController
     }
     public function actionGradebookTesting()
     {
-        global $get,$lnfilter,$timefilter,$courseId;
+        global $get,$lnfilter,$timefilter,$courseId,$canviewall,$isteacher,$istutor;
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $params = $this->getRequestParams();
@@ -4400,19 +4392,19 @@ class GradebookController extends AppController
         $teacherId = $this->isTeacher($currentUser['id'],$courseId);
         $tutorId = $this->isTutor($currentUser['id'],$courseId);
         if ($teacherId) {
-            $isTeacher = true;
+            $isteacher = true;
         }
         if ($tutorId) {
-            $isTutor = true;
+            $istutor = true;
         }
-        if ($isTeacher || $isTutor) {
+        if ($isteacher || $istutor) {
             $canviewall = true;
         } else {
             $canviewall = false;
         }
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
-        if ($isTeacher || $isTutor) {
+        if ($isteacher || $istutor) {
             if (isset($params['timefilter'])) {
                 $timefilter = $params['timefilter'];
                 $sessionData[$courseId.'timefilter'] = $timefilter;
@@ -4434,10 +4426,9 @@ class GradebookController extends AppController
         }
         $gradebookData = $this->gbtable($currentUser->id, $courseId);
         $studentsDistinctSection = Student::findDistinctSection($courseId);
-
         $this->includeCSS(['jquery.dataTables.css','gradebook.css','course/course.css' ]);
         $this->includeJS(['general.js','gradebook/gradebookstudentdetail.js','tablesorter.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
-        $responseData = array('studentsDistinctSection' => $studentsDistinctSection,'lnfilter' => $lnfilter,'timefilter' => $timefilter,'gradebookData' => $gradebookData,'isTeacher' => $isTeacher,'isTutor' => $isTutor,'course' => $course);
+        $responseData = array('studentsDistinctSection' => $studentsDistinctSection,'lnfilter' => $lnfilter,'timefilter' => $timefilter,'gradebookData' => $gradebookData,'isTeacher' => $isteacher,'isTutor' => $istutor,'course' => $course);
         return $this->renderWithData('gradebookTesting',$responseData);
     }
 
