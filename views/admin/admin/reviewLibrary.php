@@ -57,8 +57,8 @@ global $temp;
         ?>
         <form method=post action="review-library?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>">
             <?php echo $page_ConfirmMsg; ?>
-            <p><input type=submit name="confirm" value="Yes, I'm Sure">
-                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='review-library?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>'"></p>
+            <p><input type=submit name="confirm" value="Confirm">
+                <input type=button value="Cancel" class="secondarybtn" onclick="window.location='review-library?cid=<?php echo $cid ?>&source=<?php echo $source ?>&offset=<?php echo $offset ?>&lib=<?php echo $lib ?>'"></p>
         </form>
 
     <?php

@@ -81,7 +81,7 @@ function removeResponseSuccess(response) {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "Yes,Delete": function () {
+                "Confirm": function () {
                     window.location = "actions?action=removediag&id=" + id;
                 }
             },
@@ -165,7 +165,7 @@ function removeUserSuccess(response) {
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "Yes,Delete": function () {
+                "Confirm": function () {
                     window.location = "actions?action=deladmin&id=" + id;
                 }
             },

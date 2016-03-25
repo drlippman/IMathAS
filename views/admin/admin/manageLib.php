@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <input type=hidden name=remove value="<?php echo $rlist ?>">
                 <p>
                     <input type=submit value="Really Delete">
-                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
+                    <input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
                 </p>
             </form>
         <?php
@@ -82,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div></div><br class=form>
                 <p>
                     <input type=submit value="Set Parent">
-                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
+                    <input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
                 </p>
             </form>
         <?php
@@ -104,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </p>
             <p>
                 <input type=submit value="Really Delete">
-                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
             </p>
         </form>
         <?php
@@ -118,7 +118,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php AppUtility::writeHtmlSelect ("newowner",$page_newOwnerListVal,$page_newOwnerListLabel,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
             <p>
                 <input type=submit value="Transfer">
-                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
             </p>
         </form>
         <?php

@@ -145,7 +145,7 @@ $this->title = 'Show imported students details';
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
-                "confirm": function () {
+                "Confirm": function () {
                     $('#searchText').val(null);
                     $(this).dialog('destroy').remove();
                     jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData,courseId:courseId}, 'saveCsvFileSuccess');

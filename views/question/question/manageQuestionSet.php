@@ -108,7 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             <div class="col-md-12 col-sm-12 padding-top-fifteen padding-left-zero padding-left-one">
                 <input type=submit value="Transfer">
-                <input type=button value="Nevermind" class="margin-left-fifteen secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="margin-left-fifteen secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
                 </div>
         </form>
@@ -134,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-sm-12 col-md-12 padding-left-zero margin-top-ten margin-bottom-fifteen">
                 <input type=submit value="Make Changes">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
             </div>
         </form>
@@ -156,7 +156,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-12 col-sm-12">
                 <input type=submit value="Template Questions">
-                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
         </form>
     <?php
@@ -216,7 +216,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                     <div class="col-md-6 col-sm-6 margin-top-fifteen padding-left-zero">
                         <input type=submit value="Change License / Attribution">
-                        <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                        <input type=button value="Cancel" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
                     </div>
                 </div>
         </form>
@@ -244,7 +244,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type="hidden" name="qtochg" value="<?php echo $clist ?>">
             <div class="margin-top-fifteen">
                 <input type=submit value="Change Rights">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
             </div>
         </form>
@@ -257,7 +257,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type=hidden name=remove value="<?php echo $rlist ?>">
             <div class="margin-top-fifteen">
                 <input type=submit value="Really Delete">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
         </form>
     <?php
@@ -272,7 +272,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="col-md-12 col-sm-12 padding-top-fifteen padding-left-zero">
                 <input type=submit value="Transfer">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+                <input type=button value="Cancel" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
             </div>
                 </div>
         </form>

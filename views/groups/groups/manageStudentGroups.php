@@ -327,7 +327,7 @@ function deleteResponseSuccess(response)
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "Yes,Delete": function ()
+                "Confirm": function ()
                 {
                     window.location ="manage-student-groups?cid="+cid+"&deleteGrpSet="+deleteGrpSet+"&confirm=true";
                 }
@@ -376,7 +376,7 @@ function deleteGrpResponseSuccess(response)
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "Yes,Delete": function ()
+                "Confirm": function ()
                 {
                     var sel = $("#post-type-radio-list input[type='radio']:checked");
                     var selected = sel.val();

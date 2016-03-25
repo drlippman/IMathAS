@@ -75,7 +75,7 @@ switch ($action) {
         }
             echo "<p>Are you sure you want to delete this user?</p>\n";
         echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=deladmin&id=$getId'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></p>\n";
+        echo "<input type=button value=\"Cancel\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></p>\n";
         break;
         break;
     case "chgpwd":
@@ -966,7 +966,7 @@ switch ($action) {
         echo '<div class=""><br>';
         echo "<div class='col-md-10 col-sm-10'>" . AppUtility::t('Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.', false) . "</div><br>\n";
         echo "<br> <div class='col-md-6 col-sm-6 padding-left-zero'><div class='col-md-2 col-sm-2'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\"></div>\n";
-        echo "<div class='col-md-2 col-sm-2 padding-left-zero'><input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
+        echo "<div class='col-md-2 col-sm-2 padding-left-zero'><input type=button value=\"Cancel\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
         echo '</div>';
         break;
 }
