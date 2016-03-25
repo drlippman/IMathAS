@@ -613,18 +613,18 @@ function AMpreview(inputId,outputId) {
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
    var dispstr = str;
-  var foundaltcap = false; 
+  var foundaltcap = []; 
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
 		  str = str.replace("E","varE");	
 	  } else {
-	  	foundaltcap = false;
+	  	foundaltcap[i] = false;
 	  	for (var j=0; j<vars.length; j++) {
 	  		if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
-	  			foundaltcap = true;
+	  			foundaltcap[i] = true;
 	  			break;
 	  		}
-	  		if (!foundaltcap) {
+	  		if (!foundaltcap[i]) {
 	  			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
 	  		}
 	  	}
@@ -645,7 +645,7 @@ function AMpreview(inputId,outputId) {
   }
  
   //quote out multiletter variables
-  var varstoquote = new Array();
+  var varstoquote = new Array(); var regmod;
   for (var i=0; i<vars.length; i++) {
 	  if (vars[i].length>1) {
 		  var isgreek = false;
@@ -656,8 +656,14 @@ function AMpreview(inputId,outputId) {
 			  }
 		  }
 		  if (!isgreek && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
-		  	var varpts = vars[i].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
-		  	dispstr = dispstr.replace(varpts[0], '"'+varpts[1]+'"_"'+varpts[2]+'"');
+		  	if (!foundaltcap[i]) {
+		  		regmod = "gi";
+		  	} else {
+		  		regmod = "g";
+		  	}
+		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
+		  	var varpts = new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod).exec(vars[i]);
+		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), '"'+varpts[1]+'"_"'+varpts[2]+'"');
 		  	str = str.replace(varpts[0], "repvars"+i);
 		  	vars[i] = "repvars"+i;
 		  }
@@ -1030,9 +1036,11 @@ function doonsubmit(form,type2,skipconfirm) {
 				  str = str.replace("E","varE");	
 			  } else {
 				foundaltcap = false;
-				if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
-					foundaltcap = true;
-					break;
+				for (var j=0; j<vars.length; j++) {
+					if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+						foundaltcap = true;
+						break;
+					}
 				}
 				if (!foundaltcap) {
 					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
