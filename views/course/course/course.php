@@ -21,12 +21,12 @@ $groupAdmin = $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
 if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
     ?>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$curBreadcrumb], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
     </div>
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+                <div class="vertical-align title-page"><?php echo $curName ?></div>
             </div>
         </div>
     </div>
@@ -36,12 +36,12 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
 <?php }else if ((($teacherId) || ($isTutor && ($user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)))) {
     ?>
     <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false),$curBreadcrumb], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
     </div>
     <div class = "title-container padding-bottom-two-em">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page word-wrap-break-word"><?php echo $this->title ?></div>
+                <div class="vertical-align title-page word-wrap-break-word"><?php echo $curName; ?></div>
             </div>
             <?php if($user['rights'] >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT){?>
             <div class="pull-left header-btn">
@@ -62,7 +62,7 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $curBreadcrumb; ?></div>
+            <div class="vertical-align title-page"><?php echo $curName; ?></div>
         </div>
     </div>
 </div>

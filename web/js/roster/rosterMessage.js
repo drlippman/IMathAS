@@ -2,6 +2,15 @@ $(document).ready(function () {
     initEditor();
     validateForm();
 });
+
+function showBodyScroll() {
+    jQuery('html, body').css('overflow', 'auto');
+}
+
+function hideBodyScroll() {
+    jQuery('html, body').css('overflow', 'hidden');
+}
+
 function validateForm(){
     $('#message-button').click(function() {
         tinyMCE.triggerSave();

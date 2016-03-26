@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
         <div class="col-md-12 col-sm-12 padding-left-zero margin-top-fifteen padding-right-zero">
             <div class="col-md-2 col-sm-2 select-text-margin"><b><?php AppUtility::t('Subject')?></b></div>
-            <div class="col-md-10 col-sm-10"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></div>
+            <div class="col-md-10 col-sm-10"><?php echo '<input class="textbox subject form-control" type="text" name="subject" maxlength="60">'; ?></div>
         </div>
         <div class="col-md-12 col-sm-12 padding-left-zero margin-top-twenty padding-right-zero">
             <div class="col-md-2 col-sm-2"><b><?php AppUtility::t('Message')?></b></div>

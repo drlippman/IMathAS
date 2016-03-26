@@ -278,11 +278,10 @@ function pass(){
     alert(courseId);
     jQuerySubmit('get-assessment-pass-ajax', {cid:courseId}, 'removePassSuccess');
 }
-    function removePassSuccess(response) {
-    response=JSON.parse(response);
-   if (response.status == 0) {
+    response=JSON.parse(response);    function removePassSuccess(response) {
+
+            if (response.status == 0) {
        var passwords=response.assessmentArray;
-       console.log(passwords);
     var html="<input type='text' class='pass1' placeholder='noting'>"
     jQuery('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Enter the password', zIndex: 10000, autoOpen: true,

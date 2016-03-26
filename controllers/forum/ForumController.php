@@ -1994,7 +1994,7 @@ class ForumController extends AppController
                 if($forumDataId->errors['name'])
                 {
                     $this->setErrorFlash('Forum name can not be blank.');
-                    return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/add-forum?cid='.$courseId.'block='.$block.'&tb='.$tb));
+                    return $this->redirect(AppUtility::getURLFromHome('forum', 'forum/add-forum?cid='.$courseId.'&block='.$block.'&tb='.$tb));
                 }
                 $forumId = $forumDataId['id'];
                 $itemType = 'Forum';

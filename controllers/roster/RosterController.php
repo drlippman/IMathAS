@@ -670,8 +670,9 @@ class RosterController extends AppController
             }
                 if ($filename)
                 {
-
-                    $this->redirect(array('show-import-student', 'courseId' => $courseId,'newUser' => $newUser,'existingUser' => $existingUser));
+                    $responseData = array('courseId' => $courseId,'newUser' => $newUser,'existingUser' => $existingUser);
+                    $_SESSION['responseData']=$responseData;
+                    $this->redirect('show-import-student', $responseData);
                 }
             } else {
                 $this->setErrorFlash(AppConstant::ADD_AT_LEAST_ONE_RECORD);
@@ -806,7 +807,7 @@ class RosterController extends AppController
     {
         global $a;
         $this->guestUserHandler();
-        $studentInformation = $this->getRequestParams();
+        $studentInformation = $_SESSION['responseData'];
         $isCodePresent = false;
         $isSectionPresent = false;
         $this->layout = "master";
@@ -859,7 +860,7 @@ class RosterController extends AppController
             $this->setSuccessFlash(AppConstant::STUDENT_EXISTS);
             return $this->redirect('import-student?cid='.$courseId);
         }
-
+        unset ($_SESSION['responseData']);
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/importstudent.js', 'general.js']);
         $responseData = array( 'uniqueStudents' => $uniqueStudentsForNewStudent,'existingStudent' => $uniqueStudentsForExistingStudent, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'duplicateStudents' => $duplicateStudentsForNewStudent,'course' => $course);

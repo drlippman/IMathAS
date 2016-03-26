@@ -61,17 +61,19 @@ function CommonPopUp(message)
         buttons: {
             "Ok": function () {
                 jQuery('#searchText').val(null);
-
+                showBodyScroll();
                 jQuery(this).dialog('destroy').remove();
                 return false;
             }
         },
         open: function(){
+            hideBodyScroll();
             jQuery('.ui-widget-overlay').bind('click',function(){
                 jQuery('#dialog').dialog('close');
             })
         },
         close: function (event, ui) {
+            showBodyScroll();
             jQuery(this).remove();
         }
 
