@@ -36,7 +36,7 @@ $(document).ready(function () {
                 } else if(subject != '')
                 {
                     $('.subject-error-message').removeClass("subject-error-message");
-                    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+                    jQuerySubmit('send-message-ajax',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
                 }
             }
             else

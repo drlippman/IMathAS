@@ -162,7 +162,7 @@ function markSentDelete()
                         uncheckAllCheckbox(true);
                         $(this).dialog("close");
                         var readMsg = {checkedMsgs: markArray};
-                        jQuerySubmit('mark-sent-remove-ajax', readMsg, 'successSentDelete');
+                        jQuerySubmit('sent-mark-as-delete-ajax', readMsg, 'successSentDelete');
                         return true;
                     }
                 },

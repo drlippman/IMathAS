@@ -78,7 +78,6 @@ class AssessmentController extends AppController
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $teacherId = $this->isTeacher($user['id'], $courseId);
-//        $this->noValidRights($teacherId);
         $block = $this->getParamVal('block');
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
@@ -1235,7 +1234,7 @@ class AssessmentController extends AppController
                 }
             }
             if ($assessmentclosed) {
-                $temp .= '<p>' . 'This assessment is closed2' . '</p>';
+                $temp .= '<p>' . 'This assessment is closed' . '</p>';
                 if ($adata['avail'] > 0) {
                     $viewedassess = array();
                     if ($adata['enddate'] < $now && $adata['allowlate'] > 10 && !$actas && !isset($sessiondata['stuview'])) {

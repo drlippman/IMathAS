@@ -326,9 +326,9 @@ class AppUtility extends Component
             $tmatches[3] = $tmatches[2];
             $tmatches[2] = AppConstant::NUMERIC_ZERO;
         }
-        $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_ELEVEN;
+        $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_TWELVE;
         if ($tmatches[3] == "pm") {
-            $tmatches[1] += AppConstant::NUMERIC_ELEVEN;
+            $tmatches[1] += AppConstant::NUMERIC_TWELVE;
         }
         $deftime = $tmatches[1] * AppConstant::SECONDS + $tmatches[2];
 
@@ -338,9 +338,9 @@ class AppUtility extends Component
             $tmatches[3] = $tmatches[2];
             $tmatches[2] = AppConstant::NUMERIC_ZERO;
         }
-        $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_ELEVEN;
+        $tmatches[1] = $tmatches[1] % AppConstant::NUMERIC_TWELVE;
         if ($tmatches[3] == "pm") {
-            $tmatches[1] += AppConstant::NUMERIC_ELEVEN;
+            $tmatches[1] += AppConstant::NUMERIC_TWELVE;
         }
         $deftime += AppConstant::NUMERIC_TEN_THOUSAND * ($tmatches[1] * AppConstant::SECONDS + $tmatches[2]);
         return $deftime;

@@ -1239,6 +1239,7 @@ class ForumController extends AppController
 
                             } else {
                                 $grade = array(
+
                                     'gradetype' => 'forum',
                                     'gradetypeid' => $forumId,
                                     'userid' => $userId,

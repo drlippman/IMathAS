@@ -293,7 +293,7 @@ function changeImage(element, temp, rowId) {
         element.bln = !element.bln;
     }
     var row = {rowId: rowId};
-    jQuerySubmit('change-image-ajax', row,{ });
+    jQuerySubmit('toggle-tagged-ajax', row,{ });
 }
 
 var picsize = 0;

@@ -153,7 +153,7 @@ class MessageController extends AppController
     /*
      * Ajax call method for sending the message.
      */
-    public function actionConfirmMessage()
+    public function actionSendMessageAjax()
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
@@ -533,7 +533,7 @@ class MessageController extends AppController
     /*
      *  Ajax call method to remove  message form outbox
      */
-    public function actionMarkSentRemoveAjax()
+    public function actionSentMarkAsDeleteAjax()
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
@@ -715,7 +715,7 @@ class MessageController extends AppController
     /*
      * Ajax call method to mark flag as important
      */
-    public function actionChangeImageAjax()
+    public function actionToggleTaggedAjax()
     {
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];

@@ -1248,7 +1248,6 @@ class AdminController extends AppController
                 }
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/course?cid='.$params['id']));
             } else {
-
                 $blockcnt = AppConstant::NUMERIC_ONE;
                 $itemorder =  serialize(array());
                 $query = new Course();

@@ -75,7 +75,7 @@ function changeImage(element, temp, rowId)
 {
 
     var row = {rowId: rowId};
-    jQuerySubmit('change-image-ajax', row,'responseOfUpdateFlag');
+    jQuerySubmit('toggle-tagged-ajax', row,'responseOfUpdateFlag');
 }
 
 function responseOfUpdateFlag()
