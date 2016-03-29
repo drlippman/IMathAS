@@ -3,6 +3,7 @@ $(document).ready(function () {
     selectCheckBox();
     deleteGrade();
     selectCheckBoxForGradeName();
+    courseid = $("#courseid").val();
 });
 
 function selectCheckBoxForGradeName() {
@@ -43,7 +44,7 @@ function deleteGrade() {
             markArray.push($(this).val());
         });
         if (markArray.length != 0) {
-            var html = '<div><p>Are you SURE you want to delete these offline grade items and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first..</p></div>';
+            var html = '<div><p>Are you SURE you want to delete these offline grade items and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first.</p></div>';
             var cancelUrl = $(this).attr('href');
             e.preventDefault();
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
@@ -90,5 +91,5 @@ function deleteGrade() {
 
 function gradeDeleteSuccess(response)
 {
-    location.reload();
+    window.location = "gradebook?cid="+courseid;
 }

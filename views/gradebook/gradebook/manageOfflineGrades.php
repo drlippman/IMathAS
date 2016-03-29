@@ -14,6 +14,7 @@ $this->title = 'Manage Offline Grades';
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 <form method=post action="manage-offline-grades?cid=<?php echo $course->id ?>">
+<input type="hidden" id="courseid" value="<?php echo $course->id?>">
 <div class="title-container padding-bottom-two-em">
     <div class="row margin-bottom-ten">
         <div class="pull-left page-heading">

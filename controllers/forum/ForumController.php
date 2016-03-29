@@ -298,7 +298,7 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $currentUser = $this->user;
         $threadsperpage = $currentUser['listperpage'];
-        $forumId = $params['forum'];
+        $forumId = $this->getParamVal('forumid');
         $courseId = $params['cid'];
         $cid = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
@@ -320,7 +320,8 @@ class ForumController extends AppController
         } else {
             $isteacher = false;
         }
-        if($this->isPostMethod()){
+
+//        if($this->isPostMethod()){
 
         $forumData = Forums::getById($forumId);
         if (($isteacher || isset($tutorId)) && isset($params['score'])) {
@@ -384,7 +385,7 @@ class ForumController extends AppController
             }
         }
 
-        }
+//        }
         $forumname = $forumData['name'];
         $postby = $forumData['postby'];
         $forumsettings = $forumData['settings'];
