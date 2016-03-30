@@ -21,7 +21,7 @@ $pers = $defaultValuesArray['pers'];
 $stu = $params['stu'];
 
 //PROCESS ANY TODOS
-if (isset($params['clearattempt']) && isset($params['asid']) && $isTeacher) {
+if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
 
     if ($params['clearattempt'] == "true") {
         $isgroup = $defaultValuesArray['groupId'];
@@ -43,7 +43,7 @@ if (isset($params['clearattempt']) && isset($params['asid']) && $isTeacher) {
     }
 }
 
-if (isset($params['breakfromgroup']) && isset($params['asid']) && $isTeacher) {
+if (isset($params['breakfromgroup']) && isset($params['asid']) && $isteacher) {
     if ($params['breakfromgroup'] == "confirmed") {
     } else {
         echo $defaultValuesArray['studentNameWithAssessmentName'];
@@ -59,7 +59,7 @@ if (isset($params['breakfromgroup']) && isset($params['asid']) && $isTeacher) {
     }
 }
 
-if (isset($params['clearscores']) && isset($params['asid']) && $isTeacher) {
+if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
     if ($_GET['clearscores'] == "true") {
         $isgroup = $defaultValuesArray['groupId'];
         if ($isgroup) {
@@ -115,9 +115,9 @@ if ($links == 0) { //View/Edit full assessment
 $coursetheme = 'default.css';
 $useeditor = 'review';
 $sessiondata['coursetheme'] = $coursetheme;
-$sessiondata['isteacher'] = $isTeacher;
+$sessiondata['isteacher'] = $isteacher;
 
-if ($isTeacher || $isTutor) {
+if ($isteacher || $istutor) {
     $placeinhead = '<script type="text/javascript" src="' . AppUtility::getBasePath() . '/web/js/gradebook/rubric.js?v=070113"></script>';
 
 }
@@ -143,10 +143,10 @@ $line = $assessmentData;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php if($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+    <?php if($isteacher || ($istutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
         echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']);
-    } elseif($isTutor || $isStudent){
-        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $isTutor]);
+    } elseif($istutor || $isStudent){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook', 'userId' => $currentUser , 'isTutor'=> $istutor]);
     }?>
 </div>
 <?php
@@ -180,14 +180,14 @@ if ($canedit) {
 }
 
 list($testtype, $showans) = explode('-', $line['deffeedback']);
-if ($showans == 'N' && !$isTeacher && !$isTutor) {
+if ($showans == 'N' && !$isteacher && !$istutor) {
     echo "You shouldn't be here";
     exit;
 }
 echo "<h4 class='col-md-12 col-sm-12 margin-top-zero'>{$line['name']}</h4>\n";
 $aid = $line['assessmentid'];
 
-if (($isTeacher || $isTutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
+if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
     if ($line['agroupid'] > 0) {
 
         echo "<p>Group members: <ul>";
@@ -209,7 +209,7 @@ if ($line['endtime'] == 0) {
     echo "<div class='col-md-12 col-sm-12 padding-top-five'>Last change: " . AppUtility::tzdate("F j, Y, g:i a", $line['endtime']) . "</div>";
     $timespent = round(($line['endtime'] - $line['starttime']) / 60);
     if ($timespent < 250) {
-        echo "<div class='col-md-12 col-sm-12 padding-top-five'>Time spent: " . $timespent . " minutes<br/></div>\n";
+        echo "Time spent: " . $timespent . " minutes<br/>\n";
     }
     $timeontask = array_sum(explode(',', str_replace('~', ',', $line['timeontask'])));
     if ($timeontask > 0) {
@@ -225,7 +225,7 @@ if ($exceptionData['enddate']) {
     }
 }
 
-if ($isteacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+if ($isteacher || ($istutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
     if (($exped) && $exped != $line['enddate']) {
         echo "<div>Has exception, with due date: " . AppUtility::tzdate("F j, Y, g:i a", $exped);
         echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
@@ -236,7 +236,7 @@ if ($isteacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT
     }
     echo "</div>";
 }
-if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+if ($isteacher || ($istutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
     if ($line['agroupid'] > 0) {
         echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. "; ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&cid=' . $course->id . '&asid=' . $params['asid'] . '&from=' . $from . '&uid=' . $params['uid'] . '&breakfromgroup=true'); ?> ">Separate
@@ -249,7 +249,7 @@ if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT
 <form id="mainform" method=post
       action="gradebook-view-assessment-details?stu=<?php echo $stu ?>&cid=<?php echo $course->id ?>&from=<?php echo $from ?>&asid=<?php echo $asid ?>&update=true">
 
-<?php if ($isteacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
+<?php if ($isteacher || ($istutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) { ?>
 
     <div class="col-md-12 col-sm-12 gradebook-view-assessment-link mobile-padding-bottom-one-pt-five-em">
         <div class="col-md-2 col-sm-3 padding-top-one-pt-five-em">
@@ -294,7 +294,7 @@ if (($line['timelimit'] > 0) && ($line['endtime'] - $line['starttime'] > $line['
     }
     echo "$over seconds.<BR>\n";
     $reset = $line['endtime'] - $line['timelimit'];
-    if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+    if ($isteacher || ($istutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
         ?>
         <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook-view-assessment-details?stu=' . $stu . '&starttime=' . $reset . '&asid=' . $params['asid'] . '&from=' . $from . '&cid=' . $course->id . '&uid=' . $params['uid']) ?>">
             Clear overtime and accept grade </a> </p>
@@ -534,7 +534,6 @@ for ($i = 0; $i < count($questions); $i++) {
     echo "<div ";
     if($canedit && (getpts($scores[$i]) == $pts[$questions[$i]])){
         echo 'class="col-md-12 col-sm-12 iscorrect isperfect"';
-        print_r($i);
     }elseif($canedit && (($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i]) == $pts[$questions[$i]]) {
         echo 'class="iscorrect col-md-12 col-sm-12"';
     }elseif($scores[$i] == -1) {
@@ -545,7 +544,6 @@ for ($i = 0; $i < count($questions); $i++) {
     $totalpossible += $pts[$questions[$i]];
 
     echo '>';
-
     foreach ($librariesName as $libraryName) {
         if ($libraryName['questionId'] == $questions[$i]) {
             if ($libraryName[2] == null) {
@@ -556,8 +554,7 @@ for ($i = 0; $i < count($questions); $i++) {
 
         }
     }
-
-    if ($isTeacher || $isTutor || ($testtype == "Practice" && $showans != "V") || ($testtype != "Practice" && (($showans == "I" && !in_array(-1, $scores)) || ($showans != "V" && time() > $saenddate)))) {
+    if ($isteacher || $istutor || ($testtype == "Practice" && $showans != "V") || ($testtype != "Practice" && (($showans == "I" && !in_array(-1, $scores)) || ($showans != "V" && time() > $saenddate)))) {
         $showa = true;
     } else {
         $showa = false;
@@ -632,7 +629,7 @@ for ($i = 0; $i < count($questions); $i++) {
         echo ')';
     }
     echo "in {$attempts[$i]} attempt(s)\n";
-    if ($isTeacher || $isTutor) {
+    if ($isteacher || $istutor) {
         if ($canedit && getpts($scores[$i]) == $pts[$questions[$i]]) {
             echo '<div class="iscorrect isperfect">';
         } else if ($canedit && ((isset($rawscores) && isperfect($rawscores[$i])) || getpts($scores[$i]) == $pts[$questions[$i]])) {
@@ -642,7 +639,6 @@ for ($i = 0; $i < count($questions); $i++) {
         } else {
             echo '<div>';
         }
-
         if ($canedit && $parts != '') {
             $togr = array();
             foreach ($qtypes as $k => $t) {
@@ -747,7 +743,7 @@ for ($i = 0; $i < count($questions); $i++) {
             echo '<br/>';
         }
 
-        if ($isTeacher || ($isTutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
+        if ($isteacher || ($istutor && $user['rights'] >= AppConstant::GROUP_ADMIN_RIGHT)) {
             ?>
 
             <br><a target="_blank"
@@ -774,7 +770,6 @@ for ($i = 0; $i < count($questions); $i++) {
         }
         echo '</div>';
         echo '</div>';
-
     }
     echo "</div>\n";
 
@@ -817,6 +812,7 @@ if ($canedit && !($params['lastver']) && !($params['reviewver'])) {
     */
 
 } else if (trim($line['feedback']) != '') {
+    echo " <div class='col-md-12 col-sm-12'>";
     echo "<p>Instructor Feedback:<div class=\"intro\">{$line['feedback']}</div></p>";
     if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype'] != 0) {
         ?>
@@ -825,6 +821,7 @@ if ($canedit && !($params['lastver']) && !($params['reviewver'])) {
                 to GradeBook</a></p>
     <?php
     }
+    echo " </div>";
 }
 echo "</form>";
 echo '</div>';

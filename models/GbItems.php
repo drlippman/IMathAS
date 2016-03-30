@@ -54,7 +54,7 @@ class GbItems extends BaseImasGbitems
 
     public static function getbyCourseId($courseId)
     {
-        $gradeNames = GbItems::find()->where(['courseid' => $courseId])->all();
+        $gradeNames = GbItems::find()->where(['courseid' => $courseId])->orderBy(['name' => AppConstant::ASCENDING])->all();
         return $gradeNames;
     }
 

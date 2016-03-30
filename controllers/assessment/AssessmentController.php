@@ -3256,6 +3256,7 @@ class AssessmentController extends AppController
                         }
                     }
                     $temp .= '<script type="text/javascript">var thumbSet = initVideoObject("' . $viddata[0] . '",{' . implode(',', $outarr) . '}); </script>';
+
                     $qmin = 0;
                     $qmax = count($questions);
                     $dopage = false;
@@ -3282,7 +3283,7 @@ class AssessmentController extends AppController
                         basicshowq($i, $showansduring, $questions, $testsettings, $qi, $seeds, $showhints, $attempts, $regenonreattempt, $showansafterlast, $showeachscore, $noraw, $rawscores, false);
                         $quesout .= ob_get_clean();
                         $quesout = substr($quesout, 0, -7) . '<br/><input type="button" class="btn" value="' . _('Submit') . '" onclick="assessbackgsubmit(' . $i . ',\'submitnotice' . $i . '\')" /><span id="submitnotice' . $i . '"></span></div>';
-                    } else {
+                     } else {
                         if (!$sessiondata['istutorial']) {
                             $temp .= '<div class="prequestion">';
                             $temp .= "<p>" . 'No attempts remain on this problem.' . "</p>";

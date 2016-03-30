@@ -3579,7 +3579,7 @@ class GradebookController extends AppController
                 $questionsInformation = Questions::retrieveQuestionDataForgradebook($assessmentAndAssessmentSessionData['questions']);
             }
         }
-        $this->includeCSS(['gradebook.css']);
+        $this->includeCSS(['gradebook.css','mathtest.css']);
         $this->includeJS(['general.js','gradebook/rubric.js']);
         $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion, 'groupMembers' =>$groupMembers, 'librariesName' => $librariesName,
             'questionsData' => $questionsData,'questionsInformation' => $questionsInformation, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
