@@ -713,7 +713,7 @@ if ($overwriteBody==1) {
 				if ($line['locked']>0) {
 					echo '<td><img src="../img/lock.png"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
 				} else {
-					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student out of the course?\');" class="ll">Lock</a></td>';
+					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student ('.str_replace("'","\\'",$line['LastName'].', '.$line['FirstName']).') out of the course?\');" class="ll">Lock</a></td>';
 				}
 				/*if (!isset($CFG['GEN']['noInstrUnenroll'])) {
 					echo '<td><a href="listusers.php?cid='.$cid.'&action=unenroll&uid='.$line['userid'].'">Unenroll</a></td>';
