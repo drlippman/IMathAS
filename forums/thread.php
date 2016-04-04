@@ -123,9 +123,9 @@
 		if ($dofilter) {
 			$limthreads = array();
 			if ($isteacher || $groupid==0) {
-				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$groupid'";
+				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$groupid' AND forumid='$forumid'";
 			} else {
-				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid=0 OR stugroupid='$groupid'";
+				$query = "SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid='$groupid') AND forumid='$forumid'";
 			}
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
