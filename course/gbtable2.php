@@ -868,7 +868,7 @@ function gbtable() {
 	if ($secfilter!=-1 && $limuser<=0) {
 		$query .= "AND imas_students.section='$secfilter' ";
 	}
-	if ($hidelocked) {
+	if ($hidelocked && $limuser==0) {
 		$query .= "AND imas_students.locked=0 ";
 	}
 	if (isset($timefilter)) {
