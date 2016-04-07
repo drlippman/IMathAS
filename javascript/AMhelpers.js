@@ -43,6 +43,9 @@ function calculate(inputId,outputId,format) {
 		  if (str.match(/,/)) {
 		  	  err += _("Invalid use of a comma.");
 		  }
+		  if (format.indexOf('allowxtimes')!=-1) {
+		  	  str = str.replace(/(x|X|\u00D7)/,"*");  
+		  }
 		  if (format.indexOf('mixed')!=-1) {
 		  	  str = str.replace(/_/,' ');
 		  } else if (format.indexOf('scinot')!=-1) {
@@ -988,7 +991,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 			str = str.replace(',','*NaN*'); //force eval error
 			//str = str.replace(/,/g,"");
-			if (calcformat[qn].indexOf('scinot')!=-1) {
+			if (calcformat[qn].indexOf('scinot')!=-1 || calcformat[qn].indexOf('allowxtimes')!=-1) {
 				str = str.replace(/(x|X|\u00D7)/,"*");
 			}
 			if (str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
