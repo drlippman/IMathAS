@@ -1678,7 +1678,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 					if (!$isgreek && preg_match('/^(\w+)_(\d*[a-zA-Z]+\w+)$/',$variables[$i],$matches)) {
 						$sa = str_replace($matches[0], '"'.$matches[1].'"_"'.$matches[2].'"', $sa);
-					} else if (!$isgreek) {
+					} else if (!$isgreek && $variables[$i]!='varE' && !preg_match('/^\w_\d+$/',$variables[$i])) {
 						$sa = str_replace($variables[$i], '"'.$variables[$i].'"', $sa);
 					}
 				}

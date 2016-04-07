@@ -9,7 +9,10 @@ function normalizemathunicode(str) {
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
 	str = str.replace(/\bOO\b/i,"oo");
-	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu").replace(/Δ/,"Delta");
+	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
+	str = str.replace(/α/,"alpha").replace(/β/,"beta").replace(/γ/,"gamma").replace(/δ/,"delta").replace(/ε/,"epsilon").replace(/κ/,"kappa");
+	str = str.replace(/λ/,"lambda").replace(/ρ/,"rho").replace(/τ/,"tau").replace(/χ/,"chi").replace(/ω/,"omega");
+	str = str.replace(/Ω/,"Omega").replace(/Γ/,"Gamma").replace(/Φ/,"Phi").replace(/Δ/,"Delta").replace(/Σ/,"Sigma");
 	return str;
 }
 
@@ -612,7 +615,6 @@ function AMpreview(inputId,outputId) {
   var str = document.getElementById(inputId).value;
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
-   var dispstr = str;
   var foundaltcap = []; 
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
@@ -624,10 +626,10 @@ function AMpreview(inputId,outputId) {
 	  			foundaltcap[i] = true;
 	  			break;
 	  		}
-	  		if (!foundaltcap[i]) {
-	  			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
-	  		}
 	  	}
+	  	if (!foundaltcap[i]) {
+			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+		}
 	  }
 	  
 	  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
@@ -643,7 +645,8 @@ function AMpreview(inputId,outputId) {
 	  }
 	  */
   }
- 
+  console.log(str);
+  var dispstr = str; 
   //quote out multiletter variables
   var varstoquote = new Array(); var regmod;
   for (var i=0; i<vars.length; i++) {
@@ -664,6 +667,7 @@ function AMpreview(inputId,outputId) {
 		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
 		  	var varpts = new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod).exec(vars[i]);
 		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), '"'+varpts[1]+'"_"'+varpts[2]+'"');
+		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
 		  	str = str.replace(varpts[0], "repvars"+i);
 		  	vars[i] = "repvars"+i;
 		  }
@@ -1028,37 +1032,37 @@ function doonsubmit(form,type2,skipconfirm) {
 		
 		vars = varlist.split("|");
 		for (var i=0; i<vars.length; i++) {
-			  if (vars[i].length>2 && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
+			foundaltcap = false;
+			for (var j=0; j<vars.length; j++) {
+				if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+					foundaltcap = true;
+					break;
+				}
+			}
+			if (!foundaltcap) {
+				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+			}
+			
+			if (vars[i].length>2 && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
 				var varpts = vars[i].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
 				str = str.replace(varpts[0], "repvars"+i);
 				vars[i] = "repvars"+i;
-			  } else if (vars[i] == "varE") {
-				  str = str.replace("E","varE");	
-			  } else {
-				foundaltcap = false;
-				for (var j=0; j<vars.length; j++) {
-					if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
-						foundaltcap = true;
-						break;
-					}
-				}
-				if (!foundaltcap) {
-					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
-				}
+			} else if (vars[i] == "varE") {
+				str = str.replace("E","varE");	
+			}
+			
+			/*else if (vars[i].charCodeAt(0)>96) { //lowercase
+			  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
+				//vars[i] = vars[i].toLowerCase();
+				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 			  }
-			  
-			  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
-				  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
-					//vars[i] = vars[i].toLowerCase();
-					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
-				  }
-			  } else {
-				  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
-					//vars[i] = vars[i].toLowerCase();
-					str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
-				  }
+			} else {
+			  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+				//vars[i] = vars[i].toLowerCase();
+				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 			  }
-			  */
+			}
+			*/
 		}
 		varlist = vars.join("|");
 		
