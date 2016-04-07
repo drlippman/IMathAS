@@ -1676,9 +1676,15 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							break;
 						}
 					}
-					if (!$isgreek && preg_match('/^(\w+)_(\d*[a-zA-Z]+\w+)$/',$variables[$i],$matches)) {
-						$sa = str_replace($matches[0], '"'.$matches[1].'"_"'.$matches[2].'"', $sa);
-					} else if (!$isgreek && $variables[$i]!='varE' && !preg_match('/^\w_\d+$/',$variables[$i])) {
+					if (!$isgreek && preg_match('/^(\w+)_(\w+)$/',$variables[$i],$matches)) {
+						if (strlen($matches[1])>1) {
+							$matches[1] = '"'.$matches[1].'"';
+						}
+						if (strlen($matches[2])>1) {
+							$matches[2] = '"'.$matches[2].'"';
+						}
+						$sa = str_replace($matches[0], $matches[1].'_'.$matches[2], $sa);
+					} else if (!$isgreek && $variables[$i]!='varE') {
 						$sa = str_replace($variables[$i], '"'.$variables[$i].'"', $sa);
 					}
 				}

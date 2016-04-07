@@ -645,7 +645,7 @@ function AMpreview(inputId,outputId) {
 	  }
 	  */
   }
-  console.log(str);
+
   var dispstr = str; 
   //quote out multiletter variables
   var varstoquote = new Array(); var regmod;
@@ -658,6 +658,28 @@ function AMpreview(inputId,outputId) {
 				break;
 			  }
 		  }
+		  if (vars[i].match(/^\w+_\w+$/)) {
+		  	if (!foundaltcap[i]) {
+		  		regmod = "gi";
+		  	} else {
+		  		regmod = "g";
+		  	}
+		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
+		  	var varpts = new RegExp(/^(\w+)_(\w+)$/,regmod).exec(vars[i]);
+		  	if (varpts[1].length>1) {
+		  		varpts[1] = '"'+varpts[1]+'"';
+		  	} 
+		  	if (varpts[2].length>1) {
+		  		varpts[2] = '"'+varpts[2]+'"';
+		  	} 
+		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
+		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
+		  	str = str.replace(varpts[0], "repvars"+i);
+		  	vars[i] = "repvars"+i;
+		  } else if (!isgreek && vars[i]!="varE") {
+			  varstoquote.push(vars[i]);
+		  }
+		  /*
 		  if (!isgreek && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
 		  	if (!foundaltcap[i]) {
 		  		regmod = "gi";
@@ -674,6 +696,7 @@ function AMpreview(inputId,outputId) {
 		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/) && vars[i]!="varE") {
 			  varstoquote.push(vars[i]);
 		  }
+		  */
 	  }
   }
   vl = vars.join("|");
@@ -1043,8 +1066,8 @@ function doonsubmit(form,type2,skipconfirm) {
 				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
 			}
 			
-			if (vars[i].length>2 && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
-				var varpts = vars[i].match(/^(\w+)_(\d*[a-zA-Z]+\w+)$/);
+			if (vars[i].length>2 && vars[i].match(/^\w+_\w+$/)) {
+				var varpts = vars[i].match(/^(\w+)_(\w+)$/);
 				str = str.replace(varpts[0], "repvars"+i);
 				vars[i] = "repvars"+i;
 			} else if (vars[i] == "varE") {
