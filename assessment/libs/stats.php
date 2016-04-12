@@ -371,14 +371,24 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	return showasciisvg($outst,$width,$height);
 }
 
-//fdbargraph(barlabels,freqarray,label,[width,height])
+//fdbargraph(barlabels,freqarray,label,[width,height,options])
 //barlabels: array of labels for the bars
 //freqarray: array of frequencies/heights for the bars
 //label: general label for bars
 //width,height (optional): width and height for graph
-function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
+//options (optional): array of options:
+//  options['valuelabels'] = array of value labels, to be placed above bars
+//  options['showgrid'] = false to hide the horizontal grid lines
+function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	if (!is_array($bl) || !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
 	if (count($bl) != count($freq)) { echo "barlabels and freqarray must have same length"; return 0;}
+	
+	if (isset($options['valuelabels'])) {
+		$valuelabels = $options['valuelabels'];
+	} else {
+		$valuelabels = false;
+	}
+	
 	$alt = "Histogram for $label <table class=stats><thead><tr><th>Bar Label</th><th>Frequency/Height</th></tr></thead>\n<tbody>\n";
 	$start = 0;
 	$x = $start+1;
@@ -390,6 +400,13 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
 		$st .= "[$x,{$freq[$curr]}]);";
 		$x -= 1;
 		$st .= "text([$x,0],\"{$bl[$curr]}\",\"below\");";
+		if ($valuelabels!==false) {
+			if (is_array($valuelabels)) {
+				$st .= "text([$x,{$freq[$curr]}],\"{$valuelabels[$curr]}\",\"above\");";
+			} else {
+				$st .= "text([$x,{$freq[$curr]}],\"{$freq[$curr]}\",\"above\");";
+			}
+		}
 		$x += 1;
 		if ($freq[$curr]>$maxfreq) { $maxfreq = $freq[$curr];}
 	}
@@ -398,16 +415,23 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
 		return $alt;
 	}
 	$x++;
+	$topborder = ($valuelabels===false?5:25);
+	$leftborder = min(60, 9*strlen($maxfreq)+10);
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	$outst = "setBorder(45,40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	$outst = "setBorder($leftborder,40,10,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 	
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
 	
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
 	
+	if (isset($options['showgrid']) && $options['showgrid']==false) {
+		$gdy = 0;
+	} else {
+		$gdy = $step;
+	}
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 	
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
