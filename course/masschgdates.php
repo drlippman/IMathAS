@@ -72,6 +72,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$reviewdate = parsedatetime($pts[0],$pts[1]);
 				}
 			}
+			if ($data[3] != 'NA') {
+				if ($data[3]=='A') {
+					$fpdate = 2000000000;
+				} else if ($data[3] == 'N') {
+					$fpdate = 0;
+				} else {
+					$pts = explode('~',$data[3]);
+					$fpdate = parsedatetime($pts[0],$pts[1]);
+				}
+			}
+			if ($data[4] != 'NA') {
+				if ($data[4]=='A') {
+					$frdate = 2000000000;
+				} else if ($data[4] == 'N') {
+					$frdate = 0;
+				} else {
+					$pts = explode('~',$data[4]);
+					$frdate = parsedatetime($pts[0],$pts[1]);
+				}
+			}
 			/*
 			if (isset($_POST['rdatetype'.$i])) {
 				if ($_POST['rdatetype'.$i]=='0') {
@@ -82,9 +102,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			*/
 			
-			$type = $data[3]; // $_POST['type'.$i];
-			$id = $data[4]; // $_POST['id'.$i];
-			$avail = intval($data[5]);
+			$type = $data[5]; // $_POST['type'.$i];
+			$id = $data[6]; // $_POST['id'.$i];
+			$avail = intval($data[7]);
 			if ($type=='Assessment') {
 				if ($id>0) {
 					$query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate',avail='$avail' WHERE id='$id'";
@@ -92,7 +112,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
-					$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+					if ($data[3] != 'NA' && $data[4] != 'NA') {
+						$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',postby='$fpdate',replyby='$frdate',avail='$avail' WHERE id='$id'";
+					} else {
+						$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+					}
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='Wiki') {
@@ -137,27 +161,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=102813\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=041116\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }	
 
 
 /******* begin html output ********/
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
-//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;} 
-//		td {padding: .1em .4em;}</style>';
-$placeinhead .= '<style type="text/css">
-		td {padding: .1em 4px;}
-		.mcind1 {padding-left:20px} .mcind2 {padding-left:36px} .mcind3 {padding-left:52px;}
-		.mcind4 {padding-left:66px;} .mcind5 {padding-left:84px;} mcind6 {padding-left:100px;}
-		.mcind0 img, .mcind1 img, .mcind2 img, .mcind3 img, .mcind4 img, .mcind5 img, .mcind6 img {float: left;}
-		.mcind0 div, .mcind1 div, .mcind2 div, .mcind3 div, .mcind4 div, .mcind5 div, .mcind6 div {margin-left: 21px;}
-		</style>';
-require("../header.php");
+
 
 if ($overwriteBody==1) {
+	require("../header.php");
 	echo $body;
 } else {		
 	
@@ -169,13 +183,6 @@ if ($overwriteBody==1) {
 	
 	$availnames = array(_("Hidden"),_("By Dates"),_("Always"));
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
-	echo "&gt; Mass Change Dates</div>\n";
-	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
-	echo '<script type="text/javascript">';
-	echo 'var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();';
-	echo '</script>';
-	
 	if (isset($_GET['orderby'])) {
 		$orderby = $_GET['orderby'];
 		$sessiondata['mcdorderby'.$cid] = $orderby;
@@ -194,6 +201,39 @@ if ($overwriteBody==1) {
 	} else {
 		$filter = "all";
 	}
+	/*if (isset($_GET['incforum'])) {
+		$incforum = $_GET['incforum'];
+		$sessiondata['mcdincforum'.$cid] = $incforum;
+		writesessiondata();
+	} else if (isset($sessiondata['mcdincforum'.$cid])) {
+		$incforum = $sessiondata['mcdincforum'.$cid];
+	} else {
+	*/
+	$incforum = false;
+//	}
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
+	//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
+	//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;} 
+	//		td {padding: .1em .4em;}</style>';
+	$placeinhead .= '<style type="text/css">
+			td {padding: .1em 4px;}
+			.mcind1 {padding-left:20px} .mcind2 {padding-left:36px} .mcind3 {padding-left:52px;}
+			.mcind4 {padding-left:66px;} .mcind5 {padding-left:84px;} mcind6 {padding-left:100px;}
+			.mcind0 img, .mcind1 img, .mcind2 img, .mcind3 img, .mcind4 img, .mcind5 img, .mcind6 img {float: left;}
+			.mcind0 div, .mcind1 div, .mcind2 div, .mcind3 div, .mcind4 div, .mcind5 div, .mcind6 div {margin-left: 21px;}
+			</style>';
+	if (!$incforum) {
+		$placeinhead .= '<style type="text/css">.mcf {display:none;}</style>';
+		$placeinhead .= '<script type="text/javascript">var includeforums = false;</script>';
+	} else {
+		$placeinhead .= '<script type="text/javascript">var includeforums = true;</script>';
+	}
+	require("../header.php");
+	
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
+	echo "&gt; Mass Change Dates</div>\n";
+	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
+	
 	echo "<script type=\"text/javascript\">var filteraddr = \"$imasroot/course/masschgdates.php?cid=$cid&orderby=$orderby\";";
 	
 	echo "var orderaddr = \"$imasroot/course/masschgdates.php?cid=$cid&filter=$filter\";</script>";
@@ -235,7 +275,14 @@ if ($overwriteBody==1) {
 	echo '<option value="blocks" ';
 	if ($filter=='blocks') {echo 'selected="selected"';}
 	echo '>Blocks</option>';
-	echo '</select>';
+	echo '</select> ';
+	echo '<button type="button" id="MCDforumtoggle" onclick="toggleMCDincforum()">';
+	if ($incforum) {
+		echo _('Hide Forum Dates');
+	} else {
+		echo _('Show Forum Dates');
+	}
+	echo '</button>';
 	echo '</p>';
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
@@ -255,9 +302,9 @@ if ($overwriteBody==1) {
 	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
 	
 	if ($picicons) {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	} else {
-		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	}
 	$prefix = array();
 	if ($orderby==3) {  //course page order
@@ -295,6 +342,8 @@ if ($overwriteBody==1) {
 	$startdates = Array();
 	$enddates = Array();
 	$reviewdates = Array();
+	$fpdates = Array();
+	$frdates = Array();
 	$ids = Array();
 	$avails = array();
 	$types = Array();
@@ -309,6 +358,7 @@ if ($overwriteBody==1) {
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = $row[3];
+			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[4];
 			$avails[] = $row[5];
 			if (isset($prefix['Assessment'.$row[4]])) {$pres[] = $prefix['Assessment'.$row[4]];} else {$pres[] = '';}
@@ -324,6 +374,7 @@ if ($overwriteBody==1) {
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = -1;
+			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if (isset($prefix['InlineText'.$row[3]])) {$pres[] = $prefix['InlineText'.$row[3]];} else {$pres[] = '';}
@@ -339,6 +390,7 @@ if ($overwriteBody==1) {
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = -1;
+			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if (isset($prefix['LinkedText'.$row[3]])) {$pres[] = $prefix['LinkedText'.$row[3]];} else {$pres[] = '';}
@@ -346,7 +398,7 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='forums') {
-		$query = "SELECT name,startdate,enddate,id,avail FROM imas_forums WHERE courseid='$cid' ";
+		$query = "SELECT name,startdate,enddate,id,avail,postby,replyby FROM imas_forums WHERE courseid='$cid' ";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$types[] = "Forum";
@@ -354,6 +406,8 @@ if ($overwriteBody==1) {
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = -1;
+			$fpdates[] = $row[5]; 
+			$frdates[] = $row[6];
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if (isset($prefix['Forum'.$row[3]])) {$pres[] = $prefix['Forum'.$row[3]];} else {$pres[] = '';}
@@ -369,6 +423,7 @@ if ($overwriteBody==1) {
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = -1;
+			$fpdates[] = -1; $frdates[] = -1;
 			$ids[] = $row[3];
 			$avails[] = $row[4];
 			if (isset($prefix['Wiki'.$row[3]])) {$pres[] = $prefix['Wiki'.$row[3]];} else {$pres[] = '';}
@@ -381,7 +436,7 @@ if ($overwriteBody==1) {
 		$items = unserialize(mysql_result($result,0,0));
 		
 		function getblockinfo($items,$parent) {
-			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
+			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
@@ -392,6 +447,7 @@ if ($overwriteBody==1) {
 					$enddates[] = $item['enddate'];
 					$avails[] = $item['avail'];
 					$reviewdates[] = -1;
+					$fpdates[] = -1; $frdates[] = -1;
 					if (isset($prefix['Block'.$parent.'-'.($k+1)])) {$pres[] = $prefix['Block'.$parent.'-'.($k+1)];} else {$pres[] = '';}
 					if (count($item['items'])>0) {
 						getblockinfo($item['items'],$parent.'-'.($k+1));
@@ -463,6 +519,10 @@ if ($overwriteBody==1) {
 		echo "; baserdates[$cnt] = ";
 		//if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {echo '"NA"';} else { echo $reviewdates[$i];}
 		if ($reviewdates[$i]==-1) {echo '"NA"';} else { echo $reviewdates[$i];}
+		echo "; basefpdates[$cnt] = ";
+		if ($fpdates[$i]==-1) {echo '"NA"';} else { echo $fpdates[$i];}
+		echo "; basefrdates[$cnt] = ";
+		if ($frdates[$i]==-1) {echo '"NA"';} else { echo $frdates[$i];}
 		echo ";</script>";
 		echo "</td>";
 		if ($picicons==0) {
@@ -585,6 +645,97 @@ if ($overwriteBody==1) {
 			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
 		}
 		echo '</td>';
+		echo "<td class=\"mcf togdis".($avails[$i]!=1?' dis':'')."\">";
+		if ($types[$i]=='Forum') {
+			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fp',$cnt)\"/>";
+			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
+				echo "<input type=hidden id=\"fpdatetype$cnt\" name=\"fpdatetype$cnt\" value=\"0\"/>";
+			} else {
+				echo "<input type=hidden id=\"fpdatetype$cnt\" name=\"fpdatetype$cnt\" value=\"1\"/>";
+			}
+			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
+				echo "<span id=\"fpspan0$cnt\" class=\"show\">";
+			} else {
+				echo "<span id=\"fpspan0$cnt\" class=\"hide\">";
+			}
+			echo "<input type=radio name=\"fpdatean$cnt\" value=\"0\" id=\"fpdateanN$cnt\" ";
+			if ($fpdates[$i]==0) {
+				echo 'checked=1';
+			} 
+			echo " />Never <input type=radio name=\"fpdatean$cnt\" value=\"2000000000\"  id=\"fpdateanA$cnt\"  ";
+			if ($fpdates[$i]!=0) {
+				echo 'checked=1';
+			} 
+			echo " />Always</span>";
+			
+			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
+				echo "<span id=\"fpspan1$cnt\" class=\"hide\">";
+			} else {
+				echo "<span id=\"fpspan1$cnt\" class=\"show\">";
+			}
+			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
+				$fpdates[$i] = $enddates[$i];
+				$fpdate = tzdate("m/d/Y",$fpdates[$i]);
+				$fptime = $deftime;
+			} else {
+				$fpdate = tzdate("m/d/Y",$fpdates[$i]);
+				$fptime = tzdate("g:i a",$fpdates[$i]);
+			}
+		
+			echo "<input type=text size=10 id=\"fpdate$cnt\" name=\"fpdate$cnt\" value=\"$fpdate\" onblur=\"ob(this)\"/>(";
+			echo "<span id=\"fpd$cnt\">".getshortday($fpdates[$i]).'</span>';
+			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].fpdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].fpdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('fpdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		
+			echo " at <input type=text size=8 id=\"fptime$cnt\" name=\"fptime$cnt\" value=\"$fptime\"></span>";
+		}
+		echo '</td>';
+		echo "<td class=\"mcf togdis".($avails[$i]!=1?' dis':'')."\">";
+		if ($types[$i]=='Forum') {
+			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fr',$cnt)\"/>";
+			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
+				echo "<input type=hidden id=\"frdatetype$cnt\" name=\"frdatetype$cnt\" value=\"0\"/>";
+			} else {
+				echo "<input type=hidden id=\"frdatetype$cnt\" name=\"frdatetype$cnt\" value=\"1\"/>";
+			}
+			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
+				echo "<span id=\"frspan0$cnt\" class=\"show\">";
+			} else {
+				echo "<span id=\"frspan0$cnt\" class=\"hide\">";
+			}
+			echo "<input type=radio name=\"frdatean$cnt\" value=\"0\" id=\"frdateanN$cnt\" ";
+			if ($frdates[$i]==0) {
+				echo 'checked=1';
+			} 
+			echo " />Never <input type=radio name=\"frdatean$cnt\" value=\"2000000000\"  id=\"frdateanA$cnt\"  ";
+			if ($frdates[$i]!=0) {
+				echo 'checked=1';
+			} 
+			echo " />Always</span>";
+			
+			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
+				echo "<span id=\"frspan1$cnt\" class=\"hide\">";
+			} else {
+				echo "<span id=\"frspan1$cnt\" class=\"show\">";
+			}
+			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
+				$frdates[$i] = $enddates[$i];
+				$frdate = tzdate("m/d/Y",$frdates[$i]);
+				$frtime = $deftime;
+			} else {
+				$frdate = tzdate("m/d/Y",$frdates[$i]);
+				$frtime = tzdate("g:i a",$frdates[$i]);
+			}
+		
+			echo "<input type=text size=10 id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\"/>(";
+			echo "<span id=\"frd$cnt\">".getshortday($frdates[$i]).'</span>';
+			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
+		
+			echo " at <input type=text size=8 id=\"frtime$cnt\" name=\"frtime$cnt\" value=\"$frtime\"></span>";
+		}
+		echo '</td>';
+		
 		//echo "<td>Send Down: <a href=\"#\" <input type=button value=\"Change\" onclick=\"senddown($cnt)\"/> <input type=button value=\"Copy\" onclick=\"copydown($cnt)\"/></td>";
 		echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
 		echo '<option value="1">Send down date &amp; time changes</option>';
