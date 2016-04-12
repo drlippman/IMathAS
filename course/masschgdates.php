@@ -161,7 +161,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=102813\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=041116\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }	
@@ -183,13 +183,6 @@ if ($overwriteBody==1) {
 	
 	$availnames = array(_("Hidden"),_("By Dates"),_("Always"));
 
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
-	echo "&gt; Mass Change Dates</div>\n";
-	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
-	echo '<script type="text/javascript">';
-	echo 'var basesdates = new Array(); var baseedates = new Array(); var baserdates = new Array();';
-	echo '</script>';
-	
 	if (isset($_GET['orderby'])) {
 		$orderby = $_GET['orderby'];
 		$sessiondata['mcdorderby'.$cid] = $orderby;
@@ -208,15 +201,16 @@ if ($overwriteBody==1) {
 	} else {
 		$filter = "all";
 	}
-	if (isset($_GET['incforum'])) {
+	/*if (isset($_GET['incforum'])) {
 		$incforum = $_GET['incforum'];
 		$sessiondata['mcdincforum'.$cid] = $incforum;
 		writesessiondata();
 	} else if (isset($sessiondata['mcdincforum'.$cid])) {
 		$incforum = $sessiondata['mcdincforum'.$cid];
 	} else {
-		$incforum = false;
-	}
+	*/
+	$incforum = false;
+//	}
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 	//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
 	//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;} 
@@ -235,6 +229,11 @@ if ($overwriteBody==1) {
 		$placeinhead .= '<script type="text/javascript">var includeforums = true;</script>';
 	}
 	require("../header.php");
+	
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
+	echo "&gt; Mass Change Dates</div>\n";
+	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
+	
 	echo "<script type=\"text/javascript\">var filteraddr = \"$imasroot/course/masschgdates.php?cid=$cid&orderby=$orderby\";";
 	
 	echo "var orderaddr = \"$imasroot/course/masschgdates.php?cid=$cid&filter=$filter\";</script>";
@@ -276,7 +275,14 @@ if ($overwriteBody==1) {
 	echo '<option value="blocks" ';
 	if ($filter=='blocks') {echo 'selected="selected"';}
 	echo '>Blocks</option>';
-	echo '</select>';
+	echo '</select> ';
+	echo '<button type="button" id="MCDforumtoggle" onclick="toggleMCDincforum()">';
+	if ($incforum) {
+		echo _('Hide Forum Dates');
+	} else {
+		echo _('Show Forum Dates');
+	}
+	echo '</button>';
 	echo '</p>';
 	
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
@@ -430,7 +436,7 @@ if ($overwriteBody==1) {
 		$items = unserialize(mysql_result($result,0,0));
 		
 		function getblockinfo($items,$parent) {
-			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
+			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
 				if (is_array($item)) {
 					$ids[] = $parent.'-'.($k+1);
@@ -653,11 +659,11 @@ if ($overwriteBody==1) {
 				echo "<span id=\"fpspan0$cnt\" class=\"hide\">";
 			}
 			echo "<input type=radio name=\"fpdatean$cnt\" value=\"0\" id=\"fpdateanN$cnt\" ";
-			if ($fpdates[$i]!=2000000000) {
+			if ($fpdates[$i]==0) {
 				echo 'checked=1';
 			} 
 			echo " />Never <input type=radio name=\"fpdatean$cnt\" value=\"2000000000\"  id=\"fpdateanA$cnt\"  ";
-			if ($fpdates[$i]==2000000000) {
+			if ($fpdates[$i]!=0) {
 				echo 'checked=1';
 			} 
 			echo " />Always</span>";
@@ -698,11 +704,11 @@ if ($overwriteBody==1) {
 				echo "<span id=\"frspan0$cnt\" class=\"hide\">";
 			}
 			echo "<input type=radio name=\"frdatean$cnt\" value=\"0\" id=\"frdateanN$cnt\" ";
-			if ($frdates[$i]!=2000000000) {
+			if ($frdates[$i]==0) {
 				echo 'checked=1';
 			} 
 			echo " />Never <input type=radio name=\"frdatean$cnt\" value=\"2000000000\"  id=\"frdateanA$cnt\"  ";
-			if ($frdates[$i]==2000000000) {
+			if ($frdates[$i]!=0) {
 				echo 'checked=1';
 			} 
 			echo " />Always</span>";
