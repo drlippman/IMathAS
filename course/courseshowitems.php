@@ -565,7 +565,9 @@ function enditem($canedit) {
 			   	   if ($exceptions[$items[$i]][2]>0 && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
 			   	   	   $canundolatepass = true;
 			   	   }
-			   	   $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latepasshrs*3600));
+			   	   if ($exceptions[$items[$i]][2]>0) {
+			   	   	   $latepasscnt = max(0,round(($exceptions[$items[$i]][1] - $line['enddate'])/($latepasshrs*3600)));
+			   	   }
 				   $line['startdate'] = $exceptions[$items[$i]][0];
 				   $line['enddate'] = $exceptions[$items[$i]][1];
 			   }
