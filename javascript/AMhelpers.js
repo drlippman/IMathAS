@@ -669,6 +669,9 @@ function AMpreview(inputId,outputId) {
 		  	}
 		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
 		  	var varpts = new RegExp(/^(\w+)_(\w+)$/,regmod).exec(vars[i]);
+		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
+		  	dispstr = dispstr.replace(remvarparen, vars[i]);
+		  	str = str.replace(remvarparen, vars[i]);
 		  	if (varpts[1].length>1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	} 
@@ -1067,10 +1070,14 @@ function doonsubmit(form,type2,skipconfirm) {
 			}
 			if (!foundaltcap) {
 				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+				regmod = "gi";
+			} else {
+				regmod = "g";
 			}
 			
 			if (vars[i].length>2 && vars[i].match(/^\w+_\w+$/)) {
 				var varpts = vars[i].match(/^(\w+)_(\w+)$/);
+				str = str.replace(new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod), vars[i]);
 				str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 				vars[i] = "repvars"+i;
 			} else if (vars[i] == "varE") {
