@@ -677,7 +677,7 @@ function AMpreview(inputId,outputId) {
 		  	} 
 		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
 		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
-		  	str = str.replace(varpts[0], "repvars"+i);
+		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 		  	vars[i] = "repvars"+i;
 		  } else if (!isgreek && vars[i]!="varE") {
 			  varstoquote.push(vars[i]);
@@ -1071,7 +1071,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			
 			if (vars[i].length>2 && vars[i].match(/^\w+_\w+$/)) {
 				var varpts = vars[i].match(/^(\w+)_(\w+)$/);
-				str = str.replace(varpts[0], "repvars"+i);
+				str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
 				vars[i] = "repvars"+i;
 			} else if (vars[i] == "varE") {
 				str = str.replace("E","varE");	
