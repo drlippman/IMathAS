@@ -591,7 +591,58 @@ $x = $ztest;
 //tcdf(t,df,[dec])
 //calculates the area under the t-distribution with "df" degrees of freedom
 //to the left of the t-value t
-//based on someone else's code - can't remember whose!
+//based on code from www.math.ucla.edu/~tom/distributions/tDist.html
+function tcdf($X, $df, $dec=4) {
+	if ($df<=0) {
+		echo "Degrees of freedom must be positive";
+		return false;
+	} else {
+		$A=$df/2;
+		$S=$A+.5;
+		$Z=$df/($df+$X*$X);
+		$BT=exp(gamma_log($S)-gamma_log(.5)-gamma_log($A)+$A*log($Z)+.5*log(1-$Z));
+		if ($Z<($A+1)/($S+2)) {
+			$betacdf=$BT*Betinc($Z,$A,.5,$dec);
+		} else {
+			$betacdf=1-$BT*Betinc(1-$Z,.5,$A,$dec);
+		}
+		if ($X<0) {
+			$tcdf=$betacdf/2;
+		} else {
+			$tcdf=1-$betacdf/2;
+		}
+	}
+	return round($tcdf,$dec);
+}
+
+function Betinc($X,$A,$B, $dec) {
+	$A0=0;
+	$B0=1;
+	$A1=1;
+	$B1=1;
+	$M9=0;
+	$A2=0;
+	//an epsilon of .00001 seems to give tcdf accurate to 9 decimal places
+	$eps = pow(10, -1*$dec);
+	while (abs(($A1-$A2)/$A1)>$eps) {
+		$A2=$A1;
+		$C9=-($A+$M9)*($A+$B+$M9)*$X/($A+2*$M9)/($A+2*$M9+1);
+		$A0=$A1+$C9*$A0;
+		$B0=$B1+$C9*$B0;
+		$M9=$M9+1;
+		$C9=$M9*($B-$M9)*$X/($A+2*$M9-1)/($A+2*$M9);
+		$A1=$A0+$C9*$A1;
+		$B1=$B0+$C9*$B1;
+		$A0=$A0/$B1;
+		$B0=$B0/$B1;
+		$A1=$A1/$B1;
+		$B1=1;
+	}
+	return $A1/$A;
+}
+
+/*
+Older code, couldn't handle fractional degrees of freedom
 function tcdf($ttest,$df,$dec=4) {
 	$eps = pow(.1,$dec);
 	
@@ -635,6 +686,7 @@ function tcdf($ttest,$df,$dec=4) {
 	return $pval;
 	} else {return false;}
 }
+*/
 
 //invnormalcdf(p,[dec])
 //Inverse Normal CDF
