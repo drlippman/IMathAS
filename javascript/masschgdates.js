@@ -377,14 +377,16 @@ Date.prototype.getWeekDays = function(d) {
 				if (type=='a') {
 					$('#avail'+cnt).val((baserdates[cnt]!='NA' && to==2)?1:to);
 					if (to==0) {
-						$(els[i]).closest('tr').find('td.togdis').addClass('dis');
+						$(els[i]).closest('tr').find('td.togdishid').addClass('dis');
 					} else {
-						$(els[i]).closest('tr').find('td.togdis').removeClass('dis');
+						$(els[i]).closest('tr').find('td.togdishid').removeClass('dis');
 					}
 					if (to==1 || (baserdates[cnt]!='NA' && to==2)) {
 						$('#availname'+cnt).text(availnames[1]);
+						$(els[i]).closest('tr').find('td.togdis').removeClass('dis');
 					} else {
 						$('#availname'+cnt).text(availnames[to]);
+						$(els[i]).closest('tr').find('td.togdis').addClass('dis');
 					}
 					
 				} else {

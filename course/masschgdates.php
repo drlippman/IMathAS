@@ -161,7 +161,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
-		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=041116\"></script>";
+		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=041316\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
 }	
@@ -645,7 +645,7 @@ if ($overwriteBody==1) {
 			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
 		}
 		echo '</td>';
-		echo "<td class=\"mcf togdis".($avails[$i]!=1?' dis':'')."\">";
+		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
 		if ($types[$i]=='Forum') {
 			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fp',$cnt)\"/>";
 			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
@@ -690,7 +690,7 @@ if ($overwriteBody==1) {
 			echo " at <input type=text size=8 id=\"fptime$cnt\" name=\"fptime$cnt\" value=\"$fptime\"></span>";
 		}
 		echo '</td>';
-		echo "<td class=\"mcf togdis".($avails[$i]!=1?' dis':'')."\">";
+		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
 		if ($types[$i]=='Forum') {
 			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fr',$cnt)\"/>";
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
