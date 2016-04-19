@@ -1032,7 +1032,7 @@ if (!isset($_POST['embedpostback'])) {
 							echo "<p>", sprintf(_('%s already has a group.  No change made'), $thisusername), "</p>";
 							$loginfo .= "$thisusername already in group. ";
 						} else {
-							$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('$userid','{$sessiondata['groupid']}')";
+							$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ('{$_POST['user'.$i]}','{$sessiondata['groupid']}')";
 							mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							
 							$fieldstocopy = explode(',',$fieldstocopy);
@@ -2081,7 +2081,8 @@ if (!isset($_POST['embedpostback'])) {
 				$testsettings['intro'] .= _('Group Members:') . " <ul>";
 				
 				$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
-				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ORDER BY imas_users.LastName,imas_users.FirstName";
+				$query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid='{$sessiondata['groupid']}' ";
+				$query .= "AND imas_assessment_sessions.assessmentid='{$testsettings['id']}' ORDER BY imas_users.LastName,imas_users.FirstName";
 				$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 				while ($row = mysql_fetch_row($result)) {
 					$curgrp[] = $row[0];
