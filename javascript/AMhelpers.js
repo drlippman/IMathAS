@@ -869,7 +869,7 @@ function syntaxcheckexpr(str,format,vl) {
 	  return err;
 }
 
-var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega'];
+var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 var calctoproc = {};
 var intcalctoproc = {};
 var calcformat = {};
