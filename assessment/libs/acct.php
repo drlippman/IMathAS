@@ -142,9 +142,9 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 			for ($i=0;$i<count($sg['elements']);$i+=2) {
 				if (isset($sg['fixed']) && in_array($i, $sg['fixed'])) {
 					if (!isset($sg['header']) && count($sg['elements']==2)) {
-						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['elements'][$i].'</b></td>';
+						$out .= '<tr><td style="padding-left:'.($ind+.5).'em;"><b>'.$sg['elements'][$i].'</b></td>';
 					} else {
-						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;">'.$sg['elements'][$i].'</td>';
+						$out .= '<tr><td style="padding-left:'.($ind+.5).'em;">'.$sg['elements'][$i].'</td>';
 					}
 					$sn--;
 				} else {
