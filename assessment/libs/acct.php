@@ -669,6 +669,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			if ($sl>$maxsize[$j]) { $maxsize[$j] = $sl;}
 			if (!$hasdecimals && strpos($cols[$j][$i],'.')!==false) { $hasdecimals = true;}
 		}
+		$maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
 	}
 	if (count($headers)!=0) {
 		if (!is_array($headers[0])) {
