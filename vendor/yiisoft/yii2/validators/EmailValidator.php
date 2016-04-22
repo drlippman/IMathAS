@@ -73,7 +73,7 @@ class EmailValidator extends Validator
         // make sure string length is limited to avoid DOS attacks
         if (!is_string($value) || strlen($value) >= 320) {
             $valid = false;
-        } elseif (!preg_match('/^(.*<?)(.*)@(.*)(>?)$/', $value, $matches)) {
+        } elseif (!preg_match('/^(.*<?)(.*)@(.*?)(>?)$/', $value, $matches)) {
             $valid = false;
         } else {
             $domain = $matches[3];
@@ -92,16 +92,16 @@ class EmailValidator extends Validator
     /**
      * @inheritdoc
      */
-    public function clientValidateAttribute($object, $attribute, $view)
+    public function clientValidateAttribute($model, $attribute, $view)
     {
         $options = [
             'pattern' => new JsExpression($this->pattern),
             'fullPattern' => new JsExpression($this->fullPattern),
             'allowName' => $this->allowName,
             'message' => Yii::$app->getI18n()->format($this->message, [
-                'attribute' => $object->getAttributeLabel($attribute),
+                'attribute' => $model->getAttributeLabel($attribute),
             ], Yii::$app->language),
-            'enableIDN' => (boolean) $this->enableIDN,
+            'enableIDN' => (bool) $this->enableIDN,
         ];
         if ($this->skipOnEmpty) {
             $options['skipOnEmpty'] = 1;
@@ -112,6 +112,6 @@ class EmailValidator extends Validator
             PunycodeAsset::register($view);
         }
 
-        return 'yii.validation.email(value, messages, ' . Json::encode($options) . ');';
+        return 'yii.validation.email(value, messages, ' . Json::htmlEncode($options) . ');';
     }
 }

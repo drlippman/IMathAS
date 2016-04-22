@@ -48,7 +48,7 @@ class AssetManager extends Component
      * The array values are the corresponding configurations. If a value is false, it means the corresponding asset
      * bundle is disabled and [[getBundle()]] should return null.
      *
-     * If this this property is false, it means the whole asset bundle feature is disabled and [[getBundle()]]
+     * If this property is false, it means the whole asset bundle feature is disabled and [[getBundle()]]
      * will always return null.
      *
      * The following example shows how to disable the bootstrap css file used by Bootstrap widgets
@@ -64,11 +64,11 @@ class AssetManager extends Component
      */
     public $bundles = [];
     /**
-     * @return string the root directory storing the published asset files.
+     * @var string the root directory storing the published asset files.
      */
     public $basePath = '@webroot/assets';
     /**
-     * @return string the base URL through which the published asset files can be accessed.
+     * @var string the base URL through which the published asset files can be accessed.
      */
     public $baseUrl = '@web/assets';
     /**
@@ -81,7 +81,8 @@ class AssetManager extends Component
      * the corresponding value will replace the asset and be registered with the view.
      * For example, an asset file `my/path/to/jquery.js` matches a key `jquery.js`.
      *
-     * Note that the target asset files should be either absolute URLs or paths relative to [[baseUrl]] and [[basePath]].
+     * Note that the target asset files should be absolute URLs, domain relative URLs (starting from '/') or paths
+     * relative to [[baseUrl]] and [[basePath]].
      *
      * In the following example, any assets ending with `jquery.min.js` will be replaced with `jquery/dist/jquery.js`
      * which is relative to [[baseUrl]] and [[basePath]].
@@ -89,6 +90,14 @@ class AssetManager extends Component
      * ```php
      * [
      *     'jquery.min.js' => 'jquery/dist/jquery.js',
+     * ]
+     * ```
+     *
+     * You may also use aliases while specifying map value, for example:
+     *
+     * ```php
+     * [
+     *     'jquery.min.js' => '@web/js/jquery/jquery.js',
      * ]
      * ```
      */
@@ -150,6 +159,42 @@ class AssetManager extends Component
      * significantly degrade the performance.
      */
     public $forceCopy = false;
+    /**
+     * @var boolean whether to append a timestamp to the URL of every published asset. When this is true,
+     * the URL of a published asset may look like `/path/to/asset?v=timestamp`, where `timestamp` is the
+     * last modification time of the published asset file.
+     * You normally would want to set this property to true when you have enabled HTTP caching for assets,
+     * because it allows you to bust caching when the assets are updated.
+     * @since 2.0.3
+     */
+    public $appendTimestamp = false;
+    /**
+     * @var callable a callback that will be called to produce hash for asset directory generation.
+     * The signature of the callback should be as follows:
+     *
+     * ```
+     * function ($path)
+     * ```
+     *
+     * where `$path` is the asset path. Note that the `$path` can be either directory where the asset
+     * files reside or a single file. For a CSS file that uses relative path in `url()`, the hash
+     * implementation should use the directory path of the file instead of the file path to include
+     * the relative asset files in the copying.
+     *
+     * If this is not set, the asset manager will use the default CRC32 and filemtime in the `hash`
+     * method.
+     *
+     * Example of an implementation using MD4 hash:
+     *
+     * ```php
+     * function ($path) {
+     *     return hash('md4', $path);
+     * }
+     * ```
+     *
+     * @since 2.0.6
+     */
+    public $hashCallback;
 
     private $_dummyBundles = [];
 
@@ -178,7 +223,7 @@ class AssetManager extends Component
      * This method will first look for the bundle in [[bundles]]. If not found,
      * it will treat `$name` as the class of the asset bundle and create a new instance of it.
      *
-     * @param string $name the class name of the asset bundle
+     * @param string $name the class name of the asset bundle (without the leading backslash)
      * @param boolean $publish whether to publish the asset files in the asset bundle before it is returned.
      * If you set this false, you must manually call `AssetBundle::publish()` to publish the asset files.
      * @return AssetBundle the asset bundle instance
@@ -201,6 +246,15 @@ class AssetManager extends Component
         }
     }
 
+    /**
+     * Loads asset bundle class by name
+     *
+     * @param string $name bundle name
+     * @param array $config bundle object configuration
+     * @param boolean $publish if bundle should be published
+     * @return AssetBundle
+     * @throws InvalidConfigException if configuration isn't valid
+     */
     protected function loadBundle($name, $config = [], $publish = true)
     {
         if (!isset($config['class'])) {
@@ -214,10 +268,17 @@ class AssetManager extends Component
         return $bundle;
     }
 
+    /**
+     * Loads dummy bundle by name
+     *
+     * @param string $name
+     * @return AssetBundle
+     */
     protected function loadDummyBundle($name)
     {
         if (!isset($this->_dummyBundles[$name])) {
             $this->_dummyBundles[$name] = $this->loadBundle($name, [
+                'sourcePath' => null,
                 'js' => [],
                 'css' => [],
                 'depends' => [],
@@ -236,9 +297,28 @@ class AssetManager extends Component
     public function getAssetUrl($bundle, $asset)
     {
         if (($actualAsset = $this->resolveAsset($bundle, $asset)) !== false) {
-            return Url::isRelative($actualAsset) ? $this->baseUrl . '/' . $actualAsset : $actualAsset;
+            if (strncmp($actualAsset, '@web/', 5) === 0) {
+                $asset = substr($actualAsset, 5);
+                $basePath = Yii::getAlias("@webroot");
+                $baseUrl = Yii::getAlias("@web");
+            } else {
+                $asset = Yii::getAlias($actualAsset);
+                $basePath = $this->basePath;
+                $baseUrl = $this->baseUrl;
+            }
         } else {
-            return Url::isRelative($asset) ? $bundle->baseUrl . '/' . $asset : $asset;
+            $basePath = $bundle->basePath;
+            $baseUrl = $bundle->baseUrl;
+        }
+
+        if (!Url::isRelative($asset) || strncmp($asset, '/', 1) === 0) {
+            return $asset;
+        }
+
+        if ($this->appendTimestamp && ($timestamp = @filemtime("$basePath/$asset")) > 0) {
+            return "$baseUrl/$asset?v=$timestamp";
+        } else {
+            return "$baseUrl/$asset";
         }
     }
 
@@ -346,6 +426,9 @@ class AssetManager extends Component
      * @param array $options the options to be applied when publishing a directory.
      * The following options are supported:
      *
+     * - only: array, list of patterns that the file paths should match if they want to be copied.
+     * - except: array, list of patterns that the files or directories should match if they want to be excluded from being copied.
+     * - caseSensitive: boolean, whether patterns specified at "only" or "except" should be case sensitive. Defaults to true.
      * - beforeCopy: callback, a PHP callback that is called before copying each sub-directory or file.
      *   This overrides [[beforeCopy]] if set.
      * - afterCopy: callback, a PHP callback that is called after a sub-directory or file is successfully copied.
@@ -384,7 +467,7 @@ class AssetManager extends Component
      */
     protected function publishFile($src)
     {
-        $dir = $this->hash(dirname($src) . filemtime($src));
+        $dir = $this->hash($src);
         $fileName = basename($src);
         $dstDir = $this->basePath . DIRECTORY_SEPARATOR . $dir;
         $dstFile = $dstDir . DIRECTORY_SEPARATOR . $fileName;
@@ -413,6 +496,9 @@ class AssetManager extends Component
      * @param array $options the options to be applied when publishing a directory.
      * The following options are supported:
      *
+     * - only: array, list of patterns that the file paths should match if they want to be copied.
+     * - except: array, list of patterns that the files or directories should match if they want to be excluded from being copied.
+     * - caseSensitive: boolean, whether patterns specified at "only" or "except" should be case sensitive. Defaults to true.
      * - beforeCopy: callback, a PHP callback that is called before copying each sub-directory or file.
      *   This overrides [[beforeCopy]] if set.
      * - afterCopy: callback, a PHP callback that is called after a sub-directory or file is successfully copied.
@@ -426,29 +512,30 @@ class AssetManager extends Component
      */
     protected function publishDirectory($src, $options)
     {
-        $dir = $this->hash($src . filemtime($src));
+        $dir = $this->hash($src);
         $dstDir = $this->basePath . DIRECTORY_SEPARATOR . $dir;
         if ($this->linkAssets) {
             if (!is_dir($dstDir)) {
                 symlink($src, $dstDir);
             }
-        } elseif (!is_dir($dstDir) || !empty($options['forceCopy']) || (!isset($options['forceCopy']) && $this->forceCopy)) {
-            $opts = [
-                'dirMode' => $this->dirMode,
-                'fileMode' => $this->fileMode,
-            ];
-            if (isset($options['beforeCopy'])) {
-                $opts['beforeCopy'] = $options['beforeCopy'];
-            } elseif ($this->beforeCopy !== null) {
-                $opts['beforeCopy'] = $this->beforeCopy;
-            } else {
-                $opts['beforeCopy'] = function ($from, $to) {
-                    return strncmp(basename($from), '.', 1) !== 0;
-                };
+        } elseif (!empty($options['forceCopy']) || ($this->forceCopy && !isset($options['forceCopy'])) || !is_dir($dstDir)) {
+            $opts = array_merge(
+                $options,
+                [
+                    'dirMode' => $this->dirMode,
+                    'fileMode' => $this->fileMode,
+                ]
+            );
+            if (!isset($opts['beforeCopy'])) {
+                if ($this->beforeCopy !== null) {
+                    $opts['beforeCopy'] = $this->beforeCopy;
+                } else {
+                    $opts['beforeCopy'] = function ($from, $to) {
+                        return strncmp(basename($from), '.', 1) !== 0;
+                    };
+                }
             }
-            if (isset($options['afterCopy'])) {
-                $opts['afterCopy'] = $options['afterCopy'];
-            } elseif ($this->afterCopy !== null) {
+            if (!isset($opts['afterCopy']) && $this->afterCopy !== null) {
                 $opts['afterCopy'] = $this->afterCopy;
             }
             FileHelper::copyDirectory($src, $dstDir, $opts);
@@ -472,12 +559,7 @@ class AssetManager extends Component
             return $this->_published[$path][0];
         }
         if (is_string($path) && ($path = realpath($path)) !== false) {
-            $base = $this->basePath . DIRECTORY_SEPARATOR;
-            if (is_file($path)) {
-                return $base . $this->hash(dirname($path) . filemtime($path)) . DIRECTORY_SEPARATOR . basename($path);
-            } else {
-                return $base . $this->hash($path . filemtime($path));
-            }
+            return $this->basePath . DIRECTORY_SEPARATOR . $this->hash($path) . (is_file($path) ? DIRECTORY_SEPARATOR . basename($path) : '');
         } else {
             return false;
         }
@@ -498,11 +580,7 @@ class AssetManager extends Component
             return $this->_published[$path][1];
         }
         if (is_string($path) && ($path = realpath($path)) !== false) {
-            if (is_file($path)) {
-                return $this->baseUrl . '/' . $this->hash(dirname($path) . filemtime($path)) . '/' . basename($path);
-            } else {
-                return $this->baseUrl . '/' . $this->hash($path . filemtime($path));
-            }
+            return $this->baseUrl . '/' . $this->hash($path) . (is_file($path) ? '/' . basename($path) : '');
         } else {
             return false;
         }
@@ -516,6 +594,10 @@ class AssetManager extends Component
      */
     protected function hash($path)
     {
+        if (is_callable($this->hashCallback)) {
+            return call_user_func($this->hashCallback, $path);
+        }
+        $path = (is_file($path) ? dirname($path) : $path) . filemtime($path);
         return sprintf('%x', crc32($path . Yii::getVersion()));
     }
 }

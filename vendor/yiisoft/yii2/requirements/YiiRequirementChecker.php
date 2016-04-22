@@ -63,7 +63,7 @@ class YiiRequirementChecker
      * @param array|string $requirements requirements to be checked.
      * If an array, it is treated as the set of requirements;
      * If a string, it is treated as the path of the file, which contains the requirements;
-     * @return static self instance.
+     * @return $this self instance.
      */
     function check($requirements)
     {
@@ -199,7 +199,7 @@ class YiiRequirementChecker
             return false;
         }
 
-        return ((integer) $value == 1 || strtolower($value) == 'on');
+        return ((int) $value == 1 || strtolower($value) == 'on');
     }
 
     /**
@@ -244,7 +244,7 @@ class YiiRequirementChecker
             return 0;
         }
         if (is_numeric($verboseSize)) {
-            return (integer) $verboseSize;
+            return (int) $verboseSize;
         }
         $sizeUnit = trim($verboseSize, '0123456789');
         $size = str_replace($sizeUnit, '', $verboseSize);

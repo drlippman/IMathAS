@@ -19,4 +19,5 @@ return array(
     'kartik\\date\\' => array($vendorDir . '/kartik-v/yii2-widget-datepicker'),
     'kartik\\base\\' => array($vendorDir . '/kartik-v/yii2-krajee-base'),
     'cebe\\markdown\\' => array($vendorDir . '/cebe/markdown'),
+    'Faker\\' => array($vendorDir . '/fzaninotto/faker/src/Faker'),
 );

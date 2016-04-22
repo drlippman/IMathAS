@@ -44,7 +44,7 @@
 yii = (function ($) {
     var pub = {
         /**
-         * List of scripts that can be loaded multiple times via AJAX requests. Each script can be represented
+         * List of JS or CSS URLs that can be loaded multiple times via AJAX requests. Each script can be represented
          * as either an absolute URL or a relative one.
          */
         reloadableScripts: [],
@@ -61,14 +61,14 @@ yii = (function ($) {
          * @return string|undefined the CSRF parameter name. Undefined is returned if CSRF validation is not enabled.
          */
         getCsrfParam: function () {
-            return $('meta[name=csrf-param]').prop('content');
+            return $('meta[name=csrf-param]').attr('content');
         },
 
         /**
          * @return string|undefined the CSRF token. Undefined is returned if CSRF validation is not enabled.
          */
         getCsrfToken: function () {
-            return $('meta[name=csrf-token]').prop('content');
+            return $('meta[name=csrf-token]').attr('content');
         },
 
         /**
@@ -78,8 +78,8 @@ yii = (function ($) {
          * @param value the CSRF token value
          */
         setCsrfToken: function (name, value) {
-            $('meta[name=csrf-param]').prop('content', name);
-            $('meta[name=csrf-token]').prop('content', value)
+            $('meta[name=csrf-param]').attr('content', name);
+            $('meta[name=csrf-token]').attr('content', value);
         },
 
         /**
@@ -121,27 +121,51 @@ yii = (function ($) {
          * If the `data-method` attribute is not defined, the `href` attribute (if any) of the element
          * will be assigned to `window.location`.
          *
+         * Starting from version 2.0.3, the `data-params` attribute is also recognized when you specify
+         * `data-method`. The value of `data-params` should be a JSON representation of the data (name-value pairs)
+         * that should be submitted as hidden inputs. For example, you may use the following code to generate
+         * such a link:
+         *
+         * ```php
+         * use yii\helpers\Html;
+         * use yii\helpers\Json;
+         *
+         * echo Html::a('submit', ['site/foobar'], [
+         *     'data' => [
+         *         'method' => 'post',
+         *         'params' => [
+         *             'name1' => 'value1',
+         *             'name2' => 'value2',
+         *         ],
+         *     ],
+         * ];
+         * ```
+         *
          * @param $e the jQuery representation of the element
          */
         handleAction: function ($e) {
             var method = $e.data('method'),
                 $form = $e.closest('form'),
-                action = $e.attr('href');
+                action = $e.attr('href'),
+                params = $e.data('params');
 
             if (method === undefined) {
                 if (action && action != '#') {
                     window.location = action;
+                } else if ($e.is(':submit') && $form.length) {
+                    $form.trigger('submit');
                 }
                 return;
             }
 
-            var newForm = !$form.length || action && action != '#';
+            var newForm = !$form.length;
             if (newForm) {
                 if (!action || !action.match(/(^\/|:\/\/)/)) {
                     action = window.location.href;
                 }
-                $form = $('<form method="' + method + '" action="' + action + '"></form>');
-                var target = $e.prop('target');
+                $form = $('<form method="' + method + '"></form>');
+                $form.attr('action', action);
+                var target = $e.attr('target');
                 if (target) {
                     $form.attr('target', target);
                 }
@@ -164,16 +188,41 @@ yii = (function ($) {
                 activeFormData.submitObject = $e;
             }
 
-            var oldMethod = $form.prop('method');
-            $form.prop('method', method);
+            // temporarily add hidden inputs according to data-params
+            if (params && $.isPlainObject(params)) {
+                $.each(params, function (idx, obj) {
+                    $form.append('<input name="' + idx + '" value="' + obj + '" type="hidden">');
+                });
+            }
+
+            var oldMethod = $form.attr('method');
+            $form.attr('method', method);
+            var oldAction = null;
+            if (action && action != '#') {
+                oldAction = $form.attr('action');
+                $form.attr('action', action);
+            }
 
             $form.trigger('submit');
+            $.when($form.data('yiiSubmitFinalizePromise')).then(
+                function () {
+                    if (oldAction != null) {
+                        $form.attr('action', oldAction);
+                    }
+                    $form.attr('method', oldMethod);
 
-            $form.prop('method', oldMethod);
+                    // remove the temporarily added hidden inputs
+                    if (params && $.isPlainObject(params)) {
+                        $.each(params, function (idx, obj) {
+                            $('input[name="' + idx + '"]', $form).remove();
+                        });
+                    }
 
-            if (newForm) {
-                $form.remove();
-            }
+                    if (newForm) {
+                        $form.remove();
+                    }
+                }
+            );
         },
 
         getQueryParams: function (url) {
@@ -261,6 +310,7 @@ yii = (function ($) {
         var loadedScripts = $('script[src]').map(function () {
             return this.src.charAt(0) === '/' ? hostInfo + this.src : this.src;
         }).toArray();
+
         $.ajaxPrefilter('script', function (options, originalOptions, xhr) {
             if (options.dataType == 'jsonp') {
                 return;
@@ -276,6 +326,20 @@ yii = (function ($) {
                     xhr.abort();
                 }
             }
+        });
+
+        $(document).ajaxComplete(function (event, xhr, settings) {
+            var styleSheets = [];
+            $('link[rel=stylesheet]').each(function () {
+                if ($.inArray(this.href, pub.reloadableScripts) !== -1) {
+                    return;
+                }
+                if ($.inArray(this.href, styleSheets) == -1) {
+                    styleSheets.push(this.href)
+                } else {
+                    $(this).remove();
+                }
+            })
         });
     }
 

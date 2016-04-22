@@ -1,5 +1,34 @@
 yii.gii = (function ($) {
-    var isActive = $('.default-view').length > 0;
+
+    var $clipboardContainer = $("#clipboard-container"),
+    valueToCopy = '',
+
+    onKeydown = function(e) {
+        var $target;
+        $target = $(e.target);
+
+        if ($target.is("input:visible, textarea:visible")) {
+            return;
+        }
+
+        if (typeof window.getSelection === "function" && window.getSelection().toString()) {
+            return;
+        }
+
+        if (document.selection != null && document.selection.createRange().text) {
+            return;
+        }
+
+        $clipboardContainer.empty().show();
+        return $("<textarea id='clipboard'></textarea>").val(valueToCopy).appendTo($clipboardContainer).focus().select();
+    },
+
+    onKeyup = function(e) {
+        if ($(e.target).is("#clipboard")) {
+            $("#clipboard-container").empty().hide();
+        }
+        return true;
+    };
 
     var initHintBlocks = function () {
         $('.hint-block').each(function () {
@@ -34,6 +63,25 @@ yii.gii = (function ($) {
         });
     };
 
+    var fillModal = function(data) {
+        var $modal = $('#preview-modal'),
+         $link = $(this),
+         $modalBody = $modal.find('.modal-body');
+        if (!$link.hasClass('modal-refresh')) {
+            var filesSelector = 'a.' + $modal.data('action');
+            var $files = $(filesSelector);
+            var index = $files.filter('[href="' + $link.attr('href') + '"]').index(filesSelector);
+            var $prev = $files.eq(index - 1);
+            var $next = $files.eq((index + 1 == $files.length ? 0 : index + 1));
+            $modal.data('current', $files.eq(index));
+            $modal.find('.modal-previous').attr('href', $prev.attr('href')).data('title', $prev.data('title'));
+            $modal.find('.modal-next').attr('href', $next.attr('href')).data('title', $next.data('title'));
+        }
+        $modalBody.html(data);
+        valueToCopy = $("<div/>").html(data.replace(/(<(br[^>]*)>)/ig, '\n')).text().trim() + '\n';
+        $modal.find('.content').css('max-height', ($(window).height() - 200) + 'px');
+    };
+
     var initPreviewDiffLinks = function () {
         $('.preview-code, .diff-code, .modal-refresh, .modal-previous, .modal-next').on('click', function () {
             var $modal = $('#preview-modal');
@@ -60,18 +108,7 @@ yii.gii = (function ($) {
                 url: $link.prop('href'),
                 data: $('.default-view form').serializeArray(),
                 success: function (data) {
-                    if (!$link.hasClass('modal-refresh')) {
-                        var filesSelector = 'a.' + $modal.data('action');
-                        var $files = $(filesSelector);
-                        var index = $files.filter('[href="' + $link.attr('href') + '"]').index(filesSelector);
-                        var $prev = $files.eq(index - 1);
-                        var $next = $files.eq((index + 1 == $files.length ? 0 : index + 1));
-                        $modal.data('current', $files.eq(index));
-                        $modal.find('.modal-previous').attr('href', $prev.attr('href')).data('title', $prev.data('title'));
-                        $modal.find('.modal-next').attr('href', $next.attr('href')).data('title', $next.data('title'));
-                    }
-                    $modal.find('.modal-body').html(data);
-                    $modal.find('.content').css('max-height', ($(window).height() - 200) + 'px');
+                    fillModal(data);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     $modal.find('.modal-body').html('<div class="error">' + XMLHttpRequest.responseText + '</div>');
@@ -127,6 +164,12 @@ yii.gii = (function ($) {
         });
     };
 
+    $(document).on("keydown", function(e) {
+        if (valueToCopy && (e.ctrlKey || e.metaKey) && (e.which === 67)) {
+            return onKeydown(e);
+        }
+    }).on("keyup", onKeyup);
+
     return {
         autocomplete: function (counter, data) {
             var datum = new Bloodhound({
@@ -146,23 +189,65 @@ yii.gii = (function ($) {
             initConfirmationCheckboxes();
             initToggleActions();
 
-            // model generator: hide class name input when table name input contains *
+            // model generator: hide class name inputs when table name input contains *
             $('#model-generator #generator-tablename').change(function () {
-                $('#model-generator .field-generator-modelclass').toggle($(this).val().indexOf('*') == -1);
+                var show = ($(this).val().indexOf('*') === -1);
+                $('.field-generator-modelclass').toggle(show);
+                if ($('#generator-generatequery').is(':checked')) {
+                    $('.field-generator-queryclass').toggle(show);
+                }
             }).change();
 
             // model generator: translate table name to model class
-            $('#generator-tablename').on('blur', function () {
+            $('#model-generator #generator-tablename').on('blur', function () {
                 var tableName = $(this).val();
-                if ($('#generator-modelclass').val()=='' && tableName && tableName.indexOf('*') === -1){
-                    var modelClass='';
+                var tablePrefix = $(this).attr('table_prefix') || '';
+                if (tablePrefix.length) {
+                    // if starts with prefix
+                    if (tableName.slice(0, tablePrefix.length) === tablePrefix) {
+                        // remove prefix
+                        tableName = tableName.slice(tablePrefix.length);
+                    }
+                }
+                if ($('#generator-modelclass').val() === '' && tableName && tableName.indexOf('*') === -1) {
+                    var modelClass = '';
                     $.each(tableName.split('_'), function() {
                         if(this.length>0)
                             modelClass+=this.substring(0,1).toUpperCase()+this.substring(1);
                     });
-                    $('#generator-modelclass').val(modelClass);
+                    $('#generator-modelclass').val(modelClass).blur();
                 }
             });
+
+            // model generator: translate model class to query class
+            $('#model-generator #generator-modelclass').on('blur', function () {
+                var modelClass = $(this).val();
+                if (modelClass !== '') {
+                    var queryClass = $('#generator-queryclass').val();
+                    if (queryClass === '') {
+                        queryClass = modelClass + 'Query';
+                        $('#generator-queryclass').val(queryClass);
+                    }
+                }
+            });
+
+            // model generator: synchronize query namespace with model namespace
+            $('#model-generator #generator-ns').on('blur', function () {
+                var stickyValue = $('#model-generator .field-generator-queryns .sticky-value');
+                var input = $('#model-generator #generator-queryns');
+                if (stickyValue.is(':visible') || !input.is(':visible')) {
+                    var ns = $(this).val();
+                    stickyValue.html(ns);
+                    input.val(ns);
+                }
+            });
+
+            // model generator: toggle query fields
+            $('form #generator-generatequery').change(function () {
+                $('form .field-generator-queryns').toggle($(this).is(':checked'));
+                $('form .field-generator-queryclass').toggle($(this).is(':checked'));
+                $('form .field-generator-querybaseclass').toggle($(this).is(':checked'));
+            }).change();
 
             // hide message category when I18N is disabled
             $('form #generator-enablei18n').change(function () {
@@ -178,7 +263,7 @@ yii.gii = (function ($) {
             $('.module-form #generator-moduleclass').change(function () {
                 var value = $(this).val().match(/(\w+)\\\w+$/);
                 var $idInput = $('#generator-moduleid');
-                if (value && value[1] && $idInput.val() == '') {
+                if (value && value[1] && $idInput.val() === '') {
                     $idInput.val(value[1]);
                 }
             });

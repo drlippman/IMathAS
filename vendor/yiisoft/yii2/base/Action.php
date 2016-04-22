@@ -12,8 +12,8 @@ use Yii;
 /**
  * Action is the base class for all controller action classes.
  *
- * Action provides a way to divide a complex controller into
- * smaller actions in separate class files.
+ * Action provides a way to reuse action method code. An action method in an Action
+ * class can be used in multiple controllers or in different projects.
  *
  * Derived classes must implement a method named `run()`. This method
  * will be invoked by the controller when the action is requested.
@@ -41,7 +41,7 @@ class Action extends Component
      */
     public $id;
     /**
-     * @var Controller the controller that owns this action
+     * @var Controller|\yii\web\Controller the controller that owns this action
      */
     public $controller;
 

@@ -55,7 +55,7 @@
             return this.each(function () {
                 var $e = $(this);
                 var settings = $.extend({}, defaults, options || {});
-                gridData[$e.prop('id')] = {settings: settings};
+                gridData[$e.attr('id')] = {settings: settings};
 
                 var enterPressed = false;
                 $(document).off('change.yiiGridView keydown.yiiGridView', settings.filterSelector)
@@ -83,7 +83,7 @@
 
         applyFilter: function () {
             var $grid = $(this), event;
-            var settings = gridData[$grid.prop('id')].settings;
+            var settings = gridData[$grid.attr('id')].settings;
             var data = {};
             $.each($(settings.filterSelector).serializeArray(), function () {
                 data[this.name] = this.value;
@@ -117,13 +117,14 @@
 
         setSelectionColumn: function (options) {
             var $grid = $(this);
-            var id = $(this).prop('id');
+            var id = $(this).attr('id');
             gridData[id].selectionColumn = options.name;
             if (!options.multiple) {
                 return;
             }
-            var inputs = "#" + id + " input[name='" + options.checkAll + "']";
-            $(document).off('click.yiiGridView', inputs).on('click.yiiGridView', inputs, function () {
+            var checkAll = "#" + id + " input[name='" + options.checkAll + "']";
+            var inputs = "#" + id + " input[name='" + options.name + "']";
+            $(document).off('click.yiiGridView', checkAll).on('click.yiiGridView', checkAll, function () {
                 $grid.find("input[name='" + options.name + "']:enabled").prop('checked', this.checked);
             });
             $(document).off('click.yiiGridView', inputs + ":enabled").on('click.yiiGridView', inputs + ":enabled", function () {
@@ -134,7 +135,7 @@
 
         getSelectedRows: function () {
             var $grid = $(this);
-            var data = gridData[$grid.prop('id')];
+            var data = gridData[$grid.attr('id')];
             var keys = [];
             if (data.selectionColumn) {
                 $grid.find("input[name='" + data.selectionColumn + "']:checked").each(function () {
@@ -152,7 +153,7 @@
         },
 
         data: function () {
-            var id = $(this).prop('id');
+            var id = $(this).attr('id');
             return gridData[id];
         }
     };

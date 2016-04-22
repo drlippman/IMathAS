@@ -24,6 +24,7 @@ class GenerateAction extends \yii\base\Action
      */
     public $controller;
 
+
     /**
      * @inheritdoc
      */
@@ -56,7 +57,7 @@ class GenerateAction extends \yii\base\Action
             return;
         }
         echo "The following files will be generated:\n";
-        $skipAll = $this->controller->interactive ? null : true;
+        $skipAll = $this->controller->interactive ? null : !$this->controller->overwrite;
         $answers = [];
         foreach ($files as $file) {
             $path = $file->getRelativePath();
@@ -102,7 +103,7 @@ class GenerateAction extends \yii\base\Action
             return;
         }
 
-        if ($this->generator->save($files, (array)$answers, $results)) {
+        if ($this->generator->save($files, (array) $answers, $results)) {
             $this->controller->stdout("\nFiles were generated successfully!\n", Console::FG_GREEN);
         } else {
             $this->controller->stdout("\nSome errors occurred while generating the files.", Console::FG_RED);

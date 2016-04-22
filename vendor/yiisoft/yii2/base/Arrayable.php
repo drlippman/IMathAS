@@ -34,7 +34,7 @@ interface Arrayable
      * returning the corresponding field value. The signature of the callable should be:
      *
      * ```php
-     * function ($field, $model) {
+     * function ($model, $field) {
      *     // return field value
      * }
      * ```
@@ -52,8 +52,8 @@ interface Arrayable
      *     'email',
      *     'firstName' => 'first_name',
      *     'lastName' => 'last_name',
-     *     'fullName' => function () {
-     *         return $this->first_name . ' ' . $this->last_name;
+     *     'fullName' => function ($model) {
+     *         return $model->first_name . ' ' . $model->last_name;
      *     },
      * ];
      * ```
@@ -62,6 +62,7 @@ interface Arrayable
      * @see toArray()
      */
     public function fields();
+
     /**
      * Returns the list of additional fields that can be returned by [[toArray()]] in addition to those listed in [[fields()]].
      *
@@ -75,6 +76,7 @@ interface Arrayable
      * @see fields()
      */
     public function extraFields();
+
     /**
      * Converts the object into an array.
      *

@@ -77,7 +77,7 @@ class Controller extends \yii\base\Controller
     {
         if (!empty($params)) {
             // populate options here so that they are available in beforeAction().
-            $options = $this->options($id);
+            $options = $this->options($id === '' ? $this->defaultAction : $id);
             foreach ($params as $name => $value) {
                 if (in_array($name, $options, true)) {
                     $default = $this->$name;
@@ -486,9 +486,9 @@ class Controller extends \yii\base\Controller
      */
     protected function parseDocCommentSummary($reflection)
     {
-        $docLines = preg_split('~\R~', $reflection->getDocComment());
+        $docLines = preg_split('~\R~u', $reflection->getDocComment());
         if (isset($docLines[1])) {
-            return trim($docLines[1], ' *');
+            return trim($docLines[1], "\t *");
         }
         return '';
     }

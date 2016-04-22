@@ -56,7 +56,7 @@ class Controller extends \yii\base\Controller
      * @param \yii\base\Action $action the action to be bound with parameters
      * @param array $params the parameters to be bound to the action
      * @return array the valid parameters that the action can run with.
-     * @throws HttpException if there are missing or invalid parameters.
+     * @throws BadRequestHttpException if there are missing or invalid parameters.
      */
     public function bindActionParams($action, $params)
     {
@@ -73,7 +73,7 @@ class Controller extends \yii\base\Controller
             $name = $param->getName();
             if (array_key_exists($name, $params)) {
                 if ($param->isArray()) {
-                    $args[] = $actionParams[$name] = is_array($params[$name]) ? $params[$name] : [$params[$name]];
+                    $args[] = $actionParams[$name] = (array) $params[$name];
                 } elseif (!is_array($params[$name])) {
                     $args[] = $actionParams[$name] = $params[$name];
                 } else {
@@ -110,9 +110,9 @@ class Controller extends \yii\base\Controller
                 throw new BadRequestHttpException(Yii::t('yii', 'Unable to verify your data submission.'));
             }
             return true;
-        } else {
-            return false;
         }
+        
+        return false;
     }
 
     /**

@@ -5,8 +5,61 @@ Upgrading Instructions for Yii Framework v2
 
 The following upgrading instructions are cumulative. That is,
 if you want to upgrade from version A to version C and there is
-version B between A and C, you need to following the instructions
+version B between A and C, you need to follow the instructions
 for both A and B.
+
+
+Upgrade from Yii 2.0.5
+----------------------
+  
+* The signature of the following methods in `yii\console\controllers\MessageController` has changed. They have an extra parameter `$markUnused`.
+  - `saveMessagesToDb($messages, $db, $sourceMessageTable, $messageTable, $removeUnused, $languages, $markUnused)`
+  - `saveMessagesToPHP($messages, $dirName, $overwrite, $removeUnused, $sort, $markUnused)`
+  - `saveMessagesCategoryToPHP($messages, $fileName, $overwrite, $removeUnused, $sort, $category, $markUnused)`
+  - `saveMessagesToPO($messages, $dirName, $overwrite, $removeUnused, $sort, $catalog, $markUnused)`
+
+Upgrade from Yii 2.0.4
+----------------------
+
+Upgrading from 2.0.4 to 2.0.5 does not require any changes.
+
+Upgrade from Yii 2.0.3
+----------------------
+
+* Updated dependency to `cebe/markdown` to version `1.1.x`.
+  If you need stick with 1.0.x, you can specify that in your `composer.json` by
+  adding the following line in the `require` section:
+  
+  ```json
+  "cebe/markdown": "~1.0.0",
+  ```
+
+Upgrade from Yii 2.0.2
+----------------------
+
+Starting from version 2.0.3 Yii `Security` component relies on OpenSSL crypto lib instead of Mcrypt. The reason is that
+Mcrypt is abandoned and isn't maintained for years. Therefore your PHP should be compiled with OpenSSL support. Most
+probably there's nothing to worry because it is quite typical.
+
+If you've extended `yii\base\Security` to override any of the config constants you have to update your code:
+
+    - `MCRYPT_CIPHER` — now encoded in `$cipher` (and hence `$allowedCiphers`).
+    - `MCRYPT_MODE` — now encoded in `$cipher` (and hence `$allowedCiphers`).
+    - `KEY_SIZE` — now encoded in `$cipher` (and hence `$allowedCiphers`).
+    - `KDF_HASH` — now `$kdfHash`.
+    - `MAC_HASH` — now `$macHash`.
+    - `AUTH_KEY_INFO` — now `$authKeyInfo`.
+
+Upgrade from Yii 2.0.0
+----------------------
+
+* Upgraded Twitter Bootstrap to [version 3.3.x](http://blog.getbootstrap.com/2014/10/29/bootstrap-3-3-0-released/).
+  If you need to use an older version (i.e. stick with 3.2.x) you can specify that in your `composer.json` by
+  adding the following line in the `require` section:
+  
+  ```json
+  "bower-asset/bootstrap": "3.2.*",
+  ```
 
 Upgrade from Yii 2.0 RC
 -----------------------
@@ -44,7 +97,7 @@ Upgrade from Yii 2.0 Beta
   the composer-asset-plugin, *before* you update your project:
 
   ```
-  php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
+  php composer.phar global require "fxp/composer-asset-plugin:~1.0.0"
   ```
 
   You also need to add the following code to your project's `composer.json` file:
@@ -146,7 +199,7 @@ Upgrade from Yii 2.0 Beta
   ];
   ```
 
-  > Note: If you are using the `Advanced Application Template` you should not add this configuration to `common/config`
+  > Note: If you are using the `Advanced Project Template` you should not add this configuration to `common/config`
   or `console/config` because the console application doesn't have to deal with CSRF and uses its own request that
   doesn't have `cookieValidationKey` property.
 
@@ -200,6 +253,7 @@ new ones save the following code as `convert.php` that should be placed in the s
 
 * Static helper `yii\helpers\Security` has been converted into an application component. You should change all usage of
   its methods to a new syntax, for example: instead of `yii\helpers\Security::hashData()` use `Yii::$app->getSecurity()->hashData()`.
+  The `generateRandomKey()` method now produces not an ASCII compatible output. Use `generateRandomString()` instead.
   Default encryption and hash parameters has been upgraded. If you need to decrypt/validate data that was encrypted/hashed
   before, use the following configuration of the 'security' component:
 
@@ -269,7 +323,7 @@ new ones save the following code as `convert.php` that should be placed in the s
 
   - `asDate`
   - `asTime`
-  - `asDateTime`
+  - `asDatetime`
   - `asSize` has been split up into `asSize` and `asShortSize`
   - `asCurrency`
   - `asDecimal`

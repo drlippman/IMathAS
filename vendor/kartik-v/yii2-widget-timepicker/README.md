@@ -1,6 +1,12 @@
 yii2-widget-timepicker
 ======================
 
+[![Latest Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-timepicker/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-timepicker)
+[![License](https://poser.pugx.org/kartik-v/yii2-widget-timepicker/license)](https://packagist.org/packages/kartik-v/yii2-widget-timepicker)
+[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-timepicker/downloads)](https://packagist.org/packages/kartik-v/yii2-widget-timepicker)
+[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-timepicker/d/monthly)](https://packagist.org/packages/kartik-v/yii2-widget-timepicker)
+[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-widget-timepicker/d/daily)](https://packagist.org/packages/kartik-v/yii2-widget-timepicker)
+
 The TimePicker widget  allows you to easily select a time for a text input using your mouse or keyboards arrow keys. The widget is a wrapper enhancement of the <a href='https://github.com/rendom/bootstrap-3-timepicker' target='_blank'>TimePicker plugin</a> by rendom forked from  <a href='https://github.com/jdewit/bootstrap-timepicker' target='_blank'>jdewit's TimePicker</a>. This widget as used here has been specially enhanced for Yii framework 2.0 and Bootstrap 3.
 
 > NOTE: This extension is a sub repo split of [yii2-widgets](https://github.com/kartik-v/yii2-widgets). The split has been done since 08-Nov-2014 to allow developers to install this specific widget in isolation if needed. One can also use the extension the previous way with the whole suite of [yii2-widgets](http://demos.krajee.com/widgets).
@@ -25,7 +31,7 @@ to the ```require``` section of your `composer.json` file.
 
 ## Latest Release
 
-> NOTE: The latest version of the module is v1.0.0 released on 08-Nov-2014. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-timepicker/blob/master/CHANGE.md) for details.
+> NOTE: The latest version of the module is v1.0.1 released on 12-Jan-2016. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-timepicker/blob/master/CHANGE.md) for details.
 
 ## Demo
 

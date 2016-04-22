@@ -3,42 +3,58 @@
 /**
  * @package   yii2-krajee-base
  * @author    Kartik Visweswaran <kartikv2@gmail.com>
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
- * @version   1.7.4
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2016
+ * @version   1.8.4
  */
 
 namespace kartik\base;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Trait for all translations used in Krajee extensions
  *
+ * @property array $i18n
+ *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
- * @since 1.7.4
+ * @since 1.8.4
  */
 trait TranslationTrait
 {
     /**
      * Yii i18n messages configuration for generating translations
      *
+     * @param string $dir the directory path where translation files will exist
+     * @param string $cat the message category
+     *
      * @return void
      */
-    public function initI18N()
+    public function initI18N($dir = '', $cat = '')
     {
-        if (empty($this->_msgCat)) {
+        if (empty($cat) && empty($this->_msgCat)) {
             return;
         }
-        $reflector = new \ReflectionClass(get_class($this));
-        $dir = dirname($reflector->getFileName());
-        Yii::setAlias("@{$this->_msgCat}", $dir);
-        if (empty($this->i18n)) {
-            $this->i18n = [
-                'class' => 'yii\i18n\PhpMessageSource',
-                'basePath' => "@{$this->_msgCat}/messages",
-                'forceTranslation' => true
-            ];
+        if (empty($cat)) {
+            $cat = $this->_msgCat;
         }
-        Yii::$app->i18n->translations[$this->_msgCat] = $this->i18n;
+        if (empty($dir)) {
+            $reflector = new \ReflectionClass(get_class($this));
+            $dir = dirname($reflector->getFileName());
+        }
+        Yii::setAlias("@{$cat}", $dir);
+        $config = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'basePath' => "@{$cat}/messages",
+            'forceTranslation' => true
+        ];
+        $globalConfig = ArrayHelper::getValue(Yii::$app->i18n->translations, "{$cat}*", []);
+        if (!empty($globalConfig)) {
+            $config = array_merge($config, is_array($globalConfig) ? $globalConfig : (array) $globalConfig);
+        }
+        if (!empty($this->i18n) && is_array($this->i18n)) {
+            $config = array_merge($config, $this->i18n);
+        }
+        Yii::$app->i18n->translations["{$cat}*"] = $config;
     }
 }

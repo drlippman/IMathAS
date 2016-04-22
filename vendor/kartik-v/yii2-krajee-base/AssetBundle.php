@@ -3,8 +3,8 @@
 /**
  * @package   yii2-krajee-base
  * @author    Kartik Visweswaran <kartikv2@gmail.com>
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
- * @version   1.7.4
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2016
+ * @version   1.8.4
  */
 
 namespace kartik\base;
@@ -21,10 +21,10 @@ class AssetBundle extends \yii\web\AssetBundle
     const EMPTY_PATH = 'N0/P@T#';
     const KRAJEE_ASSET = 'K3/@$$3T$';
     const KRAJEE_PATH = 'K3/P@T#';
-    
+
     public $js = self::KRAJEE_ASSET;
     public $css = self::KRAJEE_ASSET;
-    public $sourcePath = self::KRAJEE_PATH;    
+    public $sourcePath = self::KRAJEE_PATH;
     public $depends = [
         'yii\web\JqueryAsset',
         'yii\web\YiiAsset',
@@ -34,7 +34,8 @@ class AssetBundle extends \yii\web\AssetBundle
     /**
      * @inheritdoc
      */
-    public function init() {
+    public function init()
+    {
         parent::init();
         if ($this->js === self::KRAJEE_ASSET) {
             $this->js = [];
@@ -46,12 +47,45 @@ class AssetBundle extends \yii\web\AssetBundle
             $this->sourcePath = null;
         }
     }
-    
+
+    /**
+     * Adds a language JS locale file
+     *
+     * @param string $lang the ISO language code
+     * @param string $prefix the language locale file name prefix
+     * @param string $dir the language file directory relative to source path
+     * @param bool $min whether to auto use minified version
+     *
+     * @return AssetBundle instance
+     */
+    public function addLanguage($lang = '', $prefix = '', $dir = null, $min = false)
+    {
+        if (empty($lang) || substr($lang, 0, 2) == 'en') {
+            return $this;
+        }
+        $ext = $min ? (YII_DEBUG ? ".min.js" : ".js") : ".js";
+        $file = "{$prefix}{$lang}{$ext}";
+        if ($dir === null) {
+            $dir = 'js';
+        } elseif ($dir === "/") {
+            $dir = '';
+        }
+        $path = $this->sourcePath . '/' . $dir;
+        if (!Config::fileExists("{$path}/{$file}")) {
+            $lang = Config::getLang($lang);
+            $file = "{$prefix}{$lang}{$ext}";
+        }
+        if (Config::fileExists("{$path}/{$file}")) {
+            $this->js[] = empty($dir) ? $file : "{$dir}/{$file}";
+        }
+        return $this;
+    }
+
     /**
      * Set up CSS and JS asset arrays based on the base-file names
      *
      * @param string $type whether 'css' or 'js'
-     * @param array  $files the list of 'css' or 'js' basefile names
+     * @param array $files the list of 'css' or 'js' basefile names
      */
     protected function setupAssets($type, $files = [])
     {

@@ -1,11 +1,12 @@
 yii2-widget-datepicker
 ======================
 
-[![Latest Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/v/stable.svg)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![License](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/license.svg)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/downloads.svg)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/d/monthly.png)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
-[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/d/daily.png)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+[![Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+[![Untable Version](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/v/unstable)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+[![License](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/license)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/downloads)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/d/monthly)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
+[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-widget-datepicker/d/daily)](https://packagist.org/packages/kartik-v/yii2-widget-datepicker)
 
 The DatePicker widget is a Yii 2 wrapper for the [Bootstrap DatePicker plugin](http://eternicode.github.io/bootstrap-datepicker) with various enhancements. The plugin is a fork of Stefan Petre's DatePicker (of eyecon.ro), with improvements by @eternicode. The widget is specially styled for Yii framework 2.0 and Bootstrap 3 and allows graceful degradation to a normal HTML text input, if the browser does not support JQuery. The widget supports these markups:
 
@@ -25,20 +26,20 @@ The preferred way to install this extension is through [composer](http://getcomp
 To install, either run
 
 ```
-$ php composer.phar require kartik-v/yii2-widget-datepicker "*"
+$ php composer.phar require kartik-v/yii2-widget-datepicker "@dev"
 ```
 
 or add
 
 ```
-"kartik-v/yii2-widget-datepicker": "*"
+"kartik-v/yii2-widget-datepicker": "@dev"
 ```
 
-to the ```require``` section of your `composer.json` file.
+to the `require` section of your `composer.json` file.
 
 ## Latest Release
 
-> NOTE: The latest version of the module is v1.3.2. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-datepicker/blob/master/CHANGE.md) for details.
+> NOTE: The latest version of the module is v1.3.9. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-datepicker/blob/master/CHANGE.md) for details.
 
 ## Demo
 

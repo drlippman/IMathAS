@@ -8,6 +8,8 @@
 namespace yii\db\mssql;
 
 use yii\base\InvalidParamException;
+use yii\base\NotSupportedException;
+use yii\db\Query;
 
 /**
  * QueryBuilder is the query builder for MS SQL Server databases (version 2008 and above).
@@ -29,6 +31,7 @@ class QueryBuilder extends \yii\db\QueryBuilder
         Schema::TYPE_INTEGER => 'int',
         Schema::TYPE_BIGINT => 'bigint',
         Schema::TYPE_FLOAT => 'float',
+        Schema::TYPE_DOUBLE => 'float',
         Schema::TYPE_DECIMAL => 'decimal',
         Schema::TYPE_DATETIME => 'datetime',
         Schema::TYPE_TIMESTAMP => 'timestamp',
@@ -116,25 +119,28 @@ class QueryBuilder extends \yii\db\QueryBuilder
 
     /**
      * Builds a SQL statement for renaming a DB table.
-     * @param string $table the table to be renamed. The name will be properly quoted by the method.
+     * @param string $oldName the table to be renamed. The name will be properly quoted by the method.
      * @param string $newName the new table name. The name will be properly quoted by the method.
      * @return string the SQL statement for renaming a DB table.
      */
-    public function renameTable($table, $newName)
+    public function renameTable($oldName, $newName)
     {
-        return "sp_rename '$table', '$newName'";
+        return 'sp_rename ' . $this->db->quoteTableName($oldName) . ', ' . $this->db->quoteTableName($newName);
     }
 
     /**
      * Builds a SQL statement for renaming a column.
      * @param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
-     * @param string $name the old name of the column. The name will be properly quoted by the method.
+     * @param string $oldName the old name of the column. The name will be properly quoted by the method.
      * @param string $newName the new name of the column. The name will be properly quoted by the method.
      * @return string the SQL statement for renaming a DB column.
      */
-    public function renameColumn($table, $name, $newName)
+    public function renameColumn($table, $oldName, $newName)
     {
-        return "sp_rename '$table.$name', '$newName', 'COLUMN'";
+        $table = $this->db->quoteTableName($table);
+        $oldName = $this->db->quoteColumnName($oldName);
+        $newName = $this->db->quoteColumnName($newName);
+        return "sp_rename '{$table}.{$oldName}', {$newName}, 'COLUMN'";
     }
 
     /**
@@ -214,5 +220,55 @@ class QueryBuilder extends \yii\db\QueryBuilder
             $this->_oldMssql = $version[0] < 11;
         }
         return $this->_oldMssql;
+    }
+
+    /**
+     * Builds SQL for IN condition
+     *
+     * @param string $operator
+     * @param array $columns
+     * @param Query $values
+     * @param array $params
+     * @return string SQL
+     */
+    protected function buildSubqueryInCondition($operator, $columns, $values, &$params)
+    {
+        if (is_array($columns)) {
+            throw new NotSupportedException(__METHOD__ . ' is not supported by MSSQL.');
+        }
+        return parent::buildSubqueryInCondition($operator, $columns, $values, $params);
+    }
+
+    /**
+     * Builds SQL for IN condition
+     *
+     * @param string $operator
+     * @param array $columns
+     * @param array $values
+     * @param array $params
+     * @return string SQL
+     */
+    protected function buildCompositeInCondition($operator, $columns, $values, &$params)
+    {
+        $quotedColumns = [];
+        foreach ($columns as $i => $column) {
+            $quotedColumns[$i] = strpos($column, '(') === false ? $this->db->quoteColumnName($column) : $column;
+        }
+        $vss = [];
+        foreach ($values as $value) {
+            $vs = [];
+            foreach ($columns as $i => $column) {
+                if (isset($value[$column])) {
+                    $phName = self::PARAM_PREFIX . count($params);
+                    $params[$phName] = $value[$column];
+                    $vs[] = $quotedColumns[$i] . ($operator === 'IN' ? ' = ' : ' != ') . $phName;
+                } else {
+                    $vs[] = $quotedColumns[$i] . ($operator === 'IN' ? ' IS' : ' IS NOT') . ' NULL';
+                }
+            }
+            $vss[] = '(' . implode($operator === 'IN' ? ' AND ' : ' OR ', $vs) . ')';
+        }
+
+        return '(' . implode($operator === 'IN' ? ' OR ' : ' AND ', $vss) . ')';
     }
 }

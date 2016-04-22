@@ -1,8 +1,8 @@
 <?php
 /**
- * @link      http://www.yiiframework.com/
+ * @link http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
- * @license   http://www.yiiframework.com/license/
+ * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\gii\console;
@@ -23,7 +23,7 @@ use yii\console\Controller;
  *
  * @author Tobias Munk <schmunk@usrbin.de>
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since  2.0
+ * @since 2.0
  */
 class GenerateController extends Controller
 {
@@ -32,9 +32,11 @@ class GenerateController extends Controller
      */
     public $module;
     /**
-     * @var boolean whether to generate all files and overwrite existing files
+     * @var boolean whether to overwrite all existing code files when in non-interactive mode.
+     * Defaults to false, meaning none of the existing code files will be overwritten.
+     * This option is used only when `--interactive=0`.
      */
-    public $generate = false;
+    public $overwrite = false;
     /**
      * @var array a list of the available code generators
      */
@@ -119,16 +121,19 @@ class GenerateController extends Controller
      */
     public function options($id)
     {
-        if (isset($this->generators[$id])) {
-            $attributes = $this->generators[$id]->attributes;
-            unset($attributes['templates']);
-            return array_merge(
-                parent::options($id),
-                array_keys($attributes)
-            );
-        } else {
-            return parent::options($id);
+        $options = parent::options($id);
+        $options[] = 'overwrite';
+
+        if (!isset($this->generators[$id])) {
+            return $options;
         }
+
+        $attributes = $this->generators[$id]->attributes;
+        unset($attributes['templates']);
+        return array_merge(
+            $options,
+            array_keys($attributes)
+        );
     }
 
     /**
@@ -179,7 +184,7 @@ class GenerateController extends Controller
         unset($attributes['templates']);
         $hints = $action->generator->hints();
 
-        $options = [];
+        $options = parent::getActionOptionsHelp($action);
         foreach ($attributes as $name => $value) {
             $type = gettype($value);
             $options[$name] = [

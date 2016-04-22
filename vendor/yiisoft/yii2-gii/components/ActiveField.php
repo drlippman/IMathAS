@@ -47,7 +47,7 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * Makes field remember its value between page reloads
-     * @return static the field object itself
+     * @return $this the field object itself
      */
     public function sticky()
     {
@@ -59,7 +59,7 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * Makes field auto completable
      * @param array $data auto complete data (array of callables or scalars)
-     * @return static the field object itself
+     * @return $this the field object itself
      */
     public function autoComplete($data)
     {
@@ -68,7 +68,7 @@ class ActiveField extends \yii\widgets\ActiveField
         foreach ($data as &$item) {
             $item = ['word' => $item];
         }
-        $this->form->getView()->registerJs("yii.gii.autocomplete($counter, " . Json::encode($data) . ");");
+        $this->form->getView()->registerJs("yii.gii.autocomplete($counter, " . Json::htmlEncode($data) . ");");
 
         return $this;
     }

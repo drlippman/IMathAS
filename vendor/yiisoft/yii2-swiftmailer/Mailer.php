@@ -79,6 +79,12 @@ class Mailer extends BaseMailer
      * @var string message default class name.
      */
     public $messageClass = 'yii\swiftmailer\Message';
+    /**
+     * @var boolean whether to enable writing of the SwiftMailer internal logs using Yii log mechanism.
+     * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
+     * @see Logger
+     */
+    public $enableSwiftMailerLogging = false;
 
     /**
      * @var \Swift_Mailer Swift mailer instance.
@@ -163,10 +169,24 @@ class Mailer extends BaseMailer
         if (isset($config['plugins'])) {
             $plugins = $config['plugins'];
             unset($config['plugins']);
+        } else {
+            $plugins = [];
         }
+
+        if ($this->enableSwiftMailerLogging) {
+            $plugins[] = [
+                'class' => 'Swift_Plugins_LoggerPlugin',
+                'constructArgs' => [
+                    [
+                        'class' => 'yii\swiftmailer\Logger'
+                    ]
+                ],
+            ];
+        }
+
         /* @var $transport \Swift_MailTransport */
         $transport = $this->createSwiftObject($config);
-        if (isset($plugins)) {
+        if (!empty($plugins)) {
             foreach ($plugins as $plugin) {
                 if (is_array($plugin) && isset($plugin['class'])) {
                     $plugin = $this->createSwiftObject($plugin);
@@ -192,6 +212,7 @@ class Mailer extends BaseMailer
         } else {
             throw new InvalidConfigException('Object configuration must be an array containing a "class" element.');
         }
+
         if (isset($config['constructArgs'])) {
             $args = [];
             foreach ($config['constructArgs'] as $arg) {
@@ -206,13 +227,15 @@ class Mailer extends BaseMailer
         } else {
             $object = Yii::createObject($className);
         }
+
         if (!empty($config)) {
+            $reflection = new \ReflectionObject($object);
             foreach ($config as $name => $value) {
-                if (property_exists($object, $name)) {
+                if ($reflection->hasProperty($name) && $reflection->getProperty($name)->isPublic()) {
                     $object->$name = $value;
                 } else {
                     $setter = 'set' . $name;
-                    if (method_exists($object, $setter) || method_exists($object, '__call')) {
+                    if ($reflection->hasMethod($setter) || $reflection->hasMethod('__call')) {
                         $object->$setter($value);
                     } else {
                         throw new InvalidConfigException('Setting unknown property: ' . $className . '::' . $name);

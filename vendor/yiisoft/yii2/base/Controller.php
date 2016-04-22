@@ -236,17 +236,21 @@ class Controller extends Component implements ViewContextInterface
      * The method will trigger the [[EVENT_BEFORE_ACTION]] event. The return value of the method
      * will determine whether the action should continue to run.
      *
+     * In case the action should not run, the request should be handled inside of the `beforeAction` code
+     * by either providing the necessary output or redirecting the request. Otherwise the response will be empty.
+     *
      * If you override this method, your code should look like the following:
      *
      * ```php
      * public function beforeAction($action)
      * {
-     *     if (parent::beforeAction($action)) {
-     *         // your custom code here
-     *         return true;  // or false if needed
-     *     } else {
+     *     if (!parent::beforeAction($action)) {
      *         return false;
      *     }
+     *
+     *     // your custom code here
+     *
+     *     return true; // or false to not run the action
      * }
      * ```
      *
@@ -364,17 +368,29 @@ class Controller extends Component implements ViewContextInterface
      */
     public function render($view, $params = [])
     {
-        $output = $this->getView()->render($view, $params, $this);
+        $content = $this->getView()->render($view, $params, $this);
+        return $this->renderContent($content);
+    }
+
+    /**
+     * Renders a static string by applying a layout.
+     * @param string $content the static string being rendered
+     * @return string the rendering result of the layout with the given static string as the `$content` variable.
+     * If the layout is disabled, the string will be returned back.
+     * @since 2.0.1
+     */
+    public function renderContent($content)
+    {
         $layoutFile = $this->findLayoutFile($this->getView());
         if ($layoutFile !== false) {
-            return $this->getView()->renderFile($layoutFile, ['content' => $output], $this);
+            return $this->getView()->renderFile($layoutFile, ['content' => $content], $this);
         } else {
-            return $output;
+            return $content;
         }
     }
 
     /**
-     * Renders a view.
+     * Renders a view without applying layout.
      * This method differs from [[render()]] in that it does not apply any layout.
      * @param string $view the view name. Please refer to [[render()]] on how to specify a view name.
      * @param array $params the parameters (name-value pairs) that should be made available in the view.

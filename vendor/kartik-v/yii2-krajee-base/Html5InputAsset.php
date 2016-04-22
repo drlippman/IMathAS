@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2016
  * @package yii2-krajee-base
- * @version 1.7.4
+ * @version 1.8.4
  */
 
 namespace kartik\base;
@@ -14,7 +14,7 @@ namespace kartik\base;
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since 1.0
  */
-class Html5InputAsset extends \kartik\base\AssetBundle
+class Html5InputAsset extends AssetBundle
 {
     /**
      * @inheritdoc

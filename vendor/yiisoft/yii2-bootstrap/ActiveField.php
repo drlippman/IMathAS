@@ -7,7 +7,6 @@
 
 namespace yii\bootstrap;
 
-use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -51,7 +50,7 @@ use yii\helpers\ArrayHelper;
  * ```php
  * use yii\bootstrap\ActiveForm;
  *
- * $form = ActiveForm::begin(['layout' => 'horizontal'])
+ * $form = ActiveForm::begin(['layout' => 'horizontal']);
  *
  * // Form field without label
  * echo $form->field($model, 'demo', [
@@ -71,17 +70,17 @@ use yii\helpers\ArrayHelper;
  * ]);
  *
  * // With 'default' layout you would use 'template' to size a specific field:
- * // echo $form->field($model, 'demo', [
- * //     'template' => '{label} <div class="row"><div class="col-sm-4">{input}{error}{hint}</div></div>'
- * // ]);
+ * echo $form->field($model, 'demo', [
+ *     'template' => '{label} <div class="row"><div class="col-sm-4">{input}{error}{hint}</div></div>'
+ * ]);
  *
- *  // Input group
- *  echo $form->field($model, 'demo', [
- *      'inputTemplate' => '<div class="input-group"><span class="input-group-addon">@</span>{input}</div>',
- *  ]);
+ * // Input group
+ * echo $form->field($model, 'demo', [
+ *     'inputTemplate' => '<div class="input-group"><span class="input-group-addon">@</span>{input}</div>',
+ * ]);
  *
- *  ActiveForm::end();
- *  ```
+ * ActiveForm::end();
+ * ```
  *
  * @see \yii\bootstrap\ActiveForm
  * @see http://getbootstrap.com/css/#forms
@@ -92,7 +91,7 @@ use yii\helpers\ArrayHelper;
 class ActiveField extends \yii\widgets\ActiveField
 {
     /**
-     * @var bool whether to render [[checkboxList()]] and [[radioList()]] inline.
+     * @var boolean whether to render [[checkboxList()]] and [[radioList()]] inline.
      */
     public $inline = false;
     /**
@@ -137,11 +136,11 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public $inlineRadioListTemplate = "{label}\n{beginWrapper}\n{input}\n{error}\n{endWrapper}\n{hint}";
     /**
-     * @var bool whether to render the error. Default is `true` except for layout `inline`.
+     * @var boolean whether to render the error. Default is `true` except for layout `inline`.
      */
     public $enableError = true;
     /**
-     * @var bool whether to render the label. Default is `true`.
+     * @var boolean whether to render the label. Default is `true`.
      */
     public $enableLabel = true;
 
@@ -153,7 +152,7 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $layoutConfig = $this->createLayoutConfig($config);
         $config = ArrayHelper::merge($layoutConfig, $config);
-        return parent::__construct($config);
+        parent::__construct($config);
     }
 
     /**
@@ -201,6 +200,9 @@ class ActiveField extends \yii\widgets\ActiveField
                 $this->template = $options['template'];
                 unset($options['template']);
             }
+            if (isset($options['label'])) {
+                $this->parts['{labelTitle}'] = $options['label'];
+            }
             if ($this->form->layout === 'horizontal') {
                 Html::addCssClass($this->wrapperOptions, $this->horizontalCssClasses['offset']);
             }
@@ -222,6 +224,9 @@ class ActiveField extends \yii\widgets\ActiveField
             } else {
                 $this->template = $options['template'];
                 unset($options['template']);
+            }
+            if (isset($options['label'])) {
+                $this->parts['{labelTitle}'] = $options['label'];
             }
             if ($this->form->layout === 'horizontal') {
                 Html::addCssClass($this->wrapperOptions, $this->horizontalCssClasses['offset']);
@@ -250,8 +255,10 @@ class ActiveField extends \yii\widgets\ActiveField
                 ];
             }
         }  elseif (!isset($options['item'])) {
-            $options['item'] = function ($index, $label, $name, $checked, $value) {
-                return '<div class="checkbox">' . Html::checkbox($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
+            $itemOptions = isset($options['itemOptions']) ? $options['itemOptions'] : [];
+            $options['item'] = function ($index, $label, $name, $checked, $value) use ($itemOptions) {
+                $options = array_merge(['label' => $label, 'value' => $value], $itemOptions);
+                return '<div class="checkbox">' . Html::checkbox($name, $checked, $options) . '</div>';
             };
         }
         parent::checkboxList($items, $options);
@@ -276,11 +283,31 @@ class ActiveField extends \yii\widgets\ActiveField
                 ];
             }
         }  elseif (!isset($options['item'])) {
-            $options['item'] = function ($index, $label, $name, $checked, $value) {
-                return '<div class="radio">' . Html::radio($name, $checked, ['label' => $label, 'value' => $value]) . '</div>';
+            $itemOptions = isset($options['itemOptions']) ? $options['itemOptions'] : [];
+            $options['item'] = function ($index, $label, $name, $checked, $value) use ($itemOptions) {
+                $options = array_merge(['label' => $label, 'value' => $value], $itemOptions);
+                return '<div class="radio">' . Html::radio($name, $checked, $options) . '</div>';
             };
         }
         parent::radioList($items, $options);
+        return $this;
+    }
+
+    /**
+     * Renders Bootstrap static form control.
+     * @param array $options the tag options in terms of name-value pairs. These will be rendered as
+     * the attributes of the resulting tag. There are also a special options:
+     *
+     * - encode: boolean, whether value should be HTML-encoded or not.
+     *
+     * @return $this the field object itself
+     * @since 2.0.5
+     * @see http://getbootstrap.com/css/#forms-controls-static
+     */
+    public function staticControl($options = [])
+    {
+        $this->adjustLabelFor($options);
+        $this->parts['{input}'] = Html::activeStaticControl($this->model, $this->attribute, $options);
         return $this;
     }
 
@@ -303,13 +330,13 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @param bool $value whether to render a inline list
-     * @return static the field object itself
+     * @param boolean $value whether to render a inline list
+     * @return $this the field object itself
      * Make sure you call this method before [[checkboxList()]] or [[radioList()]] to have any effect.
      */
     public function inline($value = true)
     {
-        $this->inline = (bool)$value;
+        $this->inline = (bool) $value;
         return $this;
     }
 
@@ -376,8 +403,13 @@ class ActiveField extends \yii\widgets\ActiveField
                 $label = Html::encode($this->model->getAttributeLabel($attribute));
             }
         }
+        if (!isset($options['for'])) {
+            $options['for'] = Html::getInputId($this->model, $this->attribute);
+        }
         $this->parts['{beginLabel}'] = Html::beginTag('label', $options);
         $this->parts['{endLabel}'] = Html::endTag('label');
-        $this->parts['{labelTitle}'] = $label;
+        if (!isset($this->parts['{labelTitle}'])) {
+            $this->parts['{labelTitle}'] = $label;
+        }
     }
 }

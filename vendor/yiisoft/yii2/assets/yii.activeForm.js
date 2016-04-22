@@ -40,11 +40,12 @@
         /**
          * afterValidate event is triggered after validating the whole form.
          * The signature of the event handler should be:
-         *     function (event, messages)
+         *     function (event, messages, errorAttributes)
          * where
          *  - event: an Event object.
          *  - messages: an associative array with keys being attribute IDs and values being error message arrays
          *    for the corresponding attributes.
+         *  - errorAttributes: an array of attributes that have validation errors. Please refer to attributeDefaults for the structure of this parameter.
          */
         afterValidate: 'afterValidate',
         /**
@@ -97,7 +98,7 @@
          * where
          *  - event: an Event object.
          *  - jqXHR: a jqXHR object
-         *  - settings: the status of the request ("success", "notmodified", "error", "timeout", "abort", or "parsererror").
+         *  - textStatus: the status of the request ("success", "notmodified", "error", "timeout", "abort", or "parsererror").
          */
         ajaxComplete: 'ajaxComplete'
     };
@@ -121,7 +122,9 @@
         // the type of data that you're expecting back from the server
         ajaxDataType: 'json',
         // the URL for performing AJAX-based validation. If not set, it will use the the form's action
-        validationUrl: undefined
+        validationUrl: undefined,
+        // whether to scroll to first visible error after validation.
+        scrollToError: true
     };
 
     // NOTE: If you change any of these defaults, make sure you update yii\widgets\ActiveField::getClientOptions() as well
@@ -148,7 +151,7 @@
         validationDelay: 500,
         // whether to enable AJAX-based validation.
         enableAjaxValidation: false,
-        // function (attribute, value, messages), the client-side validation function.
+        // function (attribute, value, messages, deferred, $form), the client-side validation function.
         validate: undefined,
         // status of the input field, 0: empty, not entered before, 1: validated, 2: pending validation, 3: validating
         status: 0,
@@ -157,6 +160,24 @@
         // the value of the input
         value: undefined
     };
+
+
+    var submitDefer;
+
+    var setSubmitFinalizeDefer = function($form) {
+        submitDefer = $.Deferred();
+        $form.data('yiiSubmitFinalizePromise', submitDefer.promise());
+    };
+
+    // finalize yii.js $form.submit
+    var submitFinalize = function($form) {
+        if(submitDefer) {
+            submitDefer.resolve();
+            submitDefer = undefined;
+            $form.removeData('yiiSubmitFinalizePromise');
+        }
+    };
+
 
     var methods = {
         init: function (attributes, options) {
@@ -168,7 +189,7 @@
 
                 var settings = $.extend({}, defaults, options || {});
                 if (settings.validationUrl === undefined) {
-                    settings.validationUrl = $form.prop('action');
+                    settings.validationUrl = $form.attr('action');
                 }
 
                 $.each(attributes, function (i) {
@@ -227,6 +248,14 @@
             return attribute;
         },
 
+        // manually trigger the validation of the attribute with the specified ID
+        validateAttribute: function (id) {
+            var attribute = methods.find.call(this, id);
+            if (attribute != undefined) {
+                validateAttribute($(this), attribute, true);
+            }
+        },
+
         // find an attribute config based on the specified attribute ID
         find: function (id) {
             var attributes = $(this).data('yiiActiveForm').attributes,
@@ -251,6 +280,7 @@
             return this.data('yiiActiveForm');
         },
 
+        // validate all applicable inputs in the form
         validate: function () {
             var $form = $(this),
                 data = $form.data('yiiActiveForm'),
@@ -264,6 +294,7 @@
                 $form.trigger(event, [messages, deferreds]);
                 if (event.result === false) {
                     data.submitting = false;
+                    submitFinalize($form);
                     return;
                 }
             }
@@ -282,7 +313,7 @@
                     $form.trigger(event, [this, msg, deferreds]);
                     if (event.result !== false) {
                         if (this.validate) {
-                            this.validate(this, getValue($form, this), msg, deferreds);
+                            this.validate(this, getValue($form, this), msg, deferreds, $form);
                         }
                         if (this.enableAjaxValidation) {
                             needAjaxValidation = true;
@@ -303,13 +334,13 @@
                 }
                 if (needAjaxValidation) {
                     var $button = data.submitObject,
-                        extData = '&' + data.settings.ajaxParam + '=' + $form.prop('id');
-                    if ($button && $button.length && $button.prop('name')) {
-                        extData += '&' + $button.prop('name') + '=' + $button.prop('value');
+                        extData = '&' + data.settings.ajaxParam + '=' + $form.attr('id');
+                    if ($button && $button.length && $button.attr('name')) {
+                        extData += '&' + $button.attr('name') + '=' + $button.attr('value');
                     }
                     $.ajax({
                         url: data.settings.validationUrl,
-                        type: $form.prop('method'),
+                        type: $form.attr('method'),
                         data: $form.serialize() + extData,
                         dataType: data.settings.ajaxDataType,
                         complete: function (jqXHR, textStatus) {
@@ -332,6 +363,7 @@
                         },
                         error: function () {
                             data.submitting = false;
+                            submitFinalize($form);
                         }
                     });
                 } else if (data.submitting) {
@@ -350,15 +382,20 @@
                 data = $form.data('yiiActiveForm');
 
             if (data.validated) {
+                // Second submit's call (from validate/updateInputs)
                 data.submitting = false;
                 var event = $.Event(events.beforeSubmit);
                 $form.trigger(event);
                 if (event.result === false) {
                     data.validated = false;
+                    submitFinalize($form);
                     return false;
                 }
                 return true;   // continue submitting the form since validation passes
             } else {
+                // First submit's call (from yii.js/handleAction) - execute validating
+                setSubmitFinalizeDefer($form);
+
                 if (data.settings.timer !== undefined) {
                     clearTimeout(data.settings.timer);
                 }
@@ -387,15 +424,48 @@
                     );
                     $container.find(this.error).html('');
                 });
-                $form.find(data.settings.summary).hide().find('ul').html('');
+                $form.find(data.settings.errorSummary).hide().find('ul').html('');
             }, 1);
+        },
+
+        /**
+         * Updates error messages, input containers, and optionally summary as well.
+         * If an attribute is missing from messages, it is considered valid.
+         * @param messages array the validation error messages, indexed by attribute IDs
+         * @param summary whether to update summary as well.
+         */
+        updateMessages: function (messages, summary) {
+            var $form = $(this);
+            var data = $form.data('yiiActiveForm');
+            $.each(data.attributes, function () {
+                updateInput($form, this, messages);
+            });
+            if (summary) {
+                updateSummary($form, messages);
+            }
+        },
+
+        /**
+         * Updates error messages and input container of a single attribute.
+         * If messages is empty, the attribute is considered valid.
+         * @param id attribute ID
+         * @param messages array with error messages
+         */
+        updateAttribute: function(id, messages) {
+            var attribute = methods.find.call(this, id);
+            if (attribute != undefined) {
+                var msg = {};
+                msg[id] = messages;
+                updateInput($(this), attribute, msg);
+            }
         }
+
     };
 
     var watchAttribute = function ($form, attribute) {
         var $input = findInput($form, attribute);
         if (attribute.validateOnChange) {
-            $input.on('change.yiiActiveForm',function () {
+            $input.on('change.yiiActiveForm', function () {
                 validateAttribute($form, attribute, false);
             });
         }
@@ -407,7 +477,10 @@
             });
         }
         if (attribute.validateOnType) {
-            $input.on('keyup.yiiActiveForm', function () {
+            $input.on('keyup.yiiActiveForm', function (e) {
+                if ($.inArray(e.which, [16, 17, 18, 37, 38, 39, 40]) !== -1 ) {
+                    return;
+                }
                 if (attribute.value !== getValue($form, attribute)) {
                     validateAttribute($form, attribute, false, attribute.validationDelay);
                 }
@@ -451,7 +524,7 @@
             methods.validate.call($form);
         }, validationDelay ? validationDelay : 200);
     };
-    
+
     /**
      * Returns an array prototype with a shortcut method for adding a new deferred.
      * The context of the callback will be the deferred object so it can be resolved like ```this.resolve()```
@@ -475,34 +548,46 @@
         var data = $form.data('yiiActiveForm');
 
         if (submitting) {
-            var errorInputs = [];
+            var errorAttributes = [];
             $.each(data.attributes, function () {
                 if (!this.cancelled && updateInput($form, this, messages)) {
-                    errorInputs.push(this.input);
+                    errorAttributes.push(this);
                 }
             });
 
-            $form.trigger(events.afterValidate, [messages]);
+            $form.trigger(events.afterValidate, [messages, errorAttributes]);
 
             updateSummary($form, messages);
 
-            if (errorInputs.length) {
-                var top = $form.find(errorInputs.join(',')).first().offset().top;
-                var wtop = $(window).scrollTop();
-                if (top < wtop || top > wtop + $(window).height) {
-                    $(window).scrollTop(top);
+            if (errorAttributes.length) {
+                if (data.settings.scrollToError) {
+                    var top = $form.find($.map(errorAttributes, function(attribute) {
+                        return attribute.input;
+                    }).join(',')).first().closest(':visible').offset().top;
+                    var wtop = $(window).scrollTop();
+                    if (top < wtop || top > wtop + $(window).height()) {
+                        $(window).scrollTop(top);
+                    }
                 }
                 data.submitting = false;
             } else {
                 data.validated = true;
                 var $button = data.submitObject || $form.find(':submit:first');
                 // TODO: if the submission is caused by "change" event, it will not work
-                if ($button.length) {
-                    $button.click();
-                } else {
-                    // no submit button in the form
-                    $form.submit();
+                if ($button.length && $button.attr('type') == 'submit' && $button.attr('name')) {
+                    // simulate button input value
+                    var $hiddenButton = $('input[type="hidden"][name="' + $button.attr('name') + '"]', $form);
+                    if (!$hiddenButton.length) {
+                        $('<input>').attr({
+                            type: 'hidden',
+                            name: $button.attr('name'),
+                            value: $button.attr('value')
+                        }).appendTo($form);
+                    } else {
+                        $hiddenButton.attr('value', $button.attr('value'));
+                    }
                 }
+                $form.submit();
             }
         } else {
             $.each(data.attributes, function () {
@@ -511,6 +596,7 @@
                 }
             });
         }
+        submitFinalize($form);
     };
 
     /**
@@ -581,11 +667,11 @@
 
     var getValue = function ($form, attribute) {
         var $input = findInput($form, attribute);
-        var type = $input.prop('type');
+        var type = $input.attr('type');
         if (type === 'checkbox' || type === 'radio') {
             var $realInput = $input.filter(':checked');
             if (!$realInput.length) {
-                $realInput = $form.find('input[type=hidden][name="' + $input.prop('name') + '"]');
+                $realInput = $form.find('input[type=hidden][name="' + $input.attr('name') + '"]');
             }
             return $realInput.val();
         } else {

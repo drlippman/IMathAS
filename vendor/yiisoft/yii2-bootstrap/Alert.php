@@ -9,7 +9,6 @@ namespace yii\bootstrap;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 /**
  * Alert renders an alert bootstrap component.
@@ -117,14 +116,14 @@ class Alert extends Widget
      */
     protected function renderCloseButton()
     {
-        if ($this->closeButton !== false) {
-            $tag = ArrayHelper::remove($this->closeButton, 'tag', 'button');
-            $label = ArrayHelper::remove($this->closeButton, 'label', '&times;');
-            if ($tag === 'button' && !isset($this->closeButton['type'])) {
-                $this->closeButton['type'] = 'button';
+        if (($closeButton = $this->closeButton) !== false) {
+            $tag = ArrayHelper::remove($closeButton, 'tag', 'button');
+            $label = ArrayHelper::remove($closeButton, 'label', '&times;');
+            if ($tag === 'button' && !isset($closeButton['type'])) {
+                $closeButton['type'] = 'button';
             }
 
-            return Html::tag($tag, $label, $this->closeButton);
+            return Html::tag($tag, $label, $closeButton);
         } else {
             return null;
         }
@@ -136,9 +135,7 @@ class Alert extends Widget
      */
     protected function initOptions()
     {
-        Html::addCssClass($this->options, 'alert');
-        Html::addCssClass($this->options, 'fade');
-        Html::addCssClass($this->options, 'in');
+        Html::addCssClass($this->options, ['alert', 'fade', 'in']);
 
         if ($this->closeButton !== false) {
             $this->closeButton = array_merge([

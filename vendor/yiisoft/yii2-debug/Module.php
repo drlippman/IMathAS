@@ -10,6 +10,7 @@ namespace yii\debug;
 use Yii;
 use yii\base\Application;
 use yii\base\BootstrapInterface;
+use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
 use yii\web\ForbiddenHttpException;
@@ -31,6 +32,13 @@ class Module extends \yii\base\Module implements BootstrapInterface
      */
     public $allowedIPs = ['127.0.0.1', '::1'];
     /**
+     * @var array the list of hosts that are allowed to access this module.
+     * Each array element is a hostname that will be resolved to an IP address that is compared
+     * with the IP address of the user. A use case is to use a dynamic DNS (DDNS) to allow access.
+     * The default value is `[]`.
+     */
+    public $allowedHosts = [];
+    /**
      * @inheritdoc
      */
     public $controllerNamespace = 'yii\debug\controllers';
@@ -39,7 +47,7 @@ class Module extends \yii\base\Module implements BootstrapInterface
      */
     public $logTarget;
     /**
-     * @var array list of debug panels. The array keys are the panel IDs, and values are the corresponding
+     * @var array|Panel[] list of debug panels. The array keys are the panel IDs, and values are the corresponding
      * panel class names or configuration arrays. This will be merged with [[corePanels()]].
      * You may reconfigure a core panel via this property by using the same panel ID.
      * You may also disable a core panel by setting it to be false in this property.
@@ -49,6 +57,21 @@ class Module extends \yii\base\Module implements BootstrapInterface
      * @var string the directory storing the debugger data files. This can be specified using a path alias.
      */
     public $dataPath = '@runtime/debug';
+    /**
+     * @var integer the permission to be set for newly created debugger data files.
+     * This value will be used by PHP [[chmod()]] function. No umask will be applied.
+     * If not set, the permission will be determined by the current environment.
+     * @since 2.0.6
+     */
+    public $fileMode;
+    /**
+     * @var integer the permission to be set for newly created directories.
+     * This value will be used by PHP [[chmod()]] function. No umask will be applied.
+     * Defaults to 0775, meaning the directory is read-writable by owner and group,
+     * but read-only for other users.
+     * @since 2.0.6
+     */
+    public $dirMode = 0775;
     /**
      * @var integer the maximum number of debug data files to keep. If there are more files generated,
      * the oldest ones will be removed.
@@ -101,6 +124,9 @@ class Module extends \yii\base\Module implements BootstrapInterface
         }
 
         foreach ($this->panels as $id => $config) {
+            if (is_string($config)) {
+                $config = ['class' => $config];
+            }
             $config['module'] = $this;
             $config['id'] = $id;
             $this->panels[$id] = Yii::createObject($config);
@@ -120,8 +146,16 @@ class Module extends \yii\base\Module implements BootstrapInterface
         });
 
         $app->getUrlManager()->addRules([
-            $this->id => $this->id,
-            $this->id . '/<controller:\w+>/<action:\w+>' => $this->id . '/<controller>/<action>',
+            [
+                'class' => 'yii\web\UrlRule',
+                'route' => $this->id,
+                'pattern' => $this->id,
+            ],
+            [
+                'class' => 'yii\web\UrlRule',
+                'route' => $this->id . '/<controller>/<action>',
+                'pattern' => $this->id . '/<controller:[\w\-]+>/<action:[\w\-]+>',
+            ]
         ], false);
     }
 
@@ -175,9 +209,11 @@ class Module extends \yii\base\Module implements BootstrapInterface
         $url = Url::toRoute(['/' . $this->id . '/default/toolbar',
             'tag' => $this->logTarget->tag,
         ]);
-        echo '<div id="yii-debug-toolbar" data-url="' . $url . '" style="display:none"></div>';
+        echo '<div id="yii-debug-toolbar" data-url="' . Html::encode($url) . '" style="display:none" class="yii-debug-toolbar-bottom"></div>';
         /* @var $view View */
         $view = $event->sender;
+
+        // echo is used in order to support cases where asset manager is not available
         echo '<style>' . $view->renderPhpFile(__DIR__ . '/assets/toolbar.css') . '</style>';
         echo '<script>' . $view->renderPhpFile(__DIR__ . '/assets/toolbar.js') . '</script>';
     }
@@ -191,6 +227,12 @@ class Module extends \yii\base\Module implements BootstrapInterface
         $ip = Yii::$app->getRequest()->getUserIP();
         foreach ($this->allowedIPs as $filter) {
             if ($filter === '*' || $filter === $ip || (($pos = strpos($filter, '*')) !== false && !strncmp($ip, $filter, $pos))) {
+                return true;
+            }
+        }
+        foreach ($this->allowedHosts as $hostname) {
+            $filter = gethostbyname($hostname);
+            if ($filter === $ip) {
                 return true;
             }
         }

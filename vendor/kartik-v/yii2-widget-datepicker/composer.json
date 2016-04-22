@@ -4,7 +4,7 @@
     "keywords": ["yii2", "extension", "widget", "select2", "form", "date", "picker", "jquery", "plugin"],
     "homepage": "https://github.com/kartik-v/yii2-widget-datepicker",
     "type": "yii2-extension",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Kartik Visweswaran",
@@ -12,13 +12,17 @@
             "homepage": "http://www.krajee.com/"
         }
     ],
-	"minimum-stability": "stable",
     "require": {
-        "kartik-v/yii2-krajee-base": "*"
+        "kartik-v/yii2-krajee-base": "~1.7"
     },
     "autoload": {
         "psr-4": {
             "kartik\\date\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.3.x-dev"
         }
     }
 }

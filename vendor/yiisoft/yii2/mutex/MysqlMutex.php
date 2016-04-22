@@ -18,11 +18,11 @@ use yii\base\InvalidConfigException;
  * ```
  * [
  *     'components' => [
- *         'db'=> [
+ *         'db' => [
  *             'class' => 'yii\db\Connection',
  *             'dsn' => 'mysql:host=127.0.0.1;dbname=demo',
  *         ]
- *         'mutex'=> [
+ *         'mutex' => [
  *             'class' => 'yii\mutex\MysqlMutex',
  *         ],
  *     ],
@@ -57,7 +57,7 @@ class MysqlMutex extends DbMutex
      */
     protected function acquireLock($name, $timeout = 0)
     {
-        return (boolean) $this->db
+        return (bool) $this->db
             ->createCommand('SELECT GET_LOCK(:name, :timeout)', [':name' => $name, ':timeout' => $timeout])
             ->queryScalar();
     }
@@ -70,7 +70,7 @@ class MysqlMutex extends DbMutex
      */
     protected function releaseLock($name)
     {
-        return (boolean) $this->db
+        return (bool) $this->db
             ->createCommand('SELECT RELEASE_LOCK(:name)', [':name' => $name])
             ->queryScalar();
     }

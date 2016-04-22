@@ -172,6 +172,7 @@ class User extends Component
     {
         if ($this->_identity === false) {
             if ($this->enableSession && $autoRenew) {
+                $this->_identity = null;
                 $this->renewAuthStatus();
             } else {
                 return null;
@@ -422,10 +423,12 @@ class User extends Component
             $this->setReturnUrl($request->getUrl());
         }
         if ($this->loginUrl !== null) {
-            return Yii::$app->getResponse()->redirect($this->loginUrl);
-        } else {
-            throw new ForbiddenHttpException(Yii::t('yii', 'Login Required'));
+            $loginUrl = (array) $this->loginUrl;
+            if ($loginUrl[0] !== Yii::$app->requestedRoute) {
+                return Yii::$app->getResponse()->redirect($this->loginUrl);
+            }
         }
+        throw new ForbiddenHttpException(Yii::t('yii', 'Login Required'));
     }
 
     /**
@@ -538,7 +541,7 @@ class User extends Component
             $identity->getId(),
             $identity->getAuthKey(),
             $duration,
-        ]);
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $cookie->expire = time() + $duration;
         Yii::$app->getResponse()->getCookies()->add($cookie);
     }
@@ -613,7 +616,7 @@ class User extends Component
 
         $this->setIdentity($identity);
 
-        if (($this->authTimeout !== null || $this->absoluteAuthTimeout !== null) && $identity !== null) {
+        if ($identity !== null && ($this->authTimeout !== null || $this->absoluteAuthTimeout !== null)) {
             $expire = $this->authTimeout !== null ? $session->get($this->authTimeoutParam) : null;
             $expireAbsolute = $this->absoluteAuthTimeout !== null ? $session->get($this->absoluteAuthTimeoutParam) : null;
             if ($expire !== null && $expire < time() || $expireAbsolute !== null && $expireAbsolute < time()) {
@@ -652,15 +655,27 @@ class User extends Component
      */
     public function can($permissionName, $params = [], $allowCaching = true)
     {
-        $auth = Yii::$app->getAuthManager();
         if ($allowCaching && empty($params) && isset($this->_access[$permissionName])) {
             return $this->_access[$permissionName];
         }
-        $access = $auth->checkAccess($this->getId(), $permissionName, $params);
+        $access = $this->getAuthManager()->checkAccess($this->getId(), $permissionName, $params);
         if ($allowCaching && empty($params)) {
             $this->_access[$permissionName] = $access;
         }
 
         return $access;
+    }
+
+    /**
+     * Returns auth manager associated with the user component.
+     *
+     * By default this is the `authManager` application component.
+     * You may override this method to return a different auth manager instance if needed.
+     * @return \yii\rbac\ManagerInterface
+     * @since 2.0.6
+     */
+    protected function getAuthManager()
+    {
+        return Yii::$app->getAuthManager();
     }
 }
