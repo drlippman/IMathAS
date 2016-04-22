@@ -49,10 +49,25 @@
         				
            ], 
            
-    - Thats it! Its all DONE and you are ready to go from here with OpenMath application.
-    - For more detail about Yii2 go through http://stuff.cebe.cc/yii2-guide.pdf
+##### Psysh Integration
+ - Follow psysh installation instructions (http://psysh.org/#install)
+ - In the console, type `psysh` to start a new shell prompt
+ - Then copy and paste the code below in at the prompt
+ 
+        require(__DIR__ . '/vendor/autoload.php');
+        require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
+ 
+        $config = require(__DIR__ . '/config/web.php');
+        error_reporting(E_ALL ^ E_NOTICE);
+        $app = new yii\web\Application($config);
 
- ##### Following are some useful links: 
+           
+  
+           
+ Thats it! Its all DONE and you are ready to go from here with OpenMath application.
+ For more detail about Yii2 go through http://stuff.cebe.cc/yii2-guide.pdf
+
+##### Following are some useful links: 
  - http://www.yiiframework.com/download/
  - http://www.yiiframework.com/doc-2.0/guide-tutorial-advanced-app.html
  - http://stuff.cebe.cc/yii2-guide.pdf
