@@ -4,3 +4,4 @@
 .idea/
 runtime/
 web/assets/
+config/db.php
