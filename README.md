@@ -73,7 +73,7 @@ Mamp (installation process follows)
 13) Now switch to branch “development” (in your command-line program, enter $ git checkout development)
 ```
 ```
-14) In the file structure go to config/db.php file
+14) Copy the `config/db_example.php` to `config/db.php` and then:
      1) Change the the name of the database at the end of line 5 to the database name you made in step 6.
      2) Also change the password and username as well ( Which should be root,root ).
 ```
@@ -113,12 +113,10 @@ These are tips for if anything breaks and or doesn't work.
  - Follow psysh installation instructions (http://psysh.org/#install)
  - In the console, type `psysh` to start a new shell prompt
  - Then copy and paste the code below in at the prompt
- 
+
         require(__DIR__ . '/vendor/autoload.php');
         require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
- 
+
         $config = require(__DIR__ . '/config/web.php');
         error_reporting(E_ALL ^ E_NOTICE);
         $app = new yii\web\Application($config);
-
-  
