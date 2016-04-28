@@ -14,16 +14,11 @@ engines:
     enabled: true
   phpmd:
     enabled: true
-#ratings:
-#  paths:
-#  - "**.css"
-#  - "**.inc"
-#  - "**.js"
-#  - "**.jsx"
-#  - "**.module"
-#  - "**.php"
-#  - "**.py"
-#  - "**.rb"
+ratings:
+  paths:
+  - "**.css"
+  - "**.js"
+  - "**.php"
 exclude_paths:
 - config/
 - tests/
