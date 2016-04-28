@@ -279,7 +279,7 @@
 		 	 echo _('View Reply Instructions');
 		 } 
 		echo '</a>';
-		echo '<div id="postreplyinstr" style="display:none;">';
+		echo '<div id="postreplyinstr" style="display:none;" class="intro">';
 		if ($postinstr != '') {
 			echo '<h4>'._('Posting Instructions').'</h4>';
 			echo $postinstr;

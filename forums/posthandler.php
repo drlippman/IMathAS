@@ -404,10 +404,10 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		}
 		if ($forumsettings['postinstr'] != '' && $_GET['modify']=="new") {
 			echo '<h4>'._('Posting Instructions').'</h4>';
-			echo '<div>'.$forumsettings['postinstr'].'</div><br/>';
+			echo '<div class="intro">'.$forumsettings['postinstr'].'</div><br/>';
 		} else if ($forumsettings['replyinstr'] != '' && $_GET['modify']=="reply") {
 			echo '<h4>'._('Reply Instructions').'</h4>';
-			echo '<div>'.$forumsettings['replyinstr'].'</div><br/>';
+			echo '<div class="intro">'.$forumsettings['replyinstr'].'</div><br/>';
 		}
 		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify={$_GET['modify']}&replyto={$_GET['replyto']}\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
