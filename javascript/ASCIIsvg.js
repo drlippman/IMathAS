@@ -1125,11 +1125,11 @@ function mathjs(st,varlist) {
         else if (ch==")") nested++;
         j--;
       }
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
       j--;
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else { 
       return "Error: incorrect syntax in "+st+" at position "+j;
@@ -1158,8 +1158,8 @@ function mathjs(st,varlist) {
       }
     } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
       k++;
-      while (k<st.length && (ch=st.charAt(k))>="a" && ch<="z" ||
-               ch>="A" && ch<="Z") k++;
+      while (k<st.length && ((ch=st.charAt(k))>="a" && ch<="z" ||
+               ch>="A" && ch<="Z")) k++;
       if (ch=='(' && st.slice(i+1,k).match(/^(sin|cos|tan|sec|csc|cot|logten|log|ln|exp|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|sqrt|abs|nthroot)$/)) {
 	      nested = 1;
 	      k++;
@@ -1197,11 +1197,11 @@ function mathjs(st,varlist) {
         else if (ch==")") nested++;
         j--;
       }
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
       j--;
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else { 
       return "Error: incorrect syntax in "+st+" at position "+j;
