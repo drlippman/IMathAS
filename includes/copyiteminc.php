@@ -546,6 +546,7 @@ function getiteminfo($itemid) {
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)==0) {
 		echo "Uh oh, item #$itemid doesn't appear to exist";
+		return array(false,false,false,false);
 	}
 	$itemtype = mysql_result($result,0,0);
 	$typeid = mysql_result($result,0,1);
