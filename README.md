@@ -17,7 +17,9 @@ Mamp (installation process follows)
 ![image one](readmeimg/mampic.png)
 
 ```
-2) Clone the https://github.com/lumenlearning/IMathAS onto your desktop (Or any other folder) using your command-line program (such as Terminal using a Mac) and switch to branch “oldmommaster” ($ cd oldmommaster)
+2) Clone the https://github.com/lumenlearning/IMathAS onto your desktop (Or any other folder) using your command-line program (such as Terminal using a Mac) 
+
+3) Switch to branch “old_mom_master” ($ git checkout old_mom_master)
 
 ```
 ```
