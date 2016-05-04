@@ -76,6 +76,18 @@ function Viewer3D(paramObj, targetel) {
 			if (t.vert[i][2]>t.zmax) {t.zmax=t.vert[i][2];}
 		}
 	}
+	if (t.xmin==t.xmax) {
+		t.xmin -= 1;
+		t.xmax += 1;
+	}
+	if (t.ymin==t.ymax) {
+		t.ymin -= 1;
+		t.ymax += 1;
+	}
+	if (t.zmin==t.zmax) {
+		t.zmin -= 1;
+		t.zmax += 1;
+	}
 	
 	//initialize
 	var daxis = [];
