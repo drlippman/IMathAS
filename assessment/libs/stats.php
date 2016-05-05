@@ -394,7 +394,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		$vertlabel = $options['vertlabel'];
 		$usevertlabel = true;
 	} else {
-		$vertlabel = 'Frequency/Height';
+		$vertlabel = 'Bar Height';
 		$usevertlabel = false;
 	}
 	if (isset($options['gap'])) {
@@ -403,7 +403,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 		$gap = 0;
 	}
 	
-	$alt = "Histogram for $label <table class=stats><thead><tr><th>Bar Label</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
+	$alt = "Bar graph for $label <table class=stats><thead><tr><th>Bar Label</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
 	$start = 0;
 	$x = $start+1;
 	$maxfreq = 0;
