@@ -159,11 +159,15 @@
 				}
 				echo $out;
 				echo '<h2>'.$adata['name'].'</h2>';
-				echo '<p>', _('Password required for access.'), '</p>';
-				echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
-				echo "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
-				echo '<input type=submit value="', _('Submit'), '" />';
-				echo "</form>";
+				if (strpos($adata['name'],'RPNow') !== false && strpos($_SERVER['HTTP_USER_AGENT'],'RPNow') === false) {
+					echo '<p>This assessment requires the use of Remote Proctor Now (RPNow).</p>';
+				} else {
+					echo '<p>', _('Password required for access.'), '</p>';
+					echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
+					echo "<p>Password: <input type=\"password\" name=\"password\" autocomplete=\"off\" /></p>";
+					echo '<input type=submit value="', _('Submit'), '" />';
+					echo "</form>";
+				}
 				require("../footer.php");
 				exit;
 			}
