@@ -322,6 +322,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 	
 	//get items with content views, for enabling stats link
+	/*
+	//removed - always showing stats link now.
 	if (isset($teacherid) || isset($tutorid)) { 
 		$hasstats = array();
 		$query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$cid' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
@@ -332,6 +334,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 			$hasstats[$row[0]] = true;	
 		}
 	}
+	*/
 	
 	//get read linked items
 	$readlinkeditems = array();
