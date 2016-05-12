@@ -65,7 +65,7 @@ $askforuserinfo = false;
 
 //use new behavior for place_aid requests that don't come from a placein_###_# key
 if (
-    (isset($_SESSION['place_aid']) && isset($_SESSION['lti_keytype']) && $_SESSION['lti_keytype']=='cc-a')
+    (isset($_SESSION['place_aid']) && isset($_SESSION['lti_keytype']) && $_SESSION['lti_keytype']=='cc-a' && !isset($_REQUEST['oauth_consumer_key']))
     ||
     (isset($_REQUEST['custom_place_aid']) && isset($_REQUEST['oauth_consumer_key']) && substr($_REQUEST['oauth_consumer_key'],0,7)!='placein')
     ) {
