@@ -652,23 +652,25 @@ if ($myrights<20) {
 
 			//remember search
 		if (isset($_POST['search'])) {
-			$safesearch = $_POST['search'];
+			$safesearch = trim($_POST['search']);
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
-			if (isset($_POST['searchmine'])) {
-				$searchmine = 1;
-			} else {
-				$searchmine = 0;
-			}
-			$sessiondata['searchmine'.$cid] = $searchmine;
 			if (isset($_POST['searchall'])) {
 				$searchall = 1;
 			} else {
 				$searchall = 0;
 			}
 			$sessiondata['searchall'.$cid] = $searchall;
+			if (isset($_POST['searchmine'])) {
+				$searchmine = 1;
+			} else {
+				$searchmine = 0;
+			}
+			$sessiondata['searchmine'.$cid] = $searchmine;
+			
+			
 			if ($searchall==1 && trim($search)=='' && $searchmine==0) {
 				$overwriteBody = 1;
 				$body = "Must provide a search term when searching all libraries <a href=\"manageqset.php\">Try again</a>";
@@ -685,7 +687,7 @@ if ($myrights<20) {
 			
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
-			$safesearch = $sessiondata['lastsearch'.$cid]; //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
@@ -813,9 +815,12 @@ if ($myrights<20) {
 				$query .= " AND imas_questionset.ownerid='$userid'";
 			}
 		}
-		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id LIMIT 500";
+		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id ";
+		if ($searchall==1) {
+			$query .= " LIMIT 300";
+		}
 		$resultLibs = mysql_query($query) or die("Query failed : " . mysql_error());
-		
+		$searchlimited = (mysql_num_rows($resultLibs)==300);
 		$page_questionTable = array();
 		$page_libstouse = array();
 		$page_libqids = array();
@@ -1294,7 +1299,9 @@ function getnextprev(formn,loc) {
 				$ln++;
 			}
 		}
-
+		if ($searchall==1 && $searchlimited) {
+			echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
+		}
 		echo "</tbody></table>\n";
 		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array(false,'S',false,false,false,'S','N','D'";
