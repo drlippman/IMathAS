@@ -480,7 +480,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	
 		//remember search
 		if (isset($_POST['search'])) {
-			$safesearch = $_POST['search'];
+			$safesearch = trim($_POST['search']);
 			$safesearch = str_replace(' and ', ' ',$safesearch);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
@@ -504,7 +504,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$sessiondata['searchmine'.$cid] = $searchmine;
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
-			$safesearch = $sessiondata['lastsearch'.$cid]; //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
+			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
 			$search = stripslashes($safesearch);
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
@@ -603,8 +603,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$lnames = implode(", ",$lnamesarr);
 
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
-			
-			if (isset($search)) {
+
+			if (isset($search) && ($searchall==0 || $searchlikes!='')) {
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
@@ -619,6 +619,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') "; 
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
+				if ($searchall==1) {
+					$query .= " LIMIT 300";
+				}
 				if ($search=='recommend' && count($existingq)>0) {
 					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
 					$query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
@@ -638,6 +641,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if (mysql_num_rows($result)==0) {
 					$noSearchResults = true;
 				} else {
+					$searchlimited = (mysql_num_rows($result)==300);
+
 					$alt=0;
 					$lastlib = -1;
 					$i=0;
@@ -775,7 +780,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$ln++;
 							
 					} //end while
-					
+
 					//pull question useage data
 					if (count($page_questionTable)>0) {
 						$allusedqids = implode(',', array_keys($page_questionTable));
@@ -848,10 +853,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$userights[$row[0]] = $row[5];
 					$extref[$row[0]] = $row[6];
 					$qgroupid[$row[0]] = $row[7];
-					$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$row[1]}'";
-					$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					$times[$row[0]] = mysql_result($result2,0,0);
-					
+				}
+				//pull question useage data
+				if (count($qsetid)>0) {
+					$allusedqids = implode(',', array_unique($qsetid));
+					$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
+					$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+					$qsetusecnts = array();
+					while ($row = mysql_fetch_row($result)) {
+						$qsetusecnts[$row[0]] = $row[1];
+					}
 				}
 				
 				$page_assessmentQuestions['desc'][$x] = $aidnames[$aidq];
@@ -868,7 +879,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
 					$page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
 					$page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
-					$page_assessmentQuestions[$x]['times'][$y] = $times[$qid];
+					$page_assessmentQuestions[$x]['times'][$y] = $qsetusecnts[$qsetid[$qid]];
 					$page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userid) ? "Yes" : "" ;
 					$page_assessmentQuestions[$x]['add'][$y] = "<a href=\"modquestion.php?qsetid=$qsetid[$qid]&aid=$aid&cid=$cid\">Add</a>";
 					$page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userid) ? "<a href=\"moddataset.php?id=$qsetid[$qid]&aid=$aid&cid=$cid&frompot=1\">Edit</a>" : "<a href=\"viewsource.php?id=$qsetid[$qid]&aid=$aid&cid=$cid\">View</a>" ;
@@ -1177,6 +1188,9 @@ if ($overwriteBody==1) {
 				</tr>
 <?php
 					}
+				}
+				if ($searchall==1 && $searchlimited) {
+					echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
 				}
 ?>					
 			</tbody>
