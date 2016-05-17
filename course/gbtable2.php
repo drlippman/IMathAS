@@ -1200,13 +1200,25 @@ function gbtable() {
 				}
 				$gb[$row][1][$col][2] = 1; //show link
 				$gb[$row][1][$col][3] = 0; //is counted
-				if ($gb[0][1][$col][3]<1) { //past
-					$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
-				} 
-				if ($gb[0][1][$col][3]<2) { //past or cur
-					$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+								
+				if ($cntingb[$i] == 1) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					}
+					$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];		
+				} else if ($cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpastec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					}
+					$cattotfutureec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];	
 				}
-				$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+				
 			} else if ($l['gradetype']=='exttool') {
 				if (!isset($exttoolidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($exttoolcol[$l['gradetypeid']])) {
 					continue;
@@ -1247,35 +1259,7 @@ function gbtable() {
 			}
 		}
 	}
-	/*
-	//Get discussion grades
-	unset($discusspts);
-	$discussidx = array_flip($discuss);
-	$query = "SELECT imas_forum_posts.userid,imas_forum_posts.forumid,SUM(imas_forum_posts.points) FROM imas_forum_posts,imas_forums WHERE imas_forum_posts.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
-	if ($limuser>0) { $query .= " AND imas_forum_posts.userid='$limuser' ";}
-	$query .= "GROUP BY imas_forum_posts.forumid,imas_forum_posts.userid ";
-	
-	$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($r = mysql_fetch_row($result2)) {
-		if (!isset($discussidx[$r[1]]) || !isset($sturow[$r[0]]) || !isset($discusscol[$r[1]])) {
-			continue;
-		}
-		$i = $discussidx[$r[1]];
-		$row = $sturow[$r[0]];
-		$col = $discusscol[$r[1]];
-		if ($r[2]!=null) {
-			$gb[$row][1][$col][0] = 1*$r[2];
-		}
-		$gb[$row][1][$col][3] = 0; //is counted
-		if ($gb[0][1][$col][3]<1) { //past
-			$cattotpast[$row][$category[$i]][$col] = $r[2];
-		} 
-		if ($gb[0][1][$col][3]<2) { //past or cur
-			$cattotcur[$row][$category[$i]][$col] = $r[2];
-		}
-		$cattotfuture[$row][$category[$i]][$col] = $r[2];
-	}
-	*/
+
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
 		
