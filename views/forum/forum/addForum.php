@@ -6,23 +6,29 @@ use kartik\date\DatePicker;
 use app\components\AssessmentUtility;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-$this->title = $pageTitle;
-?>
-    <!-- previous form syntax, replace .. with php start and end  -->
-    <!-- <form enctype="multipart/form-data" method=post action=".. echo $page_formActionTag .."> -->
+use yii\helpers\HtmlPurifier;
 
+$this->title = $pageTitle; // hard-coded value so not needed to be html::encoded
+
+?>
+ 
     <?php 
         $form = ActiveForm::begin([
-            'method' => 'post',
+            'id' => "",
             'options' => ['enctype' => 'multipart/form-data'],
         ]);
+
     ?>
+
+   
 
     <?php if ($modifyForumId){ ?>
         <input type="hidden" name="modifyFid" value="<?php echo $modifyForumId;?>">
     <?php } ?>
      <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home', Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
+
+   
     </div>
     <div class = "title-container">
         <div class="row">
@@ -41,25 +47,29 @@ $this->title = $pageTitle;
             <div class="col-md-10 col-sm-9">
                 <?php $title = AppUtility::t('Enter forum name here', false);
                 if ($forumData) {
-                $title = $forumData['name'];
+                    $title = Html::encode($forumData['name']);
                 } ?>
-                <input class="name form-control" id="name-forum" maxlength="60" type=text size=0 style="width: 100%;height: 40px; border: #a9a9a9 1px solid;" name=name value="<?php echo trim($title);?>">
+
+                <input class="name form-control" id="name-forum" maxlength="60" type=text size=0 style="width: 100%;height: 40px; border: #a9a9a9 1px solid;" name=name value="<?php echo trim($title);?>" ondblclick="this.value=' '">
             </div>
         </div>
-            <BR class=form>
+        <BR class=form>
 
         <div class="editor-summary col-md-12 col-sm-12 padding-left-zero padding-right-zero">
             <div class="col-md-2 col-sm-3">
-                <?php AppUtility::t('Description')?>
+                <?php AppUtility::t('Description') ?>
             </div>
             <div class="col-md-10 col-sm-9 padding-left-zero padding-right-zero">
                 <div class="col-md-12 col-sm-12 editor add-forum-summary-textarea">
                     <?php  $description = 'Enter forum description here';
                              if ($forumData) {
                                  $description = $forumData['description'];
-                        } ?>
-                        <textarea cols="5" rows="12" id="description" name="description" style="width: 100%;">
-                    <?php echo $description; ?></textarea>
+                                }
+                             ?>
+                        <textarea cols="5" rows="12" id="description" name="description" style="width: 100%;" >
+                           <?php echo HtmlPurifier::process($description); ?>
+                        </textarea>
+                    
                 </div>
             </div>
         </div>
@@ -506,4 +516,3 @@ $this->title = $pageTitle;
         <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
     </div>
     <?php ActiveForm::end(); ?>
-    <!-- </form> -->
