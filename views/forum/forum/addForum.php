@@ -4,10 +4,20 @@ use app\components\AppConstant;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AssessmentUtility;
+use yii\widgets\ActiveForm;
+use yii\helpers\Html;
 $this->title = $pageTitle;
 ?>
+    <!-- previous form syntax, replace .. with php start and end  -->
+    <!-- <form enctype="multipart/form-data" method=post action=".. echo $page_formActionTag .."> -->
 
-    <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+    <?php 
+        $form = ActiveForm::begin([
+            'method' => 'post',
+            'options' => ['enctype' => 'multipart/form-data'],
+        ]);
+    ?>
+
     <?php if ($modifyForumId){ ?>
         <input type="hidden" name="modifyFid" value="<?php echo $modifyForumId;?>">
     <?php } ?>
@@ -495,4 +505,5 @@ $this->title = $pageTitle;
     <div class="header-btn col-md-offset-2 col-sm-offset-3 col-md-6 col-sm-6 padding-top-ten padding-bottom-thirty">
         <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
     </div>
-    </form>
+    <?php ActiveForm::end(); ?>
+    <!-- </form> -->
