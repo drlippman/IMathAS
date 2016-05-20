@@ -1825,7 +1825,7 @@ function gbtable() {
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
 					if ($gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
 						$avgs[] = $gb[$i][1][$j][0];
-						if ($limuser==-1 && $gb[0][1][$j][6]==1) { //for online, if showning avgs
+						if ($limuser==-1 && $gb[0][1][$j][6]==0) { //for online, if showning avgs
 							$avgtime[] = $gb[$i][1][$j][7];
 							$avgtimedisp[] = $gb[$i][1][$j][8];
 						}
