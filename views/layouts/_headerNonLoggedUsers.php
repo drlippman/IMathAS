@@ -21,7 +21,7 @@
                 ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
             Yii::$app->user->isGuest ?
                 ['label' => ''] :
-                ['label' => (ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
+                ['label' => Html::encode((ucfirst(Yii::$app->user->identity->FirstName)) .' '. Html::encode(ucfirst(Yii::$app->user->identity->LastName))),
                     'url' => ['/site/logout'],
                     'linkOptions' => ['data-method' => 'post'], 'class' => 'user-alignment'],
 
