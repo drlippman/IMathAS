@@ -847,6 +847,9 @@ function gbstudisp($stu) {
 			echo '<th>'._('Due Date').'</th>';
 			$sarr .= ",'D'";
 		}
+	} else if ($stu==-1) {
+		echo '<th>', _('Time Spent (In Questions)'), '</th>';
+		$sarr = "'S','N','N','N','N'";
 	} else {
 		$sarr = "'S','N','N','N'";
 	}
@@ -1021,6 +1024,12 @@ function gbstudisp($stu) {
 					} else {
 						echo '<td>-</td>';
 					}
+				}
+			} else if ($stu==-1) {
+				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7]>-1) {
+					echo '<td>'.$gbt[1][1][$i][7].' min ('.$gbt[1][1][$i][8].' min)</td>';
+				} else {
+					echo '<td></td>';
 				}
 			}
 			if ($stu>0) {

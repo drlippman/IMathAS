@@ -1063,7 +1063,7 @@ function gbtable() {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;
-		} else	if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
+		} else	if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']]+10)) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
 		} else if ($assessmenttype[$i]=="Practice") {
@@ -1815,25 +1815,31 @@ function gbtable() {
 	if ($limuser<1) {
 		//create averages
 		$gb[$ln][0][0] = "Averages";
-		$avgs = array();
+
 		for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
-			$avgs[$j] = array();
+			$avgs = array();
+			$avgtime = array();
+			$avgtimedisp = array();
 			
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
 					if ($gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
-						$avgs[$j][] = $gb[$i][1][$j][0];
+						$avgs[] = $gb[$i][1][$j][0];
+						if ($limuser==-1 && $gb[0][1][$j][6]==1) { //for online, if showning avgs
+							$avgtime[] = $gb[$i][1][$j][7];
+							$avgtimedisp[] = $gb[$i][1][$j][8];
+						}
 					}
 				}
 			}
 			
-			if (count($avgs[$j])>0) {
-				sort($avgs[$j], SORT_NUMERIC);
+			if (count($avgs)>0) {
+				sort($avgs, SORT_NUMERIC);
 				$fivenum = array();
 				for ($k=0; $k<5; $k++) {
-					$fivenum[] = gbpercentile($avgs[$j],$k*25);
+					$fivenum[] = gbpercentile($avgs,$k*25);
 				}
-				$fivenumsum = 'n = '.count($avgs[$j]).'<br/>';
+				$fivenumsum = 'n = '.count($avgs).'<br/>';
 				$fivenumsum .= implode(',&nbsp;',$fivenum);
 				if ($gb[0][1][$j][2]>0) {
 					for ($k=0; $k<5; $k++) {
@@ -1841,6 +1847,12 @@ function gbtable() {
 					}
 					$fivenumsum .= '<br/>'.implode('%,&nbsp;',$fivenum).'%';
 				}
+				if ($limuser==-1 && count($avgtime)>0) {
+					$gb[$ln][1][$j][7] = round(array_sum($avgtime)/count($avgtime),1);
+					$gb[$ln][1][$j][8] = round(array_sum($avgtimedisp)/count($avgtimedisp),1);
+				}
+				$gb[$ln][1][$j][0] = round(array_sum($avgs)/count($avgs),1);
+				$gb[$ln][1][$j][4] = 'average';
 			} else {
 				$fivenumsum = '';
 			}
@@ -1903,12 +1915,7 @@ function gbtable() {
 				}
 			}
 		}
-		foreach ($avgs as $j=>$avg) {
-			if (count($avg)>0) {
-				$gb[$ln][1][$j][0] = round(array_sum($avg)/count($avg),1);
-				$gb[$ln][1][$j][4] = 'average';
-			}
-		}
+		
 		foreach ($catavgs as $j=>$avg) {
 			for ($m=0;$m<4;$m++) {
 				if (count($avg[$m])>0) {
