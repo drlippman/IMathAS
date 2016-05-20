@@ -80,7 +80,6 @@ function getnextprev(formn,loc) {
 			}
 		}
 	}
-	console.log([[prevl,prevq],[nextl,nextq]]);
 	return ([[prevl,prevq],[nextl,nextq]]);
 }
 </script>
