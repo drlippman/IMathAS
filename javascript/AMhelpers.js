@@ -619,9 +619,12 @@ function AMpreview(inputId,outputId) {
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
   var foundaltcap = []; 
+  var dispstr = str; 
+  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
-		  str = str.replace("E","varE");	
+		  str = str.replace("E","varE");
+		  dispstr = dispstr.replace("E","varE");
 	  } else {
 	  	foundaltcap[i] = false;
 	  	for (var j=0; j<vars.length; j++) {
@@ -632,24 +635,12 @@ function AMpreview(inputId,outputId) {
 	  	}
 	  	if (!foundaltcap[i]) {
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+			dispstr = dispstr.replace(new RegExp(vars[i],"gi"),vars[i]);
 		}
 	  }
-	  
-	  /*else if (vars[i].charCodeAt(0)>96) { //lowercase
-		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
-			//vars[i] = vars[i].toLowerCase();
-			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
-		  }
-	  } else {
-	  	  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
-		   	//vars[i] = vars[i].toLowerCase();
-		   	str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
-		  }
-	  }
-	  */
   }
 
-  var dispstr = str; 
+  
   //quote out multiletter variables
   var varstoquote = new Array(); var regmod;
   for (var i=0; i<vars.length; i++) {
@@ -713,6 +704,7 @@ function AMpreview(inputId,outputId) {
 	  dispstr = dispstr.replace(reg,"\"$1\"");
   }
   dispstr = dispstr.replace("varE","E");
+  dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;

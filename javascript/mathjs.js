@@ -56,17 +56,16 @@ function nthroot(n,base) {
 function nthlogten(n,v) {
 	return ((Math.log(v))/(Math.log(n)));
 }
+var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth".split("|");
 function functoindex(match) {
-	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
-	for (var i=0;i<func.length;i++) {
-		if (func[i]==match) {
+	for (var i=0;i<funcstoindexarr.length;i++) {
+		if (funcstoindexarr[i]==match) {
 			return '@'+i+'@';
 		}
 	}
 }
 function indextofunc(match, contents) {
-	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
-	return func[contents];
+	return funcstoindexarr[contents];
 }
 
 function safepow(base,power) {
