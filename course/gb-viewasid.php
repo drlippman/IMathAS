@@ -1054,7 +1054,7 @@
 		$row = mysql_fetch_row($result);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		
-		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessment_sessions.* ";
+		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessments.endmsg,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1066,6 +1066,61 @@
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		
+		$scores = array();
+		$qs = explode(',',$line['questions']);
+		$sp = explode(';',$line['bestscores']);
+		foreach(explode(',',$sp[0]) as $k=>$score) {
+			$scores[$qs[$k]] = getpts($score);
+		}
+		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+		$query .= " AND imas_questions.id IN ({$line['questions']})";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$i=1;
+		$totpt = 0;
+		$totposs = 0;
+		$qbreakdown = '';
+		while ($row = mysql_fetch_row($result)) {
+			if ($i%2!=0) {$qbreakdown .= "<tr class=even>"; } else {$qbreakdown .= "<tr class=odd>";}
+			$qbreakdown .= '<td>';
+			if ($row[3]==1) {
+				$qbreakdown .= '<span class="red">Withdrawn</span> ';
+			}
+			$qbreakdown .= $row[0];
+			$qbreakdown .= "</td><td>{$scores[$row[1]]} / ";
+			if ($row[2]==9999) {
+				$poss= $line['defpoints'];
+			} else {
+				$poss = $row[2];
+			}
+			$qbreakdown .= $poss;
+			
+			$qbreakdown .= "</td></tr>\n";
+			$i++;
+			$totpt += $scores[$row[1]];
+			$totposs += $poss;
+		}
+		$pc = round(100*$totpt/$totposs,1);
+		
+		
+		$endmsg = unserialize($line['endmsg']);
+		$outmsg = '';
+		if (isset($endmsg['msgs'])) {
+			foreach ($endmsg['msgs'] as $sc=>$msg) { //array must be reverse sorted
+				if (($endmsg['type']==0 && $total>=$sc) || ($endmsg['type']==1 && $pc>=$sc)) {
+					$outmsg = $msg;
+					break;
+				}
+			}
+			if ($outmsg=='') {
+				$outmsg = $endmsg['def'];
+			}
+			if (!isset($endmsg['commonmsg'])) {$endmsg['commonmsg']='';}
+				
+			if (strpos($outmsg,'redirectto:')!==false) {
+				$outmsg = '';
+			}
+		}
+		
 		echo "<h4>{$line['name']}</h4>\n";
 		echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
 		if ($line['endtime']==0) { 
@@ -1074,53 +1129,27 @@
 			echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "</p>\n";
 		}
 		
+		if ($outmsg!='') {
+			echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
+			if ($endmsg['commonmsg']!='' && $endmsg['commonmsg']!='<p></p>') {
+				echo $endmsg['commonmsg'];
+			}
+		}
 		
 		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
 		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
 		if (mysql_result($result,0,0)>0) {
 			include("../assessment/catscores.php");
-			$sp = explode(';',$line['bestscores']);
 			catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
 		}
 		
-		$scores = array();
-		$qs = explode(',',$line['questions']);
-		$sp = explode(';',$line['bestscores']);
-		foreach(explode(',',$sp[0]) as $k=>$score) {
-			$scores[$qs[$k]] = getpts($score);
-		}
+		
 		
 		echo "<h4>Question Breakdown</h4>\n";
 		echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
-		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		$query .= " AND imas_questions.id IN ({$line['questions']})";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$i=1;
-		$totpt = 0;
-		$totposs = 0;
-		while ($row = mysql_fetch_row($result)) {
-			if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
-			echo '<td>';
-			if ($row[3]==1) {
-				echo '<span class="red">Withdrawn</span> ';
-			}
-			echo $row[0];
-			echo "</td><td>{$scores[$row[1]]} / ";
-			if ($row[2]==9999) {
-				$poss= $line['defpoints'];
-			} else {
-				$poss = $row[2];
-			}
-			echo $poss;
-			
-			echo "</td></tr>\n";
-			$i++;
-			$totpt += $scores[$row[1]];
-			$totposs += $poss;
-		}
+		echo $qbreakdown;
 		echo "</table>\n";
 		
-		$pc = round(100*$totpt/$totposs,1);
 		echo "<p>Total:  $totpt / $totposs  ($pc %)</p>\n";
 		
 		echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";		
