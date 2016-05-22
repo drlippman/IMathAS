@@ -78,7 +78,7 @@
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
 		
-		$query = "SELECT enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$hasexception = false;
 		if (mysql_num_rows($result)==0) {
@@ -86,7 +86,7 @@
 			$thised = $enddate;
 		} else {
 			$r = mysql_fetch_row($result);
-			$usedlatepasses = round(($r[0] - $enddate)/($hours*3600));
+			$usedlatepasses = min(max(0,round(($r[0] - $enddate)/($hours*3600))), $r[1]);
 			$hasexception = true;
 			$thised = $r[0];
 		}
