@@ -4,18 +4,21 @@ use app\components\AppUtility;
 use app\components\AppConstant;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
+use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 $this->title = AppUtility::t('Mass Change Forums',false);
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => Html::encode($this->title)]); ?>
 </div>
 
-<form id="mainform" method=post action="change-forum?cid=<?php echo $course->id ?>">
+<form id="mainform" method=post action="change-forum?cid=<?php echo Html::encode($course->id) ?>">
     <div class="title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?> </div>
+                <div class="vertical-align title-page"><?php echo Html::encode($this->title) ?> </div>
             </div>
         </div>
     </div>
