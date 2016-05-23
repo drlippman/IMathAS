@@ -256,7 +256,7 @@ function enditem($canedit) {
 						echo '</span>';
 					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
-					echo "<b><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
+					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
@@ -451,9 +451,9 @@ function enditem($canedit) {
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
 					if ($items[$i]['SH'][0]=='S') {
-						echo "<a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
+						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
 					} else {
-						echo "<i><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
+						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
 					}
 					echo "</b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
