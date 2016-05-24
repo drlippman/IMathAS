@@ -41,12 +41,12 @@ $now = $currentTime;
 </div>
 <input type="hidden" id="userId" value="<?php echo Html::encode($userId); ?>">
 <input type="hidden" id="forumId" value="<?php echo Html::encode($forumData->id); ?>">
-<input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
+<input type="hidden" id="courseId" value="<?php echo Html::encode($course->id); ?>">
 <div class="tab-content shadowBox">
     <div class="col-sm-12 col-md-12" style="padding-top: 30px;">
         <div class="col-sm-2 col-md-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
         <div class="col-sm-10 col-md-10">
-            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=subject value="" class="subject form-control" maxlength="60">
+            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=subject placeholder="" class="subject form-control" maxlength="60">
         </div>
     </div>
     <BR class=form>
