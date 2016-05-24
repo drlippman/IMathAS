@@ -2,6 +2,7 @@
 <?php
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Html;
 use app\models\Student;
 use app\models\Course;
 use \app\components\AppConstant;
@@ -26,7 +27,7 @@ echo Nav::widget([
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
         Yii::$app->user->isGuest ?
             ['label' => ''] :
-            ['label' => '<img class="small-icon" src="'.AppUtility::getAssetURL().'img/user.png">&nbsp;'.(ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
+            ['label' => '<img class="small-icon" src="'.AppUtility::getAssetURL().'img/user.png">&nbsp;'. Html::encode((ucfirst(Yii::$app->user->identity->FirstName)) .' '. Html::encode(ucfirst(Yii::$app->user->identity->LastName))),
                 'items' =>
                     [
                         ['label' => 'Account Settings','url' => ['/site/form?action=chguserinfo']],
