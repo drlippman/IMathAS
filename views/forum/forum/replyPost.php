@@ -1,17 +1,27 @@
 <?php
 use app\components\AppUtility;
 use app\components\AppConstant;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
+
 $this->title = AppUtility::t(' post Reply',false);
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = Html::encode($this->title);
 ?>
-<form id="add-thread" enctype="multipart/form-data" action="<?php AppUtility::getURLFromHome('forum','forum/reply-post')?>" method="post">
+<?php
+$form = ActiveForm::begin([
+    'id' => 'add-thread',
+    'options' => ['enctype' => 'multipart/form-data'],
+    ]);
+?>
+
+<!--<form id="add-thread" enctype="multipart/form-data" action="--><?php //AppUtility::getURLFromHome('forum','forum/reply-post')?><!--" method="post">-->
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name),'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forum:',false);?><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forum:',false);?><?php echo Html::encode($this->title) ?></div>
         </div>
     </div>
 </div>
@@ -22,12 +32,12 @@ $this->params['breadcrumbs'][] = $this->title;
             echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
         }?>
     </div>
-<input type="hidden" class="forum-id" value="<?php echo $forumId ?>">
-<input type="hidden" class="course-id" value="<?php echo $course->id ?>">
-<input type="hidden" class="thread-id" value="<?php echo $threadId ?>">
-<input type="hidden" name="parentId" class="parent-id" value="<?php echo $parentId ?>">
+<input type="hidden" class="forum-id" value="<?php echo Html::encode($forumId) ?>">
+<input type="hidden" class="course-id" value="<?php echo Html::encode($course->id) ?>">
+<input type="hidden" class="thread-id" value="<?php echo Html::encode($threadId) ?>">
+<input type="hidden" name="parentId" class="parent-id" value="<?php echo Html::encode($parentId) ?>">
 <?php if($isPost){?>
-<input type="hidden" name="isPost" class="isPost" value="<?php echo $isPost ?>">
+<input type="hidden" name="isPost" class="isPost" value="<?php echo Html::encode($isPost) ?>">
 <?php }?>
 
 <div class="tab-content shadowBox">
@@ -35,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-sm-12 col-md-12 padding-top">
             <div class="col-sm-1 col-md-1"><?php echo AppUtility::t('Subject')?></div>
             <div class="col-sm-11 col-md-11">
-                <input name="Subject" class="form-control min-width-hundred-per text-box subject" type="text"  readonly value="Re: <?php echo $reply[0]['subject'] ?>">
+                <input name="Subject" class="form-control min-width-hundred-per text-box subject" type="text"  readonly value="Re: <?php echo Html::encode($reply[0]['subject']) ?>">
             </div>
         </div>
 
@@ -78,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div  class="col-sm-12 col-md-12 replyTo padding-top">
             <?php
             $replyParent = new AppUtility();
-            $replyParent->printParents($replyTo);?>
+            Html::encode($replyParent->printParents($replyTo));?>
         </div>
     </div>
-    </form>
+<?php ActiveForm::end(); ?>

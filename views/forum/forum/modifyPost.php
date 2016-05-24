@@ -3,21 +3,28 @@ use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AppUtility;
 use app\components\AppConstant;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 use yii\widgets\ActiveForm;
 use app\components\AssessmentUtility;
 $this->title = AppUtility::t('Modify Post',false);
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = Html::encode($this->title);
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
-?>
-<form enctype="multipart/form-data" method="post" action="modify-post?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
+
+$form = ActiveForm::begin([
+    'id' => '',
+    'options' => ['enctype' => 'multipart/form-data'],
+    ]);
+    ?>
+<!--<form enctype="multipart/form-data" method="post" action="modify-post?forumId=--><?php //echo $forumId ?><!--&courseId=--><?php //echo $course->id ?><!--&threadId=--><?php //echo $threadId ?><!--">-->
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo Html::encode($this->title); ?></div>
         </div>
     </div>
 </div>
@@ -37,7 +44,7 @@ $now = $currentTime;
         <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');
             ?></div>
         <div class="col-sm-10">
-            <input type=text maxlength="60" value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox padding-left-ten">
+            <input type=text maxlength="60" value="<?php echo Html::encode($thread[0]['subject']) ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox padding-left-ten">
         </div>
     </div>
     <BR class=form>
@@ -172,4 +179,4 @@ $now = $currentTime;
           <input class="btn btn-primary add-new-thread" type="submit" id="save-changes" value="Save changes">
       </div>
 </div>
-</form>
+<?php ActiveForm::end(); ?>
