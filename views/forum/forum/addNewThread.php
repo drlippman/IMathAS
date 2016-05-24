@@ -3,23 +3,31 @@ use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AppUtility;
 use app\components\AppConstant;
-use yii\widgets\ActiveForm;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
-$this->title = AppUtility::t('Add New Thread',false);
-$this->params['breadcrumbs'][] = $this->title;
+
+$this->title =  AppUtility::t(' Add New Thread',false);
+$this->params['breadcrumbs'][] =  Html::encode($this->title);
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
 <div class="item-detail-header">
     <?php
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forum='.$forumData->id]]);
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name),'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forum='.$forumData->id]]);
     ?>
 </div>
-<form id="add-thread" enctype="multipart/form-data" action="<?php AppUtility::getURLFromHome('forum','forum/add-new-thread')?>" method="post">
+<?php
+ $form = ActiveForm::begin([
+     'id' => 'add-thread',
+     'options' => ['enctype' => 'multipart/form-data'],
+    ]);
+  ?>
 <div class ="title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo Html::encode($this->title) ?></div>
         </div>
     </div>
 </div>
@@ -31,8 +39,8 @@ $now = $currentTime;
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
-<input type="hidden" id="userId" value="<?php echo $userId; ?>">
-<input type="hidden" id="forumId" value="<?php echo $forumData->id; ?>">
+<input type="hidden" id="userId" value="<?php echo Html::encode($userId); ?>">
+<input type="hidden" id="forumId" value="<?php echo Html::encode($forumData->id); ?>">
 <input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
 <div class="tab-content shadowBox">
     <div class="col-sm-12 col-md-12" style="padding-top: 30px;">
@@ -170,7 +178,3 @@ $now = $currentTime;
     </div>
 </div>
 </form>
-
-
-
-
