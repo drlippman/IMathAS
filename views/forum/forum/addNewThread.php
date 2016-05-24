@@ -9,7 +9,8 @@ use yii\helpers\HtmlPurifier;
 
 
 $this->title =  AppUtility::t(' Add New Thread',false);
-$this->params['breadcrumbs'][] =  Html::encode($this->title);
+///this->title ^^^
+$this->params['breadcrumbs'][] =  $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
