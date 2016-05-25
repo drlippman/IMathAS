@@ -17,11 +17,11 @@ $this->title = AppUtility::t('Mass Change Forums',false);
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 
-<form id="mainform" method=post action="change-forum?cid=<?php echo Html::encode($course->id) ?>">
+<form id="mainform" method=post action="change-forum?cid=<?php echo $course->id ?>">
     <div class="title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo Html::encode($this->title) ?> </div>
+                <div class="vertical-align title-page"><?php echo $this->title ?> </div>
             </div>
         </div>
     </div>
@@ -38,6 +38,7 @@ $this->title = AppUtility::t('Mass Change Forums',false);
              <a href="#" onclick="return chkAllNone('mainform','checked[]',false)"><?php AppUtility::t('None')?></a>
             <ul class=nomark>
                 <?php
+                // $id and $name are parameters of array ($forumItems) elements. No user contamination.
                 foreach ($forumItems as $id => $name) {
                     echo '<li class="padding-left-zero"><input type="checkbox" name="checked[]" value="' . $id . '" /> ' . $name . '</li>';
                 }
