@@ -58,7 +58,9 @@ function delitembyid($itemid) {
 		$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$typeid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		
-		$query = "DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$typeid')";
+		//$query = "DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$typeid')";
+		$query = "DELETE imas_forum_views FROM imas_forum_views JOIN imas_forum_threads ";
+		$query .= "ON imas_forum_views.threadid=imas_forum_threads.id  WHERE imas_forum_threads.forumid='$typeid'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		
 		$query = "DELETE FROM imas_forum_posts WHERE forumid='$typeid'";

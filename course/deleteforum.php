@@ -64,8 +64,10 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			deleteallpostfiles($row[0]);
 		}
 		
-		$query = "DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$forumid')";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//$query = "DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$forumid')";
+		$query = "DELETE imas_forum_views FROM imas_forum_views JOIN imas_forum_threads ";
+		$query .= "ON imas_forum_views.threadid=imas_forum_threads.id  WHERE imas_forum_threads.forumid='$forumid'";
+ 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 		
 		$query = "DELETE FROM imas_forum_posts WHERE forumid='$forumid'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
