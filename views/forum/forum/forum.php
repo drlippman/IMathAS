@@ -1,4 +1,4 @@
-<?php
+ <?php
 use app\components\AppUtility;
 use app\components\AppConstant;
 $groupAdmin = $users['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
@@ -202,7 +202,7 @@ if (count($taginfo)==0) {
                     } else {
                         $name = "{$line['LastName']}, {$line['FirstName']}";
                     } ?>
-                     <b><a class="width-hundread-per word-break-all-width" href="<?php echo AppUtility::getURLFromHome('forum','forum/post?&page=-4&courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id']);?> "> <?php echo $line['subject'] ?></a></b>&nbsp;<?php echo $name?>
+                     <b><a class="width-hundread-per word-break-all-width" href="<?php echo AppUtility::getURLFromHome('forum','forum/post?&page=-4&courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id']);?> "> <? var_dump($line['subject'] )?><?php echo $line['subject'] ?></a></b>&nbsp;<?php echo $name?>
 
 
                      </div>
@@ -346,7 +346,3 @@ if (count($taginfo)==0) {
         ?>
     </div>
 </div>
-
-
-
-

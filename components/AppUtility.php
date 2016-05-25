@@ -24,6 +24,8 @@ use app\models\Wiki;
 use Yii;
 use yii\base\Component;
 use app\models\Links;
+use yii\helpers\Html;
+
 
 require_once("../filter/filter.php");
 
@@ -3195,7 +3197,7 @@ class AppUtility extends Component
 
                 echo "</span>\n";
                 echo '<span style="float:left">';
-                echo "<b>{$subject[$child]}</b><br/>Posted by: ";
+                echo "<b>" . HTML::encode($subject[$child]). "</b><br/>Posted by:";
 
                 if (($isTeacher || $allowmsg) && $ownerid[$child]!=0) {?>
                     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$courseId.'&userid='.$ownerid[$child].'&new='.$ownerid[$child])?>"
