@@ -11,8 +11,10 @@ use yii\helpers\HtmlPurifier;
 $this->title = AppUtility::t('Mass Change Forums',false);
 ?>
 <div class="item-detail-header">
-    <!-- Note: added encoding in several areas in next lines below: -->
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . Html::encode($course->id)], 'page_title' => Html::encode($this->title)]); ?>
+    <!-- $course->name and $course->id are not html::encoded b/c $course data is populated in controller using getById (internal process not accessible by user )
+         In addition, $this->title is not encoded either because it is hard-coded through AppUtility
+    -->
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
 
 <form id="mainform" method=post action="change-forum?cid=<?php echo Html::encode($course->id) ?>">
