@@ -134,12 +134,12 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
     <div class="clear-both"></div>
 <?php }
 ?>
+
     <input type="hidden" class="courseId" value="<?php echo $course->id?>">
 
 <?php if ($isTutor && isset($sessionData['ltiitemtype']) && $sessionData['ltiitemtype'] == 3) {
     $placeinhead .= '<script type="text/javascript">jQuery(function(){jQuery(".instrdates").hide();});</script>';
 }
-
 if ($overwriteBody == 1) {
     echo $body;
 } else {
@@ -167,10 +167,11 @@ if ($overwriteBody == 1) {
 
     <?php
     }
+
     $blockAddress = AppUtility::getURLFromHome('course', 'course/get-block-items?cid='.$course->id. '&folder=');
     ?>
     <script type="text/javascript">
-        var getbiaddr = '<?php echo $blockAddress;?>';
+        var getbiaddr = '<?php  echo $blockAddress;?>';
         var oblist = '<?php echo $oblist ?>';
         var plblist = '<?php echo $plblist ?>';
         var cid = '<?php echo $course->id ?>';
@@ -244,4 +245,3 @@ if ($overwriteBody == 1) {
     }
 }
 ?></div></div>
-
