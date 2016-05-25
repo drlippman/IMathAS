@@ -30,7 +30,7 @@ $now = $currentTime;
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo HTML::encode($this->title) ?></div>
         </div>
         <?php if(($users['rights']>AppConstant::NUMERIC_FIVE && time()<$forumData['postby']) || $isteacher ){ ?>
             <div class="pull-left header-btn">
