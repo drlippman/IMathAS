@@ -205,13 +205,13 @@ if (count($taginfo)==0) {
                     } else {
                         $name = "{$line['LastName']}, {$line['FirstName']}";
                     } ?>
-                     <b><a class="width-hundread-per word-break-all-width" href="<?php echo AppUtility::getURLFromHome('forum','forum/post?&page=-4&courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id']);?> "> <? var_dump($line['subject'] )?><?php echo $line['subject'] ?></a></b>&nbsp;<?php echo $name?>
+                     <b><a class="width-hundread-per word-break-all-width" href="<?php echo AppUtility::getURLFromHome('forum','forum/post?&page=-4&courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['id']);?> "> <?php echo $line['subject'] ?></a></b>&nbsp;<?php echo $name?>
 
 
                      </div>
                      </td>
 
-                     <td class="c width-hundread-per word-break-all-width"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['forumid']);?>"><?php echo $line['name']?></a></td>
+                     <td class="c width-hundread-per word-break-all-width"><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['forumid']);?>"><?php echo HTML::encode($line['name']); ?></a></td>
                     <?php echo "<td class='C '>$posts</td><td class=c>{$line['views']} </td><td class=c>$lastpost ";
                     echo "</td></tr>\n";
                 } ?>
@@ -235,7 +235,7 @@ if (count($taginfo)==0) {
                 echo "<div class='col-md-12 col-sm-12 padding-left-right-thirty padding-top-twenty'>
         <div class='block'>";
                 echo "<b>{$line['subject']}</b>";
-                echo ' (in '.$line['name'].')';
+                echo ' (in '.HTML::encode($line['name']).')';
                 if ($line['isanon']==1) {
                     $name = "Anonymous";
                 } else {
@@ -322,7 +322,7 @@ if (count($taginfo)==0) {
                      </span>
 
                             <?php } ?>
-                            <b><a class="word-break-break-all width-hundread-per" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['id']);?>"><?php echo $line['name'];?></a></b>
+                            <b><a class="word-break-break-all width-hundread-per" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['id']);?>"><?php echo HTML::encode($line['name']);?></a></b>
 <!--                            --><?php //if ($newcnt[$line['id']]>0)
 //                                { ?>
 <!--                                <a href="--><?php //echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$cid.'&forumid='.$line['id'].'&page=-1');?><!--" style="color:red">New Posts  (--><?php //echo $newcnt[$line['id']];?><!--) </a>-->
