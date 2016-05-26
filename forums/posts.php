@@ -343,6 +343,26 @@
 			
 	?>
 		<script type="text/javascript">
+		var haschanges = false;
+		$(function() {
+			$(".scorebox").on('keypress', function() {haschanges = true;});
+		});
+		function checkchgstatus(type,id) {
+			//type: 0 reply, 1 modify
+			if (haschanges) {
+				if (type==0) {
+					action = 'reply';
+				} else if (type==1) {
+					action = 'modify';
+				}
+				if (confirm("You have unsaved changes. Click OK to save changes before continuing, or Cancel to discard changes")) {
+					$("form").append('<input type="hidden" name="actionrequest" value="'+action+':'+id+'"/>').submit();
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}
 		function toggleshow(butn) {
 			var forumgrp = $(butn).closest(".block").nextAll(".forumgrp").first();
 			if (forumgrp.hasClass("hidden")) {
@@ -467,14 +487,14 @@
 				} 
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
 					if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
-						echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
+						echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\" onclick=\"return checkchgstatus(1,$child)\">Modify</a> \n";
 					}
 				}
 				if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
 				}
 				if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\">Reply</a>";
+					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\" onclick=\"return checkchgstatus(0,$child)\">Reply</a>";
 				}
 				
 				echo "</span>\n";
@@ -589,7 +609,7 @@
 				if ($haspoints) {
 					if ($caneditscore && $ownerid[$child]!=$userid) {
 						echo '<hr/>';
-						echo "Score: <input type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
+						echo "Score: <input class=scorebox type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
 						if ($points[$child]!==null) {
 							echo $points[$child];
 						}
@@ -597,7 +617,7 @@
 						if ($rubric != 0) {
 							echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
 						}
-						echo " Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
+						echo " Private Feedback: <textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
 						if ($feedback[$child]!==null) {
 							echo $feedback[$child];
 						}
@@ -624,7 +644,7 @@
 			}
 		}
 		if ($caneditscore && $haspoints) {
-			echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
+			echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&thread=$threadid&score=true\">";
 		}
 		printchildren(0);
 		if ($caneditscore && $haspoints) {
