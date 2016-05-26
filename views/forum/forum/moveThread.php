@@ -10,8 +10,15 @@ $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
+<?php
+        $form = ActiveForm::begin([
+            'id' => "",
+            'options' => ['enctype' => 'multipart/form-data'],
+        ]);
 
-<form id="myForm" method="post" action="move-thread?forumid=<?php echo $forumId ?>&courseid=<?php echo $course->id ?>&threadid=<?php echo $threadId ?>&move=<?php echo $move?>">
+    ?>
+    <!-- previous form values { id = "myForm", method = "post", action = " non-php-echoed [move-thread?forumid=] php-echoed [$forumId] non-php-echoed [&courseid=] php-echoed [$course->id] non-php-echoed [&threadid=] php-echoed [$threadId] non-php-echoed [&move=] php-echoed [$move]  "}  -->
+
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
 </div>
@@ -131,4 +138,4 @@ $now = $currentTime;
         </div>
     </div>
 </div>
-</form>
+<?php ActiveForm::end(); ?>
