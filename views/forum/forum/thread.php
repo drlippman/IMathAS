@@ -244,7 +244,7 @@ echo '</div>';
     {            ?>
 
         <div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
-            <div >
+This is this            <div >
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
                     <th class="width-fifteen-per text-align-center"><?php echo AppUtility::t('Topic')?></th>
@@ -374,9 +374,9 @@ echo '</div>';
                 </table>
             </div>
         </div>
+        cmncnm,znxc,mzxn
         <div id="searchpost"></div>
     <?php }
     }
 ?>
 </div>
-
