@@ -38,7 +38,7 @@ $form = ActiveForm::begin([
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
- <!-- $threadId is defined on line 675 of ForumController: $threadId = $this->getParamVal('threadId');
+ <!-- $threadId is defined on line 675 of ForumController(FC): $threadId = $this->getParamVal('threadId');
    getParamVal function (line 143 of AppController) accepts key argument and returns Yii::$app->request->get($key); $forumId, defined on line 676 of FC, is secure in the same way -->
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>">
     <input type="hidden" id="forum-id" value="<?php echo $forumId ?>">
@@ -48,6 +48,8 @@ $form = ActiveForm::begin([
         <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');
             ?></div>
         <div class="col-sm-10">
+        <!-- $thread is defined on line 686 of FC, and receives the return from app/models/forms/ThreadForm function 'thread' which is this: $thread = ForumPosts::find()->where(['forumid' => $forumid])->orderBy(['posttype'=> $sortBy ,'id' => $sortBy])->all(); 
+        The data being perused is possibly input from user so subsequent $thread is encoded -->
             <input type=text maxlength="60" value="<?php echo Html::encode($thread[0]['subject']) ?>" size=0 style="width: 100%; height: 40px; border:#6d6d6d 1px solid;"  name=subject class="subject textbox padding-left-ten">
         </div>
     </div>
@@ -58,18 +60,17 @@ $form = ActiveForm::begin([
         <div class="col-sm-10 message-div">
             <div class=editor>
                 <textarea cols=5 rows=12 id=message name=message style="width: 100%">
-                    <?php echo $thread[0]['message'];?>
+                    <?php echo Html::encode($thread[0]['message']);?>
                 </textarea>
             </div>
         </div>
     </div>
       <div style="margin-left: 18%">
-    <?php if($forumData['forumtype'] == 1){?>
+    <?php if($forumData['forumtype'] == 1){?> <!-- Forum Type is either 'Regular Forum' or 'File Sharing Forum'
         <?php if($thread[0]['files'] != '')
         {
             $files = explode('@@',$thread[0]['files']);
-
-
+                //the following loops through array data of thread files, displays uploaded images
                 for ($i=0;$i<count($files)/2;$i++){
                     ?>
                     <br><input type="text" name="file[<?php echo $i;?>]" value="<?php echo $files[2*$i]?>"/>
@@ -95,6 +96,8 @@ $form = ActiveForm::begin([
         <div>
             <span class="col-sm-2 align-title"><?php echo AppUtility::t('Post Type');?></span>
             <span class="col-sm-10" id="post-type-radio-list">
+
+                 <!-- radio button list displayed beneath Message text area -->
                  <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
                                  <input type='radio' checked name='post-type' id="regular" value='0'value="0"<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'], AppConstant::NUMERIC_ZERO);?> >
                                  <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Regular');?></td></div></tr>
