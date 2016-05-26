@@ -8,8 +8,10 @@ use yii\helpers\HtmlPurifier;
 use yii\widgets\ActiveForm;
 use app\components\AssessmentUtility;
 
+// The base model is BaseImasForumPosts which has subject and message purified
 $this->title = AppUtility::t('Modify Post',false);
-$this->params['breadcrumbs'][] = Html::encode($this->title);
+// removed encoding around $this->title line 13 as that variable is directly defined in line above
+$this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 
@@ -18,14 +20,14 @@ $form = ActiveForm::begin([
     'options' => ['enctype' => 'multipart/form-data'],
     ]);
     ?>
-<!--<form enctype="multipart/form-data" method="post" action="modify-post?forumId=--><?php //echo $forumId ?><!--&courseId=--><?php //echo $course->id ?><!--&threadId=--><?php //echo $threadId ?><!--">-->
+ <!-- $course is defined in line 672 of ForumController, where it receives result of query. Thus any parameters attached to course, as well as $course itself, will be from the back-end and secure -->
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL().'course/course/course?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo Html::encode($this->title); ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title; ?></div>
         </div>
     </div>
 </div>
@@ -36,7 +38,8 @@ $form = ActiveForm::begin([
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
-
+ <!-- $threadId is defined on line 675 of ForumController: $threadId = $this->getParamVal('threadId');
+   getParamVal function (line 143 of AppController) accepts key argument and returns Yii::$app->request->get($key); $forumId, defined on line 676 of FC, is secure in the same way -->
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>">
     <input type="hidden" id="forum-id" value="<?php echo $forumId ?>">
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
