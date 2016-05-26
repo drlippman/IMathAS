@@ -219,6 +219,7 @@ if ($overwriteBody == 1) {
                 echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
                 echo 'link along the left side of the screen.</p><p class="padding-left-fifteen">If you want to build from scratch, use the "Add An Item" pull down below to get started.</p><p>&nbsp;</p>';
             }
+
             echo ShowItemCourse::generateAddItem($folder,'t',$studview);
         }
     }

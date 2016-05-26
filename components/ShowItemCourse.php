@@ -16,6 +16,8 @@ use app\models\WikiRevision;
 use app\models\WikiView;
 use \yii\base\Component;
 use app\components\Calendar;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 class ShowItemCourse extends Component
 {
@@ -834,7 +836,7 @@ class ShowItemCourse extends Component
                     <?php if ($tlwrds != '') {
                         echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
                     }
-                    echo ">{$line['name']}</a></b>";
+                    echo ">". HTML::encode($line['name'])."</a></b>";
                     if ($line['enddate'] != AppConstant::ALWAYS_TIME) {
                         echo "<BR> $endname $endDate \n";
                     }

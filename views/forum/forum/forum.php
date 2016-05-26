@@ -1,6 +1,9 @@
  <?php
 use app\components\AppUtility;
 use app\components\AppConstant;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
+
 $groupAdmin = $users['rights'] >= AppConstant::GROUP_ADMIN_RIGHT;
 require("../components/filehandler.php");
 if ($searchtype=='none')
@@ -265,7 +268,7 @@ if (count($taginfo)==0) {
                     //if (count($fl)>2) {echo '</ul>';}
                     echo '</p>';
                 }
-                echo filter($line['message']); ?>
+                echo HtmlPurifier::process(filter($line['message'])); ?>
                 <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$line['forumid'].'&threadid='.$line['threadid'].'&page=-4'); ?>">Show full thread</a></p>
                 <?php echo "</div></div>\n";
             }
