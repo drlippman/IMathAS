@@ -7,12 +7,10 @@ use app\components\AssessmentUtility;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
-
-$this->title = $pageTitle; // hard-coded value so not needed to be html::encoded
-
+$this->title = $pageTitle;
 ?>
- 
-    <?php 
+
+    <?php
         $form = ActiveForm::begin([
             'id' => "",
             'options' => ['enctype' => 'multipart/form-data'],
@@ -20,15 +18,21 @@ $this->title = $pageTitle; // hard-coded value so not needed to be html::encoded
 
     ?>
 
-   
 
+
+    <?php
+        $form = ActiveForm::begin([
+                'id' => "",
+                'options' => ['enctype' => 'multipart/form-data'],
+            ]);
+    ?>
     <?php if ($modifyForumId){ ?>
         <input type="hidden" name="modifyFid" value="<?php echo $modifyForumId;?>">
     <?php } ?>
      <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home', Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/course?cid='.$course->id], 'page_title' => $this->title]); ?>
 
-   
+
     </div>
     <div class = "title-container">
         <div class="row">
@@ -69,7 +73,7 @@ $this->title = $pageTitle; // hard-coded value so not needed to be html::encoded
                         <textarea cols="5" rows="12" id="description" name="description" style="width: 100%;" >
                            <?php echo HtmlPurifier::process($description); ?>
                         </textarea>
-                    
+
                 </div>
             </div>
         </div>
@@ -515,4 +519,4 @@ $this->title = $pageTitle; // hard-coded value so not needed to be html::encoded
     <div class="header-btn col-md-offset-2 col-sm-offset-3 col-md-6 col-sm-6 padding-top-ten padding-bottom-thirty">
         <button class="btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
     </div>
-    <?php ActiveForm::end(); ?>
+<?php ActiveForm::end(); ?>
