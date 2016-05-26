@@ -2,6 +2,8 @@
 use app\components\AppUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 $this->title = AppUtility::t('Move Thread',false);
 $this->params['breadcrumbs'][] = $this->title;
