@@ -4,6 +4,8 @@ use app\components\AssessmentUtility;
 use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+
 //require("../filter/filter.php");
 
 $this->title = AppUtility::t($forumData['name'],false );
@@ -28,7 +30,7 @@ $now = $currentTime;
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo HTML::encode($this->title) ?></div>
         </div>
         <?php if(($users['rights']>AppConstant::NUMERIC_FIVE && time()<$forumData['postby']) || $isteacher ){ ?>
             <div class="pull-left header-btn">
@@ -244,7 +246,7 @@ echo '</div>';
     {            ?>
 
         <div id="data" class="col-sm-12 padding-left-right-thirty padding-top-twenty padding-bottom-ten">
-This is this            <div >
+           <div >
                 <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                     <thead>
                     <th class="width-fifteen-per text-align-center"><?php echo AppUtility::t('Topic')?></th>
@@ -268,9 +270,9 @@ This is this            <div >
                         $uniqviews[$row['id']] = $row['count(imas_forum_views.userid)']-1;
                     }
 
-
                     foreach ($postInformtion as $line )
                     {
+
                         if (isset($postcount[$line['id']]))
                         {
                             $posts = $postcount[$line['id']];
@@ -293,7 +295,7 @@ This is this            <div >
                         } else {
                             $name = "{$line['LastName']}, {$line['FirstName']} ";
                         } ?>
-                        <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$forumid.'&threadid='.$line['id']);?>"><?php echo trim($line['subject'])?></a></b>:
+                        <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$forumid.'&threadid='.$line['id']);?>"><?php echo  Html::encode(trim($line['subject']))?></a></b>:
                         <div><?php echo $name?></div>
                         <?php
                         echo "</td>\n";
@@ -374,7 +376,6 @@ This is this            <div >
                 </table>
             </div>
         </div>
-        cmncnm,znxc,mzxn
         <div id="searchpost"></div>
     <?php }
     }

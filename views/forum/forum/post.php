@@ -6,6 +6,7 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 
+
 $this->title = 'Post';
 $currentLevel = AppConstant::NUMERIC_ZERO;
 
@@ -55,8 +56,8 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 
     } else{
 
-        echo "<br/><b style=\"font-size: 120%\">Post:&nbsp;&nbsp;&nbsp;{$subject[$threadid]}</b><br/>\n";
-        echo "<br> <b style=\"font-size: 100%\">Forum:&nbsp;&nbsp;$forumname</b></p><br>";
+        echo "<br/><b style=\"font-size: 120%\">Post:&nbsp;&nbsp;&nbsp;" . HTML::encode($subject[$threadid])."</b><br/>\n";
+        echo "<br> <b style=\"font-size: 100%\">Forum:&nbsp;&nbsp;".  HTML::encode($forumname) ."</b></p><br>";
 
         $nextth = '';
         $prevth = '';
@@ -86,7 +87,7 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
         <button class="btn post-btn-color expand" onclick="showall()">&nbsp;Show All</button>
         <button  class="btn post-btn-color expand" onclick="hideall()">&nbsp;Hide All</button>
 
-      <?php 
+      <?php
         echo "<br/>";echo "<br/>";
         if ($caneditscore && $haspoints) {
             echo "<form method=post action=\"thread?cid=$courseId&forum=$forumid&score=true\">";
@@ -119,4 +120,3 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
          </div>\n";
     } ?>
 </div>
-

@@ -134,12 +134,12 @@ if($isStudent || ($isTutor && ($user['rights'] != $groupAdmin))&&!$teacherId) {
     <div class="clear-both"></div>
 <?php }
 ?>
+
     <input type="hidden" class="courseId" value="<?php echo $course->id?>">
 
 <?php if ($isTutor && isset($sessionData['ltiitemtype']) && $sessionData['ltiitemtype'] == 3) {
     $placeinhead .= '<script type="text/javascript">jQuery(function(){jQuery(".instrdates").hide();});</script>';
 }
-
 if ($overwriteBody == 1) {
     echo $body;
 } else {
@@ -167,10 +167,11 @@ if ($overwriteBody == 1) {
 
     <?php
     }
+
     $blockAddress = AppUtility::getURLFromHome('course', 'course/get-block-items?cid='.$course->id. '&folder=');
     ?>
     <script type="text/javascript">
-        var getbiaddr = '<?php echo $blockAddress;?>';
+        var getbiaddr = '<?php  echo $blockAddress;?>';
         var oblist = '<?php echo $oblist ?>';
         var plblist = '<?php echo $plblist ?>';
         var cid = '<?php echo $course->id ?>';
@@ -218,6 +219,7 @@ if ($overwriteBody == 1) {
                 echo '<p class="padding-left-fifteen">To start by copying from another course, use the <a href="#">Course Items: Copy</a> ';
                 echo 'link along the left side of the screen.</p><p class="padding-left-fifteen">If you want to build from scratch, use the "Add An Item" pull down below to get started.</p><p>&nbsp;</p>';
             }
+
             echo ShowItemCourse::generateAddItem($folder,'t',$studview);
         }
     }
@@ -244,4 +246,3 @@ if ($overwriteBody == 1) {
     }
 }
 ?></div></div>
-
