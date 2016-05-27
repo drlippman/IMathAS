@@ -38,6 +38,10 @@ $now = $currentTime;
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
+  <!-- $threadId is defined on line 604 of ForumController where getParamVal method is called.
+          getParamVal is defined in AppController and is a base Yii method, as follows:
+            return Yii::$app->request->get($key);
+            Thus, it is data values that are hidden from user input -->
 <div class="tab-content shadowBox ">
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
     <div class="view-message-inner-contents">
