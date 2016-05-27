@@ -17,7 +17,13 @@ $now = $currentTime;
         ]);
 
     ?>
-    <!-- previous form values { id = "myForm", method = "post", action = " non-php-echoed [move-thread?forumid=] php-echoed [$forumId] non-php-echoed [&courseid=] php-echoed [$course->id] non-php-echoed [&threadid=] php-echoed [$threadId] non-php-echoed [&move=] php-echoed [$move]  "}  -->
+    <!-- previous form values(just in case) { id = "myForm", method = "post", action = " non-php-echoed [move-thread?forumid=] php-echoed [$forumId] non-php-echoed [&courseid=] php-echoed [$course->id] non-php-echoed [&threadid=] php-echoed [$threadId] non-php-echoed [&move=] php-echoed [$move]  "}  -->
+
+
+    <!-- $course defined on line 602-603 of ForumController(FC): $course = Course::getById($courseId);
+         Course::getById($cid) returns Course::findOne(['id' =>$cide]);
+         I believe that findOne is a method of BaseActiveRecord, so querying the db;
+         Thus, $course and $course params are secure -->
 
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
