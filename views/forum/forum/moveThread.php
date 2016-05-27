@@ -95,6 +95,10 @@ $now = $currentTime;
 
         <div id="move-forum"><div class="title-middle-option center"><?php AppUtility::t('Move to forum');?></div>
             <div>
+            <!-- $forums is defined in ForumController line 607:
+                     $forums = Forums::getByCourseId($courseId);
+                     This array is populated away from user input -->
+
                 <?php $currentTime = time();
                 foreach ($forums as $forum) {
                     if($forum['forumid'] == $forumId)
@@ -111,7 +115,7 @@ $now = $currentTime;
 
             <div id="move-thread"><div class="title-middle-option center"><?php AppUtility::t('Move to thread');?></div>
                 <div>
-
+                <!-- $threads is an array populated on line 623 of ForumController ($threads is assigned to $threadArray when passing $responseData to the model) -->
                     <?php
                     $threadCount = 0;
                     foreach ($threads as $thread) {
