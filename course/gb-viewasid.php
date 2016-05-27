@@ -1043,16 +1043,35 @@
 		
 	} else if ($links==1) { //show grade detail question/category breakdown
 		require("../header.php");
-		
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 		if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";}
 		echo "&gt; Detail</div>";
-		echo "<h2>Grade Book Detail</h2>\n";
-		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
+		
+		$isdiag = false;
+		if ($istutor || $isteacher) {
+			$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$isdiag = true;
+				list($sel1name,$sel2name) = mysql_fetch_row($result);
+			}
+		}
+
+		$query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$row = mysql_fetch_row($result);
-		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+
+		if ($isdiag) {
+			$selparts = explode('~',$row[2]);
+			$ID = $selparts[0];
+			$term = $selparts[1];
+			echo "<h2>Score Report</h2>\n";
+			echo "<h3>{$row[1]}, {$row[0]}<br/>($ID)</h3>\n";	
+		} else {
+			echo "<h2>Grade Book Detail</h2>\n";
+			echo "<h3>{$row[1]}, {$row[0]}</h3>\n";	
+		}
 		
 		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessments.endmsg,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
@@ -1143,12 +1162,12 @@
 			catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
 		}
 		
-		
-		
-		echo "<h4>Question Breakdown</h4>\n";
-		echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
-		echo $qbreakdown;
-		echo "</table>\n";
+		if (!($istutor && $isdiag)) {
+			echo "<h4>Question Breakdown</h4>\n";
+			echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
+			echo $qbreakdown;
+			echo "</table>\n";
+		}
 		
 		echo "<p>Total:  $totpt / $totposs  ($pc %)</p>\n";
 		
