@@ -313,6 +313,7 @@ switch($_GET['action']) {
 		} else {
 			$blockcnt = 1;
 			$itemorder = addslashes(serialize(array()));
+			mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
 			$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,toolset,chatset,showlatepass,itemorder,topbar,cploc,available,istemplate,deftime,deflatepass,theme,ltisecret,blockcnt) VALUES ";
 			$query .= "('{$_POST['coursename']}','$userid','{$_POST['ekey']}','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$toolset,$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail',$istemplate,'$deftime','$deflatepass','$theme','{$_POST['ltisecret']}','$blockcnt');";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -331,7 +332,7 @@ switch($_GET['action']) {
 			
 			
 			if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
-				mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+				
 				$query = "SELECT useweights,orderby,defaultcat,defgbmode,stugbmode FROM imas_gbscheme WHERE courseid='{$_POST['usetemplate']}'";
 				$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$row = mysql_fetch_row($result);
@@ -434,8 +435,9 @@ switch($_GET['action']) {
 					}
 				}
 				copyrubrics();
-				mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+				
 			}
+			mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 			
 			require("../header.php");
 			echo '<div class="breadcrumb">'.$breadcrumbbase.'<a href="admin.php">Admin</a> &gt; Course Creation Confirmation</div>';

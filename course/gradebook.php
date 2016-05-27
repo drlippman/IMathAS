@@ -47,8 +47,8 @@ if ($canviewall) {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$gbmode = mysql_result($result,0,0);
-		
-		
+		$sessiondata[$cid.'gbmode'] = $gbmode;
+		writesessiondata();
 	}
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];

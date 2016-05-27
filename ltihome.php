@@ -106,6 +106,8 @@ if (isset($_POST['createcourse'])) {
 		
 		$avail = 0;
 		$lockaid = 0;
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+			
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 		$query .= "('{$sessiondata['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -152,6 +154,8 @@ if (isset($_POST['createcourse'])) {
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		copyrubrics();
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+			
 	}
 	$query = "UPDATE imas_lti_courses SET courseid=$cid WHERE org='{$sessiondata['ltiorg']}' AND contextid='{$sessiondata['lti_context_id']}'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
