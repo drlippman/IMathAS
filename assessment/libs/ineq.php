@@ -51,6 +51,7 @@ function ineqplot($funcs) {
 //
 //funcstring format: (function and filltype are required) - one string or array
 //  function of x,above or below,linecolor,dash,strokewidth
+//  or x=number,right or left,linecolor,dash,strokewidth
 function ineqbetweenplot($funcs) { 
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
@@ -69,6 +70,7 @@ function ineqbetweenplot($funcs) {
 	$stopat = 102;
 	$xmin -= 5*($xmax-$xmin)/$settings[6];
 	$newfuncstr = array();
+	$skipi = array();
 	foreach ($funcs as $k=>$function) {
 		$function = explode(",",$function);
 		$filltype = $function[1];
@@ -77,17 +79,33 @@ function ineqbetweenplot($funcs) {
 		if (!isset($function[3])) {$function[3] = '';}
 		$newfuncstr[] = $function[0].','.$function[2].',,,,,'.$function[4].','.$function[3];
 		//correct for parametric
-		$func = makepretty($function[0]);
-		$func = mathphp($func,"x");
-		$func = str_replace("x",'$x',$func);
-		$xfunc = create_function('$x','return ('.$func.');');
-		for ($i = 0; $i<$stopat;$i++) {
-			$x = $xmin + $dx*$i;
-			$y = round($xfunc($x),3);
-			if ($filltype=='above') {
-				$mins[$i][$k] = $y;
-			} else {
-				$maxs[$i][$k] = $y;
+		if ($function[0]{0}=='x') {
+			$val = substr($function[0],2);
+			$ix = ($val-$xmin)/$dx;
+			if ($ix>0 && $ix<102) {
+				if ($filltype=='right') {
+					for ($i=0;$i<$ix;$i++) {
+						$skipi[$i] = true;	
+					}
+				} else {
+					for ($i=102;$i>$ix;$i--) {
+						$skipi[$i] = true;
+					}
+				}
+			}
+		} else {
+			$func = makepretty($function[0]);
+			$func = mathphp($func,"x");
+			$func = str_replace("x",'$x',$func);
+			$xfunc = create_function('$x','return ('.$func.');');
+			for ($i = 0; $i<$stopat;$i++) {
+				$x = $xmin + $dx*$i;
+				$y = round($xfunc($x),3);
+				if ($filltype=='above') {
+					$mins[$i][$k] = $y;
+				} else {
+					$maxs[$i][$k] = $y;
+				}
 			}
 		}
 	}
@@ -97,12 +115,12 @@ function ineqbetweenplot($funcs) {
 	for ($i = 0; $i<$stopat;$i++) {
 		$min = max($mins[$i]);
 		$max = min($maxs[$i]);
-		if ($min<$max) { //point is in shape
+		if ($min<$max && !isset($skipi[$i])) { //point is in shape
 			if ($inshape==false) {
 				$inshape = true;
 				$shapecnt++;
 				$shape[$shapecnt] = array();
-				if ($i==0) {
+				if ($i==0 || isset($skipi[$i-1])) {
 					//in shape from beginning
 					$shape[$shapecnt][] = array($i,$min,$max);	
 				} else {
@@ -122,16 +140,18 @@ function ineqbetweenplot($funcs) {
 			}
 		} else { //point is not in shape
 			if ($inshape==true) {
-				//exiting shape
-				//interpolate exit point
-				//identify curve each value came from
-				$minidx = array_search($min, $mins[$i]);
-				$maxidx = array_search($max, $maxs[$i]);
-				//find intersection between (i-1, mins[i-1][minidx]) to (i,min)
-				// and (i-1,maxs[i-1][maxidx]), (i,max)
-				$ti = ($mins[$i-1][$minidx] - $maxs[$i-1][$maxidx])/($max-$maxs[$i-1][$maxidx]-$min+$mins[$i-1][$minidx]);
-				$yi = ($max-$maxs[$i-1][$maxidx])*$ti + $maxs[$i-1][$maxidx];
-				$shape[$shapecnt][] = array($i-1+$ti,$yi);
+				if (!isset($skipi[$i])) {
+					//exiting shape
+					//interpolate exit point
+					//identify curve each value came from
+					$minidx = array_search($min, $mins[$i]);
+					$maxidx = array_search($max, $maxs[$i]);
+					//find intersection between (i-1, mins[i-1][minidx]) to (i,min)
+					// and (i-1,maxs[i-1][maxidx]), (i,max)
+					$ti = ($mins[$i-1][$minidx] - $maxs[$i-1][$maxidx])/($max-$maxs[$i-1][$maxidx]-$min+$mins[$i-1][$minidx]);
+					$yi = ($max-$maxs[$i-1][$maxidx])*$ti + $maxs[$i-1][$maxidx];
+					$shape[$shapecnt][] = array($i-1+$ti,$yi);
+				}
 				$inshape = false;
 			}
 		}
