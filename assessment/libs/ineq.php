@@ -79,7 +79,7 @@ function ineqbetweenplot($funcs) {
 		if (!isset($function[3])) {$function[3] = '';}
 		$newfuncstr[] = $function[0].','.$function[2].',,,,,'.$function[4].','.$function[3];
 		//correct for parametric
-		if ($function[0]{0}=='x') {
+		if (substr($function[0],0,2)=='x=') {
 			$val = substr($function[0],2);
 			$ix = ($val-$xmin)/$dx;
 			if ($ix>0 && $ix<102) {
@@ -113,8 +113,13 @@ function ineqbetweenplot($funcs) {
 	$shape = array();
 	$shapecnt = -1;
 	for ($i = 0; $i<$stopat;$i++) {
-		$min = max($mins[$i]);
-		$max = min($maxs[$i]);
+		if (isset($mins[$i])) {
+			$min = max($mins[$i]);
+			$max = min($maxs[$i]);
+		} else {
+			$min=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7]; 
+			$max=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7]; 
+		}
 		if ($min<$max && !isset($skipi[$i])) { //point is in shape
 			if ($inshape==false) {
 				$inshape = true;
