@@ -514,7 +514,7 @@ function tokenize($str,$anstype,$countcnt) {
 				}
 				$j++;
 			}
-			if ($j==$len) {
+			if ($j>=$len) {
 				$i = $j;
 				echo _('unmatched parens/brackets - likely will cause an error');
 			} else {
