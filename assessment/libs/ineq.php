@@ -50,8 +50,8 @@ function ineqplot($funcs) {
 //  specifications.
 //
 //funcstring format: (function and filltype are required) - one string or array
-//  function of x,above or below,linecolor,dash,strokewidth
-//  or x=number,right or left,linecolor,dash,strokewidth
+//  function of x,above or below,linecolor,dash,strokewidth,fillcolor
+//  or x=number,right or left,linecolor,dash,strokewidth,fillcolor
 function ineqbetweenplot($funcs) { 
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
@@ -71,13 +71,19 @@ function ineqbetweenplot($funcs) {
 	$xmin -= 5*($xmax-$xmin)/$settings[6];
 	$newfuncstr = array();
 	$skipi = array();
+	$fillcolor = 'blue';
 	foreach ($funcs as $k=>$function) {
 		$function = explode(",",$function);
 		$filltype = $function[1];
 		if (!isset($function[2])) {$function[2] = '';}
 		if (!isset($function[4])) {$function[4] = 1;}
 		if (!isset($function[3])) {$function[3] = '';}
+		if (isset($function[5])) {$fillcolor=$function[5];}
 		$newfuncstr[] = $function[0].','.$function[2].',,,,,'.$function[4].','.$function[3];
+		for ($i = 0; $i<$stopat;$i++) {
+			$mins[$i][$k]=$settings[2] - 5*($settings[3]-$settings[2])/$settings[7]; 
+			$maxs[$i][$k]=$settings[3] + 5*($settings[3]-$settings[2])/$settings[7]; 
+		}
 		//correct for parametric
 		if (substr($function[0],0,2)=='x=') {
 			$val = substr($function[0],2);
@@ -182,7 +188,7 @@ function ineqbetweenplot($funcs) {
 	$path .= '])';
 	
 	$p = showplot($newfuncstr,$settings[0],$settings[1],$settings[2],$settings[3],$settings[4],$settings[5],$settings[6],$settings[7]);
-	$p = str_replace("' />","fill=\"transblue\";strokewidth=0;$path;' />",$p);
+	$p = str_replace("' />","fill=\"trans$fillcolor\";strokewidth=0;$path;' />",$p);
 	return $p;		
 }
 
