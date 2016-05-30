@@ -52,6 +52,22 @@ switch($_GET['action']) {
 			$oldrights = $line['rights'];
 			$oldspecialrights = $line['specialrights'];
 		}
+		echo '<script type="text/javascript">
+			function onrightschg() {
+				var selrights = this.value;
+				if (selrights<75) {
+					$("input[name^=specialrights]").prop("checked",false);
+				} else if (selrights==75) {
+					$("#specialrights1,#specialrights4,#specialrights8").prop("checked",true);
+					$("#specialrights2").prop("checked",false);
+				} else if (selrights==100) {
+					$("input[name^=specialrights]").prop("checked",true);
+				}
+			}
+			$(function() {
+				$("input[name=newrights]").on("change", onrightschg);
+				});
+			</script>';
 		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
 		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
@@ -79,22 +95,22 @@ switch($_GET['action']) {
 		}
 		echo '<span class="form">Task Rights:</span><span class="formright">';
 		if ($myrights>=75) {
-			echo '<input type="checkbox" name="specialrights1" ';
+			echo '<input type="checkbox" name="specialrights1" id="specialrights1" ';
 			if (($oldspecialrights&1)==1) { echo 'checked';}
 			echo '><label for="specialrights1">Designate group template courses</label><br/>';
 		}
 		if ($myrights==100) {
-			echo '<input type="checkbox" name="specialrights2" ';
+			echo '<input type="checkbox" name="specialrights2" id="specialrights2" ';
 			if (($oldspecialrights&2)==2) { echo 'checked';}
 			echo '><label for="specialrights2">Designate global template courses</label><br/>';
 		}
 		if ($myrights>=75) {
-			echo '<input type="checkbox" name="specialrights4" ';
+			echo '<input type="checkbox" name="specialrights4" id="specialrights4" ';
 			if (($oldspecialrights&4)==4) { echo 'checked';}
 			echo '><label for="specialrights4">Create Diagnostic logins</label><br/>';
 		}
 		if ($myrights>=75 && !$allownongrouplibs) {
-			echo '<input type="checkbox" name="specialrights8" ';
+			echo '<input type="checkbox" name="specialrights8" id="specialrights8" ';
 			if (($oldspecialrights&8)==8) { echo 'checked';}
 			echo '><label for="specialrights8">Create public (open to all) question libraries</label><br/>';
 		}

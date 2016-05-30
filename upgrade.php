@@ -1704,6 +1704,11 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+			 $query = "UPDATE imas_users SET specialrights=15 WHERE rights=100";			
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 			 $query = "UPDATE imas_users SET rights=40 WHERE rights=60";
 			 $res = mysql_query($query);
 			 if ($res===false) {
