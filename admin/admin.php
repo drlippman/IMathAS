@@ -331,7 +331,7 @@ $placeinhead .= '</script>';
 <?php
 	}
 // END OF ADMINISTRATION BLOCK, BEGIN DIAGNOSTICS BLOCK
-	if($myrights >= 60) {
+	if(($myspecialrights&4)==4 || $myrights == 100) {
 ?>	
 	<h4>Diagnostics</h4>
 	<div class=item>

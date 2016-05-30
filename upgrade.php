@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 105;
+$latest = 107;
 
 
 @set_time_limit(0);
@@ -1685,6 +1685,30 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 			  
+		}
+		if ($last<106) {
+			$query = "ALTER TABLE  `imas_users` ADD  `specialrights` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0';";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<107) {
+			$query = "UPDATE imas_users SET specialrights=4 WHERE rights=60";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = "UPDATE imas_users SET specialrights=13 WHERE rights=75";			
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "UPDATE imas_users SET rights=40 WHERE rights=60";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

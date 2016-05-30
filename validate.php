@@ -31,6 +31,7 @@
  }
  
  $myrights = 0;
+ $myspecialrights = 0;
  $ispublic = false;
  //domain checks for special themes, etc. if desired
  $requestaddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
@@ -316,7 +317,7 @@
 		*/
 	}
 	//$username = $_COOKIE['username'];
-	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
+	$query = "SELECT SID,rights,specialrights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$query .= ',listperpage,hasuserimg,theme';
 	}
@@ -325,6 +326,7 @@
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
+	$myspecialrights = $line['specialrights'];
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];

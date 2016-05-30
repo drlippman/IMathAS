@@ -15,7 +15,20 @@ switch($_GET['action']) {
 		if ($myrights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		
-		$query = "UPDATE imas_users SET rights='{$_POST['newrights']}'";
+		$specialrights = 0;
+		if (isset($_POST['specialrights1'])) {
+			$specialrights += 1;
+		}
+		if (isset($_POST['specialrights2']) && $myrights==100) {
+			$specialrights += 2;
+		}
+		if (isset($_POST['specialrights4'])) {
+			$specialrights += 4;
+		}
+		if (isset($_POST['specialrights8'])) {
+			$specialrights += 8;
+		}
+		$query = "UPDATE imas_users SET rights='{$_POST['newrights']}',specialrights=$specialrights";
 		if ($myrights == 100) {
 			$query .= ",groupid='{$_POST['group']}'";
 		}
@@ -117,7 +130,20 @@ switch($_GET['action']) {
 		} else {
 			$homelayout = '|0,1,2||0,1';
 		}
-		$query = "INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout) VALUES ('{$_POST['adminname']}','$md5pw','{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['newrights']}','{$_POST['email']}','$newgroup','$homelayout');";
+		$specialrights = 0;
+		if (isset($_POST['specialrights1'])) {
+			$specialrights += 1;
+		}
+		if (isset($_POST['specialrights2']) && $myrights==100) {
+			$specialrights += 2;
+		}
+		if (isset($_POST['specialrights4'])) {
+			$specialrights += 4;
+		}
+		if (isset($_POST['specialrights8'])) {
+			$specialrights += 8;
+		}
+		$query = "INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,specialrights) VALUES ('{$_POST['adminname']}','$md5pw','{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['newrights']}','{$_POST['email']}','$newgroup','$homelayout',$specialrights);";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$newuserid = mysql_insert_id();
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
@@ -286,20 +312,22 @@ switch($_GET['action']) {
 		$avail = 3 - $_POST['stuavail'] - $_POST['teachavail'];
 		
 		$istemplate = 0;
-		if ($myrights==100) {
+		if (($myspecialrights&1)==1 || $myrights==100) {
+			if (isset($_POST['isgrptemplate'])) {
+				$istemplate += 2;
+			}
+		}
+		if (($myspecialrights&2)==2 || $myrights==100) {
 			if (isset($_POST['istemplate'])) {
 				$istemplate += 1;
 			}
+		}
+		if ($myrights==100) {	
 			if (isset($_POST['isselfenroll'])) {
 				$istemplate += 4;
 			}
 			if (isset($_POST['isguest'])) {
 				$istemplate += 8;
-			}
-		}
-		if ($myrights>=75) {
-			if (isset($_POST['isgrptemplate'])) {
-				$istemplate += 2;
 			}
 		}
 		
