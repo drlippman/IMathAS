@@ -22,7 +22,7 @@ $now = $currentTime;
 
     <!-- $course defined on line 602-603 of ForumController(FC): $course = Course::getById($courseId);
          Course::getById($cid) returns Course::findOne(['id' =>$cide]);
-         I believe that findOne is a method of BaseActiveRecord, so querying the db;
+         findOne is a method of BaseActiveRecord, so querying the db;
          Thus, $course and $course params are secure -->
 
 <div class="item-detail-header">
@@ -97,7 +97,7 @@ $now = $currentTime;
             <div>
             <!-- $forums is defined in ForumController line 607:
                      $forums = Forums::getByCourseId($courseId);
-                     This array is populated away from user input -->
+                     This array is populated away from user input but still want to sanitize user input -->
 
                 <?php $currentTime = time();
                 foreach ($forums as $forum) {
