@@ -5,6 +5,7 @@ use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 //require("../filter/filter.php");
 
