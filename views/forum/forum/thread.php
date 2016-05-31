@@ -5,11 +5,14 @@ use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii\helpers\HtmlPurifier;
+use yii\helpers\Purifier;
 
 //require("../filter/filter.php");
+// note: tracing $forumData variables within ForumController suggest shieling from user but will encode where possible
+// encode name
 
-$this->title = AppUtility::t($forumData['name'],false );
+$tempVar = Html::encode($forumData['name']);
+$this->title = AppUtility::t($tempVar,false );
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
@@ -19,18 +22,21 @@ $now = $currentTime;
 <?php }?>
 <div class="item-detail-header">
 
+   <!-- encode course->name -->
     <?php if($params['search'] != 'none') {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forumid='.$forumid.'&clearsearch=true']]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name),'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forumid='.$forumid.'&clearsearch=true']]);
     } else
     {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
     }?>
 
 </div>
 
+
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
+          <!-- encode title -->
             <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo HTML::encode($this->title) ?></div>
         </div>
         <?php if(($users['rights']>AppConstant::NUMERIC_FIVE && time()<$forumData['postby']) || $isteacher ){ ?>
