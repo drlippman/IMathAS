@@ -97,17 +97,18 @@ $now = $currentTime;
             <div>
             <!-- $forums is defined in ForumController line 607:
                      $forums = Forums::getByCourseId($courseId);
-                     This array is populated away from user input but still want to sanitize user input -->
+                     $forums is populated in some fields by user inputted field data so to be 
+                     safe those data vars are being encoded prior to output -->
 
                 <?php $currentTime = time();
                 foreach ($forums as $forum) {
                     if($forum['forumid'] == $forumId)
                     {?>
                         <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'>
-                            <td><input type='radio' name='forum-name' checked id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                            <td><input type='radio' name='forum-name' checked id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>" . Html::encode($forum['forumName']) . "</td></div></tr>";?>
 
                     <?php }else{?>
-                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>". Html::encode($forum['forumName']) ."</td></div></tr>";?>
                     <?php           }?>
                 <?php  } ?>
             </div>
