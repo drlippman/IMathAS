@@ -600,6 +600,7 @@ class ForumController extends AppController
     {
         $this->layout = 'master';
         $courseId = $this->getParamVal('courseid');
+
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $forumId = $this->getParamVal('forumid');
@@ -615,6 +616,7 @@ class ForumController extends AppController
             (
                 'forumid' => $forum->id,
                 'forumName' => $forum->name,
+                // 'forumName' => "<script>alert('hi');</script>",
                 'courseid' => $forum->courseid,
             );
             array_push($forumArray, $tempArray);
