@@ -317,9 +317,9 @@
 		*/
 	}
 	//$username = $_COOKIE['username'];
-	$query = "SELECT SID,rights,specialrights,groupid,LastName,FirstName,deflib";
+	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		$query .= ',listperpage,hasuserimg,theme';
+		$query .= ',listperpage,hasuserimg,theme,specialrights';
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
