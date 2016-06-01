@@ -5,14 +5,10 @@ use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii\helpers\Purifier;
+use yii\helpers\HtmlPurifier;
 
-//require("../filter/filter.php");
-// note: tracing $forumData variables within ForumController suggest shieling from user but will encode where possible
-// encode name
 
-$tempVar = Html::encode($forumData['name']);
-$this->title = AppUtility::t($tempVar,false );
+$this->title = AppUtility::t($forumData['name'],false );
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
