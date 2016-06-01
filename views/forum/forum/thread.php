@@ -124,12 +124,12 @@ $now = $currentTime;
     } else {
         $name = "{$row['FirstName']} {$row['LastName']}";
     }
-    echo "<br/>Posted by: $name, ";
+    echo "<br/>Posted by: " . Html::encode($name) . ", ";
     echo AppUtility::tzdate("F j, Y, g:i a",$row['postdate']);
 
     echo "</div>
     <div class=blockitems>";
-    echo filter($row['message']); ?>
+    echo HtmlPurifier::process(filter($row['message'])); ?>
     <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
 </div>
 
@@ -299,7 +299,7 @@ echo '</div>';
                             $name = "{$line['LastName']}, {$line['FirstName']} ";
                         } ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$forumid.'&threadid='.$line['id']);?>"><?php echo  Html::encode(trim($line['subject']))?></a></b>:
-                        <div><?php echo $name?></div>
+                        <div><?php echo Html::encode($name);?></div>
                         <?php
                         echo "</td>\n";
                         if ($isteacher && $groupsetid>0 && !$dofilter) {
