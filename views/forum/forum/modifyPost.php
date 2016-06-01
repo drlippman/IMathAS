@@ -10,7 +10,6 @@ use app\components\AssessmentUtility;
 
 // The base model is BaseImasForumPosts which has subject and message purified
 $this->title = AppUtility::t('Modify Post',false);
-// removed encoding around $this->title line 13 as that variable is directly defined in line above
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
@@ -60,7 +59,7 @@ $form = ActiveForm::begin([
         <div class="col-sm-10 message-div">
             <div class=editor>
                 <textarea cols=5 rows=12 id=message name=message style="width: 100%">
-                    <?php echo Html::encode($thread[0]['message']);?>
+                    <?php echo HTMLPurifier::process($thread[0]['message']);?>
                 </textarea>
             </div>
         </div>
