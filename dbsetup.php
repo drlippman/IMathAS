@@ -16,7 +16,12 @@ $link = mysql_connect($dbserver,$dbusername, $dbpassword)
   or die("Could not connect : " . mysql_error());
 mysql_select_db($dbname) 
   or die("Could not select database");
-  
+
+$query = "set session sql_mode=''";
+$result = mysql_query($query);
+
+
+
 $query = "SELECT ver FROM imas_dbschema WHERE id=1";
 $result = mysql_query($query);
 if ($result!==false) {
