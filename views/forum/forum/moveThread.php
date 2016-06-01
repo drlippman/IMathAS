@@ -2,14 +2,29 @@
 use app\components\AppUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 $this->title = AppUtility::t('Move Thread',false);
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
+<?php
+        $form = ActiveForm::begin([
+            'id' => "",
+            'options' => ['enctype' => 'multipart/form-data'],
+        ]);
 
-<form id="myForm" method="post" action="move-thread?forumid=<?php echo $forumId ?>&courseid=<?php echo $course->id ?>&threadid=<?php echo $threadId ?>&move=<?php echo $move?>">
+    ?>
+    <!-- previous form values(just in case) { id = "myForm", method = "post", action = " non-php-echoed [move-thread?forumid=] php-echoed [$forumId] non-php-echoed [&courseid=] php-echoed [$course->id] non-php-echoed [&threadid=] php-echoed [$threadId] non-php-echoed [&move=] php-echoed [$move]  "}  -->
+
+
+    <!-- $course defined on line 602-603 of ForumController(FC): $course = Course::getById($courseId);
+         Course::getById($cid) returns Course::findOne(['id' =>$cide]);
+         findOne is a method of BaseActiveRecord, so querying the db;
+         Thus, $course and $course params are secure -->
+
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Thread'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?forum='.$forumId.'&cid=' . $course->id]]); ?>
 </div>
@@ -23,6 +38,10 @@ $now = $currentTime;
 <div class="item-detail-content">
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
+  <!-- $threadId is defined on line 604 of ForumController where getParamVal method is called.
+          getParamVal is defined in AppController and is a base Yii method, as follows:
+            return Yii::$app->request->get($key);
+            Thus, it is data values that are hidden from user input -->
 <div class="tab-content shadowBox ">
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
     <div class="view-message-inner-contents">
@@ -76,15 +95,20 @@ $now = $currentTime;
 
         <div id="move-forum"><div class="title-middle-option center"><?php AppUtility::t('Move to forum');?></div>
             <div>
+            <!-- $forums is defined in ForumController line 607:
+                     $forums = Forums::getByCourseId($courseId);
+                     $forums is populated in some fields by user inputted field data so to be 
+                     safe those data vars (name) are being encoded prior to output -->
+
                 <?php $currentTime = time();
                 foreach ($forums as $forum) {
                     if($forum['forumid'] == $forumId)
                     {?>
                         <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'>
-                            <td><input type='radio' name='forum-name' checked id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                            <td><input type='radio' name='forum-name' checked id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>" . Html::encode($forum['forumName']) . "</td></div></tr>";?>
 
                     <?php }else{?>
-                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumid']."' value='".$forum['forumid']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>". Html::encode($forum['forumName']) ."</td></div></tr>";?>
                     <?php           }?>
                 <?php  } ?>
             </div>
@@ -92,7 +116,7 @@ $now = $currentTime;
 
             <div id="move-thread"><div class="title-middle-option center"><?php AppUtility::t('Move to thread');?></div>
                 <div>
-
+                <!-- $threads is an array populated on line 623 of ForumController ($threads is assigned to $threadArray when passing $responseData to the model). Encoding subject for safety -->
                     <?php
                     $threadCount = 0;
                     foreach ($threads as $thread) {
@@ -110,7 +134,7 @@ $now = $currentTime;
                             }
 
                            echo "<span class='cr'><i class='cr-icon fa fa-check align-check'></i></span>
-                                </label></td>"." " ."<td>{$thread['subject']}</td></div></tr>" ;?>
+                                </label></td>"." " ."<td>". Html::encode($thread['subject']) . "</td></div></tr>" ;?>
                         <?php }
                         if($thread['parent'] == 0)
                         {
@@ -129,4 +153,4 @@ $now = $currentTime;
         </div>
     </div>
 </div>
-</form>
+<?php ActiveForm::end(); ?>
