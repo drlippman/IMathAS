@@ -130,7 +130,7 @@ class ForumPosts extends BaseImasForumPosts
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
         $this->id = $maxid;
-        $this->forumid = isset($params['ForumPosts']['forumid']) ? $params['ForumPosts']['forumid'] : null;
+        $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->threadid = isset($maxid) ? $maxid : null;
         if (empty($params['subject']))
         {
