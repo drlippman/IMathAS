@@ -40,14 +40,18 @@ $now = $currentTime;
         echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
     }?>
 </div>
+
+
 <input type="hidden" id="userId" value="<?php echo Html::encode($userId); ?>">
 <input type="hidden" id="forumId" value="<?php echo Html::encode($forumData->id); ?>">
 <input type="hidden" id="courseId" value="<?php echo Html::encode($course->id); ?>">
+
+
 <div class="tab-content shadowBox">
     <div class="col-sm-12 col-md-12" style="padding-top: 30px;">
         <div class="col-sm-2 col-md-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
         <div class="col-sm-10 col-md-10">
-          <?= $form->field($model, 'subject')->textInput(['maxlength' => true ,'class'=>'subject']) ?>
+          <?= $form->field($model, 'subject')->textInput(['maxlength' => true ,'type'=> 'text', 'size'=> '0','class'=>'subject' ,'style'=>'width:100%;height: 40px; border: #6d6d6d 1px solid;' ,'class'=>"subject form-control" ,'maxlength'=> "60"]) ?>
         </div>
     </div>
     <BR class=form>
@@ -73,8 +77,8 @@ $now = $currentTime;
         <div class="col-sm-2 col-md-2 message-label"><?php echo AppUtility::t('Message')?></div>
         <div class="col-sm-10 col-md-10 message-div">
             <div class=editor>
-                <textarea cols=5 rows=12 id=message name=message style="width: 100%">
-                </textarea>
+                <?= $form->field($model, 'message')->textArea(['id' =>'message','style'=>'width: 100%','rows' => '12', 'cols' => '5']) ?>
+
             </div>
         </div>
     </div>

@@ -130,35 +130,19 @@ class ForumPosts extends BaseImasForumPosts
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
         $this->id = $maxid;
-        $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
+        $this->forumid = isset($params['ForumPosts']['forumid']) ? $params['ForumPosts']['forumid'] : null;
         $this->threadid = isset($maxid) ? $maxid : null;
         if (empty($params['subject']))
         {
             $params['subject'] = '(None)';
         }
-        $this->subject = trim($params['subject']);
+        $this->subject = trim($params['ForumPosts']['subject']);
         $this->userid = isset($userId) ? $userId : null;
-        $this->message = isset($params['message']) ? $params['message'] : null;
+        $this->message = isset($params['ForumPosts']['message']) ? $params['message'] : null;
         $postdate = AppController::dateToString();
         $this->postdate = $postdate;
         $this->posttype = $postType;
         $this->replyby=$reply;
-//        if ($alwaysReplies == AppConstant::NUMERIC_ONE)
-//        {
-//            $this->replyby = AppConstant::ALWAYS_TIME;
-//        }
-//        elseif ($alwaysReplies == AppConstant::NUMERIC_TWO)
-//        {
-//            $this->replyby = AppConstant::NUMERIC_ZERO;
-//        }
-//        elseif ($alwaysReplies == AppConstant::NUMERIC_THREE)
-//        {
-//            $this->replyby = $date;
-//        }
-//        else
-//        {
-//            $this->replyby = null;
-//        }
         $this->isanon = $isNonValue;
         $this->files = $fileName;
         $this->tag = $tag;
