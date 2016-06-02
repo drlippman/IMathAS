@@ -47,7 +47,7 @@ $now = $currentTime;
     <div class="col-sm-12 col-md-12" style="padding-top: 30px;">
         <div class="col-sm-2 col-md-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
         <div class="col-sm-10 col-md-10">
-            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=subject placeholder="" class="subject form-control" maxlength="60">
+          <?= $form->field($model, 'subject')->textInput(['maxlength' => true ,'class'=>'subject']) ?>
         </div>
     </div>
     <BR class=form>
@@ -178,4 +178,4 @@ $now = $currentTime;
         <a href="#" class="btn btn-primary add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
     </div>
 </div>
-</form>
+<?php ActiveForm::end(); ?>
