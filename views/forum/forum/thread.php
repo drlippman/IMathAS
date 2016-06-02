@@ -5,8 +5,8 @@ use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
-//require("../filter/filter.php");
 
 $this->title = AppUtility::t($forumData['name'],false );
 $this->params['breadcrumbs'][] = $this->title;
@@ -18,18 +18,21 @@ $now = $currentTime;
 <?php }?>
 <div class="item-detail-header">
 
+   <!-- encode course->name -->
     <?php if($params['search'] != 'none') {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forumid='.$forumid.'&clearsearch=true']]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name),'Forum List'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id,AppUtility::getHomeURL() . 'forum/forum/thread?cid=' . $course->id.'&forumid='.$forumid.'&clearsearch=true']]);
     } else
     {
-        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]);
     }?>
 
 </div>
 
+
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
+          <!-- encode title -->
             <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo HTML::encode($this->title) ?></div>
         </div>
         <?php if(($users['rights']>AppConstant::NUMERIC_FIVE && time()<$forumData['postby']) || $isteacher ){ ?>
@@ -121,12 +124,12 @@ $now = $currentTime;
     } else {
         $name = "{$row['FirstName']} {$row['LastName']}";
     }
-    echo "<br/>Posted by: $name, ";
+    echo "<br/>Posted by: " . Html::encode($name) . ", ";
     echo AppUtility::tzdate("F j, Y, g:i a",$row['postdate']);
 
     echo "</div>
     <div class=blockitems>";
-    echo filter($row['message']); ?>
+    echo HtmlPurifier::process(filter($row['message'])); ?>
     <p><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$row['forumid'].'&threadid='.$row['threadid']);?>">Show full thread</a></p>
 </div>
 
@@ -296,7 +299,7 @@ echo '</div>';
                             $name = "{$line['LastName']}, {$line['FirstName']} ";
                         } ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?courseid='.$cid.'&forumid='.$forumid.'&threadid='.$line['id']);?>"><?php echo  Html::encode(trim($line['subject']))?></a></b>:
-                        <div><?php echo $name?></div>
+                        <div><?php echo Html::encode($name);?></div>
                         <?php
                         echo "</td>\n";
                         if ($isteacher && $groupsetid>0 && !$dofilter) {
