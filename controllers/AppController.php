@@ -23,7 +23,7 @@ use Yii;
 class AppController extends Controller
 {
 
-    public $enableCsrfValidation = false;
+    public $enableCsrfValidation = true;
 
     function getRequestParams()
     {

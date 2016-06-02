@@ -1284,6 +1284,7 @@ class ForumController extends AppController
      */
     public function actionAddNewThread()
     {
+        $model = new ForumPosts();
         $this->layout = 'master';
         $user = $this->user;
         $userId = $this->getUserId();
@@ -1308,6 +1309,7 @@ class ForumController extends AppController
 
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
+            var_dump($params);
             if (isset($params['tag'])) {
                 $tag = $params['tag'];
             } else {
@@ -1384,7 +1386,7 @@ class ForumController extends AppController
 
             $newThread = new ForumThread();
             $newThread->createThread($params, $user->id, $threadId,$groupId);
-            
+
             $views = new ForumView();
             $views->createThread($user->id, $threadId);
             if ($user['rights'] == AppConstant::STUDENT_RIGHT) {
@@ -1397,7 +1399,7 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
-        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId,
+        $responseData = array('model'=> $model ,'forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights, 'groupSet' => $groupSet, 'curstugroupid' => $curstugroupid, 'groupSetId' => $groupSetId,
             'isTeacher' => $isTeacher, 'tagList' => $tagList, 'lineTag' => $lineTag, 'allowaNon' => $allowaNon);
         return $this->renderWithData('addNewThread', $responseData);
     }
@@ -1893,7 +1895,7 @@ class ForumController extends AppController
                 $settingValue = $params['allow-anonymous-posts'] + $params['allow-students-to-modify-posts'] + $params['allow-students-to-delete-own-posts'] + $params['like-post'] + $params['viewing-before-posting'];
                 $updateForum = new Forums();
                 $updateForum->UpdateForum($params, $endDate, $startDate, $postDate, $replyByDate, $settingValue,$cntingb);
-                
+
                 if (isset($params['Get-email-notify-of-new-posts'])) {
                     $subscriptionEntry = new ForumSubscriptions();
                     $subscriptionEntry->AddNewEntry($params['modifyFid'], $user['id']);
