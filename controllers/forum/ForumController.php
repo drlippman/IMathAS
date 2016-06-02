@@ -1309,7 +1309,6 @@ class ForumController extends AppController
 
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-            var_dump($params);
             if (isset($params['tag'])) {
                 $tag = $params['tag'];
             } else {
