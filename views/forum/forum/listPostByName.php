@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo /* $this->title */ "this view can be deleted" ?></div>
         </div>
     </div>
 </div>

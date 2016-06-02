@@ -1,0 +1,1 @@
+echo "<h2>this view can be deleted</h2>";
