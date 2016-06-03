@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 107;
+$latest = 108;
 
 
 @set_time_limit(0);
@@ -1711,6 +1711,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 }
 			 $query = "UPDATE imas_users SET rights=40 WHERE rights=60";
 			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<108) {
+			$query = "ALTER TABLE  `imas_questions` CHANGE  `showans`  `showans` CHAR(1) NOT NULL DEFAULT '0';";
+			$res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }

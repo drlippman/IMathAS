@@ -93,10 +93,12 @@ function ineqbetweenplot($funcs) {
 					for ($i=0;$i<$ix;$i++) {
 						$skipi[$i] = true;	
 					}
+					$skipi[$i-1] = $ix;
 				} else {
 					for ($i=102;$i>$ix;$i--) {
 						$skipi[$i] = true;
 					}
+					$skipi[$i+1] = $ix;
 				}
 			}
 		} else {
@@ -132,6 +134,10 @@ function ineqbetweenplot($funcs) {
 				$shapecnt++;
 				$shape[$shapecnt] = array();
 				if ($i==0 || isset($skipi[$i-1])) {
+					if (isset($skipi[$i-1])) { //entering from x=
+						$ti = $skipi[$i-1];
+						$shape[$shapecnt][] = array($ti,$min,$max);
+					}
 					//in shape from beginning
 					$shape[$shapecnt][] = array($i,$min,$max);	
 				} else {
@@ -162,6 +168,10 @@ function ineqbetweenplot($funcs) {
 					$ti = ($mins[$i-1][$minidx] - $maxs[$i-1][$maxidx])/($max-$maxs[$i-1][$maxidx]-$min+$mins[$i-1][$minidx]);
 					$yi = ($max-$maxs[$i-1][$maxidx])*$ti + $maxs[$i-1][$maxidx];
 					$shape[$shapecnt][] = array($i-1+$ti,$yi);
+				} else {
+					//exiting shape by hitting x=
+					$ti = $skipi[$i];
+					$shape[$shapecnt][] = array($ti,$min,$max);
 				}
 				$inshape = false;
 			}
