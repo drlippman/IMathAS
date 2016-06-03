@@ -358,6 +358,10 @@
 		$sessiondata['mathdisp'] = 1;
 		writesessiondata();
 	}
+	if (isset($_GET['usetiny4'])) {
+		$sessiondata['usetiny4'] = ($_GET['usetiny4']=='false')?0:1;
+		writesessiondata();
+	}
 	
 	if (isset($_GET['readernavon'])) {
 		$sessiondata['readernavon'] = true;

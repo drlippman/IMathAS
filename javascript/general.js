@@ -2,6 +2,7 @@
 var closetimer	= 0;
 var ddmenuitem	= 0;
 var homemenuloaded = 0;
+var usetiny4 = false;
 // open hidden layer
 function mopen(id,cid) {	
 	if (id=='homemenu' && homemenuloaded==0) {
@@ -280,7 +281,48 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
+function initeditor4(edmode,edids,css){
+	var cssmode = css || 0;
+	var selectorstr = '';
+	if (edmode=="exact") { //list of IDs
+		selectorstr = '#'+edids.split(/,/).join(",#");
+	} else if (edmode=="textareas") { //class-based selection
+		selectorstr = "textarea."+edids;
+	}
+	var edsetup = {
+		selector: selectorstr,
+		plugins: [
+			"advlist image charmap anchor",
+			"searchreplace code link textcolor",
+			"media table paste asciimath asciisvg"
+		],
+		menubar: "edit insert format table tools ",
+		toolbar: "alignleft aligncenter alignright | bullist numlist outdent indent | forecolor backcolor | bold italic subscript superscript | link unlink image | asciimath asciimathcharmap asciisvg",
+		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
+		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
+		AScgiloc : imasroot+'/filter/graph/svgimg.php',
+		convert_urls: false,
+		file_browser_callback : fileBrowserCallBackFunc,
+		file_browser_types: 'file image',
+		imagetools_cors_hosts: ['s3.amazonaws.com'],
+		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
+		images_upload_credentials: true,
+		paste_data_images: true,
+		default_link_target: "_blank"
+	}
+	for (var i in tinymce.editors) {
+		tinymce.editors[i].remove();
+	}
+	tinymce.init(edsetup);
+	
+};
+
+
 function initeditor(edmode,edids,css) {
+	if (usetiny4) {
+		initeditor4(edmode,edids,css);
+		return;
+	}
 	var cssmode = css || 0;
 	var edsetup = {
 	    mode : edmode,
@@ -322,7 +364,11 @@ function initeditor(edmode,edids,css) {
 }
 
 function fileBrowserCallBack(field_name, url, type, win) {
-	var connector = imasroot+"/editor/file_manager.php";
+	if (usetiny4) {
+		var connector = imasroot+"/tinymce4/file_manager.php";
+	} else {
+		var connector = imasroot+"/editor/file_manager.php";
+	}
 	my_field = field_name;
 	my_win = win;
 	switch (type) {
@@ -337,7 +383,7 @@ function fileBrowserCallBack(field_name, url, type, win) {
 		file : connector,
 		title : 'File Manager',
 		width : 350,  
-		height : 430,
+		height : 450,
 		resizable : "yes",
 		inline : "yes",  
 		close_previous : "no"

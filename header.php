@@ -126,12 +126,21 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	echo '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=111612"></script>';
+	if ($sessiondata['usetiny4']==1) {
+		echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
+		echo '<script type="text/javascript">usetiny4 = true;</script>';
+	} else {
+		echo '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=111612"></script>';
+	}
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
-		echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+		if ($sessiondata['usetiny4']==1) {
+			echo 'var fileBrowserCallBackFunc = fileBrowserCallBack;';
+		} else {
+			echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+		}
 	} else {
 		echo 'var fileBrowserCallBackFunc = null;';
 	}
