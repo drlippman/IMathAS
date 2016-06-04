@@ -6,11 +6,11 @@
 .mce-toolbar .mce-btn .mce-caret {
 	margin-top: 6px;
 }
-.mce-toolbar .mce-colorbutton .mce-open, .mce-splitbtn .mce-open {
+.mce-toolbar .mce-colorbutton .mce-open, .mce-toolbar .mce-splitbtn .mce-open {
 	padding-left: 2px;
 	padding-right: 2px;
 }
-.mce-toolbar .mce-colorbutton button, .mce-splitbtn button {
+.mce-toolbar .mce-colorbutton button, .mce-toolbar .mce-splitbtn button {
 	padding-right: 4px;
 }
 .mce-toolbar .mce-colorbutton .mce-preview {

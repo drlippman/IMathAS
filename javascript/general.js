@@ -294,21 +294,23 @@ function initeditor4(edmode,edids,css){
 		plugins: [
 			"advlist image charmap anchor",
 			"searchreplace code link textcolor",
-			"media table paste asciimath asciisvg"
+			"media table paste asciimath asciisvg rollups"
 		],
-		menubar: "edit insert format table tools ",
-		toolbar: "alignleft aligncenter alignright | bullist numlist outdent indent | forecolor backcolor | bold italic subscript superscript | link unlink image | asciimath asciimathcharmap asciisvg",
+		menubar: false,//"edit insert format table tools ",
+		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code",
+		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
 		file_browser_callback : fileBrowserCallBackFunc,
 		file_browser_types: 'file image',
-		imagetools_cors_hosts: ['s3.amazonaws.com'],
+		//imagetools_cors_hosts: ['s3.amazonaws.com'],
 		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
-		images_upload_credentials: true,
+		//images_upload_credentials: true,
 		paste_data_images: true,
-		default_link_target: "_blank"
+		default_link_target: "_blank",
+		content_style: "body {background-color: #ffffff !important;}"
 	}
 	for (var i in tinymce.editors) {
 		tinymce.editors[i].remove();
