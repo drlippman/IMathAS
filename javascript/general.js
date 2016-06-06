@@ -310,8 +310,15 @@ function initeditor4(edmode,edids,css){
 		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
-		content_style: "body {background-color: #ffffff !important;}"
+		content_style: "body {background-color: #ffffff !important;}",
+		table_class_list: [{title: "None", value:''},
+			{title:"Gridded", value:"gridded"},
+			{title:"Gridded Centered", value:"gridded centered"}]
 	}
+	if (document.documentElement.clientWidth<540) {
+		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor";
+		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
+	} 
 	for (var i in tinymce.editors) {
 		tinymce.editors[i].remove();
 	}
