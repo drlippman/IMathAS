@@ -20,6 +20,7 @@ class StudentEnrollmentForm extends Model
             [['code'], 'integer'],
             ['code', 'compare', 'compareValue' => 0, 'operator'=> '>=','message'=>'Code must be of 10 digits.'],
             ['code', 'compare', 'compareValue' => 9999999999, 'operator' => '<=','message'=>'Code must be of 10 digits.'],
+            [['usernameToEnroll','section'],'filter','filter'=>'\yii\helpers\Html::encode'],
         ];
 
     }
