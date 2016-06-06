@@ -1,19 +1,25 @@
 <?php
 use app\components\AppUtility;
+use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 
 $this->title = AppUtility::t('Roster', false);
-$this->params['breadcrumbs'][] = $this->title;
+   // encode title. id called specifically have been deemed safe and left alone
+$this->params['breadcrumbs'][] = Html::encode($this->title);
 $urlmode = AppUtility::urlMode();
 ?>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" id="image-id" value="<?php echo $isImageColumnPresent ?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
+   <!-- html encoding -->
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), Html::encode($course->name)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/course?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container padding-bottom-two-em">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+   <!-- html encoding -->
+            <div class="vertical-align title-page"><?php echo Html::encode($this->title) ?></div>
         </div>
     </div>
 </div>
@@ -21,6 +27,7 @@ $urlmode = AppUtility::urlMode();
     <?php echo $this->render("../../course/course/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
 </div>
 <div class="tab-content shadowBox">
+
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
 <div class="roster-upper-content col-md-12 col-sm-12 padding-right-thirty">
     <div class="page-title col-md-7 col-sm-6 pull-left">
@@ -179,14 +186,15 @@ if(!empty($resultDefaultUserList)) {
 				<?php }
             echo $hasSectionData;
             echo $hasCodeData;
+            // html encoding in variables user specified
             if ($line['locked']>0) {
-                echo '<td class="word-break-break-all"><span class="greystrike">'.$line['LastName'].'</span></td>';
-                echo '<td class="word-break-break-all"><span class="greystrike">'.$line['FirstName'].'</span></td>';
+                echo '<td class="word-break-break-all"><span class="greystrike">'. Html::encode($line['LastName']) .'</span></td>';
+                echo '<td class="word-break-break-all"><span class="greystrike">'. Html::encode($line['FirstName']) .'</span></td>';
             } else {
-                echo '<td class="word-break-break-all">'.$line['LastName'].'</td><td class="word-break-break-all">'.$line['FirstName'].'</td>';
+                echo '<td class="word-break-break-all">'. Html::encode($line['LastName']) .'</td><td class="word-break-break-all">'. Html::encode($line['FirstName']).'</td>';
             }
             ?>
-				<td class="word-break-break-all"><a href="mailto:<?php echo $line['email'] ?>"><?php echo $line['email'] ?></a></td>
+				<td class="word-break-break-all"><a href="mailto:<?php echo Html::encode($line['email']) ?>"><?php echo Html::encode($line['email']) ?></a></td>
 				<td class="word-break-break-all"><?php echo $line['SID'] ?></td>
 				<td class="word-break-break-all"><a href="login-log?cid=<?php echo $course->id ?>&uid=<?php echo $line['userid'] ?>" class="lal"><?php echo $lastaccess ?></a></td>
             <td class="word-break-break-all">
