@@ -12,16 +12,6 @@ $this->title = $pageTitle;
 
     <?php
         $form = ActiveForm::begin([
-            'id' => "",
-            'options' => ['enctype' => 'multipart/form-data'],
-        ]);
-
-    ?>
-
-
-
-    <?php
-        $form = ActiveForm::begin([
                 'id' => "",
                 'options' => ['enctype' => 'multipart/form-data'],
             ]);
