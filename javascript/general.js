@@ -310,6 +310,8 @@ function initeditor4(edmode,edids,css){
 		//images_upload_credentials: true,
 		paste_data_images: true,
 		default_link_target: "_blank",
+		resize: "both",
+		width: '100%',
 		content_style: "body {background-color: #ffffff !important;}",
 		table_class_list: [{title: "None", value:''},
 			{title:"Gridded", value:"gridded"},
