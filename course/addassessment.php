@@ -775,6 +775,9 @@ if ($overwriteBody==1) {
 					<option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
 					<option value="Embed" <?php writeHtmlSelected($line['displaymethod'],"Embed",0) ?>>Embedded</option>
 					<option value="VideoCue" <?php writeHtmlSelected($line['displaymethod'],"VideoCue",0) ?>>Video Cued</option>
+					<?php if (isset($CFG['GEN']['livepollserver'])) {
+						echo '<option value="LivePoll" '.writeHtmlSelected($line['displaymethod'],"LivePoll",0).'>Live Poll</option>';
+					}?>
 				</select>
 			</span><BR class=form>
 	

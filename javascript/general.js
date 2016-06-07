@@ -292,18 +292,18 @@ function initeditor4(edmode,edids,css){
 	var edsetup = {
 		selector: selectorstr,
 		plugins: [
-			"advlist image charmap anchor",
+			"advlist attach image charmap anchor",
 			"searchreplace code link textcolor",
 			"media table paste asciimath asciisvg rollups"
 		],
 		menubar: false,//"edit insert format table tools ",
 		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code",
-		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | link unlink image | table | asciimath asciimathcharmap asciisvg",
+		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
 		AScgiloc : imasroot+'/filter/graph/svgimg.php',
 		convert_urls: false,
-		file_browser_callback : fileBrowserCallBackFunc,
+		file_picker_callback : filePickerCallBackFunc,
 		file_browser_types: 'file image',
 		//imagetools_cors_hosts: ['s3.amazonaws.com'],
 		images_upload_url: imasroot+'/tinymce4/upload_handler.php',
@@ -373,11 +373,8 @@ function initeditor(edmode,edids,css) {
 }
 
 function fileBrowserCallBack(field_name, url, type, win) {
-	if (usetiny4) {
-		var connector = imasroot+"/tinymce4/file_manager.php";
-	} else {
-		var connector = imasroot+"/editor/file_manager.php";
-	}
+	var connector = imasroot+"/editor/file_manager.php";
+	
 	my_field = field_name;
 	my_win = win;
 	switch (type) {
@@ -402,6 +399,31 @@ function fileBrowserCallBack(field_name, url, type, win) {
 	    });
 
 	//window.open(connector, "file_manager", "modal,width=450,height=440,scrollbars=1");
+}
+function filePickerCallBack(callback, value, meta) {
+	var connector = imasroot+"/tinymce4/file_manager.php";
+
+	switch (meta.filetype) {
+		case "image":
+			connector += "?type=img";
+			break;
+		case "file":
+			connector += "?type=files";
+			break;
+	}
+	tinyMCE.activeEditor.windowManager.open({
+		file : connector,
+		title : 'File Manager',
+		width : 350,  
+		height : 450,
+		resizable : "yes",
+		inline : "yes",  
+		close_previous : "no"
+	    }, {
+		oninsert: function(url, objVal) {
+			callback(url);
+		}
+	    });
 }
 function imascleanup(type, value) {
 	if (type=="get_from_editor") {

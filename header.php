@@ -39,7 +39,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=060516"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=060616"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -137,12 +137,12 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo 'var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
 		if ($sessiondata['usetiny4']==1) {
-			echo 'var fileBrowserCallBackFunc = fileBrowserCallBack;';
+			echo 'var filePickerCallBackFunc = filePickerCallBack;';
 		} else {
 			echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
 		}
 	} else {
-		echo 'var fileBrowserCallBackFunc = null;';
+		echo 'var fileBrowserCallBackFunc = null; var filePickerCallBackFunc = null;';
 	}
 	echo 'initeditor("exact","'.$useeditor.'");';
 	echo '</script>';

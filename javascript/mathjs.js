@@ -159,7 +159,7 @@ function mathjs(st,varlist) {
   st= st.replace(/([0-9])\*\(EE\)([\-0-9])/,"$1e$2");
 
   
-  st = st.replace(/\)([\(0-9a-zA-Z])/g,"\)*$1");
+  st = st.replace(/\)([\(0-9a-zA-Z]|\.\d+)/g,"\)*$1");
   
   var i,j,k, ch, nested;
   while ((i=st.indexOf("^"))!=-1) {

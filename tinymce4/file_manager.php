@@ -98,16 +98,10 @@ if (isset($_REQUEST["action"]) && $_REQUEST["action"] == "upload_file") {
 ?>
     },
     mySubmit : function (filename) {
-        var win = args.window;
 
         // insert information now
-        win.document.getElementById(args.input).value = filename;
-
-        // for image browsers: update image dimensions
-        if (win.ImageDialog) {
-		if (win.ImageDialog.getImageData) win.ImageDialog.getImageData();
-		if (win.ImageDialog.showPreviewImage) win.ImageDialog.showPreviewImage(URL);
-	}
+        top.tinymce.activeEditor.windowManager.getParams().oninsert(filename);
+    
         // close popup window
         top.tinymce.activeEditor.windowManager.close();
     }
