@@ -923,6 +923,16 @@ if (!isset($_POST['embedpostback'])) {
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
 		$placeinhead .= '<script src="'.$imasroot.'/javascript/ytapi.js"></script>';
 	}
+	if ($testsettings['displaymethod'] == "LivePoll") {
+		$placeinhead .= '<script src="http://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js"></script>';
+		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher']?'teachers':'students');
+		$now = time();
+		if (isset($CFG['GEN']['livepollpassword'])) {
+			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now));
+		}
+		$placeinhead .= '<script type="text/javascript">livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");</script>';
+	}
 	if ($sessiondata['intreereader']) {
 		$flexwidth = true;
 	}
@@ -2048,6 +2058,130 @@ if (!isset($_POST['embedpostback'])) {
 			echo '</script>';
 			exit;
 			
+		} else if ($_GET['action']=='livepollscoreq') {
+			//TODO:  Check curattempt
+			$qn = $_POST['toscore'];
+			if ($_POST['verattempts']!=$attempts[$qn]) {
+				echo '{error: "question was already submitted"}';
+			} else {
+				if (isset($_POST['disptime']) && !$isreview) {
+					$used = $now - intval($_POST['disptime']);
+					$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+				}
+				$GLOBALS['scoremessages'] = '';
+				$GLOBALS['questionmanualgrade'] = false;
+				$rawscore = scorequestion($qn);
+				
+				//record score
+				recordtestdata();
+				
+				//get question last answer
+				$ar = $GLOBALS['lastanswers'][$qn];
+				$arv = explode('##',$ar);
+				$arv = $arv[count($arv)-1];
+				
+				$tocheck = $userid.$rawscore.$arv;
+				$now = time();
+				if (isset($CFG['GEN']['livepollpassword'])) {
+					$livepollsig = base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now));
+				}
+				
+				$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/qscored?user='.$userid.'&score='.urlencode($rawscore).'&now='.$now.'&la='.urlencode($arv).'&sig='.$livepollsig);
+				echo '{success: true}';
+			}
+			exit;
+		} else if ($_GET['action']=='livepollopenq') {
+			$qn = $_GET['qn'];
+			//TODO:  update imas_livepoll_status with currentquestion
+			if (isset($CFG['GEN']['livepollpassword'])) {
+				$livepollsig = base64_encode(sha1($qn . $CFG['GEN']['livepollpassword'] . $now));
+			}
+			
+			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?qn='.$qn.'&now='.$now.'&sig='.$livepollsig);
+			
+			if ($r=='success') {
+				return '{success: true}';
+			} else {
+				return '{error: "'.$r.'"}';
+			}
+			
+		} else if ($_GET['action']=='livepollstopq') {
+			$qn = $_GET['qn'];
+			//TODO:  update imas_livepoll_status with currentquestion
+			
+			if ($showeachscore) {
+				$nextact='showscore';
+			} else {
+				$nextact='wait';
+			}
+			if (isset($CFG['GEN']['livepollpassword'])) {
+				$livepollsig = base64_encode(sha1($qn . $nextact. $CFG['GEN']['livepollpassword'] . $now));
+			}
+			
+			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/stopq?qn='.$qn.'&nextact='.$nextact.'&now='.$now.'&sig='.$livepollsig);
+			
+			if ($r=='success') {
+				return '{success: true}';
+			} else {
+				return '{error: "'.$r.'"}';
+			}
+			
+		} else if ($_GET['action']=='livepollshowq') {
+			//TODO:  Check curattempt
+			//TODO:  Check currentquestion to see if this is OK
+			$qn = $_GET['qn'];
+			$colors = array();
+			basicshowq($qn,false,$colors);
+			exit;
+		} else if ($_GET['action']=='livepollshowqscore') {
+			//TODO:  Check curattempt
+			//TODO:  Check currentquestion to see if this is OK
+			$qn = $_GET['qn'];
+			$colors = array($rawscores[$qn]);
+			if ($showeachscore) {
+				//TODO i18n
+				$msg =  "<p>This question, with your last answer";
+				if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
+					$msg .= " and correct answer";
+					$showcorrectnow = true;
+				} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
+					($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn])) {
+					$msg .= " and correct answer";
+					$showcorrectnow = true;
+				} else {
+					$showcorrectnow = false;
+				}
+				if ($showcorrectnow) {
+					echo $msg . ', is displayed below</p>';
+					echo '</div>';
+					displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
+				} else {
+					echo $msg . ', is displayed below</p>';
+					echo '</div>';
+					displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
+				}
+			}
+			exit;
+		} else if ($_GET['action']=='livepollgetallres') {
+			$qn = $_GET['qn'];
+			if ($sessiondata['isteacher']) {
+				$query = "SELECT userid,bestrawscores,bestlastanswers FROM imas_assessment_sessions WHERE assessmentid='{$testsettings['id']}'";
+				$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+				$json = '[';
+				while ($row = mysql_fetch_row($result)) {
+					$thisarr = array("user"=>$row[0]);
+					$bs = explode(',',$row[1]);
+					$thisarr['score'] = $bs[$qn];
+					$las = explode('~',$row[2]);
+					$ar = $las[$qn];
+					$arv = explode('##',$ar);
+					$thisarr['la'] = $arv[count($arv)-1];
+					$json .= json_encode($thisarr);
+				}
+				$json .= ']';
+				echo $json;
+			}
+			exit;
 		}
 	} else { //starting test display  
 		$canimprove = false;
@@ -2454,6 +2588,42 @@ if (!isset($_POST['embedpostback'])) {
 			
 					
 			
+		} else if ($testsettings['displaymethod']=='LivePoll') {
+			echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/assessment/showtest.php?embedpostback=true";</script>';
+			echo "<input type=\"hidden\" id=\"asidverify\" name=\"asidverify\" value=\"$testid\" />";
+			echo '<input type="hidden" id="disptime" name="disptime" value="'.time().'" />';
+			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";	
+			
+			if ($sessiondata['isteacher']) {
+				echo '<div class="navbar">';
+				echo '<p id="activestu">&nbsp;</p>';
+				echo "<h4>", _('Questions'), "</h4>\n";
+				echo "<ul class=qlist>\n";
+				for ($i = 0; $i < count($questions); $i++) {
+					echo "<li>";
+					if ($showcat>1 && $qi[$questions[$i]]['category']!='0') {
+						if ($qi[$questions[$i]]['withdrawn']==1) {
+							echo "<a href=\"#\" data-showq=\"$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
+						} else {
+							echo "<a href=\"#\" data-showq=\"$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+						}
+					} else {
+						if ($qi[$questions[$i]]['withdrawn']==1) {
+							echo "<a href=\"#\" data-showq=\"$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
+						} else {
+							echo "<a href=\"#\" data-showq=\"$i\">Q ". ($i+1) . "</a>";
+						}
+					}
+					echo '<br/>&nbsp;&nbsp;<a href="#" class="small" data-showr="'.$i.'">Results</a>';
+					echo '</li>';	
+				}
+				echo "</ul>";
+				echo '</div>';
+				echo '<div class="inset" id="livepollcontent">';
+				echo '</div>';
+			} else {//stu view
+				echo '<div id="livepollcontent">'._('Waiting for the instructor to start a question').'</div>';
+			}
 		}
 	}
 	//IP:  eqntips
