@@ -2,7 +2,6 @@
 use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-// use yii\helpers\HtmlPurifier;
 
 $this->title = AppUtility::t('Enroll an Existing user', false);
 ?>
