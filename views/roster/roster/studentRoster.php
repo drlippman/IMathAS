@@ -2,7 +2,6 @@
 use app\components\AppUtility;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii\helpers\HtmlPurifier;
 
 $this->title = AppUtility::t('Roster', false);
    // encode title. id called specifically have been deemed safe and left alone
