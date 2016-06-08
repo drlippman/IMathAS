@@ -866,7 +866,7 @@
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
-if (!isset($_POST['embedpostback'])) {
+if (!isset($_REQUEST['embedpostback'])) {
 	
 	if ($testsettings['eqnhelper']==1 || $testsettings['eqnhelper']==2) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
@@ -1185,7 +1185,7 @@ if (!isset($_POST['embedpostback'])) {
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">Practice Assessment.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
-	if (!$isreview && !$superdone) {
+	if (!$isreview && !$superdone && $testsettings['testtype']=="LivePoll") {
 		$duetimenote = '';
 		if ($exceptionduedate > 0) {
 			$timebeforedue = $exceptionduedate - time();
@@ -2080,24 +2080,26 @@ if (!isset($_POST['embedpostback'])) {
 				$arv = explode('##',$ar);
 				$arv = $arv[count($arv)-1];
 				
-				$tocheck = $userid.$rawscore.$arv;
+				$aid = $testsettings['id'];
+				$tocheck = $aid.$qn.$userid.$rawscore.$arv;
 				$now = time();
 				if (isset($CFG['GEN']['livepollpassword'])) {
 					$livepollsig = base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now));
 				}
 				
-				$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/qscored?user='.$userid.'&score='.urlencode($rawscore).'&now='.$now.'&la='.urlencode($arv).'&sig='.$livepollsig);
+				$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/qscored?aid='.$aid.'&qn='.$qn.'&user='.$userid.'&score='.urlencode($rawscore).'&now='.$now.'&la='.urlencode($arv).'&sig='.$livepollsig);
 				echo '{success: true}';
 			}
 			exit;
 		} else if ($_GET['action']=='livepollopenq') {
 			$qn = $_GET['qn'];
+			$aid = $testsettings['id'];
 			//TODO:  update imas_livepoll_status with currentquestion
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = base64_encode(sha1($qn . $CFG['GEN']['livepollpassword'] . $now));
+				$livepollsig = base64_encode(sha1($aid.$qn . $CFG['GEN']['livepollpassword'] . $now));
 			}
 			
-			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?qn='.$qn.'&now='.$now.'&sig='.$livepollsig);
+			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?aid='.$aid.'&qn='.$qn.'&now='.$now.'&sig='.$livepollsig);
 			
 			if ($r=='success') {
 				return '{success: true}';
@@ -2107,6 +2109,7 @@ if (!isset($_POST['embedpostback'])) {
 			
 		} else if ($_GET['action']=='livepollstopq') {
 			$qn = $_GET['qn'];
+			$aid = $testsettings['id'];
 			//TODO:  update imas_livepoll_status with currentquestion
 			
 			if ($showeachscore) {
@@ -2115,10 +2118,10 @@ if (!isset($_POST['embedpostback'])) {
 				$nextact='wait';
 			}
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = base64_encode(sha1($qn . $nextact. $CFG['GEN']['livepollpassword'] . $now));
+				$livepollsig = base64_encode(sha1($aid.$qn . $nextact. $CFG['GEN']['livepollpassword'] . $now));
 			}
 			
-			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/stopq?qn='.$qn.'&nextact='.$nextact.'&now='.$now.'&sig='.$livepollsig);
+			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/stopq?aid='.$aid.'&qn='.$qn.'&nextact='.$nextact.'&now='.$now.'&sig='.$livepollsig);
 			
 			if ($r=='success') {
 				return '{success: true}';
@@ -2596,7 +2599,7 @@ if (!isset($_POST['embedpostback'])) {
 			
 			if ($sessiondata['isteacher']) {
 				echo '<div class="navbar">';
-				echo '<p id="activestu">&nbsp;</p>';
+				echo '<p id="livepollactivestu">&nbsp;</p>';
 				echo "<h4>", _('Questions'), "</h4>\n";
 				echo "<ul class=qlist>\n";
 				for ($i = 0; $i < count($questions); $i++) {
@@ -2614,15 +2617,21 @@ if (!isset($_POST['embedpostback'])) {
 							echo "<a href=\"#\" data-showq=\"$i\">Q ". ($i+1) . "</a>";
 						}
 					}
-					echo '<br/>&nbsp;&nbsp;<a href="#" class="small" data-showr="'.$i.'">Results</a>';
 					echo '</li>';	
 				}
 				echo "</ul>";
 				echo '</div>';
-				echo '<div class="inset" id="livepollcontent">';
+				echo '<div class="inset" id="livepollinstrq">';
+				echo ' <div><span class="floatright"><button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button></span>';
+				echo ' <b><span id="LPqnumber">Select a Question</span></b> ';
+				echo ' <input type="checkbox" id="LPshowqchkbox" checked> Show Question ';
+				echo ' <input type="checkbox" id="LPshowrchkbox"> Show Results </div><br class="clear">';
+				echo ' <div id="livepollqcontent" >Select a Question</div>';
+				echo ' <div id="livepollrcontent" style="display:none"></div>';
 				echo '</div>';
+
 			} else {//stu view
-				echo '<div id="livepollcontent">'._('Waiting for the instructor to start a question').'</div>';
+				echo '<div id="livepollqcontent">'._('Waiting for the instructor to start a question').'</div>';
 			}
 		}
 	}
