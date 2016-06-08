@@ -6079,7 +6079,7 @@ function checkanswerformat($tocheck,$ansformats) {
 		}
 	} 
 	if (in_array("notrig",$ansformats)) {
-		if (preg_match('/(sin|cos|tan|cot|csc|sec)/',$tocheck)) {
+		if (preg_match('/(sin|cos|tan|cot|csc|sec)/i',$tocheck)) {
 			return false;
 		}
 	} 
