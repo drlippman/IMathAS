@@ -6229,7 +6229,7 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
-	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷'), array('(',')','oo','U','/','<=','>=','/'), $str);
+	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷','⋅'), array('(',')','oo','U','/','<=','>=','/','*'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;	
 }
