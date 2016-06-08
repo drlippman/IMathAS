@@ -1408,14 +1408,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "$leftb<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"";
 		if (!isset($hidepreview)) {
 		  $hidepreview=true;	
-		  $useeqnhelper=false;
-                  $out .= " oninput=\"calculate('tc$qn','p$qn','$answerformat');hideeh()\"";
+                  $out .= " oninput=\"livepreview('tc$qn','p$qn','$answerformat','calculate');hideeh()\"";
 
-		} else {
-		  $useeqnhelper=false;
-                  $out .= " oninput=\"calculate('tc$qn','p$qn','$answerformat');hideeh()\"";
-
-		}
+		} 
 		$ansformats = explode(',',$answerformat);
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 			$tip = _('Enter your answer as a list of values separated by commas: Example: -4, 3, 2') . "<br/>";
@@ -1455,9 +1450,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />\n";
 		if (!isset($hidepreview)) {
-			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
+			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat',false)\" /> &nbsp;\n";
 		}
-		$preview .= "$leftb<span id=p$qn></span>$rightb ";
+		$preview .= "&nbsp;&nbsp;&nbsp;$leftb<span id=p$qn></span>$rightb <br>";
 		$out .= "<script type=\"text/javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
 		
 		if (isset($answer)) {
@@ -1608,11 +1603,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\"";
 		if (!isset($hidepreview)) {
 		  $hidepreview=true;	
-		  $useeqnhelper=false;
-                  $out .= " oninput=\"AMpreview('tc$qn','p$qn');hideeh()\"";
-		} else {
-		  $out .= " oninput=\"AMpreview('tc$qn','p$qn');hideeh()\"";
-		  $useeqnhelper=false;		  
+                  $out .= " oninput=\"livepreview('tc$qn','p$qn','','AM');hideeh()\"";
 		}
 
 
@@ -1639,7 +1630,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
 		}
 		if (!isset($hidepreview)) {$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"AMpreview('tc$qn','p$qn')\" /> &nbsp;\n";}
-		$preview .= "<span id=p$qn></span>\n";
+		$preview .= "&nbsp;&nbsp;&nbsp;<span id=p$qn></span>\n<br>";
 		
 		if (!isset($variables)) { $variables = "x";}
 		$variables = explode(",",$variables);
