@@ -2061,22 +2061,26 @@ if (!isset($_REQUEST['embedpostback'])) {
 		} else if ($_GET['action']=='livepollscoreq') {
 			//TODO:  Check curattempt
 			$qn = $_POST['toscore'];
-			if ($_POST['verattempts']!=$attempts[$qn]) {
-				echo '{error: "question was already submitted"}';
-			} else {
+			//TODO:  figure out what to do with this
+			//if ($_POST['verattempts']!=$attempts[$qn]) {
+			//	echo '{error: "question was already submitted"}';
+			//} else {
 				if (isset($_POST['disptime']) && !$isreview) {
 					$used = $now - intval($_POST['disptime']);
 					$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
 				}
 				$GLOBALS['scoremessages'] = '';
 				$GLOBALS['questionmanualgrade'] = false;
+				$GLOBALS['lastanspretty'] = array();
 				$rawscore = scorequestion($qn);
 				
 				//record score
 				recordtestdata();
 				
 				//get question last answer
+				
 				$ar = $GLOBALS['lastanswers'][$qn];
+				
 				$arv = explode('##',$ar);
 				$arv = $arv[count($arv)-1];
 				
@@ -2089,7 +2093,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				
 				$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/qscored?aid='.$aid.'&qn='.$qn.'&user='.$userid.'&score='.urlencode($rawscore).'&now='.$now.'&la='.urlencode($arv).'&sig='.$livepollsig);
 				echo '{success: true}';
-			}
+			//}
 			exit;
 		} else if ($_GET['action']=='livepollopenq') {
 			$qn = $_GET['qn'];
@@ -2134,7 +2138,20 @@ if (!isset($_REQUEST['embedpostback'])) {
 			//TODO:  Check currentquestion to see if this is OK
 			$qn = $_GET['qn'];
 			$colors = array();
-			basicshowq($qn,false,$colors);
+			if (isset($_GET['includeqinfo']) && $sessiondata['isteacher']) {
+				$GLOBALS['capturechoices'] = true;
+				ob_start();
+				basicshowq($qn,false,$colors);
+				$out = array("html"=>ob_get_clean());
+				if (isset($GLOBALS['choicesdata'][$qn])) {
+					$out["choices"] = $GLOBALS['choicesdata'][$qn][1];
+				} else {
+					$out["choices"] = array();
+				}
+				echo json_encode($out);
+			} else {
+				basicshowq($qn,false,$colors);
+			}
 			exit;
 		} else if ($_GET['action']=='livepollshowqscore') {
 			//TODO:  Check curattempt
@@ -2599,7 +2616,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			
 			if ($sessiondata['isteacher']) {
 				echo '<div class="navbar">';
-				echo '<p id="livepollactivestu">&nbsp;</p>';
+				//echo '<p id="livepollactivestu">&nbsp;</p>';
 				echo "<h4>", _('Questions'), "</h4>\n";
 				echo "<ul class=qlist>\n";
 				for ($i = 0; $i < count($questions); $i++) {
@@ -2622,10 +2639,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "</ul>";
 				echo '</div>';
 				echo '<div class="inset" id="livepollinstrq">';
-				echo ' <div><span class="floatright"><button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button></span>';
-				echo ' <b><span id="LPqnumber">Select a Question</span></b> ';
-				echo ' <input type="checkbox" id="LPshowqchkbox" checked> Show Question ';
-				echo ' <input type="checkbox" id="LPshowrchkbox"> Show Results </div><br class="clear">';
+				echo ' <div>';
+				echo '<span class="floatright" id="livepollactivestu"></span>';
+				echo ' <p><b><span id="LPqnumber">Select a Question</span></b></p> ';
+				echo ' <p><input type="checkbox" id="LPshowqchkbox" checked> Show Question ';
+				echo ' <input type="checkbox" id="LPshowrchkbox"> Show Results ';
+				echo ' <button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button></p></div><br class="clear">';
 				echo ' <div id="livepollqcontent" >Select a Question</div>';
 				echo ' <div id="livepollrcontent" style="display:none"></div>';
 				echo '</div>';
