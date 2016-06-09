@@ -9,6 +9,12 @@ var livepoll = new function() {
 	var LPtimestart = 0;
 	var qdata = [];
 	var results = [];
+	var settings {
+		showqonload = true,
+		showreslive = false,
+		showresonclose = true,
+		showansonclose = true
+		};
 	
 	this.init = function(server, room, timestamp, sig) {
 		isteacher = room.match(/teacher/);
@@ -23,7 +29,17 @@ var livepoll = new function() {
 		} else {
 			socket.on('livepoll show', showHandler);
 		}
+	}
 	
+	this.restoreState(qn, action) {
+		showHandler({qn: qn, action=act});
+	}
+	
+	this.updateSettings() {
+		settings.showqonload = $("#LPsettings-dispq").is(":checked");
+		settings.showreslive = $("#LPsettings-liveres").is(":checked");
+		settings.showresonclose = $("#LPsettings-resafter").is(":checked");
+		settings.showansonclose = $("#LPsettings-showans").is(":checked");
 	}
 	
 	function setupInstructorPanel() {
@@ -35,19 +51,36 @@ var livepoll = new function() {
 			$("#LPshowrchkbox").on("change", function() {
 				$("#livepollrcontent").toggle($("#LPshowrchkbox").is(":checked"));
 			});
-			$("#LPshowanschkbox").on("change", function() {
-				if ($("#LPshowanschkbox").is(":checked")) {
-					$(".LPcorrect").addClass("LPshowcorrect");	
-					$(".LPwrong").addClass("LPshowwrong");	
-				} else {
-					$(".LPcorrect").removeClass("LPshowcorrect");	
-					$(".LPwrong").removeClass("LPshowwrong");	
-				}
-			});
+			$("#LPshowanschkbox").on("change", showAnsIfAllowed);
 			$("#LPstartq").on("click", startQuestion);
 			$("#LPstopq").on("click", stopQuestion);
 		});	
 	}
+	
+	function showAnsIfAllowed() {
+		if ($("#LPshowanschkbox").is(":checked") && (curstate==3 || curstate==4)) {
+			$(".LPcorrect").addClass("LPshowcorrect");	
+			$(".LPwrong").addClass("LPshowwrong");	
+			if (curstate==3 && curquestions>=0) {
+				$.ajax({
+					url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion+'&newstate=4;
+				}).done(function(data) {	
+					curstate = 4;
+				}
+			}
+		} else {
+			$(".LPcorrect").removeClass("LPshowcorrect");	
+			$(".LPwrong").removeClass("LPshowwrong");	
+			if (curstate==4 && curquestions>=0) {
+				$.ajax({
+					url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion+'&newstate=3;
+				}).done(function(data) {	
+					curstate = 3;
+				}
+			}
+		}	
+	}
+	
 	function showHandler(data) {
 		clearInterval(LPtimer);
 		LPtimestart = 0;
@@ -55,7 +88,7 @@ var livepoll = new function() {
 		var qn = data.qn;
 		if (data.action=='showq') {
 			$.ajax({
-				url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn
+				url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn+'&seed='+data.seed;
 			}).done(function(data) {
 				var parsed = preProcess(data);
 				var button = '<div><span id="livepollsubmit"><button type="button" onclick="livepoll.submitQuestion('+qn+')">Submit</button></span></div>';
@@ -113,7 +146,6 @@ var livepoll = new function() {
 				scoredat[i] = 0;
 			}
 		}
-		console.log(qdata);
 		if (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans") {
 			if (qdata[curquestion].anstypes=="choices") {
 				var anss = qdata[curquestion].ans.split(/\s+or\s+/);
@@ -126,13 +158,29 @@ var livepoll = new function() {
 		}
 		var ischoices = false;
 		var rescnt = 0;
+		var drawinitstack = [];
 		for (i in results[curquestion]) {
-			pts = results[curquestion][i].ans.split(/\$(!|#)\$/);
 			ischoices = (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans");
 			if (ischoices) {
+				pts = results[curquestion][i].ans.split("!$!");
 				subpts = pts[2].split("|");
 			} else {
+				pts = results[curquestion][i].ans.split("!#!");
 				subpts = [pts[0]];
+			}
+			if (qdata[curquestion].anstypes.match(/calc/) || qdata[curquestion].anstypes=="numfunc") {
+				subpts[0] = "`"+subpts[0]+"`";
+			} else if (qdata[curquestion].anstypes=="draw") {
+				var la = subpts[0].replace("(","[").replace(")","]");
+				la = la.split(";;")
+				if  (la[0]!='') {
+					la[0] = '['+la[0].replace(";","],[")+"]";	
+				}
+				la = '[['+la.join('],[')+']];
+				drawinitstack.push(function() {
+					drawla["draw"+curquestion+"-"+i] = la;
+					initCanvases("draw"+curquestion+"-"+i);
+				})
 			}
 			for (var j=0;j<subpts.length;j++) {
 				if (datatots.hasOwnProperty(subpts[j])) {
@@ -146,19 +194,35 @@ var livepoll = new function() {
 		}
 		var out = '';
 		if (qdata[curquestion].choices.length>0) {
-			out += "<table class=\"LPres\"><thead><tr><th>Answer</th><th>Frequency</th></tr></thead><tbody>";
-			for (i=0;i<qdata[curquestion].choices.length;i++) {
-				out += '<tr class="';
-				if (scoredat[i]>0) {
-					out += "LPcorrect";
-				} else {
-					out += "LPwrong";
+			if (qdata[curquestion].initrdisp) {
+				for (i=0;i<qdata[curquestion].randkeys.length;i++) {
+					partn = qdata[curquestion].randkeys[i];
+					$("#LPresval"+partn).text(datatots[partn]);
 				}
-				out += '"><td>';
-				out += qdata[curquestion].choices[i];
-				out += "</td><td>"+datatots[i]+"</td></tr>";
+			} else {
+				out += "<table class=\"LPres\"><thead><tr><th>Answer</th><th>Frequency</th></tr></thead><tbody>";
+				for (i=0;i<qdata[curquestion].randkeys.length;i++) {
+					partn = qdata[curquestion].randkeys[i];
+					out += '<tr class="';
+					if (scoredat[partn]>0) {
+						out += "LPcorrect";
+					} else {
+						out += "LPwrong";
+					}
+					out += '"><td>';
+					out += qdata[curquestion].choices[partn];
+					out += '</td><td id="LPresval'+partn+'">'+datatots[partn]+"</td></tr>";
+				}
+				out += "</tbody></table>";
+				$("#livepollrcontent").html(out);
+				qdata[curquestion].initrdisp = true;
+				if (usingASCIIMath) {
+					rendermathnode(document.getElementById("livepollrcontent"));
+				}
+				if (usingASCIISvg) {
+					setTimeout("drawPics()",100);
+				}
 			}
-			out += "</tbody></table>";
 		} else {
 			var sortedkeys = getSortedKeys(datatots);
 			out += "<table class=\"LPres\"><thead><tr><th>Answer</th><th>Frequency</th></tr></thead><tbody>";
@@ -171,11 +235,21 @@ var livepoll = new function() {
 				}
 				out += '"><td>';
 				out += sortedkeys[i];
-				out += "</td><td>"+datatots[sortedkeys[i]]+"</td></tr>";
+				out += "</td><td>";datatots[sortedkeys[i]]+"</td></tr>";
 			}
 			out += "</tbody></table>";
+			$("#livepollrcontent").html(out);
+			if (usingASCIIMath) {
+				rendermathnode(document.getElementById("livepollrcontent"));
+			}
+			if (usingASCIISvg) {
+				setTimeout("drawPics()",100);
+			}
+			for (i in drawinitstack) {
+				drawinitstack[i]();
+			}
 		}
-		$("#livepollrcontent").html(out);
+		
 		$("#livepollrcnt").html(rescnt+" result"+(rescnt==1?"":"s")+" received.");
 	}
 	
@@ -191,30 +265,52 @@ var livepoll = new function() {
 		return false;
 	}
 	
-	function showQuestion(qn) {
+	function showQuestion(qn, forceregen) {
 		if (!working) {
-			$("#LPstopq").hide();
-			$("#LPstartq").hide();
-			
-			if (curquestion != -1 && curstate==2 && qn != curquestion) {
+			if (qn==curquestion && typeof forceregen == 'undefined') {
+				//redisplaying the same q?  just ignore it
+				return;
+			} else if (curquestion != -1 && curstate==2) {
+				//if another question is currently open, stop it
 				stopQuestion();
 			}
+			
+			$("#LPstopq").hide();
+			$("#LPstartq").hide();
 			
 			$("#LPqnumber").text("Question "+(qn+1));
 			$("#livepollqcontent").html("Loading...");
 			$("#livepollrcontent").html("");
+			
+			if (typeof forceregen != 'undefined') {
+				var regenstr = '&forceregen=true';	
+			} else {
+				var regenstr = '';
+			}
+			
 			working = true;
 			$.ajax({
-				url: assesspostbackurl+'&action=livepollshowq&includeqinfo=true&qn='+qn,
+				url: assesspostbackurl+'&action=livepollshowq&includeqinfo=true&qn='+qn+regenstr,
 				dataType: "json"
 			}).done(function(data) {
+				curquestion = qn;
+				curstate = 1;
+				
+				$("#LPshowqchkbox").attr("checked", settings.showqonload).trigger("change");
+				$("#LPshowrchkbox").attr("checked", settings.showreslive).trigger("change");
+				$("#LPshowanschkbox").attr("checked", settings.showansonclose).trigger("change");
+				$("#LPshowansmsg").text("Show Answers When Closed");
+				
 				var parsed = preProcess(data.html);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
+				$("livepollqcontent").append('<p><a href="#" onclick="showQuestion('+qn+',true);return false;">Clear results and generate a new version of this question</a></p>');
 				$("#LPstartq").show();
-				curquestion = qn;
-				curstate = 1;
-				qdata[qn] = {choices: data.choices, ans: data.ans.toString(), anstypes: data.anstypes};
+				
+				qdata[qn] = {choices: data.choices, ans: data.ans.toString(), anstypes: data.anstypes, seed: data.seed, drawinit: data.drawinit, initrdisp:false};
+				if (typeof forceregen != 'undefined') {
+					results[qn] = [];	
+				}
 				updateResults();
 			}).always(function(data) {
 				working = false;
@@ -277,13 +373,16 @@ var livepoll = new function() {
 		if (qn<0 || curstate==2 || working) { return;}
 		$("#LPstartq").text("Opening Student Input...");
 		working = true;
+		
 		$.ajax({
-			url: assesspostbackurl+'&action=livepollopenq&qn='+qn
+			url: assesspostbackurl+'&action=livepollopenq&qn='+qn+'&seed='+qdata[qn].seed;
 		}).done(function(data) {
 			$("#LPstartq").text("Open Student Input").hide();
 			$("#LPstopq").show();
 			curstate = 2;
 			LPtimer = setInterval(LPtimerkeeper,1000);
+			showAnsIfAllowed();
+			$("#LPshowansmsg").text("Show Answers When Closed");
 		}).always(function(data) {
 			working = false;	
 		});
@@ -292,14 +391,22 @@ var livepoll = new function() {
 		if (curquestion<0 || curstate!=2 || working) { return;}
 		$("#LPstopq").text("Closing Student Input...");
 		working = true;
+		if ( $("#LPshowanschkbox").is(":checked") ) {
+			var newstate = 4;
+		} else {
+			var newstate = 3;
+		}
 		$.ajax({
-			url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion
+			url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion+'&newstate='+newstate;
 		}).done(function(data) {
 			$("#LPstopq").text("Close Student Input").hide();
 			$("#LPstartq").show();
-			curstate = 4;
+			curstate = newstate;
 			clearInterval(LPtimer);
 			LPtimestart = 0;
+			$("#LPshowansmsg").text("Show Answers");
+			showAnsIfAllowed();
+			$("#LPshowrchkbox").attr("checked", settings.showresonclose || $("#LPshowrchkbox").is(":checked")).trigger("change");
 		}).always(function(data) {
 			working = false;	
 		});

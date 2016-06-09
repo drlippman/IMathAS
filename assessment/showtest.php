@@ -44,7 +44,7 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displayformat FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
@@ -195,6 +195,9 @@
 			if (trim($adata['itemorder'])=='') {
 				echo _('No questions in assessment!');
 				exit;
+			}
+			if ($adata['displaymethod']=='LivePoll') {
+				$adata['shuffle'] = $adata['shuffle'] | 4;  //force all stu same random seed
 			}
 			
 			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
@@ -516,6 +519,7 @@
 		} else {
 			$LPinf = mysql_fetch_assoc($result);
 		}
+		$testsettings['shuffle'] = $testsettings['shuffle'] | 4; //force all students same seed
 	}
 	
 	$now = time();
@@ -2130,15 +2134,18 @@ if (!isset($_REQUEST['embedpostback'])) {
 			}
 			$qn = intval($_GET['qn']);
 			$aid = $testsettings['id'];
+			$seed = intval($_GET['seed']);
 			
 			$query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate=2 WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = base64_encode(sha1($aid.$qn . $CFG['GEN']['livepollpassword'] . $now));
+				$livepollsig = base64_encode(sha1($aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now));
 			}
+			$regenstr = '';
 			
-			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?aid='.$aid.'&qn='.$qn.'&now='.$now.'&sig='.$livepollsig);
+			
+			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?aid='.$aid.'&qn='.$qn.'&seed='.$seed.'&now='.$now.'&sig='.$livepollsig);
 			
 			if ($r=='success') {
 				echo '{success: true}';
@@ -2185,7 +2192,21 @@ if (!isset($_REQUEST['embedpostback'])) {
 			exit;
 			
 		} else if ($_GET['action']=='livepollshowq') {
-			$qn = $_GET['qn'];
+			$qn = intval($_GET['qn']);
+			if (isset($_GET['forceregen'])) {
+				srand();
+				do {
+					$newseed = rand(1,9999);
+				} while ($newseed == $seeds[$qn]);
+				$seeds[$qn] = $newseed;
+				//skipping reloadqi as we're not pulling from group, and shouldn't be using multipart
+				recordtestdata();
+			} else if (isset($_GET['seed'])) {
+				if ($seeds[$qn] != $_GET['newseed']) { //instr has done regen
+					$seeds[$qn] = intval($_GET['newseed']);
+					recordtestdata();
+				}
+			}
 			
 			if (!$sessiondata['isteacher'] && ($LPinf['curquestion'] != $qn || ($LPinf['curstate'] != 2 && $LPinf['curstate'] != 3))) {
 				echo 'wrong question or not open for display';
@@ -2194,17 +2215,22 @@ if (!isset($_REQUEST['embedpostback'])) {
 			
 			$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
 			if (isset($_GET['includeqinfo']) && $sessiondata['isteacher']) {
-				$GLOBALS['capturechoices'] = true;
+				$GLOBALS['capturechoices'] = 'shuffled';
+				$GLOBALS['capturedrawinit'] = true;
 				ob_start();
 				$anstypes = displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$regen,false,array());
-				$out = array("html"=>ob_get_clean());
+				$out = array("html"=>ob_get_clean(),'choices'=>'','ans'=>'','randkeys'=>'','drawinit'=>'');
 				if (isset($GLOBALS['choicesdata'][$qn])) {
 					$out["choices"] = $GLOBALS['choicesdata'][$qn][1];
 					$out["ans"] = $GLOBALS['choicesdata'][$qn][2];
-				} else {
-					$out["choices"] = array();
+					$out["randkeys"] = $GLOBALS['choicesdata'][$qn][3];
 				}
+				if (isset($GLOBALS['drawinitdata'][$qn])) {
+					$out["drawinit"] = $GLOBALS['drawinitdata'][$qn];
+				} 
 				$out["anstypes"] = implode(',',$anstypes);
+				$out["seed"] = $seeds[$qn];
+				
 				echo json_encode($out);
 			} else {
 				displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$regen,false,array());
@@ -2680,14 +2706,22 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo '</div>';
 				echo '<div class="inset" id="livepollinstrq">';
 				echo '<div id="LPsettings">';
-				
+				echo '<p><label><input type="checkbox" id="LPsettings-dispq" onclick="livepoll.updateSettings()" checked> ';
+				echo ' Show question on this computer before it is opened for student input</label><br/>';
+				echo '<p><label><input type="checkbox" id="LPsettings-liveres" onclick="livepoll.updateSettings()"> ';
+				echo ' Show results live as students submit answers</label><br/>';
+				echo '<p><label><input type="checkbox" id="LPsettings-resafter" onclick="livepoll.updateSettings()" checked> ';
+				echo ' Show results automatically after closing student input</label><br/>';
+				echo '<p><label><input type="checkbox" id="LPsettings-showans" onclick="livepoll.updateSettings()" checked> ';
+				echo ' Show answers automatically after closing student input</label><br/>';
 				echo '</div>'; 
 				echo ' <div>';
 				echo ' <p><b><span id="LPqnumber">Select a Question</span></b></p> ';
-				echo ' <p><input type="checkbox" id="LPshowqchkbox" checked> Show Question ';
-				echo ' <input type="checkbox" id="LPshowrchkbox"> Show Results ';
-				echo ' <input type="checkbox" id="LPshowanschkbox"> Show Answers ';
-				echo ' <button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button></p></div><br class="clear">';
+				echo ' <p><button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button>';
+				echo ' <label><input type="checkbox" id="LPshowqchkbox" checked> Show Question</label> ';
+				echo ' <label><input type="checkbox" id="LPshowrchkbox"> Show Results</label> ';
+				echo ' <label><input type="checkbox" id="LPshowanschkbox" checked> <span id="LPshowansmsg">Show Answers When Closed</span></label> ';
+				echo ' </p></div><br class="clear">';
 				echo ' <div id="livepollqcontent" >Select a Question</div>';
 				echo ' <div id="livepollrwrapper"><p id="livepollrcnt"></p>';
 				echo ' <div id="livepollrcontent" style="display:none"></div></div>';
@@ -2720,6 +2754,16 @@ if (!isset($_REQUEST['embedpostback'])) {
 				
 			} else {//stu view
 				echo '<div id="livepollqcontent">'._('Waiting for the instructor to start a question').'</div>';
+				if ($LPinf[curstate]<2) {
+					$act=0;
+				} else if ($LPinf[curstate]==2) {
+					$act = 'showq';
+				} else if ($LPinf[curstate]>2) {
+					$act = $LPinf[curstate];
+				}
+				if ($act!=0) {
+					echo '<script type="text/javascript">$(function(){livepoll.restoreState('.$LPinf['curquestion'].',"'.$act.'");});</script>';
+				}
 			}
 		}
 	}
