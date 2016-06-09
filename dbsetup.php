@@ -1028,6 +1028,13 @@ $sql = 'CREATE TABLE `imas_content_track` (
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_content_track created<br/>';
 
+$sql = 'CREATE TABLE `imas_livepoll_status` (
+	  `assessmentid` INT(10) unsigned NOT NULL PRIMARY KEY,
+	  `curquestion` TINYINT(2) unsigned NOT NULL,
+	  `curstate` TINYINT(1) unsigned NOT NULL
+	) ENGINE=InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_livepoll_status created<br/>';
 
 $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,

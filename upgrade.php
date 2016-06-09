@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 108;
+$latest = 109;
 
 
 @set_time_limit(0);
@@ -1721,6 +1721,18 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
+		}
+		if ($last<109) {
+			$query = 'CREATE TABLE `imas_livepoll_status` (
+				  `assessmentid` INT(10) unsigned NOT NULL PRIMARY KEY,
+				  `curquestion` TINYINT(2) unsigned NOT NULL,
+				  `curstate` TINYINT(1) unsigned NOT NULL
+				) ENGINE=InnoDB;';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 echo '<p>table imas_livepoll_status created</p>';
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

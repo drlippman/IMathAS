@@ -3,7 +3,10 @@ var livepoll = new function() {
 	var isteacher;
 	var curquestion = -1;
 	var curqresults;
+	var curstate = 0;
 	var working = false;
+	var LPtimer;
+	var LPtimestart = 0;
 	var qdata = [];
 	var results = [];
 	
@@ -19,25 +22,35 @@ var livepoll = new function() {
 			setupInstructorPanel();
 		} else {
 			socket.on('livepoll show', showHandler);
-			
 		}
 	
 	}
 	
 	function setupInstructorPanel() {
 		$(function() {
-			$("a[data-showq]").on("click", showQuestion);
+			$("a[data-showq]").on("click", showQuestionHandler);
 			$("#LPshowqchkbox").on("change", function() {
 				$("#livepollqcontent").toggle($("#LPshowqchkbox").is(":checked"));
 			});
 			$("#LPshowrchkbox").on("change", function() {
 				$("#livepollrcontent").toggle($("#LPshowrchkbox").is(":checked"));
 			});
+			$("#LPshowanschkbox").on("change", function() {
+				if ($("#LPshowanschkbox").is(":checked")) {
+					$(".LPcorrect").addClass("LPshowcorrect");	
+					$(".LPwrong").addClass("LPshowwrong");	
+				} else {
+					$(".LPcorrect").removeClass("LPshowcorrect");	
+					$(".LPwrong").removeClass("LPshowwrong");	
+				}
+			});
 			$("#LPstartq").on("click", startQuestion);
 			$("#LPstopq").on("click", stopQuestion);
 		});	
 	}
 	function showHandler(data) {
+		clearInterval(LPtimer);
+		LPtimestart = 0;
 		//handle question show	
 		var qn = data.qn;
 		if (data.action=='showq') {
@@ -48,23 +61,35 @@ var livepoll = new function() {
 				var button = '<div><span id="livepollsubmit"><button type="button" onclick="livepoll.submitQuestion('+qn+')">Submit</button></span></div>';
 				$("#livepollqcontent").html(parsed.html+button);
 				postProcess('livepollqcontent',parsed.code);
+				curquestion = qn;
+				curstate = 2;
+				LPtimer = setInterval(LPtimerkeeper,1000);
 			});
-		} else if (data.action=='wait') {
-			$("#livepollqcontent").html(_('Waiting for the instructor to start a question'));
-		} else if (data.action=='showscore') {
+		} else if (data.action=='3') {
+			$("#livepollsubmit").remove();
+			$("#livepollqcontent").find("input").attr("disabled",true);
+			curstate = 3;
+			curquestion = qn;
+		} else if (data.action=='4') {
 			$.ajax({
 				url: assesspostbackurl+'&action=livepollshowqscore&qn='+data.qn
 			}).done(function(data) {
 				var parsed = preProcess(data);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
+				curquestion = qn;
+				curstate = 4;
 			});
+		} else if (data.action=='0') {
+			$("#livepollqcontent").html(_('Waiting for the instructor to start a question'));
+			curstate = 0;
 		}
+				
 	}
 	
 	function updateUsercount(data) {
 		//receive usercount data	
-		$("#livepollactivestu").html(data.cnt+" connected student"+(data.cnt==1?'':'s'));
+		$("#livepollactivestu").html(data.cnt+" student"+(data.cnt==1?'':'s'));
 	}
 	
 	function addResult(data) {
@@ -75,6 +100,9 @@ var livepoll = new function() {
 		results[curquestion][data.user] = data;
 		updateResults();
 	}
+	this.loadResults = function(data) {
+		results = data;
+	}
 	
 	function updateResults() {
 		var datatots = [];
@@ -82,13 +110,30 @@ var livepoll = new function() {
 		if (qdata[curquestion].choices.length>0) {
 			for (i=0;i<qdata[curquestion].choices.length;i++) {
 				datatots[i] = 0;
+				scoredat[i] = 0;
+			}
+		}
+		console.log(qdata);
+		if (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans") {
+			if (qdata[curquestion].anstypes=="choices") {
+				var anss = qdata[curquestion].ans.split(/\s+or\s+/);
+			} else if (qdata[curquestion].anstypes=="multans") { 
+				var anss = qdata[curquestion].ans.split(/\s*,\s*/);
+			}
+			for (i=0;i<anss.length;i++) {
+				scoredat[anss[i]] = 1;
 			}
 		}
 		var ischoices = false;
+		var rescnt = 0;
 		for (i in results[curquestion]) {
 			pts = results[curquestion][i].ans.split(/\$(!|#)\$/);
-			ischoices = (pts.length>1);
-			subpts = pts[0].split("|");
+			ischoices = (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans");
+			if (ischoices) {
+				subpts = pts[2].split("|");
+			} else {
+				subpts = [pts[0]];
+			}
 			for (var j=0;j<subpts.length;j++) {
 				if (datatots.hasOwnProperty(subpts[j])) {
 					datatots[subpts[j]] += 1;
@@ -97,27 +142,41 @@ var livepoll = new function() {
 					scoredat[subpts[j]] = results[curquestion][i].score;
 				}
 			}
+			rescnt++;
 		}
 		var out = '';
 		if (qdata[curquestion].choices.length>0) {
-			out += "<table><tr><td>Answer</td><td>Frequency</td></tr>";
+			out += "<table class=\"LPres\"><thead><tr><th>Answer</th><th>Frequency</th></tr></thead><tbody>";
 			for (i=0;i<qdata[curquestion].choices.length;i++) {
-				out += "<tr><td>";
+				out += '<tr class="';
+				if (scoredat[i]>0) {
+					out += "LPcorrect";
+				} else {
+					out += "LPwrong";
+				}
+				out += '"><td>';
 				out += qdata[curquestion].choices[i];
 				out += "</td><td>"+datatots[i]+"</td></tr>";
 			}
-			out += "</table>";
+			out += "</tbody></table>";
 		} else {
 			var sortedkeys = getSortedKeys(datatots);
-			out += "<table><tr><td>Answer</td><td>Frequency</td></tr>";
+			out += "<table class=\"LPres\"><thead><tr><th>Answer</th><th>Frequency</th></tr></thead><tbody>";
 			for (i=0;i<sortedkeys.length;i++) {
-				out += "<tr><td>";
+				out += '<tr class="';
+				if (scoredat[sortedkeys[i]]>0) {
+					out += "LPcorrect";
+				} else {
+					out += "LPwrong";
+				}
+				out += '"><td>';
 				out += sortedkeys[i];
 				out += "</td><td>"+datatots[sortedkeys[i]]+"</td></tr>";
 			}
-			out += "</table>";
+			out += "</tbody></table>";
 		}
 		$("#livepollrcontent").html(out);
+		$("#livepollrcnt").html(rescnt+" result"+(rescnt==1?"":"s")+" received.");
 	}
 	
 	function getSortedKeys(obj) {
@@ -125,13 +184,19 @@ var livepoll = new function() {
 		return keys.sort(function(a,b){return obj[b]-obj[a]});
 	}
 	
-	function showQuestion(e) {
+	function showQuestionHandler(e) {
 		e.preventDefault();
+		var qn = $(this).attr("data-showq")*1;
+		showQuestion(qn);
+		return false;
+	}
+	
+	function showQuestion(qn) {
 		if (!working) {
 			$("#LPstopq").hide();
 			$("#LPstartq").hide();
-			var qn = $(this).attr("data-showq")*1;
-			if (curquestion != -1 && qn != curquestion) {
+			
+			if (curquestion != -1 && curstate==2 && qn != curquestion) {
 				stopQuestion();
 			}
 			
@@ -143,17 +208,16 @@ var livepoll = new function() {
 				url: assesspostbackurl+'&action=livepollshowq&includeqinfo=true&qn='+qn,
 				dataType: "json"
 			}).done(function(data) {
-				console.log(data);
-				console.log(data.html);
 				var parsed = preProcess(data.html);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
 				$("#LPstartq").show();
 				curquestion = qn;
-				qdata[qn] = {qtype: data.qtype, choices: data.choices};
+				curstate = 1;
+				qdata[qn] = {choices: data.choices, ans: data.ans.toString(), anstypes: data.anstypes};
 				updateResults();
 			}).always(function(data) {
-				working = false;	
+				working = false;
 			});
 		}
 
@@ -210,7 +274,7 @@ var livepoll = new function() {
 	
 	function startQuestion() {
 		var qn = curquestion;
-		if (qn<0 || working) { return;}
+		if (qn<0 || curstate==2 || working) { return;}
 		$("#LPstartq").text("Opening Student Input...");
 		working = true;
 		$.ajax({
@@ -218,12 +282,14 @@ var livepoll = new function() {
 		}).done(function(data) {
 			$("#LPstartq").text("Open Student Input").hide();
 			$("#LPstopq").show();
+			curstate = 2;
+			LPtimer = setInterval(LPtimerkeeper,1000);
 		}).always(function(data) {
 			working = false;	
 		});
 	}
 	function stopQuestion() {
-		if (curquestion<0 || working) { return;}
+		if (curquestion<0 || curstate!=2 || working) { return;}
 		$("#LPstopq").text("Closing Student Input...");
 		working = true;
 		$.ajax({
@@ -231,9 +297,39 @@ var livepoll = new function() {
 		}).done(function(data) {
 			$("#LPstopq").text("Close Student Input").hide();
 			$("#LPstartq").show();
+			curstate = 4;
+			clearInterval(LPtimer);
+			LPtimestart = 0;
 		}).always(function(data) {
 			working = false;	
 		});
+	}
+	function LPtimerkeeper() {
+		var now = Date.now();
+		if (LPtimestart==0) {
+			LPtimestart = now;
+		}
+		var elapsed = Math.round((now - LPtimestart)/1000);
+		var sec = elapsed%60;
+		var min = (Math.floor(elapsed/60))%60;
+		var hrs = Math.floor(elapsed/3600);
+		var timestr = " ";
+		if (hrs>0) {
+			timestr += hrs+":";
+		}
+		if (min>9 || hrs==0) {
+			timestr += min+":";
+		} else if (min>0) {
+			timestr += "0"+min+":";
+		} else {
+			timestr += "0:";
+		}
+		if (sec>9) {
+			timestr += sec;	
+		} else {
+			timestr += "0"+sec;
+		}
+		$("#livepolltopright").html(timestr);
 	}
 	
 	this.submitQuestion = function(qn) {

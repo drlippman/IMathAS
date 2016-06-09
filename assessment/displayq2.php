@@ -1008,7 +1008,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (!isset($GLOBALS['choicesdata'])) {
 				$GLOBALS['choicesdata'] = array();
 			}
-			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answer);
 		}
 		
 		//trim out unshuffled showans
@@ -1160,7 +1160,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (!isset($GLOBALS['choicesdata'])) {
 				$GLOBALS['choicesdata'] = array();
 			}
-			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answer);
 		}
 		
 		$labits = explode('|',$la);
