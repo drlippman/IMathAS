@@ -206,6 +206,7 @@ var livepoll = new function() {
 		var condenseddrawarr = [];
 		var condenseddraw;
 		var drawinitstack = [];
+		//group and total results
 		for (i in results[curquestion]) {
 			ischoices = (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans");
 			if (ischoices) {
@@ -235,6 +236,14 @@ var livepoll = new function() {
 				}
 			}
 			rescnt++;
+		}
+		//pre-explode initpts for draw
+		var initpts,drawwidth,drawheight;
+		if (qdata[curquestion].anstypes=="draw") {
+			var initpts = qdata[curquestion].drawinit.replace(/"|'/g,'').split(",");
+			for (var j=1;j<initpts.length;j++) {
+				initpts[j] *= 1;  //convert to number
+			}
 		}
 		var out = '';
 		var maxfreq = Math.max.apply(null,datatots); 
@@ -271,8 +280,37 @@ var livepoll = new function() {
 					setTimeout("drawPics()",100);
 				}
 			}
+		} else if (qdata[curquestion].anstypes=="draw" && initpts[11]==0) { //draw, no snap
+			var sortedkeys = getSortedKeys(datatots);
+			for (var i=0;i<sortedkeys.length;i++) {
+				drawwidth = initpts[6];
+				drawheight = initpts[7];
+				initpts.unshift("LP"+curquestion+"-"+i);
+				//rewrite this at some point;
+				var la = sortedkeys[i].replace(/\(/g,"[").replace(/\)/g,"]");
+				la = la.split(";;")
+				if  (la[0]!='') {
+					la[0] = '['+la[0].replace(/;/g,"],[")+"]";	
+				}
+				la = '[['+la.join('],[')+']]';
+				canvases["LP"+curquestion+"-"+i] = initpts;
+				drawla["LP"+curquestion+"-"+i] = JSON.parse(la);
+				
+				out += '<div class="';
+				if (scoredat[sortedkeys[i]]>0) {
+					out += "LPcorrect";
+				} else {
+					out += "LPwrong";
+				}
+				out += '">';
+				out += '<canvas class="drawcanvas" id="canvasLP'+curquestion+"-"+i+'" width='+drawwidth+' height='+drawheight+'></canvas>';
+				out += '<input type="hidden" id="qnLP'+curquestion+"-"+i+'"/></div>';
+			}
+			$("#livepollrcontent").html('<div class="LPdrawgrid" >'+out+'</div>');
+			for (var i=0;i<sortedkeys.length;i++) {
+				initCanvases("LP"+curquestion+"-"+i);
+			}
 		} else {
-			var initpts,drawwidth,drawheight;
 			var sortedkeys = getSortedKeys(datatots);
 			out += '<table class=\"LPres\"><thead><tr><th>Answer</th><th style="min-width:10em">Frequency</th></tr></thead><tbody>';
 			for (var i=0;i<sortedkeys.length;i++) {
@@ -284,10 +322,10 @@ var livepoll = new function() {
 				}
 				out += '"><td>';
 				if (qdata[curquestion].anstypes=="draw") {
-					initpts = qdata[curquestion].drawinit.replace(/"|'/g,'').split(",");
-					for (var j=1;j<initpts.length;j++) {
-						initpts[j] *= 1;  //convert to number
-					}
+					//initpts = qdata[curquestion].drawinit.replace(/"|'/g,'').split(",");
+					//for (var j=1;j<initpts.length;j++) {
+					//	initpts[j] *= 1;  //convert to number
+					//}
 					drawwidth = initpts[6];
 					drawheight = initpts[7];
 					initpts.unshift("LP"+curquestion+"-"+i);
@@ -299,12 +337,8 @@ var livepoll = new function() {
 					}
 					la = '[['+la.join('],[')+']]';
 					canvases["LP"+curquestion+"-"+i] = initpts;
-
 					drawla["LP"+curquestion+"-"+i] = JSON.parse(la);
-					drawinitstack.push(function() {
-						
-						
-					});
+					
 					out += '<canvas class="drawcanvas" id="canvasLP'+curquestion+"-"+i+'" width='+drawwidth+' height='+drawheight+'></canvas>';
 					out += '<input type="hidden" id="qnLP'+curquestion+"-"+i+'"/>';
 				} else {
@@ -326,9 +360,7 @@ var livepoll = new function() {
 			for (var i=0;i<sortedkeys.length;i++) {
 				initCanvases("LP"+curquestion+"-"+i);
 			}
-			//for (i in drawinitstack) {
-			//	drawinitstack[i]();
-			//}
+
 		}
 		
 		$("#livepollrcnt").html(rescnt+" result"+(rescnt==1?"":"s")+" received.");
@@ -393,6 +425,7 @@ var livepoll = new function() {
 				var parsed = preProcess(data.html);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
+				$(".sabtn").hide();
 				$("#livepollqcontent").append('<p><a href="#" onclick="livepoll.forceRegen('+qn+');return false;">Clear results and generate a new version of this question</a></p>');
 				$("#LPstartq").show();
 				
@@ -507,6 +540,7 @@ var livepoll = new function() {
 				$("#LPshowansmsg").text("Show Answers");
 				showAnsIfAllowed();
 				$("#LPshowrchkbox").attr("checked", settings.showresonclose || $("#LPshowrchkbox").is(":checked")).trigger("change");
+				$(".sabtn").show();
 			}
 		}).always(function(data) {
 			working = false;	

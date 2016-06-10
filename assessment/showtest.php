@@ -946,7 +946,10 @@ if (!isset($_REQUEST['embedpostback'])) {
 		if (isset($CFG['GEN']['livepollpassword'])) {
 			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now));
 		}
-		$placeinhead .= '<script type="text/javascript">livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");</script>';
+		$placeinhead .= '<script type="text/javascript">
+				if (typeof io != "undefined") {livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");}
+				else { $(function() {$("#livepollqcontent").html("<p>Unable to connect to LivePoll Hub.  Please try again later.</p>");});}</script>';
+		
 		$placeinhead .= '<style type="text/css">
 			.LPres td, .LPres th {padding: 8px; border: 1px solid #999;}
 			.LPres th {background-color: #DDDDFF;}
@@ -2229,7 +2232,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$GLOBALS['capturechoices'] = 'shuffled';
 				$GLOBALS['capturedrawinit'] = true;
 				ob_start();
-				$anstypes = displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$clearla,false,array());
+				$anstypes = displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],1,$thisshowhints,$attempts[$qn],false,$clearla,false,array());
 				$out = array("html"=>ob_get_clean(),'choices'=>array(),'ans'=>0, 'randkeys'=>0,'drawinit'=>0);
 				if (isset($GLOBALS['choicesdata'][$qn])) {
 					$out["choices"] = $GLOBALS['choicesdata'][$qn][1];
