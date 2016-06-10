@@ -780,7 +780,7 @@ if ($overwriteBody==1) {
 					<?php if (isset($CFG['GEN']['livepollserver'])) {
 						echo '<option value="LivePoll" ';
 						writeHtmlSelected($line['displaymethod'],"LivePoll",0);
-						echo '>Live Poll</option>';
+						echo '>Live Poll (experimental)</option>';
 					}?>
 				</select>
 			</span><BR class=form>
