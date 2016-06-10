@@ -188,6 +188,8 @@ var livepoll = new function() {
 		}
 		var ischoices = false;
 		var rescnt = 0;
+		var condenseddrawarr = [];
+		var condenseddraw;
 		var drawinitstack = [];
 		for (i in results[curquestion]) {
 			ischoices = (qdata[curquestion].anstypes=="choices" || qdata[curquestion].anstypes=="multans");
@@ -201,8 +203,16 @@ var livepoll = new function() {
 			if (qdata[curquestion].anstypes.match(/calc/) || qdata[curquestion].anstypes=="numfunc") {
 				subpts[0] = "`"+subpts[0]+"`";
 			}
+			if (qdata[curquestion].anstypes=="draw") {
+				condenseddraw = condenseDraw(subpts[0]);
+				if (!condenseddrawarr.hasOwnProperty(condenseddraw)) {
+					condenseddrawarr[condenseddraw] = subpts[0];
+				}
+			}
 			for (var j=0;j<subpts.length;j++) {
-				if (datatots.hasOwnProperty(subpts[j])) {
+				if (qdata[curquestion].anstypes=="draw" && datatots.hasOwnProperty(condenseddrawarr[condenseddraw])) {
+					datatots[condenseddrawarr[condenseddraw]] += 1;
+				} else if (datatots.hasOwnProperty(subpts[j])) {
 					datatots[subpts[j]] += 1;
 				} else {
 					datatots[subpts[j]] = 1;
@@ -264,16 +274,17 @@ var livepoll = new function() {
 					drawheight = initpts[7];
 					initpts.unshift("LP"+curquestion+"-"+i);
 					//rewrite this at some point;
-					var la = sortedkeys[i].replace("(","[").replace(")","]");
+					var la = sortedkeys[i].replace(/\(/g,"[").replace(/\)/g,"]");
 					la = la.split(";;")
 					if  (la[0]!='') {
-						la[0] = '['+la[0].replace(";","],[")+"]";	
+						la[0] = '['+la[0].replace(/;/g,"],[")+"]";	
 					}
 					la = '[['+la.join('],[')+']]';
+					canvases["LP"+curquestion+"-"+i] = initpts;
+					drawla["LP"+curquestion+"-"+i] = JSON.parse(la);
 					drawinitstack.push(function() {
-						canvases["LP"+curquestion+"-"+i] = initpts;
-						drawla["LP"+curquestion+"-"+i] = JSON.parse(la);
-						initCanvases("LP"+curquestion+"-"+i);
+						
+						
 					});
 					out += '<canvas class="drawcanvas" id="canvasLP'+curquestion+"-"+i+'" width='+drawwidth+' height='+drawheight+'></canvas>';
 					out += '<input type="hidden" id="qnLP'+curquestion+"-"+i+'"/>';
@@ -293,9 +304,12 @@ var livepoll = new function() {
 			if (usingASCIISvg) {
 				setTimeout("drawPics()",100);
 			}
-			for (i in drawinitstack) {
-				drawinitstack[i]();
+			for (var i=0;i<sortedkeys.length;i++) {
+				initCanvases("LP"+curquestion+"-"+i);
 			}
+			//for (i in drawinitstack) {
+			//	drawinitstack[i]();
+			//}
 		}
 		
 		$("#livepollrcnt").html(rescnt+" result"+(rescnt==1?"":"s")+" received.");
@@ -553,6 +567,9 @@ var livepoll = new function() {
 			}
 		});		
 		
+	}
+	function condenseDraw(str) {
+		return str;	
 	}
 	
 };
