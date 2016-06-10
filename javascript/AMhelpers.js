@@ -358,6 +358,7 @@ function ntuplecalc(inputId,outputId,format) {
 //preview for calccomplex
 function complexcalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
+	fullstr = normalizemathunicode(fullstr);
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -535,8 +536,9 @@ function matrixcalc(inputId,outputId,rows,cols) {
 			calcstr += "(";
 			for (var col=0; col<cols; col++) {
 				if (col>0) {str += ","; calcstr += ",";}
-				str += document.getElementById(inputId+'-'+count).value;
-				calcstr += calced(document.getElementById(inputId+'-'+count).value);
+				val = normalizemathunicode(document.getElementById(inputId+'-'+count).value);
+				str += val;
+				calcstr += calced(val);
 				count++;
 			}
 			str += ")";
@@ -545,7 +547,7 @@ function matrixcalc(inputId,outputId,rows,cols) {
 		str += "]";
 		calcstr += "]";
 	} else {
-		var str = document.getElementById(inputId).value;
+		var str = normalizemathunicode(document.getElementById(inputId).value);
 		var calcstr = str;
 		var MCdepth = 0;
 		calcstr = calcstr.replace('[','(');
