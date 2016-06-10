@@ -1165,7 +1165,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$GLOBALS['choicesdata'] = array();
 			}
 			if ($GLOBALS['capturechoices']=='shuffled') {
-				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answer, $randkeys);
+				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answers, $randkeys);
 			} else {
 				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
 			}

@@ -116,6 +116,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			deleteallaidfiles($aid);
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='$aid'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");

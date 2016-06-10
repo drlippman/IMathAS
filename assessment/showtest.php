@@ -44,7 +44,7 @@
 		$aid = $_GET['id'];
 		$isreview = false;
 		
-		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displayformat FROM imas_assessments WHERE id='$aid'";
+		$query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod FROM imas_assessments WHERE id='$aid'";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$adata = mysql_fetch_array($result, MYSQL_ASSOC);
 		$now = time();
@@ -391,7 +391,7 @@
 		}
 		exit;
 	} 
-	
+
 	//already started test
 	if (!isset($sessiondata['sessiontestid'])) {
 		echo "<html><body>", _('Error.  Access assessment from course page'), "</body></html>\n";
@@ -508,20 +508,21 @@
 		echo '</body></html>';
 		exit;
 	}
+
 	//if livepoll get status
 	if ($testsettings['displaymethod']=='LivePoll') {
 		$query = "SELECT curquestion,curstate FROM imas_livepoll_status WHERE assessmentid=".$testsettings['id'];
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		if (mysql_num_rows($result)==0) {
 			$LPinf = array("curquestion"=>0, "curstate"=>0);
-			$query = "INSERT INTO imas_livepoll_status (curquestion,curstate) VALUES (0,0) ON DUPLICATE KEY UPDATE curquestion=curquestion";
+			$query = "INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES ({$testsettings['id']},0,0) ON DUPLICATE KEY UPDATE curquestion=curquestion";
 			mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		} else {
 			$LPinf = mysql_fetch_assoc($result);
 		}
 		$testsettings['shuffle'] = $testsettings['shuffle'] | 4; //force all students same seed
 	}
-	
+
 	$now = time();
 	//check for dates - kick out student if after due date
 	//if (!$isteacher) {
@@ -877,12 +878,11 @@
 		$query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$testsettings['courseid']];
 		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-		
+
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
 if (!isset($_REQUEST['embedpostback'])) {
-	
 	if ($testsettings['eqnhelper']==1 || $testsettings['eqnhelper']==2) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=030112\"></script>";
@@ -956,6 +956,10 @@ if (!isset($_REQUEST['embedpostback'])) {
 			.LPshowcorrect td:first-child {background:#CCFFCC url(../img/gchk.gif) no-repeat 8px center;}
 			.LPshowwrong td {background-color:#FFCCCC;}
 			.LPshowwrong td:first-child {background:#FFCCCC url(../img/redx.gif) no-repeat 8px center;}
+			.LPresval {}
+			.LPresbarwrap {display:inline-block; width:100%;}
+			.LPresbar {display:inline-block; background-color: #CCCCCC; text-align:center; overflow:show; padding:5px 0px;}
+			.LPshowcorrect .LPresbar, .LPshowwrong  .LPresbar {background-color: #FFFFFF;}
 			</style>';
 	}
 	if ($sessiondata['intreereader']) {
@@ -1404,6 +1408,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$testsettings['intro'] = array_shift($intropieces);
 		}
 	}
+	
 	if (isset($_GET['action'])) {
 		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
 			echo '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
@@ -2090,7 +2095,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$qn = $_POST['toscore'];
 			
 			if ($LPinf['curquestion'] != $qn || $LPinf['curstate'] != 2) {
-				echo '{error: "wrong question or not open for submissions"}';
+				echo '{error: "Wrong question or not open for submissions"}';
 				exit;
 			}
 			//TODO:  figure out what to do with this
@@ -2162,6 +2167,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			3:  question displaying with last answer, no submit button
 			4:  question displaying scored
 			*/
+			
 			if (!$sessiondata['isteacher']) {
 				echo '{error: "unauthorized"}';
 				exit;
@@ -2169,7 +2175,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$qn = intval($_GET['qn']);
 			$aid = $testsettings['id'];
 			if (isset($_GET['newstate'])) {
-				$newstate = intval($_GET['newstate']);
+				$newstate = $showeachscore?intval($_GET['newstate']):3;
 			} else if ($showeachscore) {
 				$newstate=4;
 			} else {
@@ -2193,7 +2199,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 			
 		} else if ($_GET['action']=='livepollshowq') {
 			$qn = intval($_GET['qn']);
-			if (isset($_GET['forceregen'])) {
+			$clearla = false;
+			if (isset($_GET['forceregen']) && $sessiondata['isteacher']) {
 				srand();
 				do {
 					$newseed = rand(1,9999);
@@ -2201,15 +2208,18 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$seeds[$qn] = $newseed;
 				//skipping reloadqi as we're not pulling from group, and shouldn't be using multipart
 				recordtestdata();
+				$clearla = true;
 			} else if (isset($_GET['seed'])) {
-				if ($seeds[$qn] != $_GET['newseed']) { //instr has done regen
-					$seeds[$qn] = intval($_GET['newseed']);
+				if ($seeds[$qn] != $_GET['seed']) { //instr has done regen
+					$seeds[$qn] = intval($_GET['seed']);
 					recordtestdata();
+					$clearla = true;
 				}
 			}
 			
 			if (!$sessiondata['isteacher'] && ($LPinf['curquestion'] != $qn || ($LPinf['curstate'] != 2 && $LPinf['curstate'] != 3))) {
 				echo 'wrong question or not open for display';
+				echo $LPinf['curquestion'] . ','.$qn.','.$LPinf['curstate'];
 				exit;
 			}
 			
@@ -2218,8 +2228,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$GLOBALS['capturechoices'] = 'shuffled';
 				$GLOBALS['capturedrawinit'] = true;
 				ob_start();
-				$anstypes = displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$regen,false,array());
-				$out = array("html"=>ob_get_clean(),'choices'=>'','ans'=>'','randkeys'=>'','drawinit'=>'');
+				$anstypes = displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$clearla,false,array());
+				$out = array("html"=>ob_get_clean(),'choices'=>array(),'ans'=>0, 'randkeys'=>0,'drawinit'=>0);
 				if (isset($GLOBALS['choicesdata'][$qn])) {
 					$out["choices"] = $GLOBALS['choicesdata'][$qn][1];
 					$out["ans"] = $GLOBALS['choicesdata'][$qn][2];
@@ -2231,9 +2241,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$out["anstypes"] = implode(',',$anstypes);
 				$out["seed"] = $seeds[$qn];
 				
+				$query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate=1 WHERE assessmentid=".$testsettings['id'];
+				mysql_query($query) or die("Query failed : " . mysql_error());
+			
 				echo json_encode($out);
 			} else {
-				displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$regen,false,array());
+				displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,$thisshowhints,$attempts[$qn],false,$clearla,false,array());
 			}
 			exit;
 		} else if ($_GET['action']=='livepollshowqscore') {
@@ -2267,7 +2280,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				}
 			}
 			exit;
-		} 
+		}
 	} else { //starting test display  
 		$canimprove = false;
 		$hasreattempts = false;
@@ -2702,7 +2715,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo '</li>';	
 				}
 				echo "</ul>";
-				echo '<p><a href="#" onclick="livepoll.showsettings()">Edit Settings</a></p>';
+				echo '<p><a href="#" onclick="livepoll.showSettings()">Edit Settings</a></p>';
 				echo '</div>';
 				echo '<div class="inset" id="livepollinstrq">';
 				echo '<div id="LPsettings">';
@@ -2713,16 +2726,17 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo '<p><label><input type="checkbox" id="LPsettings-resafter" onclick="livepoll.updateSettings()" checked> ';
 				echo ' Show results automatically after closing student input</label><br/>';
 				echo '<p><label><input type="checkbox" id="LPsettings-showans" onclick="livepoll.updateSettings()" checked> ';
-				echo ' Show answers automatically after closing student input</label><br/>';
+				echo ' Show answers automatically after closing student input</label>';
+				echo ' <p><button id="LPhidesettings">Hide Settings</button></p>';
 				echo '</div>'; 
 				echo ' <div>';
 				echo ' <p><b><span id="LPqnumber">Select a Question</span></b></p> ';
-				echo ' <p><button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button>';
+				echo ' <p id="LPperqsettings" style="display:none;"><button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button>';
 				echo ' <label><input type="checkbox" id="LPshowqchkbox" checked> Show Question</label> ';
 				echo ' <label><input type="checkbox" id="LPshowrchkbox"> Show Results</label> ';
 				echo ' <label><input type="checkbox" id="LPshowanschkbox" checked> <span id="LPshowansmsg">Show Answers When Closed</span></label> ';
 				echo ' </p></div><br class="clear">';
-				echo ' <div id="livepollqcontent" >Select a Question</div>';
+				echo ' <div id="livepollqcontent"></div>';
 				echo ' <div id="livepollrwrapper"><p id="livepollrcnt"></p>';
 				echo ' <div id="livepollrcontent" style="display:none"></div></div>';
 				echo '</div>';
@@ -2754,14 +2768,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 				
 			} else {//stu view
 				echo '<div id="livepollqcontent">'._('Waiting for the instructor to start a question').'</div>';
-				if ($LPinf[curstate]<2) {
-					$act=0;
-				} else if ($LPinf[curstate]==2) {
+				if ($LPinf['curstate']<2) {
+					$act= '0';
+				} else if ($LPinf['curstate']==2) {
 					$act = 'showq';
-				} else if ($LPinf[curstate]>2) {
-					$act = $LPinf[curstate];
+				} else if ($LPinf['curstate']>2) {
+					$act = $LPinf['curstate'];
 				}
-				if ($act!=0) {
+				if ($act!='0') {
 					echo '<script type="text/javascript">$(function(){livepoll.restoreState('.$LPinf['curquestion'].',"'.$act.'");});</script>';
 				}
 			}
