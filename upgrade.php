@@ -1726,7 +1726,9 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			$query = 'CREATE TABLE `imas_livepoll_status` (
 				  `assessmentid` INT(10) unsigned NOT NULL PRIMARY KEY,
 				  `curquestion` TINYINT(2) unsigned NOT NULL,
-				  `curstate` TINYINT(1) unsigned NOT NULL
+				  `curstate` TINYINT(1) unsigned NOT NULL,
+				  `seed` INT(10) unsigned NOT NULL,
+				  `startt` BIGINT(13) unsigned NOT NULL
 				) ENGINE=InnoDB;';
 			$res = mysql_query($query);
 			 if ($res===false) {

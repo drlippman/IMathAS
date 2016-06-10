@@ -9,6 +9,7 @@ var livepoll = new function() {
 	var LPtimestart = 0;
 	var qdata = [];
 	var results = [];
+	var stucnt=0, teachcnt=0;
 	var settings = {
 		showqonload: true,
 		showreslive: false,
@@ -21,9 +22,9 @@ var livepoll = new function() {
 		
 		var querystr = 'room='+room+'&now='+timestamp+'&sig='+sig
 		socket = io('http://'+server+':3000', {query: querystr});
+		socket.on('livepoll usercount', updateUsercount);
 		
 		if (isteacher) {
-			socket.on('livepoll usercount', updateUsercount);
 			socket.on('livepoll qans', addResult);
 			setupInstructorPanel();
 		} else {
@@ -31,8 +32,14 @@ var livepoll = new function() {
 		}
 	}
 	
-	this.restoreState = function(qn, action) {
-		showHandler({qn: qn, action: action});
+	this.restoreState = function(qn, action, seed, startt) {
+		if (stucnt==0) { //haven't connected yet
+			setTimeout(function(){livepoll.restoreState(qn,action,seed,startt)}, 100);
+		} else if (teachcnt==0) { 
+			//no teachers; skip restore
+		} else {
+			showHandler({qn: qn, action: action, seed:seed, startt:startt});
+		}
 	}
 	
 	this.showSettings = function() {
@@ -67,6 +74,7 @@ var livepoll = new function() {
 			$("#LPstartq").on("click", startQuestion);
 			$("#LPstopq").on("click", stopQuestionHandler);
 			$("#LPhidesettings").on("click", hideSettings);
+			$(window).on("beforeunload", function() {stopQuestion(0);});
 		});	
 	}
 	
@@ -100,6 +108,7 @@ var livepoll = new function() {
 		//handle question show	
 		var qn = data.qn;
 		if (data.action=='showq') {
+			LPtimestart = data.startt;
 			$.ajax({
 				url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn+'&seed='+data.seed
 			}).done(function(data) {
@@ -151,8 +160,14 @@ var livepoll = new function() {
 	}
 	
 	function updateUsercount(data) {
-		//receive usercount data	
-		$("#livepollactivestu").html(data.cnt+" student"+(data.cnt==1?'':'s'));
+		//receive usercount data
+		stucnt = data.cnt;
+		teachcnt = data.teachcnt;
+		if (isteacher) {
+			$("#livepollactivestu").html(data.cnt+" student"+(data.cnt==1?'':'s'));
+		} else if (data.teachcnt==0) {
+			showHandler({action: 0, qn: -1});
+		}
 	}
 	
 	function addResult(data) {
@@ -270,6 +285,9 @@ var livepoll = new function() {
 				out += '"><td>';
 				if (qdata[curquestion].anstypes=="draw") {
 					initpts = qdata[curquestion].drawinit.replace(/"|'/g,'').split(",");
+					for (var j=1;j<initpts.length;j++) {
+						initpts[j] *= 1;  //convert to number
+					}
 					drawwidth = initpts[6];
 					drawheight = initpts[7];
 					initpts.unshift("LP"+curquestion+"-"+i);
@@ -281,6 +299,7 @@ var livepoll = new function() {
 					}
 					la = '[['+la.join('],[')+']]';
 					canvases["LP"+curquestion+"-"+i] = initpts;
+
 					drawla["LP"+curquestion+"-"+i] = JSON.parse(la);
 					drawinitstack.push(function() {
 						
@@ -443,14 +462,13 @@ var livepoll = new function() {
 		if (qn<0 || curstate==2 || working) { return;}
 		$("#LPstartq").text("Opening Student Input...");
 		working = true;
-		
+		clearInterval(LPtimer);
+		LPtimestart = Date.now();
 		$.ajax({
-			url: assesspostbackurl+'&action=livepollopenq&qn='+qn+'&seed='+qdata[qn].seed
+			url: assesspostbackurl+'&action=livepollopenq&qn='+qn+'&seed='+qdata[qn].seed+'&startt='+LPtimestart
 		}).done(function(data) {
 			$("#LPstartq").text("Open Student Input").hide();
 			$("#LPstopq").show();
-			LPtimestart = 0;
-			clearInterval(LPtimer);
 			LPtimer = setInterval(LPtimerkeeper,1000);
 			curstate = 2;
 			showAnsIfAllowed();
@@ -475,7 +493,8 @@ var livepoll = new function() {
 		}
 
 		$.ajax({
-			url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion+'&newstate='+newstate
+			url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion+'&newstate='+newstate,
+			async: (typeof pushstate == 'undefined' || pushstate!=0)
 		}).done(function(data) {
 			$("#LPstopq").text("Close Student Input").hide();
 			$("#LPstartq").show();
@@ -569,7 +588,105 @@ var livepoll = new function() {
 		
 	}
 	function condenseDraw(str) {
-		return str;	
+		var la = str.replace(/\(/g,"[").replace(/\)/g,"]");
+		la = la.split(";;")
+		if  (la[0]!='') {
+			la[0] = '['+la[0].replace(/;/g,"],[")+"]";	
+		}
+		la = '[['+la.join('],[')+']]';
+		var drawarr = JSON.parse(la);
+		if (drawarr[0].length>0) {//has freehand lines
+			for (var i=0;i<drawarr[0].length;i++) {
+				if (drawarr[0][i].length==2) { //if line has two points, sort them
+					drawarr[0][i].sort(function(a,b) {
+						if (a[0]==b[0]) {
+							return (a[1]-b[1]);
+						} else {
+							return (a[0]-b[0]);
+						}
+					});
+				}
+			}
+		} else if (drawarr.length>4 && drawarr[4].length>0) {//has ineq graphs
+			return str;
+		}
+		if (drawarr[1].length>0) {//has dots
+			drawarr[1].sort(function(a,b) {
+				if (a[0]==b[0]) {
+					return (a[1]-b[1]);
+				} else {
+					return (a[0]-b[0]);
+				}
+			});
+		}
+		if (drawarr[2].length>0) {//has opendots
+			drawarr[2].sort(function(a,b) {
+				if (a[0]==b[0]) {
+					return (a[1]-b[1]);
+				} else {
+					return (a[0]-b[0]);
+				}
+			});
+		}
+		var cc,newcc,m,b;
+		if (drawarr.length>3 && drawarr[3].length>0) { //handle twopoint curves
+			// type, x1, y1, x2, y2
+			//  0    1    2   3  4
+			for (var i=0;i<drawarr[3].length;i++) {
+				cc = drawarr[3][i];
+				if (cc[0]==5) {//standard line
+					if (cc[1]==cc[3]) {
+						newcc = [5,"x",cc[1]];
+					} else {
+						m = (cc[4]-cc[2])/(cc[3]-cc[1]);
+						b = cc[2] - m*cc[1]
+						newcc = [5, m.toFixed(4), b.toFixed(2)];
+					}
+					drawarr[3][i] = newcc;
+				} else if (cc[0]==5.2) {//ray
+					if (cc[1]==cc[3]) {
+						newcc = [5.2,"x",cc[1],cc[2]];
+					} else {
+						m = (cc[4]-cc[2])/(cc[3]-cc[1]);
+						newcc = [5.2, m.toFixed(4), cc[1],cc[2]];
+					}
+					drawarr[3][i] = newcc;
+				} else if (cc[0]==5.3) {//line seg
+					if (cc[1]<cc[3] || (cc[1]==c[3] && cc[2]<cc[4])) {
+						newcc = [5.3, cc[1],cc[2],cc[3],cc[4]];	
+					} else {
+						newcc = [5.3, cc[3],cc[4],cc[1],cc[2]];	
+					}
+					drawarr[3][i] = newcc;
+				} else if (cc[0]==6) {//parab
+					if (cc[1]==cc[3]) {
+						newcc = [6,"x",cc[1],cc[2]];
+					} else {
+						m = (cc[4]-cc[2])/((cc[3]-cc[1])*(cc[3]-cc[1]));
+						newcc = [6, m.toFixed(4), cc[1], cc[2]];
+					}
+					drawarr[3][i] = newcc;
+				} else if (cc[0]==6.5) {//sqrt
+					if (cc[1]==cc[3]) {
+						newcc = [6.5,"x",cc[1],cc[2]];
+					} else {
+						b = (cc[3]>cc[1])?1:-1;
+						m = (cc[4]-cc[2])/Math.sqrt(Math.abs(cc[3]-cc[1]));
+						newcc = [6.5, m.toFixed(4), b, cc[1], cc[2]];
+					}
+					drawarr[3][i] = newcc;
+				} else if (cc[0]==8) {//abs
+					if (cc[1]==cc[3]) {
+						newcc = [8,"x",cc[1],cc[2]];
+					} else {
+						m = (cc[4]-cc[2])/Math.abs(cc[3]-cc[1]);
+						newcc = [8, m.toFixed(4), cc[1], cc[2]];
+					}
+					drawarr[3][i] = newcc;
+				} 
+			}
+		}
+		return JSON.stringify(drawarr);
 	}
 	
 };

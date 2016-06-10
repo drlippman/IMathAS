@@ -1031,7 +1031,9 @@ echo 'imas_content_track created<br/>';
 $sql = 'CREATE TABLE `imas_livepoll_status` (
 	  `assessmentid` INT(10) unsigned NOT NULL PRIMARY KEY,
 	  `curquestion` TINYINT(2) unsigned NOT NULL,
-	  `curstate` TINYINT(1) unsigned NOT NULL
+	  `curstate` TINYINT(1) unsigned NOT NULL,
+	  `seed` INT(10) unsigned NOT NULL,
+	  `startt` BIGINT(13) unsigned NOT NULL
 	) ENGINE=InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_livepoll_status created<br/>';

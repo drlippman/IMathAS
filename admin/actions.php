@@ -536,10 +536,13 @@ switch($_GET['action']) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$line[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$line[0]}'";
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			
 			$query = "DELETE FROM imas_assessments WHERE courseid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			
 			
 			$query = "SELECT id FROM imas_drillassess WHERE courseid='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());

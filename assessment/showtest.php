@@ -511,10 +511,10 @@
 
 	//if livepoll get status
 	if ($testsettings['displaymethod']=='LivePoll') {
-		$query = "SELECT curquestion,curstate FROM imas_livepoll_status WHERE assessmentid=".$testsettings['id'];
+		$query = "SELECT curquestion,curstate,seed,startt FROM imas_livepoll_status WHERE assessmentid=".$testsettings['id'];
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		if (mysql_num_rows($result)==0) {
-			$LPinf = array("curquestion"=>0, "curstate"=>0);
+			$LPinf = array("curquestion"=>0, "curstate"=>0, "seed"=>0, "startt"=>0);
 			$query = "INSERT INTO imas_livepoll_status (assessmentid,curquestion,curstate) VALUES ({$testsettings['id']},0,0) ON DUPLICATE KEY UPDATE curquestion=curquestion";
 			mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		} else {
@@ -2140,8 +2140,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$qn = intval($_GET['qn']);
 			$aid = $testsettings['id'];
 			$seed = intval($_GET['seed']);
+			$startt = $_GET['startt'];
 			
-			$query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate=2 WHERE assessmentid='$aid'";
+			$query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate=2,seed='$seed',startt='$startt' WHERE assessmentid='$aid'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			if (isset($CFG['GEN']['livepollpassword'])) {
@@ -2150,7 +2151,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$regenstr = '';
 			
 			
-			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?aid='.$aid.'&qn='.$qn.'&seed='.$seed.'&now='.$now.'&sig='.$livepollsig);
+			$r = file_get_contents('http://'.$CFG['GEN']['livepollserver'].':3000/startq?aid='.$aid.'&qn='.$qn.'&seed='.$seed.'&startt='.$startt.'&now='.$now.'&sig='.$livepollsig);
 			
 			if ($r=='success') {
 				echo '{success: true}';
@@ -2776,7 +2777,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 					$act = $LPinf['curstate'];
 				}
 				if ($act!='0') {
-					echo '<script type="text/javascript">$(function(){livepoll.restoreState('.$LPinf['curquestion'].',"'.$act.'");});</script>';
+					echo '<script type="text/javascript">$(function(){livepoll.restoreState('.$LPinf['curquestion'].',"'.$act.'",'.$LPinf['seed'].','.$LPinf['startt'].');});</script>';
 				}
 			}
 		}
