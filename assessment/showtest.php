@@ -1217,7 +1217,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
 		echo "<div class=right><span style=\"color:#f00\">Practice Assessment.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
-	if (!$isreview && !$superdone && !$testsettings['displaymethod']=="LivePoll") {
+	if (!$isreview && !$superdone && $testsettings['displaymethod']!="LivePoll") {
 		$duetimenote = '';
 		if ($exceptionduedate > 0) {
 			$timebeforedue = $exceptionduedate - time();
@@ -1266,7 +1266,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 		}
 	} else if ($testsettings['displaymethod']=="LivePoll") {
 		$duetimenote = '<span id="livepolltopright">&nbsp;</span>';	
-	}
+	} 
+	
 	$restrictedtimelimit = false;
 	if ($testsettings['timelimit']>0 && !$isreview && !$superdone) {
 		$now = time();
