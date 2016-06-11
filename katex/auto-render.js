@@ -140,6 +140,11 @@ var renderMathInText = function(text, delimiters) {
                 katex.render(math, span, {
                     displayMode: data[i].display
                 });
+                if (data[i].format == "asciimath") {
+                	span.setAttribute("data-asciimath", data[i].data);
+                } else {
+                	span.setAttribute("data-tex", data[i].data);
+                }
             } catch (e) {
                 if (!(e instanceof katex.ParseError)) {
                     throw e;
