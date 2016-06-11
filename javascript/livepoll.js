@@ -21,7 +21,7 @@ var livepoll = new function() {
 		isteacher = room.match(/teacher/);
 		
 		var querystr = 'room='+room+'&now='+timestamp+'&sig='+sig
-		socket = io('http://'+server+':3000', {query: querystr});
+		socket = io('https://'+server+':3000', {query: querystr});
 		socket.on('livepoll usercount', updateUsercount);
 		
 		if (isteacher) {
@@ -127,7 +127,7 @@ var livepoll = new function() {
 				curstate = 3;
 			} else {
 				$.ajax({
-					url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn+'&seed='+data.seed
+					url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn
 				}).done(function(data) {
 					var parsed = preProcess(data);
 					$("#livepollqcontent").html(parsed.html).find("input").attr("disabled",true);
@@ -237,6 +237,7 @@ var livepoll = new function() {
 			}
 			rescnt++;
 		}
+	
 		//pre-explode initpts for draw
 		var initpts,drawwidth,drawheight;
 		if (qdata[curquestion].anstypes=="draw") {
@@ -328,7 +329,7 @@ var livepoll = new function() {
 					//}
 					drawwidth = initpts[6];
 					drawheight = initpts[7];
-					initpts.unshift("LP"+curquestion+"-"+i);
+	
 					//rewrite this at some point;
 					var la = sortedkeys[i].replace(/\(/g,"[").replace(/\)/g,"]");
 					la = la.split(";;")
@@ -336,7 +337,8 @@ var livepoll = new function() {
 						la[0] = '['+la[0].replace(/;/g,"],[")+"]";	
 					}
 					la = '[['+la.join('],[')+']]';
-					canvases["LP"+curquestion+"-"+i] = initpts;
+					canvases["LP"+curquestion+"-"+i] = initpts.slice();
+					canvases["LP"+curquestion+"-"+i].unshift("LP"+curquestion+"-"+i);
 					drawla["LP"+curquestion+"-"+i] = JSON.parse(la);
 					
 					out += '<canvas class="drawcanvas" id="canvasLP'+curquestion+"-"+i+'" width='+drawwidth+' height='+drawheight+'></canvas>';
