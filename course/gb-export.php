@@ -42,6 +42,8 @@
 		echo '<span class="form">Locked students?</span><span class="formright"><input type="radio" name="locked" value="hide" checked="checked"> Hide <input type="radio" name="locked" value="show" > Show </span><br class="form" />';
 		echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
 		echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include comments <br/>  <input type="radio" name="commentloc" value="1"> Separate set of columns at the end <br/><input type="radio" name="commentloc" value="0"> After each score column</span><br class="form" />';
+		echo '<span class="form">Assessment times:</span><span class="formright"> <input type="radio" name="timestype" value="0" checked="checked"> Don\'t include assessment times <br/>  <input type="radio" name="timestype" value="1"> Include total assessment time <br/><input type="radio" name="timestype" value="2"> Include time in questions</span><br class="form" />';
+		
 		echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
 		echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
 		
@@ -71,6 +73,7 @@
 	$lastlogin = $_POST['lastlogin']; //0: no, 1 yes
 	$logincnt = $_POST['logincnt']; //0: no, 1 yes
 	$hidelocked = ($_POST['locked']=='hide')?true:false;
+	$includetimes = intval($_POST['timestype']); //1 total time, 2 time on task
 	
 	$catfilter = -1;
 	$secfilter = -1;
@@ -179,7 +182,7 @@
 	
 	
 function gbinstrexport() {
-	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt;
+	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt,$includetimes;
 	$gbt = gbtable();
 	$gbo = array();
 	//print_r($gbt);
@@ -251,6 +254,14 @@ function gbinstrexport() {
 			$n++;
 			if ($commentloc==0) {
 				$gbo[0][$n] = $gbt[0][1][$i][0].': Comments';
+				$n++;
+			}
+			if ($includetimes>0 && $gbt[0][1][$i][6]==0) {
+				if ($includetimes==1) {
+					$gbo[0][$n] = $gbt[0][1][$i][0].': Time spent';
+				} else if ($includetimes==2) {
+					$gbo[0][$n] = $gbt[0][1][$i][0].': Time spent in questions';
+				}
 				$n++;
 			}
 		}
@@ -417,6 +428,14 @@ function gbinstrexport() {
 					}
 					$n++;
 				}
+				if ($includetimes>0 && $gbt[0][1][$j][6]==0) {
+					if ($includetimes==1) {
+						$gbo[$i][$n] = $gbt[$i][1][$j][7];
+					} else if ($includetimes==2) {
+						$gbo[$i][$n] = $gbt[$i][1][$j][8];
+					}
+					$n++;
+				}
 			}
 		}
 		if (!$totonleft) {
@@ -509,7 +528,7 @@ function gbinstrexport() {
 
 //HTML formatted, for Excel import?
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt;
+	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
 	
 	if ($availshow==4) {
 		$availshow=1;
@@ -621,6 +640,14 @@ function gbinstrdisp() {
 			$n++;
 			if ($commentloc==0) {
 				echo '<th>'. $gbt[0][1][$i][0].': Comments'.'</th>';
+				$n++;
+			}
+			if ($includetimes>0 && $gbt[0][1][$i][6]==0) {
+				if ($includetimes==1) {
+					echo '<th>'. $gbt[0][1][$i][0].': Time spent'.'</th>';
+				} else if ($includetimes==2) {
+					echo '<th>'. $gbt[0][1][$i][0].': Time spent in questions'.'</th>';
+				}
 				$n++;
 			}
 		}
@@ -850,6 +877,14 @@ function gbinstrdisp() {
 						echo '<td>'.$gbt[$i][1][$j][1].'</td>';
 					} else {
 						echo '<td></td>';
+					}
+					$n++;
+				}
+				if ($includetimes>0 && $gbt[0][1][$j][6]==0) {
+					if ($includetimes==1) {
+						echo '<td>'.$gbt[$i][1][$j][7].'</td>';
+					} else if ($includetimes==2) {
+						echo '<td>'.$gbt[$i][1][$j][8].'</td>';
 					}
 					$n++;
 				}

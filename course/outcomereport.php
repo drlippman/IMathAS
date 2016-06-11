@@ -27,19 +27,32 @@ while ($row = mysql_fetch_row($result)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
+if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
+	$gbmode = $_GET['gbmode'];
+} else if (isset($sessiondata[$cid.'gbmode'])) {
+	$gbmode =  $sessiondata[$cid.'gbmode'];
+} else {
+	$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$gbmode = mysql_result($result,0,0);
+}
+$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+
 
 $outc = array();
-function flattenout($arr) {
-	global $outc;
-	foreach ($arr as $oi) {
+$outcomegroups = array();
+function flattenout($arr,$level) {
+	global $outc,$outcomegroups;
+	foreach ($arr as $k=>$oi) {
 		if (is_array($oi)) {
-			flattenout($oi['outcomes']);
+			$outcomegroups[$level.'-'.$k] = $oi['name'];
+			flattenout($oi['outcomes'],$level.'-'.$k);
 		} else {
 			$outc[] = $oi;
 		}
 	}
 }
-flattenout($outcomes);
+flattenout($outcomes,'0');
 
 if (isset($_GET['stu'])) {
 	$stu = intval($_GET['stu']);
@@ -80,6 +93,48 @@ $curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."
 
 
 if ($report=='overview') {
+	$gcnt = -1;
+	function printOutcomeRow($arr,$isheader,$level,$stu=0) {
+		global $outcomeinfo,$ot,$gcnt,$type,$cid,$sarr;
+		$tots = array();
+		$html = '';
+		foreach ($arr as $k=>$oi) {
+			if (is_array($oi)) { //is outcome group
+				$gcnt++;
+				if ($isheader) {
+					$html .= '<th class="cat'.$gcnt.'"><span class="cattothdr">'.$oi['name'].'</span></th>';	
+					$sarr .= ',"N"';
+					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
+					$html .= $subhtml;
+					
+				} else {
+					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
+					$tots = $tots + $subtots;
+					if (count($subtots)>0) {
+						$html .= '<td>'.round(array_sum($subtots)/count($subtots),1).'%</td>';
+					} else {
+						$html .= '<td>-</td>';
+					}
+					$html .= $subhtml;
+				}
+			} else { //is outcome
+				if ($isheader) {
+					$html .= '<th class="cat'.$gcnt.'">'.$outcomeinfo[$oi].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oi.'&amp;type='.$type.'">[Details]</a></th>';
+					$sarr .= ',"N"';
+				} else {
+					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {
+						$html .= '<td>'.round(100*$ot[$stu][3][$type][$oi],1).'%</td>';	
+						$tots[] = round(100*$ot[$stu][3][$type][$oi],1);
+					} else {
+						$html .= '<td>-</td>';
+					}	
+				}
+				
+			}
+		}
+		return array($html, $tots);
+	}
+	
 	
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
@@ -87,10 +142,12 @@ if ($report=='overview') {
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
 	$sarr = '"S"';
-	foreach ($outc as $oc) {
+	list($html,$tots) = printOutcomeRow($outcomes,true,'0');
+	echo $html;
+	/*foreach ($outc as $oc) {
 		echo '<th>'.$outcomeinfo[$oc].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'&amp;type='.$type.'">[Details]</a></th>';
 		$sarr .= ',"N"';
-	}
+	}*/
 	echo '</tr></thead><tbody>';
 	
 	$ot = outcometable();
@@ -98,13 +155,15 @@ if ($report=='overview') {
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
 		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></td>';
-		foreach ($outc as $oc) {
+		/*foreach ($outc as $oc) {
 			if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
 				echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';	
 			} else {
 				echo '<td>-</td>';
 			}
-		}
+		}*/
+		list($html,$tots) = printOutcomeRow($outcomes,false,'0',$i);
+		echo $html;
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
@@ -198,8 +257,13 @@ if ($report=='overview') {
 	
 	$cnt = 0;
 	function printoutcomestu($arr,$ind) {
+		$html = '';
 		global $outcomeinfo, $cnt, $ot, $n, $type;
-		foreach ($arr as $oi) {
+		$tots = array();
+		for ($i=0;$i<count($ot[0][2])+1;$i++) {
+			$tots[$i] = array();
+		}
+		foreach ($arr as $k=>$oi) {
 			if ($cnt%2==0) {
 				$class = "even";
 			} else {
@@ -207,33 +271,48 @@ if ($report=='overview') {
 			}
 			$cnt++;
 			if (is_array($oi)) { //is outcome group
-				echo '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
-				printoutcomestu($oi['outcomes'],$ind+1);
+				list($subhtml,$subtots) = printoutcomestu($oi['outcomes'],$ind+1);
+				//$html .= '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+				$html .= '<tr class="'.$class.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td>';
+				for ($i=0;$i<count($ot[0][2])+1;$i++) {
+					if (count($subtots[$i])>0) {
+						$html .= '<td><b>'.round(array_sum($subtots[$i])/count($subtots[$i]),1).'%</b></td>';
+					} else {
+						$html .= '<td>-</td>';
+					}
+				}
+				$html .= '</tr>';
+				$html .= $subhtml;
+				$tots = $tots + $subtots;
 			} else {
-				echo '<tr class="'.$class.'">';
-				echo '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td>';
+				$html .= '<tr class="'.$class.'">';
+				$html .= '<td><span class="ind'.$ind.'">'.$outcomeinfo[$oi].'</span></td>';
 				if (isset($ot[1][3][$type]) && isset($ot[1][3][$type][$oi])) {
-					echo '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';	
+					$html .= '<td>'.round(100*$ot[1][3][$type][$oi],1).'%</td>';
+					$tots[0][] = round(100*$ot[1][3][$type][$oi],1);
 				} else {
-					echo '<td>-</td>';
+					$html .= '<td>-</td>';
 				}
 				for ($i=0;$i<count($ot[0][2]);$i++) {
 					if (isset($ot[1][2][$i]) && isset($ot[1][2][$i][2*$type+1][$oi])) {
 						if ($ot[1][2][$i][2*$type+1][$oi]>0) {
-							echo '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';
+							$html .= '<td>'.round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1).'%</td>';
+							$tots[$i+1][] = round(100*$ot[1][2][$i][2*$type][$oi]/$ot[1][2][$i][2*$type+1][$oi],1);
 						} else {
-							echo '<td>0%</td>';
+							$html .= '<td>0%</td>';
+							$tots[$i+1][] = 0;
 						}
 					} else {
-						echo '<td>-</td>';
+						$html .= '<td>-</td>';
 					}
 				}
-				echo '</tr>';
+				$html .= '</tr>';
 			}
 		}
+		return array($html, $tots);
 	}
-	printoutcomestu($outcomes,0);
-	
+	list($html,$tots) = printoutcomestu($outcomes,0);
+	echo $html;
 	
 }
 
