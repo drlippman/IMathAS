@@ -241,8 +241,9 @@ function hideee() {
 	$("#mqee").hide();
 }
 function savemathquill() {
-	$("#"+cureedd.id).val(MQtoAM(mqarea.mathquill('latex')));
-	hideee();	
+    $("#"+cureedd.id).val(MQtoAM(mqarea.mathquill('latex')));
+    $("#"+cureedd.id+"_change").val(MQtoAM(mqarea.mathquill('latex'))).change();
+    hideee();
 }
 
 
