@@ -787,7 +787,7 @@
 	   	}
 	   }
 	   </script>';
-	$placeinhead .= '<style type="text/css">.CodeMirror {border: 1px solid #ccc;}</style>';
+	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}</style>';
 	
 	require("../header.php");
 	
