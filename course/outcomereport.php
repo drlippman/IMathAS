@@ -62,6 +62,8 @@ if (isset($_GET['stu'])) {
 	$outcome = intval($_GET['outcome']);
 	$report = 'oneoutcome';
 	$qs = '&outcome='.$outcome;
+} else if (isset($_GET['export'])) {
+	$report = 'export';	
 } else {
 	$report = 'overview';
 	$qs = '';
@@ -77,6 +79,34 @@ $typesel .= '<option value="1" '.($type==1?'selected="selected"':'').'>'._('Past
 $typesel .= '</select>';
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+if ($report == 'overview') {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=012514\"></script>\n";
+	$placeinhead .= "<script type=\"text/javascript\">\n";
+	$placeinhead .= 'var ts = new tablescroller("myTable",';
+	if (isset($_COOKIE["ocrhdr-$cid"]) && $_COOKIE["ocrhdr-$cid"]==1) {
+		$placeinhead .= 'true,false);';
+		$headerslocked = true;
+	} else {
+		if (!isset($_COOKIE["ocrhdr-$cid"]) && isset($CFG['GBS']['lockheader']) && $CFG['GBS']['lockheader']==true) {
+			$placeinhead .= 'true,false);';
+			$headerslocked = true;
+		} else {
+			$placeinhead .= 'false,false);';
+			$headerslocked = false;
+			$usefullwidth = true;
+		}
+	}
+	$placeinhead .= "\nfunction lockcol() { \n";
+	$placeinhead .= "var tog = ts.toggle(); ";
+	$placeinhead .= "document.cookie = 'ocrhdr-$cid=1';\n document.getElementById(\"lockbtn\").value = \"" . _('Unlock headers') . "\"; ";
+	$placeinhead .= "if (tog==1) { "; //going to locked
+	$placeinhead .= "} else {";
+	$placeinhead .= "document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\"; ";
+	$placeinhead .= "}}\n ";
+	$placeinhead .= "function cancellockcol() {document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n"; 
+	$placeinhead .= '</script>';
+}
+
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/outcomereport.php?cid=$cid".$qs;
 	
 $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
@@ -85,11 +115,13 @@ $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 		window.location = selfaddr+"&type="+type;
 	}
 	</script>';
-require("../header.php");
 
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
-$curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
-
+if ($report != 'export') {
+	require("../header.php");
+	
+	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
+	$curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
+}
 
 
 if ($report=='overview') {
@@ -102,7 +134,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				$gcnt++;
 				if ($isheader) {
-					$html .= '<th class="cat'.$gcnt.'"><span class="cattothdr">'.$oi['name'].'</span></th>';	
+					$html .= '<th class="cat'.$gcnt.'"><div><span class="cattothdr">'.$oi['name'].'</span></div></th>';	
 					$sarr .= ',"N"';
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$html .= $subhtml;
@@ -111,22 +143,22 @@ if ($report=='overview') {
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$tots = $tots + $subtots;
 					if (count($subtots)>0) {
-						$html .= '<td>'.round(array_sum($subtots)/count($subtots),1).'%</td>';
+						$html .= '<td><div>'.round(array_sum($subtots)/count($subtots),1).'%</div></td>';
 					} else {
-						$html .= '<td>-</td>';
+						$html .= '<td><div>-</div></td>';
 					}
 					$html .= $subhtml;
 				}
 			} else { //is outcome
 				if ($isheader) {
-					$html .= '<th class="cat'.$gcnt.'">'.$outcomeinfo[$oi].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oi.'&amp;type='.$type.'">[Details]</a></th>';
+					$html .= '<th class="cat'.$gcnt.'"><div>'.$outcomeinfo[$oi].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oi.'&amp;type='.$type.'">[Details]</a></div></th>';
 					$sarr .= ',"N"';
 				} else {
 					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {
-						$html .= '<td>'.round(100*$ot[$stu][3][$type][$oi],1).'%</td>';	
+						$html .= '<td><div>'.round(100*$ot[$stu][3][$type][$oi],1).'%</div></td>';	
 						$tots[] = round(100*$ot[$stu][3][$type][$oi],1);
 					} else {
-						$html .= '<td>-</td>';
+						$html .= '<td><div>-</div></td>';
 					}	
 				}
 				
@@ -139,9 +171,21 @@ if ($report=='overview') {
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
 	
-	echo '<div class="cpmid">'.$typesel.'</div>';
-	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
-	$sarr = '"S"';
+	echo '<div class="cpmid">'.$typesel.' ';
+	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
+	if ($headerslocked) {
+		echo _('Unlock headers');
+	} else {
+		echo _('Lock headers');
+	}
+	echo "\"/>";
+	echo ' <a href="outcomereport.php?cid='.$cid.'&amp;export=true&amp;type='.$type.'">Export to CSV</a> ';
+	echo '</div>';
+	echo "<div id=\"tbl-container\">";
+	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+	
+	echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th><th class="cat0"><div></div></th>';
+	$sarr = '"S",false';
 	list($html,$tots) = printOutcomeRow($outcomes,true,'0');
 	echo $html;
 	/*foreach ($outc as $oc) {
@@ -154,7 +198,8 @@ if ($report=='overview') {
 
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
-		echo '<td><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></td>';
+		echo '<td><div class="trld"><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></div></td>';
+		echo '<td><div></div></td>';
 		/*foreach ($outc as $oc) {
 			if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
 				echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';	
@@ -167,6 +212,7 @@ if ($report=='overview') {
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
+	echo '</div></div>';
 	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 	echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 } else if ($report=='oneoutcome') {
@@ -313,6 +359,84 @@ if ($report=='overview') {
 	}
 	list($html,$tots) = printoutcomestu($outcomes,0);
 	echo $html;
+	
+} else if ($report=='export') {
+	header('Content-type: text/csv');
+	header("Content-Disposition: attachment; filename=\"outcomes-$cid.csv\"");
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Pragma: public');
+			
+	$gcnt = -1;
+	function outputCSV($arr) {
+		$line = '';
+		foreach ($arr as $val) {
+			 # remove any windows new lines, as they interfere with the parsing at the other end 
+			  $val = str_replace("\r\n", "\n", $val); 
+			  $val = str_replace("\n", " ", $val);
+			  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
+			  $val = str_replace("&nbsp;"," ",$val);
+		
+			  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
+			  if(preg_match("/[\,\"\n\r]/", $val)) { 
+				  $val = '"'.str_replace('"', '""', $val).'"'; 
+			  }
+			  $line .= $val.',';
+		}
+		# strip the last deliminator 
+		$line = substr($line, 0, -1); 
+		$line .= "\n";
+		return $line;
+	}
+	function getOutcomeRow($arr,$isheader,$level,$stu=0) {
+		global $outcomeinfo,$ot,$gcnt,$type,$cid,$sarr;
+		$tots = array();
+		$html = array();
+		foreach ($arr as $k=>$oi) {
+			if (is_array($oi)) { //is outcome group
+				$gcnt++;
+				if ($isheader) {
+					$html[] = $oi['name'];	
+					list($subhtml,$subtots) = getOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
+					$html = array_merge($html, $subhtml);
+				} else {
+					list($subhtml,$subtots) = getOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
+					$tots = $tots + $subtots;
+					if (count($subtots)>0) {
+						$html[] = round(array_sum($subtots)/count($subtots),1).'%';
+					} else {
+						$html[] = '-';
+					}
+					$html = array_merge($html, $subhtml);
+				}
+			} else { //is outcome
+				if ($isheader) {
+					$html[] = $outcomeinfo[$oi];
+				} else {
+					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {
+						$html[] = round(100*$ot[$stu][3][$type][$oi],1).'%';	
+						$tots[] = round(100*$ot[$stu][3][$type][$oi],1);
+					} else {
+						$html[] = '-';
+					}	
+				}
+				
+			}
+		}
+		return array($html, $tots);
+	}
+	
+	list($html,$tots) = getOutcomeRow($outcomes,true,'0');
+	array_unshift($html, "Name");
+	echo outputCSV($html);
+		
+	$ot = outcometable();
+
+	for ($i=1;$i<count($ot);$i++) {
+		list($html,$tots) = getOutcomeRow($outcomes,false,'0',$i);
+		array_unshift($html, $ot[$i][0][0]);
+		echo outputCSV($html);
+	}
+	exit;
 	
 }
 
