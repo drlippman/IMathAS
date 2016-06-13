@@ -1407,8 +1407,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "$leftb<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"";
 		if (!isset($hidepreview)) {
-		  $hidepreview=true;	
-                  $out .= " oninput=\"livepreview('tc$qn','p$qn','$answerformat','calculate');hideeh()\"";
+		  $hidepreview=true;
+		  $livepreview=true;
+                  $out .= "oninput=\"livepreview('tc$qn','p$qn','$answerformat','calculate');hideeh()\"";
 
 		} 
 		$ansformats = explode(',',$answerformat);
@@ -1449,6 +1450,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />\n";
+		if(isset($livepreview)) {
+		  $c = "_change";
+		  $out .= "<input type=\"hidden\" id=\"tc$qn$c\" onchange=\"livepreview('tc$qn','p$qn','$answerformat','calculate');\" /> \n";
+		}
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat',false)\" /> &nbsp;\n";
 		}
@@ -1602,7 +1607,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=\"tc$qn\" id=\"tc$qn\" value=\"$la\" autocomplete=\"off\"";
 		if (!isset($hidepreview)) {
-		  $hidepreview=true;	
+		  $hidepreview=true;
+		  $livepreview=true;
                   $out .= " oninput=\"livepreview('tc$qn','p$qn','','AM');hideeh()\"";
 		}
 
@@ -1625,6 +1631,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$out .= "/>\n";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 		$out .= "<input type=\"hidden\" id=\"qn$qn-vals\" name=\"qn$qn-vals\" />";
+		if(isset($livepreview)) {
+		  $c = "_change";
+		  $out .= "<input type=\"hidden\" id=\"tc$qn$c\" onchange=\"livepreview('tc$qn','p$qn','','AM');\" />";
+		}
 		$out .= getcolormark($colorbox);
 		if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
 			$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
