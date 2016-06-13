@@ -163,6 +163,7 @@ function enditem($canedit) {
 						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>", _('Copy'), "</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
+						echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
@@ -216,6 +217,7 @@ function enditem($canedit) {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Edit Contents'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>", _('Copy'), "</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
+						echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 						echo '</span>';
 					}
 					if (($hideicons&16)==0) {
@@ -256,7 +258,7 @@ function enditem($canedit) {
 						echo '</span>';
 					}
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
-					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
+					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#blockh{$items[$i]['id']}\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
@@ -270,6 +272,7 @@ function enditem($canedit) {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\" $astyle>", _('Copy'), "</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
+						echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 						echo '</span>';
 					} 
 					if (($hideicons&16)==0) {
@@ -362,6 +365,7 @@ function enditem($canedit) {
 						echo "<a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
+						echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 						echo '</span>';
 					}
 					
@@ -409,6 +413,7 @@ function enditem($canedit) {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Edit Contents'), "</a> | <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\" $astyle>", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
+						echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 						echo '</span>';
 					}
 					
@@ -451,9 +456,9 @@ function enditem($canedit) {
 					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
 					if ($items[$i]['SH'][0]=='S') {
-						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
+						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#blockh{$items[$i]['id']}\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
 					} else {
-						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
+						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#blockh{$items[$i]['id']}\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
 					}
 					echo "</b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -470,6 +475,7 @@ function enditem($canedit) {
 						echo " | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\" $astyle>", _('Delete'), "</a>";
 						echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 						echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\" $astyle>", _('NewFlag'), "</a>";
+						echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 						echo '</span>';
 					} 
 					if (($hideicons&16)==0) {
@@ -1858,6 +1864,7 @@ function enditem($canedit) {
 				echo " <a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">", _('Modify'), "</a> | <a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">", _('Delete'), "</a>";
 				echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">", _('Copy'), "</a>";
 				echo " | <a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">", _('NewFlag'), "</a>";
+				echo "\n<br> Link to block: &lt;a href=\"#blockh{$items[$i]['id']}\"&gt;{$items[$i]['name']}&lt;/a&gt;";						
 				echo '</span>';
 			}
 			if (count($items[$i]['items'])>0) {
