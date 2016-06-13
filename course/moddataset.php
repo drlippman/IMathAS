@@ -563,12 +563,18 @@
 			$inlibs = implode(",",$inlibs);
 			$locklibs = implode(",",$locklibs);
 			
-			$twobx = ($line['qcontrol']=='' && $line['answer']=='');
+			if (trim($line['qcontrol'])!='') {
+				$line['control'] .= "\n\n".$line['qcontrol'];
+				$line['qcontrol'] = '';
+			}
+			if (trim($line['answer'])!='') {
+				$line['control'] .= "\n\n".$line['answer'];
+				$line['answer'] = '';
+			}
 			
 			$line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
 	} else {
 			$myq = true;
-			$twobx = true;
 			$line['description'] = "Enter description here";
 			$query = "SELECT qrightsdef FROM imas_users WHERE id='$userid'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -641,12 +647,24 @@
 		$placeinhead .= '</script>'; 
 		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
 	}
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
+	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
+	if ($sessiondata['usetiny4']==1) {
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
+		$placeinhead .= '<script type="text/javascript">usetiny4 = true;</script>';
+	} else {
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
+	}
 	$placeinhead .= '<script type="text/javascript">
 	  var editoron = 0; var seditoron = 0;
 	  var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
-		$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+		if ($sessiondata['usetiny4']==1) {
+			$placeinhead .= 'var filePickerCallBackFunc = filePickerCallBack;';
+		} else {
+			$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
+		}
 	} else {
 		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
 	}
@@ -657,35 +675,85 @@
 		$placeinhead .= 'var originallicense = -1;';
 	}
 
-	$placeinhead .= 'function toggleeditor(el) {
+	$placeinhead .= '
+	   var controlEditor;
+	   var qEditor;
+	
+	  function toggleeditor(el) {
 	     var qtextbox =  document.getElementById(el);
 	     if ((el=="qtext" && editoron==0) || (el=="solution" && seditoron==0)) {
+	        if (el=="qtext" && typeof qEditor != "undefined") {
+	     		qEditor.toTextArea();
+	     	}
 	        qtextbox.rows += 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 	        qtextbox.value = qtextbox.value.replace(/`(.*?)`/g,\'<span class="AM" title="$1">`$1`</span>\');
-	        initeditor("exact",el,1);
-	     } else {
-		tinyMCE.execCommand("mceRemoveControl",true,el);
+	        qtextbox.value = qtextbox.value.replace(/\n\n/g,"<br/><br/>\n");
+
+	        var toinit = [];
+	        if ((el=="qtext" && editoron==0) || (el!="qtext" && editoron==1)) {
+	        	toinit.push("qtext");
+	        } 
+	        if ((el=="solution" && seditoron==0) || (el!="solution" && seditoron==1)) {
+	        	toinit.push("solution");
+	        } 
+	        console.log(toinit.join(","));
+	        initeditor("exact",toinit.join(","),1);
+	     } else {';
+	     	if ($sessiondata['usetiny4']==1) {
+			$placeinhead .= 'tinymce.remove("#"+el);';
+		} else {
+			$placeinhead .= 'tinyMCE.execCommand("mceRemoveControl",true,el);';
+		}
+	$placeinhead .= '
 		qtextbox.rows -= 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
+		if (el=="qtext") {setupQtextEditor();}
 	     }
-	     if (el=="qtext") {
+	     if (el.match(/qtext/)) {
 	     	editoron = 1 - editoron;
 	     	document.cookie = "qeditoron="+editoron;
-	     } else if (el=="solution") {
+	     } else if (el.match(/solution/)) {
 	     	seditoron = 1 - seditoron;
 	     	document.cookie = "seditoron="+seditoron;
 	     }
 	   }
+	   function initsolneditor() {
+	   	if (document.cookie.match(/seditoron=1/)) {
+	   		var val = document.getElementById("solution").value; 
+	   		if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("solution");}
+	   	}
+	   }
+	  
 	   addLoadEvent(function(){if (document.cookie.match(/qeditoron=1/)) {
 	   	var val = document.getElementById("qtext").value; 
 	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("qtext");}
-	   }});
-	   addLoadEvent(function(){if (document.cookie.match(/seditoron=1/)) {
-	   	var val = document.getElementById("solution").value; 
-	   	if (val.length<3 || val.match(/<.*?>/)) {toggleeditor("solution");}
-	   }});
-	   
+	   	else {setupQtextEditor();}
+	   }else {setupQtextEditor();}});
+	  
+	  
+	   function setupQtextEditor() {
+	   	var qtextbox = document.getElementById("qtext");
+	   	qEditor = CodeMirror.fromTextArea(qtextbox, {
+			matchTags: true,
+			mode: "imathasqtext",
+			smartIndent: true,
+			indentUnit: 2
+		      });
+		qEditor.setSize("100%",6+14*qtextbox.rows);
+	   }
+		      
+	   $(function() {
+	   	controlEditor = CodeMirror.fromTextArea(document.getElementById("control"), {
+			lineNumbers: true,
+			matchBrackets: true,
+			autoCloseBrackets: true,
+			mode: "text/x-imathas",
+			smartIndent: true,
+			indentUnit: 2
+		      });
+		controlEditor.setSize("100%",6+14*document.getElementById("control").rows);
+	   });
 	   function checklicense() {
 	   	var lic = $("#license").val();
 	   	console.log(lic+","+originallicense);
@@ -699,9 +767,30 @@
 	   	}
 	   	$("#licensewarn").html("<br/>"+warn);
 	   }
+	   
+	   function incctrlboxsize() {
+	   	controlEditor.setSize("100%",$(controlEditor.getWrapperElement()).height()+28);
+	   }
+	   function decctrlboxsize() {
+	   	controlEditor.setSize("100%",$(controlEditor.getWrapperElement()).height()-28);
+	   }
+	   function incqtboxsize() {
+	   	if (!editoron) {
+	   		qEditor.setSize("100%",$(qEditor.getWrapperElement()).height()+28);
+	   		document.getElementById("qtext").rows += 2;
+	   	}
+	   }
+	   function decqtboxsize() {
+	   	if (!editoron) {
+	   		qEditor.setSize("100%",$(qEditor.getWrapperElement()).height()-28);
+	   		document.getElementById("qtext").rows -= 2;
+	   	}
+	   }
 	   </script>';
+	$placeinhead .= '<style type="text/css">.CodeMirror {border: 1px solid #ccc;}</style>';
 	
 	require("../header.php");
+	
 	
 	if (isset($_GET['aid'])) {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -858,11 +947,11 @@ function swapentrymode() {
 	}
 }
 function incboxsize(box) {
-	document.getElementById(box).rows += 1;
+	document.getElementById(box).rows += 2;
 }
 function decboxsize(box) {
-	if (document.getElementById(box).rows > 1) 
-		document.getElementById(box).rows -= 1;
+	if (document.getElementById(box).rows > 2) 
+		document.getElementById(box).rows -= 2;
 }
 </script>
 <p>
@@ -895,49 +984,37 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 </select>
 </p>
 <p>
-<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> 
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a> |  
 <a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a> 
-Switch to: 
-<input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($line['qcontrol']!='' || $line['answer']!='') echo "DISABLED"; ?>/>
 <?php if (!isset($_GET['id'])) {
-	echo ' <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
+	echo ' | <a href="modtutorialq.php?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
 }?>
 </p>
 <div id=ccbox>
-Common Control: <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
+Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=<?php if ($twobx) {echo min(35,max(20,substr_count($line['control'],"\n")+1));} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
-<div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
-Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span>
-<input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qcontrol'];?></textarea>
-</div>
+
 <div id=qtbox>
-Question Text: <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span>
+Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
 <input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
+<textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+3));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
 </div>
-<div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
-Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span>
-<input type=submit value="Save">
-<input type=submit name=test value="Save and Test Question"><BR>
-<textarea style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea>
-</div>
+
 <?php
 if ($line['solution']=='') {
-	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();return false;">Add a detailed solution</a></p>';
+	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();initsolneditor();return false;">Add a detailed solution</a></p>';
 	echo '<div id="solutionwrapper" style="display:none;">';
 } else {
 	echo '<div id="solutionwrapper">';
 }
 ?>
 Detailed Solution: 
-<span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span>
+<span class="noselect"><span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span></span>
 <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><br/>
