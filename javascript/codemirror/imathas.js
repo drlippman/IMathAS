@@ -239,13 +239,26 @@ CodeMirror.defineMode("imathasqtext", function(config, parserConfig) {
   var imathasqtextOverlay = {
     token: function(stream, state) {
       var ch,curdepth;
-      if (stream.match("{$")) {
+      if (stream.match(/^\{\$[a-zA-Z_]/)) {
+      	  curdepth=0;
       	  while ((ch = stream.next()) != null) {
-      	  	  if (ch=="}") {
+      	  	  if (ch=='[') {
+      	  	  	  curdepth++;
+		  } else if (ch==']') {
+			  curdepth--;
+		  } else if (ch=="}") {
       	  	  	  stream.eat("}");
-      	  	  	  return "variable-2";
+      	  	  	  if (curdepth>0) {
+      	  	  	  	  return "error";
+      	  	  	  } else {
+      	  	  	  	  return "variable-2";
+      	  	  	  }
+      	  	  } else if (curdepth==0 && ch.match(/[^\w\$]/)) {
+      	  	  	 stream.backUp(1);
+      	  	  	 return "error"; 
       	  	  }
       	  }
+      	  return "error";
       } else if (stream.match(/^\$[a-zA-Z_]/)) {
       	curdepth=0;
         while ((ch = stream.next()) != null) {
@@ -253,7 +266,7 @@ CodeMirror.defineMode("imathasqtext", function(config, parserConfig) {
           	  curdepth++;
           } else if (ch==']') {
           	  curdepth--;
-          	  if (curdepth==0 && stream.peek()!='[') {
+          	  if (curdepth==0) {
           	  	  return "variable-2";
           	  }
           } else if (curdepth==0 && (stream.peek()==null || ch.match(/\W/))) {
@@ -261,10 +274,14 @@ CodeMirror.defineMode("imathasqtext", function(config, parserConfig) {
           	  	  stream.backUp(1);
           	  }
           	  return "variable-2";
+          } else if (curdepth>0 && ch.match(/[^\w\$]/)) {
+          	  stream.backUp(1);
+          	  return "error";
           } 
         }
+        if (ch==null) {return "variable-2";}
       } 
-      while (stream.next() != null && !stream.match(/^\$[a-zA-Z_]/, false) && !stream.match("{$", false)) {}
+      while (stream.next() != null && !stream.match(/^\$[a-zA-Z_]/, false) && !stream.match(/^\{\$[a-zA-Z_]/, false)) {}
       return null;
     }
   };
