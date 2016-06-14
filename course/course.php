@@ -19,7 +19,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
-	
+	$collapseall = $_POST['collapseall'];
 	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas']) && $sessiondata['courseid']==$cid) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
@@ -466,7 +466,12 @@ if ($overwriteBody==1) {
 	if ($useleftbar && isset($teacherid)) {
 ?>	
 	<div id="leftcontent" <?php if ($essentialsnavcnt<4) {echo 'class="needed"';}?>>
-		<p>
+		<b><?php echo _('Control'); ?></b><br/>
+		<b>
+                   <form action="<?php echo $imasroot ?>/course/course.php?cid=<?php echo $cid?>" method="post">
+<input type="hidden" name="collapseall" value="true" />
+  <button type="submit"  >Collapse All</button>
+</form>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
 			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
@@ -553,6 +558,12 @@ if ($overwriteBody==1) {
 		
 ?>
 		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>>
+		<b><?php echo _('Control'); ?></b><br/>
+		<b>
+                   <form action="<?php echo $imasroot ?>/course/course.php?cid=<?php echo $cid?>" method="post">
+<input type="hidden" name="collapseall" value="true" />
+  <button type="submit"  >Collapse All</button>
+</form>
 			
 <?php
 		if ($msgset<4 || ($toolset&2)==0 || ($toolset&1)==0) {
