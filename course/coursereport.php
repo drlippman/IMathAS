@@ -207,7 +207,7 @@ if ($overwriteBody==1) {
    Student Summary:
 <?
    $query = "select sid, count(ias.userid)";
-   $query .=", group_concat(substr(ia.name,1,5)) ";
+   $query .=", group_concat(ia.name), group_concat(ia.minscore SEPARATOR '#'),group_concat(ias.bestscores  SEPARATOR '#') ";
    $query .= " from imas_users as iu";
    $query .= " join imas_students as stu on iu.id = stu.userid ";
   $query .= " left join imas_assessment_sessions as ias ";
@@ -223,26 +223,87 @@ $query .= " where iu.id = stu.userid";
 <table>
 <tr>
    <th> Student </th>
-   <th> Count </th>
-   <th> Assessments </th>
+   <th> Num Attempts </th>
+   <th> No Credit </th>
+   <th> Credit </th>
    </tr>
-
+   
 <?
+$st = array();
+$i = 0;
 while($line = mysql_fetch_row($result)) {
-?>
+  $st[$i][0] = $line[0];
+  $st[$i][1] = $line[1];
+  $st[$i][2] = $line[2];
+  $st[$i][3] = 0;
+  $st[$i][4] = 0;  
+  $st[$i][5] = "";
+  $st[$i][6] = "";  
+  for ($j = 0; $j < count($line); $j++) {
+    if ($j < 3) {
+      $st[$i][$j] =  $line[$j];
+    } 
+  }
+  $assess = explode(',',$st[$i][2]);
+  $minscores = explode('#',$line[3]);
+  $bestscoresArr = explode('#',$line[4]);
+  $ncc = "";
+  $cc = "";
+  for($k = 0; $k < count($minscores); $k++) {
+    $sp = explode(';',$bestscoresArr[$k]);
+    $scores = explode(',',$sp[0]);
+    $pts = 0;
+    for ($l=0;$l<count($scores);$l++) {
+      $pts += getpts($scores[$l]);
+    }
+    if (($minscores[$k]<10000 && $pts<$minscores[$k]) || ($minscores[$k]>10000 && $pts<($minscores[$k]-10000)/100*$possible[$k])) {     
+      $st[$i][3]++;
+      $st[$i][5] .= $ncc;
+      $st[$i][5] .= $assess[$k];
+      $ncc = ":";
+    } else {
+      $st[$i][4]++;        
+      $st[$i][6] .= $cc;
+      $st[$i][6] .= $assess[$k];
+      $cc = ":";
+    }
+  }  
+   ?>
    <tr>
-    <? foreach ($line as $col) { ?>
-    <td>
-       <? echo $col ?>
-    </td>
-    <? } ?>
+      <td> <? echo $st[$i][0]; ?> </td>
+      <td> <? echo $st[$i][1]; ?> </td>
+      <td> <? echo $st[$i][3]; ?> </td>
+      <td> <? echo $st[$i][4]; ?> </td>
+
    </tr>
-<?  
+<?
+      
+  $i++;
 }
+$numrows = $i;
 ?>
 
 </table>
+<table>
+<tr>
+   <th> Student </th>
+   <th> Num Attempts </th>
+   <th> No Credit </th>
+   <th> Credit </th>
+   </tr>
+<?
+for($i = 0; $i < $numrows; $i++) {
 
+?>
+   <tr>
+      <td> <? echo $st[$i][0]; ?> </td>
+      <td> <? echo $st[$i][1]; ?> </td>
+      <td> <? echo $st[$i][5]; ?> </td>
+      <td> <? echo $st[$i][6]; ?> </td>
+
+   </tr>
+<? }      ?>
+</table>
    Assessment Summary:
 <?
    $query = "select ia.name, count(userid),group_concat(sid) ";
