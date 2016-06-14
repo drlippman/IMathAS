@@ -244,6 +244,7 @@ while($line = mysql_fetch_row($result)) {
       $st[$i][$j] =  $line[$j];
     } 
   }
+  if($st[$i][1] > 0) {
   $assess = explode(',',$st[$i][2]);
   $minscores = explode('#',$line[3]);
   $bestscoresArr = explode('#',$line[4]);
@@ -267,7 +268,8 @@ while($line = mysql_fetch_row($result)) {
       $st[$i][6] .= $assess[$k];
       $cc = ":";
     }
-  }  
+  }
+  }
    ?>
    <tr>
       <td> <? echo $st[$i][0]; ?> </td>
@@ -306,7 +308,7 @@ for($i = 0; $i < $numrows; $i++) {
 </table>
    Assessment Summary:
 <?
-   $query = "select ia.name, count(userid),group_concat(sid) ";
+   $query = "select ia.name, count(userid) ";
    $query .= " from imas_assessment_sessions join imas_users as iu";
    $query .= " on iu.id = userid join imas_assessments as ia ";
    $query .= " on assessmentid=ia.id where courseid = '$cid' ";
@@ -317,23 +319,80 @@ for($i = 0; $i < $numrows; $i++) {
 <table>
 <tr>
    <th> Assessment </th>
-   <th> Count </th>
-   <th> Students </th>
+   <th> Num Attempts </th>
+   <th> No Credit </th>
+   <th> Credit </th>
    </tr>
 <?
+   $atbl = array();
+   $k = 0;
 while($line = mysql_fetch_row($result)) {
-?>
+  for ($j = 0; $j < count($line); $j++) {
+      $atbl[$k][$j] =  $line[$j];
+  }
+  $numnc = 0;
+  $numcred = 0;
+  $credusers = "[";
+  $nocredusers = "[";
+  for($i = 0; $i < $numrows; $i++) {
+    $snocred = explode(":",$st[$i][5]);
+    $scred = explode(":",$st[$i][6]);
+    if(in_array($line[0],$snocred)) {
+      $numnc++;
+      $nocredusers .= $st[$i][0];
+    } else if(in_array($line[0],$scred)) {
+      $numcred++;
+      $credusers .= $st[$i][0];
+    }
+  }
+  $nocredusers .= "]";
+  $credusers .= "]";
+  
+  $atbl[$k][2] = $numnc;
+  $atbl[$k][3] = $numcred;
+  $atbl[$k][4] = $nocredusers;
+  $atbl[$k][5] = $credusers;
+  $k++;
+
+  ?>
    <tr>
     <? foreach ($line as $col) { ?>
     <td>
        <? echo $col ?>
     </td>
-    <? } ?>
+    <? }
+
+    ?>
+      <td> <? echo $numnc; ?> </td>
+      <td> <? echo $numcred; ?> </td>
+
    </tr>
 <?  
 }
+
 ?>
 
+</table>
+    <table>
+<tr>
+   <th> Assessment </th>
+   <th> Num Attempts </th>
+   <th> No Credit </th>
+   <th> Credit </th>
+   </tr>
+<?
+    $numrows = $k;
+for($i = 0; $i < $numrows; $i++) {
+
+?>
+   <tr>
+      <td> <? echo $atbl[$i][0]; ?> </td>
+      <td> <? echo $atbl[$i][1]; ?> </td>
+      <td> <? echo $atbl[$i][4]; ?> </td>
+      <td> <? echo $atbl[$i][5]; ?> </td>
+
+   </tr>
+<? }      ?>
 </table>
 
 
