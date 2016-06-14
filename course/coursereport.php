@@ -206,13 +206,19 @@ if ($overwriteBody==1) {
    <div>
    Student Summary:
 <?
-   $query = "select sid, count(userid), group_concat(substr(ia.name,1,5)) ";
-   $query .= " from imas_assessment_sessions join imas_users as iu";
-   $query .= " on iu.id = userid join imas_assessments as ia ";
-   $query .= " on assessmentid=ia.id where courseid = '$cid' ";
-   $query .= " and from_unixtime(greatest(starttime,endtime)) > ";
-   $query .= " date_sub(now(),INTERVAL 1 WEEK) group by userid ";
-   $result = mysql_query($query) or die("Query failed : " . mysql_error());
+   $query = "select sid, count(ias.userid)";
+   $query .=", group_concat(substr(ia.name,1,5)) ";
+   $query .= " from imas_users as iu";
+   $query .= " join imas_students as stu on iu.id = stu.userid ";
+  $query .= " left join imas_assessment_sessions as ias ";
+   $query .= " on iu.id = ias.userid";
+   $query .=" left join imas_assessments as ia ";
+$query .= " on assessmentid=ia.id  ";
+$query .= " where iu.id = stu.userid";
+ $query .= " or (ia.courseid = '$cid' and from_unixtime(greatest(starttime,endtime)) > ";
+ $query .= " date_sub(now(),INTERVAL 1 WEEK))";
+   $query .=" group by iu.sid ";
+    $result = mysql_query($query) or die("Query failed : " . mysql_error());
 ?>
 <table>
 <tr>
