@@ -738,6 +738,7 @@
 			matchTags: true,
 			mode: "imathasqtext",
 			smartIndent: true,
+			lineWrapping: true,
 			indentUnit: 2
 		      });
 		qEditor.setSize("100%",6+14*qtextbox.rows);
@@ -750,6 +751,7 @@
 			autoCloseBrackets: true,
 			mode: "text/x-imathas",
 			smartIndent: true,
+			lineWrapping: true,
 			indentUnit: 2
 		      });
 		controlEditor.setSize("100%",6+14*document.getElementById("control").rows);
