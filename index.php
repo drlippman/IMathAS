@@ -361,6 +361,10 @@ function printCourses($data,$title,$type=null) {
 		}*/
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';
+		if ($type=='teach') {	 	
+		echo ' <a href="course/coursereport.php?folder=0&cid='.$data[$i]['id'].'">';
+		echo '(weekly report)</a>';
+		}
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {
 			echo ' <span style="color:green;">', _('Hidden'), '</span>';
 		}
