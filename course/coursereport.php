@@ -199,8 +199,8 @@ if ($overwriteBody==1) {
    <table>
    <tr> <td>Num Students: </td><td><? echo $usercount; ?>
    (out of <? echo $totalstudents ?>) </td></tr>
-   <tr> <td> Num Unique Assessments: </td><td><? echo $assessmentcount; ?> </td></tr>
-   <tr> <td> Total Assessments: </td><td><? echo $totalcount; ?> </td></tr>
+   <tr> <td> Num Assessments Attempted: </td><td><? echo $assessmentcount; ?> </td></tr>
+   <tr> <td> Total Num Attempts: </td><td><? echo $totalcount; ?> </td></tr>
 </table>
    </div>
    <div>
