@@ -50,66 +50,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
 	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 	
-	$openblocks = Array(0);
-	$prevloadedblocks = array(0);
-	if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}
-	if (isset($_COOKIE['prevloadedblocks-'.$cid]) && $_COOKIE['prevloadedblocks-'.$cid]!='') {$prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$cid]);}
-	$plblist = implode(',',$prevloadedblocks);
-	$oblist = implode(',',$openblocks);
 	
 	$curBreadcrumb = $breadcrumbbase;
-	if (isset($backtrack) && count($backtrack)>0) {
-		if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
-			$curBreadcrumb = '';
-			$sendcrumb = '';
-			$depth = substr_count($sessiondata['ltiitemid'][1],'-');
-			for ($i=$depth-1;$i<count($backtrack);$i++) {
-				if ($i>$depth-1) {
-					$curBreadcrumb .= " &gt; ";
-					$sendcrumb .= " &gt; ";
-				}
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
-				}
-				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
-				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "</a>";
-				}
-			}
-			$curname = $backtrack[count($backtrack)-1][0];
-			if (count($backtrack)>$depth) {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
-			}
-			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
-			
-		} else {
-			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
-			for ($i=0;$i<count($backtrack);$i++) {
-				$curBreadcrumb .= " &gt; ";
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
-				}
-				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
-				if ($i!=count($backtrack)-1) {
-					$curBreadcrumb .= "</a>";
-				}
-			}
-			$curname = $backtrack[count($backtrack)-1][0];
-			if (count($backtrack)==1) {
-				$backlink =  "<span class=right><a href=\"course.php?cid=$cid&folder=0\">" . _('Back') . "</a></span><br class=\"form\" />";
-			} else {
-				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
-			}
-		}
-	} else {
-		$curBreadcrumb .= $coursename;
-		$curname = $coursename;
-	}
-	
-	
+	$curBreadcrumb .= "<a href=\"course.php?cid=$cid\">$coursename</a>   ";
+	$curname = $coursename;
 
-
+	
 
 
 
