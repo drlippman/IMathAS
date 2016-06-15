@@ -5,8 +5,7 @@
 /*** master php includes *******/
 require("../validate.php");
 require("courseshowitems.php");
-require("../includes/htmlutil.php");
-require("../includes/calendardisp.php");
+
 
 /*** pre-html data manipulation, including function code *******/
 
