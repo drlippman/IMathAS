@@ -206,8 +206,14 @@ if ($overwriteBody==1) {
    <div>
    Student Summary:
 <?
-   $query = "select sid, count(ias.userid)";
-   $query .=", group_concat(ia.name), group_concat(ia.minscore SEPARATOR '#'),group_concat(ias.bestscores  SEPARATOR '#') ";
+   $query = "select sid, count(ias.userid)"; // 1,2
+$query .=", group_concat(ia.name) "; // 3
+$query .= ", group_concat(ia.minscore SEPARATOR '#') "; //4
+$query .= ", group_concat(ias.bestscores  SEPARATOR '#') "; //5
+$query .= ", group_concat(ia.id  SEPARATOR '#') "; // 6
+$query .= ", group_concat(ia.defpoints  SEPARATOR '#') "; // 7
+$query .= ", group_concat(ia.itemorder  SEPARATOR '#') "; // 8
+
    $query .= " from imas_users as iu";
    $query .= " join imas_students as stu on iu.id = stu.userid ";
   $query .= " left join imas_assessment_sessions as ias ";
@@ -224,12 +230,13 @@ $query .= " where iu.id = stu.userid";
 <tr>
    <th> Student </th>
    <th> Num Attempts </th>
-   <th> No Credit </th>
-   <th> Credit </th>
+   <th> Cumulative Score </th>
    </tr>
    
 <?
 $st = array();
+$asPtsArr = array();
+$asPossArr = array();
 $i = 0;
 while($line = mysql_fetch_row($result)) {
   $st[$i][0] = $line[0];
@@ -238,7 +245,10 @@ while($line = mysql_fetch_row($result)) {
   $st[$i][3] = 0;
   $st[$i][4] = 0;  
   $st[$i][5] = "";
-  $st[$i][6] = "";  
+  $st[$i][6] = "";
+  $st[$i][7] = 0;  
+  $st[$i][8] = 0;  
+  $st[$i][9] = "";
   for ($j = 0; $j < count($line); $j++) {
     if ($j < 3) {
       $st[$i][$j] =  $line[$j];
@@ -248,16 +258,88 @@ while($line = mysql_fetch_row($result)) {
   $assess = explode(',',$st[$i][2]);
   $minscores = explode('#',$line[3]);
   $bestscoresArr = explode('#',$line[4]);
+  $aids = explode('#',$line[5]);
+  $defpointsArr = explode('#',$line[6]);
+  $itemorderArr = explode('#',$line[7]);
+
+
+
+
+
+
+
+
+  
   $ncc = "";
   $cc = "";
   for($k = 0; $k < count($minscores); $k++) {
+
+
+    $aitems = explode(',',$itemorderArr[$k]);
+    $n = 0;
+    $atofind = array();
+    foreach ($aitems as $v) {
+      if (strpos($v,'~')!==FALSE) {
+	$sub = explode('~',$v);
+	if (strpos($sub[0],'|')===false) { //backwards compat
+	  $atofind[$n] = $sub[0];
+	  $aitemcnt[$n] = 1;
+	  $n++;
+	} else {
+	  $grpparts = explode('|',$sub[0]);
+	  if ($grpparts[0]==count($sub)-1) { //handle diff point values in group if n=count of group
+	    for ($i=1;$i<count($sub);$i++) {
+	      $atofind[$n] = $sub[$i];
+	      $aitemcnt[$n] = 1;
+	      $n++;
+	    }
+	  } else {
+	    $atofind[$n] = $sub[1];
+	    $aitemcnt[$n] = $grpparts[0];
+	    $n++;
+	  }
+	}
+      } else {
+	$atofind[$n] = $v;
+	$aitemcnt[$n] = 1;
+	$n++;
+      }
+    }
+
+
+
+
+
+
+
+
     $sp = explode(';',$bestscoresArr[$k]);
     $scores = explode(',',$sp[0]);
+    $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$aids[$k]}'";
+    $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+    $totalpossible = 0;
+    while ($r = mysql_fetch_row($result2)) {
+      if (($m = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts	
+	if ($r[0]==9999) {
+	  $totalpossible += $aitemcnt[$m]*$defpointsArr[$k]; //use defpoints
+	} else {
+	  $totalpossible += $aitemcnt[$m]*$r[0]; //use points from question
+	}
+      }
+    }
+    $possible[$k] = $totalpossible;
+    $asPossArr["'{$aids[$k]}'"] = $possible[$k];
+    if (!isset($asPtsArr["'{$aids[$k]}'"])) {
+      $asPtsArr["'{$aids[$k]}'"] = 0;
+    }
+
+    //    $possible[$k] = $pointsArr[$k];
     $pts = 0;
     for ($l=0;$l<count($scores);$l++) {
       $pts += getpts($scores[$l]);
     }
-    if (($minscores[$k]<10000 && $pts<$minscores[$k]) || ($minscores[$k]>10000 && $pts<($minscores[$k]-10000)/100*$possible[$k])) {     
+    //    if (($minscores[$k]<10000 && $pts<$minscores[$k]) || ($minscores[$k]>10000 && $pts<($minscores[$k]-10000)/100*$possible[$k])) {
+    if ($pts<(0.5*$possible[$k])) {     
       $st[$i][3]++;
       $st[$i][5] .= $ncc;
       $st[$i][5] .= $assess[$k];
@@ -268,14 +350,20 @@ while($line = mysql_fetch_row($result)) {
       $st[$i][6] .= $assess[$k];
       $cc = ":";
     }
+    $st[$i][7] = $st[$i][7] + $possible[$k];
+    $st[$i][8] = $st[$i][8] + $pts;
+    $asPtsArr["'{$aids[$k]}'"] += $pts;
+    
   }
   }
    ?>
    <tr>
       <td> <? echo $st[$i][0]; ?> </td>
       <td> <? echo $st[$i][1]; ?> </td>
-      <td> <? echo $st[$i][3]; ?> </td>
-      <td> <? echo $st[$i][4]; ?> </td>
+      <td> <? if ($st[$i][7] > 0) {
+                $pc = "{$st[$i][8]}/{$st[$i][7]}";
+              } else { $pc = "NA"; }
+              echo $pc; ?> </td>
 
    </tr>
 <?
@@ -290,8 +378,8 @@ $numrows = $i;
 <tr>
    <th> Student </th>
    <th> Num Attempts </th>
-   <th> No Credit </th>
-   <th> Credit </th>
+   <th> Under 50% </th>
+<th> &gt;= 50% </th>
    </tr>
 <?
 for($i = 0; $i < $numrows; $i++) {
@@ -308,7 +396,7 @@ for($i = 0; $i < $numrows; $i++) {
 </table>
    Assessment Summary:
 <?
-   $query = "select ia.name, count(userid) ";
+   $query = "select ia.name, count(userid),ia.id ";
    $query .= " from imas_assessment_sessions join imas_users as iu";
    $query .= " on iu.id = userid join imas_assessments as ia ";
    $query .= " on assessmentid=ia.id where courseid = '$cid' ";
@@ -320,8 +408,7 @@ for($i = 0; $i < $numrows; $i++) {
 <tr>
    <th> Assessment </th>
    <th> Num Attempts </th>
-   <th> No Credit </th>
-   <th> Credit </th>
+   <th> Average Score </th>
    </tr>
 <?
    $atbl = array();
@@ -348,26 +435,29 @@ while($line = mysql_fetch_row($result)) {
   $nocredusers .= "]";
   $credusers .= "]";
   
-  $atbl[$k][2] = $numnc;
-  $atbl[$k][3] = $numcred;
-  $atbl[$k][4] = $nocredusers;
-  $atbl[$k][5] = $credusers;
-  $k++;
+  $atbl[$k][3] = $numnc;
+  $atbl[$k][4] = $numcred;
+  $atbl[$k][5] = $nocredusers;
+  $atbl[$k][6] = $credusers;
+  if($atbl[$k][1] > 0) {
+    $index = "'{$atbl[$k][2]}'";
+    //$atbl[$k][7] = $index;
+        $atbl[$k][7] = $asPtsArr[$index]*100/$asPossArr[$index];
+  } else {
+    $atbl[$k][7] = 0;
+  }
 
   ?>
    <tr>
-    <? foreach ($line as $col) { ?>
-    <td>
-       <? echo $col ?>
-    </td>
-    <? }
+    <td> <? echo $line[0] ?> </td>
+    <td> <? echo $line[1] ?> </td>
 
-    ?>
-      <td> <? echo $numnc; ?> </td>
-      <td> <? echo $numcred; ?> </td>
+      <td> <? echo  $atbl[$k][7]."%"; ?> </td>
 
    </tr>
-<?  
+<?
+   $k++;
+
 }
 
 ?>
@@ -377,8 +467,8 @@ while($line = mysql_fetch_row($result)) {
 <tr>
    <th> Assessment </th>
    <th> Num Attempts </th>
-   <th> No Credit </th>
-   <th> Credit </th>
+<th> &lt; 50% </th>
+<th> &gt;= 50% </th>
    </tr>
 <?
     $numrows = $k;
@@ -388,8 +478,8 @@ for($i = 0; $i < $numrows; $i++) {
    <tr>
       <td> <? echo $atbl[$i][0]; ?> </td>
       <td> <? echo $atbl[$i][1]; ?> </td>
-      <td> <? echo $atbl[$i][4]; ?> </td>
       <td> <? echo $atbl[$i][5]; ?> </td>
+      <td> <? echo $atbl[$i][6]; ?> </td>
 
    </tr>
 <? }      ?>
