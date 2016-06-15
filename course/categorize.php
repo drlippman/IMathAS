@@ -34,7 +34,7 @@ function addcategory() {
 function quickpick() {
 	$('select.qsel').each(function() {
 		if ($(this).val()==0) {
-			$(this).find('optgroup[label=Libraries] option:first').prop('selected',true);
+			$(this).find('optgroup[label='+document.getElementById("label").value+'] option:first').prop('selected',true);
 		}
 	});
 }
@@ -51,6 +51,36 @@ function resetcat() {
 	if (confirm("Are you SURE you want to reset all categories to Uncategorized/Default?")) {
 		$('select.qsel').val(0);
 	}
+}
+function previewq(formn,loc,qn) {
+	var addr = '$imasroot/course/testquestion.php?cid=$cid&checked=1&qsetid='+qn+'&loc=c'+loc+'&formn='+formn;
+	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+	previewpop.focus();
+}
+
+function getnextprev(formn,loc) {
+	var form = document.getElementById(formn);
+	var prevq = 0; var nextq = 0; var found=false;
+	var prevl = 0; var nextl = 0;
+	for (var e = 0; e < form.elements.length; e++) {
+		var el = form.elements[e];
+		if (typeof el.type == "undefined") {
+			continue;
+		}
+		if (el.type == 'checkbox') {
+			if (found) {
+				nextq = el.value;
+				nextl = el.id;
+				break;
+			} else if (el.id==loc) {
+				found = true;
+			} else {
+				prevq = el.value;
+				prevl = el.id;
+			}
+		}
+	}
+	return ([[prevl,prevq],[nextl,nextq]]);
 }
 </script>
 END;
@@ -151,14 +181,15 @@ END;
 	$itemarr = explode(',', $itemarr);
 	
 	echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
-	echo "<form method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
+	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th>Category</th></tr></thead><tbody>';
+	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
 	
 	foreach($itemarr as $qid) {
-		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\" value=\"{$qsetids[$qid]}\"/></td>";
 		echo "<td>{$descriptions[$qid]}</td><td>";
+		echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$qid,{$qsetids[$qid]})\"/>";
 		echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
@@ -187,14 +218,17 @@ END;
 			echo ">{$libnames[$qlibid]}</option>\n";
 		}
 		echo '</optgroup>\n';
-		echo '<optgroup label="Assessments">';
-		//add assessment names as options
-		foreach ($qsetidassessment[$qsetids[$qid]] as $qaid) {
-			echo '<option value="AID-'.$qaid.'" ';
-			if ($category[$qid] == "AID-$qaid" && !$issel) { echo "selected=1"; $issel= true;}
-			echo ">{$assessmentnames[$qaid]}</option>\n";
+		
+		if (isset($qsetidassessment[$qsetids[$qid]])) {
+			echo '<optgroup label="Assessments">';
+			//add assessment names as options
+			foreach ($qsetidassessment[$qsetids[$qid]] as $qaid) {
+				echo '<option value="AID-'.$qaid.'" ';
+				if ($category[$qid] == "AID-$qaid" && !$issel) { echo "selected=1"; $issel= true;}
+				echo ">{$assessmentnames[$qaid]}</option>\n";
+			}
+			echo '</optgroup>\n';
 		}
-		echo '</optgroup>\n';
 
 		echo '<optgroup label="Custom">';
 		foreach ($extracats as $cat) {
@@ -223,7 +257,11 @@ END;
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
 		
 	}
-	echo "<p>Select first listed library for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+echo "<p>Select first listed <select id=\"label\">\n";
+echo "<option value=\"Libraries\">Libraries</option>";
+echo "<option value=\"Assessments\">Assessments</option>";
+echo "</select>\n";
+echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
 	
 	echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";

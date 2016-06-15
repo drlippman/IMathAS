@@ -65,7 +65,7 @@ $askforuserinfo = false;
 
 //use new behavior for place_aid requests that don't come from a placein_###_# key
 if (
-    (isset($_SESSION['place_aid']) && isset($_SESSION['lti_keytype']) && $_SESSION['lti_keytype']=='cc-a')
+    (isset($_SESSION['place_aid']) && isset($_SESSION['lti_keytype']) && $_SESSION['lti_keytype']=='cc-a' && !isset($_REQUEST['oauth_consumer_key']))
     ||
     (isset($_REQUEST['custom_place_aid']) && isset($_REQUEST['oauth_consumer_key']) && substr($_REQUEST['oauth_consumer_key'],0,7)!='placein')
     ) {
@@ -1702,7 +1702,12 @@ if (isset($_GET['launch'])) {
 				$keytype = 'cc-c';
 				$_SESSION['place_aid'] = array($sourcecid,$_REQUEST['custom_place_aid']);
 			}
-		}		
+		} else if (isset($_REQUEST['custom_open_folder'])) {
+			$keytype = 'cc-of';
+			$parts = explode('-',$_REQUEST['custom_open_folder']);
+			$sourcecid = $parts[0];
+			$_SESSION['view_folder'] = array($sourcecid,$parts[1]);
+		}	
 	} else if ($keyparts[0]=='aid') {   //also cid:org
 		$_SESSION['ltilookup'] = 'a';
 		$aid = intval($keyparts[1]);
@@ -2087,7 +2092,11 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 			}
 			return '';
 		}
-		$loc = findfolder($items, $keyparts[2], '0');
+		if ($keyparts[2]=='0') {
+			$loc = '0';
+		} else {
+			$loc = findfolder($items, $keyparts[2], '0');
+		}
 		if ($loc=='') {
 			reporterror("invalid folder identifier in folder view launch");
 		}

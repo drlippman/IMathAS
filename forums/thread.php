@@ -69,7 +69,14 @@
 				}
 			}
 		}
-		if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
+		if (isset($_POST['actionrequest'])) {
+			list($action,$actionid) = explode(':',$_POST['actionrequest']);
+			if ($action=='reply') {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_GET['thread']}&modify=reply&replyto=$actionid");
+			} else if ($action=='modify') {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_GET['thread']}&modify=$actionid");
+			}
+		} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['prevth']}");
 		} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Next') {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/posts.php?page=$page&cid=$cid&forum=$forumid&thread={$_POST['nextth']}");
@@ -123,9 +130,9 @@
 		if ($dofilter) {
 			$limthreads = array();
 			if ($isteacher || $groupid==0) {
-				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$groupid'";
+				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid='$groupid' AND forumid='$forumid'";
 			} else {
-				$query = "SELECT id FROM imas_forum_threads WHERE stugroupid=0 OR stugroupid='$groupid'";
+				$query = "SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid='$groupid') AND forumid='$forumid'";
 			}
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
@@ -279,7 +286,7 @@
 		 	 echo _('View Reply Instructions');
 		 } 
 		echo '</a>';
-		echo '<div id="postreplyinstr" style="display:none;">';
+		echo '<div id="postreplyinstr" style="display:none;" class="intro">';
 		if ($postinstr != '') {
 			echo '<h4>'._('Posting Instructions').'</h4>';
 			echo $postinstr;

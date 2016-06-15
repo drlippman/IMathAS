@@ -142,9 +142,9 @@ function makestatement($s, $sn, $ops, &$anstypes, &$questions, &$answer, &$showa
 			for ($i=0;$i<count($sg['elements']);$i+=2) {
 				if (isset($sg['fixed']) && in_array($i, $sg['fixed'])) {
 					if (!isset($sg['header']) && count($sg['elements']==2)) {
-						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;"><b>'.$sg['elements'][$i].'</b></td>';
+						$out .= '<tr><td style="padding-left:'.($ind+.5).'em;"><b>'.$sg['elements'][$i].'</b></td>';
 					} else {
-						$out .= '<tr><td style="padding-left:'.($hdrindent+.5).'em;">'.$sg['elements'][$i].'</td>';
+						$out .= '<tr><td style="padding-left:'.($ind+.5).'em;">'.$sg['elements'][$i].'</td>';
 					}
 					$sn--;
 				} else {
@@ -644,16 +644,21 @@ function makeaccttable($rowhead, $rows, $anshead, $ansarray, $sn, &$anstypes, &$
 	return $out;
 }
 
-//makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
+//makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize, $opts)
 //headers:  array(title, colspan, title, colspan,...) or array(title,title,title) or array of these for multiple headers
-//coltypes: array(true if scores, false if fixed), one for each column
+//coltypes: array(true if scores, false if fixed), one for each column  (use 2 to add dollar signs when not already in column values)
 //fixedrows: array(title, colspan, title, colspan,...), ignores coltypes
 //columsn: an array for each column of fixed values or answer values
-function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize) {
+//opts: optionsal array of options:
+//   $opts['totrow']: row to treat as totals row (decorates above and below with lines) - optional
+//   $opts['class']: class to use for table
+function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $opts=array()) {
 	if ($anstypes === null) { $anstypes = array();}
 	if ($answer === null) { $answer = array();}
 	if ($showanswer === null) { $showanswer = '';}
 	if ($displayformat === null) { $displayformat = array();}
+	if (isset($opts['totrow'])) { $totrow = $opts['totrow'];} else {$totrow = -1;}
+	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'gridded';}
 	
 	$maxsize = array();  $hasdecimals = false;
 	for ($j=0;$j<count($coltypes);$j++) {
@@ -664,12 +669,13 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 			if ($sl>$maxsize[$j]) { $maxsize[$j] = $sl;}
 			if (!$hasdecimals && strpos($cols[$j][$i],'.')!==false) { $hasdecimals = true;}
 		}
+		$maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
 	}
 	if (count($headers)!=0) {
 		if (!is_array($headers[0])) {
 			$headers = array($headers);
 		}
-		$out = '<table class="gridded"><thead>';
+		$out = '<table class="'.$tblclass.'"><thead>';
 		foreach ($headers as $hdr) {
 			$out .= '<tr>';
 			if (isset($hdr[1]) && is_numeric($hdr[1])) {
@@ -689,7 +695,7 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 		}
 		'</thead>';
 	} else {
-		$out = '<table class="gridded">';
+		$out = '<table class="'.$tblclass.'">';
 	}
 	$out .= '<tbody>';
 	$sa = $out;
@@ -703,16 +709,30 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 	for ($i=0;$i<count($cols[0]);$i++) {
 		$out .= '<tr>';  $sa .= '<tr>';
 		for ($j=0;$j<count($coltypes);$j++) {
+			if ($i+1==$totrow) {
+				$dec = ' style="border-bottom: 1px solid #000;"';
+			} else if ($i==$totrow) {
+				$dec = ' style="border-bottom: 3px double #000;"';
+			} else {
+				$dec = '';
+			}
 			if ($coltypes[$j]==false) {//fixed
 				if ($cols[$j][$i]{0}==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
-				$out .= '<td>'.$cols[$j][$i].'</td>';
-				$sa .= '<td>'.$cols[$j][$i].'</td>';
+				$out .= "<td$dec>".$cols[$j][$i].'</td>';
+				$sa .= "<td$dec>".$cols[$j][$i].'</td>';
 				
 			} else {
-				if ($cols[$j][$i]==='nobox') {$out .= '<td></td>'; $sa.= '<td></td>'; continue;}
+				if ($i==$totrow && !isset($cols[$j][$i])) {
+					$thistot = 0;
+					for ($k=0;$k<$totrow;$k++) {
+						$thistot += $cols[$j][$k];
+					}
+					$cols[$j][$i] = $thistot;
+				}
+				if ($cols[$j][$i]==='nobox') {$out .= "<td$dec></td>"; $sa.= "<td$dec></td>"; continue;}
 				
-				$out .= '<td class="r">'.($cols[$j][$i]{0}=='$'?'$':'').'[AB'.$sn.']</td>';
-				$sa .= '<td class="r">'.($cols[$j][$i]{0}=='$'?'$':'');
+				$out .= '<td'.$dec.' class="r">'.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']</td>';
+				$sa .= '<td'.$dec.' class="r">'.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'');
 				
 				$answer[$sn] = $cols[$j][$i];
 				

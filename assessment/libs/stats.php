@@ -371,15 +371,39 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 	return showasciisvg($outst,$width,$height);
 }
 
-//fdbargraph(barlabels,freqarray,label,[width,height])
+//fdbargraph(barlabels,freqarray,label,[width,height,options])
 //barlabels: array of labels for the bars
 //freqarray: array of frequencies/heights for the bars
 //label: general label for bars
 //width,height (optional): width and height for graph
-function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
+//options (optional): array of options:
+//  options['valuelabels'] = array of value labels, to be placed above bars
+//  options['showgrid'] = false to hide the horizontal grid lines
+//  options['vertlabel'] = label for vertical axis. Defaults to none
+//  options['gap'] = gap (0 &le; gap &lt; 1) between bars
+function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	if (!is_array($bl) || !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
 	if (count($bl) != count($freq)) { echo "barlabels and freqarray must have same length"; return 0;}
-	$alt = "Histogram for $label <table class=stats><thead><tr><th>Bar Label</th><th>Frequency/Height</th></tr></thead>\n<tbody>\n";
+	
+	if (isset($options['valuelabels'])) {
+		$valuelabels = $options['valuelabels'];
+	} else {
+		$valuelabels = false;
+	}
+	if (isset($options['vertlabel'])) {
+		$vertlabel = $options['vertlabel'];
+		$usevertlabel = true;
+	} else {
+		$vertlabel = 'Bar Height';
+		$usevertlabel = false;
+	}
+	if (isset($options['gap'])) {
+		$gap = $options['gap'];
+	} else {
+		$gap = 0;
+	}
+	
+	$alt = "Bar graph for $label <table class=stats><thead><tr><th>Bar Label</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
 	$start = 0;
 	$x = $start+1;
 	$maxfreq = 0;
@@ -390,24 +414,42 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200) {
 		$st .= "[$x,{$freq[$curr]}]);";
 		$x -= 1;
 		$st .= "text([$x,0],\"{$bl[$curr]}\",\"below\");";
-		$x += 1;
+		if ($valuelabels!==false) {
+			if (is_array($valuelabels)) {
+				$st .= "text([$x,{$freq[$curr]}],\"{$valuelabels[$curr]}\",\"above\");";
+			} else {
+				$st .= "text([$x,{$freq[$curr]}],\"{$freq[$curr]}\",\"above\");";
+			}
+		}
+		$x += 1 + 2*$gap;
 		if ($freq[$curr]>$maxfreq) { $maxfreq = $freq[$curr];}
 	}
+	$x -= 2*$gap;
 	$alt .= "</tbody></table>\n";
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
 	}
 	$x++;
+	$topborder = ($valuelabels===false?10:25);
+	$leftborder = min(60, 9*strlen($maxfreq)+10) + ($usevertlabel?30:0);
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
-	$outst = "setBorder(45,40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
+	$outst = "setBorder($leftborder,45,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
 	
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
 	
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
 	
+	if (isset($options['showgrid']) && $options['showgrid']==false) {
+		$gdy = 0;
+	} else {
+		$gdy = $step;
+	}
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
-	$outst .= "axes(1000,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
+	if ($usevertlabel) {
+		$outst .= "textabs([0,". ($height/2+20) . "],\"$vertlabel\",\"right\",90);";	
+	}
 	
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
@@ -567,7 +609,58 @@ $x = $ztest;
 //tcdf(t,df,[dec])
 //calculates the area under the t-distribution with "df" degrees of freedom
 //to the left of the t-value t
-//based on someone else's code - can't remember whose!
+//based on code from www.math.ucla.edu/~tom/distributions/tDist.html
+function tcdf($X, $df, $dec=4) {
+	if ($df<=0) {
+		echo "Degrees of freedom must be positive";
+		return false;
+	} else {
+		$A=$df/2;
+		$S=$A+.5;
+		$Z=$df/($df+$X*$X);
+		$BT=exp(gamma_log($S)-gamma_log(.5)-gamma_log($A)+$A*log($Z)+.5*log(1-$Z));
+		if ($Z<($A+1)/($S+2)) {
+			$betacdf=$BT*Betinc($Z,$A,.5,$dec);
+		} else {
+			$betacdf=1-$BT*Betinc(1-$Z,.5,$A,$dec);
+		}
+		if ($X<0) {
+			$tcdf=$betacdf/2;
+		} else {
+			$tcdf=1-$betacdf/2;
+		}
+	}
+	return round($tcdf,$dec);
+}
+
+function Betinc($X,$A,$B, $dec) {
+	$A0=0;
+	$B0=1;
+	$A1=1;
+	$B1=1;
+	$M9=0;
+	$A2=0;
+	//an epsilon of .00001 seems to give tcdf accurate to 9 decimal places
+	$eps = pow(10, -1*$dec);
+	while (abs(($A1-$A2)/$A1)>$eps) {
+		$A2=$A1;
+		$C9=-($A+$M9)*($A+$B+$M9)*$X/($A+2*$M9)/($A+2*$M9+1);
+		$A0=$A1+$C9*$A0;
+		$B0=$B1+$C9*$B0;
+		$M9=$M9+1;
+		$C9=$M9*($B-$M9)*$X/($A+2*$M9-1)/($A+2*$M9);
+		$A1=$A0+$C9*$A1;
+		$B1=$B0+$C9*$B1;
+		$A0=$A0/$B1;
+		$B0=$B0/$B1;
+		$A1=$A1/$B1;
+		$B1=1;
+	}
+	return $A1/$A;
+}
+
+/*
+Older code, couldn't handle fractional degrees of freedom
 function tcdf($ttest,$df,$dec=4) {
 	$eps = pow(.1,$dec);
 	
@@ -611,6 +704,7 @@ function tcdf($ttest,$df,$dec=4) {
 	return $pval;
 	} else {return false;}
 }
+*/
 
 //invnormalcdf(p,[dec])
 //Inverse Normal CDF

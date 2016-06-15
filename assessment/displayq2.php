@@ -265,6 +265,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 						$hintloc[$iidx] = $hintpart[$usenum];
 					} else if (strpos($hintpart[$usenum],'button"')!==false) {
 						$hintloc[$iidx] = "<p>{$hintpart[$usenum]}</p>\n";
+					} else if (isset($hintlabel)) {
+						$hintloc[$iidx] = "<p>$hintlabel {$hintpart[$usenum]}</p>\n";	
 					} else {
 						$hintloc[$iidx] = "<p><i>" . _('Hint:') . "</i> {$hintpart[$usenum]}</p>\n";
 					}
@@ -284,6 +286,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 					$hintloc = $hints[$usenum];
 				} else if (strpos($hints[$usenum],'button"')!==false) {
 					$hintloc = "<p>{$hints[$usenum]}</p>\n";
+				} else if (isset($hintlabel)) {
+					$hintloc = "<p>$hintlabel {$hints[$usenum]}</p>\n";
 				} else {
 					$hintloc = "<p><i>" . _('Hint:') . "</i> {$hints[$usenum]}</p>\n";
 				}
@@ -1004,7 +1008,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (!isset($GLOBALS['choicesdata'])) {
 				$GLOBALS['choicesdata'] = array();
 			}
-			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+			if ($GLOBALS['capturechoices']=='shuffled') {
+				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answer, $randkeys);
+			} else {
+				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+			}
 		}
 		
 		//trim out unshuffled showans
@@ -1156,7 +1164,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (!isset($GLOBALS['choicesdata'])) {
 				$GLOBALS['choicesdata'] = array();
 			}
-			$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+			if ($GLOBALS['capturechoices']=='shuffled') {
+				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions, $answers, $randkeys);
+			} else {
+				$GLOBALS['choicesdata'][$qn] = array($anstype, $questions);
+			}
 		}
 		
 		$labits = explode('|',$la);
@@ -1664,6 +1676,31 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if (isset($answer)) {
 			$sa = makeprettydisp($answer);
+			$greekletters = array('alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega');
+
+			for ($i = 0; $i < count($variables); $i++) {
+				if (strlen($variables[$i])>1 && $variables[$i]!='varE') {
+					$isgreek = false;
+					$varlower = strtolower($variables[$i]);
+					for ($j = 0; $j< count($greekletters);$j++) {
+						if ($varlower==$greekletters[$j]) {
+							$isgreek = true;
+							break;
+						}
+					}
+					if (!$isgreek && preg_match('/^(\w+)_(\w+)$/',$variables[$i],$matches)) {
+						if (strlen($matches[1])>1) {
+							$matches[1] = '"'.$matches[1].'"';
+						}
+						if (strlen($matches[2])>1) {
+							$matches[2] = '"'.$matches[2].'"';
+						}
+						$sa = str_replace($matches[0], $matches[1].'_'.$matches[2], $sa);
+					} else if (!$isgreek && $variables[$i]!='varE') {
+						$sa = str_replace($variables[$i], '"'.$variables[$i].'"', $sa);
+					}
+				}
+			}
 		}
 	} else if ($anstype == "ntuple") {
 		if (isset($options['answerboxsize'])) {if (is_array($options['answerboxsize'])) {$sz = $options['answerboxsize'][$qn];} else {$sz = $options['answerboxsize'];}}
@@ -2444,7 +2481,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if (count($answerformat)>1 && $answerformat[1]=='abs') { $out .= 'class="sel" '; $def = 8;}
 					$out .= '/>';
 				}
-				if (count($answerformat)==1 || in_array('rational',$answerformat)) {
+				if (in_array('rational',$answerformat)) {
 					$out .= "<img src=\"$imasroot/img/tprat.png\" onclick=\"settool(this,$qn,8.2)\" ";
 					if (count($answerformat)>1 && $answerformat[1]=='rational') { $out .= 'class="sel" '; $def = 8.2;}
 					$out .= '/>';
@@ -2531,7 +2568,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if ($colorbox!='') { $out .= '</div>';}
 			$out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
 			$out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
-			
+			if (isset($GLOBALS['capturedrawinit'])) {
+				if (!isset($GLOBALS['drawinitdata'])) {
+					$GLOBALS['drawinitdata'] = array();
+				}
+				$GLOBALS['drawinitdata'][$qn] = "'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid";
+			}
 			$la = str_replace(array('(',')'),array('[',']'),$la);
 			$la = explode(';;',$la);
 			if ($la[0]!='') {
@@ -6050,7 +6092,7 @@ function checkanswerformat($tocheck,$ansformats) {
 		}
 	} 
 	if (in_array("notrig",$ansformats)) {
-		if (preg_match('/(sin|cos|tan|cot|csc|sec)/',$tocheck)) {
+		if (preg_match('/(sin|cos|tan|cot|csc|sec)/i',$tocheck)) {
 			return false;
 		}
 	} 
@@ -6200,7 +6242,7 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
-	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷'), array('(',')','oo','U','/','<=','>=','/'), $str);
+	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷','⋅'), array('(',')','oo','U','/','<=','>=','/','*'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;	
 }

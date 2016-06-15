@@ -3,7 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2 or later
 // 
-// File Version : 25
+// File Version : 26
 //
 
 global $allowedmacros;
@@ -1556,11 +1556,13 @@ function simplexfindpivotpoint($sm) {
 	$pivotcondition = PivotPointNoSolution;	// set to no solutions
 	$minfraction = array(-1,1);				// the smallest ratio - set to not found
 	$ColumnMinValue = array(1,1);			// not found as we need to find negatives
+	
+	// In the last row find the largest negative value
 	for($c=0;$c<$pivotcolumncount;$c++){
 		$value = $sm[$lastrow][$c]; //fractiontodecimal($sm[$lastrow][$c]);
 		if($value[0]<0) {
 			if($value[0]*$ColumnMinValue[1] < $value[1]*$ColumnMinValue[0]) { 
-				// Get the smallest value in the objective row
+				// Set the smallest ratio
 				$ColumnMinValue = $value; 
 			}
 		}
@@ -1573,6 +1575,7 @@ function simplexfindpivotpoint($sm) {
 		// Find all columns that are equal to the min value
 		$ColumnMinIndexList = array();
 		
+		// Find all columns that are equal with the maximum negative values
 		for($c=0;$c<$cols;$c++) {
 			if($ColumnMinValue==$sm[$lastrow][$c]) {	
 				$k = count($ColumnMinIndexList);
@@ -1584,15 +1587,16 @@ function simplexfindpivotpoint($sm) {
 			$ratiotest[$m] = array();	 // create an array of ratios
 			$c = $ColumnMinIndexList[$m]; // for column c index m
 			for ($r=0;$r<$lastrow; $r++) {
-				$valuetop =  $sm[$r][$lastcol];
-				$valuebot =  $sm[$r][$c];
-				// test for non-negative not positive fixed 2-2-2016
-				if($valuebot[0]<0) {
+				$lastcolumn =  $sm[$r][$lastcol];
+				$testcolumn =  $sm[$r][$c];
+				
+				// test column must be positive and last column must be non-negative 3-30-2016
+				if(($testcolumn[0]<=0)||($lastcolumn[0]<0)) {
 					$value = array(-1,1);
 				}
 				else {
-					$top = $valuetop[0]*$valuebot[1];
-					$bot = $valuetop[1]*$valuebot[0];
+					$top = $lastcolumn[0]*$testcolumn[1];
+					$bot = $lastcolumn[1]*$testcolumn[0];
 					if($bot < 0) {
 						$top*=-1;
 						$bot*=-1;  // make the bottom positive
@@ -1662,15 +1666,15 @@ function simplexfindpivotpoint($sm) {
 			// now test to see if this is a valid 
 			for ($r=0;$r<$lastrow; $r++){
 		  $ratiotest[$j][$r] = array();
-		  $valuetop =  $sm[$r][$lastcol];
-		  $valuebot =  $sm[$r][$c];
-		  if($valuebot[0]<=0) {
+		  $lastcolumn =  $sm[$r][$lastcol];
+		  $testcolumn =  $sm[$r][$c];
+		  if($testcolumn[0]<=0) {
 			$value = array(-1,1);
 		  }
 		  else {
 			$numberofnonzeroenteries++;  // found a positive possible pivot value
-			$top = $valuetop[0]*$valuebot[1];
-			$bot = $valuetop[1]*$valuebot[0];
+			$top = $lastcolumn[0]*$testcolumn[1];
+			$bot = $lastcolumn[1]*$testcolumn[0];
 			if($bot < 0) {
 				$top*=-1;
 				$bot*=-1;  // bottom must be positive
@@ -1802,10 +1806,10 @@ function simplexfindpivotpointmixed($sm) {
   		$ratiolist[$r] = array();
   		for($c = 0; $c < $lastcol; $c++){
 			if($columnlist[$c] == "Y") {
-				$valuetop =  $sm[$r][$lastcol];
-				$valuebot =  $sm[$r][$c];
-				$top = $valuetop[0]*$valuebot[1];
-				$bot = $valuetop[1]*$valuebot[0];
+				$lastcolumn =  $sm[$r][$lastcol];
+				$testcolumn =  $sm[$r][$c];
+				$top = $lastcolumn[0]*$testcolumn[1];
+				$bot = $lastcolumn[1]*$testcolumn[0];
 				if($bot < 0) {
 					$top*=-1;
 					$bot*=-1;  // make the denominator must always be positive
@@ -2702,18 +2706,16 @@ function simplexhasmixedconstrants($sm){
 }
 
 
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
+// ***** DEPRECIATED *****
 //
 // list of all DEPRECIATED functions are below
 //
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
+// ***** DEPRECIATED *****
+//
 //simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), $tablestyle = ""]) 
 //
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
+// ***** DEPRECIATED *****
+//
 // USE simplexdisplaycolortable instead
 //
 // Create a string that is a valid HTML table syntax for display.
@@ -2977,7 +2979,7 @@ function simplexdisplaytable() {
 
 // simplexnumberofsolutions(solutionlist)
 //
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
+// ***** DEPRECIATED *****
 //
 // solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
 //			
@@ -3002,7 +3004,7 @@ function simplexnumberofsolutions($solutionlist) {
 
 //simplexsolve(simplexmatrix,type)
 //
-// ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****    ***** DEPRECIATED *****
+// ***** DEPRECIATED *****
 // use simplexsolve2
 //
 // this method solves the standard maximization problem which has the following conditions
@@ -3122,6 +3124,8 @@ function simplexsolve($sm,$type,$showfractions=1) {
 
 // Change Log
 
+// 2016-03-30 Found bug in simplexfindpivotpoint when a element in the matrix was zero could be used as a pivot point.
+//
 // 2016-02-27 standardizing the variable names and created a color display table function
 // 2016-02-26 working on standardizing the documentation
 // 2016-02-26 - debugging fixed read solution.

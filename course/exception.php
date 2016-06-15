@@ -86,6 +86,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//this is not group-safe
 			$stu = $_GET['uid'];
 			$aid = $_GET['aid'];
+			$query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
+			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			list($shuffle) = mysql_fetch_row($result);
+			$allqsameseed = (($shuffle&2)==2);
+			
 			$query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			if (mysql_num_rows($result)>0) {
@@ -103,7 +108,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				for ($i=0; $i<count($questions); $i++) {
 					$scores[$i] = -1;  
 					$attempts[$i] = 0;
-					$seeds[$i] = rand(1,9999);
+					if ($allqsameseed && $i>0) {
+						$seeds[$i] = $seeds[0];
+					} else {
+						$seeds[$i] = rand(1,9999);
+					}
 					$newla = array();
 					$laarr = explode('##',$lastanswers[$i]);
 					//may be some files not accounted for here... 
@@ -234,7 +243,7 @@ if ($overwriteBody==1) {
 		</span><BR class=form>
 		<span class="form"><input type="checkbox" name="forceregen"/></span>
 		<span class="formright">Force student to work on new versions of all questions?  Students 
-		   will keep any scores earned, but must work new versions of questions to improve score.</span><br class="form"/>
+		   will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
 		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  
 		   Student currently has <?php echo $latepasses;?> latepasses.</span><br class="form"/>

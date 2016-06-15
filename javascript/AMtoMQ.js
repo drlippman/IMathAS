@@ -772,6 +772,7 @@ function MQtoAM(tex) {
 			tex = tex.substring(0,i) + tex.substring(i+4);
 		}
 	}
+	tex = tex.replace(/_(\w)/g,'_$1 ');
 	tex = tex.replace(/_{([\d\.]+)}/g,'_$1');
 	tex = tex.replace(/{/g,'(');
 	tex = tex.replace(/}/g,')');

@@ -167,7 +167,7 @@ if ($myrights<20) {
 				$page_libRights['label'][1] = "Closed to group, private to others";
 				$page_libRights['label'][2] = "Open to group, private to others";
 				
-				if ($isadmin || $isgrpadmin || $allownongrouplibs) {
+				if ($isadmin || ($myspecialrights&8)==8 || $allownongrouplibs) {
 					$page_libRights['label'][3] = "Closed to all";
 					$page_libRights['label'][4] = "Open to group, closed to others";
 					$page_libRights['label'][5] = "Open to all";
@@ -436,7 +436,7 @@ if ($myrights<20) {
 		$page_libRights['label'][1] = "Closed to group, private to others";
 		$page_libRights['label'][2] = "Open to group, private to others";
 		
-		if ($isadmin || $isgrpadmin || $allownongrouplibs) {
+		if ($isadmin || ($myspecialrights&8)==8 || $allownongrouplibs) {
 			$page_libRights['label'][3] = "Closed to all";
 			$page_libRights['label'][4] = "Open to group, closed to others";
 			$page_libRights['label'][5] = "Open to all";

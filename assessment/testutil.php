@@ -524,7 +524,7 @@ function scorequestion($qn, $rectime=true) {
 	if ($loc!==false) {
 		array_splice($reattempting,$loc,1);
 	}
-	if ((getpts($scores[$qn])>=getpts($bestscores[$qn]) || ($noscores && ($lastrawscore!=$rawscores[$qn] || $rawscore==0))) && !$isreview) {
+	if ((getpts($scores[$qn])>=getpts($bestscores[$qn]) || ($noscores && ($lastrawscore!=$rawscores[$qn] || $rawscore==0)) || $testsettings['displaymethod']=='LivePoll') && !$isreview) {
 		$bestseeds[$qn] = $seeds[$qn];
 		$bestscores[$qn] = $scores[$qn];
 		$bestrawscores[$qn] = $rawscores[$qn];

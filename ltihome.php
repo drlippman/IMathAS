@@ -106,6 +106,8 @@ if (isset($_POST['createcourse'])) {
 		
 		$avail = 0;
 		$lockaid = 0;
+		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+			
 		$query = "INSERT INTO imas_courses (name,ownerid,enrollkey,hideicons,picicons,allowunenroll,copyrights,msgset,chatset,showlatepass,itemorder,topbar,cploc,available,theme,ltisecret,blockcnt) VALUES ";
 		$query .= "('{$sessiondata['lti_context_label']}','$userid','$randkey','$hideicons','$picicons','$unenroll','$copyrights','$msgset',$chatset,$showlatepass,'$itemorder','$topbar','$cploc','$avail','$theme','$randkey','$blockcnt');";
 		mysql_query($query) or die("Query failed : " . mysql_error());
@@ -152,6 +154,8 @@ if (isset($_POST['createcourse'])) {
 		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		copyrubrics();
+		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+			
 	}
 	$query = "UPDATE imas_lti_courses SET courseid=$cid WHERE org='{$sessiondata['ltiorg']}' AND contextid='{$sessiondata['lti_context_id']}'";
 	mysql_query($query) or die("Query failed : " . mysql_error());
@@ -182,6 +186,12 @@ if (isset($_POST['createcourse'])) {
 			exit;
 				
 		} else {
+			$query = "SELECT name FROM imas_courses WHERE id='$typeid'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$cname = mysql_result($result,0,0);
+			
+			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/bltilaunch.php?custom_open_folder=$typeid-0";
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.urlencode($url).'&title='.urlencode($cname).'&text='.urlencode($cname));
 			exit;
 		}
 	}
@@ -256,17 +266,17 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 	echo '<h3>Link courses</h3>';
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This placement on your LMS has not yet been linked to content on $installname. ";
-	if (!isset($sessiondata['lti_selection_return'])) {
-		echo 'You can either do a full course placement, in which case all content of the course is available from this one placement, or ';
-		echo 'you can place an individual assessment.  Select the placement you\'d like to make: ';
-	} else {
-		echo 'Select the assessment you\'d like to use: ';
-	}
+	//if (!isset($sessiondata['lti_selection_return'])) {
+		echo 'You can either do a full course placement, in which case all content of the course is available from this one placement (but no grades are returned), or ';
+		echo 'you can place an individual assessment (and grades will be returned, if supported by your LMS).  Select the placement you\'d like to make: ';
+	//} else {
+	//	echo 'Select the assessment you\'d like to use: ';
+	//}
 	
 	echo '<br/> <select name="setplacement"> ';
-	if (!isset($sessiondata['lti_selection_return'])) {
+	//if (!isset($sessiondata['lti_selection_return'])) { 
 		echo '<option value="course">Whole course Placement</option>';
-	}
+	//}
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {

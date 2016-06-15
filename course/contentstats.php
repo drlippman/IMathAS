@@ -104,7 +104,13 @@ if ($overwritebody) {
 	$idents = array_keys($descrips);
 	
 	if (count($idents)==0) {
-		echo '<p>No views on this item yet</p>';
+		if ($stype=='I') {
+			echo '<p>'._('No clicks on links in this item yet').'</p>';
+		} else if ($stype=='F') {
+			echo '<p>'._('No posts or replies in this forum yet').'</p>';
+		} else {
+			echo '<p>No views on this item yet</p>';
+		}
 	}
 	
 	foreach ($idents as $ident) {

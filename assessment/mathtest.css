@@ -141,7 +141,9 @@ div.navbar {
 	border:1px solid #000;
 	color:#000;
 }
-
+div.navbar.fixedonscroll {
+	width:125px;
+}
 div.navbar h4 {
 	margin-top: 0px;
 }

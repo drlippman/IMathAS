@@ -1,0 +1,10 @@
+Add to edsetup
+
+setup: function(ed) {
+	ed.on('blur', function() {
+		ed.uploadImages();	
+	});
+}
+
+
+need to capture submit actions and ensure uploadImages is complete before submitting

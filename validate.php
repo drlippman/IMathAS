@@ -31,6 +31,7 @@
  }
  
  $myrights = 0;
+ $myspecialrights = 0;
  $ispublic = false;
  //domain checks for special themes, etc. if desired
  $requestaddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
@@ -318,13 +319,14 @@
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		$query .= ',listperpage,hasuserimg,theme';
+		$query .= ',listperpage,hasuserimg,theme,specialrights';
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
+	$myspecialrights = $line['specialrights'];
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];
@@ -354,6 +356,10 @@
 	
 	if (isset($_GET['mathjax'])) {
 		$sessiondata['mathdisp'] = 1;
+		writesessiondata();
+	}
+	if (isset($_GET['usetiny4'])) {
+		$sessiondata['usetiny4'] = ($_GET['usetiny4']=='false')?0:1;
 		writesessiondata();
 	}
 	

@@ -26,6 +26,19 @@
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else {
+		if (isset($_GET['secfilter'])) {
+			$secfilter = $_GET['secfilter'];
+			$sessiondata[$cid.'secfilter'] = $secfilter;
+			writesessiondata();
+		} else if (isset($sessiondata[$cid.'secfilter'])) {
+			$secfilter = $sessiondata[$cid.'secfilter'];
+		} else {
+			$secfilter = -1;
+		}
+	}
 	
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -111,8 +124,8 @@
 	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
 	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid' WHERE istu.courseid='$cid' ";
-	if ($istutor && isset($tutorsection) && $tutorsection!='') {
-		$query .= " AND istu.section='$tutorsection' ";
+	if ($secfilter != -1) {
+		$query .= " AND istu.section='$secfilter' ";
 	}
 	if ($hidelocked) {
 		$query .= ' AND istu.locked=0 ';

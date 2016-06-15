@@ -113,11 +113,16 @@ fdhistogram(freqarray,label,start,cw,[labelstart,upper,width,height])
 <BR>&nbsp;upper (optional): first upper class limit.  Defaults to start+classwidth
 <BR>&nbsp;width,height (optional): width and height in pixels of graph
 <BR><h3><a name="fdbargraph">fdbargraph</a></h3>
-fdbargraph(barlabels,freqarray,label,[width,height])
+fdbargraph(barlabels,freqarray,label,[width,height,options])
 <BR>barlabels: array of labels for the bars
 <BR>freqarray: array of frequencies/heights for the bars
 <BR>label: general label for bars
 <BR>width,height (optional): width and height for graph
+<BR>options (optional): array of options:
+<BR>&nbsp;&nbsp;options['valuelabels'] = array of value labels, to be placed above bars
+<BR>&nbsp;&nbsp;options['showgrid'] = false to hide the horizontal grid lines
+<BR>&nbsp;&nbsp;options['vertlabel'] = label for vertical axis. Defaults to none
+<BR>&nbsp;&nbsp;options['gap'] = gap (0 &le; gap &lt; 1) between bars
 <BR><h3><a name="piechart">piechart</a></h3>
 piechart(percents, labels, {width, height})
 <BR>create a piechart
@@ -143,7 +148,7 @@ normalcdf(z,[dec])
 tcdf(t,df,[dec])
 <BR>calculates the area under the t-distribution with "df" degrees of freedom
 <BR>to the left of the t-value t
-<BR>based on someone else's code - can't remember whose!
+<BR>based on code from www.math.ucla.edu/~tom/distributions/tDist.html
 <BR><h3><a name="invnormalcdf">invnormalcdf</a></h3>
 invnormalcdf(p,[dec])
 <BR>Inverse Normal CDF

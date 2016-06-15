@@ -383,7 +383,7 @@ if (!(isset($teacherid))) {
 				}
 			}	
 			
-			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl,ic.istemplate FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
 			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
 			$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			
@@ -437,6 +437,31 @@ function writeCourseInfo($line, $skipcopyright=2) {
 	} else {
 		echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
 	}	
+}
+
+function writeOtherGrpTemplates($grptemplatelist) {
+	if (count($grptemplatelist)==0) { return;}
+	?>
+	<li class=lihdr>
+	<span class=dd>-</span>
+	<span class=hdr onClick="toggle('OGT<?php echo $line['groupid'] ?>')">
+		<span class=btn id="bOGT<?php echo $line['groupid'] ?>">+</span>
+	</span>
+	<span class=hdr onClick="toggle('OGT<?php echo $line['groupid'] ?>')">
+		<span id="nOGT<?php echo $line['groupid'] ?>" ><?php echo _('Group Templates') . "\n" ?>
+		</span>
+	</span> 
+	<ul class=hide id="OGT<?php echo $line['groupid'] ?>">
+	<?php
+	$showncourses = array();
+	foreach ($grptemplatelist as $gt) {
+		if (in_array($gt['courseid'], $showncourses)) {continue;}
+		echo '<li><span class=dd>-</span>';
+		writeCourseInfo($gt);
+		$showncourses[] = $gt['courseid'];
+		echo '<li>';
+	}
+	echo '</ul></li>';
 }
 
 
@@ -654,12 +679,15 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 	 if ($page_hasGroups) {
 				$lastteacher = 0;
 				$lastgroup = -1;
+				$grptemplatelist = array();
 				while ($line = mysql_fetch_array($courseGroupResults, MYSQL_ASSOC)) {
 					if ($line['groupid']!=$lastgroup) {
 						if ($lastgroup!=-1) {
 							echo "				</ul>\n			</li>\n";
+							writeOtherGrpTemplates($grptemplatelist);
 							echo "			</ul>\n		</li>\n";
 							$lastteacher = 0;
+							$grptemplatelist = array();
 						}
 	?>					
 				<li class=lihdr>
@@ -700,6 +728,9 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 							<?php
 							//do class for has terms.  Attach data-termsurl attribute.
 							writeCourseInfo($line);
+							if (($line['istemplate']&2)==2) {
+								$grptemplatelist[] = $line;
+							}
 							?>  
 						</li>
 	<?php
@@ -708,6 +739,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 				
 						</ul>
 					</li>
+					<?php writeOtherGrpTemplates($grptemplatelist);?>
 				</ul>
 			</li> 
 		</ul>

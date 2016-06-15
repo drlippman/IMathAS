@@ -34,7 +34,7 @@ div#centercontent {
 	padding-left: 0px;
 }
 
-div.navbar {
+div.navbar, div.navbar.fixedonscroll {
 	float:none;
 	position:relative;
 	width: auto;
@@ -42,6 +42,7 @@ div.navbar {
 	left: 0px;
 	margin-left: 0px;
 }
+
 div.navbar h4 {
 	margin-bottom: 5px;
 }
@@ -55,6 +56,14 @@ ul.qlist li {
 	margin-left: 0px;
 	margin-top: 0px;
 }
+
+div.navbar.fixedonscroll {
+	padding-left: 20px;
+}
+div.navbar.fixedonscroll ul.qlist li {
+	display: list-item;
+}
+
 div.inset {
 	position: relative;
 	overflow: visible;
@@ -92,3 +101,25 @@ ul#navlist a {
 #homelinkbox {
 	font-size: 90%;
 }
+div#logo {
+	margin-left:0px;
+	margin-rigth:0px;
+}
+div#logo img {
+	max-width: 100%;
+}
+div#loginbox td {
+	display: block;
+}
+span.form {
+	width: auto;
+	float: none;
+	text-align: left;
+	margin-bottom: 5px;
+	padding-right: 0px;
+}
+span.formright {
+	width: auto;
+	float: none;
+}
+	

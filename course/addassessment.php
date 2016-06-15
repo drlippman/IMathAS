@@ -57,6 +57,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			deleteallaidfiles($_GET['id']);
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$_GET['id']}'";
+			mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}");
@@ -775,6 +777,11 @@ if ($overwriteBody==1) {
 					<option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
 					<option value="Embed" <?php writeHtmlSelected($line['displaymethod'],"Embed",0) ?>>Embedded</option>
 					<option value="VideoCue" <?php writeHtmlSelected($line['displaymethod'],"VideoCue",0) ?>>Video Cued</option>
+					<?php if (isset($CFG['GEN']['livepollserver'])) {
+						echo '<option value="LivePoll" ';
+						writeHtmlSelected($line['displaymethod'],"LivePoll",0);
+						echo '>Live Poll (experimental)</option>';
+					}?>
 				</select>
 			</span><BR class=form>
 	
