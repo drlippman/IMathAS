@@ -42,6 +42,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
+   $oneweekago = strtotime("1 week ago");
+   $sincemonday = strtotime("Monday this week");
+   $rangestart = $oneweekago;
 	
    
 		
@@ -54,7 +57,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}	
 
 
-	$query = "select count(distinct userid) as usercount,count(distinct assessmentid) as assessmentcount,count(userid) as totalcount from imas_assessment_sessions join imas_assessments on assessmentid=imas_assessments.id where courseid ='$cid' and from_unixtime(greatest(starttime,endtime)) > date_sub(now(),INTERVAL 1 WEEK)";
+	$query = "select count(distinct userid) as usercount,count(distinct assessmentid) as assessmentcount,count(userid) as totalcount from imas_assessment_sessions join imas_assessments on assessmentid=imas_assessments.id where courseid ='$cid' and endtime > $rangestart";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 
@@ -186,9 +189,6 @@ if ($overwriteBody==1) {
    Student Summary:
 <?
 
-   $oneweekago = strtotime("1 week ago");
-   $sincemonday = strtotime("Monday this week");
-   $rangestart = $oneweekago;
 
    $query = "select sid, count(ias.userid)"; // 1,2
    $query .=", group_concat(ia.name) "; // 3
@@ -206,7 +206,7 @@ if ($overwriteBody==1) {
    $query .= " on assessmentid=ia.id  ";
    $query .= " where iu.id = stu.userid";
    $query .= " or (ia.courseid = '$cid'  ";
-   $query .=  "and (greatest(starttime,endtime) > $rangestart )) ";
+   $query .=  "and endtime > $rangestart ) ";
    $query .=" group by iu.sid ";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
 ?>
@@ -399,8 +399,7 @@ for($i = 0; $i < $numrows; $i++) {
    $query .= " from imas_assessment_sessions join imas_users as iu";
    $query .= " on iu.id = userid join imas_assessments as ia ";
    $query .= " on assessmentid=ia.id where courseid = '$cid' ";
-   $query .= " and from_unixtime(greatest(starttime,endtime)) > ";
-   $query .= " date_sub(now(),INTERVAL 1 WEEK) group by ia.id ";
+   $query .= " and endtime > $rangestart group by ia.id; ";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
 ?>
 <table class="gb">
