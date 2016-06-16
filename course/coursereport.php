@@ -235,8 +235,6 @@ while($line = mysql_fetch_row($result)) {
   $st[$i][7] = 0;  
   $st[$i][8] = 0;  
   $st[$i][9] = "";
-  $st[$i][10] = "[";
-  $st[$i][11] = "[";
 
   if($st[$i][1] > 0) {
   $assess = explode(',',$st[$i][2]);
@@ -256,8 +254,6 @@ while($line = mysql_fetch_row($result)) {
   
   $ncc = "";
   $cc = "";
-  $nccb = "";
-  $ccb = "";
   for($k = 0; $k < count($minscores); $k++) {
 
 
@@ -331,17 +327,11 @@ while($line = mysql_fetch_row($result)) {
       $st[$i][5] .= $ncc;
       $st[$i][5] .= $assess[$k];
       $ncc = ":";
-      $st[$i][10] .= $nccb;
-      $st[$i][10] .= $assess[$k];
-      $nccb = "]:[";
     } else {
       $st[$i][4]++;        
       $st[$i][6] .= $cc;
       $st[$i][6] .= $assess[$k];
       $cc = ":";
-      $st[$i][11] .= $ccb;
-      $st[$i][11] .= $assess[$k];
-      $ccb = "]:[";
     }
     $st[$i][7] = $st[$i][7] + $possible[$k];
     $st[$i][8] = $st[$i][8] + $pts;
@@ -368,8 +358,6 @@ while($line = mysql_fetch_row($result)) {
 
    </tr>
 <?
-  $st[$i][10] .= "]";
-  $st[$i][11] .= "]";
       
   $i++;
 }
@@ -397,8 +385,8 @@ for($i = 0; $i < $numrows; $i++) {
    
       <td> <? echo $st[$i][0]; ?> </td>
       <td align="center"> <? echo $st[$i][1]; ?> </td>
-      <td> <? echo $st[$i][10]; ?> </td>
-      <td> <? echo $st[$i][11]; ?> </td>
+  <td> <? echo "[".str_replace(":","]:[",$st[$i][5])."]"; ?> </td>
+  <td> <? echo "[".str_replace(":","]:[",$st[$i][6])."]"; ?> </td>
 
    </tr>
 <? }      ?>
