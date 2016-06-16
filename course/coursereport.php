@@ -1,10 +1,34 @@
 <?php 
-//IMathAS:  Main course page
-//(c) 2006 David Lippman
+//IMathAS:  Course Recent Report
+//(c) 2016 David Cooper, David Lippman
 
 /*** master php includes *******/
 require("../validate.php");
-require("courseshowitems.php");
+
+// this gets points from the scores string
+// warning this code was copied from courseshowitems.php
+// if something changes with the way scores are stored,
+// then this will need to be updated.
+function getpts($scs) {
+  $tot = 0;
+  foreach(explode(',',$scs) as $sc) {
+    $qtot = 0;
+    if (strpos($sc,'~')===false) {
+      if ($sc>0) { 
+	$qtot = $sc;
+      } 
+    } else {
+      $sc = explode('~',$sc);
+      foreach ($sc as $s) {
+	if ($s>0) { 
+	  $qtot+=$s;
+	}
+      }
+    }
+    $tot += round($qtot,1);
+  }
+  return $tot;
+}
 
 
 /*** pre-html data manipulation, including function code *******/
@@ -28,7 +52,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$overwriteBody = 1;
 		$body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
 	}	
-	
+
 
 	$query = "select count(distinct userid) as usercount,count(distinct assessmentid) as assessmentcount,count(userid) as totalcount from imas_assessment_sessions join imas_assessments on assessmentid=imas_assessments.id where courseid ='$cid' and from_unixtime(greatest(starttime,endtime)) > date_sub(now(),INTERVAL 1 WEEK)";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -92,6 +116,16 @@ if ($overwriteBody==1) {
 				window.location = toopen;
 			}
 		}
+
+
+		function highlightrow(el) {
+		  el.setAttribute("lastclass",el.className);
+		  el.className = "highlight";
+		}
+		function unhighlightrow(el) {
+		  el.className = el.getAttribute("lastclass");
+		}
+
 	</script>
 
 <?php
@@ -141,7 +175,7 @@ if ($overwriteBody==1) {
    <div>
    
    In The last week:
-   <table>
+   <table class="gb">
    <tr> <td>Num Students: </td><td><? echo $usercount; ?>
    (out of <? echo $totalstudents ?>) </td></tr>
    <tr> <td> Num Assessments Attempted: </td><td><? echo $assessmentcount; ?> </td></tr>
@@ -151,32 +185,39 @@ if ($overwriteBody==1) {
    <div>
    Student Summary:
 <?
+
+   $oneweekago = strtotime("1 week ago");
+   $sincemonday = strtotime("Monday this week");
+   $rangestart = $oneweekago;
+
    $query = "select sid, count(ias.userid)"; // 1,2
-$query .=", group_concat(ia.name) "; // 3
-$query .= ", group_concat(ia.minscore SEPARATOR '#') "; //4
-$query .= ", group_concat(ias.bestscores  SEPARATOR '#') "; //5
-$query .= ", group_concat(ia.id  SEPARATOR '#') "; // 6
-$query .= ", group_concat(ia.defpoints  SEPARATOR '#') "; // 7
-$query .= ", group_concat(ia.itemorder  SEPARATOR '#') "; // 8
+   $query .=", group_concat(ia.name) "; // 3
+   $query .= ", group_concat(ia.minscore SEPARATOR '#') "; //4
+   $query .= ", group_concat(ias.bestscores  SEPARATOR '#') "; //5
+   $query .= ", group_concat(ia.id  SEPARATOR '#') "; // 6
+   $query .= ", group_concat(ia.defpoints  SEPARATOR '#') "; // 7
+   $query .= ", group_concat(ia.itemorder  SEPARATOR '#') "; // 8
 
    $query .= " from imas_users as iu";
    $query .= " join imas_students as stu on iu.id = stu.userid ";
-  $query .= " left join imas_assessment_sessions as ias ";
+   $query .= " left join imas_assessment_sessions as ias ";
    $query .= " on iu.id = ias.userid";
    $query .=" left join imas_assessments as ia ";
-$query .= " on assessmentid=ia.id  ";
-$query .= " where iu.id = stu.userid";
- $query .= " or (ia.courseid = '$cid' and from_unixtime(greatest(starttime,endtime)) > ";
- $query .= " date_sub(now(),INTERVAL 1 WEEK))";
+   $query .= " on assessmentid=ia.id  ";
+   $query .= " where iu.id = stu.userid";
+   $query .= " or (ia.courseid = '$cid'  ";
+   $query .=  "and (greatest(starttime,endtime) > $rangestart )) ";
    $query .=" group by iu.sid ";
-    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 ?>
-<table>
-<tr>
+<table class="gb">
+<thead><tr>
    <th> Student </th>
    <th> Num Attempts </th>
    <th> Cumulative Score </th>
-   </tr>
+   <th> No Credit </th>
+   <th> Credit </th>
+</tr>   </thead><tbody>
    
 <?
 $st = array();
@@ -283,8 +324,8 @@ while($line = mysql_fetch_row($result)) {
     for ($l=0;$l<count($scores);$l++) {
       $pts += getpts($scores[$l]);
     }
-    //    if (($minscores[$k]<10000 && $pts<$minscores[$k]) || ($minscores[$k]>10000 && $pts<($minscores[$k]-10000)/100*$possible[$k])) {
-    if ($pts<(0.5*$possible[$k])) {     
+    if (($minscores[$k]<10000 && $pts<$minscores[$k]) || ($minscores[$k]>10000 && $pts<($minscores[$k]-10000)/100*$possible[$k])) {
+    //if ($pts<(0.5*$possible[$k])) {     
       $st[$i][3]++;
       $st[$i][5] .= $ncc;
       $st[$i][5] .= $assess[$k];
@@ -301,14 +342,22 @@ while($line = mysql_fetch_row($result)) {
     
   }
   }
+  if ($i%2!=0) {
+    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  } else {
+    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  }
    ?>
-   <tr>
+
       <td> <? echo $st[$i][0]; ?> </td>
       <td> <? echo $st[$i][1]; ?> </td>
       <td> <? if ($st[$i][7] > 0) {
                 $pc = "{$st[$i][8]}/{$st[$i][7]}";
               } else { $pc = "NA"; }
               echo $pc; ?> </td>
+      <td> <? echo $st[$i][3]; ?> </td>
+      <td> <? echo $st[$i][4]; ?> </td>
+			       
 
    </tr>
 <?
@@ -317,20 +366,25 @@ while($line = mysql_fetch_row($result)) {
 }
 $numrows = $i;
 ?>
-
+</tbody>
 </table>
-<table>
-<tr>
+<table class="gb">
+<thead>
    <th> Student </th>
    <th> Num Attempts </th>
-   <th> Under 50% </th>
-<th> &gt;= 50% </th>
-   </tr>
+   <th> No Credit </th>
+<th> Credit </th>
+   </thead>
 <?
 for($i = 0; $i < $numrows; $i++) {
+  if ($i%2!=0) {
+    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  } else {
+    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  }
 
 ?>
-   <tr>
+   
       <td> <? echo $st[$i][0]; ?> </td>
       <td> <? echo $st[$i][1]; ?> </td>
       <td> <? echo $st[$i][5]; ?> </td>
@@ -349,12 +403,14 @@ for($i = 0; $i < $numrows; $i++) {
    $query .= " date_sub(now(),INTERVAL 1 WEEK) group by ia.id ";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
 ?>
-<table>
-<tr>
+<table class="gb">
+<thead>
    <th> Assessment </th>
    <th> Num Attempts </th>
    <th> Average Score </th>
-   </tr>
+   <th> No Credit </th>
+   <th> Credit </th>
+   </thead>
 <?
    $atbl = array();
    $k = 0;
@@ -391,14 +447,19 @@ while($line = mysql_fetch_row($result)) {
   } else {
     $atbl[$k][7] = 0;
   }
+  if ($k%2!=0) {
+    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  } else {
+    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  }
 
   ?>
-   <tr>
+   
     <td> <? echo $line[0] ?> </td>
     <td> <? echo $line[1] ?> </td>
-
       <td> <? echo  $atbl[$k][7]."%"; ?> </td>
-
+    <td> <? echo $numnc ?> </td>
+    <td> <? echo $numcred ?> </td>
    </tr>
 <?
    $k++;
@@ -408,19 +469,24 @@ while($line = mysql_fetch_row($result)) {
 ?>
 
 </table>
-    <table>
-<tr>
+    <table class="gb">
+<thead>
    <th> Assessment </th>
    <th> Num Attempts </th>
-<th> &lt; 50% </th>
-<th> &gt;= 50% </th>
-   </tr>
+<th> No Credit </th>
+<th> Credit </th>
+   </thead>
 <?
     $numrows = $k;
 for($i = 0; $i < $numrows; $i++) {
+  if ($i%2!=0) {
+    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  } else {
+    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+  }
 
 ?>
-   <tr>
+   
       <td> <? echo $atbl[$i][0]; ?> </td>
       <td> <? echo $atbl[$i][1]; ?> </td>
       <td> <? echo $atbl[$i][5]; ?> </td>
