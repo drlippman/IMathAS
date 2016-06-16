@@ -177,16 +177,16 @@ if ($overwriteBody==1) {
 ?>
    <div>
    
-   In The last week:
+<h3>   In the last week... </h3>
    <table class="gb">
-   <tr> <td>Num Students: </td><td><? echo $usercount; ?>
-   (out of <? echo $totalstudents ?>) </td></tr>
-   <tr> <td> Num Assessments Attempted: </td><td><? echo $assessmentcount; ?> </td></tr>
-   <tr> <td> Total Num Attempts: </td><td><? echo $totalcount; ?> </td></tr>
+   <tr> <td><? echo $usercount; ?> 
+   (out of <? echo $totalstudents ?>) </td><td> Students attempted at least one assessment. </td></tr>
+   <tr> <td> <? echo $assessmentcount; ?> </td><td> Assessments were attempted. </td></tr>
+   <tr> <td> <? echo $totalcount; ?> </td><td> Total attempts were made. </td></tr>
 </table>
    </div>
    <div>
-   Student Summary:
+<h3>   Student Summary: </h3>
 <?
 
 
@@ -235,11 +235,9 @@ while($line = mysql_fetch_row($result)) {
   $st[$i][7] = 0;  
   $st[$i][8] = 0;  
   $st[$i][9] = "";
-  for ($j = 0; $j < count($line); $j++) {
-    if ($j < 3) {
-      $st[$i][$j] =  $line[$j];
-    } 
-  }
+  $st[$i][10] = "[";
+  $st[$i][11] = "[";
+
   if($st[$i][1] > 0) {
   $assess = explode(',',$st[$i][2]);
   $minscores = explode('#',$line[3]);
@@ -258,6 +256,8 @@ while($line = mysql_fetch_row($result)) {
   
   $ncc = "";
   $cc = "";
+  $nccb = "";
+  $ccb = "";
   for($k = 0; $k < count($minscores); $k++) {
 
 
@@ -299,6 +299,7 @@ while($line = mysql_fetch_row($result)) {
 
 
 
+
     $sp = explode(';',$bestscoresArr[$k]);
     $scores = explode(',',$sp[0]);
     $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$aids[$k]}'";
@@ -330,11 +331,17 @@ while($line = mysql_fetch_row($result)) {
       $st[$i][5] .= $ncc;
       $st[$i][5] .= $assess[$k];
       $ncc = ":";
+      $st[$i][10] .= $nccb;
+      $st[$i][10] .= $assess[$k];
+      $nccb = "]:[";
     } else {
       $st[$i][4]++;        
       $st[$i][6] .= $cc;
       $st[$i][6] .= $assess[$k];
       $cc = ":";
+      $st[$i][11] .= $ccb;
+      $st[$i][11] .= $assess[$k];
+      $ccb = "]:[";
     }
     $st[$i][7] = $st[$i][7] + $possible[$k];
     $st[$i][8] = $st[$i][8] + $pts;
@@ -350,17 +357,19 @@ while($line = mysql_fetch_row($result)) {
    ?>
 
       <td> <? echo $st[$i][0]; ?> </td>
-      <td> <? echo $st[$i][1]; ?> </td>
+      <td  align="center"> <? echo $st[$i][1]; ?> </td>
       <td> <? if ($st[$i][7] > 0) {
                 $pc = "{$st[$i][8]}/{$st[$i][7]}";
               } else { $pc = "NA"; }
               echo $pc; ?> </td>
-      <td> <? echo $st[$i][3]; ?> </td>
-      <td> <? echo $st[$i][4]; ?> </td>
+      <td align="center"> <? echo $st[$i][3]; ?> </td>
+      <td align="center"> <? echo $st[$i][4]; ?> </td>
 			       
 
    </tr>
 <?
+  $st[$i][10] .= "]";
+  $st[$i][11] .= "]";
       
   $i++;
 }
@@ -368,6 +377,7 @@ $numrows = $i;
 ?>
 </tbody>
 </table>
+<br>
 <table class="gb">
 <thead>
    <th> Student </th>
@@ -386,14 +396,14 @@ for($i = 0; $i < $numrows; $i++) {
 ?>
    
       <td> <? echo $st[$i][0]; ?> </td>
-      <td> <? echo $st[$i][1]; ?> </td>
-      <td> <? echo $st[$i][5]; ?> </td>
-      <td> <? echo $st[$i][6]; ?> </td>
+      <td align="center"> <? echo $st[$i][1]; ?> </td>
+      <td> <? echo $st[$i][10]; ?> </td>
+      <td> <? echo $st[$i][11]; ?> </td>
 
    </tr>
 <? }      ?>
 </table>
-   Assessment Summary:
+<h3>   Assessment Summary: </h3>
 <?
    $query = "select ia.name, count(userid),ia.id ";
    $query .= " from imas_assessment_sessions join imas_users as iu";
@@ -455,10 +465,10 @@ while($line = mysql_fetch_row($result)) {
   ?>
    
     <td> <? echo $line[0] ?> </td>
-    <td> <? echo $line[1] ?> </td>
-      <td> <? echo  $atbl[$k][7]."%"; ?> </td>
-    <td> <? echo $numnc ?> </td>
-    <td> <? echo $numcred ?> </td>
+    <td  align="center"> <? echo $line[1] ?> </td>
+      <td  align="center"> <? echo  $atbl[$k][7]."%"; ?> </td>
+    <td  align="center"> <? echo $numnc ?> </td>
+    <td align="center"> <? echo $numcred ?> </td>
    </tr>
 <?
    $k++;
@@ -468,6 +478,7 @@ while($line = mysql_fetch_row($result)) {
 ?>
 
 </table>
+<br>
     <table class="gb">
 <thead>
    <th> Assessment </th>
@@ -487,7 +498,7 @@ for($i = 0; $i < $numrows; $i++) {
 ?>
    
       <td> <? echo $atbl[$i][0]; ?> </td>
-      <td> <? echo $atbl[$i][1]; ?> </td>
+      <td  align="center"> <? echo $atbl[$i][1]; ?> </td>
       <td> <? echo $atbl[$i][5]; ?> </td>
       <td> <? echo $atbl[$i][6]; ?> </td>
 
