@@ -196,7 +196,8 @@ if (isset($_POST['text'])) {
 	}
 	
 	$code .= "\n//end stored values - Tutorial Style question\n\n";
-	
+	$code .= $_POST['keepcode']."\n";
+	$code .= "\n//end retained code - Tutorial Style question\n\n";
 	//$code .= '$noshuffle = "all"'."\n";
 	
 	//now we convert as needed
@@ -383,6 +384,14 @@ function getqvalues($code,$type) {
 	$qtol = array();
 	$feedbacktxtdef = array();
 	$qtold = array();
+	
+	if (strpos($code,'//end retained') !== false) {
+		$keepcode = substr($code, strpos($code,'//end stored'), strpos($code,'//end retained')-strpos($code,'//end stored'));
+		$keepcode = trim(substr($keepcode, strpos($keepcode,"\n")));
+	} else {
+		$keepcode = '';
+	}
+	
 	$code = substr($code, 0, strpos($code,'//end stored'));
 	eval(interpret('control',$type,$code));
 	
@@ -411,7 +420,7 @@ function getqvalues($code,$type) {
 			}
 		}
 		
-		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle);
+		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $keepcode);
 	} else {
 		if ($type=='number') {
 			if (isset($reltolerance)) {
@@ -427,7 +436,7 @@ function getqvalues($code,$type) {
 		}else if ($type=='essay') {
 			$qparts = array(0);
 		}
-		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle));
+		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), $keepcode);
 	}
 }
 
@@ -560,7 +569,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
 	require_once("../assessment/interpret5.php");
-	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $qshuffle) = getqvalues($code,$type);
+	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $qshuffle, $keepcode) = getqvalues($code,$type);
 	$partial = array();
 	
 	for ($n=0;$n<$nparts;$n++) {
@@ -603,6 +612,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$hinttext = array();
 	$qtol = array_fill(0,1,"abs");
 	$qtext = "";
+	$keepcode = '';
 	
 	$line['description'] = "Enter description here";
 	$query = "SELECT qrightsdef FROM imas_users WHERE id='$userid'";
@@ -1066,6 +1076,7 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 <textarea cols="60" rows="6" id="popuptxt" name="popuptxt" style="width: 100%"></textarea>
 <input type="button" value="Save" onclick="popuptxtsave()"/>
 </div>
+<input type="hidden" name="keepcode" value="<?php echo htmlentities($keepcode);?>"/>
 <p><input type="submit" value="Save and Test"/></p>
 <p>&nbsp;</p>
 
