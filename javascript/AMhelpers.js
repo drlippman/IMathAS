@@ -1,6 +1,139 @@
 //IMathAS:  Handles preview buttons and pre-submit calculations for assessments
 //(c) 2006 David Lippman
 
+//define these to be overwritten later in case the corresponding options aren't used
+var updateeeddpos = function() { }; 
+var updateehpos = function() { };
+
+var LivePreviews = [];
+function setupLivePreview(qn) {
+	if (!LivePreviews.hasOwnProperty(qn)) {
+		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
+			LivePreviews[qn] = {
+			  delay: (mathRenderer=="MathJax"?100:20),   // delay after keystroke before updating
+			  finaldelay: 1000,
+			  preview: null,     // filled in by Init below
+			  buffer: null,      // filled in by Init below
+			
+			  timeout: null,     // store setTimout id
+			  finaltimeout: null,  // setTimeout id for clicking preview
+			  mjRunning: false,  // true when MathJax is processing
+			  mjPending: false,  // true when a typeset has been queued
+			  oldText: null,     // used to check if an update is needed
+			
+			  //
+			  //  Get the preview and buffer DIV's
+			  //
+			  Init: function() {
+				$("#p"+qn).css("positive","relative")
+					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;"></span>')
+					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;"></span>');	  
+				this.preview = document.getElementById("lpbuf1"+qn);
+				this.buffer = document.getElementById("lpbuf2"+qn);
+			  },
+	
+			  SwapBuffers: function () {
+			    var buffer = this.preview, preview = this.buffer;
+			    this.buffer = buffer; this.preview = preview;
+			    buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+			    preview.style.position = ""; preview.style.visibility = "";
+			  },
+			
+			  Update: function (content) {
+			    if (this.timeout) {clearTimeout(this.timeout)}
+			    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+			    this.timeout = setTimeout(this.callback,this.delay);
+			    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+			  },
+			
+			  RenderNow: function(text) {
+				  //called by preview button
+			      this.buffer.innerHTML = this.oldtext = text;
+			      this.mjRunning = true;
+			      this.RenderBuffer();
+			  },
+			  RenderBuffer: function() {
+			      if (mathRenderer=="MathJax") {
+				      MathJax.Hub.Queue(
+					["Typeset",MathJax.Hub,this.buffer],
+					["PreviewDone",this]
+				      );   
+			      } else if (mathRenderer=="Katex") {
+			      	      renderMathInElement(this.buffer);
+				      if ($(this.buffer).children(".mj").length>0) {//has MathJax elements
+					      MathJax.Hub.Queue(["PreviewDone",this]);
+				      } else {
+					      this.PreviewDone();
+				      }
+			      }	  
+			  },
+			  
+			  DoFinalPreview: function() {
+				$("#pbtn"+qn).trigger("click");
+			  },
+			  
+			  CreatePreview: function () {
+			    this.timeout = null;
+			    if (this.mjPending) return;
+			    var text = document.getElementById("tc"+qn).value;
+			    if (text === this.oldtext) return;
+			    if (this.mjRunning) {
+			      this.mjPending = true;
+			      MathJax.Hub.Queue(["CreatePreview",this]);
+			    } else {
+			      this.oldtext = text;
+			      this.buffer.innerHTML = "`"+text+"`";
+			      this.mjRunning = true;
+			      this.RenderBuffer();
+			    }
+			  },
+			
+			  PreviewDone: function () {
+			    this.mjRunning = this.mjPending = false;
+			    this.SwapBuffers();
+			    updateeeddpos();
+			    updateehpos();
+			  }
+			
+			};
+			LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+			LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			LivePreviews[qn].Init();
+		} else if (mathRenderer=="img") {
+			LivePreviews[qn] = {
+				finaldelay: 1000,
+				finaltimeout: null,  // setTimeout id for clicking preview
+			  
+				Update: function (content) {
+				    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+				    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+				  },
+				
+				  RenderNow: function(text) {
+				      var outnode = document.getElementById("p"+qn);
+				      outnode.innerHTML = text;
+				      rendermathnode(outnode);
+				  },
+				  
+				  DoFinalPreview: function() {
+					$("#pbtn"+qn).trigger("click");
+				  }
+			}
+		} else {
+			LivePreviews[qn] = {
+				Update: function (content) {  },
+				RenderNow: function(text) {  }
+			}
+		}
+	}
+}
+function updateLivePreview() {
+	var targ = event.target;
+	var qn = targ.id.substr(2);
+	setupLivePreview(qn);
+	LivePreviews[qn].Update();
+}
+
 function normalizemathunicode(str) {
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
 	str = str.replace(/\u2044|\u2215/g, "/");
@@ -92,6 +225,10 @@ function calculate(inputId,outputId,format) {
   	  	  fullstr = '{'+fullstr+'}';
   	  }
   }
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow(fullstr);
+  /*
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
@@ -100,6 +237,7 @@ function calculate(inputId,outputId,format) {
   if (!noMathRender) {
 	  rendermathnode(outnode);
   }
+  */
 }
 
 //Function to convert inequalities into interval notation

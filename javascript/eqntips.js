@@ -13,6 +13,8 @@ function showeh(eln) {
 	if (eecurel!=null) {
 		return;
 	}
+	unhideeh(0);
+	
 	el = document.getElementById(eln);
 	var eh = document.getElementById('eh');
 	if (eln != ehcurel) {
@@ -27,7 +29,7 @@ function showeh(eln) {
 		eh.style.display = "none";
 		ehcurel = null;
 	}
-	unhideeh(0);
+	
 	el.focus();
 }
 
@@ -93,4 +95,16 @@ function showehdd(eln,shorttip,qn) {
 		
 	}
 	curehdd = eln;
+}
+
+function updateehpos() {
+	if (!curehdd && !ehcurel) return;
+	var eh = document.getElementById("eh");
+	var ehdd = document.getElementById("ehdd");
+	var el = document.getElementById(curehdd || ehcurel);
+	p = findPos(el);
+	eh.style.left = p[0] + "px";
+	eh.style.top = (p[1] + el.offsetHeight) + "px";
+	ehdd.style.left = p[0] + "px";
+	ehdd.style.top = (p[1] + el.offsetHeight) + "px";
 }

@@ -198,6 +198,14 @@ function showeedd(eln,type,extras) {
 	p.left += el.outerWidth();
 	dd.css('left',p.left+"px").css('top',p.top+"px").height(el.outerHeight()-2).show();
 }
+function updateeeddpos() {
+	if (!cureedd) {return;}
+	var dd = $("#mqeedd");	
+	var el = $("#"+cureedd.id);
+	var p = el.offset();
+	p.left += el.outerWidth();
+	dd.css('left',p.left+"px").css('top',p.top+"px").height(el.outerHeight()-2).show();
+}
 function hideeedd() {
 	mqeeddclosetimer = setTimeout(function() {$("#mqeedd").hide();}, 250);
 }
