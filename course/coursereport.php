@@ -65,11 +65,34 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$assessmentcount = $line['assessmentcount'];
 	$totalcount = $line['totalcount'];
 
-	$query = "select count(userid) as totalstudents from imas_students where courseid ='$cid' ";
+	$query = "select userid from imas_students where courseid ='$cid' ";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$totalstudents = 0;
 
-	$totalstudents = $line['totalstudents'];
+// $st indices
+$sNameI       = 0;
+$sAttemptsI   = 1;
+$sCumulativeI = 2;
+$sNoCredI     = 3;
+$sCredI       = 4;
+$sNoCredSI    = 5;
+$sCredSI      = 6;
+$sPossI     = 7;
+$sPtsI      = 8;
+
+	$st = array();
+
+	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	  $uid = $line['userid'];
+	  $totalstudents++;
+	  $st["'{$uid}'"][$sAttemptsI] = 0;
+	  $st["'{$uid}'"][$sNoCredI]   = 0;
+	  $st["'{$uid}'"][$sCredI]     = 0;
+	  $st["'{$uid}'"][$sNoCredSI]  = "";
+	  $st["'{$uid}'"][$sCredSI]    = "";
+	  $st["'{$uid}'"][$sCPossI]    = 0;  
+	  $st["'{$uid}'"][$sCPtsI]     = 0;  
+	  
 
 
 	//DEFAULT DISPLAY PROCESSING
@@ -199,16 +222,6 @@ if ($overwriteBody==1) {
 $pointsI = 0;
 $idI     = 1;
 
-// $st indices
-$sNameI       = 0;
-$sAttemptsI   = 1;
-$sCumulativeI = 2;
-$sNoCredI     = 3;
-$sCredI       = 4;
-$sNoCredSI    = 5;
-$sCredSI      = 6;
-$sPossI     = 7;
-$sPtsI      = 8;
 
 // $atbl indices
 $aNameI       = 0;
@@ -237,13 +250,13 @@ $secondI = 1;
    $query .= ", ia.itemorder   "; // 9
 // last column. Add additional columns immediately before this comment
    $query .= " from imas_users as iu";
-$query .= " join imas_students as stu on iu.id = stu.userid "; // no teachers
-   $query .= " left join imas_assessment_sessions as ias ";
+//$query .= " join imas_students as stu on iu.id = stu.userid "; // no teachers
+   $query .= " join imas_assessment_sessions as ias ";
    $query .= " on iu.id = ias.userid";
-   $query .=" left join imas_assessments as ia ";
+   $query .=" join imas_assessments as ia ";
    $query .= " on assessmentid=ia.id  ";
-   $query .= " where iu.id = stu.userid";
-   $query .= " or (ia.courseid = '$cid'  ";
+//   $query .= " where iu.id = stu.userid";
+   $query .= " where (ia.courseid = '$cid'  ";
    $query .=  "and endtime > $rangestart ) ";
    $query .=" order by iu.sid ";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -258,148 +271,90 @@ $query .= " join imas_students as stu on iu.id = stu.userid "; // no teachers
 </tr>   </thead><tbody>
    
 <?
-$st = array();
 $asPtsArr = array();
 $asPossArr = array();
 $asIdxArr = array();
 $asNextIdx = 0; 
-$i = 0;
+
 
 $atbl = array();
-
+$student = -1;
 while($line = mysql_fetch_row($result)) {
-  if(!isset($student)) {
-    $st[$i][$sAttemptsI] = 0;
-    $st[$i][$sNoCredI]   = 0;
-    $st[$i][$sCredI]     = 0;
-    $st[$i][$sNoCredSI]  = "";
-    $st[$i][$sCredSI]    = "";
-    $st[$i][$sCPossI]    = 0;  
-    $st[$i][$sCPtsI]     = 0;  
-  } else if( $student != $line[$sidI]) {
-    if ($i%2!=0) {
-    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
-  } else {
-    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
-  }
-   ?>
-
-      <td> <? echo $st[$i][$sNameI]; ?> </td>
-      <td  align="center"> <? echo $st[$i][$sAttemptsI]; ?> </td>
-      <td> <? if ($st[$i][$sPossI] > 0) {
-                $pc = "{$st[$i][$sPtsI]}/{$st[$i][$sPossI]}";
-              } else { $pc = "NA"; }
-              echo $pc; ?> </td>
-       <td align="center">
-       <? if ($st[$i][$sNoCredI] > 0) { ?>
-	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_nc')\">"; 
-		        echo $st[$i][$sNoCredI]; ?> </p>
-	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_nc'><li>";
-	     echo str_replace(":","</li><li>",$st[$i][$sNoCredSI])."</li><ul>";
-	  } else {
-             echo $st[$i][$sNoCredI];
-	  }
-	  ?>
-	       
-       </td>
-      <td align="center">
-       <? if ($st[$i][$sCredI] > 0) { ?>
-	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_c')\">"; 
-		        echo $st[$i][$sCredI]; ?> </p>
-	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_c'><li>";
-	     echo str_replace(":","</li><li>",$st[$i][$sCredSI])."</li><ul>";
-          } else {
-             echo $st[$i][$sCredI];
-	  }
-	  ?>
-      </td>
-
-			       
-
-   </tr>
-<?
-    $i++;
-    $st[$i][$sAttemptsI] = 0;
-    $st[$i][$sNoCredI]   = 0;
-    $st[$i][$sCredI]     = 0;
-    $st[$i][$sNoCredSI]  = "";
-    $st[$i][$sCredSI]    = "";
-    $st[$i][$sCPossI]    = 0;  
-    $st[$i][$sCPtsI]     = 0;  
+  $uid = $line[$uidI];
+  if ($student !== $line[$sidI]) {
     $ncc = "";
     $cc = "";
-
   }
   $student = $line[$sidI];
-  $st[$i][$sNameI]  = $line[$firstNameI];
-  $st[$i][$sNameI] .= " ";
-  $st[$i][$sNameI] .= $line[$lastNameI];
+  $st["'{$uid}'"][$sNameI]  = $line[$firstNameI];
+  $st["'{$uid}'"][$sNameI] .= " ";
+  $st["'{$uid}'"][$sNameI] .= $line[$lastNameI];
 
   if(!is_null($line[$testNameI])) {
-  $st[$i][$sAttemptsI]++;
-  $assess = $line[$testNameI];
-  $minscore = $line[$minScoreI];
-  $bestscores = $line[$bestScoreI];
-  $aid = $line[$testIdI];
-  $defpoints = $line[$defPointsI];
-  $aitems = explode(',',$line[$itemOrderI]);
-  
-  if (!isset($asIdxArr["'{$aid}'"])) {
-    $k = $asNextIndex;
-    $asIdxArr["'{$aid}'"] = $k;
-    $asNextIndex++;
-    $atbl[$k][$aNameI]     = $assess;
-    $atbl[$k][$aAttemptsI] = 1;
-    $atbl[$k][$aidI]       = $aid;
-  } else {
-    $k = $asIdxArr["'{$aid}'"];
-    $atbl[$k][$aAttemptsI]++;
-  }
-
-  
-  $n = 0;
-  $atofind = array();
-  foreach ($aitems as $v) {
-    if (strpos($v,'~')!==FALSE) {
-      $sub = explode('~',$v);
-      if (strpos($sub[$firstI],'|')===false) { //backwards compat
-	$atofind[$n] = $sub[$firstI];
-	$aitemcnt[$n] = 1;
-	$n++;
-      } else {
-	$grpparts = explode('|',$sub[$firstI]);
-	if ($grpparts[$firstI]==count($sub)-1) { //handle diff point values in group if n=count of group
-	  for ($i=1;$i<count($sub);$i++) {
-	    $atofind[$n] = $sub[$i];
-	    $aitemcnt[$n] = 1;
+    $st["'{$uid}'"][$sAttemptsI]++;
+    $assess = $line[$testNameI];
+    $minscore = $line[$minScoreI];
+    $bestscores = $line[$bestScoreI];
+    $aid = $line[$testIdI];
+    $defpoints = $line[$defPointsI];
+    $aitems = explode(',',$line[$itemOrderI]);
+    
+    if (!isset($asIdxArr["'{$aid}'"])) {
+      $k = $asNextIndex;
+      $asIdxArr["'{$aid}'"] = $k;
+      $asNextIndex++;
+      $atbl[$k][$aNameI]     = $assess;
+      $atbl[$k][$aAttemptsI] = 1;
+      $atbl[$k][$aidI]       = $aid;
+    } else {
+      $k = $asIdxArr["'{$aid}'"];
+      $atbl[$k][$aAttemptsI]++;
+    }
+    
+    
+    $n = 0;
+    $atofind = array();
+    foreach ($aitems as $v) {
+      if (strpos($v,'~')!==FALSE) {
+	$sub = explode('~',$v);
+	if (strpos($sub[$firstI],'|')===false) { //backwards compat
+	  $atofind[$n] = $sub[$firstI];
+	  $aitemcnt[$n] = 1;
+	  $n++;
+	} else {
+	  $grpparts = explode('|',$sub[$firstI]);
+	  if ($grpparts[$firstI]==count($sub)-1) { //handle diff point values in group if n=count of group
+	    for ($i=1;$i<count($sub);$i++) {
+	      $atofind[$n] = $sub[$i];
+	      $aitemcnt[$n] = 1;
+	      $n++;
+	    }
+	  } else {
+	    $atofind[$n] = $sub[$secondI];
+	    $aitemcnt[$n] = $grpparts[$firstI];
 	    $n++;
 	  }
+	}
+      } else {
+	$atofind[$n] = $v;
+	$aitemcnt[$n] = 1;
+	$n++;
+      }
+    }
+    
+    $sp = explode(';',$bestscores);
+    $scores = explode(',',$sp[$firstI]);
+    $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$aid}'";
+    $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+    $totalpossible = 0;
+    while ($r = mysql_fetch_row($result2)) {
+      if (($m = array_search($r[$idI],$atofind))!==false) { //only use first item from grouped questions for total pts	
+	if ($r[$pointsI]==9999) {
+	  $totalpossible += $aitemcnt[$m]*$defpoints; //use defpoints
 	} else {
-	  $atofind[$n] = $sub[$secondI];
-	  $aitemcnt[$n] = $grpparts[$firstI];
-	  $n++;
+	  $totalpossible += $aitemcnt[$m]*$r[$pointsI]; //use points from question
 	}
       }
-    } else {
-      $atofind[$n] = $v;
-      $aitemcnt[$n] = 1;
-      $n++;
-    }
-  }
-  
-  $sp = explode(';',$bestscores);
-  $scores = explode(',',$sp[$firstI]);
-  $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$aid}'";
-  $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-  $totalpossible = 0;
-  while ($r = mysql_fetch_row($result2)) {
-    if (($m = array_search($r[$idI],$atofind))!==false) { //only use first item from grouped questions for total pts	
-      if ($r[$pointsI]==9999) {
-	$totalpossible += $aitemcnt[$m]*$defpoints; //use defpoints
-      } else {
-	$totalpossible += $aitemcnt[$m]*$r[$pointsI]; //use points from question
-      }
-    }
     }
     $possible = $totalpossible;
     $asPossArr["'{$aid}'"] = $possible;
@@ -413,22 +368,29 @@ while($line = mysql_fetch_row($result)) {
     }
     if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$possible)) {
     //if ($pts<(0.5*$possible)) {     
-      $st[$i][$sNoCredI]++;
-      $st[$i][$sNoCredSI] .= $ncc;
-      $st[$i][$sNoCredSI] .= $assess;
+      $st["'{$uid}'"][$sNoCredI]++;
+      $st["'{$uid}'"][$sNoCredSI] .= $ncc;
+      $st["'{$uid}'"][$sNoCredSI] .= $assess;
       $ncc = ":";
     } else {
-      $st[$i][$sCredI]++;        
-      $st[$i][$sCredSI] .= $cc;
-      $st[$i][$sCredSI] .= $assess;
+      $st["'{$uid}'"][$sCredI]++;        
+      $st["'{$uid}'"][$sCredSI] .= $cc;
+      $st["'{$uid}'"][$sCredSI] .= $assess;
       $cc = ":";
     }
-    $st[$i][$sPossI] = $st[$i][$sPossI] + $possible;
-    $st[$i][$sPtsI] = $st[$i][$sPtsI] + $pts;
+    $st["'{$uid}'"][$sPossI] = $st["'{$uid}'"][$sPossI] + $possible;
+    $st["'{$uid}'"][$sPtsI] = $st["'{$uid}'"][$sPtsI] + $pts;
     $asPtsArr["'{$aid}'"] += $pts;
     
   }
 }
+
+$numrows = count($st);
+$keys = array_keys($st);
+for($i = 0; $i < $numrows; $i++) {
+
+  $uid = $keys[$i];
+
     if ($i%2!=0) {
     echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
   } else {
@@ -436,41 +398,42 @@ while($line = mysql_fetch_row($result)) {
   }
    ?> 
  
-      <td> <? echo $st[$i][$sNameI]; ?> </td>
-      <td  align="center"> <? echo $st[$i][$sAttemptsI]; ?> </td>
-      <td> <? if ($st[$i][$sPossI] > 0) {
-                $pc = "{$st[$i][$sPtsI]}/{$st[$i][$sPossI]}";
+      <td> <? echo $st[$uid][$sNameI]; ?> </td>
+      <td  align="center"> <? echo $st[$uid][$sAttemptsI]; ?> </td>
+      <td> <? if ($st[$uid][$sPossI] > 0) {
+                $pc = "{$st[$uid][$sPtsI]}/{$st[$uid][$sPossI]}";
               } else { $pc = "NA"; }
               echo $pc; ?> </td>
        <td align="center">
-       <? if ($st[$i][$sNoCredI] > 0) { ?>
-	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_nc')\">"; 
-		        echo $st[$i][$sNoCredI]; ?> </p>
-	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_nc'><li>";
-	     echo str_replace(":","</li><li>",$st[$i][$sNoCredSI])."</li><ul>";
+       <? if ($st[$uid][$sNoCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$st[$uid][$sNameI]}_nc')\">"; 
+		        echo $st[$uid][$sNoCredI]; ?> </p>
+	  <? echo "<ul style=\"display:none\" id='{$st[$uid][$sNameI]}_nc'><li>";
+	     echo str_replace(":","</li><li>",$st[$uid][$sNoCredSI])."</li></ul>";
           } else {
-             echo $st[$i][$sNoCredI];
+             echo $st[$uid][$sNoCredI];
 	  }
 	  ?>
 	       
        </td>
       <td align="center">
-       <? if ($st[$i][$sCredI] > 0) { ?>
-	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_c')\">"; 
-		        echo $st[$i][$sCredI]; ?> </p>
-	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_c'><li>";
-	     echo str_replace(":","</li><li>",$st[$i][$sCredSI])."</li><ul>";
+       <? if ($st[$uid][$sCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$st[$uid][$sNameI]}_c')\">"; 
+		        echo $st[$uid][$sCredI]; ?> </p>
+	  <? echo "<ul style=\"display:none\" id='{$st[$uid][$sNameI]}_c'><li>";
+	     echo str_replace(":","</li><li>",$st[$uid][$sCredSI])."</li></ul>";
           } else {
-             echo $st[$i][$sCredI];
+             echo $st[$uid][$sCredI];
 	  }
 	  ?>
       </td>
-			       
-
    </tr>
-      <?
-$numrows = $i+1;
+
+	  <?
+	  }
+
 ?>
+
 </tbody>
 </table>
 <br>
@@ -492,17 +455,18 @@ foreach ($asIdxArr as $k) {
   $credusers = "<ul style=\"display:none\" id='{$atbl[$k][$aNameI]}_c'>";
   $nocredusers = "<ul style=\"display:none\" id='{$atbl[$k][$aNameI]}_nc'>";
   for($i = 0; $i < $numrows; $i++) {
-    $snocred = explode(":",$st[$i][$sNoCredSI]);
-    $scred = explode(":",$st[$i][$sCredSI]);
+    $keys = array_keys($st);
+    $snocred = explode(":",$st[$keys[$i]][$sNoCredSI]);
+    $scred = explode(":",$st[$keys[$i]][$sCredSI]);
     if(in_array($atbl[$k][$aNameI],$snocred)) {
       $numnc++;
       $nocredusers .= "<li>";
-      $nocredusers .= $st[$i][$sNameI];
+      $nocredusers .= $st[$keys[$i]][$sNameI];
       $nocredusers .= "</li>";
     } else if(in_array($atbl[$k][$aNameI],$scred)) {
       $numcred++;
       $credusers .= "<li>";
-      $credusers .= $st[$i][$sNameI];
+      $credusers .= $st[$keys[$i]][$sNameI];
       $credusers .= "</li>";
     }
   }
@@ -576,7 +540,7 @@ require("../footer.php");
 
 
 
-
+}
 
 ?>
 
