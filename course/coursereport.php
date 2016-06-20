@@ -102,24 +102,15 @@ if ($overwriteBody==1) {
 	if (isset($teacherid)) {
  ?>  
 	<script type="text/javascript">
-		function moveitem(from,blk) { 
-			var to = document.getElementById(blk+'-'+from).value;
-			
-			if (to != from) {
-				var toopen = '<?php echo $jsAddress1 ?>&block=' + blk + '&from=' + from + '&to=' + to;
-				window.location = toopen;
-			}
-		}
-		
-		function additem(blk,tb) {
-			var type = document.getElementById('addtype'+blk+'-'+tb).value;
-			if (tb=='BB' || tb=='LB') { tb = 'b';}
-			if (type!='') {
-				var toopen = '<?php echo $jsAddress2 ?>/add' + type + '.php?block='+blk+'&tb='+tb+'&cid=<?php echo $_GET['cid'] ?>';
-				window.location = toopen;
-			}
-		}
-
+	    function toggleList(id) {
+	    var list = document.getElementById(id);
+	    
+	    if (list.style.display == "none"){
+	      list.style.display = "";
+	    } else {
+	      list.style.display = "none";
+	    }
+	  }
 
 		function highlightrow(el) {
 		  el.setAttribute("lastclass",el.className);
@@ -186,8 +177,11 @@ if ($overwriteBody==1) {
    </div>
    <div>
 <h3>   Student Summary: </h3>
+   Click Credit/No Credit numbers for detail.
 <?
-// line indices
+				  
+// line indices for main course report
+// AA
    $firstNameI  = 0;
    $lastNameI   = 1;
    $sidI        = 2;
@@ -198,6 +192,12 @@ if ($overwriteBody==1) {
    $testIdI     = 7;
    $defPointsI  = 8;
    $itemOrderI  = 9;
+// end of indices for main course report
+
+
+// r indices for imas_questions
+$pointsI = 0;
+$idI     = 1;
 
 // $st indices
 $sNameI       = 0;
@@ -214,21 +214,28 @@ $sPtsI      = 8;
 $aNameI       = 0;
 $aAttemptsI   = 1;
 $aidI         = 2;
-$aScoreI      = 3;
-$aNoCredI     = 4;
-$aCredI       = 5;
-$aNoCredUI    = 6;
-$aCredUI      = 7;
+$aNoCredI     = 3;
+$aCredI       = 4;
+$aNoCredUI    = 5;
+$aCredUI      = 6;
+$aScoreI      = 7;
+
+// explode indices
+$firstI  = 0;
+$secondI = 1;
 
 
-   $query = "select FirstName, LastName, sid, ias.userid"; // 0,1,2
-   $query .=", ia.name "; // 3
-   $query .= ", ia.minscore  "; //4
-   $query .= ", ias.bestscores   "; //5
-   $query .= ", ia.id   "; // 6
-   $query .= ", ia.defpoints   "; // 7
-   $query .= ", ia.itemorder   "; // 8
-
+// NOTE: If you add columns to the query, make sure you add them to the
+// end so that indices don't get confused, then add a variable to the
+// line indices mentioned in comment AA
+   $query = "select FirstName, LastName, sid, ias.userid"; // 0,1,2,3
+   $query .=", ia.name "; // 4
+   $query .= ", ia.minscore  "; //5
+   $query .= ", ias.bestscores   "; //6
+   $query .= ", ia.id   "; // 7
+   $query .= ", ia.defpoints   "; // 8
+   $query .= ", ia.itemorder   "; // 9
+// last column. Add additional columns immediately before this comment
    $query .= " from imas_users as iu";
 $query .= " join imas_students as stu on iu.id = stu.userid "; // no teachers
    $query .= " left join imas_assessment_sessions as ias ";
@@ -269,7 +276,7 @@ while($line = mysql_fetch_row($result)) {
     $st[$i][$sCredSI]    = "";
     $st[$i][$sCPossI]    = 0;  
     $st[$i][$sCPtsI]     = 0;  
-  } else if( $student != $line[2]) {
+  } else if( $student != $line[$sidI]) {
     if ($i%2!=0) {
     echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
   } else {
@@ -277,14 +284,36 @@ while($line = mysql_fetch_row($result)) {
   }
    ?>
 
-      <td> <? echo $st[$i][0]; ?> </td>
-      <td  align="center"> <? echo $st[$i][1]; ?> </td>
-      <td> <? if ($st[$i][7] > 0) {
-                $pc = "{$st[$i][8]}/{$st[$i][7]}";
+      <td> <? echo $st[$i][$sNameI]; ?> </td>
+      <td  align="center"> <? echo $st[$i][$sAttemptsI]; ?> </td>
+      <td> <? if ($st[$i][$sPossI] > 0) {
+                $pc = "{$st[$i][$sPtsI]}/{$st[$i][$sPossI]}";
               } else { $pc = "NA"; }
               echo $pc; ?> </td>
-      <td align="center"> <? echo $st[$i][3]; ?> </td>
-      <td align="center"> <? echo $st[$i][4]; ?> </td>
+       <td align="center">
+       <? if ($st[$i][$sNoCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_nc')\">"; 
+		        echo $st[$i][$sNoCredI]; ?> </p>
+	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_nc'><li>";
+	     echo str_replace(":","</li><li>",$st[$i][$sNoCredSI])."</li><ul>";
+	  } else {
+             echo $st[$i][$sNoCredI];
+	  }
+	  ?>
+	       
+       </td>
+      <td align="center">
+       <? if ($st[$i][$sCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_c')\">"; 
+		        echo $st[$i][$sCredI]; ?> </p>
+	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_c'><li>";
+	     echo str_replace(":","</li><li>",$st[$i][$sCredSI])."</li><ul>";
+          } else {
+             echo $st[$i][$sCredI];
+	  }
+	  ?>
+      </td>
+
 			       
 
    </tr>
@@ -301,7 +330,7 @@ while($line = mysql_fetch_row($result)) {
     $cc = "";
 
   }
-  $student = $line[2];
+  $student = $line[$sidI];
   $st[$i][$sNameI]  = $line[$firstNameI];
   $st[$i][$sNameI] .= " ";
   $st[$i][$sNameI] .= $line[$lastNameI];
@@ -333,21 +362,21 @@ while($line = mysql_fetch_row($result)) {
   foreach ($aitems as $v) {
     if (strpos($v,'~')!==FALSE) {
       $sub = explode('~',$v);
-      if (strpos($sub[0],'|')===false) { //backwards compat
-	$atofind[$n] = $sub[0];
+      if (strpos($sub[$firstI],'|')===false) { //backwards compat
+	$atofind[$n] = $sub[$firstI];
 	$aitemcnt[$n] = 1;
 	$n++;
       } else {
-	$grpparts = explode('|',$sub[0]);
-	if ($grpparts[0]==count($sub)-1) { //handle diff point values in group if n=count of group
+	$grpparts = explode('|',$sub[$firstI]);
+	if ($grpparts[$firstI]==count($sub)-1) { //handle diff point values in group if n=count of group
 	  for ($i=1;$i<count($sub);$i++) {
 	    $atofind[$n] = $sub[$i];
 	    $aitemcnt[$n] = 1;
 	    $n++;
 	  }
 	} else {
-	  $atofind[$n] = $sub[1];
-	  $aitemcnt[$n] = $grpparts[0];
+	  $atofind[$n] = $sub[$secondI];
+	  $aitemcnt[$n] = $grpparts[$firstI];
 	  $n++;
 	}
       }
@@ -359,16 +388,16 @@ while($line = mysql_fetch_row($result)) {
   }
   
   $sp = explode(';',$bestscores);
-  $scores = explode(',',$sp[0]);
+  $scores = explode(',',$sp[$firstI]);
   $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$aid}'";
   $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
   $totalpossible = 0;
   while ($r = mysql_fetch_row($result2)) {
-    if (($m = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts	
-      if ($r[0]==9999) {
+    if (($m = array_search($r[$idI],$atofind))!==false) { //only use first item from grouped questions for total pts	
+      if ($r[$pointsI]==9999) {
 	$totalpossible += $aitemcnt[$m]*$defpoints; //use defpoints
       } else {
-	$totalpossible += $aitemcnt[$m]*$r[0]; //use points from question
+	$totalpossible += $aitemcnt[$m]*$r[$pointsI]; //use points from question
       }
     }
     }
@@ -405,16 +434,37 @@ while($line = mysql_fetch_row($result)) {
   } else {
     echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
   }
-   ?>
-
-      <td> <? echo $st[$i][0]; ?> </td>
-      <td  align="center"> <? echo $st[$i][1]; ?> </td>
-      <td> <? if ($st[$i][7] > 0) {
-                $pc = "{$st[$i][8]}/{$st[$i][7]}";
+   ?> 
+ 
+      <td> <? echo $st[$i][$sNameI]; ?> </td>
+      <td  align="center"> <? echo $st[$i][$sAttemptsI]; ?> </td>
+      <td> <? if ($st[$i][$sPossI] > 0) {
+                $pc = "{$st[$i][$sPtsI]}/{$st[$i][$sPossI]}";
               } else { $pc = "NA"; }
               echo $pc; ?> </td>
-      <td align="center"> <? echo $st[$i][3]; ?> </td>
-      <td align="center"> <? echo $st[$i][4]; ?> </td>
+       <td align="center">
+       <? if ($st[$i][$sNoCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_nc')\">"; 
+		        echo $st[$i][$sNoCredI]; ?> </p>
+	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_nc'><li>";
+	     echo str_replace(":","</li><li>",$st[$i][$sNoCredSI])."</li><ul>";
+          } else {
+             echo $st[$i][$sNoCredI];
+	  }
+	  ?>
+	       
+       </td>
+      <td align="center">
+       <? if ($st[$i][$sCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$st[$i][$sNameI]}_c')\">"; 
+		        echo $st[$i][$sCredI]; ?> </p>
+	  <? echo "<ul style=\"display:none\" id='{$st[$i][$sNameI]}_c'><li>";
+	     echo str_replace(":","</li><li>",$st[$i][$sCredSI])."</li><ul>";
+          } else {
+             echo $st[$i][$sCredI];
+	  }
+	  ?>
+      </td>
 			       
 
    </tr>
@@ -424,33 +474,10 @@ $numrows = $i+1;
 </tbody>
 </table>
 <br>
-<table class="gb">
-<thead>
-   <th> Student </th>
-   <th> Num Attempts </th>
-   <th> No Credit </th>
-<th> Credit </th>
-   </thead>
-<?
-for($i = 0; $i < $numrows; $i++) {
-  if ($i%2!=0) {
-    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
-  } else {
-    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
-  }
-
-?>
-   
-      <td> <? echo $st[$i][0]; ?> </td>
-      <td align="center"> <? echo $st[$i][1]; ?> </td>
-  <td> <? echo "<ul><li>".str_replace(":","</li><li>",$st[$i][5])."</li><ul>"; ?> </td>
-  <td> <? echo "<ul><li>".str_replace(":","</li><li>",$st[$i][6])."</li><ul>"; ?> </td>
-
-   </tr>
-<? }      ?>
-</table>
 <h3>   Assessment Summary: </h3>
-<table class="gb">
+
+       Click Credit/No Credit numbers for detail.
+    <table class="gb">
 <thead>
    <th> Assessment </th>
    <th> Num Attempts </th>
@@ -462,36 +489,36 @@ for($i = 0; $i < $numrows; $i++) {
 foreach ($asIdxArr as $k) {
   $numnc = 0;
   $numcred = 0;
-  $credusers = "<ul>";
-  $nocredusers = "<ul>";
+  $credusers = "<ul style=\"display:none\" id='{$atbl[$k][$aNameI]}_c'>";
+  $nocredusers = "<ul style=\"display:none\" id='{$atbl[$k][$aNameI]}_nc'>";
   for($i = 0; $i < $numrows; $i++) {
-    $snocred = explode(":",$st[$i][5]);
-    $scred = explode(":",$st[$i][6]);
-    if(in_array($atbl[$k][0],$snocred)) {
+    $snocred = explode(":",$st[$i][$sNoCredSI]);
+    $scred = explode(":",$st[$i][$sCredSI]);
+    if(in_array($atbl[$k][$aNameI],$snocred)) {
       $numnc++;
       $nocredusers .= "<li>";
-      $nocredusers .= $st[$i][0];
+      $nocredusers .= $st[$i][$sNameI];
       $nocredusers .= "</li>";
-    } else if(in_array($atbl[$k][0],$scred)) {
+    } else if(in_array($atbl[$k][$aNameI],$scred)) {
       $numcred++;
       $credusers .= "<li>";
-      $credusers .= $st[$i][0];
+      $credusers .= $st[$i][$sNameI];
       $credusers .= "</li>";
     }
   }
   $nocredusers .= "</ul>";
   $credusers .= "</ul>";
-  
-  $atbl[$k][3] = $numnc;
-  $atbl[$k][4] = $numcred;
-  $atbl[$k][5] = $nocredusers;
-  $atbl[$k][6] = $credusers;
-  if($atbl[$k][1] > 0) {
+
+  $atbl[$k][$aNoCredI] = $numnc;
+  $atbl[$k][$aCredI] = $numcred;
+  $atbl[$k][$aNoCredUI] = $nocredusers;
+  $atbl[$k][$aCredUI] = $credusers;
+  if($atbl[$k][$aAttemptsI] > 0) {
     $index = "'{$atbl[$k][2]}'";
-    //$atbl[$k][7] = $index;
-        $atbl[$k][7] = $asPtsArr[$index]*100/$asPossArr[$index];
+    //$atbl[$k][$aScoreI] = $index;
+        $atbl[$k][$aScoreI] = $asPtsArr[$index]*100/$asPossArr[$index];
   } else {
-    $atbl[$k][7] = 0;
+    $atbl[$k][$aScoreI] = 0;
   }
   if ($k%2!=0) {
     echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
@@ -501,11 +528,31 @@ foreach ($asIdxArr as $k) {
 
   ?>
    
-    <td> <? echo $atbl[$k][0] ?> </td>
-    <td  align="center"> <? echo $atbl[$k][1] ?> </td>
-      <td  align="center"> <? echo  $atbl[$k][7]."%"; ?> </td>
-    <td  align="center"> <? echo $numnc ?> </td>
-    <td align="center"> <? echo $numcred ?> </td>
+    <td> <? echo $atbl[$k][$aNameI] ?> </td>
+    <td  align="center"> <? echo $atbl[$k][$aAttemptsI] ?> </td>
+      <td  align="center"> <? echo  $atbl[$k][$aScoreI]."%"; ?> </td>
+       <td align="center">
+       <? if ($atbl[$k][$aNoCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$atbl[$k][$aNameI]}_nc')\">"; 
+		        echo $atbl[$k][$aNoCredI]; ?> </p>
+	  <? 
+	     echo $atbl[$k][$aNoCredUI];
+          } else {
+             echo $atbl[$k][$aNoCredI];
+	  }
+	  ?>
+	       
+       </td>
+      <td align="center">
+       <? if ($atbl[$k][$aCredI] > 0) { ?>
+	  <p onclick=<? echo "\"toggleList('{$atbl[$k][$aNameI]}_c')\">"; 
+		        echo $atbl[$k][$aCredI]; ?> </p>
+	  <? echo $atbl[$k][$aCredUI];
+          } else {
+             echo $atbl[$k][$aCredI];
+	  }
+	  ?>
+      </td>
    </tr>
 <?
    $k++;
@@ -514,33 +561,6 @@ foreach ($asIdxArr as $k) {
 
 ?>
 
-</table>
-<br>
-    <table class="gb">
-<thead>
-   <th> Assessment </th>
-   <th> Num Attempts </th>
-<th> No Credit </th>
-<th> Credit </th>
-   </thead>
-<?
-    $numrows = $k;
-for($i = 0; $i < $numrows; $i++) {
-  if ($i%2!=0) {
-    echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
-  } else {
-    echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
-  }
-
-?>
-   
-      <td> <? echo $atbl[$i][0]; ?> </td>
-      <td  align="center"> <? echo $atbl[$i][1]; ?> </td>
-      <td> <? echo $atbl[$i][5]; ?> </td>
-      <td> <? echo $atbl[$i][6]; ?> </td>
-
-   </tr>
-<? }      ?>
 </table>
 
 
