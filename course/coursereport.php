@@ -65,7 +65,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$assessmentcount = $line['assessmentcount'];
 	$totalcount = $line['totalcount'];
 
-	$query = "select userid from imas_students where courseid ='$cid' ";
+
+	// Set up the main $st array with first and last name for all students
+	// in a class
+	$query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid ='$cid' ";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$totalstudents = 0;
 
@@ -85,6 +88,9 @@ $sPtsI      = 8;
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	  $uid = $line['userid'];
 	  $totalstudents++;
+          $st["'{$uid}'"][$sNameI]  = $line['firstName'];
+          $st["'{$uid}'"][$sNameI] .= " ";
+          $st["'{$uid}'"][$sNameI] .= $line['lastName'];
 	  $st["'{$uid}'"][$sAttemptsI] = 0;
 	  $st["'{$uid}'"][$sNoCredI]   = 0;
 	  $st["'{$uid}'"][$sCredI]     = 0;
@@ -205,16 +211,13 @@ if ($overwriteBody==1) {
 				  
 // line indices for main course report
 // AA
-   $firstNameI  = 0;
-   $lastNameI   = 1;
-   $sidI        = 2;
-   $uidI        = 3;
-   $testNameI   = 4;
-   $minScoreI   = 5;
-   $bestScoreI  = 6;
-   $testIdI     = 7;
-   $defPointsI  = 8;
-   $itemOrderI  = 9;
+   $uidI        = 0;
+   $testNameI   = 1;
+   $minScoreI   = 2;
+   $bestScoreI  = 3;
+   $testIdI     = 4;
+   $defPointsI  = 5;
+   $itemOrderI  = 6;
 // end of indices for main course report
 
 
@@ -241,24 +244,20 @@ $secondI = 1;
 // NOTE: If you add columns to the query, make sure you add them to the
 // end so that indices don't get confused, then add a variable to the
 // line indices mentioned in comment AA
-   $query = "select FirstName, LastName, sid, ias.userid"; // 0,1,2,3
-   $query .=", ia.name "; // 4
-   $query .= ", ia.minscore  "; //5
-   $query .= ", ias.bestscores   "; //6
-   $query .= ", ia.id   "; // 7
-   $query .= ", ia.defpoints   "; // 8
-   $query .= ", ia.itemorder   "; // 9
+   $query = "select ias.userid"; // 0
+   $query .=", ia.name "; // 1
+   $query .= ", ia.minscore  "; //2
+   $query .= ", ias.bestscores   "; //3
+   $query .= ", ia.id   "; // 4
+   $query .= ", ia.defpoints   "; // 5
+   $query .= ", ia.itemorder   "; // 6
 // last column. Add additional columns immediately before this comment
-   $query .= " from imas_users as iu";
-//$query .= " join imas_students as stu on iu.id = stu.userid "; // no teachers
-   $query .= " join imas_assessment_sessions as ias ";
-   $query .= " on iu.id = ias.userid";
+   $query .= " from imas_assessment_sessions as ias ";
    $query .=" join imas_assessments as ia ";
    $query .= " on assessmentid=ia.id  ";
-//   $query .= " where iu.id = stu.userid";
    $query .= " where (ia.courseid = '$cid'  ";
    $query .=  "and endtime > $rangestart ) ";
-   $query .=" order by iu.sid ";
+   $query .=" order by ias.userid ";
    $result = mysql_query($query) or die("Query failed : " . mysql_error());
 ?>
 <table class="gb">
@@ -278,17 +277,13 @@ $asNextIdx = 0;
 
 
 $atbl = array();
-$student = -1;
+$uid = -1;
 while($line = mysql_fetch_row($result)) {
-  $uid = $line[$uidI];
-  if ($student !== $line[$sidI]) {
+  if ($uid !== $line[$uidI]) {
     $ncc = "";
     $cc = "";
   }
-  $student = $line[$sidI];
-  $st["'{$uid}'"][$sNameI]  = $line[$firstNameI];
-  $st["'{$uid}'"][$sNameI] .= " ";
-  $st["'{$uid}'"][$sNameI] .= $line[$lastNameI];
+  $uid = $line[$uidI];
 
   if(!is_null($line[$testNameI])) {
     $st["'{$uid}'"][$sAttemptsI]++;
