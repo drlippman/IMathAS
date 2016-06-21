@@ -96,7 +96,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
 	//TODO:  Fix for timezone handling
-	$oneweekago = 0;// strtotime("1 week ago");
+	$oneweekago = strtotime("1 week ago");
 	//$oneweekago = 0;
 	$sincemonday = strtotime("Monday this week");
 	
@@ -161,7 +161,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
 		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
 		
-		if ($line['minscores']!=0) { //use minscore
+		if ($assessmentInfo[$aid]['minscore']!=0) { //use minscore
 			$minscore = $assessmentInfo[$aid]['minscore'];
 			if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$assessmentInfo[$aid]['possible'])) {
 				//student did not get credit
@@ -269,7 +269,7 @@ foreach ($st as $uid=>$stu) {
 	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
 	echo '<td class="c">'.$stuattemptedCnt.'</td>';
 	
-	if ($stu['totalPointsOnAttempted']>0) {
+	if ($stu['totalPointsPossibleOnAttempted']>0) {
 		echo '<td>'.$stu['totalPointsOnAttempted'].'/'.$stu['totalPointsPossibleOnAttempted'];
 		echo ' ('. round(100*$stu['totalPointsOnAttempted']/$stu['totalPointsPossibleOnAttempted'],1) .'%)</td>';
 	} else {
