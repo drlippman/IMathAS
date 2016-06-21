@@ -96,7 +96,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
 	//TODO:  Fix for timezone handling
-	$oneweekago = strtotime("1 week ago");
+	$oneweekago = 0;// strtotime("1 week ago");
 	//$oneweekago = 0;
 	$sincemonday = strtotime("Monday this week");
 	
@@ -118,9 +118,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$uid = $line['userid'];
 		$totalstudents++;
 		$st[$uid]['stuname']  = $line['lastName'].', '.$line['firstName'];
-		$st[$uid]['stuattemptCnt'] = 0;
-		$st[$uid]['stuNocredCnt'] = 0;
-		$st[$uid]['stuGotcreditCnt']  = 0;
 		$st[$uid]['stuNocreditAssessList'] = array();
 		$st[$uid]['stuCreditAssessList'] = array();
 		$st[$uid]['totalPointsOnAttempted'] = 0;
@@ -142,8 +139,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$uid = $line['userid'];
 		$aid = $line['id'];
 		$totalAttemptCount++;
-		
-		$st[$uid]['stuattemptCnt']++;
 		
 		//store assessment info
 		if (!isset($assessmentInfo[$aid])) {
@@ -170,24 +165,20 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 			$minscore = $assessmentInfo[$aid]['minscore'];
 			if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$assessmentInfo[$aid]['possible'])) {
 				//student did not get credit
-				$st[$uid]['stuNocredCnt']++;
 				$st[$uid]['stuNocreditAssessList'][] = $aid;
 				$assessmentInfo[$aid]['nocreditstulist'][] = $uid;
 			} else {
 				//student did get credit
-				$st[$uid]['stuGotcreditCnt']++;        
 				$st[$uid]['stuCreditAssessList'][] = $aid;
 				$assessmentInfo[$aid]['gotcreditstulist'][] = $uid;
 			}
 		} else { //no minscore, so use alternate break value
 			if (100*$pts/$assessmentInfo[$aid]['possible'] < $breakpercent) {
 				//student did not get credit
-				$st[$uid]['stuNocredCnt']++;
 				$st[$uid]['stuNocreditAssessList'][] = $aid;
 				$assessmentInfo[$aid]['nocreditstulist'][] = $uid;
 			} else {
 				//student did get credit
-				$st[$uid]['stuGotcreditCnt']++;        
 				$st[$uid]['stuCreditAssessList'][] = $aid;
 				$assessmentInfo[$aid]['gotcreditstulist'][] = $uid;
 			}
@@ -198,7 +189,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	$totalstudents = count($st);
 	$attemptedstudents = 0;
 	foreach ($st as $user) {
-		if ($user['stuattemptCnt']>0) {
+		if (count($user['stuCreditAssessList'])>0 || count($user['stuNocreditAssessList'])>0) {
 			$attemptedstudents++;
 		}
 	}
@@ -274,38 +265,43 @@ foreach ($st as $uid=>$stu) {
 	}
 	
 	echo '<td>'.$stu['stuname'].'</td>';
-	echo '<td class="c">'.$stu['stuattemptCnt'].'</td>';
+	
+	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
+	echo '<td class="c">'.$stuattemptedCnt.'</td>';
+	
 	if ($stu['totalPointsOnAttempted']>0) {
 		echo '<td>'.$stu['totalPointsOnAttempted'].'/'.$stu['totalPointsPossibleOnAttempted'];
 		echo ' ('. round(100*$stu['totalPointsOnAttempted']/$stu['totalPointsPossibleOnAttempted'],1) .'%)</td>';
 	} else {
 		echo '<td>N/A</td>';
 	}
-	if ($stu['stuNocredCnt'] > 0) {
+	echo '<td class="c">';
+	if (count($stu['stuNocreditAssessList']) > 0) {
 		uasort($stu['stuNocreditAssessList'], function($a,$b) {global $assessmentInfo; return strcasecmp($assessmentInfo[$a]['name'],$assessmentInfo[$b]['name']);});
 		
-		echo '<td class="c" >'.$stu['stuNocredCnt'];
+		echo count($stu['stuNocreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuNocreditAssessList'] as $aid) {
 			echo '<li>'.$assessmentInfo[$aid]['name'].'</li>';
 		}
 		echo '</ul>';
 	} else {
-		echo '<td class="c">0';
+		echo '0';
 	}
 	echo '</td>';
 
-	if ($stu['stuGotcreditCnt'] > 0) {
+	echo '<td class="c">';
+	if (count($stu['stuCreditAssessList']) > 0) {
 		uasort($stu['stuCreditAssessList'], function($a,$b) {global $assessmentInfo; return strcasecmp($assessmentInfo[$a]['name'],$assessmentInfo[$b]['name']);});
 		
-		echo '<td class="c" onclick="toggleList(\'stu_'.$uid.'\')">'.$stu['stuGotcreditCnt'];
+		echo count($stu['stuCreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuCreditAssessList'] as $aid) {
 			echo '<li>'.$assessmentInfo[$aid]['name'].'</li>';
 		}
 		echo '</ul>';
 	} else {
-		echo '<td class="c">0';
+		echo '0';
 	}
 	echo '</td>';
 	echo '</tr>';
@@ -354,29 +350,31 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 	
 	echo '<td class="c">'. round(100*($ainfo['totalPointsEarned']/$ainfo['attempts'])/$ainfo['possible'],1) .'</td>';
 
+	echo '<td class="c">';
 	if (count($ainfo['nocreditstulist']) > 0) {
 		uasort($ainfo['nocreditstulist'], function($a,$b) {global $st; return strcasecmp($st[$a]['stuname'],$st[$b]['stuname']);});
-		echo '<td class="c" onclick="toggleList(\'as_'.$aid.'\')">'.count($ainfo['nocreditstulist']);
+		echo count($ainfo['nocreditstulist']);
 		echo '<ul class="nomark asul" style="display:none">';
 		foreach ($ainfo['nocreditstulist'] as $uid) {
 			echo '<li>'.$st[$uid]['stuname'].'</li>';
 		}
 		echo '</ul>';
 	} else {
-		echo '<td class="c">0';
+		echo '0';
 	}
 	echo '</td>';
 
+	echo '<td class="c">';
 	if (count($ainfo['gotcreditstulist']) > 0) {
 		uasort($ainfo['gotcreditstulist'], function($a,$b) {global $st; return strcasecmp($st[$a]['stuname'],$st[$b]['stuname']);});
-		echo '<td class="c" onclick="toggleList(\'as_'.$aid.'\')">'.count($ainfo['gotcreditstulist']);
+		echo count($ainfo['gotcreditstulist']);
 		echo '<ul class="nomark asul" style="display:none">';
 		foreach ($ainfo['gotcreditstulist'] as $uid) {
 			echo '<li>'.$st[$uid]['stuname'].'</li>';
 		}
 		echo '</ul>';
 	} else {
-		echo '<td class="c">0';
+		echo '0';
 	}
 	echo '</td>';
 	echo '</tr>';
