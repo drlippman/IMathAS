@@ -36,10 +36,16 @@ if ($overwriteBody==1) {
 	$curBreadcrumb .= "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	$curname = $coursename;
 	echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Course Reports</div>';
-	
+	echo '<div class="pagetitle"><h2>Course Reports</h2></div>';
 	echo '<ul class="nomark">';
-	echo '<li><a href="report-weeklylab.php?cid='.$cid.'">Weekly Report - Lab Style Courses</a></li>';
+	echo '<li><a href="report-weeklylab.php?cid='.$cid.'">Activity Report - Lab Style Courses</a></li>';
+	echo '<li><a href="outcomereport.php?cid='.$cid.'">Outcome Report</a></li>';
+	echo '<li><a href="logingrid.php?cid='.$cid.'">Login Grid</a></li>';
 	echo '</ul>';
+	
+	echo '<p>&nbsp;</p>';
+	echo '<p>Individual student login logs and detailed activity logs can be accessed ';
+	echo 'from the Gradebook report for an individual student.</p>';
 }
 
 require("../footer.php");

@@ -4,6 +4,7 @@
 
 /*** master php includes *******/
 require("../validate.php");
+require("../includes/htmlutil.php");
 
 /*** pre-html data manipulation, including function code *******/
 
@@ -94,17 +95,61 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	$overwriteBody=1;
 	$body = _("You need to log in as a teacher to access this page\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-
-	//TODO:  Fix for timezone handling
-	$oneweekago = strtotime("1 week ago");
-	//$oneweekago = 0;
-	$sincemonday = strtotime("Monday this week");
 	
-	$rangestart = $oneweekago;
-	$timedescr = "In the last week";
+	if (isset($_POST['interval'])) { 
+		//settings update postback
+		if (!isset($sessiondata['reportsettings-weeklylab'])) {
+			$sessiondata['reportsettings-weeklylab'] = array();
+		}
+		$sessiondata['reportsettings-weeklylab'.$cid]['interval'] = $_POST['interval'];
+		$sessiondata['reportsettings-weeklylab'.$cid]['useminscore'] = isset($_POST['useminscore']);
+		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
+		writesessiondata();
+		
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/report-weeklylab.php?cid=$cid");
+		exit;
+	}
 	
-	//break credit from non-credit for assignments without minscore
-	$breakpercent = 75;  
+	if (isset($sessiondata['reportsettings-weeklylab'.$cid])) {
+		$interval = $sessiondata['reportsettings-weeklylab'.$cid]['interval'];
+		$useminscore = $sessiondata['reportsettings-weeklylab'.$cid]['useminscore'];
+		$breakpercent = $sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'];
+		
+	} else {
+		$interval = '1week';
+		$useminscore = true;
+		$breakpercent = 75;
+	}
+	
+	$intervalarr = array(	'today'=>'today', 
+				'thisweek'=>'this week (since Monday)',
+				'1week'=>'one week (7 days)',
+				'2week'=>'two weeks (14 days)',
+				'4week'=>'one month (30 days)',
+				'alltime'=>'all time');
+	
+	list($yr,$month,$day,$dayofweek) = explode('-', date('Y-m-d-w'));
+	$startofday = mktime(0,0,0,$month,$day,$yr);
+	
+	if ($interval=='1week' || ($interval=='thisweek' && $dayofweek==0)) {
+		$rangestart = $startofday - 7*24*60*60;
+		$timedescr = 'In the last week (7 days)';
+	} else if ($interval=='today' || ($interval=='thisweek' && $dayofweek==1)) {
+		$rangestart = $startofday;
+		$timedescr = 'Today';
+	} else if ($interval=='thisweek') {
+		$rangestart = $startofday - ($dayofweek-1)*24*60*60;
+		$timedescr = 'This week (since Monday)';
+	} else if ($interval=='2week') {
+		$rangestart = $startofday - 14*24*60*60;
+		$timedescr = 'In the last two weeks (14 days)';
+	} else if ($interval=='4week') {
+		$rangestart = $startofday - 30*24*60*60;
+		$timedescr = 'In the last month (30 days)';
+	} else if ($interval=='alltime') {
+		$rangestart = 0;
+		$timedescr = 'Since the start of the course';
+	}
 		
 	// Set up the main $st array with first and last name for all students
 	// in a class
@@ -161,7 +206,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
 		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
 		
-		if ($assessmentInfo[$aid]['minscore']!=0) { //use minscore
+		if ($assessmentInfo[$aid]['minscore']!=0 && $useminscore) { //use minscore
 			$minscore = $assessmentInfo[$aid]['minscore'];
 			if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$assessmentInfo[$aid]['possible'])) {
 				//student did not get credit
@@ -206,7 +251,17 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		function unhighlightrow(el) { $(el).removeClass("highlight");}
 		function expandAllSummaries(type) { $("."+type+"ul").toggle(true);}
 		function collapseAllSummaries(type) { $("."+type+"ul").toggle(false);}
+		function toggleadv(el) {
+			if ($("#viewfield").is(":hidden")) {
+				$(el).html("Hide report settings");
+				$("#viewfield").slideDown();
+			} else {
+				$(el).html("Edit report settings");
+				$("#viewfield").slideUp();
+			}
+		}
 	</script>';
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=062216\"></script>\n";
 }
 	
 /******* begin html output ********/
@@ -221,12 +276,36 @@ if ($overwriteBody==1) {
 	echo $body;
 } else {
 
-	echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; Weekly Report - Lab</div>';
+	echo '<div class="breadcrumb">'. $curBreadcrumb . '&gt; Activity Report - Lab</div>';
+
+
+	echo '<div class="pagetitle"><h2>Activity Report - Lab Style Courses</h2></div>';
+	echo '<p>This report summarizes the activity of students for '.$intervalarr[$interval].'.<br/>';
+	if ($useminscore) {
+		echo 'Activity is divided into "credit" or "no credit". If a "minimum score to receive credit" is set for the assignment, that is ';
+		echo 'used to make the classification.  Otherwise, a score of '.$breakpercent.' is used.</p>';
+	} else {
+		echo 'Activity is divided into "credit" or "no credit" using a score of '.$breakpercent.'.</p>';
+	}
 	
-	echo '<div class="pagetitle"><h2>Weekly Report - Lab Style Courses</h2></div>';
-	echo '<p>This report summarizes the activy for students over the last week.  Activity is divided into ';
-	echo '"credit" or "no credit".  If a "minimum score to receive credit" is set for the assignment, that is ';
-	echo 'used to make the classification.  Otherwise, a score of '.$breakpercent.' is used.</p>';
+	echo '<p><a href="#" onclick="toggleadv(this);return false">Edit report settings</a></p>';
+	echo '<fieldset style="display:none;" id="viewfield"><legend>Report Settings</legend>';
+	echo '<form method="post" action="report-weeklylab.php?cid='.$cid.'">';
+	echo '<span class="form">Time interval to display:</span>';
+	echo '<span class="formright">';
+	writeHtmlSelect('interval',array_keys($intervalarr),array_values($intervalarr),$interval,'1week');
+	echo '</span><br class="form"/>';
+	echo '<span class="form">Use &quot;minimum score to receive credit&quot; (if defined) to determine credit/no-credit:</span>';
+	echo '<span class="formright"><input type="checkbox" name="useminscore" value="1" '.getHtmlChecked($useminscore,true).'/></span>';
+	echo '<br class="form"/>';
+	echo '<span class="form">Score to separate credit/no-credit:</span>';
+	echo '<span class="formright"><input type="text" size="3" name="breakpercent" value="'.$breakpercent.'"/>%</span>';
+	echo '<br class="form"/>';
+	
+	echo '<div class="submit"><input type="submit" value="Update"/></div>';
+	
+	echo '</form></fieldset>';
+	
 	
 	echo '<h3>'.$timedescr.'</h3>';
 	echo '<table class="gb">';
@@ -242,13 +321,13 @@ if ($overwriteBody==1) {
    <button type="button" onclick="collapseAllSummaries('stu')">Collapse All</button>
    </p>
 
-<table class="gb">
+<table class="gb" id="stuTable">
 <thead><tr>
    <th> Student </th>
    <th> Number of Assessments Attempted </th>
    <th> Cumulative Score </th>
-   <th> Asessments with No Credit </th>
-   <th> Asessments with Credit </th>
+   <th> Assessments with No Credit </th>
+   <th> Assessments with Credit </th>
 </tr>   </thead><tbody>
    
 <?php
@@ -322,10 +401,10 @@ foreach ($st as $uid=>$stu) {
    <button type="button" onclick="collapseAllSummaries('as')">Collapse All</button>
    </p>
 
-<table class="gb">
+<table class="gb" id="assessTable">
   <thead>
    <th> Assessment </th>
-   <th> Num Attempts </th>
+   <th> Number of Attempts </th>
    <th> Average Score </th>
    <th> No Credit </th>
    <th> Credit </th>
@@ -348,7 +427,7 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 	echo '<td>'.$ainfo['name'].'</td>';
 	echo '<td class="c">'. $ainfo['attempts'] .'</td>';
 	
-	echo '<td class="c">'. round(100*($ainfo['totalPointsEarned']/$ainfo['attempts'])/$ainfo['possible'],1) .'</td>';
+	echo '<td class="c">'. round(100*($ainfo['totalPointsEarned']/$ainfo['attempts'])/$ainfo['possible'],1) .'%</td>';
 
 	echo '<td class="c">';
 	if (count($ainfo['nocreditstulist']) > 0) {
@@ -386,6 +465,13 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 </table>
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+
+<script type="text/javascript">
+$(function() {
+ initSortTable('stuTable',Array("S","N","P","N","N"),true,true,true);
+ initSortTable('assessTable',Array("S","N","N","N","N"),true,true,true);
+});
+</script>
 <?php
 require("../footer.php");
 }
