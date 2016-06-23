@@ -41,6 +41,7 @@ function reshrinkeh(eln) {
 		document.getElementById("ehdd").style.display = "block";
 		document.getElementById('eh').style.display = "none";
 		ehcurel = null;
+		curehdd = eln;
 		unhideeh(0);
 	}
 }
