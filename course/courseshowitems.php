@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess,$collapseall;
 	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
@@ -91,7 +91,7 @@ function enditem($canedit) {
 			}
 			
 			$bnum = $i+1;
-			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
+			if (in_array($items[$i]['id'],$openblocks) && !$collapseall) { $isopen=true;} else {$isopen=false;}
 			if (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') {
 				$availbeh = _('Expanded');
 			} else if ($items[$i]['SH'][1]=='F') {
@@ -110,7 +110,7 @@ function enditem($canedit) {
 				$items[$i]['avail'] = 1;
 			}
 			if ($items[$i]['avail']==2 || ($items[$i]['avail']==1 && $items[$i]['startdate']<$now && $items[$i]['enddate']>$now)) { //if "available"
-				if ($firstload && (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O')) {
+				if ($firstload && (strlen($items[$i]['SH'])==1 || $items[$i]['SH'][1]=='O') && !$collapseall) {
 					echo "<script> oblist = oblist + ',".$items[$i]['id']."';</script>\n";
 					$isopen = true;
 				}
@@ -1829,7 +1829,7 @@ function enditem($canedit) {
 			} else {
 				$color = makecolor2($items[$i]['startdate'],$items[$i]['enddate'],$now);
 			}
-			if (in_array($items[$i]['id'],$openblocks)) { $isopen=true;} else {$isopen=false;}
+			if (in_array($items[$i]['id'],$openblocks) && !$collapseall) { $isopen=true;} else {$isopen=false;}
 			if ($isopen || count($items[$i]['items'])==0) {
 				$liclass = 'blockli';
 				$qviewstyle = '';
