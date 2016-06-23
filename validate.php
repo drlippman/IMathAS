@@ -56,7 +56,7 @@
  //check for bad sessionids.  
  if (strlen($sessionid)<10) { 
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
-	echo "Error.  Please <a href=\"$imasroot/index.php\">Home</a>try again</a>";
+	echo "Error.  Please <a href=\"$imasroot/index.php\">try again</a>";
 	exit;	 
  }
  $sessiondata = array();

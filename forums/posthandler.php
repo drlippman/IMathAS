@@ -421,7 +421,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					var filecnt = 1;
 					function addnewfile(t) {
 						var s = document.createElement("span");
-						s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /> File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
+						s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /><br/>File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
 						t.parentNode.insertBefore(s,t);
 						filecnt++;
 					}</script>';
@@ -436,7 +436,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
 					}
 				}
-				echo 'Description: <input type="text" name="newfiledesc-0" /> ';
+				echo 'Description: <input type="text" name="newfiledesc-0" /><br/>';
 				echo 'File: <input type="file" name="newfile-0" /><br/>';
 				echo '<a href="#" onclick="addnewfile(this);return false;">Add another file</a>';
 				echo "</span><br class=form>\n";

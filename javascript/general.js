@@ -315,8 +315,35 @@ function initeditor4(edmode,edids,css){
 		content_style: "body {background-color: #ffffff !important;}",
 		table_class_list: [{title: "None", value:''},
 			{title:"Gridded", value:"gridded"},
-			{title:"Gridded Centered", value:"gridded centered"}]
-	}
+			{title:"Gridded Centered", value:"gridded centered"}],
+		style_formats_merge: true,
+		style_formats: [{
+			title: "Font Family",
+			items: [
+			    {title: 'Arial', inline: 'span', styles: { 'font-family':'arial'}},
+			    {title: 'Book Antiqua', inline: 'span', styles: { 'font-family':'book antiqua'}},
+			    {title: 'Comic Sans MS', inline: 'span', styles: { 'font-family':'comic sans ms,sans-serif'}},
+			    {title: 'Courier New', inline: 'span', styles: { 'font-family':'courier new,courier'}},
+			    {title: 'Georgia', inline: 'span', styles: { 'font-family':'georgia,palatino'}},
+			    {title: 'Helvetica', inline: 'span', styles: { 'font-family':'helvetica'}},
+			    {title: 'Impact', inline: 'span', styles: { 'font-family':'impact,chicago'}},
+			    {title: 'Open Sans', inline: 'span', styles: { 'font-family':'Open Sans'}},
+			    {title: 'Symbol', inline: 'span', styles: { 'font-family':'symbol'}},
+			    {title: 'Tahoma', inline: 'span', styles: { 'font-family':'tahoma'}},
+			    {title: 'Terminal', inline: 'span', styles: { 'font-family':'terminal,monaco'}},
+			    {title: 'Times New Roman', inline: 'span', styles: { 'font-family':'times new roman,times'}},
+			    {title: 'Verdana', inline: 'span', styles: { 'font-family':'Verdana'}}
+			]
+			},
+			{title: "Font Size", items: [
+                                {title: '8pt', inline:'span', styles: { fontSize: '12px', 'font-size': '8px' } },
+                                {title: '10pt', inline:'span', styles: { fontSize: '12px', 'font-size': '10px' } },
+                                {title: '12pt', inline:'span', styles: { fontSize: '12px', 'font-size': '12px' } },
+                                {title: '14pt', inline:'span', styles: { fontSize: '12px', 'font-size': '14px' } },
+                                {title: '16pt', inline:'span', styles: { fontSize: '12px', 'font-size': '16px' } }
+                        ]
+                }]
+        }
 	if (document.documentElement.clientWidth<540) {
 		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";

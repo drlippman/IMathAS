@@ -49,7 +49,7 @@ function ahahDone(url, target) {
    
 var loadedblocks = new Array();
 
-function toggleblock(bnum,folder) {
+function toggleblock(event,bnum,folder) {
       var node = document.getElementById('block'+bnum);
       //var butn = document.getElementById('but'+bnum);
       var img = document.getElementById('img'+bnum);
@@ -84,6 +84,12 @@ function toggleblock(bnum,folder) {
       plblist = plblist.join(',');
       document.cookie = 'openblocks-' +cid+'='+ oblist;
       document.cookie = 'prevloadedblocks-'+cid+'='+plblist;
+      if (event.ctrlKey && node.className == 'hidden') {
+          $("a[id^=blockh]").each(function(i,el) { 
+          	var id=$(el).attr("id").substr(6); 
+          	if ($("#block"+id).hasClass("blockitems")) { toggleblock({},id,null);}
+          });  
+      }
    }
    
 function showcalcontents(el) {

@@ -48,7 +48,19 @@
 			return 0;
 		}
 	}
-	
+	function sortPercent(a,b){
+		try {
+			a = parseFloat(a.match(/[\d\.]+\s*%/));
+			b = parseFloat(b.match(/[\d\.]+\s*%/));
+			
+			if (isNaN(a)) { a=0; }
+			if (isNaN(b)) { b=0; }
+			
+			return a/1 - b/1;
+		} catch(e) {
+			return 0;
+		}
+	}
 	function sortDate(a,b) {
 		if (ar = a.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)(am|pm)/)) {
 			a = ar[3]*10000 + ar[1]*100 + 1*ar[2] + .01*(ar[4]/1-(ar[4]/1==12?12:0)+(ar[6]=='pm'?12:0))+.0001*ar[5]/1;
@@ -172,6 +184,8 @@
 			cellArray = cellArray.sort(sortDate);
 		} else if (sortMethod=='B') {
 			cellArray = cellArray.sort(sortSortby);
+		} else if (sortMethod=='P') {
+			cellArray = cellArray.sort(sortPercent);
 		} else{
 			cellArray = cellArray.sort(sortString);
 		}
