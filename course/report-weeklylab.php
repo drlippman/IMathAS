@@ -86,7 +86,7 @@ function getpointspossible($aid, $itemorder, $defaultpoints) {
 $overwriteBody = 0;
 $body = "";
 $cid = intval($_GET['cid']);
-$pagetitle = 'Weekly Report - Lab Style Course';
+$pagetitle = 'Activity Report - Lab Style Course';
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by someone not in the course
 	$overwriteBody=1;
