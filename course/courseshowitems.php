@@ -247,7 +247,7 @@ function enditem($canedit) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo _('collapse');} else {echo _('expand');}
-						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
+						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
@@ -255,7 +255,7 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
+					echo "<span class=pointer onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span style=\"color:red;\">", _('New'), "</span>";
@@ -440,7 +440,7 @@ function enditem($canedit) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo _('collapse');} else {echo _('expand');}
-						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
+						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
@@ -448,7 +448,7 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
+					echo "<span class=pointer onClick=\"toggleblock(,event'{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
 					if ($items[$i]['SH'][0]=='S') {
 						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
