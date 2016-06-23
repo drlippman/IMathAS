@@ -18,6 +18,9 @@ if ($row[0]=='') {
 	$outcomes = array();
 } else {
 	$outcomes = unserialize($row[0]);
+	if (!is_array($outcomes)) {
+		$outcomes = array();
+	}
 }
 
 $outcomeinfo = array();
@@ -171,50 +174,55 @@ if ($report=='overview') {
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
 	
-	echo '<div class="cpmid">'.$typesel.' ';
-	echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
-	if ($headerslocked) {
-		echo _('Unlock headers');
+	if (count($outcomes)==0) {
+		echo '<p>'._('No outcomes are defined in this course.').'</p>';
 	} else {
-		echo _('Lock headers');
-	}
-	echo "\"/>";
-	echo ' <a href="outcomereport.php?cid='.$cid.'&amp;export=true&amp;type='.$type.'">Export to CSV</a> ';
-	echo '</div>';
-	echo "<div id=\"tbl-container\">";
-	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
 	
-	echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th><th class="cat0"><div></div></th>';
-	$sarr = '"S",false';
-	list($html,$tots) = printOutcomeRow($outcomes,true,'0');
-	echo $html;
-	/*foreach ($outc as $oc) {
-		echo '<th>'.$outcomeinfo[$oc].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'&amp;type='.$type.'">[Details]</a></th>';
-		$sarr .= ',"N"';
-	}*/
-	echo '</tr></thead><tbody>';
-	
-	$ot = outcometable();
-
-	for ($i=1;$i<count($ot);$i++) {
-		echo '<tr class="'.($i%2==0?'even':'odd').'">';
-		echo '<td><div class="trld"><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></div></td>';
-		echo '<td><div></div></td>';
-		/*foreach ($outc as $oc) {
-			if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
-				echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';	
-			} else {
-				echo '<td>-</td>';
-			}
-		}*/
-		list($html,$tots) = printOutcomeRow($outcomes,false,'0',$i);
+		echo '<div class="cpmid">'.$typesel.' ';
+		echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
+		if ($headerslocked) {
+			echo _('Unlock headers');
+		} else {
+			echo _('Lock headers');
+		}
+		echo "\"/>";
+		echo ' <a href="outcomereport.php?cid='.$cid.'&amp;export=true&amp;type='.$type.'">Export to CSV</a> ';
+		echo '</div>';
+		echo "<div id=\"tbl-container\">";
+		echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
+		
+		echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th><th class="cat0"><div></div></th>';
+		$sarr = '"S",false';
+		list($html,$tots) = printOutcomeRow($outcomes,true,'0');
 		echo $html;
-		echo '</tr>';
+		/*foreach ($outc as $oc) {
+			echo '<th>'.$outcomeinfo[$oc].'<br/><a class="small" href="outcomereport.php?cid='.$cid.'&amp;outcome='.$oc.'&amp;type='.$type.'">[Details]</a></th>';
+			$sarr .= ',"N"';
+		}*/
+		echo '</tr></thead><tbody>';
+		
+		$ot = outcometable();
+	
+		for ($i=1;$i<count($ot);$i++) {
+			echo '<tr class="'.($i%2==0?'even':'odd').'">';
+			echo '<td><div class="trld"><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></div></td>';
+			echo '<td><div></div></td>';
+			/*foreach ($outc as $oc) {
+				if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
+					echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';	
+				} else {
+					echo '<td>-</td>';
+				}
+			}*/
+			list($html,$tots) = printOutcomeRow($outcomes,false,'0',$i);
+			echo $html;
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+		echo '</div></div>';
+		echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+		echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 	}
-	echo '</tbody></table>';
-	echo '</div></div>';
-	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
-	echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 } else if ($report=='oneoutcome') {
 	
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Outcome Detail").'</div>';
