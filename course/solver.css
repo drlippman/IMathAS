@@ -1,0 +1,104 @@
+.solverpopup
+{
+	position: absolute;
+	top: 35%;
+	right: 5px;
+	height: auto;
+	max-width: 450px;
+	padding: 2px;
+	margin: 0;
+	margin-left: 0.5em;
+	margin-top: 0.5em;
+	border: 1px solid black;
+	background: #F8F8F8; 
+	z-index: 11;
+	overflow: visible;
+}
+#solvertopbar {
+	background: #369; /* Blue from standard menu bar */
+	width: 100%;
+	color: #fff;
+	font-size: 10px;
+	font-family: arial;
+	font-weight: bold;
+	margin-right: 5px;
+	cursor: pointer;
+	height: 16px;
+	line-height: 16px;
+	border-radius: 8px
+}
+#solvertopbar>span {
+	padding-left: 5px;
+}
+#solverclosebutton {
+	width: 12px;
+	height: 12px;
+	line-height: 12px;
+	float: right;
+	text-align: center;
+	background: #eee;
+	color: #555;
+	margin: 2px;
+	border: 0; /*1px solid #009;*/
+	font-family: sans-serif;
+	font-size: 8px;
+	cursor: pointer;
+	border-radius: 6px
+}
+#solverclosebutton:hover {
+	color: #f00;
+}
+#operationselect {
+	padding: 2px;
+}
+div#sagecelloutput, div#sagecell {
+	width: 90%;
+	align: center;
+	margin: 0 auto;
+	padding-top: 6px;
+}
+div#sagecelloutput, div.sagecell_input {
+	opacity: 0.5;
+}
+div#sagecelloutput {
+	position: relative;
+	top: -20px;
+}
+#sagecellcontainer {
+	position: relative;
+}
+#solverhelpicon {
+	position: absolute;
+	right: 5px;
+	bottom: 25px;
+}
+#sagetocontroldiv {
+	padding: 3px;
+	text-align: center;
+	color: #555;
+}
+#sagetocontrol {
+	text-align: center;
+	padding: 30px;
+	margin: 30px;
+	color: #000;
+}
+#solvergobutton {
+	background-color: #606; /* purple from standard menu bar */
+    border: none;
+    color: white;
+    padding: 2px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 2px;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+#solvergobutton:hover {
+    box-shadow: 2px 6px 6px 0 rgba(0,0,0,0.24),0 7px 20px 0 rgba(0,0,0,0.19);
+}
+}
