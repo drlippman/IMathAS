@@ -944,7 +944,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher']?'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
-			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now));
+			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
 		}
 		$placeinhead .= '<script type="text/javascript">
 				if (typeof io != "undefined") {livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");}
@@ -2129,7 +2129,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$tocheck = $aid.$qn.$userid.$rawscore.$arv;
 				$now = time();
 				if (isset($CFG['GEN']['livepollpassword'])) {
-					$livepollsig = base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now));
+					$livepollsig = base64_encode(sha1($tocheck . $CFG['GEN']['livepollpassword'] . $now,true));
 				}
 				
 				$r = file_get_contents('https://'.$CFG['GEN']['livepollserver'].':3000/qscored?aid='.$aid.'&qn='.$qn.'&user='.$userid.'&score='.urlencode($rawscore).'&now='.$now.'&la='.urlencode($arv).'&sig='.$livepollsig);
@@ -2150,7 +2150,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = base64_encode(sha1($aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now));
+				$livepollsig = base64_encode(sha1($aid.$qn .$seed. $CFG['GEN']['livepollpassword'] . $now, true));
 			}
 			$regenstr = '';
 			
@@ -2187,7 +2187,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$newstate=3;
 			}
 			if (isset($CFG['GEN']['livepollpassword'])) {
-				$livepollsig = base64_encode(sha1($aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now));
+				$livepollsig = base64_encode(sha1($aid.$qn . $newstate. $CFG['GEN']['livepollpassword'] . $now,true));
 			}
 			
 			$query = "UPDATE imas_livepoll_status SET curquestion='$qn',curstate='$newstate' WHERE assessmentid='$aid'";
