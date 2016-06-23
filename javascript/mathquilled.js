@@ -250,6 +250,10 @@ function hideee() {
 }
 function savemathquill() {
 	$("#"+cureedd.id).val(MQtoAM(mqarea.mathquill('latex')));
+	var btn = $("#pbtn"+cureedd.id.substr(2));
+	if (btn) {
+		btn.trigger("click");
+	}
 	hideee();	
 }
 

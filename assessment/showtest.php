@@ -885,7 +885,7 @@
 if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['eqnhelper']==1 || $testsettings['eqnhelper']==2) {
 		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=030112\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=062216\"></script>";
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
 	} else if ($testsettings['eqnhelper']==3 || $testsettings['eqnhelper']==4) {
@@ -900,7 +900,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				</style><![endif]-->';
 		}
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=062216\"></script>";
 		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
@@ -908,7 +908,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	
 	//IP: eqntips 
 	if ($testsettings['showtips']==2) {
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
+		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
 	}
 	$placeinhead .= '<script type="text/javascript">
 	   function toggleintroshow(n) {
