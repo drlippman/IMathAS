@@ -140,8 +140,7 @@ function setupLivePreview(qn) {
 		} 
 	}
 }
-function updateLivePreview() {
-	var targ = event.target;
+function updateLivePreview(targ) {
 	var qn = targ.id.substr(2);
 	setupLivePreview(qn);
 	LivePreviews[qn].Update();

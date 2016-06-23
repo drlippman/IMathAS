@@ -1444,7 +1444,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		if (!isset($hidepreview)) {
-			$out .= 'onKeyUp="updateLivePreview()" ';
+			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>$rightb";
 		$out .= getcolormark($colorbox);
@@ -1625,7 +1625,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		if (!isset($hidepreview)) {
-			$out .= 'onKeyUp="updateLivePreview()" ';
+			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>\n";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
@@ -1812,7 +1812,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		if (!isset($hidepreview)) {
-			$out .= 'onKeyUp="updateLivePreview()" ';
+			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
@@ -1900,7 +1900,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
 		if (!isset($hidepreview)) {
-			$out .= 'onKeyUp="updateLivePreview()" ';
+			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>";
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
@@ -1998,7 +1998,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 			}
 			if ($displayformat == 'usepreview') {
-				$out .= 'onKeyUp="updateLivePreview()" ';
+				$out .= 'onKeyUp="updateLivePreview(this)" ';
 			}
 			$addlclass = '';
 			if ($displayformat=='debit') { $out .= 'onkeyup="editdebit(this)" style="text-align: right;" ';}
@@ -2252,8 +2252,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		if (in_array('inequality',$ansformats)) {
-			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 <= %s < 4'), $variables) . " <br/>";
-			$tip .= sprintf(_('Use or to combine intervals.  Example: %s < 2 or %s >= 3'), $variables, $variables) . "<br/>";
+			$tip = sprintf(_('Enter your answer using inequality notation.  Example: 3 &lt;= %s &lt; 4'), $variables) . " <br/>";
+			$tip .= sprintf(_('Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3'), $variables, $variables) . "<br/>";
 			$tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
 			$shorttip = _('Enter an interval using inequalities');
 		} else {
@@ -2290,7 +2290,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .")\" onblur=\"hideee();hideeedd();\" ";
 		}
 		if (!isset($hidepreview)) {
-			$out .= 'onKeyUp="updateLivePreview()" ';
+			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= '/>';
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
