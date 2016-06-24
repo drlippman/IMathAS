@@ -1,6 +1,151 @@
 //IMathAS:  Handles preview buttons and pre-submit calculations for assessments
 //(c) 2006 David Lippman
 
+//define these to be overwritten later in case the corresponding options aren't used
+var updateeeddpos = function() { }; 
+var updateehpos = function() { };
+
+var LivePreviews = [];
+function setupLivePreview(qn) {
+	if (!LivePreviews.hasOwnProperty(qn)) {
+		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
+			LivePreviews[qn] = {
+			  delay: (mathRenderer=="MathJax"?100:20),   // delay after keystroke before updating
+			  finaldelay: 1000,
+			  preview: null,     // filled in by Init below
+			  buffer: null,      // filled in by Init below
+			
+			  timeout: null,     // store setTimout id
+			  finaltimeout: null,  // setTimeout id for clicking preview
+			  mjRunning: false,  // true when MathJax is processing
+			  mjPending: false,  // true when a typeset has been queued
+			  oldText: null,     // used to check if an update is needed
+			
+			  //
+			  //  Get the preview and buffer DIV's
+			  //
+			  Init: function() {
+				$("#p"+qn).css("positive","relative")
+					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;"></span>')
+					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;"></span>');	  
+				this.preview = document.getElementById("lpbuf1"+qn);
+				this.buffer = document.getElementById("lpbuf2"+qn);
+			  },
+	
+			  SwapBuffers: function () {
+			    var buffer = this.preview, preview = this.buffer;
+			    this.buffer = buffer; this.preview = preview;
+			    buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+			    preview.style.position = ""; preview.style.visibility = "";
+			  },
+			
+			  Update: function (content) {
+			    if (this.timeout) {clearTimeout(this.timeout)}
+			    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+			    this.timeout = setTimeout(this.callback,this.delay);
+			    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+			  },
+			
+			  RenderNow: function(text) {
+				  //called by preview button
+			      this.buffer.innerHTML = this.oldtext = text;
+			      this.mjRunning = true;
+			      this.RenderBuffer();
+			  },
+			  RenderBuffer: function() {
+			      if (mathRenderer=="MathJax") {
+				      MathJax.Hub.Queue(
+					["Typeset",MathJax.Hub,this.buffer],
+					["PreviewDone",this]
+				      );   
+			      } else if (mathRenderer=="Katex") {
+			      	      renderMathInElement(this.buffer);
+				      if ($(this.buffer).children(".mj").length>0) {//has MathJax elements
+					      MathJax.Hub.Queue(["PreviewDone",this]);
+				      } else {
+					      this.PreviewDone();
+				      }
+			      }	  
+			  },
+			  
+			  DoFinalPreview: function() {
+				$("#pbtn"+qn).trigger("click");
+			  },
+			  
+			  preformat: function(text) {
+			  	if (intcalctoproc.hasOwnProperty(qn)) {
+			  		if (!calcformat[qn].match(/inequality/)) {
+			  			text = text.replace(/U/g,"uu");
+			  		} else {
+			  			text = text.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
+			  			if (text.match(/all\s*real/i)) {
+			  				text = "text("+text+")";
+			  			}
+			  		}
+			  	}
+			  	return text;
+			  },
+			  
+			  CreatePreview: function () {
+			    this.timeout = null;
+			    if (this.mjPending) return;
+			    if (document.getElementById("tc"+qn)==null) { //string preview
+			    	    var text = document.getElementById("qn"+qn).value;
+			    } else {
+			    	    var text = document.getElementById("tc"+qn).value;
+			    }
+			    if (text === this.oldtext) return;
+			    if (this.mjRunning) {
+			      this.mjPending = true;
+			      MathJax.Hub.Queue(["CreatePreview",this]);
+			    } else {
+			      this.oldtext = text;
+			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
+			      this.mjRunning = true;
+			      this.RenderBuffer();
+			    }
+			  },
+			
+			  PreviewDone: function () {
+			    this.mjRunning = this.mjPending = false;
+			    this.SwapBuffers();
+			    updateeeddpos();
+			    updateehpos();
+			  }
+			
+			};
+			LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+			LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			LivePreviews[qn].Init();
+		} else {
+			LivePreviews[qn] = {
+				finaldelay: 1000,
+				finaltimeout: null,  // setTimeout id for clicking preview
+			  
+				Update: function (content) {
+				    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+				    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+				  },
+				
+				  RenderNow: function(text) {
+				      var outnode = document.getElementById("p"+qn);
+				      outnode.innerHTML = text;
+				      rendermathnode(outnode);
+				  },
+				  
+				  DoFinalPreview: function() {
+					$("#pbtn"+qn).trigger("click");
+				  }
+			}
+		} 
+	}
+}
+function updateLivePreview(targ) {
+	var qn = targ.id.substr(2);
+	setupLivePreview(qn);
+	LivePreviews[qn].Update();
+}
+
 function normalizemathunicode(str) {
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
 	str = str.replace(/\u2044|\u2215/g, "/");
@@ -92,6 +237,10 @@ function calculate(inputId,outputId,format) {
   	  	  fullstr = '{'+fullstr+'}';
   	  }
   }
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow(fullstr);
+  /*
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
@@ -100,6 +249,7 @@ function calculate(inputId,outputId,format) {
   if (!noMathRender) {
 	  rendermathnode(outnode);
   }
+  */
 }
 
 //Function to convert inequalities into interval notation
@@ -155,6 +305,7 @@ function intcalculate(inputId,outputId,format) {
 		var pat = str.match(/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/);
 		var ineqvar = (pats != null)?pats[1]:((pat != null)?pat[1]:'');
 	  } else {
+	  	  var origstr = fullstr;
 		  fullstr = fullstr.replace(/\s+/g,'');
 	  }
 	  if (format.indexOf('list')!=-1) {
@@ -179,11 +330,16 @@ function intcalculate(inputId,outputId,format) {
 		  em = str.charAt(str.length-1);
 		  vals = str.substring(1,str.length-1);
 		  vals = vals.split(/,/);
-		  if (vals.length != 2) {
-			  fullstr = _("syntax incomplete");
+		  if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
+		  	  if(format.indexOf('inequality')!=-1) {
+		  	  	  origstr = origstr.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
+		  	  	  fullstr = "`"+origstr+"`: " + _("invalid inequality notation");
+		  	  } else {
+		  	  	  fullstr = "`"+origstr.replace(/U/g,"uu")+"`: " + _("invalid interval notation");
+		  	  }
 			  isok = false;
 			  break;
-		  }
+		  } 
 		  for (j=0; j<2; j++) {	
 			  if (vals[j].match(/oo$/) || vals[j].match(/oo\W/)) {
 				  calcvals[j] = vals[j];
@@ -271,8 +427,10 @@ function intcalculate(inputId,outputId,format) {
 	 }
   }
   
-  
-  var outnode = document.getElementById(outputId);
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow(fullstr);
+  /*var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
     outnode.removeChild(outnode.firstChild);
@@ -280,6 +438,7 @@ function intcalculate(inputId,outputId,format) {
   if (!noMathRender) {
 	  rendermathnode(outnode);
   }
+  */
 	
 }
 
@@ -297,12 +456,21 @@ function ntuplecalc(inputId,outputId,format) {
 		var NCdepth = 0;
 		var lastcut = 0;
 		var err = ""; 
+		var notationok = true;
+		if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
+			notationok=false;		
+		}
 		for (var i=0; i<fullstr.length; i++) {
 			dec = false;
 			if (NCdepth==0) {
 				outcalced += fullstr.charAt(i);
 				lastcut = i+1;
-			} 
+				if (fullstr.charAt(i)==',') {
+					if (!fullstr.charAt(i+1).match(/[\(\[\<\{]/) || !fullstr.charAt(i-1).match(/[\)\]\>\}]/)) {
+						notationok=false;
+					}
+				}
+			}
 			if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
 				NCdepth++;		
 			} else if (fullstr.charAt(i).match(/[\)\]\>\}]/)) {
@@ -334,15 +502,21 @@ function ntuplecalc(inputId,outputId,format) {
 				lastcut = i+1;
 			}
 		}
+		if (NCdepth!=0) {
+			notationok = false;
+		}
+		if (notationok==false) {
+			err += _("Invalid notation")+". ";
+		}
 		//outstr = '`'+fullstr+'` = '+outcalced;
-		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
+		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1 || notationok==false) {
 			 outstr = '`'+fullstr+'`'+". " + err;
 		} else {
 			 outstr = '`'+fullstr+'` = '+outcalced +". " + err;
 		}
 	}
 	if (outputId != null) {
-		 var outnode = document.getElementById(outputId);
+		 /*var outnode = document.getElementById(outputId);
 		 var n = outnode.childNodes.length;
 		 for (var i=0; i<n; i++) {
 		    outnode.removeChild(outnode.firstChild);
@@ -350,7 +524,10 @@ function ntuplecalc(inputId,outputId,format) {
 		 outnode.appendChild(document.createTextNode(outstr));
 		 if (!noMathRender) {
 			  rendermathnode(outnode);
-		 }
+		 }*/
+		 var qn = outputId.substr(1);
+		 setupLivePreview(qn);
+		 LivePreviews[qn].RenderNow(outstr);
 	}
 	 return outcalced;
 }
@@ -403,7 +580,7 @@ function complexcalc(inputId,outputId,format) {
 		}
 	}
 	if (outputId != null) {
-		 var outnode = document.getElementById(outputId);
+		 /*var outnode = document.getElementById(outputId);
 		 var n = outnode.childNodes.length;
 		 for (var i=0; i<n; i++) {
 		    outnode.removeChild(outnode.firstChild);
@@ -411,7 +588,10 @@ function complexcalc(inputId,outputId,format) {
 		 outnode.appendChild(document.createTextNode(outstr));
 		 if (!noMathRender) {
 			  rendermathnode(outnode);
-		 }
+		 }*/
+		 var qn = outputId.substr(1);
+		 setupLivePreview(qn);
+		 LivePreviews[qn].RenderNow(outstr);
 	}
 	 return outcalced;
 }
@@ -600,14 +780,19 @@ function mathjsformat(inputId,outputId) {
 
 function stringqpreview(inputId,outputId) {
 	var str = document.getElementById(inputId).value;
-	var outnode = document.getElementById(outputId);
+	
+	var qn = outputId.substr(1);
+	setupLivePreview(qn);
+	LivePreviews[qn].RenderNow("`"+str+"`");
+	
+	/*var outnode = document.getElementById(outputId);
 	var n = outnode.childNodes.length;
 	for (var i=0; i<n; i++)
 		outnode.removeChild(outnode.firstChild);
 	outnode.appendChild(document.createTextNode('`'+str+'`'));
 	if (!noMathRender) {
 		rendermathnode(outnode);
-	}
+	}*/
 }
 
 //preview button for numfunc type
@@ -708,14 +893,15 @@ function AMpreview(inputId,outputId) {
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
   
-  var outnode = document.getElementById(outputId);
+  
+  /*var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
     outnode.removeChild(outnode.firstChild);
     outnode.appendChild(document.createTextNode('`'+dispstr+'`'));
     if (!noMathRender) {
 	rendermathnode(outnode);
-    }
+    }*/
   //outnode.appendChild(AMparseMath(dispstr));
   
   //the following does a quick syntax check of the formula
@@ -771,7 +957,11 @@ function AMpreview(inputId,outputId) {
   }
   if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
   else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
-  outnode.appendChild(document.createTextNode(" " + err));
+  //outnode.appendChild(document.createTextNode(" " + err));
+  
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow('`'+dispstr+'` '+err);
 
 }
 
