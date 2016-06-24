@@ -84,7 +84,7 @@ function toggleblock(event,bnum,folder) {
       plblist = plblist.join(',');
       document.cookie = 'openblocks-' +cid+'='+ oblist;
       document.cookie = 'prevloadedblocks-'+cid+'='+plblist;
-      if (event.ctrlKey && node.className == 'hidden') {
+      if (event.shiftKey && node.className == 'hidden') {
           $("a[id^=blockh]").each(function(i,el) { 
           	var id=$(el).attr("id").substr(6); 
           	if ($("#block"+id).hasClass("blockitems")) { toggleblock({},id,null);}
