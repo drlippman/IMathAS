@@ -656,6 +656,7 @@
 	} else {
 		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
 	}
+	$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
 	  var editoron = 0; var seditoron = 0;
 	  var coursetheme = "'.$coursetheme.'";';
@@ -756,6 +757,8 @@
 		      });
 		//controlEditor.setSize("100%",6+14*document.getElementById("control").rows);
 	   });
+
+
 	   function checklicense() {
 	   	var lic = $("#license").val();
 	   	console.log(lic+","+originallicense);
@@ -793,11 +796,13 @@
 	   	}
 	   }
 	   </script>';
+	$placeinhead .= "<script src=\"$imasroot/javascript/solver.js?ver=230616\" type=\"text/javascript\"></script>\n";
 	$placeinhead .= '<style type="text/css">.CodeMirror {font-size: medium;border: 1px solid #ccc;}
 		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
 		#qtbox .CodeMirror-scroll {min-height:150px; max-height:600px;}
 		</style>';
+	$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	
 	require("../header.php");
 	
@@ -1002,10 +1007,12 @@ Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";
 </p>
 <div id=ccbox>
 Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsize('control')">[+]</span><span class=pointer onclick="decctrlboxsize('control')">[-]</span></span>
+<input type=button id="solveropenbutton" value="Solver">
 <input type=submit value="Save">
 <input type=submit name=test value="Save and Test Question"><BR>
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
+
 
 <div id=qtbox>
 Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
@@ -1098,6 +1105,52 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 </p>
 </form>
 
+<?php
+$placeinfooter='
+<div id="solverpopup" style="display: none" class="solverpopup">
+	<div id="solvertopbar">
+		<div id="solverclosebutton">X</div>
+		<span>Solver</span>
+	</div>
+	<div id="solverinsides">
+	<div id="operationselect">
+	Select and drag or copy an expression from your question code.
+	<img id="solverinputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	<div id="solverinputhelp" style="display: none;">
+	</div>
+	<input id="imathastosage" type="text" size="30">
+	<select id="solveroperation" name="solveroperation">
+		<option id="solverchoose" value="">Choose
+		<option id="solversolve" value="solve">Solve
+		<option id="solverdiff" value="diff">Differentiate
+		<option id="solverint" value="integral">Integrate
+		<option id="solverplot" value="plot">Plot
+		</select>
+	<button id="solvergobutton" type="button">Go</button>
+	</div>
+	<div id="sagemathcode" style="display: none;"></div>
+	<div id="sagecellcontainer">
+		<div id="sagecell"></div>
+		<img id="solverhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	</div>
+	<div id="solverhelpbody" style="display: none">
+	</div>
+	<div id="sagecelloutput"></div>
+    <div id="sagetocontroldiv" style="display: none;" >
+		Drag this to the Common Control box or use the buttons below.
+	<img id="solveroutputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	<div id="sagetocontrolresult">
+		<p><span id="sagetocontrol" draggable="true"></span></p>
+	</div>
+	</div>
+	<div id="solveroutputhelp" style="display: none;">
+	</div>
+	<input id="solverappendalone" type="button" value="Insert in Common Control">
+	<input id="solverappend" type="button" value="Insert as $answer">
+	</div>
+</div>
+';
+?>
 
 <?php
 	require("../footer.php");

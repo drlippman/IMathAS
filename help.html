@@ -158,6 +158,7 @@ dd {
 	<li><a href="#feedbackmacros">Feedback Macros</a></li>
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
 	<li><a href="#mathentry">Math Entry</li>
+	<li><a href="#solver">Solver</li>
 	<li><a href="#writingcommon">Options Common to All Types</a></li>
 	<li><a href="#questiontypes">Question Types</a></li>
 		<ul>
@@ -1940,6 +1941,61 @@ for a limited subset of LaTeX). For more info, see the
 <a href="http://www1.chapman.edu/~jipsen/mathml/asciimathsyntax.html">full ASCIIMath syntax</a>, or look at
 some <a href="http://www1.chapman.edu/~jipsen/mathml/asciimath.html">examples</a>.</p>
 
+</div>
+<div class=h2>
+<h2><a name="solver">Solver</a></h2>
+While writing a question, it can be handy to quickly solve a formula for a variable.  For example, if you're writing a question that asks students to solve y=($a x + $b)/($b x - $a) for x, where $a and $b are randomized variables.  You might need to calculate the correct answer.  The Solver tool can help solve or check the solution.
+</div>
+<div class=h3>
+<h3><a name="solverinput">Solver Input</a></h3>
+		Tips:
+		<ul>
+			<li>Select your code from the Common Control box, then either drag-drop or copy-paste it to the box below, or
+			<li>Highlight an expression in Common Control and press <kbd>Ctrl-M</kbd> to update the Solver code, or
+			<li>Highlight an expression in your code before clicking Solver.
+			<li>Select an operation to perform: Solve, Differentiate, Integrate, Plot.
+			<li>You may need to change the colored Sage code below to solve for the correct variable or to adjust the plot window etc.  See the help icon below for examples.
+		</ul>
+</div>
+<div class=h3>
+<h3><a name="solversage">Solver: Sage Syntax</a></h3>
+		SageMath examples:
+		<blockquote><code>
+		#create symbolic variables<br/>
+		x,y,a,b,c,d = var('x,y,a,b,c,d')                <br/>
+		# solve the equation for x<br/>
+		solve( y==(a*x+b)/(c*x-d) , x )   <br/><br/>
+
+		x = var('x')<br/>
+		#Differentiate<br/>
+		diff( 3*x^4 , x )                <br/><br/>
+
+		x = var('x')<br/>
+		#Plot in a standard window<br/>
+		plot( -x^2+4 , (x,-10,10) )      <br/><br/>
+
+		x = var('x')<br/>
+		#Simplify<br/>
+		simplify( 5*x+7*(-3*x-4) )       <br/>
+		</code></blockquote>
+		Tips:
+		<ul>
+			<li>Declare any variables using <code>var()</code> as above.  By default, x is a variable.
+			<li>Use two equal signs for math equations.
+			<li>With <code>solve() diff() integral()</code>  give the independent variable after a comma.
+			<li>With <code>plot()</code> a range for the independent variable must be specified, e.g. <code>(x, -10, 10)</code>.
+			<li>Select a new operation or click <b>Go</b> to calculate.
+		</ul>
+</div>
+<div class=h3>
+<h3><a name="solveroutput">Solver Output</a></h3>
+		Tips:
+		<ul>
+			<li>Drag the result above to the Common Control box where you define the $answer or any other location, or
+			<li>Click <b>Insert in Common Control</b> to append the result to the end of the Common Control, or
+			<li>Click <b>Insert as $answer</b> to append <code>$answer = <i>result</i></code> to the Common Control (not available if <code>$answer</code> is already defined).
+			<li>Note: Touchscreens might not be supported by the drag operation.
+		</ul>
 </div>
 <div class=h2>
 <h2><a name="writingcommon">Common options to all types</a></h2>

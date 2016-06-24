@@ -1,9 +1,10 @@
-<html
-<head>
 <?php
 	$dbsetup = true; //prevents connection to database
 	include("config.php");
+	if (!isset($_GET['bare'])) {
 ?>
+<html
+<head>
 <title><?php echo $installname;?> Help</title>
 <style type="text/css">
 table td {
@@ -35,15 +36,18 @@ h2,h3,h4 {
 }
 </style>
 <?php
+	}
 //IMathAS:  Reads sections of the help.html file
 //(c) 2006 David Lippman
-	if (!isset($_GET['section'])) {
+	if (!isset($_GET['section']) && !isset($_GET['bare'])) {
 		echo "<style type=\"text/css\">\n";
 		echo "div.h2 {margin-left: 10px;} \n div.h3 {margin-left: 20px;} \n div.h3 {margin-left: 30px;} \n";
 		echo "</style>\n";
 	}
-	echo "</head><body>\n";
-	if (isset($_GET['section'])) {
+	if (!isset($_GET['bare'])) {
+		echo "</head><body>\n";
+	}
+	if (isset($_GET['section']) && !isset($_GET['bare'])) {
 		echo '<div id="headerindex" class="pagetitle"><h2>'.$installname.' Help</h2></div>';
 	}
 
@@ -95,11 +99,13 @@ h2,h3,h4 {
 				}
 			
 			} else if (preg_match('/.*<h(1|2|3|4)>\s*<a\s+name\="([^"]+)".*/',$buffer,$matches) && $matches[2]==$_GET['section']) {
-				echo "<style type=\"text/css\">\n";
-				for ($i=$matches[1]+1;$i<5;$i++) {
-					echo "div.h$i { margin-left: " . 10*($i-$matches[1]) . "px;}\n";
+				if (!isset($_GET['bare'])) {
+					echo "<style type=\"text/css\">\n";
+					for ($i=$matches[1]+1;$i<5;$i++) {
+						echo "div.h$i { margin-left: " . 10*($i-$matches[1]) . "px;}\n";
+					}
+					echo "</style>\n";
 				}
-				echo "</style>\n";
 					
 				echo "<div>\n$buffer";
 				$indiv = true;
@@ -110,7 +116,9 @@ h2,h3,h4 {
 	} else {
 		echo "No handle";
 	}
-	echo "</body></html>\n";
+	if (!isset($_GET['bare'])) {
+		echo "</body></html>\n";
+	}
 ?>
 
 
