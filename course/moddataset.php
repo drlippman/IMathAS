@@ -1005,44 +1005,6 @@ Common Control: <span class="noselect"><span class=pointer onclick="incctrlboxsi
 <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(20,substr_count($line['control'],"\n")+3));?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
 </div>
 
-<div id="solverpopup" style="display: none" class="solverpopup">
-	<div id="solvertopbar">
-		<div id="solverclosebutton">X</div>
-		<span>Solver</span>
-	</div>
-	<div id="operationselect">
-	Select and drag or copy an expression from your question code.
-	<img id="solverinputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
-	<div id="solverinputhelp" style="display: none;">
-	</div>
-	<input id="imathastosage" type="text" size="30">
-	<select id="solveroperation" name="solveroperation">
-		<option id="solverchoose" value="">Choose
-		<option id="solversolve" value="solve">Solve
-		<option id="solverdiff" value="diff">Differentiate
-		<option id="solverint" value="integral">Integrate
-		<option id="solverplot" value="plot">Plot
-		</select>
-	<button id="solvergobutton" type="button">Go</button>
-	</div>
-	<div id="sagemathcode" style="display: none;"></div>
-	<div id="sagecellcontainer">
-		<div id="sagecell"></div>
-		<img id="solverhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
-	</div>
-	<div id="solverhelpbody" style="display: none">
-	</div>
-	<div id="sagecelloutput"></div>
-    <div id="sagetocontroldiv" style="display: none;" >
-		Drag or copy this to the Common Control box.
-	<img id="solveroutputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
-		<span id="sagetocontrol" type="text" size="50" draggable="true" ></span>
-	</div>
-	<div id="solveroutputhelp" style="display: none;">
-	</div>
-	<input id="solverappendalone" type="button" value="Insert in Common Control">
-	<input id="solverappend" type="button" value="Insert as $answer">
-</div>
 
 <div id=qtbox>
 Question Text: <span class="noselect"><span class=pointer onclick="incqtboxsize('qtext')">[+]</span><span class=pointer onclick="decqtboxsize('qtext')">[-]</span></span>
@@ -1135,6 +1097,50 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 </p>
 </form>
 
+<?php
+$placeinfooter='
+<div id="solverpopup" style="display: none" class="solverpopup cp">
+	<div id="solvertopbar">
+		<div id="solverclosebutton">X</div>
+		<span>Solver</span>
+	</div>
+	<div id="operationselect">
+	Select and drag or copy an expression from your question code.
+	<img id="solverinputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	<div id="solverinputhelp" style="display: none;">
+	</div>
+	<input id="imathastosage" type="text" size="30">
+	<select id="solveroperation" name="solveroperation">
+		<option id="solverchoose" value="">Choose
+		<option id="solversolve" value="solve">Solve
+		<option id="solverdiff" value="diff">Differentiate
+		<option id="solverint" value="integral">Integrate
+		<option id="solverplot" value="plot">Plot
+		</select>
+	<button id="solvergobutton" type="button">Go</button>
+	</div>
+	<div id="sagemathcode" style="display: none;"></div>
+	<div id="sagecellcontainer">
+		<div id="sagecell"></div>
+		<img id="solverhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	</div>
+	<div id="solverhelpbody" style="display: none">
+	</div>
+	<div id="sagecelloutput"></div>
+    <div id="sagetocontroldiv" style="display: none;" >
+		Drag this to the Common Control box or use the buttons below.
+	<img id="solveroutputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	<div id="sagetocontrolresult">
+		<p><span id="sagetocontrol" draggable="true"></span></p>
+	</div>
+	</div>
+	<div id="solveroutputhelp" style="display: none;">
+	</div>
+	<input id="solverappendalone" type="button" value="Insert in Common Control">
+	<input id="solverappend" type="button" value="Insert as $answer">
+</div>
+';
+?>
 
 <?php
 	require("../footer.php");
