@@ -26,8 +26,8 @@ function setupLivePreview(qn) {
 			  //
 			  Init: function() {
 				$("#p"+qn).css("positive","relative")
-					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;"></span>')
-					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;"></span>');	  
+					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;position:absolute;"></span>')
+					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');	  
 				this.preview = document.getElementById("lpbuf1"+qn);
 				this.buffer = document.getElementById("lpbuf2"+qn);
 			  },
