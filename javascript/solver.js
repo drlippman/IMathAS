@@ -21,10 +21,16 @@
 			}
 			return true; //process as usual
 		});
-		//TODO make paste event trigger
-		//$("#imathastosage").on("paste",handleDrop);
-		//TODO when the Sage CodeMirror div gets focus, increase opacity
+		//when the Sage CodeMirror div is edited, increase opacity
+		$("#sagecell").on("click", handleSageClick );
+		$("#sagecell").on("keyup", handleSageClick );
+
+		$("#imathastosage").on("click",handleImathasClick);
+		$("#imathastosage").on("keyup",handleImathasClick);
+		$("#imathastosage").on("focus",handleImathasClick);
 		$("#imathastosage").on("drop",function(event) {handleDrop(event);});
+		//TODO make paste event trigger
+		//$("#imathastosage").on("paste",function(event) {handleDrop(event);});
 		$("#sagetocontrol").on("dragstart", function(event) {
 			handleDragStart(event);
 		});
@@ -69,7 +75,7 @@
 				solvermousebase = {left:evt.pageX, top: evt.pageY};
 				$("body").bind("mousemove",solvermousemove);
 				$("body").mouseup(function(event) {
-					var p = $("#solverpopup").offset();
+					var p = $("#solverpopup").position();
 					lastsolverpos.left = p.left;
 					lastsolverpos.top = p.top;
 					$("body").unbind("mousemove",solvermousemove);
@@ -120,11 +126,19 @@
 
 		function handleSageEvent() {
 			//copy some styles to avoid additional colors
+			if ( $("div.breadcrumb").css("color") !==undefined ) {
+				$("#solvertopbar").css( "color",
+						$("div.breadcrumb").css("color") );
+			}
+			if ( $("#navlist").css("color") !==undefined) {
+				$("#solvergobutton").css( "color",
+						$("#navlist").css("color") );
+			}
 			if ( $("div.breadcrumb").css("background-color") !==undefined ) {
 				$("#solvertopbar").css( "background-color",
 						$("div.breadcrumb").css("background-color") );
 			}
-			if ( $("#navlist").css("background-color")  !==undefined) {
+			if ( $("#navlist").css("background-color") !==undefined) {
 				$("#solvergobutton").css( "background-color",
 						$("#navlist").css("background-color") );
 			}
@@ -159,10 +173,16 @@
 		//facilitate copying to Common Control
 		function handleSolverCopy() {
 			var sageoutput=$("#solverpopup").find(".sagecell_sessionOutput").text();
-			$("#sagetocontroldiv").show();
-			$("#sagetocontrol").val(convertMomSageVariables(sageoutput,false).formula);
-			$("#sagetocontrol").text(convertMomSageVariables(sageoutput,false).formula);
-			//$("#sagetocontrol").select();
+			if (sageoutput.match(/Traceback|Error/i)) {
+				//show error message
+				$("#sagecelloutput").css("opacity",1.0);
+				$("#sagetocontroldiv").hide();
+			} else {
+				$("#sagetocontroldiv").show();
+				$("#sagetocontrol").val(convertMomSageVariables(sageoutput,false).formula);
+				$("#sagetocontrol").text(convertMomSageVariables(sageoutput,false).formula);
+				//$("#sagetocontrol").select();
+			}
 		}
 
 		//Append output as $answer to Common Control
@@ -219,12 +239,15 @@
 					});
 				}
 				//sage variables include MOM variables (rands) plus any MOM symbolic variables
-				var sage_variables=formula.match(/([a-z][a-z0-9]*)/gi);
-				if (sage_variables && imathas_variables) {
+				var sage_variables_with_dups=formula.match(/([a-z][a-z0-9]*)/gi);
+				if (sage_variables_with_dups) {
 					//remove math function names from sage_variables
-					sage_variables=sage_variables.filter(function(variable) {
-							return (math_functions.indexOf(variable)==-1);
-							});
+					var sage_variables=sage_variables_with_dups.filter(function(variable,index,self) {
+						return (math_functions.indexOf(variable)==-1 &&
+									self.indexOf(variable)==index);
+					});
+				}
+				if (sage_variables_with_dups && imathas_variables) {
 					//list a symbolic variable before MOM variables (rands)
 					var limit=sage_variables.length;
 					while (imathas_variables.indexOf(sage_variables[0])>=0 && limit>0) {
@@ -252,7 +275,7 @@
 				if (this.imathas_variables!==undefined && this.imathas_variables!=null) {
 					//prepend IMathAS variables with $
 					imathas_variables.forEach(function(value,index) {
-							var regex=new RegExp(value+"\\\b","g");
+							var regex=new RegExp(value+"\\b","g");
 							formula=formula.replace(regex,"$"+value)
 							});
 				}
@@ -279,9 +302,13 @@
 				//if no operation selected and contains =
 				//assume solving for the first symbolic variable
 				sagecommand=sagecommand+"\nsolve( "+formula+" , "+variables[0]+")";
+				$("#solveroperation").val("solve")
+										.trigger("chosen:updated");
 			} else {
 				//start with example of differentiating wrt the first symbolic variable
 				sagecommand=sagecommand+"\ndiff( "+formula+" , "+variables[0]+")";
+				$("#solveroperation").val("diff")
+										.trigger("chosen:updated");
 			}
 			return sagecommand;
 		}
@@ -335,11 +362,33 @@
 		}
 
 		function handleSolverGo() {
-			var formula_variables = convertMomSageVariables(
-					$("#imathastosage").val(), true);
-			sagecommand=guessSageCommand(formula_variables);
-			sendSageCommand(sagecommand);
+			if ($("#imathastosage").val()) {
+				var formula_variables = convertMomSageVariables(
+						$("#imathastosage").val(), true);
+				sagecommand=guessSageCommand(formula_variables);
+				sendSageCommand(sagecommand);
+			}
 			$("#sagecell").find(".sagecell_evalButton").click();
+		}
+
+		function handleImathasClick() {
+			//for IE, guess initial position
+			var go_offset = $("#solvergobutton").offset();
+			go_offset.top = $("#imathastosage").offset().top
+			$("#solvergobutton").offset(go_offset);
+
+			$("#solvergobutton").css("top","initial");
+		}
+
+		function handleSageClick() {
+			$("#imathastosage").val("");
+			//TODO save initial location for IE
+			var go_offset = $("#solvergobutton").offset();
+			go_offset.top = $(".sagecell_input").offset().top
+			$("#solvergobutton").offset(go_offset);
+			$(".sagecell_input").css("opacity",1.0);
+			$("#sagecell").css("opacity",1.0);
+			$("#sagecelloutput").css("opacity",1.0);
 		}
 
 		function handleDrop(event) {
