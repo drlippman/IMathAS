@@ -24,6 +24,7 @@ var curTarget = null;
 var nocanvaswarning = false;
 var hasTouch = false;
 var didMultiTouch = false;
+var clickmightbenewcurve = false;
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -56,6 +57,7 @@ var didMultiTouch = false;
    targets.mode
    	0:  set of line segments / freeform drawing
    	0.5: single line segment (basic tool)
+   	0.7:  freeform drawing on mousedown only (no click-line)
    	1: solid dot
    	2: open dot
    tptypes
@@ -828,6 +830,7 @@ function drawMouseDown(ev) {
 			}
 		}
 	}
+	
 	if (curTarget!=null) { //is a target currectly in action?
 		if( navigator.userAgent.match(/Android/i) ) {
 			ev.preventDefault();
@@ -846,6 +849,16 @@ function drawMouseDown(ev) {
 			//see if current point
 			
 			var foundpt = findnearpoint(curTarget,mouseOff);
+			if (foundpt!=null) {
+				if (curLine!=null && foundpt[0]<1 && curLine!=foundpt[1]) {
+					foundpt = null;
+				} else if (curTPcurve!=null & foundpt[0]>=5 && foundpt[0]<10 && curTPcurve!=foundpt[1]) {
+					foundpt = null;
+				} else if (curIneqcurve!=null && foundpt[0]>=10 && foundpt[0]<11 && curIneqcurve!=foundpt[1]) {
+					foundpt = null;
+				}
+			}
+			
 			if (foundpt==null) { //not a current point
 				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pendown.cur), default';
 				if (targets[curTarget].mode==1) {//if in dot mode
@@ -856,7 +869,7 @@ function drawMouseDown(ev) {
 					odots[curTarget].push([mouseOff.x,mouseOff.y]);
 					dragObj = {mode: 2, num: odots[curTarget].length-1};
 					//targets[curTarget].el.style.cursor = 'move';
-				} else if (targets[curTarget].mode==0) { //in line mode
+				} else if (targets[curTarget].mode==0 || targets[curTarget].mode==0.7) { //in line mode
 					if (curLine==null) { //start new line
 						lines[curTarget].push([[mouseOff.x,mouseOff.y]]);
 						curLine = lines[curTarget].length-1;
@@ -953,7 +966,7 @@ function drawMouseDown(ev) {
 					oldpointpos = ineqlines[curTarget][foundpt[1]][foundpt[2]];
 					//curIneqcurve = foundpt[1];
 				}
-				
+				clickmightbenewcurve = true;
 			}
 			drawTarget();
 		} else {  //clicked outside currect target region
@@ -1084,6 +1097,17 @@ function drawMouseUp(ev) {
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 		
+		if (clickmightbenewcurve==true) {
+			if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {
+				tplines[curTarget].push([[mouseOff.x,mouseOff.y]]);
+				curTPcurve = tplines[curTarget].length-1;
+				tptypes[curTarget][curTPcurve] = targets[curTarget].mode;
+			} else if (targets[curTarget].mode>=10 && targets[curTarget].mode<11) {//in ineqline mode
+				ineqlines[curTarget].push([[mouseOff.x,mouseOff.y]]);
+				curIneqcurve = ineqlines[curTarget].length-1;
+				ineqtypes[curTarget][curIneqcurve] = targets[curTarget].mode;
+			}			
+		}
 		if (lastdrawmouseup!=null && mousePos.x==lastdrawmouseup.x && mousePos.y==lastdrawmouseup.y) {
 			//basically a double-click which IE can handle
 			if (curLine!=null && dragObj==null) {
@@ -1097,6 +1121,10 @@ function drawMouseUp(ev) {
 		}
 		if (curLine != null && dragObj==null) {
 			if (targets[curTarget].mode==0.5 && lines[curTarget][curLine].length>1) {
+				curLine = null;
+				dragobj = null;
+				drawTarget();
+			} else if (targets[curTarget].mode==0.7) {
 				curLine = null;
 				dragobj = null;
 				drawTarget();
@@ -1188,6 +1216,7 @@ function drawMouseUp(ev) {
 
 function drawMouseMove(ev) {
 	var tempTarget = null;
+	clickmightbenewcurve = false;
 	var mousePos = mouseCoords(ev);
 	
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
@@ -1237,7 +1266,7 @@ function drawMouseMove(ev) {
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
 			if (dragObj==null) { //notdragging
 				if (curLine!=null) {
-					if (mouseisdown && targets[curTarget].mode==0) {
+					if (mouseisdown && (targets[curTarget].mode==0 || targets[curTarget].mode==0.7)) {
 						var last = lines[curTarget][curLine].length-1;
 						var dist = Math.pow(lines[curTarget][curLine][last][0]-mouseOff.x,2) + Math.pow(lines[curTarget][curLine][last][1]-mouseOff.y,2);
 						//add point to line

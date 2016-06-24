@@ -2406,6 +2406,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$plot = showplot("",$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
 			$plot = substr($plot,0,$insat).str_replace("'",'"',substr($backg,5)).substr($plot,$insat);
+		} else if (!is_array($backg) && $backg=='none') {
+			$plot = showasciisvg("initPicture(0,10,0,10);",$settings[6],$settings[7]);
 		} else {
 			$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 		}
@@ -2419,9 +2421,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$plot = addfractionaxislabels($plot,$grid[4]);
 		}
 		
+		
 		if ($settings[8]!="") {
 		}
 		$bg = getgraphfilename($plot);
+		
 		$dotline = 0;
 		if ($colorbox!='') { $out .= '<div class="'.$colorbox.'" id="qnwrap'.$qn.'">';}
 		if (isset($GLOBALS['hidedrawcontrols'])) {
@@ -2534,6 +2538,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$out .= "onclick=\"settool(this,$qn,0)\">" . _('Line') . "</span>";
 					} else if ($answerformat[$i]=='lineseg') {
 						$out .= "onclick=\"settool(this,$qn,0.5)\">" . _('Line Segment') . "</span>";
+					} else if ($answerformat[$i]=='freehand') {
+						$out .= "onclick=\"settool(this,$qn,0.7)\">" . _('Freehand Draw') . "</span>";
 					} else if ($answerformat[$i]=='dot') {
 						$out .= "onclick=\"settool(this,$qn,1)\">" . _('Dot') . "</span>";
 					} else if ($answerformat[$i]=='opendot') {
@@ -2551,6 +2557,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$def = 0;
 				} else if ($answerformat[0]=='lineseg') {
 					$def = 0.5;
+				} else if ($answerformat[0]=='freehand') {
+					$def = 0.7;
 				} else if ($answerformat[0]=='dot') {
 					$def = 1;
 				} else if ($answerformat[0]=='opendot') {
