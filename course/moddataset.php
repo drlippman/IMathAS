@@ -1120,11 +1120,12 @@ $placeinfooter='
 	</div>
 	<input id="imathastosage" type="text" size="30">
 	<select id="solveroperation" name="solveroperation">
-		<option id="solverchoose" value="">Choose
-		<option id="solversolve" value="solve">Solve
-		<option id="solverdiff" value="diff">Differentiate
-		<option id="solverint" value="integral">Integrate
-		<option id="solverplot" value="plot">Plot
+		<option id="solverchoose" value="">Choose</option>
+		<option id="solversolve" value="solve">Solve</option>
+		<option id="solversolve" value="simplify">Simplify</option>
+		<option id="solverdiff" value="diff">Differentiate</option>
+		<option id="solverint" value="integral">Integrate</option>
+		<option id="solverplot" value="plot">Plot</option>
 		</select>
 	<button id="solvergobutton" type="button">Go</button>
 	</div>

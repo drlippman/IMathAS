@@ -343,8 +343,14 @@
 					sagecommand = formula;
 				} else {
 					var variable_list=variables.join(",");
-					sagecommand=variable_list+"=var(\""+variable_list+"\")";
-					sagecommand=sagecommand+"\n"+operation+"( "+formula+" , "+variables[0]+")";
+					var variablestr=variable_list+"=var(\""+variable_list+"\")";
+					if (operation=="plot") {
+						sagecommand=variablestr+"\nplot("+formula+", ("+variables[0]+",-10,10))";
+					} else if (operation=="simplify") {
+						sagecommand="def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variablestr+"\nfullsimp("+formula+")";
+					} else {
+						sagecommand=variablestr+"\n"+operation+"( "+formula+" , "+variables[0]+")";
+					}
 				}
 				
 				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);;
@@ -353,12 +359,19 @@
 					return; //no code window found
 				}
 				var sagecommand=$("#sagecell").find(".CodeMirror").get(0).CodeMirror.getValue();
+				//remove fullsimp def if there
+				sagecommand = sagecommand.replace(/.*?def\s+fullsimp.*?\n/,"");
 				//get variable declaration
 				variables=sagecommand.replace(/\n.*/i,"");
 				//remove previous operation
-				sagecommand=sagecommand.replace(/.*\n\s*(diff|solve|integral|plot|simplify)/i,"");
+				sagecommand=sagecommand.replace(/.*\n\s*(diff|solve|integral|plot|fullsimp)/i,"");
 				//remove plot range if present
 				sagecommand=sagecommand.replace(/,\s*\(([a-z_0-9]+),[-0-9\s,]*\)\)/i,", $1)");
+				//coming from fullsimp, re-add variable
+				if (!sagecommand.match(/,/)) {
+					var firstvar = variables.match(/^(.*?),/);
+					sagecommand=sagecommand.replace(/\)\s*$/,","+firstvar[1]+")");
+				}
 				if ($("#solveroperation").val()=="diff") {
 					sagecommand=variables+"\ndiff"+sagecommand;
 				} else if ($("#solveroperation").val()=="solve") {
@@ -371,7 +384,7 @@
 					sagecommand=variables+"\nplot"+sagecommand+", ("+variable+",-10,10))";
 				} else if ($("#solveroperation").val()=="simplify") {
 					sagecommand=sagecommand.replace(/,\s*([a-z0-9_]+)/i,"");
-					sagecommand=variables+"\nsimplify"+sagecommand;
+					sagecommand="def fullsimp(expr):return expr.simplify_full().simplify_trig()\n"+variables+"\nfullsimp"+sagecommand;
 				}
 				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);
 			}
