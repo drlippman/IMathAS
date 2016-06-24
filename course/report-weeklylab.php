@@ -96,6 +96,17 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	$body = _("You need to log in as a teacher to access this page\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	
+	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
+		$gbmode = $_GET['gbmode'];
+	} else if (isset($sessiondata[$cid.'gbmode'])) {
+		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else {
+		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$gbmode = mysql_result($result,0,0);
+	}
+	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	
 	if (isset($_POST['interval'])) { 
 		//settings update postback
 		if (!isset($sessiondata['reportsettings-weeklylab'])) {
@@ -154,6 +165,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	// Set up the main $st array with first and last name for all students
 	// in a class
 	$query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid ='$cid' ";
+	if ($hidelocked) {
+		$query .= "AND stu.locked=0 ";
+	}
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$totalstudents = 0;
 
