@@ -1099,11 +1099,12 @@ if ($line['deleted']==1 && ($myrights==100 || $ownerid==$userid)) {
 
 <?php
 $placeinfooter='
-<div id="solverpopup" style="display: none" class="solverpopup cp">
+<div id="solverpopup" style="display: none" class="solverpopup">
 	<div id="solvertopbar">
 		<div id="solverclosebutton">X</div>
 		<span>Solver</span>
 	</div>
+	<div id="solverinsides">
 	<div id="operationselect">
 	Select and drag or copy an expression from your question code.
 	<img id="solverinputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
@@ -1138,6 +1139,7 @@ $placeinfooter='
 	</div>
 	<input id="solverappendalone" type="button" value="Insert in Common Control">
 	<input id="solverappend" type="button" value="Insert as $answer">
+	</div>
 </div>
 ';
 ?>

@@ -126,22 +126,18 @@
 
 		function handleSageEvent() {
 			//copy some styles to avoid additional colors
-			if ( $("div.breadcrumb").css("color") !==undefined ) {
-				$("#solvertopbar").css( "color",
-						$("div.breadcrumb").css("color") );
-			}
-			if ( $("#navlist").css("color") !==undefined) {
+			/*if ( $("#navlist").css("color") !==undefined) {
 				$("#solvergobutton").css( "color",
 						$("#navlist").css("color") );
-			}
-			if ( $("div.breadcrumb").css("background-color") !==undefined ) {
-				$("#solvertopbar").css( "background-color",
-						$("div.breadcrumb").css("background-color") );
+				$("#solvertopbar").css( "color",
+						$("#navlist").css("color") );
 			}
 			if ( $("#navlist").css("background-color") !==undefined) {
 				$("#solvergobutton").css( "background-color",
 						$("#navlist").css("background-color") );
-			}
+				$("#solvertopbar").css( "background-color",
+						$("#navlist").css("background-color") );
+			}*/
 			$("#solverpopup").show()
 				if (controlEditor.somethingSelected()) {
 					var selection=controlEditor.getSelection();
@@ -200,21 +196,23 @@
 		//Show Solver Input help
 		function handleSolverInputHelp() {
 			//load using help.php
-			$("#solverinputhelp").load("../help.php?section=solverinput");
+			$("#solverinputhelp").load("../help.php?section=solverinput&bare=true");
 			$("#solverinputhelp").toggle();
 		}
 
 		//Show Sage help
 		function handleSolverHelp() {
 			//load using help.php
-			$("#solverhelpbody").load("../help.php?section=solversage");
+			$("#solverhelpbody").load("../help.php?section=solversage&bare=true");
+			$("#solverhelpbody").find(".pagetitle").remove();
 			$("#solverhelpbody").toggle();
 		}
 
 		//Show Sage Ouput help
 		function handleSolverOutputHelp() {
 			//load using help.php
-			$("#solverhelpbody").load("../help.php?section=solveroutput");
+			$("#solveroutputhelp").load("../help.php?section=solveroutput&bare=true");
+			$("#solveroutputhelp").find(".pagetitle").remove();
 			$("#solveroutputhelp").toggle();
 		}
 
@@ -333,31 +331,50 @@
 		}
 
 		function operationChange() {
-			if ( $("#sagecell").find(".CodeMirror").size() <= 0 ) {
-				return; //no code window found
+			if ($("#imathastosage").val()) {
+				//added since the user might modify the imathastosage string then select an operation change 
+				var formula_variables = convertMomSageVariables(
+						$("#imathastosage").val(), true);
+				var formula=formula_variables.formula;
+				var variables=formula_variables.variables;
+				var sagecommand;
+				var operation=$("#solveroperation").val();
+				if (variables===undefined||variables===null||operation===undefined || operation == "") {
+					sagecommand = formula;
+				} else {
+					var variable_list=variables.join(",");
+					sagecommand=variable_list+"=var(\""+variable_list+"\")";
+					sagecommand=sagecommand+"\n"+operation+"( "+formula+" , "+variables[0]+")";
+				}
+				
+				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);;
+			} else {
+				if ( $("#sagecell").find(".CodeMirror").size() <= 0 ) {
+					return; //no code window found
+				}
+				var sagecommand=$("#sagecell").find(".CodeMirror").get(0).CodeMirror.getValue();
+				//get variable declaration
+				variables=sagecommand.replace(/\n.*/i,"");
+				//remove previous operation
+				sagecommand=sagecommand.replace(/.*\n\s*(diff|solve|integral|plot|simplify)/i,"");
+				//remove plot range if present
+				sagecommand=sagecommand.replace(/,\s*\(([a-z_0-9]+),[-0-9\s,]*\)\)/i,", $1)");
+				if ($("#solveroperation").val()=="diff") {
+					sagecommand=variables+"\ndiff"+sagecommand;
+				} else if ($("#solveroperation").val()=="solve") {
+					sagecommand=variables+"\nsolve"+sagecommand;
+				} else if ($("#solveroperation").val()=="integral") {
+					sagecommand=variables+"\nintegral"+sagecommand;
+				} else if ($("#solveroperation").val()=="plot") {
+					var variable=sagecommand.replace(/.*,\s*([\w_]+)\s*\)/im,"$1");
+					sagecommand=sagecommand.replace(/(.*),\s*[\w_]+\s*\)/im,"$1");
+					sagecommand=variables+"\nplot"+sagecommand+", ("+variable+",-10,10))";
+				} else if ($("#solveroperation").val()=="simplify") {
+					sagecommand=sagecommand.replace(/,\s*([a-z0-9_]+)/i,"");
+					sagecommand=variables+"\nsimplify"+sagecommand;
+				}
+				$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);
 			}
-			var sagecommand=$("#sagecell").find(".CodeMirror").get(0).CodeMirror.getValue();
-			//get variable declaration
-			variables=sagecommand.replace(/\n.*/i,"");
-			//remove previous operation
-			sagecommand=sagecommand.replace(/.*\n\s*(diff|solve|integral|plot|simplify)/i,"");
-			//remove plot range if present
-			sagecommand=sagecommand.replace(/,\s*\(([a-z_0-9]+),[-0-9\s,]*\)\)/i,", $1)");
-			if ($("#solveroperation").val()=="diff") {
-				sagecommand=variables+"\ndiff"+sagecommand;
-			} else if ($("#solveroperation").val()=="solve") {
-				sagecommand=variables+"\nsolve"+sagecommand;
-			} else if ($("#solveroperation").val()=="integral") {
-				sagecommand=variables+"\nintegral"+sagecommand;
-			} else if ($("#solveroperation").val()=="plot") {
-				var variable=sagecommand.replace(/.*,\s*([\w_]+)\s*\)/im,"$1");
-				sagecommand=sagecommand.replace(/(.*),\s*[\w_]+\s*\)/im,"$1");
-				sagecommand=variables+"\nplot"+sagecommand+", ("+variable+",-10,10))";
-			} else if ($("#solveroperation").val()=="simplify") {
-				sagecommand=sagecommand.replace(/,\s*([a-z0-9_]+)/i,"");
-				sagecommand=variables+"\nsimplify"+sagecommand;
-			}
-			$("#sagecell").find(".CodeMirror").get(0).CodeMirror.setValue(sagecommand);
 			$("#sagecell").find(".sagecell_evalButton").click();
 		}
 
