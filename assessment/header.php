@@ -49,7 +49,7 @@ if (isset($CFG['locale'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
 	}
 }
-echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=060616\"></script>\n";
+echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=062416\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
@@ -144,12 +144,7 @@ div { zoom: 1; }
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	if ($sessiondata['usetiny4']==1) {
-		echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
-		echo '<script type="text/javascript">usetiny4 = true;</script>';
-	} else {
-		echo '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=111612"></script>';
-	}
+	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var usingTinymceEditor = true;';
@@ -159,13 +154,9 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 		echo 'var coursetheme = "'.$coursetheme.'";';
 	}
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
-		if ($sessiondata['usetiny4']==1) {
-			echo 'var filePickerCallBackFunc = filePickerCallBack;';
-		} else {
-			echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
-		}
+		echo 'var filePickerCallBackFunc = filePickerCallBack;';
 	} else {
-		echo 'var fileBrowserCallBackFunc = null; var filePickerCallBackFunc = null;';
+		echo 'var filePickerCallBackFunc = null;';
 	}
 	echo 'initeditor("textareas","mceEditor");';
 	echo '</script>';

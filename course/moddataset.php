@@ -650,24 +650,16 @@
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
-	if ($sessiondata['usetiny4']==1) {
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
-		$placeinhead .= '<script type="text/javascript">usetiny4 = true;</script>';
-	} else {
-		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=082911"></script>';
-	}
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
+	
 	$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
 	  var editoron = 0; var seditoron = 0;
 	  var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
-		if ($sessiondata['usetiny4']==1) {
-			$placeinhead .= 'var filePickerCallBackFunc = filePickerCallBack;';
-		} else {
-			$placeinhead .= 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
-		}
+		$placeinhead .= 'var filePickerCallBackFunc = filePickerCallBack;';
 	} else {
-		$placeinhead .= 'var fileBrowserCallBackFunc = null;';
+		$placeinhead .= 'var filePickerCallBackFunc = null;';
 	}
 	
 	if (isset($_GET['id'])) {
@@ -700,13 +692,8 @@
 	        } 
 	        console.log(toinit.join(","));
 	        initeditor("exact",toinit.join(","),1);
-	     } else {';
-	     	if ($sessiondata['usetiny4']==1) {
-			$placeinhead .= 'tinymce.remove("#"+el);';
-		} else {
-			$placeinhead .= 'tinyMCE.execCommand("mceRemoveControl",true,el);';
-		}
-	$placeinhead .= '
+	     } else {
+	     	tinymce.remove("#"+el);
 		qtextbox.rows -= 3;
 		qtextbox.value = qtextbox.value.replace(/<span\s+class="AM"[^>]*>(.*?)<\\/span>/g,"$1");
 		if (el=="qtext") {setupQtextEditor();}

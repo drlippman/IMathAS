@@ -39,7 +39,7 @@ div.breadcrumb { display:none;}
 <script type="text/javascript">
 var imasroot = '<?php echo $imasroot; ?>'; var cid = <?php echo (isset($cid) && is_numeric($cid))?$cid:0; ?>;
 </script>
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=060616"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/general.js?v=062416"></script>
 <?php
 //$sessiondata['mathdisp'] = 3;
 //writesessiondata();
@@ -126,23 +126,14 @@ if (isset($placeinhead)) {
 	echo $placeinhead;
 }
 if (isset($useeditor) && $sessiondata['useed']==1) {
-	if ($sessiondata['usetiny4']==1) {
-		echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
-		echo '<script type="text/javascript">usetiny4 = true;</script>';
-	} else {
-		echo '<script type="text/javascript" src="'.$imasroot.'/editor/tiny_mce.js?v=111612"></script>';
-	}
+	echo '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
 	echo "\n";
 	echo '<script type="text/javascript">';
 	echo 'var coursetheme = "'.$coursetheme.'";';
 	if (!isset($CFG['GEN']['noFileBrowser'])) {
-		if ($sessiondata['usetiny4']==1) {
-			echo 'var filePickerCallBackFunc = filePickerCallBack;';
-		} else {
-			echo 'var fileBrowserCallBackFunc = "fileBrowserCallBack";';
-		}
+		echo 'var filePickerCallBackFunc = filePickerCallBack;';
 	} else {
-		echo 'var fileBrowserCallBackFunc = null; var filePickerCallBackFunc = null;';
+		echo 'var filePickerCallBackFunc = null;';
 	}
 	echo 'initeditor("exact","'.$useeditor.'");';
 	echo '</script>';
