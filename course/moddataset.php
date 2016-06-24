@@ -690,7 +690,6 @@
 	        if ((el=="solution" && seditoron==0) || (el!="solution" && seditoron==1)) {
 	        	toinit.push("solution");
 	        } 
-	        console.log(toinit.join(","));
 	        initeditor("exact",toinit.join(","),1);
 	     } else {
 	     	tinymce.remove("#"+el);
@@ -748,7 +747,6 @@
 
 	   function checklicense() {
 	   	var lic = $("#license").val();
-	   	console.log(lic+","+originallicense);
 	   	var warn = "";
 	   	if (originallicense>-1) {
 	   		if (originallicense==0 && lic != 0) {
@@ -1102,7 +1100,7 @@ $placeinfooter='
 	<div id="solverinsides">
 	<div id="operationselect">
 	Select and drag or copy an expression from your question code.
-	<img id="solverinputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	<img id="solverinputhelpicon" src="../img/help.gif" alt="Help"><br/>
 	<div id="solverinputhelp" style="display: none;">
 	</div>
 	<input id="imathastosage" type="text" size="30">
@@ -1119,14 +1117,14 @@ $placeinfooter='
 	<div id="sagemathcode" style="display: none;"></div>
 	<div id="sagecellcontainer">
 		<div id="sagecell"></div>
-		<img id="solverhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+		<img id="solverhelpicon" src="../img/help.gif" alt="Help"><br/>
 	</div>
 	<div id="solverhelpbody" style="display: none">
 	</div>
 	<div id="sagecelloutput"></div>
     <div id="sagetocontroldiv" style="display: none;" >
 		Drag this to the Common Control box or use the buttons below.
-	<img id="solveroutputhelpicon" src="/imathas/img/help.gif" alt="Help"><br/>
+	<img id="solveroutputhelpicon" src="../img/help.gif" alt="Help"><br/>
 	<div id="sagetocontrolresult">
 		<p><span id="sagetocontrol" draggable="true"></span></p>
 	</div>
