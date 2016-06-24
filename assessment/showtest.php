@@ -889,7 +889,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
 	} else if ($testsettings['eqnhelper']==3 || $testsettings['eqnhelper']==4) {
-		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
+		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
 		if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
 			$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
 				.mathquill-editable.empty { width: 0.5em; }
