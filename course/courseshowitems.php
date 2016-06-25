@@ -448,7 +448,7 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock(,event'{$items[$i]['id']}','$parent-$bnum')\">";
+					echo "<span class=pointer onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
 					if ($items[$i]['SH'][0]=='S') {
 						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";

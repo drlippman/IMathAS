@@ -122,7 +122,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$lbl[1] = 1;
 			$noyaxis = true;
 		}
-		if (!isset($lbl[2])) {  //allow xscl:yscl:off for ticks but no labels
+		if (!isset($lbl[2]) || $lbl[2]!='off') {  //allow xscl:yscl:off for ticks but no labels
 			$commands .= 'axes('.$lbl[0].','.$lbl[1].',1';
 		} else {
 			$commands .= 'axes('.$lbl[0].','.$lbl[1].',null';
