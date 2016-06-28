@@ -341,7 +341,8 @@ function initeditor(edmode,edids,css){
                                 {title: '10pt', inline:'span', styles: { fontSize: '12px', 'font-size': '10px' } },
                                 {title: '12pt', inline:'span', styles: { fontSize: '12px', 'font-size': '12px' } },
                                 {title: '14pt', inline:'span', styles: { fontSize: '12px', 'font-size': '14px' } },
-                                {title: '16pt', inline:'span', styles: { fontSize: '12px', 'font-size': '16px' } }
+                                {title: '16pt', inline:'span', styles: { fontSize: '12px', 'font-size': '16px' } },
+                                {title: '20pt', inline:'span', styles: { fontSize: '12px', 'font-size': '20px' } }
                         ]
                 }]
         }
