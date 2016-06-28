@@ -1409,7 +1409,7 @@ function AMcheckTeX() {
 //onload function (replaces the onload="translate()" in the <body> tag)
 function generic()
 {
-	if (AMnoMathML && typeof waitforAMTcgiloc != 'undefined' && AMTcgiloc==null) {
+	if (typeof waitforAMTcgiloc != 'undefined' && AMTcgiloc==null) {
 		setTimeout("generic()",50);
 	} else {
 		if (!AMnoMathML && AMisGecko>0) {
