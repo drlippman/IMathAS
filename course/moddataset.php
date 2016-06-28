@@ -726,7 +726,8 @@
 			mode: "imathasqtext",
 			smartIndent: true,
 			lineWrapping: true,
-			indentUnit: 2
+			indentUnit: 2,
+			tabSize: 2
 		      });
 		//qEditor.setSize("100%",6+14*qtextbox.rows);
 	   }
@@ -739,7 +740,8 @@
 			mode: "text/x-imathas",
 			smartIndent: true,
 			lineWrapping: true,
-			indentUnit: 2
+			indentUnit: 2,
+			tabSize: 2
 		      });
 		//controlEditor.setSize("100%",6+14*document.getElementById("control").rows);
 	   });
