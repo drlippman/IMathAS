@@ -2660,7 +2660,12 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	
 	$a = mathphp(makepretty(mathphppre($a)), $vlist);
 	$b = mathphp(makepretty(mathphppre($b)), $vlist);
-	
+	if ($a=='' || $b=='') {
+		if (isset($GLOBALS['teacherid'])) {
+			echo "<p>Debug info: one function failed to compile.</p>";
+		}
+		return false;
+	}
 	//echo "pretty: $a, $b";
 	for($i=0; $i < count($variables); $i++) {
 		$a = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$a);
@@ -2677,6 +2682,9 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		}
 		$ansa = @eval("return ($a);");
 		$ansb = @eval("return ($b);");
+		if ($ansa===false || $ansb===false) {
+			break;
+		}
 		//echo "real: $ansa, my: $ansb <br/>";
 		if (isNaN($ansa)) {$cntnana++; if (isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
 		if (isNaN($ansb)) {$cntnanb++; continue;}
@@ -2699,9 +2707,17 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		}
 	}
 	//echo "$i, $ansa, $ansb, $cntnana, $cntnanb";
-	if (($cntnana==20 || $cntnanb==20) && isset($GLOBALS['teacherid'])) {
-		echo "<p>Debug info: one function evaled to Not-a-number at all test points.  Check \$domain</p>";
-		echo "<p>Funcs: $a and $b</p>";
+	if ($cntnana==20 || $cntnanb==20) {
+		if (isset($GLOBALS['teacherid'])) {
+			echo "<p>Debug info: one function evaled to Not-a-number at all test points.  Check \$domain</p>";
+			echo "<p>Funcs: $a and $b</p>";
+		}
+		return false;
+	} else if ($i<20) {
+		if (isset($GLOBALS['teacherid'])) {
+			echo "<p>Debug info: one function was invalid.</p>";
+			echo "<p>Funcs: $a and $b</p>";
+		}
 		return false;
 	}
 	if (abs($cntnana - $cntnanb)>1) {
@@ -2836,7 +2852,6 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb, $tol=.001) {
 		}
 	}
 }
-
 
 function gettwopointlinedata($str,$xmin=-5,$xmax=5,$ymin=-5,$ymax=5,$w=300,$h=300) {
 	return gettwopointdata($str,'line',$xmin,$xmax,$ymin,$ymax,$w,$h);
