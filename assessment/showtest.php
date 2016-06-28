@@ -2833,11 +2833,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 				qcnt++;
 			}
 			var status = 0;';
-			if ($showeachscore) {
-				echo 'if (pts == '.$pgposs.') {status=2;} else if (unanscnt<qcnt) {status=1;}';	
-			} else {
+			//REMOVED to make consistent with load-time calculations
+			//if ($showeachscore) {
+			//	echo 'if (pts == '.$pgposs.') {status=2;} else if (unanscnt<qcnt) {status=1;}';	
+			//} else {
 				echo 'if (unanscnt == 0) { status = 2;} else if (unanscnt<qcnt) {status=1;}';
-			}
+			//}
 			echo 'if (top !== self) {
 				try {
 					top.updateTRunans("'.$testsettings['id'].'", status);
