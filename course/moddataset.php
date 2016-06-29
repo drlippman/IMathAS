@@ -727,7 +727,8 @@
 			smartIndent: true,
 			lineWrapping: true,
 			indentUnit: 2,
-			tabSize: 2
+			tabSize: 2,
+			styleSelectedText:true
 		      });
 		//qEditor.setSize("100%",6+14*qtextbox.rows);
 	   }
@@ -741,7 +742,8 @@
 			smartIndent: true,
 			lineWrapping: true,
 			indentUnit: 2,
-			tabSize: 2
+			tabSize: 2,
+			styleSelectedText:true
 		      });
 		//controlEditor.setSize("100%",6+14*document.getElementById("control").rows);
 	   });
@@ -788,6 +790,9 @@
 		#ccbox .CodeMirror, #qtbox .CodeMirror {height: auto;}
 		#ccbox .CodeMirror-scroll {min-height:220px; max-height:600px;}
 		#qtbox .CodeMirror-scroll {min-height:150px; max-height:600px;}
+		.CodeMirror-selectedtext {color: #ffffff !important;background-color: #3366AA;}
+		.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
+		.CodeMirror-selected {background: #666666;}
 		</style>';
 	$placeinhead .= "<link href=\"$imasroot/course/solver.css?ver=230616\" rel=\"stylesheet\">";
 	
