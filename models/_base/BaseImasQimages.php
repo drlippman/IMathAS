@@ -35,7 +35,9 @@ class BaseImasQimages extends \yii\db\ActiveRecord
             [['qsetid'], 'integer'],
             [['var'], 'string', 'max' => 50],
             [['filename'], 'string', 'max' => 100],
-            [['alttext'], 'string', 'max' => 254]
+            [['alttext'], 'string', 'max' => 254],
+            [['var','Alttext'],'filter','filter'=>'\yii\helpers\HtmlPurifier::process'],
+
         ];
     }
 
