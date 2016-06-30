@@ -60,7 +60,9 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
 //            [['author', 'control', 'qcontrol', 'qtext', 'answer', 'solution', 'extref', 'ancestors', 'ancestorauthors', 'otherattribution'], 'required'],
             [['author', 'control', 'qcontrol', 'qtext', 'answer', 'solution', 'extref', 'ancestors', 'ancestorauthors', 'otherattribution'], 'string'],
             [['description', 'avgtime', 'importuid'], 'string', 'max' => 254],
-            [['qtype'], 'string', 'max' => 20]
+            [['qtype'], 'string', 'max' => 20],
+            [['description', 'control','qcontrol','qtext','answer','solution'],'filter','filter'=>'\yii\helpers\HtmlPurifier::process'],
+
         ];
     }
 
