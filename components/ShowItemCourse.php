@@ -836,7 +836,8 @@ class ShowItemCourse extends Component
                     <?php if ($tlwrds != '') {
                         echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
                     }
-                    echo ">". HTML::encode($line['name'])."</a></b>";
+                    // This is not encoded because for some reason it messes up the html tags instead of purly encodeing them
+                    echo ">". $line['name']."</a></b>";
                     if ($line['enddate'] != AppConstant::ALWAYS_TIME) {
                         echo "<BR> $endname $endDate \n";
                     }
@@ -957,7 +958,7 @@ class ShowItemCourse extends Component
                         }
                     }
                     echo "<div class=title><i>"; ?>
-                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"><?php echo HTML::encode($line['name']) ?></a>
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"><?php echo $line['name'] ?></a>
                   <?php  echo '<span class="instrdates">';
                     echo "<br/><i>$show</i>\n";
                     echo '</span>';
@@ -1474,6 +1475,7 @@ class ShowItemCourse extends Component
                              src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                     <?php }
                     echo "<div class=title><i>"; ?>
+                      <!-- the fallowing $line['name'] is the one for the forum names  -->
                     <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forumid='.$line['id'])?>"><?php echo HTML::encode($line['name'])?></a></b></i>
                    <?php if (($newPostCnts[$line['id']]) && $newPostCnts[$line['id']] > AppConstant::NUMERIC_ZERO) { ?>
                         <a style="color:red" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&forumid='.$line['id'],'&page=-1')?>"><?php sprintf(_('New Posts (%s)'),$newPostCnts[$line['id']])?></a>
