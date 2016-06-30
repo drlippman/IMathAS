@@ -82,6 +82,9 @@ function setupLivePreview(qn) {
 			  				text = "text("+text+")";
 			  			}
 			  		}
+			  	} else if (vlist.hasOwnProperty(qn)) {
+			  		text = AMnumfuncPrepVar(qn, text)[1];
+			  		
 			  	}
 			  	return text;
 			  },
@@ -160,7 +163,9 @@ function normalizemathunicode(str) {
 	str = str.replace(/Ω/,"Omega").replace(/Γ/,"Gamma").replace(/Φ/,"Phi").replace(/Δ/,"Delta").replace(/Σ/,"Sigma");
 	return str;
 }
-
+function wrapAMnotice(str) {
+	return '<span class="AMHnotice">'+str+'</span>';
+}
 //handles preview button for calculated type
 function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
@@ -219,12 +224,12 @@ function calculate(inputId,outputId,format) {
 		  }
 		  if (!isNaN(res) && res!="Infinity") {  
 			  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-				  str = "`"+str+"` " + err;
+				  str = "`"+str+"` " + wrapAMnotice(err);
 			  } else {
-				  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+". "+err;
+				  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+". "+wrapAMnotice(err);
 			  }
 		  } else if (str!="") {
-			  str = "`"+str+"` = "+_("undefined")+". "+err;
+			  str = "`"+str+"` = "+_("undefined")+". "+wrapAMnotice(err);
 		  }
 	  }
 	  strarr[sc] = str+" ";
@@ -232,7 +237,7 @@ function calculate(inputId,outputId,format) {
   fullstr = strarr.join(', ');
   if (format.indexOf('set')!=-1) {
   	  if (!document.getElementById(inputId).value.match(/^\s*{.*?}\s*$/)) {
-  	  	  fullstr += ("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}");
+  	  	  fullstr += wrapAMnotice(_("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}"));
   	  } else {
   	  	  fullstr = '{'+fullstr+'}';
   	  }
@@ -333,9 +338,9 @@ function intcalculate(inputId,outputId,format) {
 		  if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
 		  	  if(format.indexOf('inequality')!=-1) {
 		  	  	  origstr = origstr.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
-		  	  	  fullstr = "`"+origstr+"`: " + _("invalid inequality notation");
+		  	  	  fullstr = "`"+origstr+"`: " + wrapAMnotice(_("invalid inequality notation"));
 		  	  } else {
-		  	  	  fullstr = "`"+origstr.replace(/U/g,"uu")+"`: " + _("invalid interval notation");
+		  	  	  fullstr = "`"+origstr.replace(/U/g,"uu")+"`: " + wrapAMnotice(_("invalid interval notation"));
 		  	  }
 			  isok = false;
 			  break;
@@ -364,7 +369,7 @@ function intcalculate(inputId,outputId,format) {
 				  if (!isNaN(res) && res!="Infinity") {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
-						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+err;
+						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+wrapAMnotice(err);
 					  //} else {
 						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
 					  //}
@@ -372,7 +377,7 @@ function intcalculate(inputId,outputId,format) {
 				  	  calcvals[j] = _("undefined");
 				  }
 				  if (err != '') {
-				  	  fullerr += err;
+				  	  fullerr += wrapAMnotice(err);
 				  }
 				  
 			  }
@@ -408,19 +413,19 @@ function intcalculate(inputId,outputId,format) {
 				 origstr = origstr.replace(/</g,'lt');
 				 origstr = origstr.replace(/>/g,'gt');
 				 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-				 	 fullstr = '`'+origstr + '`'+". "+fullerr;
+				 	 fullstr = '`'+origstr + '`'+". "+wrapAMnotice(fullerr);
 				 } else {
-				 	 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`'+". "+fullerr;
+				 	 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`'+". "+wrapAMnotice(fullerr);
 				 }
 			 }
 		 } else {
 		 	 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-				  fullstr = '`'+strarr.join('uu') + '`'+". "+fullerr;	 
+				  fullstr = '`'+strarr.join('uu') + '`'+". "+wrapAMnotice(fullerr);	 
 			 } else {
 			 	 if (format.indexOf('list')!=-1) {
-			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , ')+". "+fullerr; 
+			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , ')+". "+wrapAMnotice(fullerr);
 			 	 } else {
-			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ')+". "+fullerr;
+			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ')+". "+wrapAMnotice(fullerr);
 			 	 }
 			 }
 		 }
@@ -510,9 +515,9 @@ function ntuplecalc(inputId,outputId,format) {
 		}
 		//outstr = '`'+fullstr+'` = '+outcalced;
 		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1 || notationok==false) {
-			 outstr = '`'+fullstr+'`'+". " + err;
+			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
 		} else {
-			 outstr = '`'+fullstr+'` = '+outcalced +". " + err;
+			 outstr = '`'+fullstr+'` = '+outcalced +". " + wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
@@ -574,9 +579,9 @@ function complexcalc(inputId,outputId,format) {
 			}
 		}
 		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-			outstr = '`'+fullstr+'`'+". "+err;
+			outstr = '`'+fullstr+'`'+". "+wrapAMnotice(err);
 		} else {
-			outstr = '`'+fullstr+'` = '+outcalced+". "+err;
+			outstr = '`'+fullstr+'` = '+outcalced+". "+wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
@@ -795,14 +800,11 @@ function stringqpreview(inputId,outputId) {
 	}*/
 }
 
-//preview button for numfunc type
-function AMpreview(inputId,outputId) {
-  var qn = inputId.slice(2);
+function AMnumfuncPrepVar(qn,str) {
   var vl = vlist[qn];
   var fl = flist[qn];
-  vars = vl.split("|");
+  var vars = vl.split("|");
   
-  var str = document.getElementById(inputId).value;
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
   var foundaltcap = []; 
@@ -883,29 +885,28 @@ function AMpreview(inputId,outputId) {
 		  */
 	  }
   }
-  vl = vars.join("|");
-  
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
 	  var reg = new RegExp("("+vltq+")","g");
 	  dispstr = dispstr.replace(reg,"\"$1\"");
-  }
+  }                                   
   dispstr = dispstr.replace("varE","E");
-  dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);
+  dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);	
   
-  
-  /*var outnode = document.getElementById(outputId);
-  var n = outnode.childNodes.length;
-  for (var i=0; i<n; i++)
-    outnode.removeChild(outnode.firstChild);
-    outnode.appendChild(document.createTextNode('`'+dispstr+'`'));
-    if (!noMathRender) {
-	rendermathnode(outnode);
-    }*/
-  //outnode.appendChild(AMparseMath(dispstr));
+  return [str,dispstr];
+}
+
+//preview button for numfunc type
+function AMpreview(inputId,outputId) {
+  var qn = inputId.slice(2);
+  var strprocess = AMnumfuncPrepVar(qn, document.getElementById(inputId).value);
+  str = strprocess[0];
+  dispstr = strprocess[1];
   
   //the following does a quick syntax check of the formula
   
+  var vl = vlist[qn];
+  var fl = flist[qn];
   
   ptlist = pts[qn].split(",");
   var err = '';
@@ -961,7 +962,7 @@ function AMpreview(inputId,outputId) {
   
   var qn = outputId.substr(1);
   setupLivePreview(qn);
-  LivePreviews[qn].RenderNow('`'+dispstr+'` '+err);
+  LivePreviews[qn].RenderNow('`'+dispstr+'` '+wrapAMnotice(err));
 
 }
 
