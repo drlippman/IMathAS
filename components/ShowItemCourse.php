@@ -958,7 +958,7 @@ class ShowItemCourse extends Component
                         }
                     }
                     echo "<div class=title><i>"; ?>
-                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"><?php echo $line['name'] ?></a>
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-test?id='.$typeid . '&cid=' . $courseId) ?>"><?php echo HTML::encode($line['name']) ?></a>
                   <?php  echo '<span class="instrdates">';
                     echo "<br/><i>$show</i>\n";
                     echo '</span>';
