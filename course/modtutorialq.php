@@ -108,7 +108,9 @@ if (isset($_POST['text'])) {
 	//generate question code
 	//this part stores the values in the question code, in form that makes
 	//them easy to recover later.
-	$code = '';
+	$code = "//start randomization code - Tutorial Style question\n\n";
+	$code .= $_POST['randvars'];
+	$code .= "\n\n//end randomization code - Tutorial Style question\n\n";
 	if ($nparts==1) {
 		$qtype = $qtypes[0];
 		
@@ -391,7 +393,187 @@ function getqvalues($code,$type) {
 	} else {
 		$keepcode = '';
 	}
+	if (strpos($code,'//end randomization') !== false) {
+		$randvars = substr($code, strpos($code,'//start randomization'), strpos($code,'//end randomization')-strpos($code,'//start randomization'));
+		$randvars = trim(substr($randvars, strpos($randvars,"\n")));
+	} else {
+		$randvars = '';
+	}
 	
+	if (strpos($code,'//end randomization') !== false) {
+		$toparse = substr($code, strpos($code,'//end randomization'), strpos($code,'//end stored')-strpos($code,'//end randomization'));
+		$toparse = trim(substr($toparse, strpos($toparse,"\n")));
+	} else {
+		$toparse = substr($code, 0, strpos($code,'//end stored'));
+	}
+	$hinttext = array();
+	preg_match_all('/\$hinttext\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+	foreach ($matches as $m) {
+		$hinttext[$m[1]] = $m[2];
+	}
+	$nhints = count($hinttext);
+	
+	if (preg_match('/anstypes/',$toparse)) {
+		preg_match('/\$anstypes\s*=\s*"(.*)"/', $toparse, $matches);
+		$qtypes = explode(',', $matches[1]);
+		$nparts = count($qtypes);
+		$qtol = array();
+		$qtold = array();
+		preg_match_all('/\$reltolerance\[(\d+)\]\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$qtol[$m[1]] = 'rel';
+			$qtold[$m[1]] = $m[2];
+		}
+		preg_match_all('/\$abstolerance\[(\d+)\]\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$qtol[$m[1]] = 'abs';
+			$qtold[$m[1]] = $m[2];
+		}
+		$partialcredit = array();
+		preg_match_all('/\$partialcredit\[(\d+)\]\s*=\s*array\((.*)\)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$partialcredit[$m[1]] = explode(',',$m[2]);
+		}
+		$questions = array();
+		preg_match_all('/\$questions\[(\d+)\]\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$questions[$m[1]][$m[2]] = $m[3];
+		}
+		$feedbacktxt = array();
+		preg_match_all('/\$feedbacktxt\[(\d+)\]\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$feedbacktxt[$m[1]][$m[2]] = $m[3];
+		}
+		foreach ($partialcredit as $k=>$v) {
+			$qparts[$k] = count($v)/2;
+		}
+		foreach ($questions as $k=>$v) {
+			$qparts[$k] = count($v);
+		}
+		$displayformat = array();
+		preg_match_all('/\$displayformat\[(\d+)\]\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$displayformat[$m[1]] = $m[2];
+		}
+		$feedbacktxtdef = array();
+		preg_match_all('/\$feedbacktxtdef\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$feedbacktxtdef[$m[1]] = $m[2];
+		}
+		$feedbacktxtessay = array();
+		preg_match_all('/\$feedbacktxtessay\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$feedbacktxtessay[$m[1]] = $m[2];
+		}
+		$answer = array();
+		preg_match_all('/\$answer\[(\d+)\]\s*=\s*"?(.*)"?/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$answer[$m[1]] = $m[2];
+		}       
+		$answerboxsize = array();
+		preg_match_all('/\$answerboxsize\[(\d+)\]\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$answerboxsize[$m[1]] = $m[2];
+		}
+		$displayformat = array();
+		preg_match_all('/\$displayformat\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$displayformat[$m[1]] = $m[2];
+		}
+		$noshuffle = array();
+		preg_match_all('/\$noshuffle\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$noshuffle[$m[1]] = $m[2];
+		}
+		$scoremethod = array();
+		preg_match_all('/\$scoremethod\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$scoremethod[$m[1]] = $m[2];
+		}
+		//print_r(array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $keepcode, $randvars));
+		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $keepcode, $randvars);
+	} else {
+		preg_match_all('/\$reltolerance\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$qtol = 'rel';
+			$qtold = $m[1];
+		}
+		preg_match_all('/\$abstolerance\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$qtol = 'abs';
+			$qtold = $m[1];
+		}
+		$partialcredit = array();
+		preg_match_all('/\$partialcredit\s*=\s*array\((.*)\)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$partialcredit = explode(',',$m[1]);
+		}
+		$questions = array();
+		preg_match_all('/\$questions\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$questions[$m[1]] = $m[2];
+		}
+		if (count($questions)>0) {
+			$qparts = array(count($questions));	
+		} else if (count($partialcredit)>0) {
+			$qparts = array(count($partialcredit)/2);
+		} else {
+			$qparts = array(0);
+		}
+
+		$feedbacktxt = array();
+		preg_match_all('/\$feedbacktxt\[(\d+)\]\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$feedbacktxt[$m[1]] = $m[2];
+		}
+
+		$displayformat = '';
+		preg_match_all('/\$displayformat\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$displayformat = $m[1];
+		}
+		$feedbacktxtdef = '';
+		preg_match_all('/\$feedbacktxtdef\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$feedbacktxtdef = $m[1];
+		}
+		$feedbacktxtessay = '';
+		preg_match_all('/\$feedbacktxtessay\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$feedbacktxtessay = $m[1];
+		}
+		$answer = '';
+		preg_match_all('/\$answer\s*=\s*"?(.*)"?/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$answer = $m[1];
+		}       
+		$answerboxsize = '';
+		preg_match_all('/\$answerboxsize\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$answerboxsize = $m[1];
+		}
+		$displayformat = '';
+		preg_match_all('/\$displayformat\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$displayformat = $m[1];
+		}
+		$noshuffle = '';
+		preg_match_all('/\$noshuffle\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$noshuffle = $m[1];
+		}
+		$scoremethod = '';
+		preg_match_all('/\$scoremethod\s*=\s*"(.*)"/', $toparse, $matches, PREG_SET_ORDER);
+		foreach ($matches as $m) {
+			$scoremethod = $m[1];
+		}
+		//print_r(array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), $keepcode, $randvars));
+	
+		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), $keepcode, $randvars);
+	
+	}
+		
+	/*
 	$code = substr($code, 0, strpos($code,'//end stored'));
 	eval(interpret('control',$type,$code));
 	
@@ -420,7 +602,7 @@ function getqvalues($code,$type) {
 			}
 		}
 		
-		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $keepcode);
+		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $keepcode, $randvars);
 	} else {
 		if ($type=='number') {
 			if (isset($reltolerance)) {
@@ -436,8 +618,9 @@ function getqvalues($code,$type) {
 		}else if ($type=='essay') {
 			$qparts = array(0);
 		}
-		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), $keepcode);
+		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), $keepcode, $randvars);
 	}
+	*/
 }
 
 $query = "SELECT firstName,lastName FROM imas_users WHERE id='$userid'";
@@ -569,7 +752,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 	$allowedmacros = $mathfuncs;
 	require_once("../assessment/interpret5.php");
-	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $qshuffle, $keepcode) = getqvalues($code,$type);
+	list($nparts, $qtype, $qparts, $nhints, $qdisp, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $qshuffle, $keepcode, $randvars) = getqvalues($code,$type);
 	$partial = array();
 	
 	for ($n=0;$n<$nparts;$n++) {
@@ -613,6 +796,7 @@ if (isset($_GET['id']) && $_GET['id']!='new') {
 	$qtol = array_fill(0,1,"abs");
 	$qtext = "";
 	$keepcode = '';
+	$randvars = '';
 	
 	$line['description'] = "Enter description here";
 	$query = "SELECT qrightsdef FROM imas_users WHERE id='$userid'";
@@ -1077,6 +1261,7 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 <input type="button" value="Save" onclick="popuptxtsave()"/>
 </div>
 <input type="hidden" name="keepcode" value="<?php echo htmlentities($keepcode);?>"/>
+<input type="hidden" name="randvars" value="<?php echo htmlentities($randvars);?>"/>
 <p><input type="submit" value="Save and Test"/></p>
 <p>&nbsp;</p>
 
