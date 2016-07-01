@@ -33,7 +33,7 @@ if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
-$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+$placeinhead .= '<style type="text/css"> html,body {margin:0px;} div.question input.btn { margin-left: 10px; } </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
 
 $issigned = false;
@@ -72,34 +72,33 @@ $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {
 $useeditor = 1;
 require("./assessment/header.php");
 
+//seeds 1-4999 are for summative requests that are signed
+//seeds 5000-9999 are for formative requests (unsigned)
+
 if (isset($QS['showscored'])) {
 	//DE is requesting that the question be redisplayed with right/wrong markers
-	
-	$showans = ($issigned && (!isset($QS['showans']) || $QS['showans']=='true'));
 	
 	$lastanswers = array();
 	list($seed, $rawscores, $lastanswers[0]) = explode(';', $QS['showscored'], 3);
 	$rawscores = explode('~',$rawscores);
 	$seed = intval($seed);
 	
+	$showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
+	
+	
 	displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
-	echo '<script type="text/javascript">
-		$(function() {
-			var height = $("body").outerHeight();
-			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
-		});
-		</script>';
 		
 } else if (isset($_POST['seed'])) {
 	//time to score the question
 	$seed = intval($_POST['seed']);
+	$scoredonsubmit = false;
 	if (isset($_POST['auth'])) {
 		$query = "SELECT password FROM imas_users WHERE SID='{$_POST['auth']}'";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$key = $row[0];
 		$params["auth"] = stripslashes($_POST['auth']);
-		$jwtcheck = JWT::code($_POST['jwtchk'], $key);
+		$jwtcheck = JWT::decode($_POST['jwtchk'], $key);
 		if ($jwtcheck['id'] != $qsetid || $jwtcheck['seed'] != $seed) {
 			echo "ID/Seed did not check";
 			exit;
@@ -107,17 +106,19 @@ if (isset($QS['showscored'])) {
 			echo "Seed invalid";
 			exit;
 		}
+		$scoredonsubmit = $jwtcheck['scoredonsubmit'];
 	} else {
 		$key = '';
 		if ($seed<5000) {
 			echo "Seed invalid";
 			exit;
 		}
+		$scoredonsubmit = isset($_POST['showscoredonsubmit']);
 	}
 	
 	$lastanswers = array();
 
-	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0'],1);
+	list($score,$rawscores) = scoreq(0,$qsetid,$seed,$_POST['qn0'],1);
 	if (strpos($score,'~')===false) {
 		$after = round($score,1);
 		if ($after < 0) { $after = 0;}
@@ -155,8 +156,15 @@ if (isset($QS['showscored'])) {
 		window.parent.postMessage("updatescore='.$signed.'","*");
 	});
 	</script>';
-
-	echo '<p>Saving score... <img src="img/updating.gif"/></p>';
+	if ($scoredonsubmit) {
+		$rawscores = explode('~',$rawafter);
+		
+		$showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
+		
+		displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
+	} else {
+		echo '<p>Saving score... <img src="img/updating.gif"/></p>';
+	}
 	
 } else {
 	$lastanswers = array();
@@ -174,9 +182,13 @@ if (isset($QS['showscored'])) {
 	$doshowans = 0;
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
-	
+	$scoredonsubmit = false;
+	if (isset($QS['showscoredonsubmit'])) {
+		echo '<input type="hidden" name="showscoredonsubmit" value="1"/>';
+		$scoredonsubmit = true;
+	}
 	if (isset($QS['auth'])) {
-		$verarr = array("id"=>$qsetid, "seed"=>$seed);
+		$verarr = array("id"=>$qsetid, "seed"=>$seed, 'scoredonsubmit'=>$scoredonsubmit);
 		$query = "SELECT password FROM imas_users WHERE SID='".addslashes(stripslashes($QS['auth']))."'";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
@@ -206,15 +218,22 @@ if (isset($QS['showscored'])) {
 		echo "<input type=submit name=\"check\" value=\"" . _('Submit') . "\">\n";
 	}
 	echo "</form>\n";
-	echo '<script type="text/javascript">
-		$(function() {
-			var height = $("body").outerHeight();
-			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
-		});
-		</script>';
+	
 }
 
-
+echo '<script type="text/javascript">
+	if (MathJax) {
+		MathJax.Hub.Queue(function () {
+			var height = document.body.scrollHeight;
+			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
+		});
+	} else {
+		$(function() {
+			var height = document.body.scrollHeight;
+			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
+		});
+	}
+	</script>';
 require("./footer.php");
 
 
