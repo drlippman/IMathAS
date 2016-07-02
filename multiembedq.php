@@ -38,7 +38,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 session_start();
  
 function saveAssessData() {
-	global $qids, $seeds, $rawscores, $attempts, $lastanswers, $sameseed, $theme;
+	global $qids, $seeds, $rawscores, $attempts, $lastanswers, $sameseed, $theme, $targetid;
 	$_SESSION['qids'] = $qids;
 	$_SESSION['seeds'] = $seeds;
 	$_SESSION['rawscores'] = $rawscores;
@@ -46,6 +46,7 @@ function saveAssessData() {
 	$_SESSION['lastanswers'] = $lastanswers;
 	$_SESSION['sameseed'] = $sameseed;
 	$_SESSION['theme'] = $theme;
+	$_SESSION['targetid'] = $targetid;
 	
 }
 
@@ -57,6 +58,7 @@ if (isset($_SESSION['qids']) && (!isset($_GET['id']) || $_GET['id']==implode('-'
 	$lastanswers = $_SESSION['lastanswers'];
 	$sameseed = $_SESSION['sameseed'];
 	$theme = $_SESSION['theme'];
+	$targetid = $_SESSION['targetid'];
 } else {
 	$qids = explode("-",$_GET['id']);
 	foreach ($qids as $i=>$v) {
@@ -77,6 +79,9 @@ if (isset($_SESSION['qids']) && (!isset($_GET['id']) || $_GET['id']==implode('-'
 	$lastanswers = array_fill(0,count($qids), '');
 	if (isset($_GET['theme'])) {
 		$theme = preg_replace('/\W/','',$_GET['theme']);
+	}
+	if (isset($_GET['iframe_resize_id'])) {
+		$targetid = preg_replace('/[^\w:.-]/','',$_GET['iframe_resize_id']);
 	}
 	saveAssessData();
 }
@@ -143,7 +148,7 @@ echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVE
 echo '<input type="hidden" id="asidverify" value="0"/>';
 echo '<input type="hidden" id="disptime" value="'.time().'"/>';
 echo '<input type="hidden" id="isreview" value="0"/>';
-echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'">Try Another Version of ';
+echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'&amp;iframe_resize_id='.$targetid.'">Try Another Version of ';
 if (count($qids)>1) { 
 	echo 'These Questions</a></p>';
 } else {
@@ -162,20 +167,26 @@ foreach ($qids as $i=>$qid) {
 	echo '<input type="hidden" id="verattempts'.$i.'" value="'.$attempts[$i].'"/>';
 	echo '</div>';			
 }
-
+if ($targetid != '') {
 echo '<script type="text/javascript">
+	function sendresizemsg() {
+	  window.parent.postMessage( JSON.stringify({
+	      subject: "lti.frameResize",
+	      height: default_height,
+	      iframe_resize_id: "'.$targetid.'"
+	  }), "*");
+	}
 	if (MathJax) {
 		MathJax.Hub.Queue(function () {
-			var height = document.body.scrollHeight;
-			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
+			sendresizemsg();
 		});
 	} else {
 		$(function() {
-			var height = document.body.scrollHeight;
-			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
+			sendresizemsg();
 		});
 	}
-	</script>';
+</script>';
+}
 
 require("./footer.php");
 
