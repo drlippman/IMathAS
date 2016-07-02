@@ -93,7 +93,7 @@ if ($myrights < 40) {
 	}
 	
 	//data processing for diagnostics block
-	if ($myrights>=60) {
+	if (($myspecialrights&4)==4 || $myrights == 100) {
 		$query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
 		if ($myrights<75) {
 			$query .= " WHERE d.ownerid='$userid'";
@@ -144,7 +144,6 @@ if ($myrights < 40) {
 			case 15: $page_userDataType[$i] = "Tutor/TA/Proctor"; break;
 			case 20: $page_userDataType[$i] = "Teacher"; break;
 			case 40: $page_userDataType[$i] = "LimCourseCreator"; break;
-			case 60: $page_userDataType[$i] = "DiagCreator"; break;
 			case 75: $page_userDataType[$i] = "GroupAdmin"; break;
 			case 100: $page_userDataType[$i] = "Admin"; break;
 		}
