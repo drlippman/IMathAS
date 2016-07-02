@@ -60,7 +60,7 @@
         jax = state.jax[state.i];
         frame = document.getElementById(jax.inputID+"-Frame");
         inputjax = jax.inputJax.toLowerCase();
-        if (inputjax=='asciimath' || inputjax=='tex') {
+        if (frame && (inputjax=='asciimath' || inputjax=='tex')) {
           frame.setAttribute("data-"+inputjax, jax.originalText);
         }
         state.i++;

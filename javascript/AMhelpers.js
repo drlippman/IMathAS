@@ -1470,6 +1470,9 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    for (var i=0; i<initstack.length; i++) {
 		    	    var foo = initstack[i]();
 		    }
+		    if (LivePreviews.hasOwnProperty(qn)) {
+		    	 LivePreviews[qn].Init();	    
+		    }
 		    $(window).trigger("ImathasEmbedReload");
 		    initcreditboxes();
 		    
