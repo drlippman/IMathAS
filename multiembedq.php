@@ -38,13 +38,15 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
 session_start();
  
 function saveAssessData() {
-	global $qids, $seeds, $rawscores, $attempts, $lastanswers, $sameseed;
+	global $qids, $seeds, $rawscores, $attempts, $lastanswers, $sameseed, $theme;
 	$_SESSION['qids'] = $qids;
 	$_SESSION['seeds'] = $seeds;
 	$_SESSION['rawscores'] = $rawscores;
 	$_SESSION['attempts'] = $attempts;
 	$_SESSION['lastanswers'] = $lastanswers;
 	$_SESSION['sameseed'] = $sameseed;
+	$_SESSION['theme'] = $theme;
+	
 }
 
 if (isset($_SESSION['qids']) && (!isset($_GET['id']) || $_GET['id']==implode('-',$_SESSION['qids'])) && !isset($_GET['regen'])) {
@@ -54,6 +56,7 @@ if (isset($_SESSION['qids']) && (!isset($_GET['id']) || $_GET['id']==implode('-'
 	$attempts = $_SESSION['attempts'];
 	$lastanswers = $_SESSION['lastanswers'];
 	$sameseed = $_SESSION['sameseed'];
+	$theme = $_SESSION['theme'];
 } else {
 	$qids = explode("-",$_GET['id']);
 	foreach ($qids as $i=>$v) {
@@ -72,6 +75,9 @@ if (isset($_SESSION['qids']) && (!isset($_GET['id']) || $_GET['id']==implode('-'
 	$rawscores = array_fill(0,count($qids), -1);
 	$attempts = array_fill(0,count($qids), 0);
 	$lastanswers = array_fill(0,count($qids), '');
+	if (isset($_GET['theme'])) {
+		$theme = preg_replace('/\W/','',$_GET['theme']);
+	}
 	saveAssessData();
 }
 	
@@ -127,10 +133,9 @@ $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqn
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
 
-if (isset($_GET['theme'])) {
-	$sessiondata['coursetheme'] = preg_replace('/\W/','',$_GET['theme']).'.css';
+if ($theme != '') {
+	$sessiondata['coursetheme'] = $theme.'.css';
 }
-
 require("./assessment/header.php");
 
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
@@ -138,7 +143,7 @@ echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVE
 echo '<input type="hidden" id="asidverify" value="0"/>';
 echo '<input type="hidden" id="disptime" value="'.time().'"/>';
 echo '<input type="hidden" id="isreview" value="0"/>';
-echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'">Try Another Version of ';
+echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'">Try Another Version of ';
 if (count($qids)>1) { 
 	echo 'These Questions</a></p>';
 } else {
