@@ -1900,7 +1900,16 @@ These macros are used to select and format feedback messages to students.  They 
   feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
   defaultfeedback is the default incorrect response feedback <br/>
   Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
-
+<li><b>getfeedbacktxtnumfunc(stuans, partialcredit, feedbacktxt, defaultfeedback, [vars, requiretimes, tol, domain])</b>:  Gives feedback on numfunc (algebric expression/equation) questions.  <br/>
+  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.<br/>
+  partialcredit is an array or list of form array(expression, score, expression, score, ... ) where the scores are in the range [0,1].  <br/>
+  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
+  defaultfeedback is the default incorrect response feedback <br/>
+  vars should be a list of variables used in the expression. Defaults to "x"<br/>
+  requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
+  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.<br/>
+  Set domain to limit the test domain.  Defaults to "-10,10"
+  </li>
 </ul>
 </div>
 <div class=h2>

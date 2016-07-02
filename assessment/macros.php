@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -2846,6 +2846,174 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb, $tol=.001) {
 				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$fbtxt[$i/2].'</div>';
 			} else {
 				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$i/2].'</div>';
+			}
+		} else {
+			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$deffb.'</div>';
+		}
+	}
+}
+
+//$partial = array(answer,partialcreditval,answer,partialcreditval,...)
+function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb, $vars='x', $requiretimes = '', $tol='.001',$domain='-10,10') {
+	global $imasroot;
+	if ($stu===null || trim($stu)==='') {
+		return " ";
+	} else {
+		if ($tol{0}=='|') {
+			$abstol = true;
+			$tol = substr($tol,1);
+		} else {
+			$abstol =false;
+		}
+		$type = "expression";
+		if (strpos($stu, '=')!==false && strpos($stu, '=')!==false) {
+			$type = "equation";
+		}
+		$stuorig = $stu;
+		if ($type=='equation') {
+			$stu = preg_replace('/(.*)=(.*)/','$1-($2)',$stu);
+		}
+		
+		$fromto = explode(',',$domain);
+		$variables = explode(',',$vars);
+		$vlist = implode("|",$variables);
+		
+		$stu = mathphp(makepretty(mathphppre($stu)), $vlist);
+		if ($stu=='') {
+			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$deffb.'</div>';
+		}
+		
+		$numpts = 20;
+		for ($i = 0; $i < $numpts; $i++) {
+			for($j=0; $j < count($variables); $j++) {
+				if (isset($fromto[2]) && $fromto[2]=="integers") {
+					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+				} else if (isset($fromto[2*$j+1])) {
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
+				} else {
+					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
+				}
+			}
+		}
+		
+		for($i=0; $i < count($variables); $i++) {
+			$stu = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$stu);
+		}
+		$stupts = array();
+		$cntnana = 0;
+		$correct = true;
+		for ($i = 0; $i < $numpts; $i++) {
+			for($j=0; $j < count($variables); $j++) {
+				$tp[$j] = $tps[$i][$j];
+			}
+			$stupts[$i] = @eval("return ($stu);");
+			if (isNaN($stupts[$i])) {$cntnana++;}
+			if ($stupts[$i]===false) {$correct = false; break;}
+		}
+		if ($cntnana==$numpts || !$correct) { //evald to NAN at all points
+			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$deffb.'</div>';
+		}
+		
+		$match = -1;
+		if (!is_array($partial)) { $partial = explode(',',$partial);}
+		for ($k=0;$k<count($partial);$k+=2) {
+			$correct = true;
+			$b = $partial[$k];
+			if ($type=='equation') {
+				if (substr_count($b, '=')!=1) {continue;}
+				$b = preg_replace('/(.*)=(.*)/','$1-($2)',$b);
+			}
+			$b = mathphp(makepretty(mathphppre($b)), $vlist);
+			for($j=0; $j < count($variables); $j++) {
+				$b = str_replace("(".$variables[$j].")",'($tp['.$j.'])',$b);
+			}
+			
+			$cntnanb = 0;
+			$ratios = array();
+			for ($i = 0; $i < $numpts; $i++) {
+				for($j=0; $j < count($variables); $j++) {
+					$tp[$j] = $tps[$i][$j];
+				}
+				$ansb = @eval("return ($b);");
+				if ($ansb===false) { //invalid option - skip it
+					continue 2; 
+				}
+				//echo "real: $ansa, my: $ansb <br/>";
+				if (isNaN($stupts[$i])) {if (isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
+				if (isNaN($ansb)) {$cntnanb++; continue;}
+				
+				if ($type=='equation') {
+					if (abs($stupts[$i])>.000001 && is_numeric($ansb)) {
+						$ratios[] = $ansb/$stupts[$i];
+						if (abs($ansb)<=.00000001 && $stupts[$i]!=0) {
+							$cntzero++;
+						}
+					} else if (abs($stupts[$i])<=.000001 && is_numeric($ansb) && abs($ansb)<=.00000001) {
+						$cntbothzero++;
+					}
+				} else {
+					if ($abstol) {
+						if (abs($stupts[$i]-$ansb) > $tol-1E-12) {$correct = false; break;}	
+					} else {
+						if ((abs($stupts[$i]-$ansb)/(abs($stupts[$i])+.0001) > $tol-1E-12)) {$correct = false; break;}
+					}
+				}
+			}
+			//echo "$i, $ansa, $ansb, $cntnana, $cntnanb";
+			if ($cntnanb==20) {
+				continue;
+			} else if ($i<20) {
+				continue;
+			}
+			if (abs($cntnana - $cntnanb)>1) {
+				continue;
+			}
+			if ($type=="equation") {
+				if ($cntbothzero>$numpts-2) {
+					$match = $k; break;
+				} else if (count($ratios)>0) {
+					if (count($ratios)==$cntzero) {
+						continue;
+					} else {
+						$meanratio = array_sum($ratios)/count($ratios);
+						for ($i=0; $i<count($ratios); $i++) {
+							if ($abstol) {
+								if (abs($ratios[$i]-$meanratio) > $tol-1E-12) {continue 2;}	
+							} else {
+								if ((abs($ratios[$i]-$meanratio)/(abs($meanratio)+.0001) > $tol-1E-12)) {continue 2;}
+							}
+						}
+					}
+				} else {
+					continue;
+				}
+			}
+			if ($correct) {
+				if (is_array($requiretimes)) {
+					if ($requiretimes[$k]!='') {
+						if (checkreqtimes(str_replace(',','',$stuorig),$requiretimes[$k])==0) {
+							$rightanswrongformat = $k;
+							continue;
+						}
+					}
+				} else if ($requiretimes!='') {
+					if (checkreqtimes(str_replace(',','',$stuorig),$requiretimes)==0) {
+						$rightanswrongformat = $k;
+						continue;
+					}
+				}
+				$match = $k; break;
+			} else {
+				continue;
+			}
+			
+		}
+		//WHAT to do with right answer, wrong format??
+		if ($match>-1) {
+			if ($partial[$match+1]<1) {
+				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$fbtxt[$match/2].'</div>';
+			} else {
+				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$match/2].'</div>';
 			}
 		} else {
 			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$deffb.'</div>';

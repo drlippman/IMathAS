@@ -3818,7 +3818,21 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 		if (isset($options['domain'])) {if (is_array($options['domain'])) {$domain = $options['domain'][$qn];} else {$domain= $options['domain'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
+		
+		if (isset($options['requiretimes'])) {
+			if (is_array($options['requiretimes'])) {
+				if (is_array($options['requiretimes'][$qn]) || $multi>0) {
+					$requiretimes = $options['requiretimes'][$qn];
+				} else {
+					$requiretimes = $options['requiretimes'];
+				}
+			} else {
+				$requiretimes = $options['requiretimes'];
+			}
+		}
+		
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
+		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		
@@ -3865,7 +3879,29 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		
 		$ansarr = explode(' or ',$answer);
-		foreach ($ansarr as $answer) {
+		$partialpts = array_fill(0, count($ansarr), 1);
+		$origanscnt = count($ansarr);
+		if (isset($partialcredit)) {
+			if (!is_array($partialcredit)) {$partialcredit = explode(',',$partialcredit);}
+			for ($i=0;$i<count($partialcredit);$i+=2) {
+				if (!in_array($partialcredit[$i], $ansarr) || $partialcredit[$i+1]<1) {
+					$ansarr[] = $partialcredit[$i];
+					$partialpts[] = $partialcredit[$i+1];
+				}
+			}
+		}
+		
+		$rightanswrongformat = -1;
+		foreach ($ansarr as $ansidx=>$answer) {
+			if (is_array($requiretimes)) {
+				if ($ansidx<$origanscnt) {
+					$thisreqtimes = $requiretimes[0];
+				} else {
+					$thisreqtimes = $requiretimes[$ansidx-$origanscnt+1];
+				}
+			} else {
+				$thisreqtimes = $requiretimes;
+			}
 			$correct = true;
 			$answer = preg_replace('/[^\w\*\/\+\=\-\(\)\[\]\{\}\,\.\^\$\!\s]+/','',$answer);
 	
@@ -3948,14 +3984,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				echo "<p>", _('Debug info: function evaled to Not-a-number at all test points.  Check $domain'), "</p>";
 			}
 			if ($stunan>1) { //if more than 1 student NaN response
-				return 0;
+				$correct = false; continue;
 			}
 			if ($answerformat=="equation") {
 				if ($cntbothzero>18) {
 					$correct = true;
 				} else if (count($ratios)>1) {
 					if (count($ratios)==$cntzero) {
-						$correct = false; return 0;
+						$correct = false; continue;
 					} else {
 						$meanratio = array_sum($ratios)/count($ratios);
 						for ($i=0; $i<count($ratios); $i++) {
@@ -3978,7 +4014,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$meandiff = $reldifftot/$ysqrtot;
 				}
 				if (is_nan($meandiff)) {
-					$correct=false; return 0;
+					$correct=false; continue;
 				} 
 				for ($i=0; $i<count($diffs); $i++) {
 					if (isset($abstolerance)) {
@@ -3991,12 +4027,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 			if ($correct == true) {
 				//test for correct format, if specified
-				if (checkreqtimes(str_replace(',','',$_POST["tc$qn"]),$requiretimes)==0) {
-					$GLOBALS['partlastanswer'] .= '$f$1';
-					return 0; //$correct = false;
+				if ($thisreqtimes!='' && checkreqtimes(str_replace(',','',$_POST["tc$qn"]),$thisreqtimes)==0) {
+					$rightanswrongformat = $ansidx;
+					continue;
+					//$correct = false;
 				}
-				return 1;
+				return $partialpts[$ansidx];
 			}
+		}
+		if ($rightanswrongformat!=-1) {
+			$GLOBALS['partlastanswer'] .= '$f$1';
 		}
 		
 		return 0;
