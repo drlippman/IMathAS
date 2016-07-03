@@ -1273,7 +1273,7 @@ for ($n=0;$n<10;$n++) {
 		echo '</tr>';
 	}
 	echo '<tr id="qc'.$n.'-def" ';
-	if ($qtype[$n]!="number") {echo ' style="display:none;"';};
+	if ($qtype[$n]!="number" && $qtype[$n]!="numfunc") {echo ' style="display:none;"';};
 	echo '><td colspan="4">Default feedback for incorrect answers: ';
 	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="60" value="'.(isset($feedbacktxtdef[$n])?prepd($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
 	echo '</tbody></table>';
