@@ -30,7 +30,13 @@ $showtips = 2;
 $useeqnhelper = 4;
 $useeditor = 1;
 
-$JWTsecret = "testing";
+if (isset($CFG['GEN']['JWTsecret'])) {
+	$JWTsecret = $CFG['GEN']['JWTsecret'];
+} else if (getenv('AWS_SECRET_KEY')) {
+	$JWTsecret = getenv('AWS_SECRET_KEY');
+} else {
+	$JWTsecret = "testing";
+}
 
 if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
  	 $urlmode = 'https://';
