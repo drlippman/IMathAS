@@ -263,9 +263,9 @@ echo "<option value=\"Assessments\">Assessments</option>";
 echo "</select>\n";
 echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
 	
-	echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
+	echo "<p>Add new category to lists: <input type=text id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-	echo '<p><input type=submit value="Record Categorizations"> and return to the course page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
+	echo '<p><input type=submit value="Record Categorizations"> and return to the Add/Remove Questions page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 	
 	
