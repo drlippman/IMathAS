@@ -153,7 +153,7 @@ if (isset($QS['showscored'])) {
 	
 	echo '<script type="text/javascript">
 	$(function() {
-		window.parent.postMessage("updatescore='.$signed.'","*");
+		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", jwt: "'.$signed.'", frame_id: ' . $qsetid . '}), "*");
 	});
 	</script>';
 	if ($scoredonsubmit) {
@@ -225,12 +225,12 @@ echo '<script type="text/javascript">
 	if (MathJax) {
 		MathJax.Hub.Queue(function () {
 			var height = document.body.scrollHeight;
-			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
+			window.parent.postMessage(JSON.stringify({subject: "lti.frameResize", height: height, frame_id: '.$qsetid.'}), "*");
 		});
 	} else {
 		$(function() {
 			var height = document.body.scrollHeight;
-			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
+			window.parent.postMessage(JSON.stringify({subject: "lti.frameResize", height: height, frame_id: '.$qsetid.'}), "*");
 		});
 	}
 	</script>';
