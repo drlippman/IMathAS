@@ -319,6 +319,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
       qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
       qnode.setAttribute("width",picture.getAttribute("width"));
       qnode.setAttribute("height",picture.getAttribute("height"));
+      qnode.setAttribute("alt",picture.getAttribute("alt"));
       if (picture.parentNode!=null)
         picture.parentNode.replaceChild(qnode,picture);
       else
@@ -988,7 +989,7 @@ function parseShortScript(sscript,gw,gh) {
 	picture.setAttribute("height", sa[10]);
 	picture.style.width = sa[9] + "px";
 	picture.style.height = sa[10] + "px";
-	
+
 	if (sa.length > 10) {
 		commands = 'setBorder(5);';
 		commands += 'width=' +sa[9] + '; height=' +sa[10] + ';';
@@ -996,31 +997,45 @@ function parseShortScript(sscript,gw,gh) {
 		commands += 'axes(' + sa[4] +','+ sa[5] +','+ sa[6] +','+ sa[7] +','+ sa[8]+ ');';
 				
 		var inx = 11;
-		var eqnlist = 'Graphs: ';
+		var varlet = '';
+		var eqnlist = 'Graphs on the window x='+sa[0]+' to '+sa[1]+' and y='+sa[2]+' to '+sa[3]+': ';
 		
 		while (sa.length > inx+9) {
 		   commands += 'stroke="' + sa[inx+7] + '";';
+		   eqnlist += sa[inx+7] + " ";
 		   commands += 'strokewidth="' + sa[inx+8] + '";'
 		   //commands += 'strokedasharray="' + sa[inx+9] + '";'	
 		   if (sa[inx+9] != "") {
 			   commands += 'strokedasharray="' + sa[inx+9].replace(/\s+/g,',') + '";';
+			   if (sa[inx+9]=='2') {
+			   	   eqnlist += "dotted ";
+			   } else if (sa[inx+9]=='5') {
+			   	   eqnlist += "dashed ";
+			   } else if (sa[inx+9]=='5 2') {
+			   	   eqnlist += "tight dashed ";
+			   } else if (sa[inx+9]=='7 3 2 3') {
+			   	   eqnlist += "dash-dot ";
+			   } 
 		   }
 		   if (sa[inx]=="slope") {
-			   eqnlist += "dy/dx="+sa[inx+1] + "; ";
+			   eqnlist += "slopefield where dy/dx="+sa[inx+1] + ". ";
 			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');'; 
 		   } else if (sa[inx]=="label") {
-			   eqnlist += "label="+sa[inx+1] + "; ";
+			   eqnlist += "label with text "+sa[inx+1] + ' at the point ('+sa[inx+5]+','+sa[inx+6]+'). ';
 			   commands += 'text(['+sa[inx+5]+','+sa[inx+6]+'],"'+sa[inx+1]+'");';
 		   } else {
 			if (sa[inx]=="func") {
-				eqnlist += "y="+sa[inx+1] + "; ";
+				eqnlist += "graph of y="+sa[inx+1];
 				eqn = '"' + sa[inx+1] + '"';
+				varlet = 'x';
 			} else if (sa[inx] == "polar") {
-				eqnlist += "r="+sa[inx+1] + "; ";
+				eqnlist += "polar graph of r="+sa[inx+1];
 				eqn = '["cos(t)*(' + sa[inx+1] + ')","sin(t)*(' + sa[inx+1] + ')"]';
+				varlet = 'r';
 			} else if (sa[inx] == "param") {
-				eqnlist += "[x,y]=["+sa[inx+1] + "," + sa[inx+2] + "]; ";
+				eqnlist += "parametric graph of x(t)="+sa[inx+1] + ", y(t)=" + sa[inx+2];
 				eqn = '["' + sa[inx+1] + '","'+ sa[inx+2] + '"]';
+				varlet = 't';
 			}
 			
 			
@@ -1028,13 +1043,31 @@ function parseShortScript(sscript,gw,gh) {
 		//	if ((sa[inx+5]!='null')&&(sa[inx+5].length>0)) {
 				//commands += 'myplot(' + eqn +',"' + sa[inx+3] +  '","' + sa[inx+4]+'",' + sa[inx+5] + ',' + sa[inx+6]  +');';
 				commands += 'plot(' + eqn +',' + sa[inx+5] + ',' + sa[inx+6] +',null,null,' + sa[inx+3] +  ',' + sa[inx+4] +');';
-			
+				eqnlist += " from " + varlet + '='+sa[inx+5]+ ' ';
+				if (sa[inx+3]==1) { 
+					eqnlist += 'with an arrow ';
+				} else if (sa[inx+3]==2) {
+					eqnlist += 'with an open dot ';
+				} else if (sa[inx+3]==3) {
+					eqnlist += 'with a closed dot ';
+				}
+				eqnlist += "to "+varlet+'='+sa[inx+6]+' ';
+				if (sa[inx+4]==1) { 
+					eqnlist += 'with an arrow ';
+				} else if (sa[inx+4]==2) {
+					eqnlist += 'with an open dot ';
+				} else if (sa[inx+4]==3) {
+					eqnlist += 'with a closed dot ';
+				}
 			} else {
 				commands += 'plot(' + eqn +',null,null,null,null,' + sa[inx+3] +  ',' + sa[inx+4]+');';
 			}
+			eqnlist += '. ';
 		   }
 		   inx += 10;
 		}
+	
+		picture.setAttribute("alt",eqnlist);
 		
 		try {
 			eval(commands);
@@ -1043,7 +1076,7 @@ function parseShortScript(sscript,gw,gh) {
 			//alert("Graph not ready");
 		}
 		
-		picture.setAttribute("alt",eqnlist);
+		
 		//picture.setAttribute("width", sa[9]);
 		//picture.setAttribute("height", sa[9]);
 		

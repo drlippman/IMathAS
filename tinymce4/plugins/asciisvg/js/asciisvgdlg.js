@@ -39,6 +39,7 @@ var AsciisvgDialog = {
 		} else {
 			el = top.tinymce.activeEditor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);
+			ed.dom.setAttrib(el,"data-sscr",this.sscr);
 			ed.dom.setAttrib(el,"src",this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr));
 			ed.dom.setAttrib(el,"width",this.width);
 			ed.dom.setAttrib(el,"height",this.height);
@@ -93,7 +94,6 @@ var AsciisvgDialog = {
 			newopt.value = type + ',' + eq1 + ',' + eq2 + ',' + m_gstart + ',' + m_gend + ',,' + ',' + m_color + ',' + m_strokewidth + ',' + m_strokedash;
 		 }
 		
-	 
 		graphs.options[graphs.options.length] = newopt;
 		graphs.selectedIndex = graphs.options.length - 1;
 		this.graphit();

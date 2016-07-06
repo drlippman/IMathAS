@@ -196,6 +196,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	$totalAttemptCount = 0;
 	while($line = mysql_fetch_assoc($result)) {
 		$uid = $line['userid'];
+		if (!isset($st[$uid])) { continue; } //not a student we're reporting on
 		$aid = $line['id'];
 		$totalAttemptCount++;
 		
