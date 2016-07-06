@@ -100,6 +100,7 @@ function mathjs(st,varlist) {
   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/gi, matchtolower);
   if (varlist != null) {
+  	  var vararr = varlist.split("|");
 	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
 	  st = st.replace(reg,"$1#(");
@@ -119,8 +120,13 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
 	  st = st.replace(reg,"$1($2)");
+	  st = st.replace(new RegExp("\(("+varlist+")\)","g"), function(match) {
+		for (var i=0; i<vararr.length;i++) {
+			if (vararr[i]==match) { return '(@v'+i+'@)';}	//esc var so regex's below don't interfere
+		 }});
 	  st = st.replace(/@(\d+)@/g, indextofunc);
   }
+  
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
@@ -149,6 +155,11 @@ function mathjs(st,varlist) {
   
   st = st.replace(/^e$/g,"(E)");
   st = st.replace(/pi/g,"(pi)");
+  
+  st = st.replace(/@v(\d+)@/g, function(match,contents) {
+  	return vararr[contents];
+       });
+  
   st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
   st = st.replace(/([^a-zA-Z])e$/g,"$1(E)");
   
