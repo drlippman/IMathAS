@@ -105,11 +105,16 @@ $lowertime = max($now,$exlowertime);
 $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)+$serveroffset;
 
 $exceptions = array();
+$forumexceptions = array();
 if (!isset($teacherid)) {
-	$query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid='$userid'";
+	$query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	while ($row = mysql_fetch_row($result)) {
-		$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
+		if ($row[5]=='A') {
+			$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
+		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
+			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],$row[5]);
+		}
 	}
 }
 
@@ -330,11 +335,65 @@ while ($row = mysql_fetch_row($result)) {
 	$byid['D'.$row[0]] = array($moday,$tag,$colors,$json);
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
+//$query = "SELECT id,name,postby,replyby,startdate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
+$query = "SELECT id,name,postby,replyby,startdate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>0 AND postby<2000000000) OR (replyby>0 AND replyby<2000000000)) AND avail>0 AND courseid='$cid' ORDER BY name";
+
 $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 while ($row = mysql_fetch_row($result)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
+	}
+	//check for exception
+	$canundolatepassP = false;
+	$canundolatepassR = false;
+	$latepasscntP = 0;
+	$latepasscntR = 0;
+	if (isset($forumexceptions[$row[0]])) {
+	   //for forums, exceptions[$row[0]][0] is used for postby and [1] is used for replyby
+	   if ($forumexceptions[$row[0]][4]=='P' || $forumexceptions[$row[0]][4]=='F') {
+		   //if latepass and it's before original due date or exception is for more than a latepass past now
+		   if ($forumexceptions[$row[0]][2]>0 && ($now < $row[2] || $forumexceptions[$row[0]][0] > $now + $latepasshrs*60*60)) {
+			   $canundolatepassP = true;
+		   }
+		   if ($forumexceptions[$row[0]][2]>0) {
+			   $latepasscntP = max(0,round(($forumexceptions[$row[0]][0] - $row[2])/($latepasshrs*3600)));
+		   }
+		   $row[2] = $forumexceptions[$row[0]][0];
+	   }
+	   if ($forumexceptions[$row[0]][4]=='R' || $forumexceptions[$row[0]][4]=='F') {
+		   //if latepass and it's before original due date or exception is for more than a latepass past now
+		   if ($forumexceptions[$row[0]][2]>0 && ($now < $row[3] || $forumexceptions[$row[0]][1] > $now + $latepasshrs*60*60)) {
+			   $canundolatepassR = true;
+		   }
+		   if ($forumexceptions[$row[0]][2]>0) {
+			   $latepasscntR = max(0,round(($forumexceptions[$row[0]][1] - $row[3])/($latepasshrs*3600)));
+		   }
+		   $row[3] = $forumexceptions[$row[0]][1];
+	   }
+	}
+	if (($row[2]<$exlowertime || $row[2]>$uppertime) && ($row[3]<$exlowertime || $row[3]>$uppertime)) {
+		//neither postby or replyby is in calendar display range
+		continue;
+	}
+	$canuselatepassP = false;
+	$canuselatepassR = false;
+	if ($row[6]>0 && $latepasses>0 && !isset($teacherid)) {
+	   $allowlaten = $row[6]%10;
+	   $allowlateon = floor($row[6]/10)%10;
+	   if ($allowlateon != 3 && $row[2]<2000000000 && ($allowlaten==1 || $allowlaten-1>$latepasscntP)) { //it allows post LPs, and can use latepases
+		   if ($row[6]>=100 && ($now - $row[2])<$latepasshrs*3600) { //allow after due date
+			   $canuselatepassP = true;
+		   } else if ($row[6]<100 && $now < $row[2]) {
+			   $canuselatepassP = true;
+		   }
+	   }
+	   if ($allowlateon != 2 && $row[3]<2000000000&& ($allowlaten==1 || $allowlaten-1>$latepasscntR)) { //it allows replies LPs
+		   if ($row[6]>=100 && ($now - $row[3])<$latepasshrs*3600) { //allow after due date
+			   $canuselatepassR = true;
+		   } else if ($row[6]<100 && $now < $row[3]) {
+			   $canuselatepassR = true;
+		   }
+	   }
 	}
 	list($posttag,$replytag) = explode('--',$row[5]);
 	$posttag = htmlentities($posttag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
@@ -344,9 +403,11 @@ while ($row = mysql_fetch_row($result)) {
 		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		$colors = makecolor2($row[4],$row[2],$now);
 		$json = "{type:\"FP\", time:\"$time\", ";
-		if ($row[2]>$now || isset($teacherid)) {
+		//if ($row[2]>$now || isset($teacherid)) {
 			$json .= "id:\"$row[0]\",";
-		}
+		//}
+		$json .= 'allowlate:"'.($canuselatepassP?1:0).'",undolate:"'.($canundolatepassP?1:0).'",';
+		
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
 		$byid['FP'.$row[0]] = array($moday,$posttag,$colors,$json);
 	}
@@ -354,9 +415,10 @@ while ($row = mysql_fetch_row($result)) {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$colors = makecolor2($row[4],$row[3],$now);
 		$json = "{type:\"FR\", time:\"$time\",";
-		if ($row[3]>$now || isset($teacherid)) {
+		//if ($row[3]>$now || isset($teacherid)) {
 			$json .= "id:\"$row[0]\",";
-		}
+		//}
+		$json .= 'allowlate:"'.($canuselatepassR?1:0).'",undolate:"'.($canundolatepassR?1:0).'",';
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
 		$byid['FR'.$row[0]] = array($moday,$replytag,$colors,$json);
 	}

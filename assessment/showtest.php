@@ -61,7 +61,7 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			
-			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+			$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 			$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result2);
 
@@ -532,7 +532,7 @@
 		exit;
 	}
 	if (!isset($sessiondata['actas'])) { 
-		$query = "SELECT startdate,enddate,islatepass,exceptionpenalty FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
+		$query = "SELECT startdate,enddate,islatepass,exceptionpenalty FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {
@@ -570,7 +570,7 @@
 			}
 		}
 	} else {
-		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='{$sessiondata['actas']}' AND assessmentid='{$line['assessmentid']}'";
+		$query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='{$sessiondata['actas']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
 		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$row = mysql_fetch_row($result2);
 		if ($row!=null) {

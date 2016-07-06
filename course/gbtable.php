@@ -626,7 +626,7 @@ function gbtable() {
 			} else if (isset($asid[$assessments[$i]])) {
 				$thised = $enddate[$i];
 				if (!$isteacher) {
-					$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['id']}' AND assessmentid='{$assessments[$i]}'";
+					$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['id']}' AND assessmentid='{$assessments[$i]}' AND itemtype='A'";
 					$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($r2)>0) {
 						$exped = mysql_result($r2,0,0);

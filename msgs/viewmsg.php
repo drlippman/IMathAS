@@ -120,7 +120,7 @@
 			$res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if (mysql_num_rows($res)>0) {
 				list($aid,$due) = mysql_fetch_row($res);
-				$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid'";
+				$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid' AND itemtype='A'";
 				$res = mysql_query($query) or die("Query failed : $query " . mysql_error());          
 				if (mysql_num_rows($res)>0) {
 					$due = mysql_result($res,0,0);
