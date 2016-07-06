@@ -61,9 +61,20 @@ if (empty($QS['id'])) {
 
 $qsetid=intval($QS['id']);
 
-$sessiondata['coursetheme'] = $coursetheme;
-
 $page_formAction = "OEAembedq.php?id=$qsetid";
+
+if (isset($_GET['frame_id'])) {
+	$frameid = preg_replace('/[^\w:.-]/','',$_GET['frame_id']);
+	$page_formAction .= '&frame_id='.$frameid;
+} else {
+	$frameid = "OEAembedq-$qsetid";
+}
+if (isset($_GET['theme'])) {
+	$theme = preg_replace('/\W/','',$_GET['theme']);
+	$page_formAction .= '&theme='.$theme;
+	$sessiondata['coursetheme'] = $coursetheme;
+}
+
 
 $showans = false;
 
@@ -153,7 +164,7 @@ if (isset($QS['showscored'])) {
 	
 	echo '<script type="text/javascript">
 	$(function() {
-		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", jwt: "'.$signed.'", frame_id: ' . $qsetid . '}), "*");
+		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", jwt: "'.$signed.'", frame_id: "' . $frameid . '"}), "*");
 	});
 	</script>';
 	if ($scoredonsubmit) {
@@ -222,15 +233,26 @@ if (isset($QS['showscored'])) {
 }
 
 echo '<script type="text/javascript">
+	function sendresizemsg() {
+	 if(self != top){
+	  var default_height = Math.max(
+              document.body.scrollHeight, document.body.offsetHeight,
+              document.documentElement.clientHeight, document.documentElement.scrollHeight,
+              document.documentElement.offsetHeight) + 30;
+	  window.parent.postMessage( JSON.stringify({
+	      subject: "lti.frameResize",
+	      height: default_height,
+	      frame_id: "'.$frameid.'"
+	  }), "*");
+	 }
+	}
 	if (MathJax) {
 		MathJax.Hub.Queue(function () {
-			var height = document.body.scrollHeight;
-			window.parent.postMessage(JSON.stringify({subject: "lti.frameResize", height: height, frame_id: '.$qsetid.'}), "*");
+			sendresizemsg();
 		});
 	} else {
 		$(function() {
-			var height = document.body.scrollHeight;
-			window.parent.postMessage(JSON.stringify({subject: "lti.frameResize", height: height, frame_id: '.$qsetid.'}), "*");
+			sendresizemsg();
 		});
 	}
 	</script>';
