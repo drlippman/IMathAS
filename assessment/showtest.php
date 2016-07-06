@@ -1223,7 +1223,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$timebeforedue = $exceptionduedate - time();
 			if ($timebeforedue>0 && ($testsettings['enddate'] - time()) < 0) { //past original due date
 				$duetimenote .= _('This assignment is past the original due date of ').tzdate('D m/d/Y g:i a',$testsettings['enddate']).'. ';
-				if ($exceptiontype==1) {
+				if ($exceptiontype>0) {
 					$duetimenote .= _('You have used a LatePass');
 				} else {
 					$duetimenote .= _('You were granted an extension');
