@@ -97,6 +97,9 @@ var AMsymbols = [
 {input:"\\\\", tag:"mo", output:"\\",   tex:"backslash", ttype:CONST},
 {input:"setminus", tag:"mo", output:"\\", tex:null, ttype:CONST},
 {input:"xx", tag:"mo", output:"\u00D7", tex:"times", ttype:CONST},
+{input:"|><", tag:"mo", output:"\u22C9", tex:"ltimes", ttype:CONST},
+{input:"><|", tag:"mo", output:"\u22CA", tex:"rtimes", ttype:CONST},
+{input:"|><|", tag:"mo", output:"\u22C8", tex:"bowtie", ttype:CONST},
 {input:"-:", tag:"mo", output:"\u00F7", tex:"div", ttype:CONST},
 {input:"divide",   tag:"mo", output:"-:", tex:null, ttype:DEFINITION},
 {input:"@",  tag:"mo", output:"\u2218", tex:"circ", ttype:CONST},
@@ -159,13 +162,13 @@ var AMsymbols = [
 {input:"|==",  tag:"mo", output:"\u22A8", tex:"models", ttype:CONST}, //mimetex doesn't support
 
 //grouping brackets
-{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET},
-{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET},
-{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET},
-{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET},
+{input:"(", tag:"mo", output:"(", tex:null, ttype:LEFTBRACKET, val:true},
+{input:")", tag:"mo", output:")", tex:null, ttype:RIGHTBRACKET, val:true},
+{input:"[", tag:"mo", output:"[", tex:null, ttype:LEFTBRACKET, val:true},
+{input:"]", tag:"mo", output:"]", tex:null, ttype:RIGHTBRACKET, val:true},
 {input:"{", tag:"mo", output:"{", tex:"lbrace", ttype:LEFTBRACKET},
 {input:"}", tag:"mo", output:"}", tex:"rbrace", ttype:RIGHTBRACKET},
-{input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT},
+{input:"|", tag:"mo", output:"|", tex:null, ttype:LEFTRIGHT, val:true},
 //{input:"||", tag:"mo", output:"||", tex:null, ttype:LEFTRIGHT},
 {input:"(:", tag:"mo", output:"\u2329", tex:"langle", ttype:LEFTBRACKET},
 {input:":)", tag:"mo", output:"\u232A", tex:"rangle", ttype:RIGHTBRACKET},
@@ -192,6 +195,7 @@ var AMsymbols = [
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST, val:true},
+{input:"frown",  tag:"mo", output:"\u2322", tex:null, ttype:CONST},
 {input:"%",  tag:"mo", output:"%", tex:"%", ttype:CONST, notexcopy:true},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
@@ -493,13 +497,6 @@ function AMTgetTeXsymbol(symb) {
 		return (pre+symb.tex);
 	}
 }
-function AMTgetTeXbracket(symb) {
-	if (symb.tex==null) {
-		return (symb.input);
-	} else {
-		return ('\\'+symb.tex);
-	}
-}
 
 function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
   var symbol, node, result, i, st,// rightvert = false,
@@ -546,13 +543,13 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
 		    node = '{'+result[0]+'}';
 	    else {
-		    node = '{'+AMTgetTeXbracket(symbol) + result[0]+'}';
+		    node = '{'+AMTgetTeXsymbol(symbol) + result[0]+'}';
 	    }    
     } else {
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
 		    node = '{\\left.'+result[0]+'}';
 	    else {
-		    node = '{\\left'+AMTgetTeXbracket(symbol) + result[0]+'}';
+		    node = '{\\left'+AMTgetTeXsymbol(symbol) + result[0]+'}';
 	    }
     }
     return [node,result[1]];
@@ -753,10 +750,17 @@ function AMTparseExpr(str,rightbracket) {
 					if (newFrag.charAt(i)==',' && mxanynestingd==1) {
 						subpos[lastsubposstart].push(i);
 					}
+					if (mxanynestingd<0) {  //happens at the end of the row
+						if (lastsubposstart == i+1) { //if at end of row, skip to next row
+							i++;
+						} else { //misformed something - abandon treating as a matrix
+							matrix = false;
+						}
+					}
 				}
 				pos.push(len);
 				var lastmxsubcnt = -1;
-				if (mxnestingd==0 && pos.length>0) {
+				if (mxnestingd==0 && pos.length>0 && matrix) {
 					for (i=0;i<pos.length-1;i++) {
 						if (i>0) mxout += '\\\\';
 						if (i==0) {
@@ -798,7 +802,7 @@ function AMTparseExpr(str,rightbracket) {
     
     str = AMremoveCharsAndBlanks(str,symbol.input.length);
     if (typeof symbol.invisible != "boolean" || !symbol.invisible) {
-      node = '\\right'+AMTgetTeXbracket(symbol); //AMcreateMmlNode("mo",document.createTextNode(symbol.output));
+      node = '\\right'+AMTgetTeXsymbol(symbol); //AMcreateMmlNode("mo",document.createTextNode(symbol.output));
       newFrag += node;
       addedright = true;
     } else {
