@@ -774,6 +774,11 @@ function AMTparseExpr(str,rightbracket) {
 								}
 								subarr.push(newFrag.substring(subpos[pos[i]][subpos[pos[i]].length-1]+1,pos[i+1]-8));
 							}
+							mxout += '{';
+							for (var j=0;j<subarr.length;j++) {
+								mxout += 'c';
+							} 
+							mxout += '}';
 						} else {
 							//var subarr = newFrag.substr(pos[i]+8,pos[i+1]-pos[i]-16).split(',');
 							if (subpos[pos[i]].length==1) {
