@@ -73,10 +73,10 @@ if (isset($_GET['frame_id'])) {
 } else {
 	$frameid = "OEAembedq-$qsetid";
 }
-if (isset($_GET['theme'])) {
-	$theme = preg_replace('/\W/','',$_GET['theme']);
+if (isset($_REQUEST['theme'])) {
+	$theme = preg_replace('/\W/','',$_REQUEST['theme']);
 	$page_formAction .= '&theme='.$theme;
-	$sessiondata['coursetheme'] = $coursetheme;
+	$sessiondata['coursetheme'] = $theme.'.css';
 }
 
 
