@@ -134,7 +134,7 @@ if (isset($_POST['text'])) {
 					$partialout[] = $i;
 				} else if ($qtypes[0]=='number') {
 					$partialout[] = $partialans[0][$i];
-				} else if ($qtypes[$n] == 'numfunc') {
+				} else if ($qtypes[0] == 'numfunc') {
 					$partialout[] = '"'.$partialans[0][$i].'"';
 				}
 				$partialout[] = $partial[0][$i];
@@ -926,6 +926,7 @@ $placeinhead .= '<style type="text/css">
 	.CodeMirror-selected {background: #666666;}
  </style>';
 
+$flexwidth = true;
 require("../header.php");
 
 if (isset($_GET['aid'])) {
@@ -1322,8 +1323,8 @@ for ($n=0;$n<10;$n++) {
 		echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
 		if ($i==$answer[$n]) {echo 'checked="checked"';}
 		echo '/></td>';
-		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="45" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
-		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="45" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
+		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
+		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?$partial[$n][$i]:"").'"/></td>';
 		
 		echo '</tr>';
@@ -1331,7 +1332,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<tr id="qc'.$n.'-def" ';
 	if ($qtype[$n]!="number" && $qtype[$n]!="numfunc") {echo ' style="display:none;"';};
 	echo '><td colspan="4">Default feedback for incorrect answers: ';
-	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="45" value="'.(isset($feedbacktxtdef[$n])?prepd($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
+	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="60" value="'.(isset($feedbacktxtdef[$n])?prepd($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
 	echo '</tbody></table>';
 	echo '</div>'; //end hasparts holder div
 	echo '<div id="essay'.$n.'wrap" ';
@@ -1378,12 +1379,12 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 ?>
 
 <div class=editor>
-	<textarea cols="45" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qtext);?></textarea>
+	<textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qtext);?></textarea>
 </div>
 
 <div class="editor" id="GB_window" style="display:none; position: absolute; height: auto;">
 <div id="GB_caption" style="cursor:move;";><span style="float:right;"><span class="pointer clickable" onclick="GB_hide()">[X]</span></span> Edit Text</div>
-<textarea cols="45" rows="6" id="popuptxt" name="popuptxt" style="width: 100%"></textarea>
+<textarea cols="60" rows="6" id="popuptxt" name="popuptxt" style="width: 100%"></textarea>
 <input type="button" value="Save" onclick="popuptxtsave()"/>
 </div>
 <p><input type="submit" value="Save and Test"/></p>
