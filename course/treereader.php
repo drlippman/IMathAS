@@ -373,7 +373,7 @@ function upsendexceptions(&$items) {
 				if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
 			  }
 		   } else {
-			   if (isset($exceptions[$item])) {
+			   if (isset($exceptions[$item]) && $exceptions[$item][4]=='A') {
 				  // return ($exceptions[$item]);
 				   if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
 				   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}

@@ -229,12 +229,13 @@ for ($k=1;$k<9;$k++) {
 $page_allowlateonSelect = array();
 $page_allowlateonSelect['val'][0] = 0;
 $page_allowlateonSelect['label'][0] = "Posts and Replies (1 LatePass for both)";
-$page_allowlateonSelect['val'][1] = 1;
-$page_allowlateonSelect['label'][1] = "Posts or Replies (1 LatePass each)";
-$page_allowlateonSelect['val'][2] = 2;
-$page_allowlateonSelect['label'][2] = "Posts only";
-$page_allowlateonSelect['val'][3] = 3;
-$page_allowlateonSelect['label'][3] = "Replies only";
+//doesn't work yet
+//$page_allowlateonSelect['val'][1] = 1;
+//$page_allowlateonSelect['label'][1] = "Posts or Replies (1 LatePass each)";
+$page_allowlateonSelect['val'][1] = 2;
+$page_allowlateonSelect['label'][1] = "Posts only";
+$page_allowlateonSelect['val'][2] = 3;
+$page_allowlateonSelect['label'][2] = "Replies only";
 
 //HTML output
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";

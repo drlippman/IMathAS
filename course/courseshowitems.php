@@ -1237,15 +1237,16 @@ function enditem($canedit) {
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			   
 			   //check for exception
-			   $canundolatepass = false;
+			   $canundolatepassP = false;
+			   $canundolatepassR = false;
 			   $latepasscntP = 0;
 			   $latepasscntR = 0;
 			   if (isset($exceptions[$items[$i]])) {
 			   	   //for forums, exceptions[$items[$i]][0] is used for postby and [1] is used for replyby
-			   	   if ($exceptions[$items[$i]][4]=='P' || $exceptions[$items[$i]][4]=='F') {
+			   	   if (($exceptions[$items[$i]][4]=='P' || $exceptions[$items[$i]][4]=='F') && $exceptions[$items[$i]][0]>0) {
 					   //if latepass and it's before original due date or exception is for more than a latepass past now
 					   if ($exceptions[$items[$i]][2]>0 && ($now < $line['postby'] || $exceptions[$items[$i]][0] > $now + $latepasshrs*60*60)) {
-						   $canundolatepass = true;
+						   $canundolatepassP = true;
 					   }
 					   if ($exceptions[$items[$i]][2]>0) {
 						   $latepasscntP = max(0,round(($exceptions[$items[$i]][0] - $line['postby'])/($latepasshrs*3600)));
@@ -1255,10 +1256,10 @@ function enditem($canedit) {
 					   	   $line['enddate'] = $line['postby'];
 					   }
 				   }
-				   if ($exceptions[$items[$i]][4]=='R' || $exceptions[$items[$i]][4]=='F') {
+				   if (($exceptions[$items[$i]][4]=='R' || $exceptions[$items[$i]][4]=='F') && $exceptions[$items[$i]][1]>0) {
 					   //if latepass and it's before original due date or exception is for more than a latepass past now
 					   if ($exceptions[$items[$i]][2]>0 && ($now < $line['replyby'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
-						   $canundolatepass = true;
+						   $canundolatepassR = true;
 					   }
 					   if ($exceptions[$items[$i]][2]>0) {
 						   $latepasscntR = max(0,round(($exceptions[$items[$i]][1] - $line['replyby'])/($latepasshrs*3600)));
@@ -1268,6 +1269,12 @@ function enditem($canedit) {
 					   	   $line['enddate'] = $line['replyby'];
 					   }
 				   }
+			   }
+			   $canundolatepass = false;
+			   if ($exceptions[$items[$i]][4]=='F' && $exceptions[$items[$i]][0]>0 && $exceptions[$items[$i]][1]>0) {
+			   	  $canundolatepass = $canundolatepassP && $canundolatepassR;
+			   } else {
+			   	  $canundolatepass = $canundolatepassP || $canundolatepassR; 
 			   }
 			   $canuselatepassP = false;
 			   $canuselatepassR = false;
@@ -1425,13 +1432,13 @@ function enditem($canedit) {
 					echo _(' LatePass Allowed');
 				   } else if (!$canedit) {
 				   	if ($canuselatepassP || $canuselatepassR) {
-				   		echo " <a href=\"redeemlatepass.php?cid=$cid&fid=$typeid\">", _('Use LatePass'), "</a>";
+				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid\">", _('Use LatePass'), "</a>";
 				   		if ($canundolatepass) {
 				   			echo ' |';
 				   		}
 				   	}
 				   	if ($canundolatepass) {
-				   		echo " <a href=\"redeemlatepass.php?cid=$cid&fid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
+				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
 				   	}
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");

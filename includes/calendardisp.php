@@ -113,7 +113,7 @@ if (!isset($teacherid)) {
 		if ($row[5]=='A') {
 			$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
 		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
-			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],$row[5]);
+			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[5]);
 		}
 	}
 }
@@ -350,7 +350,7 @@ while ($row = mysql_fetch_row($result)) {
 	$latepasscntR = 0;
 	if (isset($forumexceptions[$row[0]])) {
 	   //for forums, exceptions[$row[0]][0] is used for postby and [1] is used for replyby
-	   if ($forumexceptions[$row[0]][4]=='P' || $forumexceptions[$row[0]][4]=='F') {
+	   if (($forumexceptions[$row[0]][3]=='P' || $forumexceptions[$row[0]][3]=='F') && $forumexceptions[$row[0]][0]>0){
 		   //if latepass and it's before original due date or exception is for more than a latepass past now
 		   if ($forumexceptions[$row[0]][2]>0 && ($now < $row[2] || $forumexceptions[$row[0]][0] > $now + $latepasshrs*60*60)) {
 			   $canundolatepassP = true;
@@ -360,7 +360,7 @@ while ($row = mysql_fetch_row($result)) {
 		   }
 		   $row[2] = $forumexceptions[$row[0]][0];
 	   }
-	   if ($forumexceptions[$row[0]][4]=='R' || $forumexceptions[$row[0]][4]=='F') {
+	   if (($forumexceptions[$row[0]][3]=='R' || $forumexceptions[$row[0]][3]=='F') && $forumexceptions[$row[0]][1]>0) {
 		   //if latepass and it's before original due date or exception is for more than a latepass past now
 		   if ($forumexceptions[$row[0]][2]>0 && ($now < $row[3] || $forumexceptions[$row[0]][1] > $now + $latepasshrs*60*60)) {
 			   $canundolatepassR = true;

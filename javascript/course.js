@@ -222,10 +222,10 @@ function showcalcontentsid(elid) {
 				}
 				html += ' New Threads Due '+caleventsarr[elid].data[i].time;
 				if (caleventsarr[elid].data[i].allowlate==1) {
-					html += ' <a href="redeemlatepass.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
+					html += ' <a href="redeemlatepassforum.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
 				}
 				if (caleventsarr[elid].data[i].undolate==1) {
-					html += ' <a href="redeemlatepass.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
+					html += ' <a href="redeemlatepassforum.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
 				}
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
@@ -241,10 +241,10 @@ function showcalcontentsid(elid) {
 				}
 				html += ' Replies Due '+caleventsarr[elid].data[i].time;
 				if (caleventsarr[elid].data[i].allowlate==1) {
-					html += ' <a href="redeemlatepass.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
+					html += ' <a href="redeemlatepassforum.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'">Use LatePass</a>';
 				}
 				if (caleventsarr[elid].data[i].undolate==1) {
-					html += ' <a href="redeemlatepass.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
+					html += ' <a href="redeemlatepassforum.php?cid='+cid+'&fid='+caleventsarr[elid].data[i].id+'&undo=true">Un-use LatePass</a>';
 				}
 				if (caleventsarr[elid].data[i].editlink!=null) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
