@@ -414,9 +414,7 @@ if (isset($_POST['text'])) {
 //return array (nparts, qparts, nhints, qdisp, questions, feedbacktxt, answer, hinttext)
 function getqvalues($code,$type) {
 	$partialcredit = array();
-	$qtol = array();
 	$feedbacktxtdef = array();
-	$qtold = array();
 	
 	if (strpos($code,'//end retained') !== false) {
 		$keepcode = substr($code, strpos($code,'//end stored'), strpos($code,'//end retained')-strpos($code,'//end stored'));
@@ -529,6 +527,8 @@ function getqvalues($code,$type) {
 		//print_r(array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $keepcode, $randvars));
 		return array($nparts, $qtypes, $qparts, $nhints, $displayformat, $questions, $feedbacktxt, $feedbacktxtdef, $feedbacktxtessay, $answer, $hinttext, $partialcredit, $qtol, $qtold, $answerboxsize, $displayformat, $scoremethod, $noshuffle, $variables, $keepcode, $randvars);
 	} else {
+		$qtol = '';
+		$qtold = '';
 		preg_match_all('/\$reltolerance\s*=\s*(.*)/', $toparse, $matches, PREG_SET_ORDER);
 		foreach ($matches as $m) {
 			$qtol = 'rel';
@@ -609,7 +609,7 @@ function getqvalues($code,$type) {
 			$variables = $m[1];
 		}
 		//print_r(array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), $qtol, $qtold, array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), $keepcode, $randvars));
-	
+
 		return array(1, array($type), $qparts, $nhints, array($displayformat), array($questions), array($feedbacktxt), array($feedbacktxtdef), array($feedbacktxtessay), array($answer), $hinttext, array($partialcredit), array($qtol), array($qtold), array($answerboxsize), array($displayformat), array($scoremethod), array($noshuffle), array($variables), $keepcode, $randvars);
 	
 	}
@@ -906,13 +906,26 @@ $shuffleval = array("all","last","none");
 $shufflelbl = array("no shuffle","shuffle all but last","shuffle all");
 
 $useeditor = "text,popuptxt";
-$placeinhead = '<style type="text/css"> 
+
+$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
+$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
+$placeinhead .= '<style type="text/css"> 
   .txted {
     padding-left: 1px;
     padding-right: 1px;
     margin-left: 0px;
     }
+    .choicetbl {
+    white-space: nowrap;
+    }
+   .CodeMirror {font-size: medium;border: 1px solid #ccc; height: auto;}
+	.CodeMirror-scroll {min-height:70px; max-height:600px;}
+	.CodeMirror-selectedtext {color: #ffffff !important;background-color: #3366AA;}
+	.CodeMirror-focused .CodeMirror-selected {background: #3366AA;}
+	.CodeMirror-selected {background: #666666;}
  </style>';
+
 require("../header.php");
 
 if (isset($_GET['aid'])) {
@@ -1103,6 +1116,34 @@ function rubrictouchmove(evt) {
 
 	return false;	
 }
+var randvarEditor;
+function setupRandvarEditor() {
+  randvarEditor = CodeMirror.fromTextArea(document.getElementById("randvars"), {
+	lineNumbers: true,
+	matchBrackets: true,
+	autoCloseBrackets: true,
+	mode: "text/x-imathas",
+	smartIndent: true,
+	lineWrapping: true,
+	indentUnit: 2,
+	tabSize: 2,
+	styleSelectedText:true
+      });
+};
+var keepcodeEditor;
+function setupKeepcodeEditor() {
+  keepcodeEditor = CodeMirror.fromTextArea(document.getElementById("keepcode"), {
+	lineNumbers: true,
+	matchBrackets: true,
+	autoCloseBrackets: true,
+	mode: "text/x-imathas",
+	smartIndent: true,
+	lineWrapping: true,
+	indentUnit: 2,
+	tabSize: 2,
+	styleSelectedText:true
+      });
+};
 </script>
 
 <form enctype="multipart/form-data" method=post action="modtutorialq.php?process=true<?php 
@@ -1178,6 +1219,21 @@ My library assignments: <span id="libnames"><?php echo $lnames;?></span><input t
 <input type=button value="Select Libraries" onClick="libselect()">
 </p>
 
+<?php
+if (trim($randvars)=='') {
+	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#randvarswrapper\').show();setupRandvarEditor();return false;">Add random variables</a></p>';
+	echo '<div id="randvarswrapper" style="display:none;">';
+} else {
+	echo '<div id="randvarswrapper">';
+	echo '<script type="text/javascript">$(function() {setupRandvarEditor();});</script>';
+}
+?>
+<p><a href="#" onclick="window.open('<?php echo $imasroot;?>/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Function Reference</a> |  
+<a href="#" onclick="window.open('<?php echo $imasroot;?>/assessment/libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Addon Macro Libraries Reference</a></p> 
+
+<textarea name="randvars" id="randvars" style="width: 100%"><?php echo htmlentities($randvars);?></textarea>
+</div>
+
 <p>This question has 
 <?php
 	writeHtmlSelect("nparts",range(1,10),range(1,10), $nparts,null,null,'onchange="changenparts(this)"');
@@ -1213,12 +1269,12 @@ for ($n=0;$n<10;$n++) {
 	echo '. Shuffle: ';
 	writeHtmlSelect("qshuffle$n",$shuffleval,$shufflelbl, $qshuffle[$n]);
 	echo '</span>';
-	
 	//numeric
 	echo '<span id="qti'.$n.'num" ';
 	if ($qtype[$n]!='number') {echo ' style="display:none;"';};
 	echo '> values that will receive feedback. Use a(n) ';
 	writeHtmlSelect("qtol$n",$qtolval,$qtollbl, $qtol[$n]);
+	
 	echo ' tolerance of <input autocomplete="off" name="tol'.$n.'" type="text" size="5" value="'.((isset($qtold[$n]) && trim($qtold[$n])!='')?$qtold[$n]:0.001).'"/>.';
 	echo ' Box size: <input autocomplete="off" name="numboxsize'.$n.'" type="text" size="2" value="'.(isset($answerboxsize[$n])?$answerboxsize[$n]:5).'"/>.';
 	echo '</span>';
@@ -1259,15 +1315,15 @@ for ($n=0;$n<10;$n++) {
 	} else {
 		echo '<div class="hasparts'.$n.'" style="display:none;">';
 	}
-	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit (0-1)</th></tr></thead><tbody>';
+	echo '<table class="choicetbl"><thead><tr><th>Correct</th><th id="choicelbl'.$n.'">'.(($qtype[$n]=='choices')?"Choice":"Answer").'</th><th>Feedback</th><th>Partial Credit<br/>(0-1)</th></tr></thead><tbody>';
 	for ($i=0;$i<6;$i++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};
 		echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
 		if ($i==$answer[$n]) {echo 'checked="checked"';}
 		echo '/></td>';
-		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
-		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
+		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="45" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
+		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="45" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="pc'.$n.'-'.$i.'" name="pc'.$n.'-'.$i.'" type="text" size="3" value="'.(isset($partial[$n][$i])?$partial[$n][$i]:"").'"/></td>';
 		
 		echo '</tr>';
@@ -1275,7 +1331,7 @@ for ($n=0;$n<10;$n++) {
 	echo '<tr id="qc'.$n.'-def" ';
 	if ($qtype[$n]!="number" && $qtype[$n]!="numfunc") {echo ' style="display:none;"';};
 	echo '><td colspan="4">Default feedback for incorrect answers: ';
-	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="60" value="'.(isset($feedbacktxtdef[$n])?prepd($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
+	echo '<input autocomplete="off" id="fb'.$n.'-def" name="fb'.$n.'-def" type="text" size="45" value="'.(isset($feedbacktxtdef[$n])?prepd($feedbacktxtdef[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-def\')"/></td></tr>';
 	echo '</tbody></table>';
 	echo '</div>'; //end hasparts holder div
 	echo '<div id="essay'.$n.'wrap" ';
@@ -1299,6 +1355,18 @@ for ($n=0;$n<4;$n++) {
 	echo '<input autocomplete="off" id="hint'.$n.'" name="hint'.$n.'" type="text" size="80" value="'.(isset($hinttext[$n])?prepd($hinttext[$n]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'hint'.$n.'\')"/></p>';
 }
 
+if (trim($keepcode)=='') {
+	echo '<p><a href="#" onclick="$(this).parent().hide();$(\'#keepcodewrapper\').show();setupKeepcodeEditor();return false;">Add additional code</a></p>';
+	echo '<div id="keepcodewrapper" style="display:none;">';
+} else {
+	echo '<div id="keepcodewrapper">';
+	echo '<script type="text/javascript">$(function() {setupKeepcodeEditor();});</script>';
+}
+?>
+<textarea name="keepcode" id="keepcode" style="width: 100%"><?php echo htmlentities($keepcode);?></textarea>
+</div>
+<?php
+
 echo '<h4>Question Text</h4>';
 echo '<p>In the question text, enter <span id="anstipsingle" ';
 if ($nparts!=1) {echo 'style="display:none;" ';}
@@ -1310,16 +1378,14 @@ echo 'enter <b>$feedback[0]</b> to indicate where the feedback for Part 0 should
 ?>
 
 <div class=editor>
-	<textarea cols="60" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qtext);?></textarea>
+	<textarea cols="45" rows="20" id="text" name="text" style="width: 100%"><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$qtext);?></textarea>
 </div>
 
 <div class="editor" id="GB_window" style="display:none; position: absolute; height: auto;">
 <div id="GB_caption" style="cursor:move;";><span style="float:right;"><span class="pointer clickable" onclick="GB_hide()">[X]</span></span> Edit Text</div>
-<textarea cols="60" rows="6" id="popuptxt" name="popuptxt" style="width: 100%"></textarea>
+<textarea cols="45" rows="6" id="popuptxt" name="popuptxt" style="width: 100%"></textarea>
 <input type="button" value="Save" onclick="popuptxtsave()"/>
 </div>
-<input type="hidden" name="keepcode" value="<?php echo htmlentities($keepcode);?>"/>
-<input type="hidden" name="randvars" value="<?php echo htmlentities($randvars);?>"/>
 <p><input type="submit" value="Save and Test"/></p>
 <p>&nbsp;</p>
 
