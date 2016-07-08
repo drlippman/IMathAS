@@ -3,6 +3,7 @@
 //(c) 2010 David Lippman
 
 require("./config.php");
+error_reporting(E_ALL);
 require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
@@ -112,7 +113,7 @@ if (isset($QS['showscored'])) {
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$key = $row[0];
-		$jwtcheck = JWT::decode($_POST['jwtchk'], $key);
+		$jwtcheck = json_decode(json_encode(JWT::decode($_POST['jwtchk'], $key)), true);
 		if ($jwtcheck['id'] != $qsetid || $jwtcheck['seed'] != $seed) {
 			echo "ID/Seed did not check";
 			exit;
