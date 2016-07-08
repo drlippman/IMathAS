@@ -3,7 +3,6 @@
 //(c) 2010 David Lippman
 
 require("./config.php");
-error_reporting(E_ALL);
 require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
@@ -18,7 +17,7 @@ require("./assessment/displayq2.php");
 
 $sessiondata = array();
 $sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 3;
+$sessiondata['mathdisp'] = 6;
 $showtips = 2;
 $useeqnhelper = 4;
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
@@ -192,9 +191,17 @@ if (isset($QS['showscored'])) {
 		$rawscores = array();
 	} else {
 		if (isset($QS['auth'])) { //is signed
-			$seed = rand(1,4999);
+			if (isset($QS['seed']) && intval($QS['seed'])<5000) {
+				$seed = intval($QS['seed']);
+			} else {
+				$seed = rand(1,4999);
+			}
 		} else {
-			$seed = rand(5000,9999);
+			if (isset($QS['seed']) && intval($QS['seed'])>4999) {
+				$seed = intval($QS['seed']);
+			} else {
+				$seed = rand(5000,9999);
+			}
 		}
 	}
 	$doshowans = 0;
@@ -253,7 +260,9 @@ echo '<script type="text/javascript">
 	  }), "*");
 	 }
 	}
-	if (MathJax) {
+	if (mathRenderer == "Katex") {
+		window.katexDoneCallback = sendresizemsg;
+	} else if (MathJax) {
 		MathJax.Hub.Queue(function () {
 			sendresizemsg();
 		});
