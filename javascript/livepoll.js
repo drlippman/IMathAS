@@ -309,7 +309,7 @@ var livepoll = new function() {
 			}
 			$("#livepollrcontent").html('<div class="LPdrawgrid" >'+out+'</div>');
 			for (var i=0;i<sortedkeys.length;i++) {
-				initCanvases("LP"+curquestion+"-"+i);
+				imathasDraw.initCanvases("LP"+curquestion+"-"+i);
 			}
 		} else {
 			var sortedkeys = getSortedKeys(datatots);
@@ -360,7 +360,7 @@ var livepoll = new function() {
 				setTimeout("drawPics()",100);
 			}
 			for (var i=0;i<sortedkeys.length;i++) {
-				initCanvases("LP"+curquestion+"-"+i);
+				imathasDraw.initCanvases("LP"+curquestion+"-"+i);
 			}
 
 		}
@@ -477,7 +477,7 @@ var livepoll = new function() {
 				if (typeof G_vmlCanvasManager != 'undefined') {
 					scripts[i] = scripts[i] + 'G_vmlCanvasManager.initElement(document.getElementById("canvas'+k[1]+'"));';
 				}
-				scripts[i] = scripts[i] + "initCanvases("+k[1]+");";     
+				scripts[i] = scripts[i] + "imathasDraw.initCanvases("+k[1]+");";     
 			    }
 			    eval(scripts[i]);
 		    }

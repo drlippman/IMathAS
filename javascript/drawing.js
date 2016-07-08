@@ -1,3 +1,7 @@
+var canvases = new Array();
+var drawla = new Array();
+
+var imathasDraw = (function($) {
 var mouseisdown = false;
 var targets = new Array();
 var imgs = new Array();
@@ -9,8 +13,6 @@ var tplines = new Array();
 var tptypes = new Array();
 var ineqlines = new Array();
 var ineqtypes = new Array();
-var canvases = new Array();
-var drawla = new Array();
 var curLine = null;
 var drawstyle = [];
 var drawlocky = [];
@@ -1486,50 +1488,10 @@ function initCanvases(k) {
 if (typeof(initstack)!='undefined') {
 	initstack.push(initCanvases);
 } else {
-// GO1.1 Generic onload by Brothercake 
-// http://www.brothercake.com/
-//setup onload function
-if(typeof window.addEventListener != 'undefined')
-{
-  //.. gecko, safari, konqueror and standard
-  window.addEventListener('load', initCanvases, false);
+	$(function() {
+		initCanvases();
+	});
 }
-else if(typeof document.addEventListener != 'undefined')
-{
-  //.. opera 7
-  document.addEventListener('load', initCanvases, false);
-}
-else if(typeof window.attachEvent != 'undefined')
-{
-  //.. win/ie
-  window.attachEvent('onload', initCanvases);
-}
-//** remove this condition to degrade older browsers
-else
-{
-  //.. mac/ie5 and anything else that gets this far
-  //if there's an existing onload function
-  if(typeof window.onload == 'function')
-  {
-    //store it
-    var existing = onload;
-    //add new onload handler
-    window.onload = function()
-    {
-      //call existing onload function
-      existing();
-      //call generic onload function
-      initCanvases();
-    };
-  }
-  else
-  {
-    //setup onload function
-    window.onload = initCanvases;
-  }
-}
-}
-
 
 
 /*
@@ -1896,3 +1858,13 @@ function shadeParabola(ctx,Vx,Vy,x,y,shX,shY,sw,sh){
 	}
 	ctx.closePath();
 }
+
+var drawexport = {
+	initCanvases:initCanvases, 
+	clearcanvas:clearcanvas, 
+	settool:settool, 
+	addnormslider:addnormslider, 
+	chgnormtype:chgnormtype
+};
+return drawexport;
+}(jQuery));
