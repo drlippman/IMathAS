@@ -346,7 +346,13 @@ function initeditor(edmode,edids,css){
                         ]
                 }]
         }
-	if (document.documentElement.clientWidth<540) {
+	if (document.documentElement.clientWidth<385) {
+		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline";
+		edsetup.toolbar2 = "bullist numlist outdent indent  | link image | asciimath asciisvg";
+	} else if (document.documentElement.clientWidth<465) {
+		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline forecolor";
+		edsetup.toolbar2 = "bullist numlist outdent indent  | link unlink image | asciimath asciisvg";
+	} else if (document.documentElement.clientWidth<575) {
 		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
 	} 

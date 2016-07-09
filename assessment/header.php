@@ -58,7 +58,7 @@ if (isset($sessiondata['coursetheme'])) {
 	}
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/themes/$coursetheme\"/>\n";
 }
-echo '<link rel="stylesheet" href="'.$imasroot.'/handheld.css" media="handheld,only screen and (max-device-width:480px)"/>';
+echo '<link rel="stylesheet" href="'.$imasroot.'/handheld.css?v=070816" media="handheld,only screen and (max-width:480px)"/>';
 if ($isdiag) {
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/diag/print.css\" media=\"print\"/>\n";
 } else {

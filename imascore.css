@@ -169,6 +169,39 @@ span.wideformright {
 	margin-bottom: 10px;
 	text-align: left;
 }
+input.form {
+	display: block;
+	width: 200px;
+	float: left;
+	margin-bottom: 10px;
+}
+
+div.submit {
+	margin-top: 10px;
+	width: 400px;
+	text-align: right;
+}
+
+@media only screen and (max-width: 760px) {
+	span.form {
+		width: auto;
+		float: none;
+		text-align: left;
+		margin-bottom: 5px;
+		padding-right: 0px;
+	}
+	span.formright, span.wideformright {
+		width: auto;
+		float: none;
+	}
+	div.submit {
+		width: auto;
+	}
+	span.formright input[type="text"], span.formright input[type="password"] {
+		max-width: 100%;
+	}
+}
+
 div.editor {
 	margin-bottom: 10px;
 }
@@ -184,17 +217,7 @@ span.left {
 	float: left;
 }
 
-input.form {
-	display: block;
-	width: 200px;
-	float: left;
-	margin-bottom: 10px;
-}
 
-div.submit {
-	width: 400px;
-	text-align: right;
-}
 
 br.form {
 	clear: left;

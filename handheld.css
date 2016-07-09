@@ -118,8 +118,13 @@ span.form {
 	margin-bottom: 5px;
 	padding-right: 0px;
 }
-span.formright {
+span.formright, span.wideformright {
 	width: auto;
 	float: none;
 }
-	
+div.submit {
+	width: auto;
+}
+span.formright input[type="text"], span.formright input[type="password"] {
+	max-width: 100%;
+}
