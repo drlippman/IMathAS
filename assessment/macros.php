@@ -4,7 +4,7 @@
 
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs","dechex","hexdec");
-array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates");
+array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","getfeedbacktxtnumfunc","getfeedbacktxtcalculated","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates");
 function mergearrays($a,$b) {
 	if (!is_array($a)) {
 		$a = array($a);
@@ -2819,7 +2819,7 @@ function getfeedbacktxtessay($stu,$fbtxt) {
 	}
 }
 
-function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb, $tol=.001) {
+function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.001) {
 	global $imasroot;
 	if ($stu===null) {
 		return " ";
@@ -2835,6 +2835,9 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb, $tol=.001) {
 		$match = -1;
 		if (!is_array($partial)) { $partial = explode(',',$partial);}
 		for ($i=0;$i<count($partial);$i+=2) {
+			if (!is_numeric($partial[$i])) {
+				$partial[$i] = @eval('return('.mathphp($partial[$i],null).');');
+			}
 			if ($abstol) {
 				if (abs($stu-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
 			} else {
@@ -2853,8 +2856,69 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb, $tol=.001) {
 	}
 }
 
+function getfeedbacktxtcalculated($stu, $stunum, $partial, $fbtxt, $deffb='Incorrect', $answerformat = '', $requiretimes = '', $tol=.001) {
+	global $imasroot;
+	if ($stu===null) {
+		return " ";
+	} else {
+		if ($tol{0}=='|') {
+			$abstol = true;
+			$tol = substr($tol,1);
+		} else {
+			$abstol =false;
+		}
+		$match = -1;
+		if (!is_array($partial)) { $partial = explode(',',$partial);}
+		for ($i=0;$i<count($partial);$i+=2) {
+			if (is_array($requiretimes)) {
+				if ($requiretimes[$i]!='') {
+					if (checkreqtimes(str_replace(',','',$stu),$requiretimes[$i])==0) {
+						$rightanswrongformat = $i;
+						continue;
+					}
+				}
+			} else if ($requiretimes!='') {
+				if (checkreqtimes(str_replace(',','',$stu),$requiretimes)==0) {
+					$rightanswrongformat = $i;
+					continue;
+				}
+			}
+			if (is_array($answerformat)) {
+				if ($answerformat[$i]!='') {
+					if (checkanswerformat($stu,$answerformat[$i])==0) {
+						$rightanswrongformat = $i;
+						continue;
+					}
+				}
+			} else if ($answerformat!='') {
+				if (checkanswerformat($stu,$answerformat)==0) {
+					$rightanswrongformat = $i;
+					continue;
+				}
+			}
+			if (!is_numeric($partial[$i])) {
+				$partial[$i] = @eval('return('.mathphp($partial[$i],null).');');
+			}
+			if ($abstol) {
+				if (abs($stunum-$partial[$i]) < $tol + 1E-12) { $match = $i; break;}
+			} else {
+				if (abs($stunum - $partial[$i])/(abs($partial[$i])+.0001) < $tol+ 1E-12) {$match = $i; break;}
+			}
+		}
+		if ($match>-1) {
+			if ($partial[$i+1]<1) {
+				return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$fbtxt[$i/2].'</div>';
+			} else {
+				return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$i/2].'</div>';
+			}
+		} else {
+			return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> '.$deffb.'</div>';
+		}
+	}
+}
+
 //$partial = array(answer,partialcreditval,answer,partialcreditval,...)
-function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb, $vars='x', $requiretimes = '', $tol='.001',$domain='-10,10') {
+function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars='x', $requiretimes = '', $tol='.001',$domain='-10,10') {
 	global $imasroot;
 	if ($stu===null || trim($stu)==='') {
 		return " ";

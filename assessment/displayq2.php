@@ -6147,6 +6147,7 @@ function parsecomplex($v) {
 function checkanswerformat($tocheck,$ansformats) {
 	$tocheck = trim($tocheck);
 	$tocheck = str_replace(',','',$tocheck);
+	if (!is_array($ansformats)) {$ansformats = explode(',',$ansformats);}
 	if (strtoupper($tocheck)=='DNE' || $tocheck=='oo' || $tocheck=='+oo' || $tocheck=='-oo') {
 		return true;
 	}
