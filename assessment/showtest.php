@@ -940,7 +940,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	}
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead .= '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
-		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js"></script>';
+		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=071116"></script>';
 		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher']?'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
