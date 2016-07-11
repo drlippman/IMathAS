@@ -13,6 +13,11 @@ if (isset($_GET['removelti'])) {
 	$query = "DELETE FROM imas_ltiusers WHERE id=$id";
 	mysql_query($query) or die("Query failed : " . mysql_error());	
 }
+if (isset($_GET['removecourselti'])) {
+	$id = intval($_GET['removecourselti']);
+	$query = "DELETE FROM imas_lti_courses WHERE id=$id";
+	mysql_query($query) or die("Query failed : " . mysql_error());	
+}
 
 if (isset($_GET['form'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
@@ -92,24 +97,37 @@ if (isset($_GET['form'])) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
 						}
 						echo '</ul></li>';
-					}
+					} 
 					$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
 					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					$teachercourses = array();
 					if (mysql_num_rows($res2)>0) {
 						echo '<li>Teacher in: <ul>';
 						while ($r = mysql_fetch_row($res2)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
+							$teachercourses[] = $r[0];
 						}
 						echo '</ul></li>';
 					}
-					$query = "SELECT org,id FROM imas_ltiusers WHERE userid=".$row['id'];
+					$query = "SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=".$row['id'];
 					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($res2)>0) {
-						echo '<li>LTI connections: <ul>';
+						echo '<li>LTI user connections: <ul>';
 						while ($r = mysql_fetch_row($res2)) {
-							echo '<li>'.$r[0].' <a href="utils.php?removelti='.$r[1].'">Remove connection</a></li>';
+							echo '<li>key:'.substr($r[0],0,strpos($r[0],':')).', remote userid:'.$r[2].' <a href="utils.php?removelti='.$r[1].'">Remove connection</a></li>';
 						}
 						echo '</ul></li>';
+					}
+					if (count($teachercourses)>0) {
+						$query = "SELECT org,id,courseid,contextid FROM imas_lti_courses WHERE courseid IN (".implode(",",$teachercourses).")";
+						$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+						if (mysql_num_rows($res2)>0) {
+							echo '<li>LTI course connections: <ul>';
+							while ($r = mysql_fetch_row($res2)) {
+								echo '<li>Course: '.$r[2].', key:'.substr($r[0],0,strpos($r[0],':')).', context:'.$r[3].' <a href="utils.php?removecourselti='.$r[1].'">Remove connection</a></li>';
+							}
+							echo '</ul></li>';
+						}
 					}
 					echo '</ul>';
 					echo '</form>';
