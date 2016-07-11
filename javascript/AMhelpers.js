@@ -85,6 +85,11 @@ function setupLivePreview(qn) {
 			  	} else if (vlist.hasOwnProperty(qn)) {
 			  		text = AMnumfuncPrepVar(qn, text)[1];
 			  		
+			  	} else if (calcformat.hasOwnProperty(qn)) {
+			  		var format = calcformat[qn];
+			  		if (format.indexOf('list')==-1 && format.indexOf('set')==-1) {
+			  			text = text.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+			  		}
 			  	}
 			  	return text;
 			  },
@@ -1459,7 +1464,7 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 					if (typeof G_vmlCanvasManager != 'undefined') {
 						scripts[i] = scripts[i] + 'G_vmlCanvasManager.initElement(document.getElementById("canvas'+k[1]+'"));';
 					}
-					scripts[i] = scripts[i] + "initCanvases("+k[1]+");";     
+					scripts[i] = scripts[i] + "imathasDraw.initCanvases("+k[1]+");";     
 				    }
 				    eval(scripts[i]);
 			    }

@@ -1,3 +1,7 @@
+var canvases = new Array();
+var drawla = new Array();
+
+var imathasDraw = (function($) {
 var mouseisdown = false;
 var targets = new Array();
 var imgs = new Array();
@@ -9,8 +13,6 @@ var tplines = new Array();
 var tptypes = new Array();
 var ineqlines = new Array();
 var ineqtypes = new Array();
-var canvases = new Array();
-var drawla = new Array();
 var curLine = null;
 var drawstyle = [];
 var drawlocky = [];
@@ -25,6 +27,7 @@ var nocanvaswarning = false;
 var hasTouch = false;
 var didMultiTouch = false;
 var clickmightbenewcurve = false;
+var hasTouchTimer = null;
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -814,14 +817,32 @@ function encodeDraw() {
 	}
 	targetOuts[curTarget].value = out;
 }
-
+var clickcnt=0;
 function drawMouseDown(ev) {
-	
-	if (hasTouch && ev.touches.length>1) {
+	clickcnt++;
+	clearAllDrawListners();
+	if (hasTouch && ev.originalEvent.touches.length>1) {
+		//hasTouch = false;
+		didMultiTouch = true;
+		//$(".tips").html("multi mousedown");
+		//$(document).on("mousemove.imathasdraw", drawMouseMove);
+		$(document).on("touchend.imathasdraw", drawMouseUp);
 		return true;  //bypass when multitouching to prevent interference with pinch zoom
+	} else {
+		//$(".tips").html("other mousedown");
+	}
+	if (hasTouch) {
+		window.clearTimeout(hasTouchTimer);
+		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+		$(document).on("touchmove.imathasdraw", drawMouseMove);
+		$(document).on("touchend.imathasdraw", drawMouseUp);
+	} else {
+		$(document).on("mousemove.imathasdraw", drawMouseMove);
+		$(document).on("mouseup.imathasdraw", drawMouseUp);
 	}
 	var mousePos = mouseCoords(ev);
-	if (curTarget==null) { //see if mouse click is inside a target; if so, select it
+	//see if mouse click is inside a target; if so, select it (unless currently in a line from another target)
+	if (curTarget==null || (curLine==null && curTPcurve==null && curIneqcurve==null)) {
 		for (i in targets) {
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
@@ -832,15 +853,16 @@ function drawMouseDown(ev) {
 	}
 	
 	if (curTarget!=null) { //is a target currectly in action?
-		if( navigator.userAgent.match(/Android/i) ) {
-			ev.preventDefault();
-		}
 		mouseisdown = true;
 		var tarelpos = getPosition(targets[curTarget].el);
+		//$(".tips").html(curTPcurve+","+clickcnt);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		  
 		//are we inside target region?
 		if (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height) {
+			if( navigator.userAgent.match(/Android/i) ) {
+				//ev.preventDefault(); //prevent pinch-zoom too
+			}
 			if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
 			if (drawlocky[curTarget]==1) {
 				mouseOff.y = targets[curTarget].imgheight/2;
@@ -1090,12 +1112,14 @@ function findnearpoint(thetarget,mouseOff) {
 
 var lastdrawmouseup = null;
 function drawMouseUp(ev) {
+	//$(".tips").html("mouseup" + curTarget + dragObj);
 	var mousePos = mouseCoords(ev);
 	mouseisdown = false;
 	if (curTarget!=null) {
 		var tarelpos = getPosition(targets[curTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
 		if (targets[curTarget].snaptogridx > 0) {mouseOff = snaptogrid(mouseOff,curTarget);}
+		var releaseInTarget = (mouseOff.x>-1 && mouseOff.x<targets[curTarget].width && mouseOff.y>-1 && mouseOff.y<targets[curTarget].height);
 		
 		if (clickmightbenewcurve==true) {
 			if (targets[curTarget].mode>=5 && targets[curTarget].mode<10) {
@@ -1131,7 +1155,7 @@ function drawMouseUp(ev) {
 			}
 		}
 		if (curTPcurve!=null && tplines[curTarget][curTPcurve].length==1) {
-			if (didMultiTouch) {
+			if (didMultiTouch || !releaseInTarget) {
 				tplines[curTarget].splice(curTPcurve,1);
 				curTPcurve = null;
 				drawTarget();
@@ -1142,7 +1166,7 @@ function drawMouseUp(ev) {
 			}
 		}
 		if (curIneqcurve!=null && ineqlines[curTarget][curIneqcurve].length==1) {
-			if (didMultiTouch) {
+			if (didMultiTouch || !releaseInTarget) {
 				ineqlines[curTarget].splice(curIneqcurve,1);
 				curIneqcurve = null;
 				drawTarget();
@@ -1211,16 +1235,29 @@ function drawMouseUp(ev) {
 		}
 	}
 	didMultiTouch = false;
-		
+	if (hasTouch) {
+		hasTouchTimer = window.setTimeout(function () {
+			hasTouch = false;	
+			clearAllDrawListners();
+			$(document).on("mousemove.imathasdraw", drawMouseMove);
+			$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+			$(document).on("mousedown.imathasdraw", drawMouseDown);
+		}, 350);
+	} else {
+		clearAllDrawListners();
+		$(document).on("mousemove.imathasdraw", drawMouseMove);
+		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+		$(document).on("mousedown.imathasdraw", drawMouseDown);
+	}
 }
 
 function drawMouseMove(ev) {
 	var tempTarget = null;
 	clickmightbenewcurve = false;
 	var mousePos = mouseCoords(ev);
-	
+	//$(".tips").html("move"+didMultiTouch);
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
-	if (curTarget==null) {
+	//if (curTarget==null) {
 		for (i in targets) {
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
@@ -1228,7 +1265,7 @@ function drawMouseMove(ev) {
 				break;
 			}
 		}
-	}
+	//}
 	if (tempTarget!=null) {
 		var tarelpos = getPosition(targets[tempTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
@@ -1250,8 +1287,9 @@ function drawMouseMove(ev) {
 		}
 	}
 	if (curTarget!=null) {
-		if (hasTouch && ev.touches.length>1) {
+		if (ev.originalEvent.touches && ev.originalEvent.touches.length>1) {
 			didMultiTouch = true;
+			//$(".tips").html("multi mousemove");
 			return true;  //bypass when multitouching to prevent interference with pinch zoom
 		} else if (typeof ev != 'undefined') {
 			ev.preventDefault();
@@ -1343,7 +1381,7 @@ function mouseCoords(ev){
 	ev = ev || window.event;
 	
 	if (hasTouch) {
-		var touch = ev.changedTouches[0] || ev.touches[0];
+		var touch = ev.originalEvent.changedTouches[0] || ev.originalEvent.touches[0];
 		return {x:touch.pageX, y:touch.pageY};
 	}
 	
@@ -1388,13 +1426,14 @@ function getMouseOffset(target, ev){
 function getPosition(e){
 	var left = 0;
 	var top  = 0;
-
-	if (e.getBoundingClientRect) {
+	
+	//seems to be causing issues
+	/*if (e.getBoundingClientRect) {
 		var box = e.getBoundingClientRect();
 		var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
                 var scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
                 return {x: box.left + scrollLeft, y: box.top + scrollTop};
-	}
+	}*/
 	while (e.offsetParent){
 		left += e.offsetLeft;
 		top  += e.offsetTop;
@@ -1403,30 +1442,21 @@ function getPosition(e){
 	
 	left += e.offsetLeft;
 	top  += e.offsetTop;
-
 	return {x:left, y:top};
-}
-
-function drawTouchCatch(ev) {
-	hasTouch = true;
-	drawMouseDown(ev);
-	document.addEventListener('touchstart',drawMouseDown);
-	document.addEventListener('touchmove',drawMouseMove);
-	document.addEventListener('touchend',drawMouseUp);
-	document.removeEventListener('touchstart',drawTouchCatch);
-	document.onmousedown = null;
-	document.onmouseup =  null;
-	document.onmousemove = null;
-}
-
-function initCanvases(k) {
-	if (document.addEventListener) {
-		document.addEventListener('touchstart',drawTouchCatch);	
-	}
-	document.onmousedown =  drawMouseDown;
-	document.onmouseup =  drawMouseUp;
-	document.onmousemove = drawMouseMove;
 	
+}
+
+
+function clearAllDrawListners() {
+	$(document).off("mousedown.imathasdraw").off("mousemove.imathasdraw").off("mouseup.imathasdraw");
+	$(document).off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw");
+}
+function initCanvases(k) {
+	clearAllDrawListners();
+	$(document).on("mousemove.imathasdraw", drawMouseMove);
+	$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
+	$(document).on("mousedown.imathasdraw", drawMouseDown);
+
 	try {
 		
 		CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
@@ -1486,50 +1516,10 @@ function initCanvases(k) {
 if (typeof(initstack)!='undefined') {
 	initstack.push(initCanvases);
 } else {
-// GO1.1 Generic onload by Brothercake 
-// http://www.brothercake.com/
-//setup onload function
-if(typeof window.addEventListener != 'undefined')
-{
-  //.. gecko, safari, konqueror and standard
-  window.addEventListener('load', initCanvases, false);
+	$(function() {
+		initCanvases();
+	});
 }
-else if(typeof document.addEventListener != 'undefined')
-{
-  //.. opera 7
-  document.addEventListener('load', initCanvases, false);
-}
-else if(typeof window.attachEvent != 'undefined')
-{
-  //.. win/ie
-  window.attachEvent('onload', initCanvases);
-}
-//** remove this condition to degrade older browsers
-else
-{
-  //.. mac/ie5 and anything else that gets this far
-  //if there's an existing onload function
-  if(typeof window.onload == 'function')
-  {
-    //store it
-    var existing = onload;
-    //add new onload handler
-    window.onload = function()
-    {
-      //call existing onload function
-      existing();
-      //call generic onload function
-      initCanvases();
-    };
-  }
-  else
-  {
-    //setup onload function
-    window.onload = initCanvases;
-  }
-}
-}
-
 
 
 /*
@@ -1569,21 +1559,8 @@ function slideronpageload(k) {
 		if (typeof(k)=='undefined' || k==normslider.idnums[i]) {
 			id = normslider.idnums[i];
 			initnormslider(id);
-			el = document.getElementById("slid1"+id);
-			if (hasTouch) {
-				el.addEventListener('touchstart',onsliderstart);
-				el.parentNode.addEventListener('touchend',onsliderstop);
-				el = document.getElementById("slid2"+id);
-				el.addEventListener('touchstart',onsliderstart);
-				el.parentNode.addEventListener('touchend',onsliderstop);
-				
-			} else {
-				el.onmousedown =  onsliderstart;
-				el.parentNode.onmouseup =  onsliderstop;
-				el = document.getElementById("slid2"+id);
-				el.onmousedown =  onsliderstart;
-				el.parentNode.onmouseup =  onsliderstop;
-			}
+			$("#slid1"+id).on("touchstart.normslider mousedown.normslider", onsliderstart);
+			$("#slid2"+id).on("touchstart.normslider mousedown.normslider", onsliderstart);
 		}
 	}
 }
@@ -1624,16 +1601,20 @@ function initnormslider(id) {
 }
 function onsliderstart(ev) {
 	ev = ev || window.event;
+	if (ev.originalEvent.touches && ev.originalEvent.touches.length>0) {
+		hasTouch = true;
+		$(document).on("touchmove.normslider", onsliderchange);
+		$(document).on("touchend.normslider", onsliderstop);
+	} else {
+		$(document).on("mousemove.normslider", onsliderchange);
+		$(document).on("mouseup.normslider", onsliderstop);
+		//normslider.curslider.el.parentNode.onmousemove = onsliderchange;
+	}
 	normslider.curslider.el = ev.target || ev.srcElement;
 	normslider.curslider.id = normslider.curslider.el.id.substring(5);
 	normslider.curslider.type = document.getElementById("shaderegions"+normslider.curslider.id).value;
 	normslider.curslider.outnode = document.getElementById(normslider.outputid);
 	normslider.curslider.startpos = getMouseOffset(normslider.curslider.el,ev);
-	if (hasTouch) {
-		document.addEventListener('touchmove',onsliderchange);
-	} else {
-		normslider.curslider.el.parentNode.onmousemove = onsliderchange;
-	}
 	normslider.curslider.el.parentNode.style.cursor = 'pointer';
 	var parentpos = getPosition(normslider.curslider.el.parentNode);
 	if (ev.preventDefault) {ev.preventDefault()};
@@ -1656,11 +1637,9 @@ function onsliderchange(ev) {
 }
 function onsliderstop(ev) {
 	if (normslider.curslider.el !== null) {
-		if (hasTouch) {
-			document.removeEventListener('touchmove',onsliderchange);
-		} else {
-			normslider.curslider.el.parentNode.onmousemove = null;
-		}
+		hasTouch = false;
+		$(document).off("touchmove.normslider touchend.normslider");
+		$(document).off("mousemove.normslider mouseup.normslider");
 		normslider.curslider.el.parentNode.style.cursor = '';
 		normslider.curslider.el = null;
 	}
@@ -1896,3 +1875,13 @@ function shadeParabola(ctx,Vx,Vy,x,y,shX,shY,sw,sh){
 	}
 	ctx.closePath();
 }
+
+var drawexport = {
+	initCanvases:initCanvases, 
+	clearcanvas:clearcanvas, 
+	settool:settool, 
+	addnormslider:addnormslider, 
+	chgnormtype:chgnormtype
+};
+return drawexport;
+}(jQuery));
