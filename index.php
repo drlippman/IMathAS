@@ -378,6 +378,8 @@ function printCourses($data,$title,$type=null) {
 	}
 	if ($type=='teach' && $myrights>39 && count($data)==0) {
 		echo '<li>', _('To add a course, head to the Admin Page'), '</li>';
+	} else if ($type=='teach' && $myrights<13 && $myrights>10 && count($data)==0) {
+		echo '<li>', _('Your instructor account has not been approved yet. Please be patient.'), '</li>';
 	}
 	echo '</ul>';
 	if ($type=='take') {
