@@ -79,9 +79,7 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	$targetid = $JWTsess->targetid;
 } else {
 	$qids = explode("-",$_GET['id']);
-	foreach ($qids as $i=>$v) {
-		$qids[$i] = intval($v);
-	}
+	
 	if (isset($_GET['sameseed']) && $_GET['sameseed']==1) {
 		$seeds = array_fill(0,count($qids), rand(5000,9999));
 		$sameseed = 1;
@@ -103,7 +101,12 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	}
 	$jwtstring = saveAssessData();
 }
-	
+foreach ($qids as $i=>$v) {
+	$qids[$i] = intval($v);
+}
+foreach ($seeds as $i=>$v) {
+	$seeds[$i] = intval($v);
+}
 require("./assessment/displayq2.php");                 
 
 if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
