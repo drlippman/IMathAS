@@ -2085,6 +2085,17 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 when there is a multipart question with only one part.
 </p>
 
+<h4>Other Reference Variables</h4>
+<p>A few other special purpose variables can be referenced:</p>
+<ul>
+<li><b>$scorenonzero</b>: This variable is only available on display, not during scoring. $scorenonzero[$thisq] (or $scorenonzero[$thisq][partindex] for multipart)
+   will be -1 if the question is unanswered, 0 if the score is zero, and 1 if the score is anything above 0.</li>
+<li><b>$scoreiscorrect</b>: This variable is only available on display, not during scoring. $scoreiscorrect[$thisq] (or $scoreiscorrect[$thisq][partindex] for multipart)
+   will be -1 if the question is unanswered, 1 if the score (before any penalties) is perfect, and 0 otherwise.</li>
+<li><b>$attemptn</b>: This variable holds the attempt number of the current attempt.  0 is the initial attempt, 1 is the next attempt, etc.</li>
+<li><b>$requestclearla</b>:  If you set $requestclearla=true in your code, it will request the display to clear out the student's last answer.
+  This might be useful if your question branches based on attempt count.  Example: <code>$requestclearla = true if ($attemptn==2 &amp;&amp; !$scoreiscorrect[$thisq])</code></li>
+
 <h4>Reusing Code</h4>
 <p>You can import in the Common Control code from another question using
 <pre>includecodefrom(questionid)</pre>
