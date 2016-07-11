@@ -820,7 +820,7 @@ function encodeDraw() {
 var clickcnt=0;
 function drawMouseDown(ev) {
 	clickcnt++;
-	clearAllListners();
+	clearAllDrawListners();
 	if (hasTouch && ev.originalEvent.touches.length>1) {
 		//hasTouch = false;
 		didMultiTouch = true;
@@ -841,7 +841,8 @@ function drawMouseDown(ev) {
 		$(document).on("mouseup.imathasdraw", drawMouseUp);
 	}
 	var mousePos = mouseCoords(ev);
-	if (curTarget==null) { //see if mouse click is inside a target; if so, select it
+	//see if mouse click is inside a target; if so, select it (unless currently in a line from another target)
+	if (curTarget==null || (curLine==null && curTPcurve==null && curIneqcurve==null)) {
 		for (i in targets) {
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
@@ -1237,13 +1238,13 @@ function drawMouseUp(ev) {
 	if (hasTouch) {
 		hasTouchTimer = window.setTimeout(function () {
 			hasTouch = false;	
-			clearAllListners();
+			clearAllDrawListners();
 			$(document).on("mousemove.imathasdraw", drawMouseMove);
 			$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 			$(document).on("mousedown.imathasdraw", drawMouseDown);
 		}, 350);
 	} else {
-		clearAllListners();
+		clearAllDrawListners();
 		$(document).on("mousemove.imathasdraw", drawMouseMove);
 		$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 		$(document).on("mousedown.imathasdraw", drawMouseDown);
@@ -1256,7 +1257,7 @@ function drawMouseMove(ev) {
 	var mousePos = mouseCoords(ev);
 	//$(".tips").html("move"+didMultiTouch);
 	//document.getElementById("ans0-0").innerHTML = dragObj + ';' + curTPcurve;
-	if (curTarget==null) {
+	//if (curTarget==null) {
 		for (i in targets) {
 			var tarelpos = getPosition(targets[i].el);
 			if (tarelpos.x<mousePos.x && (tarelpos.x+targets[i].width>mousePos.x) && tarelpos.y<mousePos.y && (tarelpos.y+targets[i].height>mousePos.y)) {
@@ -1264,7 +1265,7 @@ function drawMouseMove(ev) {
 				break;
 			}
 		}
-	}
+	//}
 	if (tempTarget!=null) {
 		var tarelpos = getPosition(targets[tempTarget].el);
 		var mouseOff = {x:(mousePos.x - tarelpos.x), y: (mousePos.y-tarelpos.y)};
@@ -1425,7 +1426,8 @@ function getMouseOffset(target, ev){
 function getPosition(e){
 	var left = 0;
 	var top  = 0;
-
+	
+	//seems to be causing issues
 	/*if (e.getBoundingClientRect) {
 		var box = e.getBoundingClientRect();
 		var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
@@ -1443,35 +1445,18 @@ function getPosition(e){
 	return {x:left, y:top};
 	
 }
-/*
-function drawTouchCatch(ev) {
-	hasTouch = true;
-	drawMouseDown(ev);
-	document.addEventListener('touchstart',drawMouseDown);
-	document.addEventListener('touchmove',drawMouseMove);
-	document.addEventListener('touchend',drawMouseUp);
-	document.removeEventListener('touchstart',drawTouchCatch);
-	document.onmousedown = null;
-	document.onmouseup =  null;
-	document.onmousemove = null;
-}
-*/
 
-function clearAllListners() {
+
+function clearAllDrawListners() {
 	$(document).off("mousedown.imathasdraw").off("mousemove.imathasdraw").off("mouseup.imathasdraw");
 	$(document).off("touchstart.imathasdraw").off("touchmove.imathasdraw").off("touchend.imathasdraw");
 }
 function initCanvases(k) {
+	clearAllDrawListners();
 	$(document).on("mousemove.imathasdraw", drawMouseMove);
 	$(document).on("touchstart.imathasdraw", function(ev) { hasTouch=true; drawMouseDown(ev);});
 	$(document).on("mousedown.imathasdraw", drawMouseDown);
-	/*if (document.addEventListener) {
-		document.addEventListener('touchstart',drawTouchCatch);	
-	}
-	document.onmousedown =  drawMouseDown;
-	document.onmouseup =  drawMouseUp;
-	document.onmousemove = drawMouseMove;
-	*/
+
 	try {
 		
 		CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
@@ -1652,12 +1637,6 @@ function onsliderchange(ev) {
 }
 function onsliderstop(ev) {
 	if (normslider.curslider.el !== null) {
-		/*if (hasTouch) {
-			document.removeEventListener('touchmove',onsliderchange);
-		} else {
-			normslider.curslider.el.parentNode.onmousemove = null;
-		}
-		*/
 		hasTouch = false;
 		$(document).off("touchmove.normslider touchend.normslider");
 		$(document).off("mousemove.normslider mouseup.normslider");
