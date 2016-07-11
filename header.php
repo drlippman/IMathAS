@@ -62,7 +62,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	//merged, eliminating original AsciiMath display; MathJax only now
 	if (isset($useeditor) && $sessiondata['useed']==1) {
 		echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=070616\" type=\"text/javascript\"></script>\n";
+		echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=071116\" type=\"text/javascript\"></script>\n";
 	}
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
@@ -81,7 +81,7 @@ if (!isset($sessiondata['mathdisp'])) {
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=070616\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=071116\" type=\"text/javascript\"></script>\n";
 	
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
@@ -105,7 +105,7 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
 	echo '</script>'; 
-	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=070616\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=071116\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; function rendermathnode(el) {AMprocessNode(el);}</script>";
