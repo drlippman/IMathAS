@@ -2311,10 +2311,27 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 	} else if ($anstype == 'draw') {
 		if ($multi>0) {
-			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
-			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
-				else if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
-			if (isset($options['background'][$qn])) { $backg = $options['background'][$qn];}
+			if (isset($options['grid'])) {
+				if (is_array($options['grid']) && isset($options['grid'][$qn])) {
+					$grid = $options['grid'][$qn];
+				} else if (!is_array($options['grid'])) {
+					$grid = $options['grid'];
+				}
+			}
+			if (isset($options['snaptogrid'])) {
+				if (is_array($options['snaptogrid']) && isset($options['snaptogrid'][$qn])) {
+					$snaptogrid = $options['snaptogrid'][$qn];
+				} else if (!is_array($options['snaptogrid'])) {
+					$snaptogrid = $options['snaptogrid'];
+				}
+			}
+			if (isset($options['background'])) {
+				if (is_array($options['background']) && isset($options['background'][$qn])) {
+					$background = $options['background'][$qn];
+				} else if (!is_array($options['background'])) {
+					$background = $options['background'];
+				}
+			}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
 		} else {
@@ -4388,9 +4405,20 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return $correct;
 	} else if ($anstype=='draw') {
 		if ($multi>0) {
-			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
-			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
-				else if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
+			if (isset($options['grid'])) {
+				if (is_array($options['grid']) && isset($options['grid'][$qn])) {
+					$grid = $options['grid'][$qn];
+				} else if (!is_array($options['grid'])) {
+					$grid = $options['grid'];
+				}
+			}
+			if (isset($options['snaptogrid'])) {
+				if (is_array($options['snaptogrid']) && isset($options['snaptogrid'][$qn])) {
+					$snaptogrid = $options['snaptogrid'][$qn];
+				} else if (!is_array($options['snaptogrid'])) {
+					$snaptogrid = $options['snaptogrid'];
+				}
+			}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
 			if (isset($options['partweights'][$qn])) {$partweights = $options['partweights'][$qn];}
