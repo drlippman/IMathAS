@@ -234,6 +234,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
+	global $imasroot;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
