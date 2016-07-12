@@ -169,6 +169,42 @@ span.wideformright {
 	margin-bottom: 10px;
 	text-align: left;
 }
+input.form {
+	display: block;
+	width: 200px;
+	float: left;
+	margin-bottom: 10px;
+}
+
+div.submit {
+	margin-top: 10px;
+	width: 400px;
+	text-align: right;
+}
+
+@media only screen and (max-width: 760px) {
+	span.form {
+		width: auto;
+		float: none;
+		text-align: left;
+		margin-bottom: 5px;
+		padding-right: 0px;
+	}
+	span.formright, span.wideformright {
+		width: auto;
+		float: none;
+	}
+	div.submit {
+		width: auto;
+	}
+	span.formright input[type="text"], span.formright input[type="password"] {
+		max-width: 100%;
+	}
+}
+
+div.editor {
+	margin-bottom: 10px;
+}
 
 span.column {
 	display: block;
@@ -181,17 +217,7 @@ span.left {
 	float: left;
 }
 
-input.form {
-	display: block;
-	width: 200px;
-	float: left;
-	margin-bottom: 10px;
-}
 
-div.submit {
-	width: 400px;
-	text-align: right;
-}
 
 br.form {
 	clear: left;
@@ -201,6 +227,10 @@ img {
 }
 img.mida {
 	vertical-align: middle;
+}
+p img {
+	max-width: 95%;
+	height: auto;	
 }
 div.right {
 	text-align: right;	
@@ -617,6 +647,21 @@ div.multiselitem {
 	float: right;
 	cursor: pointer;
 }
+
+pre {
+	font-size: medium;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
 .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}
 .fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
 .video-wrapper-wrapper{width:100%;padding:0;}	

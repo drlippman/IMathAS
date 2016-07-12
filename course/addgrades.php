@@ -36,6 +36,7 @@
 	}
 	$cid = $_GET['cid'];
 	
+	
 	if (isset($_GET['del']) && $isteacher) {
 		if (isset($_GET['confirm'])) {
 			$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['del']}'";
@@ -173,6 +174,31 @@
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid={$_GET['cid']}");
 		}
 		exit;
+	}
+	
+	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
+		$gbmode = $_GET['gbmode'];
+	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
+		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else {
+		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$gbmode = mysql_result($result,0,0);	
+	}
+	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
+	
+	if (isset($tutorsection) && $tutorsection!='') {
+		$secfilter = $tutorsection;
+	} else {
+		if (isset($_GET['secfilter'])) {
+			$secfilter = $_GET['secfilter'];
+			$sessiondata[$cid.'secfilter'] = $secfilter;
+			writesessiondata();
+		} else if (isset($sessiondata[$cid.'secfilter'])) {
+			$secfilter = $sessiondata[$cid.'secfilter'];
+		} else {
+			$secfilter = -1;
+		}
 	}
 	
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
@@ -492,9 +518,12 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			} else {
 				$query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
 			}
-			if ($istutor && isset($tutorsection) && $tutorsection!='') {
-				$query .= " AND imas_students.section='$tutorsection' ";
-			}
+		}
+		if ($secfilter != -1) {
+			$query .= " AND imas_students.section='$secfilter' ";
+		}
+		if ($hidelocked) {
+			$query .= ' AND imas_students.locked=0 ';
 		}
 		if ($hassection && $sortorder=="sec") {
 			 $query .= " ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
@@ -505,6 +534,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 	
 		while ($row = mysql_fetch_row($result)) {
 			if ($row[4]>0) {
+				if ($hidelocked) { continue; }
 				echo '<tr><td style="text-decoration: line-through;">';
 			} else {
 				echo '<tr><td>';

@@ -17,7 +17,7 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			} 
 		}
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			
 		exit;	
 	}
@@ -34,7 +34,7 @@ function addcategory() {
 function quickpick() {
 	$('select.qsel').each(function() {
 		if ($(this).val()==0) {
-			$(this).find('optgroup[label=Libraries] option:first').prop('selected',true);
+			$(this).find('optgroup[label='+document.getElementById("label").value+'] option:first').prop('selected',true);
 		}
 	});
 }
@@ -51,6 +51,36 @@ function resetcat() {
 	if (confirm("Are you SURE you want to reset all categories to Uncategorized/Default?")) {
 		$('select.qsel').val(0);
 	}
+}
+function previewq(formn,loc,qn) {
+	var addr = '$imasroot/course/testquestion.php?cid=$cid&checked=1&qsetid='+qn+'&loc=c'+loc+'&formn='+formn;
+	previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
+	previewpop.focus();
+}
+
+function getnextprev(formn,loc) {
+	var form = document.getElementById(formn);
+	var prevq = 0; var nextq = 0; var found=false;
+	var prevl = 0; var nextl = 0;
+	for (var e = 0; e < form.elements.length; e++) {
+		var el = form.elements[e];
+		if (typeof el.type == "undefined") {
+			continue;
+		}
+		if (el.type == 'checkbox') {
+			if (found) {
+				nextq = el.value;
+				nextl = el.id;
+				break;
+			} else if (el.id==loc) {
+				found = true;
+			} else {
+				prevq = el.value;
+				prevl = el.id;
+			}
+		}
+	}
+	return ([[prevl,prevq],[nextl,nextq]]);
 }
 </script>
 END;
@@ -70,6 +100,9 @@ END;
 		$outcomearr = array();
 	} else {
 		$outcomearr = unserialize($row[0]);
+		if (!is_array($outcomearr)) {
+			$outcomearr = array();
+		}
 	}
 	
 	$outcomes = array();
@@ -96,16 +129,40 @@ END;
 		$questionlibs[$row[0]][] = $row[1];
 		$libnames[$row[1]] = $row[2];
 	}
-	$query = "SELECT iq.id,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
+
+	//add assessment names as options
+	//find the names of assessments these questionsetids appear in
+	$query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
+	$query .= "FROM imas_questions INNER JOIN imas_assessments ";
+	$query .= "ON imas_questions.assessmentid=imas_assessments.id ";
+	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid='$aid') ";
+	$query .= "AND imas_assessments.courseid='$cid' ";
+	$query .= "ORDER BY aid";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$assessmentnames = array();
+	$qsetidassessment = array();
+	while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
+		//store the relevent assessment names
+		$assessmentnames[$row['aid']] = $row['name'];
+		if ($row['aid']!=$aid) {
+			//remember this other assignment which uses this same questionsetid
+				$qsetidassessment[$row['qsetid']][] = $row['aid'];
+		}
+	}
+
+	$query = "SELECT iq.id,iqs.id AS qsetid,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
 	$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$descriptions = array();
 	$category = array();
 	$extracats = array();
+	$qsetids = array();
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$descriptions[$line['id']] = $line['description'];
 		$category[$line['id']] = $line['category'];
-		if (!is_numeric($line['category']) && trim($line['category'])!='' && !in_array($line['category'],$extracats)) {
+		//remember which questionsetid corresponds to this question
+		$qsetids[$line['id']]=$line['qsetid'];
+		if (!is_numeric($line['category']) && 0!=strncmp($line['category'],"AID-",4) && trim($line['category'])!='' && !in_array($line['category'],$extracats)) {
 			$extracats[] = $line['category'];
 		}
 	}
@@ -124,14 +181,15 @@ END;
 	$itemarr = explode(',', $itemarr);
 	
 	echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
-	echo "<form method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
+	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th>Category</th></tr></thead><tbody>';
+	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
 	
 	foreach($itemarr as $qid) {
-		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\" value=\"{$qsetids[$qid]}\"/></td>";
 		echo "<td>{$descriptions[$qid]}</td><td>";
+		echo "<td><input type=button value=\"Preview\" onClick=\"previewq('selform',$qid,{$qsetids[$qid]})\"/>";
 		echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
@@ -159,7 +217,20 @@ END;
 			if ($category[$qid] == $libnames[$qlibid] && !$issel) { echo "selected=1"; $issel= true;}
 			echo ">{$libnames[$qlibid]}</option>\n";
 		}
-		echo '</optgroup><optgroup label="Custom">';
+		echo '</optgroup>\n';
+		
+		if (isset($qsetidassessment[$qsetids[$qid]])) {
+			echo '<optgroup label="Assessments">';
+			//add assessment names as options
+			foreach ($qsetidassessment[$qsetids[$qid]] as $qaid) {
+				echo '<option value="AID-'.$qaid.'" ';
+				if ($category[$qid] == "AID-$qaid" && !$issel) { echo "selected=1"; $issel= true;}
+				echo ">{$assessmentnames[$qaid]}</option>\n";
+			}
+			echo '</optgroup>\n';
+		}
+
+		echo '<optgroup label="Custom">';
 		foreach ($extracats as $cat) {
 			echo "<option value=\"$cat\" ";
 			if ($category[$qid] == $cat && !$issel) { echo "selected=1";$issel = true;}
@@ -186,11 +257,15 @@ END;
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
 		
 	}
-	echo "<p>Select first listed library for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
+echo "<p>Select first listed <select id=\"label\">\n";
+echo "<option value=\"Libraries\">Libraries</option>";
+echo "<option value=\"Assessments\">Assessments</option>";
+echo "</select>\n";
+echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
 	
-	echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
+	echo "<p>Add new category to lists: <input type=text id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-	echo '<p><input type=submit value="Record Categorizations"> and return to the course page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
+	echo '<p><input type=submit value="Record Categorizations"> and return to the Add/Remove Questions page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
 	echo "</form>\n";
 	
 	

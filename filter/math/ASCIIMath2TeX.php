@@ -84,6 +84,9 @@ array( 'input'=>'//', 'tex'=>'/', 'val'=>true, 'notexcopy'=>TRUE),
 array( 'input'=>'\\\\', 'tex'=>'backslash'),
 array( 'input'=>'setminus', 'output'=>'\\\\', 'definition'=>TRUE),
 array( 'input'=>'xx', 'tex'=>'times'),
+array( 'input'=>'|><', 'tex'=>'ltimes'),
+array( 'input'=>'><|', 'tex'=>'rtimes'),
+array( 'input'=>'|><|', 'tex'=>'bowtie'),
 array( 'input'=>'-:', 'tex'=>'div'),
 array( 'input'=>'divide', 'output'=>'-:', 'definition'=>TRUE),
 array( 'input'=>'&deg;', 'output'=>'^@', 'definition'=>TRUE),
@@ -161,6 +164,7 @@ array( 'input'=>'/_', 'tex'=>'angle'),
 array( 'input'=>'/_\\', 'tex'=>'triangle'),
 array( 'input'=>'\\ ', 'output'=>'\\ ', 'val'=>'true'),
 array( 'input'=>'%', 'tex'=>'%', 'notexcopy'=>TRUE),
+array( 'input'=>'frown'),
 array( 'input'=>'quad'),
 array( 'input'=>'qquad'),
 array( 'input'=>'cdots'),
@@ -744,11 +748,18 @@ function AMTparseExpr($str,$rightbracket) {
 						if ($newFrag{$i}==',' && $mxanynestingd==1) {
 							$subpos[$lastsubposstart][] = $i;
 						}
+						if ($mxanynestingd<0) {  //happens at the end of the row
+							if ($lastsubposstart == $i+1) { //if at end of row, skip to next row
+								$i++;
+							} else { //misformed something - abandon treating as a matrix
+								$matrix = false;
+							}
+						}
 						
 					} 
 					array_push($pos,$len);
 					$lastmxsubcnt = -1;
-					if ($mxnestingd==0 && count($pos)>0) {
+					if ($mxnestingd==0 && count($pos)>0 && $matrix) {
 						for ($i=0; $i<count($pos)-1;$i++) {
 							if ($i>0) { $mxout .= '\\\\';}
 							if ($i==0) {

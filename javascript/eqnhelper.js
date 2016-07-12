@@ -224,4 +224,12 @@ function showeedd(eln) {
 	}
 	cureedd = eln;
 }
+function updateeeddpos() {
+	if (!cureedd) {return;}
+	var dd = document.getElementById("eedd");
+	var el = document.getElementById(cureedd);
+	p = findPos(el);
+	dd.style.left = (p[0]+el.offsetWidth) + "px";
+	dd.style.top = p[1] + "px";
+}
 	

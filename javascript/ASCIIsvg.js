@@ -57,56 +57,10 @@ var aboveleft = "aboveleft";
 var aboveright = "aboveright";
 var belowleft = "belowleft";
 var belowright = "belowright";
-var pi = Math.PI, ln = Math.log, e = Math.E;
-var arcsin = Math.asin, arccos = Math.acos, arctan = Math.atan;
-var sec = function(x) { return 1/Math.cos(x) };
-var csc = function(x) { return 1/Math.sin(x) };
-var cot = function(x) { return 1/Math.tan(x) };
 var xmin, xmax, ymin, ymax, xscl, yscl, 
     xgrid, ygrid, xtick, ytick, initialized;
 var isOldIE = document.createElementNS==null;
 var picture, svgpicture, doc, width, height, a, b, c, d, i, n, p, t, x, y;
-var arcsec = function(x) { return arccos(1/x) };
-var arccsc = function(x) { return arcsin(1/x) };
-var arccot = function(x) { return arctan(1/x) };
-var sinh = function(x) { return (Math.exp(x)-Math.exp(-x))/2 };
-var cosh = function(x) { return (Math.exp(x)+Math.exp(-x))/2 };
-var tanh = 
-  function(x) { return (Math.exp(x)-Math.exp(-x))/(Math.exp(x)+Math.exp(-x)) };
-var sech = function(x) { return 1/cosh(x) };
-var csch = function(x) { return 1/sinh(x) };
-var coth = function(x) { return 1/tanh(x) };
-var arcsinh = function(x) { return ln(x+Math.sqrt(x*x+1)) };
-var arccosh = function(x) { return ln(x+Math.sqrt(x*x-1)) };
-var arctanh = function(x) { return ln((1+x)/(1-x))/2 };
-var sech = function(x) { return 1/cosh(x) };
-var csch = function(x) { return 1/sinh(x) };
-var coth = function(x) { return 1/tanh(x) };
-var arcsech = function(x) { return arccosh(1/x) };
-var arccsch = function(x) { return arcsinh(1/x) };
-var arccoth = function(x) { return arctanh(1/x) };
-var sign = function(x) { return (x==0?0:(x<0?-1:1)) };
-var logten = function(x) { return (Math.LOG10E*Math.log(x)) };
-var sinn = function(n,x) {return Math.pow(Math.sin(x),n)};
-var cosn = function(n,x) {return Math.pow(Math.cos(x),n)};
-var tann = function(n,x) {return Math.pow(Math.tan(x),n)};
-var cscn = function(n,x) {return 1/Math.pow(Math.sin(x),n)};
-var secn = function(n,x) {return 1/Math.pow(Math.cos(x),n)};
-var cotn = function(n,x) {return 1/Math.pow(Math.tan(x),n)};
-
-function factorial(x,n) {
-  if (n==null) n=1;
-  for (var i=x-n; i>0; i-=n) x*=i;
-  return (x<0?NaN:(x==0?1:x));
-}
-
-
-function C(x,k) {
-  var res=1;
-  for (var i=0; i<k; i++) res*=(x-i)/(k-i);
-  return res;
-}
-
 
 function chop(x,n) {
   if (n==null) n=0;
@@ -365,6 +319,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
       qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
       qnode.setAttribute("width",picture.getAttribute("width"));
       qnode.setAttribute("height",picture.getAttribute("height"));
+      qnode.setAttribute("alt",picture.getAttribute("alt"));
       if (picture.parentNode!=null)
         picture.parentNode.replaceChild(qnode,picture);
       else
@@ -986,231 +941,6 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
   svgpicture.appendChild(pnode);
 }
 
-function safepow(base,power) {
-	if (base<0 && Math.floor(power)!=power) {
-		for (var j=3; j<50; j+=2) {
-			if (Math.abs(Math.round(j*power)-(j*power))<.000001) {
-				if (Math.round(j*power)%2==0) {
-					return Math.pow(Math.abs(base),power);
-				} else {
-					return -1*Math.pow(Math.abs(base),power);
-				}
-			}
-		}
-		return Math.sqrt(-1);
-	} else {
-		return Math.pow(base,power);
-	}
-}
-
-function nthroot(n,base) {
-	return safepow(base,1/n);
-}
-function nthlogten(n,v) {
-	return ((Math.log(v))/(Math.log(n)));
-}
-function matchtolower(match) {
-	return match.toLowerCase();
-}
-function functoindex(match) {
-	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
-	for (var i=0;i<func.length;i++) {
-		if (func[i]==match) {
-			return '@'+i+'@';
-		}
-	}
-}
-function indextofunc(match, contents) {
-	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
-	return func[contents];
-}
-
-function mathjs(st,varlist) {
-  //translate a math formula to js function notation
-  // a^b --> pow(a,b)
-  // na --> n*a
-  // (...)d --> (...)*d
-  // n! --> factorial(n)
-  // sin^-1 --> arcsin etc.
-  //while ^ in string, find term on left and right
-  //slice and concat new formula string
-  //parenthesizes the function variables
-  st = st.replace("[","(");
-  st = st.replace("]",")");
-  st = st.replace(/root\s*(\d+)/,"root($1)");
-  st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
-  st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/gi, matchtolower);
-  if (varlist != null) {
-	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
-  	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
-	  st = st.replace(reg,"$1#(");
-	  var reg = new RegExp("("+varlist+")("+varlist+")$","g");
-	  st = st.replace(reg,"($1)($2)");
-	  var reg = new RegExp("("+varlist+")(a#|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)","g");
-	  st = st.replace(reg,"($1)$2");
-	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z#])","g"); // 10/25/10 re-removed \( for x(1+x); moved f() handling to AMhelpers;  6/1/09 readded \( for f(350/x)
-	  st = st.replace(reg,"($1)($2)$3"); //get xy3
-	 // var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
-	  //st = st.replace(reg,"($1)($2)$3"); //get xysin
-	  var reg = new RegExp("([^a-df-zA-Z#])("+varlist+")([^a-df-zA-Z#])","g");
-	  st = st.replace(reg,"$1($2)$3");
-	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
-	  st = st.replace(reg,"$1($2)$3");	  
-	  var reg = new RegExp("^("+varlist+")([^a-df-zA-Z])","g");
-	  st = st.replace(reg,"($1)$2");
-	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
-	  st = st.replace(reg,"$1($2)");
-	  st = st.replace(/@(\d+)@/g, indextofunc);
-  }
-  st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
-  st = st.replace(/#/g,"");
-  st = st.replace(/\s/g,"");
-  st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
-  st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
-  st = st.replace(/log/g,"logten");
-  
-  if (st.indexOf("^-1")!=-1) {
-    st = st.replace(/sin\^-1/g,"arcsin");
-    st = st.replace(/cos\^-1/g,"arccos");
-    st = st.replace(/tan\^-1/g,"arctan");
-    st = st.replace(/sec\^-1/g,"arcsec");
-    st = st.replace(/csc\^-1/g,"arccsc");
-    st = st.replace(/cot\^-1/g,"arccot");
-    st = st.replace(/sinh\^-1/g,"arcsinh");
-    st = st.replace(/cosh\^-1/g,"arccosh");
-    st = st.replace(/tanh\^-1/g,"arctanh");
-    st = st.replace(/sech\^-1/g,"arcsech");
-    st = st.replace(/csch\^-1/g,"arccsch");
-    st = st.replace(/coth\^-1/g,"arccoth");
-  }
-  st = st.replace(/(sin|cos|tan|sec|csc|cot)\^(\d+)\(/g,"$1n($2,");
-  st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
-  //st = st.replace(/E/g,"(EE)");
-  st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
-  
-  st = st.replace(/^e$/g,"(E)");
-  st = st.replace(/pi/g,"(pi)");
-  st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
-  st = st.replace(/([^a-zA-Z])e$/g,"$1(E)");
-  
-  st = st.replace(/([^a-zA-Z])e(?=[^a-zA-Z])/g,"$1(E)");
-  st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
-  st = st.replace(/(!)([0-9\(])/g,"$1*$2");
-  //want to keep scientific notation
-  st= st.replace(/([0-9])\*\(EE\)([\-0-9])/,"$1e$2");
-
-  
-  st = st.replace(/\)([\(0-9a-zA-Z])/g,"\)*$1");
-  
-  var i,j,k, ch, nested;
-  while ((i=st.indexOf("^"))!=-1) {
-
-    //find left argument
-    if (i==0) return "Error: missing argument";
-    j = i-1;
-    ch = st.charAt(j);
-    if (ch>="0" && ch<="9") {// look for (decimal) number
-      j--;
-      while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
-      if (ch==".") {
-        j--;
-        while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
-      }
-    } else if (ch==")") {// look for matching opening bracket and function name
-      nested = 1;
-      j--;
-      while (j>=0 && nested>0) {
-        ch = st.charAt(j);
-        if (ch=="(") nested--;
-        else if (ch==")") nested++;
-        j--;
-      }
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
-        j--;
-    } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
-      j--;
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
-        j--;
-    } else { 
-      return "Error: incorrect syntax in "+st+" at position "+j;
-    }
-    //find right argument
-    if (i==st.length-1) return "Error: missing argument";
-    k = i+1;
-    ch = st.charAt(k);
-    nch = st.charAt(k+1);
-    if (ch>="0" && ch<="9" || (ch=="-" && nch!="(") || ch==".") {// look for signed (decimal) number
-      k++;
-      while (k<st.length && (ch=st.charAt(k))>="0" && ch<="9") k++;
-      if (ch==".") {
-        k++;
-        while (k<st.length && (ch=st.charAt(k))>="0" && ch<="9") k++;
-      }
-    } else if (ch=="(" || (ch=="-" && nch=="(")) {// look for matching closing bracket and function name
-      if (ch=="-") { k++;}
-      nested = 1;
-      k++;
-      while (k<st.length && nested>0) {
-        ch = st.charAt(k);
-        if (ch=="(") nested++;
-        else if (ch==")") nested--;
-        k++;
-      }
-    } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
-      k++;
-      while (k<st.length && (ch=st.charAt(k))>="a" && ch<="z" ||
-               ch>="A" && ch<="Z") k++;
-      if (ch=='(' && st.slice(i+1,k).match(/^(sin|cos|tan|sec|csc|cot|logten|log|ln|exp|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|sqrt|abs|nthroot)$/)) {
-	      nested = 1;
-	      k++;
-	      while (k<st.length && nested>0) {
-		ch = st.charAt(k);
-		if (ch=="(") nested++;
-		else if (ch==")") nested--;
-		k++;
-	      }
-      }
-    } else { 
-      return "Error: incorrect syntax in "+st+" at position "+k;
-    }
-    st = st.slice(0,j+1)+"safepow("+st.slice(j+1,i)+","+st.slice(i+1,k)+")"+
-           st.slice(k);
-  }
-  while ((i=st.indexOf("!"))!=-1) {
-    //find left argument
-    if (i==0) return "Error: missing argument";
-    j = i-1;
-    ch = st.charAt(j);
-    if (ch>="0" && ch<="9") {// look for (decimal) number
-      j--;
-      while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
-      if (ch==".") {
-        j--;
-        while (j>=0 && (ch=st.charAt(j))>="0" && ch<="9") j--;
-      }
-    } else if (ch==")") {// look for matching opening bracket and function name
-      nested = 1;
-      j--;
-      while (j>=0 && nested>0) {
-        ch = st.charAt(j);
-        if (ch=="(") nested--;
-        else if (ch==")") nested++;
-        j--;
-      }
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
-        j--;
-    } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
-      j--;
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
-        j--;
-    } else { 
-      return "Error: incorrect syntax in "+st+" at position "+j;
-    }
-    st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
-  }
-  return st;
-}
-
 
 function slopefield(fun,dx,dy) {
   var g = fun;
@@ -1259,7 +989,7 @@ function parseShortScript(sscript,gw,gh) {
 	picture.setAttribute("height", sa[10]);
 	picture.style.width = sa[9] + "px";
 	picture.style.height = sa[10] + "px";
-	
+
 	if (sa.length > 10) {
 		commands = 'setBorder(5);';
 		commands += 'width=' +sa[9] + '; height=' +sa[10] + ';';
@@ -1267,31 +997,45 @@ function parseShortScript(sscript,gw,gh) {
 		commands += 'axes(' + sa[4] +','+ sa[5] +','+ sa[6] +','+ sa[7] +','+ sa[8]+ ');';
 				
 		var inx = 11;
-		var eqnlist = 'Graphs: ';
+		var varlet = '';
+		var eqnlist = 'Graphs on the window x='+sa[0]+' to '+sa[1]+' and y='+sa[2]+' to '+sa[3]+': ';
 		
 		while (sa.length > inx+9) {
 		   commands += 'stroke="' + sa[inx+7] + '";';
+		   eqnlist += sa[inx+7] + " ";
 		   commands += 'strokewidth="' + sa[inx+8] + '";'
 		   //commands += 'strokedasharray="' + sa[inx+9] + '";'	
 		   if (sa[inx+9] != "") {
 			   commands += 'strokedasharray="' + sa[inx+9].replace(/\s+/g,',') + '";';
+			   if (sa[inx+9]=='2') {
+			   	   eqnlist += "dotted ";
+			   } else if (sa[inx+9]=='5') {
+			   	   eqnlist += "dashed ";
+			   } else if (sa[inx+9]=='5 2') {
+			   	   eqnlist += "tight dashed ";
+			   } else if (sa[inx+9]=='7 3 2 3') {
+			   	   eqnlist += "dash-dot ";
+			   } 
 		   }
 		   if (sa[inx]=="slope") {
-			   eqnlist += "dy/dx="+sa[inx+1] + "; ";
+			   eqnlist += "slopefield where dy/dx="+sa[inx+1] + ". ";
 			commands += 'slopefield("' + sa[inx+1] + '",' + sa[inx+2] + ',' + sa[inx+2] + ');'; 
 		   } else if (sa[inx]=="label") {
-			   eqnlist += "label="+sa[inx+1] + "; ";
+			   eqnlist += "label with text "+sa[inx+1] + ' at the point ('+sa[inx+5]+','+sa[inx+6]+'). ';
 			   commands += 'text(['+sa[inx+5]+','+sa[inx+6]+'],"'+sa[inx+1]+'");';
 		   } else {
 			if (sa[inx]=="func") {
-				eqnlist += "y="+sa[inx+1] + "; ";
+				eqnlist += "graph of y="+sa[inx+1];
 				eqn = '"' + sa[inx+1] + '"';
+				varlet = 'x';
 			} else if (sa[inx] == "polar") {
-				eqnlist += "r="+sa[inx+1] + "; ";
+				eqnlist += "polar graph of r="+sa[inx+1];
 				eqn = '["cos(t)*(' + sa[inx+1] + ')","sin(t)*(' + sa[inx+1] + ')"]';
+				varlet = 'r';
 			} else if (sa[inx] == "param") {
-				eqnlist += "[x,y]=["+sa[inx+1] + "," + sa[inx+2] + "]; ";
+				eqnlist += "parametric graph of x(t)="+sa[inx+1] + ", y(t)=" + sa[inx+2];
 				eqn = '["' + sa[inx+1] + '","'+ sa[inx+2] + '"]';
+				varlet = 't';
 			}
 			
 			
@@ -1299,13 +1043,31 @@ function parseShortScript(sscript,gw,gh) {
 		//	if ((sa[inx+5]!='null')&&(sa[inx+5].length>0)) {
 				//commands += 'myplot(' + eqn +',"' + sa[inx+3] +  '","' + sa[inx+4]+'",' + sa[inx+5] + ',' + sa[inx+6]  +');';
 				commands += 'plot(' + eqn +',' + sa[inx+5] + ',' + sa[inx+6] +',null,null,' + sa[inx+3] +  ',' + sa[inx+4] +');';
-			
+				eqnlist += " from " + varlet + '='+sa[inx+5]+ ' ';
+				if (sa[inx+3]==1) { 
+					eqnlist += 'with an arrow ';
+				} else if (sa[inx+3]==2) {
+					eqnlist += 'with an open dot ';
+				} else if (sa[inx+3]==3) {
+					eqnlist += 'with a closed dot ';
+				}
+				eqnlist += "to "+varlet+'='+sa[inx+6]+' ';
+				if (sa[inx+4]==1) { 
+					eqnlist += 'with an arrow ';
+				} else if (sa[inx+4]==2) {
+					eqnlist += 'with an open dot ';
+				} else if (sa[inx+4]==3) {
+					eqnlist += 'with a closed dot ';
+				}
 			} else {
 				commands += 'plot(' + eqn +',null,null,null,null,' + sa[inx+3] +  ',' + sa[inx+4]+');';
 			}
+			eqnlist += '. ';
 		   }
 		   inx += 10;
 		}
+	
+		picture.setAttribute("alt",eqnlist);
 		
 		try {
 			eval(commands);
@@ -1314,7 +1076,7 @@ function parseShortScript(sscript,gw,gh) {
 			//alert("Graph not ready");
 		}
 		
-		picture.setAttribute("alt",eqnlist);
+		
 		//picture.setAttribute("width", sa[9]);
 		//picture.setAttribute("height", sa[9]);
 		

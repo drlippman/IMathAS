@@ -129,6 +129,9 @@ if ($row[0]=='') {
 	$outcomes = array();
 } else {
 	$outcomes = unserialize($row[0]);
+	if (!is_array($outcomes)) {
+		$outcomes = array();
+	}
 }
 
 $outcomeinfo = array();

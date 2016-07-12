@@ -1,0 +1,11 @@
+body {
+	background-color: none;
+}
+div.question {
+	background: none;
+	border: none;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.4;
+}
+

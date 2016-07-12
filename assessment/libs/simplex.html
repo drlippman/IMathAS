@@ -1,10 +1,10 @@
 <html><body>
 <h1>Macro Library simplex</h1>
-&nbsp;Simplex method functions
+&nbsp;Simplex method with mixed constraints solver
 <BR>&nbsp;Mike Jenck, Originally developed May 16-26, 2014
 <BR>&nbsp;licensed under GPL version 2 or later
 <BR>&nbsp;
-<BR>&nbsp;File Version : 21
+<BR>&nbsp;File Version : 26
 <BR>
 <BR><ul>
 <li><a href="#simplex">simplex</a></li>
@@ -15,128 +15,158 @@
 <li><a href="#simplexconverttofraction">simplexconverttofraction</a></li>
 <li><a href="#simplexdebug">simplexdebug</a></li>
 <li><a href="#simplexdefaultheaders">simplexdefaultheaders</a></li>
-<li><a href="#simplexdisplaytable">simplexdisplaytable</a></li>
+<li><a href="#simplexdisplaycolortable">simplexdisplaycolortable</a></li>
 <li><a href="#simplexdisplaylatex">simplexdisplaylatex</a></li>
-<li><a href="#simplexfindpivotpoint">simplexfindpivotpoint</a></li>
-<li><a href="#simplexgetentry">simplexgetentry</a></li>
-<li><a href="#simplexsetentry">simplexsetentry</a></li>
-<li><a href="#simplexnumberofsolutions">simplexnumberofsolutions</a></li>
-<li><a href="#simplexpivot">simplexpivot</a></li>
-<li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
-<li><a href="#simplexreadsolution">simplexreadsolution</a></li>
-<li><a href="#simplexsolutiontolatex">simplexsolutiontolatex</a></li>
-<li><a href="#simplexsolve">simplexsolve</a></li>
-<li><a href="#simplexfindsolutioninlist">simplexfindsolutioninlist</a></li>
 <li><a href="#simplexdisplaylatex2">simplexdisplaylatex2</a></li>
 <li><a href="#simplexdisplaytable2">simplexdisplaytable2</a></li>
 <li><a href="#simplexdisplaytable2string">simplexdisplaytable2string</a></li>
+<li><a href="#simplexfindpivotpoint">simplexfindpivotpoint</a></li>
+<li><a href="#simplexfindpivotpointmixed">simplexfindpivotpointmixed</a></li>
+<li><a href="#simplexgetentry">simplexgetentry</a></li>
+<li><a href="#simplexpivot">simplexpivot</a></li>
+<li><a href="#simplexreadtoanswerarray">simplexreadtoanswerarray</a></li>
+<li><a href="#simplexreadsolution">simplexreadsolution</a></li>
+<li><a href="#simplexsetentry">simplexsetentry</a></li>
+<li><a href="#simplexsolutiontolatex">simplexsolutiontolatex</a></li>
 <li><a href="#simplexsolve2">simplexsolve2</a></li>
+<li><a href="#createsimplexelement">createsimplexelement</a></li>
+<li><a href="#simplextoarray">simplextoarray</a></li>
+<li><a href="#verifytype">verifytype</a></li>
+<li><a href="#verifyconstraints">verifyconstraints</a></li>
+<li><a href="#hasmixedconstraints">hasmixedconstraints</a></li>
+<li><a href="#simplexfindsolutioninlist">simplexfindsolutioninlist</a></li>
+<li><a href="#simplexhasmixedconstrants">simplexhasmixedconstrants</a></li>
+<li><a href="#simplexdisplaytable">simplexdisplaytable</a></li>
+<li><a href="#simplexnumberofsolutions">simplexnumberofsolutions</a></li>
+<li><a href="#simplexsolve">simplexsolve</a></li>
 </ul>
 <h3><a name="simplex">simplex</a></h3>
 &nbsp;function simplex(type, objective, constraints)
-<BR>&nbsp;Creates and returns a new simplex matrix.  entries are fractions 
+<BR>&nbsp;Creates and returns a new simplex matrix. elements are fractions 
 <BR>&nbsp;stored in the form of an array(numerator, denominator).
 <BR>
-<BR>&nbsp;use simplexdisplaytable() to create a string that can be used for display
+<BR>&nbsp;INPUTS:
 <BR>
 <BR>&nbsp;type: a string that contains either "max" or "min"
-<BR>&nbsp;objective: list or array of the coefficeients 
+<BR>&nbsp;objective: list or array of the coefficients 
+<BR>&nbsp;constraints: an array that contains the inequality information. Constraints are composed of
+<BR>			  three parts:
+<BR>				  first  part is a list or array of the coefficients in the inequality
+<BR>				  second part is the inequality '<=' or '>='
+<BR>				  third  part is the right hand number
 <BR>
-<BR>&nbsp;example: if f = x1+7x2+5x3 then
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$objective = array(1,7,5)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$objective = "1,7,5"
+<BR>&nbsp;Examples
 <BR>
-<BR>&nbsp;constraints: an array that contains the inequality information. Constraints are in the
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form of:
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(array(3,1,0),"<=",35) 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;or 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array("3,1,0","<=",35)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraint first  part is a list or array of the coefficeients in the inequality
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraint second part is the inequality '<=' or '>='
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraint third  part is the right hand number
+<BR>&nbsp;objective function: f = x1+7x2+5x3
+<BR>						$objective = array(1,7,5)
+<BR>							  or
+<BR>						$objective = "1,7,5"
+<BR>&nbsp;constraint inequality: 3x1+x3 <= 35
+<BR>						$constraints[0] = array(array(3,1,0),"<=",35)
+<BR>							  or
+<BR>						$constraints[0] = array("3,1,0","<=",35)
+<BR>							 first part: array(3,0,1) or "3,0,1"
+<BR>							 second part: "<="
+<BR>							 third part: 35
 <BR>
-<BR>&nbsp;example  3x1+x3 <= 35
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;first part: array(3,0,1) or "3,0,1"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;second part: "<="
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;third part: 35
+<BR>&nbsp;use simplexdisplaytable() to create a string that can be used for display
 <BR><h3><a name="simplexchecksolution">simplexchecksolution</a></h3>
-&nbsp;simplexchecksolution(type,HasObjective,solutionlist,stuanswer)
+&nbsp;simplexchecksolution(type,HasObjective,solutionlist,stuanswer, [ismixed=FALSE])
+<BR>
+<BR>&nbsp;INPUTS:
 <BR>
 <BR>&nbsp;type: a string that contains either "max" or "min"
 <BR>&nbsp;HasObjective: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 0 Objective is not included in the $stuanswer array
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 Objective is included and is the last column in the $stuanswer array
+<BR>	   default 0 Objective value is not included in the stuanswer array
+<BR>			   1 Objective value is included and is the last column in the stuanswer array
 <BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is returned from simplexsolve
+<BR>			
+<BR>			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+<BR>			etc.
+<BR>			This is returned from simplexsolve
 <BR>
+<BR>&nbsp;ismixed: an optional flag for the function that tells the routine to read max values instead of min ones for mixed constraints
+<BR>		  default is  FALSE
 <BR>
 <BR>&nbsp;stuanswer: the answer the student submitted
 <BR>
 <BR>
-<BR>&nbsp;returns:  0 if no match is found, 1 if a match is found
+<BR>&nbsp;RETURNS:  0 if no match is found, 1 if a match is found
 <BR><h3><a name="simplexcreateanswerboxentrytable">simplexcreateanswerboxentrytable</a></h3>
 function simplexcreateanswerboxentrytable(rows, cols, [startnumber, matrixname, linemode, header, tablestyle]) 
 <BR>&nbsp;Create a string that is a valid HTML table syntax for displaying answerboxes.
+<BR>
+<BR>&nbsp;INPUTS:
 <BR>&nbsp;rows: number of rows to make
 <BR>&nbsp;cols: number of columns to make
+<BR>
 <BR>&nbsp;optional
 <BR>&nbsp;startnumber: the starting number for the answerbox.  Default is 0 
 <BR>&nbsp;matrixname: a string that holds the matrix name, like A or B.  This does not contain 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tick marks - if you want them you need to supply them.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default empty string
-<BR>&nbsp;linemode: Show none, augments, or simplex, value is either 0, 1 or 2
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 show no lines
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 show aumented line
-<BR>&nbsp;&nbsp;&nbsp;default 2 show simplex  lines
+<BR>			 tick marks or brackets - if you want them you need to supply them.
+<BR>	default empty string
+<BR>
+<BR>&nbsp;linemode: Show none, augmented, or simplex, value is either 0, 1 or 2
+<BR>		   0 show no lines
+<BR>		   1 show augmented line
+<BR>	default 2 show simplex  lines
+<BR>
 <BR>&nbsp;header: list or array of the variables "x1,x2,x3" that are used for the column titles.
 <BR>&nbsp;default none
+<BR>
 <BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
+<BR>	default none
+<BR>
+<BR>&nbsp;RETURNS: valid HTML table syntax for displaying answerboxes
 <BR><h3><a name="simplexcreateinequalities">simplexcreateinequalities</a></h3>
 &nbsp;function simplexcreateinequalities(type, objectivevariable, objective, constraints, [headers, displayASCIIticks, showfractions, includeinequalities] )
-<BR>&nbsp;Creates and returns an array of string that correspond to each line of the simple inequalities
+<BR>&nbsp;Creates an array of string that correspond to each line of the simple inequalities
 <BR>
-<BR>&nbsp;type:        a string that contains either "max" or "min"
+<BR>&nbsp;INPUTS:
+<BR>
+<BR>&nbsp;type:		a string that contains either "max" or "min"
 <BR>&nbsp;objectivevariable: the name of the objective function, like f of g.
-<BR>&nbsp;objective:   list or array of the coefficeients 
+<BR>&nbsp;objective:   list or array of the coefficients 
 <BR>&nbsp;constraints: an array that contains the inequality information. Constraints are in the
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form of array(array(3,1,0),"<=",35)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraint first  part is a list or array of the coefficeients in the inequality
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraint second part is the inequality *<= or >=)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;constraint third  part is the number on the other side of the inequality
-<BR>&nbsp;optional
-<BR>&nbsp;headers:     list or array of the variables 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default "x1,x2,x3, ..." for max
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default "y1,y2,y3, ..." for min
-<BR>&nbsp;displayASCIIticks: put tick marks around each element of the table, either 0 or 1.  Use 0
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if you are building an answerbox matrix.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 do not use math ticks
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1        use math ticks
+<BR>			  form of array(array(3,1,0),"<=",35)
+<BR>			  constraint first  part is a list or array of the coefficients in the inequality
+<BR>			  constraint second part is the inequality *<= or >=)
+<BR>			  constraint third  part is the number on the other side of the inequality
+<BR>
+<BR>&nbsp;OPTIONAL
+<BR>
+<BR>&nbsp;headers:	 list or array of the variables names to use  
+<BR>	  default "x1,x2,x3, ..." for max
+<BR>	  default "y1,y2,y3, ..." for min
+<BR>&nbsp;displayASCIIticks: put tick marks around each element of the table, either 0 or 1.  
+<BR>					0 do not use math ticks
+<BR>			default 1		use math ticks
+<BR>					Use 0 if you are building an answerbox matrix.
+<BR>
 <BR>&nbsp;showfractions: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions
+<BR>				0 shows decimals
+<BR>		default 1 shows fractions
+<BR>
 <BR>&nbsp;includeinequalities: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 does append the inequality and right hand sinde number ("<=",35)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 include the full inequality
+<BR>					  0 does append the inequality and right hand sinde number ("<=",35)
+<BR>			  default 1 include the full inequality
+<BR>
+<BR>&nbsp;RETURNS: an array of strings
 <BR><h3><a name="simplexconverttodecimals">simplexconverttodecimals</a></h3>
 function simplexconverttodecimals(simplexmatrix)
 <BR>
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
-<BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
-<BR>
+<BR>&nbsp;this function takes the simplex matrix and converts all elements to decimals 
+<BR>										  (usefull when displaying the matrix)
 <BR><h3><a name="simplexconverttofraction">simplexconverttofraction</a></h3>
 function simplexconverttofraction(simplexmatrix)
 <BR>
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
-<BR>&nbsp;this function takes the simplex matrix and converts it to fractions for displaying
-<BR>
+<BR>&nbsp;this function takes the simplex matrix and converts  all elements to fractions 
+<BR>				using "/" as the fraction bar (usefull when displaying the matrix)
 <BR><h3><a name="simplexdebug">simplexdebug</a></h3>
 function simplexdebug(simplexmatrix)
 <BR>
@@ -150,136 +180,208 @@ function simplexdebug(simplexmatrix)
 <BR><h3><a name="simplexdefaultheaders">simplexdefaultheaders</a></h3>
 &nbsp;function simplexdefaultheaders(simplexmatrix,type)
 <BR>
+<BR>&nbsp;INPUTS
+<BR>
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>&nbsp;type: a string that contains either "max" or "min" 
 <BR>
 <BR>&nbsp;creates the default header (x1,x2, ...,s1,s2,...) for max and
-<BR>&nbsp;&nbsp;&nbsp;(x1,x2, ...,y1,y2,...) for min.
+<BR>							(x1,x2, ...,y1,y2,...) for min.
 <BR>
-<BR>&nbsp;sm:   simplex matrix
-<BR>&nbsp;type: max or min
-<BR><h3><a name="simplexdisplaytable">simplexdisplaytable</a></h3>
-simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), $tablestyle = ""]) 
+<BR>&nbsp;RETURNS: a string
+<BR><h3><a name="simplexdisplaycolortable">simplexdisplaycolortable</a></h3>
+simplexdisplaycolortable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), tabletextcolor = "black"]) 
+<BR>
 <BR>&nbsp;Create a string that is a valid HTML table syntax for display.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
-<BR>&nbsp;optional
+<BR>&nbsp;OPTIONAL
 <BR>&nbsp;simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are creating a simplex display
+<BR>					are creating a simplex display
 <BR>&nbsp;displayASCII: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 do not use math ticks
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1        use math ticks
+<BR>				0 do not use math ticks
+<BR>		default 1		use math ticks
 <BR>&nbsp;mode: either 0, 1 or 2
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 show no lines
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 show aumented line
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 show simplex  lines
+<BR>		0 show no lines
+<BR>		1 show aumented line
+<BR>		2 show simplex  lines
 <BR>&nbsp;showfractions: either -1, 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-1 show as string 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 convert simplex element to a decimal
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 convert simplex element to a fraction
+<BR>				-1 show as string 
+<BR>				 0 convert simplex element to a decimal
+<BR>		 default 1 convert simplex element to a fraction using "/" as the fraction bar
 <BR>&nbsp;pivot: list or array that contains the row, column, border color, and text color.  This puts a  
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;border around the cell at (row,col). Both row and column are ZERO based.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;default point none
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;default border color = blue
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;default text  color  = black
+<BR>		 border around the cell at (row,col). Both row and column are ZERO based.
+<BR>	default point none
+<BR>	default border color = blue
+<BR>	default text  color  = black
+<BR>&nbsp;headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
+<BR>&nbsp;&nbsp;&nbsp;default none
+<BR>&nbsp;tabletextcolor: text color for the table
+<BR>	  default black
+<BR>
+<BR>&nbsp;RETURNS: a string that is a valid HTML table syntax for display.
+<BR><h3><a name="simplexdisplaylatex">simplexdisplaylatex</a></h3>
+simplexdisplaylatex(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1)])
+<BR>
+<BR>&nbsp;Create a string that is a valid latex syntax for display.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;OPTIONAL
+<BR>&nbsp;simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
+<BR>					  are creating a simplex for display
+<BR>&nbsp;showfractions: either 0 or 1
+<BR>				 0 convert simplex element to a decimal
+<BR>		 default 1 convert simplex element to a \displaystyle\frac{}{}
+<BR>&nbsp;pivot: list or array that contains the row, column.  This puts a circle around the cell at (row,col). 
+<BR>		  Both row and column are ZERO based.
+<BR>		default point none
+<BR>
+<BR>&nbsp;RETURNS: a valid latex string
+<BR><h3><a name="simplexdisplaylatex2">simplexdisplaylatex2</a></h3>
+simplexdisplaylatex2(simplex solution sets [, show$pivot=1, showentriesfractions=1]) 
+<BR>
+<BR>&nbsp;Creates an array of strings that is valid latex syntax for display.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplex solution sets: a valid solution sets array
+<BR>
+<BR>&nbsp;OPTIONAL
+<BR>&nbsp;showpivot :either 0 or 1
+<BR>				   0 don't circle a pivot point
+<BR>		   default 1 circle a pivot point
+<BR>
+<BR>&nbsp;showfractions: either 0 or 1
+<BR>				 0 convert simplex element to a decimal
+<BR>		 default 1 convert simplex element to a \displaystyle\frac{}{}
+<BR>&nbsp;RETURNS: a solution sets of valid latex
+<BR><h3><a name="simplexdisplaytable2">simplexdisplaytable2</a></h3>
+simplexdisplaytable2(simplex solution sets[, ASCII tick marks,mode,show fractions,header column names,CSS tabletextcolor=black, multiple solution pivot border color=red, multiple solution pivot text color=blue, pivot border color=blue, pivot text color=black)
+<BR>
+<BR>&nbsp;Create a 1 or two dimensional array (depends on the input) that each element either contains a valid valid HTML table syntax or 
+<BR>		 a nbsp; for displaying in a browser.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplex solution sets: a valid solution sets array
+<BR>
+<BR>&nbsp;OPTIONAL
+<BR>&nbsp;displayASCII: either 0 or 1
+<BR>				0 do not use math ticks
+<BR>		default 1		use math ticks
+<BR>&nbsp;mode: either 0, 1 or 2
+<BR>		0 show no lines
+<BR>		1 show aumented line
+<BR>		2 show simplex  lines
+<BR>&nbsp;showfractions: either -1, 0 or 1
+<BR>				-1 show as string 
+<BR>				 0 convert simplex element to a decimal
+<BR>		 default 1 convert simplex element to a fraction
 <BR>&nbsp;headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
 <BR>&nbsp;&nbsp;&nbsp;default none
 <BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR><h3><a name="simplexdisplaylatex">simplexdisplaylatex</a></h3>
-simplexdisplaylatex(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1)]) 
-<BR>&nbsp;Create a string that is a valid latex syntax for display.
-<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>	  default none
 <BR>
-<BR>&nbsp;optional
-<BR>&nbsp;simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;are creating a simplex display
-<BR>&nbsp;showfractions: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 convert simplex element to a decimal
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 convert simplex element to a \displaystyle\frac{}{}
-<BR>&nbsp;pivot: list or array that contains the row, column.  This puts a circle around the cell at (row,col). 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Both row and column are ZERO based.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default point none
+<BR>&nbsp;RETURNS: an array
+<BR><h3><a name="simplexdisplaytable2string">simplexdisplaytable2string</a></h3>
+simplexdisplaytable2string(simplexsetstable, cellpadding=5)
+<BR>
+<BR>&nbsp;Creates a string used to display all pivot paths of the simplex matrix for displaying in a browser.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>&nbsp;&nbsp;simplexsetstable: output from simplexdisplaytable2
+<BR>&nbsp;&nbsp;cellpadding: cellpadding in the table for each cell
+<BR>
+<BR>&nbsp;RETURNS: a string for displaying (usually in showanswer).
+<BR>)
 <BR><h3><a name="simplexfindpivotpoint">simplexfindpivotpoint</a></h3>
 simplexfindpivotpoint(simplexmatrix)
 <BR>
+<BR>&nbsp;INPUTS
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
 <BR>&nbsp;returns array(condition, pivotpoints )
 <BR>&nbsp;where 
 <BR>&nbsp;condition: -1 means No Solution
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 found pivot point(s)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 means no pivot points found
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 found possible multiple solution pivot point(s)
+<BR>			   0 found pivot point(s)
+<BR>			   1 means no pivot points found
+<BR>			   2 found possible multiple solution pivot point(s)
 <BR>
 <BR>&nbsp;pivotpoints: an array where the entries are the row, column where the pivot point was
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;found.  both are ZERO based.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$pivotpoints[0] = (0,1)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$pivotpoints[1] = (1,2)
+<BR>			  found.  Both row and column are ZERO based.
+<BR>			  $pivotpoints[0] = (0,1)
+<BR>			  $pivotpoints[1] = (1,2)
+<BR><h3><a name="simplexfindpivotpointmixed">simplexfindpivotpointmixed</a></h3>
+simplexfindpivotpointmixed(simplexmatrix)
+<BR>
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;returns array(condition, pivotpoints )
+<BR>&nbsp;where 
+<BR>&nbsp;condition: -2 means Nnot a mixed constraint
+<BR>			  -1 means No Solution
+<BR>			   0 found pivot point(s)
+<BR>			   1 means no pivot points found
+<BR>			   2 found possible multiple solution pivot point(s)
+<BR>
+<BR>&nbsp;pivotpoints: an array where the entries are the row, column where the pivot point was
+<BR>			  found.  Both row and column are ZERO based.
+<BR>			  $pivotpoints[0] = (0,1)
+<BR>			  $pivotpoints[1] = (1,2)
 <BR><h3><a name="simplexgetentry">simplexgetentry</a></h3>
 simplexgetentry(simplexmatrix,row,col)
 <BR>
+<BR>&nbsp;gets an entry from the simplex matrix 
+<BR>
+<BR>&nbsp;INPUTS
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>&nbsp;row: row number (zero based - first row is row 0)
 <BR>&nbsp;col: column number (zero based - first row is row 0)
 <BR>
-<BR>&nbsp;get entry from a simplex matrix at given row and col
+<BR>&nbsp;RETURNS: entry from a simplex matrix at given row and col
 <BR>
-<BR><h3><a name="simplexsetentry">simplexsetentry</a></h3>
-simplexsetentry(simplexmatrix,row,col,numerator,denominator)
-<BR>
-<BR>&nbsp;simplexmatrix: a valid simplex matrix.
-<BR>&nbsp;row: row number (zero based - first row is row 0)
-<BR>&nbsp;col: column number (zero based - first row is row 0)
-<BR>
-<BR>&nbsp;set entry for the simplex matrix at the given row and col with the given numerator and denominator.
-<BR>
-<BR><h3><a name="simplexnumberofsolutions">simplexnumberofsolutions</a></h3>
-&nbsp;simplexnumberofsolutions(solutionlist)
-<BR>
-<BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is returned from simplexsolve
-<BR>
-<BR>&nbsp;returns:  the number of solutions
 <BR><h3><a name="simplexpivot">simplexpivot</a></h3>
 &nbsp;simplexpivot(simplexmatrix,pivotpoint)
 <BR>
-<BR>&nbsp;simplexmatrix: a valid simplex matrix.
-<BR>&nbsp;pivotpoint:  list or array that contains the point to be pivoted on. 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Both row and column are ZERO based.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this ALWAYS picks $pivotpoint[0] as the pivot point
-<BR>
 <BR>&nbsp;this function pivots the simplex matrix on the given point
 <BR>
-<BR>&nbsp;returns:  the pivoted simplex matrix
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;pivotpoint:  list or array that contains the point to be pivoted on. 
+<BR>				Both row and column are ZERO based.
+<BR>
+<BR>&nbsp;RETURNS:  the pivoted simplex matrix
 <BR><h3><a name="simplexreadtoanswerarray">simplexreadtoanswerarray</a></h3>
 function simplexreadtoanswerarray(simplexmatrix, [startnumber, answer]) 
 <BR>
+<BR>&nbsp;Create/extend an array of values read by rows for the simplex matrix starting at startnumber
+<BR>
+<BR>&nbsp;INPUTS
 <BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>
-<BR>&nbsp;optional 
+<BR>&nbsp;OPTIONAL 
 <BR>&nbsp;startnumber: starting number of the array.  Default is 0 
 <BR>&nbsp;answer: pass $answer if extending an existing $answer array
 <BR>
-<BR>&nbsp;Create an array of values read by rows for the simplex matrix starting at startnumber
-<BR>
+<BR>&nbsp;RETURNS: an array
 <BR><h3><a name="simplexreadsolution">simplexreadsolution</a></h3>
 simplexreadsolution(simplexmatrix,type,showfractions)
-<BR>
-<BR>&nbsp;simplexmatrix: a valid simplex matrix.
-<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
-<BR>&nbsp;&nbsp;showfractions: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions 
 <BR>
 <BR>&nbsp;This reads the simplex matrix to find the current solution to the optimization problem.  It returns
 <BR>&nbsp;an array that contains the solution.
 <BR>
-<BR>&nbsp;array(solution values for sm, IsOptimized)
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
+<BR>&nbsp;&nbsp;showfractions: either 0 or 1
+<BR>				0 shows decimals
+<BR>		default 1 shows fractions 
+<BR>
+<BR>&nbsp;RETURNS: an array(solution values for sm, IsOptimized)
 <BR>
 <BR>&nbsp;For Max solutions the solution is an array in the form of:
 <BR>
@@ -294,152 +396,220 @@ simplexreadsolution(simplexmatrix,type,showfractions)
 <BR>&nbsp;where g contains the minimium value
 <BR>&nbsp;IsOptimized contains either a Yes or a No (objective has been reached)
 <BR>
+<BR><h3><a name="simplexsetentry">simplexsetentry</a></h3>
+simplexsetentry(simplexmatrix,row,col,numerator,denominator)
+<BR>
+<BR>&nbsp;set entry for the simplex matrix at the given row and col with the given numerator and denominator.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;row: row number (zero based - first row is row 0)
+<BR>&nbsp;col: column number (zero based - first row is row 0)
+<BR>&nbsp;numerator: any integer
+<BR>&nbsp;denominator any natural number
+<BR>
+<BR>&nbsp;RETURNS: nothing
 <BR><h3><a name="simplexsolutiontolatex">simplexsolutiontolatex</a></h3>
 &nbsp;simplexsolutiontolatex(solution)
 <BR>&nbsp;
 <BR>&nbsp;This function converts all fractions in the solution into latex fractions
 <BR>&nbsp;\displaystyle\frac{numerator}{denominator}
 <BR>
-<BR><h3><a name="simplexsolve">simplexsolve</a></h3>
-simplexsolve(simplexmatrix,type)
+<BR>&nbsp;INPUTS
+<BR>&nbsp;solution - an array of "fractions" in the form of array(numerator, denominator)
 <BR>
-<BR>&nbsp;simplexmatrix: a valid simplex matrix.
-<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
+<BR>&nbsp;RETURNS: an array of valid latex
+<BR><h3><a name="simplexsolve2">simplexsolve2</a></h3>
+simplexsolve2(simplexmatrix,type,[showfractions=1])
 <BR>
-<BR>&nbsp;this method solves the standard maximization problem which has the following conditions
-<BR>&nbsp;1) The objective function is to be maximized.
+<BR>&nbsp;Mixed constraints
+<BR>
+<BR>&nbsp;this method solves the minimization problem which has the following conditions
+<BR>&nbsp;1) The objective function is to be minimized.
 <BR>&nbsp;2) All variables are nonnegative.
-<BR>&nbsp;3) The constraints are of the form: a1x1+ a2x2+ ... + anxn <= b  where b >0
+<BR>&nbsp;3) The constraints are of the form: a1x1+ a2x2+ ... + anxn >= b  where b is any constant
 <BR>
-<BR>&nbsp;returns array(solutionlist, smlist, pivotlist)
-<BR>&nbsp;
-<BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
-<BR>&nbsp;smlist:    an array of simplex matrix with 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sma[0] = initial simplex matrix
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sma[1] = the result of the first pivot
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sma[2] = the result of the second pivot
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sma[3] = the result of the third pivot
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
+<BR>&nbsp;INPUTS:
+<BR>&nbsp;&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
+<BR>&nbsp;&nbsp;showfractions: either 0 or 1
+<BR>				0 shows decimals
+<BR>		default 1 shows fractions 
 <BR>
-<BR>&nbsp;pivotlist: an array of pivot points
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pivotlist[0][0] = the pivot used for the first pivot
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pivotlist[0][1] = if exists, another possible pivot point for this step
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pivotlist[1][0] = the pivot used for the second pivot
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pivotlist[2][0] = the pivot used for the third pivot
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
+<BR>&nbsp;RETURNS (simplexsets[][], $objectivereachedsolutionlist, runtime)
+<BR>
+<BR>&nbsp;&nbsp;simplexsets[][] = a 2 dimensional array used to build an output for the various paths that could be used to solve the simple
+<BR>
+<BR>	parent column number: column of the parent simplex (zero based).
+<BR>	Pivot Point Condition: 
+<BR>	pivot point: point that will be pivoted on
+<BR>	pivot points: array of all possible pivots
+<BR>	simplexmatrix: simplex matrix to pivot on
+<BR>	solution: the solution to the simplex matrix
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;|				   0					  |					1					 |					2				     |
+<BR>&nbsp;&nbsp;0 | simplex (1 pivot) intial matrix		  |										 |									     |
+<BR>&nbsp;&nbsp;1 | simplex (2 pivot)					  |										 |									     |
+<BR>&nbsp;&nbsp;2 | simplex (1st pivot option from (1,0)) |										 | simplex (2nd pivot option from (1,0)) |
+<BR>&nbsp;&nbsp;3 | simplex (2 pivot)					  |										 | simplex (1 pivot)				     |
+<BR>&nbsp;&nbsp;4 | simplex (1st pivot option from (3,0)) | simplex (2nd pivot option from (3,0))| simplex (1 pivot)				     |
+<BR>&nbsp;&nbsp;5 | simplex (0 pivot)					  | simplex (0 pivot)					 | simplex (0 pivot)				     |
+<BR>
+<BR><h3><a name="createsimplexelement">createsimplexelement</a></h3>
+&nbsp;*********************************************************************************************************************************
+<BR>&nbsp;*********************************************************************************************************************************
+<BR>
+<BR>&nbsp;internal utility functions needed for this module
+<BR>
+<BR>&nbsp;*********************************************************************************************************************************
+<BR>&nbsp;*********************************************************************************************************************************
+<BR>
+<BR>&nbsp;createsimplexelement
+<BR>&nbsp;simplextoarray
+<BR>&nbsp;simplextodisplay
+<BR>&nbsp;verifyconstraints
+<BR>
+<BR>
+<BR>function createsimplexelement($value)
+<BR>&nbsp;internal only
+<BR>&nbsp;returns an array in the form of (numerator, denominator) that is calculated from $value
+<BR>&nbsp;$value can be any valid real number, that will be converted into a fraction (proper or improper).
+<BR><h3><a name="simplextoarray">simplextoarray</a></h3>
+function simplextoarray(sm)
+<BR>&nbsp;this function takes the simplex matrix and verifies that each entry is a
+<BR>&nbsp;array in the form of (numerator, denominator)
+<BR>&nbsp;then returns the verified simplex matrix.
+<BR><h3><a name="verifytype">verifytype</a></h3>
+&nbsp;the following are the verify functions to verify user input
+<BR>&nbsp;the from is a string of the calling function, then the input to be 
+<BR>&nbsp;verified, then the program supplied default value
+<BR><h3><a name="verifyconstraints">verifyconstraints</a></h3>
+function verifyconstraints(type, constraints)
+<BR>&nbsp;internal only
+<BR>
+<BR>&nbsp;This function verifies that all of the constraints are vaild inequalities
+<BR>&nbsp;type:		max or min
+<BR>&nbsp;constraints: the constraints to be verified
+<BR><h3><a name="hasmixedconstraints">hasmixedconstraints</a></h3>
+function hasmixedconstraints(constraints)
+<BR>&nbsp;internal only
+<BR>
+<BR>&nbsp;This function returns true if mixed constraints are found
+<BR>					   false if all are the same type
 <BR><h3><a name="simplexfindsolutioninlist">simplexfindsolutioninlist</a></h3>
 &nbsp;simplexfindsolutioninlist(solutionlist,solution)
 <BR>
 <BR>&nbsp;Trys to find the solution if it is already in the solution list.
 <BR>
+<BR>&nbsp;INPUTS
 <BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[0] = array(solution values for matrix[0], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solutionlist[1] = array(solution values for matrix[1], IsOptimized)
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;etc.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is returned from simplexsolve
-<BR>
+<BR>			
+<BR>			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+<BR>			etc.
+<BR>			This is returned from simplexsolve
 <BR>
 <BR>&nbsp;solution = array(solution values for matrix, IsOptimized)
 <BR>
+<BR>&nbsp;RETURNS:  0 if no match is found, 1 if a match is found
+<BR><h3><a name="simplexhasmixedconstrants">simplexhasmixedconstrants</a></h3>
+&nbsp;simplexhasmixedconstrants($sm)
 <BR>
-<BR>&nbsp;returns:  0 if no match is found, 1 if a match is found
-<BR><h3><a name="simplexdisplaylatex2">simplexdisplaylatex2</a></h3>
-simplexdisplaylatex2(simplex solution sets [, show$pivot=1, showentriesfractions=1]) 
+<BR>&nbsp;INPUTS:
+<BR>&nbsp;$sm - a simpex matrix
 <BR>
-<BR>&nbsp;Creates an array of strings that is valid latex syntax for display.
+<BR>&nbsp;RETURNS - true is it is a mixed contrant matrix
+<BR>		   false - otherwise
+<BR><h3><a name="simplexdisplaytable">simplexdisplaytable</a></h3>
+&nbsp;***** DEPRECIATED *****
 <BR>
-<BR>&nbsp;simplex solution sets: a valid solution sets array
+<BR>&nbsp;list of all DEPRECIATED functions are below
 <BR>
-<BR>&nbsp;optional
-<BR>&nbsp;showpivot :either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 don't circle a pivot point
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 circle a pivot point
+<BR>&nbsp;***** DEPRECIATED *****
 <BR>
-<BR>&nbsp;showfractions: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 convert simplex element to a decimal
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 convert simplex element to a \displaystyle\frac{}{}
-<BR><h3><a name="simplexdisplaytable2">simplexdisplaytable2</a></h3>
-simplexdisplaytable2(simplex solution sets, ASCII tick marks,mode,show fractions,header column names,CSS tablestyle)
-<BR>&nbsp;Create a 1 or two dimensional array (depends on the input) that each element either contains a valid valid HTML table syntax or 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a nbsp; for displaying in a browser.
+<BR>simplexdisplaytable(simplexmatrix, [simplexmatrixname, displayASCIIticks, linemode, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"]), $header = array(), $tablestyle = ""]) 
 <BR>
-<BR>&nbsp;simplex solution sets: a valid solution sets array
+<BR>&nbsp;***** DEPRECIATED *****
 <BR>
-<BR>&nbsp;optional
+<BR>&nbsp;USE simplexdisplaycolortable instead
+<BR>
+<BR>&nbsp;Create a string that is a valid HTML table syntax for display.
+<BR>
+<BR>&nbsp;INPUTS
+<BR>
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>
+<BR>&nbsp;OPTIONAL
+<BR>&nbsp;simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
+<BR>					are creating a simplex display
 <BR>&nbsp;displayASCII: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 do not use math ticks
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1        use math ticks
+<BR>				0 do not use math ticks
+<BR>		default 1		use math ticks
 <BR>&nbsp;mode: either 0, 1 or 2
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 show no lines
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 show aumented line
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 show simplex  lines
+<BR>		0 show no lines
+<BR>		1 show aumented line
+<BR>		2 show simplex  lines
 <BR>&nbsp;showfractions: either -1, 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-1 show as string 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 convert simplex element to a decimal
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 convert simplex element to a fraction
+<BR>				-1 show as string 
+<BR>				 0 convert simplex element to a decimal
+<BR>		 default 1 convert simplex element to a fraction using "/" as the fraction bar
 <BR>&nbsp;pivot: list or array that contains the row, column, border color, and text color.  This puts a  
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;border around the cell at (row,col). Both row and column are ZERO based.
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;default point none
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;default border color = blue
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;default text  color  = black
+<BR>		 border around the cell at (row,col). Both row and column are ZERO based.
+<BR>	default point none
+<BR>	default border color = blue
+<BR>	default text  color  = black
 <BR>&nbsp;headers: list or array of the variables "x1,x2,x3" that are used for the column titles.
 <BR>&nbsp;&nbsp;&nbsp;default none
 <BR>&nbsp;tablestyle: for any additional styles for the table that you may want.  like "color:#40B3DF;"
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default none
-<BR><h3><a name="simplexdisplaytable2string">simplexdisplaytable2string</a></h3>
-simplexdisplaytable2string(simplexsetstable, cellpadding=5)
-<BR>&nbsp;Creates a string used to display all pivot paths of the simplex matrix for displaying in a browser.
+<BR>	  default none
 <BR>
-<BR>&nbsp;&nbsp;simplexsetstable: output from simplexdisplaytable2
-<BR>&nbsp;&nbsp;spacescount: number of nbsp; on each side of the displaytable
+<BR>&nbsp;RETURNS: a string that is a valid HTML table syntax for display.
+<BR><h3><a name="simplexnumberofsolutions">simplexnumberofsolutions</a></h3>
+&nbsp;simplexnumberofsolutions(solutionlist)
 <BR>
-<BR>&nbsp;returns a string for displaying (usually in showanswer).
-<BR>)
-<BR><h3><a name="simplexsolve2">simplexsolve2</a></h3>
-simplexsolve2(simplexmatrix,type,[showall, [showfractions=1]])
+<BR>&nbsp;***** DEPRECIATED *****
+<BR>
+<BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
+<BR>			
+<BR>			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+<BR>			etc.
+<BR>			This is returned from simplexsolve
+<BR>
+<BR>&nbsp;returns:  the number of solutions
+<BR><h3><a name="simplexsolve">simplexsolve</a></h3>
+simplexsolve(simplexmatrix,type)
+<BR>
+<BR>&nbsp;***** DEPRECIATED *****
+<BR>&nbsp;use simplexsolve2
 <BR>
 <BR>&nbsp;this method solves the standard maximization problem which has the following conditions
 <BR>&nbsp;1) The objective function is to be maximized.
 <BR>&nbsp;2) All variables are nonnegative.
 <BR>&nbsp;3) The constraints are of the form: a1x1+ a2x2+ ... + anxn <= b  where b >0
 <BR>
-<BR>
-<BR>&nbsp;INPUTS:
-<BR>
-<BR>&nbsp;&nbsp;simplexmatrix: a valid simplex matrix.
+<BR>&nbsp;INPUTS
+<BR>&nbsp;simplexmatrix: a valid simplex matrix.
 <BR>&nbsp;&nbsp;type: a string that contains either "max" or "min" 
-<BR>&nbsp;&nbsp;showall: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 shows all simplex matrices even those with multiple pivot point and show individual pivots in multiple columns
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 supress simplex matrices with multiple pivot point - only show individual pivots in multiple columns
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows all
+<BR>
+<BR>&nbsp;RETURNS array(solutionlist, smlist, pivotlist)
 <BR>&nbsp;
-<BR>&nbsp;&nbsp;maxrows: an integer that flags the program to abort after it get to that many rows (default = rows*columns of the simplex matrix)
-<BR>&nbsp;&nbsp;showfractions: either 0 or 1
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 shows decimals
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default 1 shows fractions 
+<BR>&nbsp;solutionlist: an array of solutions (in the case of multiple solutions).   In the form of
+<BR>			
+<BR>			solutionlist[0] = array(solution values for matrix[0], IsOptimized)
+<BR>			solutionlist[1] = array(solution values for matrix[1], IsOptimized)
+<BR>			etc.
+<BR>&nbsp;smlist:	an array of simplex matrix with 
+<BR>			sma[0] = initial simplex matrix
+<BR>			sma[1] = the result of the first pivot
+<BR>			sma[2] = the result of the second pivot
+<BR>			sma[3] = the result of the third pivot
+<BR>			etc.
 <BR>
-<BR>&nbsp;returns (simplexsets[][], $objectivereachedsolutionlist, runtime)
-<BR>
-<BR>&nbsp;&nbsp;simplexsets[][] = a 2 dimensional array used to build an output for the various paths that could be used to solve the simple
-<BR>
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;parent column number: column of the parent simplex (zero based).
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;Pivot Point Condition: 
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;pivot point: point that will be pivoted on
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;pivot points: array of all possible pivots
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;simplexmatrix: simplex matrix to pivot on
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;solution: the solution to the simplex matrix
-<BR>
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|                   0                   |                   1                   |                   2                   |
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0    | simplex (1 pivot) intial matrix       |                                       |                                       |
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1    | simplex (2 pivot)                     |                                       |                                       |
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2    | simplex (1st pivot option from (1,0)) |                                       | simplex (2nd pivot option from (1,0)) |
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3    | simplex (2 pivot)                     |                                       | simplex (1 pivot)                     |
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4    | simplex (1st pivot option from (3,0)) | simplex (2nd pivot option from (3,0)) | simplex (1 pivot)                     |
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5    | simplex (0 pivot)                     |  simplex (0 pivot)                    | simplex (0 pivot)                     |
-<BR>
+<BR>&nbsp;pivotlist: an array of pivot points
+<BR>			pivotlist[0][0] = the pivot used for the first pivot
+<BR>			pivotlist[0][1] = if exists, another possible pivot point for this step
+<BR>			pivotlist[1][0] = the pivot used for the second pivot
+<BR>			pivotlist[2][0] = the pivot used for the third pivot
+<BR>			etc.
 <BR>

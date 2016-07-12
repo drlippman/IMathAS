@@ -31,6 +31,7 @@
  }
  
  $myrights = 0;
+ $myspecialrights = 0;
  $ispublic = false;
  //domain checks for special themes, etc. if desired
  $requestaddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
@@ -55,7 +56,7 @@
  //check for bad sessionids.  
  if (strlen($sessionid)<10) { 
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
-	echo "Error.  Please <a href=\"$imasroot/index.php\">Home</a>try again</a>";
+	echo "Error.  Please <a href=\"$imasroot/index.php\">try again</a>";
 	exit;	 
  }
  $sessiondata = array();
@@ -318,13 +319,14 @@
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		$query .= ',listperpage,hasuserimg,theme';
+		$query .= ',listperpage,hasuserimg,theme,specialrights';
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];
 	$myrights = $line['rights'];
+	$myspecialrights = $line['specialrights'];
 	$groupid = $line['groupid'];
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];

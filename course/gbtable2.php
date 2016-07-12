@@ -868,7 +868,7 @@ function gbtable() {
 	if ($secfilter!=-1 && $limuser<=0) {
 		$query .= "AND imas_students.section='$secfilter' ";
 	}
-	if ($hidelocked) {
+	if ($hidelocked && $limuser==0) {
 		$query .= "AND imas_students.locked=0 ";
 	}
 	if (isset($timefilter)) {
@@ -953,7 +953,7 @@ function gbtable() {
 	
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
-	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid,ia.timelimit FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid' ";
 	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1063,7 +1063,7 @@ function gbtable() {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 2;  //in progress
 			$countthisone =true;
-		} else	if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']])) {
+		} else	if (($timelimits[$i]>0) && ($timeused > $timelimits[$i]*$timelimitmult[$l['userid']]+10)) {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 3;  //over time
 		} else if ($assessmenttype[$i]=="Practice") {
@@ -1200,13 +1200,25 @@ function gbtable() {
 				}
 				$gb[$row][1][$col][2] = 1; //show link
 				$gb[$row][1][$col][3] = 0; //is counted
-				if ($gb[0][1][$col][3]<1) { //past
-					$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
-				} 
-				if ($gb[0][1][$col][3]<2) { //past or cur
-					$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+								
+				if ($cntingb[$i] == 1) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					}
+					$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];		
+				} else if ($cntingb[$i]==2) {
+					if ($gb[0][1][$col][3]<1) { //past
+						$cattotpastec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					} 
+					if ($gb[0][1][$col][3]<2) { //past or cur
+						$cattotcurec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+					}
+					$cattotfutureec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];	
 				}
-				$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
+				
 			} else if ($l['gradetype']=='exttool') {
 				if (!isset($exttoolidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($exttoolcol[$l['gradetypeid']])) {
 					continue;
@@ -1247,35 +1259,7 @@ function gbtable() {
 			}
 		}
 	}
-	/*
-	//Get discussion grades
-	unset($discusspts);
-	$discussidx = array_flip($discuss);
-	$query = "SELECT imas_forum_posts.userid,imas_forum_posts.forumid,SUM(imas_forum_posts.points) FROM imas_forum_posts,imas_forums WHERE imas_forum_posts.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
-	if ($limuser>0) { $query .= " AND imas_forum_posts.userid='$limuser' ";}
-	$query .= "GROUP BY imas_forum_posts.forumid,imas_forum_posts.userid ";
-	
-	$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($r = mysql_fetch_row($result2)) {
-		if (!isset($discussidx[$r[1]]) || !isset($sturow[$r[0]]) || !isset($discusscol[$r[1]])) {
-			continue;
-		}
-		$i = $discussidx[$r[1]];
-		$row = $sturow[$r[0]];
-		$col = $discusscol[$r[1]];
-		if ($r[2]!=null) {
-			$gb[$row][1][$col][0] = 1*$r[2];
-		}
-		$gb[$row][1][$col][3] = 0; //is counted
-		if ($gb[0][1][$col][3]<1) { //past
-			$cattotpast[$row][$category[$i]][$col] = $r[2];
-		} 
-		if ($gb[0][1][$col][3]<2) { //past or cur
-			$cattotcur[$row][$category[$i]][$col] = $r[2];
-		}
-		$cattotfuture[$row][$category[$i]][$col] = $r[2];
-	}
-	*/
+
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
 		
@@ -1831,25 +1815,31 @@ function gbtable() {
 	if ($limuser<1) {
 		//create averages
 		$gb[$ln][0][0] = "Averages";
-		$avgs = array();
+
 		for ($j=0;$j<count($gb[0][1]);$j++) { //foreach assessment
-			$avgs[$j] = array();
+			$avgs = array();
+			$avgtime = array();
+			$avgtimedisp = array();
 			
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
 					if ($gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
-						$avgs[$j][] = $gb[$i][1][$j][0];
+						$avgs[] = $gb[$i][1][$j][0];
+						if ($limuser==-1 && $gb[0][1][$j][6]==0) { //for online, if showning avgs
+							$avgtime[] = $gb[$i][1][$j][7];
+							$avgtimedisp[] = $gb[$i][1][$j][8];
+						}
 					}
 				}
 			}
 			
-			if (count($avgs[$j])>0) {
-				sort($avgs[$j], SORT_NUMERIC);
+			if (count($avgs)>0) {
+				sort($avgs, SORT_NUMERIC);
 				$fivenum = array();
 				for ($k=0; $k<5; $k++) {
-					$fivenum[] = gbpercentile($avgs[$j],$k*25);
+					$fivenum[] = gbpercentile($avgs,$k*25);
 				}
-				$fivenumsum = 'n = '.count($avgs[$j]).'<br/>';
+				$fivenumsum = 'n = '.count($avgs).'<br/>';
 				$fivenumsum .= implode(',&nbsp;',$fivenum);
 				if ($gb[0][1][$j][2]>0) {
 					for ($k=0; $k<5; $k++) {
@@ -1857,6 +1847,12 @@ function gbtable() {
 					}
 					$fivenumsum .= '<br/>'.implode('%,&nbsp;',$fivenum).'%';
 				}
+				if ($limuser==-1 && count($avgtime)>0) {
+					$gb[$ln][1][$j][7] = round(array_sum($avgtime)/count($avgtime),1);
+					$gb[$ln][1][$j][8] = round(array_sum($avgtimedisp)/count($avgtimedisp),1);
+				}
+				$gb[$ln][1][$j][0] = round(array_sum($avgs)/count($avgs),1);
+				$gb[$ln][1][$j][4] = 'average';
 			} else {
 				$fivenumsum = '';
 			}
@@ -1919,12 +1915,7 @@ function gbtable() {
 				}
 			}
 		}
-		foreach ($avgs as $j=>$avg) {
-			if (count($avg)>0) {
-				$gb[$ln][1][$j][0] = round(array_sum($avg)/count($avg),1);
-				$gb[$ln][1][$j][4] = 'average';
-			}
-		}
+		
 		foreach ($catavgs as $j=>$avg) {
 			for ($m=0;$m<4;$m++) {
 				if (count($avg[$m])>0) {

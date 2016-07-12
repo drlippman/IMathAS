@@ -190,7 +190,7 @@
 			$groupid=0;
 		}
 		$dofilter = true;
-		$query = "SELECT id FROM imas_forum_threads WHERE stugroupid=0 OR stugroupid='$groupid'";
+		$query = "SELECT id FROM imas_forum_threads WHERE (stugroupid=0 OR stugroupid='$groupid') AND forumid='$forumid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$limthreads = array();
 		while ($row = mysql_fetch_row($result)) {

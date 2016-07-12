@@ -133,8 +133,9 @@
 			$row = mysql_fetch_row($result);
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
 			//$headers .= "From: $self\r\n";
-			$headers .= "From: {$row[0]} {$row[1]} <$sendfrom>\r\n";
+			$headers .= "From: $sendfrom\r\n";
 			$headers .= "Reply-To: $self\r\n";
+			$message = "<p><b>Note:</b>This email was sent by ".htmlentities($self)." from $installname. If you need to reply, make sure your reply goes to their email address.</p><p></p>".$message;
 			$teacheraddys = array();
 			if ($_POST['self']!="none") {
 				$teacheraddys[] = $self;
@@ -145,6 +146,8 @@
 					mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
 				}
 			}
+			
+			
 			$message .= "<p>Instructor note: Email sent to these students from course $coursename: <br/> $sentto </p>\n";
 			if ($_POST['self']=="allt") {
 				$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";

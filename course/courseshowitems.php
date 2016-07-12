@@ -23,7 +23,7 @@ function enditem($canedit) {
 
   function showitems($items,$parent,$inpublic=false) {
 	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
-	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$hasstats,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
+	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
 	   require_once("../includes/filehandler.php");
 	   
 	   if (!isset($CFG['CPS']['itemicons'])) {
@@ -247,7 +247,7 @@ function enditem($canedit) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo _('collapse');} else {echo _('expand');}
-						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
+						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
@@ -255,8 +255,8 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
-					echo "<b><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
+					echo "<span class=pointer onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\">";
+					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
 						echo "<span style=\"color:red;\">", _('New'), "</span>";
 					}
@@ -440,7 +440,7 @@ function enditem($canedit) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo _('collapse');} else {echo _('expand');}
-						echo ".gif\" onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\" /></span>";
+						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" /></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
@@ -448,12 +448,12 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock('{$items[$i]['id']}','$parent-$bnum')\">";
+					echo "<span class=pointer onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
 					if ($items[$i]['SH'][0]=='S') {
-						echo "<a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
+						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
 					} else {
-						echo "<i><a href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
+						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
 					}
 					echo "</b></span> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
@@ -565,7 +565,9 @@ function enditem($canedit) {
 			   	   if ($exceptions[$items[$i]][2]>0 && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
 			   	   	   $canundolatepass = true;
 			   	   }
-			   	   $latepasscnt = round(($exceptions[$items[$i]][1] - $line['enddate'])/($latepasshrs*3600));
+			   	   if ($exceptions[$items[$i]][2]>0) {
+			   	   	   $latepasscnt = max(0,round(($exceptions[$items[$i]][1] - $line['enddate'])/($latepasshrs*3600)));
+			   	   }
 				   $line['startdate'] = $exceptions[$items[$i]][0];
 				   $line['enddate'] = $exceptions[$items[$i]][1];
 			   }
@@ -675,9 +677,8 @@ function enditem($canedit) {
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
-					if (isset($hasstats['a'.$typeid])) {
-						echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
-					}
+					echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
+					
 					echo '</span>';
 					
 				   } else if (($line['allowlate']%10==1 || $line['allowlate']%10-1>$latepasscnt) && $latepasses>0) {
@@ -723,9 +724,8 @@ function enditem($canedit) {
 					echo " | <a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
-					if (isset($hasstats['a'.$typeid])) {
-						echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
-					}
+					echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
+					
 					echo '</span>';
 					
 				   } else if (isset($sessiondata['stuview']) && $line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600) {
@@ -789,9 +789,8 @@ function enditem($canedit) {
 					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
-					   if (isset($hasstats['a'.$typeid])) {
-						echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=A&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -898,9 +897,10 @@ function enditem($canedit) {
 						   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 						   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 						   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-						   if (isset($hasstats['i'.$typeid])) {
+						   if (strpos($line['text'],'<a')!==false) {
 						   	   echo " | <a href=\"contentstats.php?cid=$cid&type=I&id=$typeid\">",_('Stats'),'</a>';
 						   }
+						   
 						   echo '</span>';
 					   }
 					   echo "</div>";
@@ -964,9 +964,10 @@ function enditem($canedit) {
 					   echo "<a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['i'.$typeid])) {
-						   echo " | <a href=\"contentstats.php?cid=$cid&type=I&id=$typeid\">",_('Stats'),'</a>';
+					   if (strpos($line['text'],'<a')!==false) {
+					   	   echo " | <a href=\"contentstats.php?cid=$cid&type=I&id=$typeid\">",_('Stats'),'</a>';
 					   }
+					   
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
@@ -1193,9 +1194,8 @@ function enditem($canedit) {
 					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['l'.$typeid])) {
-						    echo " | <a href=\"contentstats.php?cid=$cid&type=L&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=L&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -1222,9 +1222,8 @@ function enditem($canedit) {
 					   echo "<a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['l'.$typeid])) {
-						    echo " | <a href=\"contentstats.php?cid=$cid&type=L&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=L&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['summary']}</div>\n");
@@ -1351,9 +1350,8 @@ function enditem($canedit) {
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['f'.$typeid])) {
-						    echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
@@ -1384,9 +1382,8 @@ function enditem($canedit) {
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['f'.$typeid])) {
-						    echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
@@ -1491,9 +1488,8 @@ function enditem($canedit) {
 					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['w'.$typeid])) {
-						    echo " | <a href=\"contentstats.php?cid=$cid&type=W&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=W&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   if ($duedates!='') {echo "<br/>$duedates";}
@@ -1523,9 +1519,8 @@ function enditem($canedit) {
 					   echo "<a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
-					   if (isset($hasstats['w'.$typeid])) {
-						    echo " | <a href=\"contentstats.php?cid=$cid&type=W&id=$typeid\">",_('Stats'),'</a>';
-					   }
+					   echo " | <a href=\"contentstats.php?cid=$cid&type=W&id=$typeid\">",_('Stats'),'</a>';
+					   
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");

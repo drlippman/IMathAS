@@ -277,7 +277,7 @@ function apportion_info($pop, $seats, $method) {
 	} else if ($method=='lowndes') {
 		foreach ($quotas as $s=>$q) {
 			$luq[$s] = floor($q);
-			$other[$s] = ($q - $luq[$s])/$luq[$s];
+			$other[$s] = ($luq[$s]==0?1e100:($q - $luq[$s])/$luq[$s]);
 		}
 	}
 	return array($divisor, $quotas, $luq, $other, $outdiv);

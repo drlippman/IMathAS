@@ -40,6 +40,8 @@ if (!(isset($teacherid))) {
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "DELETE FROM imas_assessments WHERE id='$aid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='$aid'";
+		mysql_query($query) or die("Query failed : " . mysql_error());
 		
 		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

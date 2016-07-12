@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 104;
+$latest = 110;
 
 
 @set_time_limit(0);
@@ -1651,6 +1651,96 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $res = mysql_query($query);
 			 if ($res===false) {
 				 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<105) {
+			 $query = "ALTER TABLE  `imas_ltiusers` ADD INDEX ( `ltiuserid` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_courses` ADD INDEX ( `istemplate` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_msgs` ADD INDEX ( `courseid` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_users` ADD INDEX ( `groupid` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_forum_views` ADD INDEX ( `lastview` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_questionset` ADD INDEX ( `replaceby` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			  
+		}
+		if ($last<106) {
+			$query = "ALTER TABLE  `imas_users` ADD  `specialrights` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0';";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<107) {
+			$query = "UPDATE imas_users SET specialrights=4 WHERE rights=60";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			$query = "UPDATE imas_users SET specialrights=13 WHERE rights=75";			
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "UPDATE imas_users SET specialrights=15 WHERE rights=100";			
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "UPDATE imas_users SET rights=40 WHERE rights=60";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<108) {
+			$query = "ALTER TABLE  `imas_questions` CHANGE  `showans`  `showans` CHAR(1) NOT NULL DEFAULT '0';";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<109) {
+			$query = 'CREATE TABLE `imas_livepoll_status` (
+				  `assessmentid` INT(10) unsigned NOT NULL PRIMARY KEY,
+				  `curquestion` TINYINT(2) unsigned NOT NULL,
+				  `curstate` TINYINT(1) unsigned NOT NULL,
+				  `seed` INT(10) unsigned NOT NULL,
+				  `startt` BIGINT(13) unsigned NOT NULL
+				) ENGINE=InnoDB;';
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 echo '<p>table imas_livepoll_status created</p>';
+		}
+		if ($last<110) {
+			 $query = "ALTER TABLE  `imas_assessment_sessions` ADD INDEX ( `endtime` )";
+			 $res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');

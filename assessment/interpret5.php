@@ -6,7 +6,7 @@
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
 //require_once("mathphp.php");
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
-$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt');
+$disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt','$myrights','$myspecialrights');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
 function interpret($blockname,$anstype,$str,$countcnt=1)
@@ -514,7 +514,7 @@ function tokenize($str,$anstype,$countcnt) {
 				}
 				$j++;
 			}
-			if ($j==$len) {
+			if ($j>=$len) {
 				$i = $j;
 				echo _('unmatched parens/brackets - likely will cause an error');
 			} else {

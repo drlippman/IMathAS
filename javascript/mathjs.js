@@ -56,17 +56,16 @@ function nthroot(n,base) {
 function nthlogten(n,v) {
 	return ((Math.log(v))/(Math.log(n)));
 }
+var funcstoindexarr = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root|arcsin|arccos|arctan|arcsec|arccsc|arccot|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth".split("|");
 function functoindex(match) {
-	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
-	for (var i=0;i<func.length;i++) {
-		if (func[i]==match) {
+	for (var i=0;i<funcstoindexarr.length;i++) {
+		if (funcstoindexarr[i]==match) {
 			return '@'+i+'@';
 		}
 	}
 }
 function indextofunc(match, contents) {
-	var func = "sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root".split("|");
-	return func[contents];
+	return funcstoindexarr[contents];
 }
 
 function safepow(base,power) {
@@ -101,8 +100,9 @@ function mathjs(st,varlist) {
   st = st.replace(/arc(sin|cos|tan|sec|csc|cot|sinh|cosh|tanh|sech|csch|coth)/gi,"$1^-1");
   st = st.replace(/(Sin|Cos|Tan|Sec|Csc|Cot|Arc|Abs|Log|Ln|Sqrt)/gi, matchtolower);
   if (varlist != null) {
-  	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
-	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
+  	  var vararr = varlist.split("|");
+	  st = st.replace(/(sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
+  	  var reg = new RegExp("(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)[\(]","g");
 	  st = st.replace(reg,"$1#(");
 	  var reg = new RegExp("("+varlist+")("+varlist+")$","g");
 	  st = st.replace(reg,"($1)($2)");
@@ -110,24 +110,30 @@ function mathjs(st,varlist) {
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("("+varlist+")("+varlist+")([^a-df-zA-Z#])","g"); // 10/25/10 re-removed \( for x(1+x); moved f() handling to AMhelpers;  6/1/09 readded \( for f(350/x)
 	  st = st.replace(reg,"($1)($2)$3"); //get xy3
-	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
-	  st = st.replace(reg,"$1($2)$3");	  
 	 // var reg = new RegExp("("+varlist+")("+varlist+")(\w*[^\(#])","g");
 	  //st = st.replace(reg,"($1)($2)$3"); //get xysin
 	  var reg = new RegExp("([^a-df-zA-Z#])("+varlist+")([^a-df-zA-Z#])","g");
+	  st = st.replace(reg,"$1($2)$3");
+	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
 	  st = st.replace(reg,"$1($2)$3");	  
 	  var reg = new RegExp("^("+varlist+")([^a-df-zA-Z])","g");
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
 	  st = st.replace(reg,"$1($2)");
+	  st = st.replace(new RegExp("\(("+varlist+")\)","g"), function(match) {
+		for (var i=0; i<vararr.length;i++) {
+			if (vararr[i]==match) { return '(@v'+i+'@)';}	//esc var so regex's below don't interfere
+		 }});
 	  st = st.replace(/@(\d+)@/g, indextofunc);
   }
+  
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
   st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
   st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
+  
   if (st.indexOf("^-1")!=-1) {
     st = st.replace(/sin\^-1/g,"arcsin");
     st = st.replace(/cos\^-1/g,"arccos");
@@ -146,8 +152,14 @@ function mathjs(st,varlist) {
   st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
   //st = st.replace(/E/g,"(EE)");
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
+  
   st = st.replace(/^e$/g,"(E)");
   st = st.replace(/pi/g,"(pi)");
+  
+  st = st.replace(/@v(\d+)@/g, function(match,contents) {
+  	return vararr[contents];
+       });
+  
   st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
   st = st.replace(/([^a-zA-Z])e$/g,"$1(E)");
   
@@ -158,10 +170,11 @@ function mathjs(st,varlist) {
   st= st.replace(/([0-9])\*\(EE\)([\-0-9])/,"$1e$2");
 
   
-  st = st.replace(/\)([\(0-9a-zA-Z])/g,"\)*$1");
+  st = st.replace(/\)([\(0-9a-zA-Z]|\.\d+)/g,"\)*$1");
   
   var i,j,k, ch, nested;
   while ((i=st.indexOf("^"))!=-1) {
+
     //find left argument
     if (i==0) return "Error: missing argument";
     j = i-1;
@@ -182,11 +195,11 @@ function mathjs(st,varlist) {
         else if (ch==")") nested++;
         j--;
       }
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
       j--;
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else { 
       return "Error: incorrect syntax in "+st+" at position "+j;
@@ -215,8 +228,8 @@ function mathjs(st,varlist) {
       }
     } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
       k++;
-      while (k<st.length && (ch=st.charAt(k))>="a" && ch<="z" ||
-               ch>="A" && ch<="Z") k++;
+      while (k<st.length && ((ch=st.charAt(k))>="a" && ch<="z" ||
+               ch>="A" && ch<="Z")) k++;
       if (ch=='(' && st.slice(i+1,k).match(/^(sin|cos|tan|sec|csc|cot|logten|log|ln|exp|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|sqrt|abs|nthroot)$/)) {
 	      nested = 1;
 	      k++;
@@ -228,7 +241,6 @@ function mathjs(st,varlist) {
 	      }
       }
     } else { 
-
       return "Error: incorrect syntax in "+st+" at position "+k;
     }
     st = st.slice(0,j+1)+"safepow("+st.slice(j+1,i)+","+st.slice(i+1,k)+")"+
@@ -255,11 +267,11 @@ function mathjs(st,varlist) {
         else if (ch==")") nested++;
         j--;
       }
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else if (ch>="a" && ch<="z" || ch>="A" && ch<="Z") {// look for variable
       j--;
-      while (j>=0 && (ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z")
+      while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
     } else { 
       return "Error: incorrect syntax in "+st+" at position "+j;
@@ -268,3 +280,4 @@ function mathjs(st,varlist) {
   }
   return st;
 }
+

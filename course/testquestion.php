@@ -60,6 +60,7 @@ if ($myrights<20) {
 	} else {
 		$page_scoreMsg = "";
 		$scores = array(-1); 
+		$rawscores = array(-1);
 		$_SESSION['choicemap'] = array();
 	}
 	

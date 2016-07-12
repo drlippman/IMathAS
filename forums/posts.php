@@ -343,69 +343,71 @@
 			
 	?>
 		<script type="text/javascript">
-		function toggleshow(bnum) {
-		   var node = document.getElementById('block'+bnum);
-		   var butn = document.getElementById('butb'+bnum);
-		   if (node.className == 'forumgrp') {
-		       node.className = 'hidden';
-		       //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
-		//       butn.value = 'Expand';
-			butn.src = imasroot+'/img/expand.gif';
-		   } else { 
-		       node.className = 'forumgrp';
-		       //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
-		//       butn.value = 'Collapse';
-			butn.src = imasroot+'/img/collapse.gif';
+		var haschanges = false;
+		$(function() {
+			$(".scorebox").on('keypress', function() {haschanges = true;});
+		});
+		function checkchgstatus(type,id) {
+			//type: 0 reply, 1 modify
+			if (haschanges) {
+				if (type==0) {
+					action = 'reply';
+				} else if (type==1) {
+					action = 'modify';
+				}
+				if (confirm("You have unsaved changes. Click OK to save changes before continuing, or Cancel to discard changes")) {
+					$("form").append('<input type="hidden" name="actionrequest" value="'+action+':'+id+'"/>').submit();
+					return false;
+				} else {
+					return true;
+				}
+			}
 		}
+		function toggleshow(butn) {
+			var forumgrp = $(butn).closest(".block").nextAll(".forumgrp").first();
+			if (forumgrp.hasClass("hidden")) {
+				forumgrp.removeClass("hidden");
+				butn.src = imasroot+'/img/collapse.gif';
+			} else {
+				forumgrp.addClass("hidden");
+				butn.src = imasroot+'/img/expand.gif';
+			}
 		}
-		function toggleitem(inum) {
-		   var node = document.getElementById('item'+inum);
-		   var butn = document.getElementById('buti'+inum);
-		   if (node.className == 'blockitems') {
-		       node.className = 'hidden';
-		       butn.value = 'Show';
-		   } else { 
-		       node.className = 'blockitems';
-		       butn.value = 'Hide';
-		   }
+		function toggleitem(butn) {
+			var blockitems = $(butn).closest(".block").nextAll(".blockitems").first();
+			if (blockitems.hasClass("hidden")) {
+				blockitems.removeClass("hidden");
+				butn.value = _('Hide');
+			} else {
+				blockitems.addClass("hidden");
+				butn.value = _('Show');
+			}
 		}
 		function expandall() {
-		   for (var i=0;i<bcnt;i++) {
-		     var node = document.getElementById('block'+i);
-		     var butn = document.getElementById('butb'+i);
-		     node.className = 'forumgrp';
-		//     butn.value = 'Collapse';
-		       //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
-		       butn.src = imasroot+'/img/collapse.gif';
-		   }
+			$(".expcol").each(function(i) {
+				var forumgrp = $(this).closest(".block").nextAll(".forumgrp").first().removeClass("hidden");
+				this.src = imasroot+'/img/collapse.gif';
+			});
 		}
 		function collapseall() {
-		   for (var i=0;i<bcnt;i++) {
-		     var node = document.getElementById('block'+i);
-		     var butn = document.getElementById('butb'+i);
-		     node.className = 'hidden';
-		//     butn.value = 'Expand';
-		       //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
-		       butn.src = imasroot+'/img/expand.gif';
-		   }
+			$(".expcol").each(function(i) {
+				var forumgrp = $(this).closest(".block").nextAll(".forumgrp").first().addClass("hidden");
+				this.src = imasroot+'/img/expand.gif';
+			});
 		}
-		
 		function showall() {
-		   for (var i=0;i<icnt;i++) {
-		     var node = document.getElementById('item'+i);
-		     var buti = document.getElementById('buti'+i);
-		     node.className = "blockitems";
-		     buti.value = "Hide";
-		   }
+			$(".shbtn").each(function(i) {
+				var blockitems = $(this).closest(".block").nextAll(".blockitems").first().removeClass("hidden");
+				this.value = _('Hide');
+			});
 		}
 		function hideall() {
-		   for (var i=0;i<icnt;i++) {
-		     var node = document.getElementById('item'+i);
-		     var buti = document.getElementById('buti'+i);
-		     node.className = "hidden";
-		     buti.value = "Show";
-		   }
+			$(".shbtn").each(function(i) {
+				var blockitems = $(this).closest(".block").nextAll(".blockitems").first().addClass("hidden");
+				this.value = _('Show');
+			});
 		}
+		
 		function savelike(el) {
 			var like = (el.src.match(/gray/))?1:0;
 			var postid = el.id.substring(8);
@@ -430,12 +432,11 @@
 		}
 		</script>
 	<?php
-		$bcnt = 0;
-		$icnt = 0;
+
 		function printchildren($base,$restricttoowner=false) {
 			$curdir = rtrim(dirname(__FILE__), '/\\');
 			global $children,$date,$subject,$message,$poster,$email,$forumid,$threadid,$isteacher,$cid,$userid,$ownerid,$points;
-			global $feedback,$posttype,$lastview,$bcnt,$icnt,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
+			global $feedback,$posttype,$lastview,$myrights,$allowreply,$allowmod,$allowdel,$allowlikes,$view,$page,$allowmsg;
 			global $haspoints,$imasroot,$postby,$replyby,$files,$CFG,$rubric,$pointsposs,$hasuserimg,$urlmode,$likes,$mylikes,$section;
 			global $canviewall, $caneditscore, $canviewscore;
 			if (!isset($CFG['CPS']['itemicons'])) {
@@ -463,8 +464,7 @@
 						$lbl = '-';
 						$img = "collapse";
 					}
-					//echo "<input type=button id=\"butb$bcnt\" value=\"$lbl\" onClick=\"toggleshow($bcnt)\"> ";
-					echo "<img class=\"pointer\" id=\"butb$bcnt\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow($bcnt)\"/> ";
+					echo "<img class=\"pointer expcol\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow(this)\"/> ";
 				}
 				if ($hasuserimg[$child]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
@@ -477,9 +477,9 @@
 				echo "<span class=right>";
 				
 				if ($view==2) {
-					echo "<input type=button id=\"buti$icnt\" value=\"Show\" onClick=\"toggleitem($icnt)\">\n";
+					echo "<input type=button class=\"shbtn\" value=\"Show\" onClick=\"toggleitem(this)\">\n";
 				} else {
-					echo "<input type=button id=\"buti$icnt\" value=\"Hide\" onClick=\"toggleitem($icnt)\">\n";
+					echo "<input type=button class=\"shbtn\" value=\"Hide\" onClick=\"toggleitem(this)\">\n";
 				}
 				
 				if ($isteacher) {
@@ -487,14 +487,14 @@
 				} 
 				if ($isteacher || ($ownerid[$child]==$userid && $allowmod)) {
 					if (($base==0 && time()<$postby) || ($base>0 && time()<$replyby) || $isteacher) {
-						echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\">Modify</a> \n";
+						echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=$child\" onclick=\"return checkchgstatus(1,$child)\">Modify</a> \n";
 					}
 				}
 				if ($isteacher || ($allowdel && $ownerid[$child]==$userid && !isset($children[$child]))) {
 					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&remove=$child\">Remove</a> \n";
 				}
 				if ($posttype[$child]!=2 && $myrights > 5 && $allowreply) {
-					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\">Reply</a>";
+					echo "<a href=\"posts.php?view=$view&cid=$cid&forum=$forumid&thread=$threadid&page=$page&modify=reply&replyto=$child\" onclick=\"return checkchgstatus(0,$child)\">Reply</a>";
 				}
 				
 				echo "</span>\n";
@@ -579,9 +579,9 @@
 				echo '<div class="clear"></div>';
 				echo "</div>\n";
 				if ($view==2) {
-					echo "<div class=hidden id=\"item$icnt\">";
+					echo "<div class=\"blockitems hidden\">";
 				} else {
-					echo "<div class=blockitems id=\"item$icnt\" style=\"clear:all\">";
+					echo "<div class=\"blockitems\" style=\"clear:all\">";
 				}
 				if(isset($files[$child]) && $files[$child]!='') {
 					$fl = explode('@@',$files[$child]);
@@ -609,7 +609,7 @@
 				if ($haspoints) {
 					if ($caneditscore && $ownerid[$child]!=$userid) {
 						echo '<hr/>';
-						echo "Score: <input type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
+						echo "Score: <input class=scorebox type=text size=2 name=\"score[$child]\" id=\"scorebox$child\" value=\"";
 						if ($points[$child]!==null) {
 							echo $points[$child];
 						}
@@ -617,7 +617,7 @@
 						if ($rubric != 0) {
 							echo printrubriclink($rubric,$pointsposs,"scorebox$child", "feedback$child");
 						}
-						echo " Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
+						echo " Private Feedback: <textarea class=scorebox cols=\"50\" rows=\"2\" name=\"feedback[$child]\" id=\"feedback$child\">";
 						if ($feedback[$child]!==null) {
 							echo $feedback[$child];
 						}
@@ -635,24 +635,16 @@
 				
 				
 				echo "<div class=\"clear\"></div></div>\n";
-				$icnt++;
+				echo '<div class="forumgrp'.(($view==1)?' hidden':'').'">';
 				if (isset($children[$child])) { //if has children
-					echo "<div class=";
-					if ($view==0 || $view==2) {
-						echo '"forumgrp"';
-					} else if ($view==1) {
-						echo '"hidden"';
-					}
-					echo " id=\"block$bcnt\">\n";
-					$bcnt++;
 					printchildren($child, ($posttype[$child]==3 && !$isteacher));
-					echo "</div>\n";
 				}
+				echo "</div>\n";
 			//}
 			}
 		}
 		if ($caneditscore && $haspoints) {
-			echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&score=true\">";
+			echo "<form method=post action=\"thread.php?cid=$cid&forum=$forumid&page=$page&thread=$threadid&score=true\">";
 		}
 		printchildren(0);
 		if ($caneditscore && $haspoints) {
@@ -670,9 +662,6 @@
 		echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" />";
 		echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" />";
 		
-		echo "<script type=\"text/javascript\">";
-		echo "var bcnt =$bcnt; var icnt = $icnt;\n";
-		echo "</script>";
 	}
 	echo "<div class=right><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Forum Topics</a></div>\n";
 	require("../footer.php");

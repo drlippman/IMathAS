@@ -17,7 +17,7 @@ $diag = $_GET['id'];
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a> &gt; Diagnostic One-time Passwords</div>\n";
 
 	// SECURITY CHECK DATA PROCESSING
-if ($myrights<60) {
+if ($myrights<100 && ($myspecialrights&4)!=4) {
 	$overwriteBody = 1;
 	$body = "You don't have authority to access this page.";
 } else if (isset($_GET['generate'])) {

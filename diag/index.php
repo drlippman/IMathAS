@@ -167,6 +167,9 @@ if (isset($_POST['SID'])) {
 	if ($entrynotunique) {
 		$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
 	}
+	if (strlen($diagSID)>50) {
+		$diagSID = substr($diagSID,0,50);
+	}
 	if (!$noproctor) {
 		if (!in_array(strtolower($_POST['passwd']),$basicpw) && !in_array(strtolower($_POST['passwd']),$superpw)) {
 			$query = "SELECT id,goodfor FROM imas_diag_onetime WHERE code='".strtoupper($_POST['passwd'])."' AND diag='$diagid'";

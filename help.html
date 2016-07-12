@@ -158,6 +158,7 @@ dd {
 	<li><a href="#feedbackmacros">Feedback Macros</a></li>
 	<li><a href="#usingothermacros">Using Other Macros</a></li>
 	<li><a href="#mathentry">Math Entry</li>
+	<li><a href="#solver">Solver</li>
 	<li><a href="#writingcommon">Options Common to All Types</a></li>
 	<li><a href="#questiontypes">Question Types</a></li>
 		<ul>
@@ -1899,7 +1900,27 @@ These macros are used to select and format feedback messages to students.  They 
   feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
   defaultfeedback is the default incorrect response feedback <br/>
   Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
-
+<li><b>getfeedbacktxtcalculated(stuans, stuansval, partialcredit, feedbacktxt, defaultfeedback, [answerformat, requiretimes, tol])</b>:  Gives feedback on calculated number questions.  <br/>
+  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  <br>
+  stuansval should be the numerical value of the student answer, obtained from $stuanswersval[$thisq]. <br/>
+  partialcredit is an array or list of form array(number, score, number, score, ... ) where the scores are in the range [0,1].  <br/>
+  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
+  defaultfeedback is the default incorrect response feedback <br/>
+  answerformat can be a single answerformat to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
+  requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
+  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.<br/>
+  Example: <code>getfeedbacktxtcalculated($stuanswers[$thisq], $stuanswersval[$thisq], array("1/2",1,"1/2",.5), array("Correct", "Right value, but give your answer as a fraction"), "Incorrect", array("fraction",""))</code>
+    will check the students answer against the answer "1/2" twice, the first time applying the "fraction" answerformat, and the second time not.</li>
+<li><b>getfeedbacktxtnumfunc(stuans, partialcredit, feedbacktxt, defaultfeedback, [vars, requiretimes, tol, domain])</b>:  Gives feedback on numfunc (algebric expression/equation) questions.  <br/>
+  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.<br/>
+  partialcredit is an array or list of form array(expression, score, expression, score, ... ) where the scores are in the range [0,1].  <br/>
+  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
+  defaultfeedback is the default incorrect response feedback <br/>
+  vars should be a list of variables used in the expression. Defaults to "x"<br/>
+  requiretimes can be a single requiretimes to apply to all expressions, or an array with each element applied to the corresponding expression<br/>
+  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.<br/>
+  Set domain to limit the test domain.  Defaults to "-10,10"
+  </li>
 </ul>
 </div>
 <div class=h2>
@@ -1940,6 +1961,61 @@ for a limited subset of LaTeX). For more info, see the
 <a href="http://www1.chapman.edu/~jipsen/mathml/asciimathsyntax.html">full ASCIIMath syntax</a>, or look at
 some <a href="http://www1.chapman.edu/~jipsen/mathml/asciimath.html">examples</a>.</p>
 
+</div>
+<div class=h2>
+<h2><a name="solver">Solver</a></h2>
+While writing a question, it can be handy to quickly solve a formula for a variable.  For example, if you're writing a question that asks students to solve y=($a x + $b)/($b x - $a) for x, where $a and $b are randomized variables.  You might need to calculate the correct answer.  The Solver tool can help solve or check the solution.
+</div>
+<div class=h3>
+<h3><a name="solverinput">Solver Input</a></h3>
+		Tips:
+		<ul>
+			<li>Select your code from the Common Control box, then either drag-drop or copy-paste it to the box below, or
+			<li>Highlight an expression in Common Control and press <kbd>Ctrl-M</kbd> to update the Solver code, or
+			<li>Highlight an expression in your code before clicking Solver.
+			<li>Select an operation to perform: Solve, Differentiate, Integrate, Plot.
+			<li>You may need to change the colored Sage code below to solve for the correct variable or to adjust the plot window etc.  See the help icon below for examples.
+		</ul>
+</div>
+<div class=h3>
+<h3><a name="solversage">Solver: Sage Syntax</a></h3>
+		SageMath examples:
+		<blockquote><code>
+		#create symbolic variables<br/>
+		x,y,a,b,c,d = var('x,y,a,b,c,d')                <br/>
+		# solve the equation for x<br/>
+		solve( y==(a*x+b)/(c*x-d) , x )   <br/><br/>
+
+		x = var('x')<br/>
+		#Differentiate<br/>
+		diff( 3*x^4 , x )                <br/><br/>
+
+		x = var('x')<br/>
+		#Plot in a standard window<br/>
+		plot( -x^2+4 , (x,-10,10) )      <br/><br/>
+
+		x = var('x')<br/>
+		#Simplify<br/>
+		simplify( 5*x+7*(-3*x-4) )       <br/>
+		</code></blockquote>
+		Tips:
+		<ul>
+			<li>Declare any variables using <code>var()</code> as above.  By default, x is a variable.
+			<li>Use two equal signs for math equations.
+			<li>With <code>solve() diff() integral()</code>  give the independent variable after a comma.
+			<li>With <code>plot()</code> a range for the independent variable must be specified, e.g. <code>(x, -10, 10)</code>.
+			<li>Select a new operation or click <b>Go</b> to calculate.
+		</ul>
+</div>
+<div class=h3>
+<h3><a name="solveroutput">Solver Output</a></h3>
+		Tips:
+		<ul>
+			<li>Drag the result above to the Common Control box where you define the $answer or any other location, or
+			<li>Click <b>Insert in Common Control</b> to append the result to the end of the Common Control, or
+			<li>Click <b>Insert as $answer</b> to append <code>$answer = <i>result</i></code> to the Common Control (not available if <code>$answer</code> is already defined).
+			<li>Note: Touchscreens might not be supported by the drag operation.
+		</ul>
 </div>
 <div class=h2>
 <h2><a name="writingcommon">Common options to all types</a></h2>
@@ -2008,6 +2084,17 @@ Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enc
 5) You can use the function getstuans($stuanswers,N,P) to retreive a student answer value.  This method bypasses some strange things that happen
 when there is a multipart question with only one part.
 </p>
+
+<h4>Other Reference Variables</h4>
+<p>A few other special purpose variables can be referenced:</p>
+<ul>
+<li><b>$scorenonzero</b>: This variable is only available on display, not during scoring. $scorenonzero[$thisq] (or $scorenonzero[$thisq][partindex] for multipart)
+   will be -1 if the question is unanswered, 0 if the score is zero, and 1 if the score is anything above 0.</li>
+<li><b>$scoreiscorrect</b>: This variable is only available on display, not during scoring. $scoreiscorrect[$thisq] (or $scoreiscorrect[$thisq][partindex] for multipart)
+   will be -1 if the question is unanswered, 1 if the score (before any penalties) is perfect, and 0 otherwise.</li>
+<li><b>$attemptn</b>: This variable holds the attempt number of the current attempt.  0 is the initial attempt, 1 is the next attempt, etc.</li>
+<li><b>$requestclearla</b>:  If you set $requestclearla=true in your code, it will request the display to clear out the student's last answer.
+  This might be useful if your question branches based on attempt count.  Example: <code>$requestclearla = true if ($attemptn==2 &amp;&amp; !$scoreiscorrect[$thisq])</code></li>
 
 <h4>Reusing Code</h4>
 <p>You can import in the Common Control code from another question using
@@ -2125,6 +2212,7 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<li>mixednumberorimproper: a reduced mixed number or improper fraction (like 2 1/2 or 5/2)</li>
 	<li>sloppymixednumber: a mixed number (will take 5/2, 2 1/2, even 1 3/2)</li>
 	<li>scinot: scientific notation (like 2.3*10^4)</li>
+	<li>allowxtimes: allows the use of x for multiplication, (like 23x10^2 for 23*10^2)</li>
 	<li>fracordec: a single fraction or decimal value</li>
 	<li>nodecimal: an answer without decimals (also disallows 10^-2 and 3E-2).</li>
 	<li>notrig: an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>

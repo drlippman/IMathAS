@@ -355,6 +355,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$outcomearr = array();
 	} else {
 		$outcomearr = unserialize($row[0]);
+		if ($outcomearr===false) {
+			$outcomearr = array();
+		}
 	}
 	$outcomes = array();
 	function flattenarr($ar) {

@@ -1,0 +1,42 @@
+<html>
+<head>
+<script type="text/javascript" src="tinymce.min.js"></script>
+<script src="http://localhost/imathas/javascript/ASCIIMathTeXImg_min.js?ver=092314" type="text/javascript"></script>
+<script type="text/javascript">
+var AMTcgiloc = 'http://localhost/cgi-bin/mimetex.exe';
+
+tinymce.init({
+    selector: "textarea",
+    plugins: [
+        "advlist image charmap anchor",
+        "searchreplace code link textcolor",
+        "media table paste asciimath asciisvg"
+    ],
+    menubar: "edit insert format table tools ",
+    //toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | asciimath asciimathcharmap asciisvg",
+    toolbar: "alignleft aligncenter alignright | bullist numlist outdent indent | forecolor backcolor | bold italic subscript superscript | link unlink image | asciimath asciimathcharmap asciisvg",
+    extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
+    AScgiloc : 'http://localhost/imathas/filter/graph/svgimg.php',
+    ASdloc : 'http://localhost/imathas/javascript/d.svg',
+});
+</script>
+</head>
+<body>
+<form method="post" action="somepage">
+    <textarea name="content" style="width:100%" rows=30>
+    &lt;p&gt;
+Include text along with math equations like &lt;span class="AM"&gt;`x=(-b+-sqrt(b^2-4ac))/(2a)`&lt;/span&gt; in your documents   
+&lt;/p&gt;
+&lt;p&gt;
+Click on the math formula to edit the AsciiMath expression used to generate it.
+&lt;/p&gt;
+&lt;p&gt;
+To edit the graph, click on the graph, then click the Graph button in the toolbar to open the control panel.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;embed type="image/svg+xml" style="width: 300px; height: 200px; vertical-align: middle; float: none;" src="http://www.imathas.com/editordemo/jscripts/tiny_mce/plugins/asciisvg/js/d.svg" sscr="-7.5,7.5,-5,5,1,1,1,1,1,300,200,func,x^2,null,0,0,,,black,1,none" /&gt;
+&lt;/p&gt;
+</textarea>
+</form>
+</body>
+</html>

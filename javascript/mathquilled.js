@@ -198,6 +198,14 @@ function showeedd(eln,type,extras) {
 	p.left += el.outerWidth();
 	dd.css('left',p.left+"px").css('top',p.top+"px").height(el.outerHeight()-2).show();
 }
+function updateeeddpos() {
+	if (!cureedd) {return;}
+	var dd = $("#mqeedd");	
+	var el = $("#"+cureedd.id);
+	var p = el.offset();
+	p.left += el.outerWidth();
+	dd.css('left',p.left+"px").css('top',p.top+"px").height(el.outerHeight()-2).show();
+}
 function hideeedd() {
 	mqeeddclosetimer = setTimeout(function() {$("#mqeedd").hide();}, 250);
 }
@@ -232,6 +240,7 @@ function showee() {
 		lasteepos.scroll = $(window).scrollTop();
 	}
 	mqee.css('left',lasteepos.left).css('top',lasteepos.top).show();
+	//console.log(AMtoMQ($("#"+cureedd.id).val()));
 	mqarea.mathquill('latex', AMtoMQ($("#"+cureedd.id).val()));
 	mqarea.find('input,textarea').focus();
 	
@@ -241,6 +250,10 @@ function hideee() {
 }
 function savemathquill() {
 	$("#"+cureedd.id).val(MQtoAM(mqarea.mathquill('latex')));
+	var btn = $("#pbtn"+cureedd.id.substr(2));
+	if (btn) {
+		btn.trigger("click");
+	}
 	hideee();	
 }
 

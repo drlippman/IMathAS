@@ -16,7 +16,12 @@ $link = mysql_connect($dbserver,$dbusername, $dbpassword)
   or die("Could not connect : " . mysql_error());
 mysql_select_db($dbname) 
   or die("Could not select database");
-  
+
+$query = "set session sql_mode=''";
+$result = mysql_query($query);
+
+
+
 $query = "SELECT ver FROM imas_dbschema WHERE id=1";
 $result = mysql_query($query);
 if ($result!==false) {
@@ -101,7 +106,8 @@ $sql = 'CREATE TABLE `imas_users` ('
 	. ' `theme` VARCHAR(32) NOT NULL DEFAULT \'\', '
 	. ' `listperpage` TINYINT(3) UNSIGNED NOT NULL DEFAULT \'20\', '
 	. ' `hideonpostswidget` TEXT NOT NULL, '
-	. ' INDEX (`lastaccess`), INDEX (`rights`), '
+	. ' `specialrights` SMALLINT(5) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' INDEX (`lastaccess`), INDEX (`rights`), INDEX (`groupid`),'
         . ' UNIQUE (`SID`)'
         . ' )'
         . ' ENGINE = InnoDB'
@@ -184,7 +190,7 @@ $sql = 'CREATE TABLE `imas_courses` ('
 	. ' `outcomes` TEXT NOT NULL, '
 	. ' `ancestors` TEXT NOT NULL, '
 	. ' `ltisecret` VARCHAR(10) NOT NULL, '
-	. ' INDEX(`ownerid`), INDEX(`name`), INDEX(`available`)'
+	. ' INDEX(`ownerid`), INDEX(`name`), INDEX(`available`), INDEX(`istemplate`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Course list\';';
@@ -255,7 +261,7 @@ $sql = 'CREATE TABLE `imas_questions` ('
 	. ' `category` VARCHAR(254) NOT NULL DEFAULT \'0\','
 	. ' `rubric` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `regen` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
-	. ' `showans` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
+	. ' `showans` CHAR(1) NOT NULL DEFAULT \'0\','
 	. ' `showhints` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `extracredit` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\','
 	. ' `withdrawn` CHAR(1) NOT NULL DEFAULT \'0\','
@@ -293,7 +299,7 @@ $sql = 'CREATE TABLE `imas_questionset` ('
 	. ' `replaceby` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `broken` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
 	. ' `solutionopts` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' INDEX (`ownerid`), INDEX(`userights`), INDEX(`deleted`)'
+	. ' INDEX (`ownerid`), INDEX(`userights`), INDEX(`deleted`), INDEX(`replaceby`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Actual set of questions\';';
@@ -350,7 +356,7 @@ $sql = 'CREATE TABLE `imas_assessment_sessions` ('
 	. ' `reviewlastanswers` MEDIUMTEXT NOT NULL, '
 	. ' `reviewreattempting` VARCHAR(255) NOT NULL, '
 	. ' `feedback` TEXT NOT NULL,'
-        . ' INDEX (`userid`), INDEX(`assessmentid`), INDEX(`agroupid`), '
+        . ' INDEX (`userid`), INDEX(`assessmentid`), INDEX(`agroupid`), INDEX(`endtime`),'
         . ' UNIQUE INDEX (userid, assessmentid) '
         . ' )'
         . ' ENGINE = InnoDB'
@@ -559,7 +565,7 @@ $sql = 'CREATE TABLE `imas_forum_views` ('
 	. ' `threadid` INT(10) UNSIGNED NOT NULL, '
         . ' `lastview` INT(10) UNSIGNED NOT NULL,'
 	. ' `tagged` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
-        . ' INDEX (`userid`), INDEX(`threadid`)'
+        . ' INDEX (`userid`), INDEX(`threadid`), INDEX(`lastview`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Forum last viewings\';';
@@ -695,7 +701,7 @@ $sql = 'CREATE TABLE `imas_msgs` ('
 	. ' `replied` TINYINT(1) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `parent` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
         . ' `baseid` INT(10) UNSIGNED NOT NULL DEFAULT \'0\', '
-	. ' INDEX (`msgto`), INDEX (`isread`), INDEX(`msgfrom`), INDEX(`baseid`)'
+	. ' INDEX (`msgto`), INDEX (`isread`), INDEX(`msgfrom`), INDEX(`baseid`), INDEX(`courseid`)'
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Internal messages\';';
@@ -843,7 +849,8 @@ $sql = 'CREATE TABLE `imas_ltiusers` ('
         . ' `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, '
         . ' `org` VARCHAR(255) NOT NULL, '
         . ' `ltiuserid` VARCHAR(255) NOT NULL, '
-        . ' `userid` INT(10) NOT NULL'
+        . ' `userid` INT(10) NOT NULL, '
+        . ' INDEX ( `ltiuserid`) '
         . ' )'
         . ' ENGINE = InnoDB;';
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
@@ -1021,6 +1028,15 @@ $sql = 'CREATE TABLE `imas_content_track` (
 mysql_query($sql) or die("Query failed : $sql " . mysql_error());
 echo 'imas_content_track created<br/>';
 
+$sql = 'CREATE TABLE `imas_livepoll_status` (
+	  `assessmentid` INT(10) unsigned NOT NULL PRIMARY KEY,
+	  `curquestion` TINYINT(2) unsigned NOT NULL,
+	  `curstate` TINYINT(1) unsigned NOT NULL,
+	  `seed` INT(10) unsigned NOT NULL,
+	  `startt` BIGINT(13) unsigned NOT NULL
+	) ENGINE=InnoDB;';
+mysql_query($sql) or die("Query failed : $sql " . mysql_error());
+echo 'imas_livepoll_status created<br/>';
 
 $sql = 'CREATE TABLE `imas_dbschema` (
 	`id` INT( 10 ) UNSIGNED NOT NULL PRIMARY KEY ,

@@ -33,6 +33,11 @@
 				mysql_query($query) or die("Query failed :$query " . mysql_error());	
 				if (isset($_POST['forceregen'])) {
 					//this is not group-safe
+					$query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
+					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+					list($shuffle) = mysql_fetch_row($result);
+					$allqsameseed = (($shuffle&2)==2);
+			
 					$query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
 					$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					if (mysql_num_rows($result)>0) {
@@ -49,7 +54,11 @@
 						for ($i=0; $i<count($questions); $i++) {
 							$scores[$i] = -1;
 							$attempts[$i] = 0;
-							$seeds[$i] = rand(1,9999);
+							if ($allqsameseed && $i>0) {
+								$seeds[$i] = $seeds[0];
+							} else {
+								$seeds[$i] = rand(1,9999);
+							}
 							$newla = array();
 							$laarr = explode('##',$lastanswers[$i]);
 							//may be some files not accounted for here... 
@@ -294,7 +303,7 @@
 	echo '</ul>';
 	echo "<input type=submit value=\"Record Changes\" />";
 	echo '<p><input type="checkbox" name="forceregen"/> Force student to work on new versions of all questions?  Students ';
-	echo 'will keep any scores earned, but must work new versions of questions to improve score.</p>';
+	echo 'will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</p>';
 	echo '<p><input type="checkbox" name="forceclear"/> Clear student\'s attempts?  Students ';
 	echo 'will <b>not</b> keep any scores earned, and must rework all problems.</p>';
 

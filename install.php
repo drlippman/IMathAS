@@ -117,6 +117,9 @@ $contents .= '
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
+     $query = "set session sql_mode=\'\'";
+     $result = mysql_query($query);
+
   }
   //clean up post and get if magic quotes aren\'t on
   function addslashes_deep($value) {

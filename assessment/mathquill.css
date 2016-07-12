@@ -24,6 +24,7 @@
 }
 .mathquill-editable .cursor {
   border-left: 1px solid black;
+  min-width: 1px;
   margin-right: -1px;
   position: relative;
   z-index: 1;

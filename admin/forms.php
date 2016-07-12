@@ -44,14 +44,30 @@ switch($_GET['action']) {
 			$oldgroup = 0;
 			$oldrights = 10;
 		} else {
-			$query = "SELECT FirstName,LastName,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
+			$query = "SELECT FirstName,LastName,rights,groupid,specialrights FROM imas_users WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			echo "<h2>{$line['FirstName']} {$line['LastName']}</h2>\n";
 			$oldgroup = $line['groupid'];
 			$oldrights = $line['rights'];
-			
+			$oldspecialrights = $line['specialrights'];
 		}
+		echo '<script type="text/javascript">
+			function onrightschg() {
+				var selrights = this.value;
+				if (selrights<75) {
+					$("input[name^=specialrights]").prop("checked",false);
+				} else if (selrights==75) {
+					$("#specialrights1,#specialrights4,#specialrights8").prop("checked",true);
+					$("#specialrights2").prop("checked",false);
+				} else if (selrights==100) {
+					$("input[name^=specialrights]").prop("checked",true);
+				}
+			}
+			$(function() {
+				$("input[name=newrights]").on("change", onrightschg);
+				});
+			</script>';
 		echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
 		echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
 		if ($oldrights == 5) {echo "CHECKED";}
@@ -69,9 +85,6 @@ switch($_GET['action']) {
 		echo "<input type=radio name=\"newrights\" value=\"40\" ";
 		if ($oldrights == 40) {echo "CHECKED";}
 		echo "> Limited Course Creator <BR>\n";
-		echo "<input type=radio name=\"newrights\" value=\"60\" ";
-		if ($oldrights == 60) {echo "CHECKED";}
-		echo "> Diagnostic Creator <BR>\n";
 		echo "<input type=radio name=\"newrights\" value=\"75\" ";
 		if ($oldrights == 75) {echo "CHECKED";}
 		echo "> Group Admin <BR>\n";
@@ -80,6 +93,28 @@ switch($_GET['action']) {
 			if ($oldrights == 100) {echo "CHECKED";}
 			echo "> Full Admin </span><BR class=form>\n";
 		}
+		echo '<span class="form">Task Rights:</span><span class="formright">';
+		if ($myrights>=75) {
+			echo '<input type="checkbox" name="specialrights1" id="specialrights1" ';
+			if (($oldspecialrights&1)==1) { echo 'checked';}
+			echo '><label for="specialrights1">Designate group template courses</label><br/>';
+		}
+		if ($myrights==100) {
+			echo '<input type="checkbox" name="specialrights2" id="specialrights2" ';
+			if (($oldspecialrights&2)==2) { echo 'checked';}
+			echo '><label for="specialrights2">Designate global template courses</label><br/>';
+		}
+		if ($myrights>=75) {
+			echo '<input type="checkbox" name="specialrights4" id="specialrights4" ';
+			if (($oldspecialrights&4)==4) { echo 'checked';}
+			echo '><label for="specialrights4">Create Diagnostic logins</label><br/>';
+		}
+		if ($myrights>=75 && !$allownongrouplibs) {
+			echo '<input type="checkbox" name="specialrights8" id="specialrights8" ';
+			if (($oldspecialrights&8)==8) { echo 'checked';}
+			echo '><label for="specialrights8">Create public (open to all) question libraries</label><br/>';
+		}
+		echo '</span><br class="form"/>';
 		
 		if ($myrights == 100) {
 			echo "<span class=form>Assign to group: </span>";
@@ -97,11 +132,13 @@ switch($_GET['action']) {
 			echo "</select><br class=form />\n";
 		}
 		
+		
 		echo "<div class=submit><input type=submit value=Save></div></form>\n";
 		break;
 	case "modify":
 	case "addcourse":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		
 		$isadminview = false;
 		if ($_GET['action']=='modify') {
 			$query = "SELECT * FROM imas_courses WHERE id='{$_GET['id']}'";
@@ -472,16 +509,21 @@ switch($_GET['action']) {
 			}		
 			echo '</span></span><br class="form" />';
 		}
-		if ($myrights>=75) {
+		if (($myspecialrights&1)==1 || ($myspecialrights&2)==2) {
 			echo '<span class="form">Mark course as template?</span>';
-			echo '<span class="formright"><input type=checkbox name="isgrptemplate" value="2" ';
-			if (($istemplate&2)==2) {echo 'checked="checked"';};
-			echo ' /> Mark as group template course';
-			if ($myrights==100) {
+			echo '<span class="formright">';
+			if (($myspecialrights&1)==1 || $myrights==100) {
+				echo '<input type=checkbox name="isgrptemplate" value="2" ';
+				if (($istemplate&2)==2) {echo 'checked="checked"';};
+				echo ' /> Mark as group template course';
+			}
+			if (($myspecialrights&2)==2 || $myrights==100) {
 				echo '<br/><input type=checkbox name="istemplate" value="1" ';
 				if (($istemplate&1)==1) {echo 'checked="checked"';};
-				echo ' /> Mark as global template course<br/>';
-				echo '<input type=checkbox name="isselfenroll" value="4" ';
+				echo ' /> Mark as global template course';
+			}
+			if ($myrights==100) {
+				echo '<br/><input type=checkbox name="isselfenroll" value="4" ';
 				if (($istemplate&4)==4) {echo 'checked="checked"';};
 				echo ' /> Mark as self-enroll course';
 				if (isset($CFG['GEN']['guesttempaccts'])) {

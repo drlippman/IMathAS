@@ -1,6 +1,159 @@
 //IMathAS:  Handles preview buttons and pre-submit calculations for assessments
 //(c) 2006 David Lippman
 
+//define these to be overwritten later in case the corresponding options aren't used
+var updateeeddpos = function() { }; 
+var updateehpos = function() { };
+
+var LivePreviews = [];
+function setupLivePreview(qn) {
+	if (!LivePreviews.hasOwnProperty(qn)) {
+		if (mathRenderer=="MathJax" || mathRenderer=="Katex") {
+			LivePreviews[qn] = {
+			  delay: (mathRenderer=="MathJax"?100:20),   // delay after keystroke before updating
+			  finaldelay: 1000,
+			  preview: null,     // filled in by Init below
+			  buffer: null,      // filled in by Init below
+			
+			  timeout: null,     // store setTimout id
+			  finaltimeout: null,  // setTimeout id for clicking preview
+			  mjRunning: false,  // true when MathJax is processing
+			  mjPending: false,  // true when a typeset has been queued
+			  oldText: null,     // used to check if an update is needed
+			
+			  //
+			  //  Get the preview and buffer DIV's
+			  //
+			  Init: function() {
+				$("#p"+qn).css("positive","relative")
+					.append('<span id="lpbuf1'+qn+'" style="visibility:hidden;position:absolute;"></span>')
+					.append('<span id="lpbuf2'+qn+'" style="visibility:hidden;position:absolute;"></span>');	  
+				this.preview = document.getElementById("lpbuf1"+qn);
+				this.buffer = document.getElementById("lpbuf2"+qn);
+			  },
+	
+			  SwapBuffers: function () {
+			    var buffer = this.preview, preview = this.buffer;
+			    this.buffer = buffer; this.preview = preview;
+			    buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+			    preview.style.position = ""; preview.style.visibility = "";
+			  },
+			
+			  Update: function (content) {
+			    if (this.timeout) {clearTimeout(this.timeout)}
+			    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+			    this.timeout = setTimeout(this.callback,this.delay);
+			    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+			  },
+			
+			  RenderNow: function(text) {
+				  //called by preview button
+			      this.buffer.innerHTML = this.oldtext = text;
+			      this.mjRunning = true;
+			      this.RenderBuffer();
+			  },
+			  RenderBuffer: function() {
+			      if (mathRenderer=="MathJax") {
+				      MathJax.Hub.Queue(
+					["Typeset",MathJax.Hub,this.buffer],
+					["PreviewDone",this]
+				      );   
+			      } else if (mathRenderer=="Katex") {
+			      	      renderMathInElement(this.buffer);
+				      if ($(this.buffer).children(".mj").length>0) {//has MathJax elements
+					      MathJax.Hub.Queue(["PreviewDone",this]);
+				      } else {
+					      this.PreviewDone();
+				      }
+			      }	  
+			  },
+			  
+			  DoFinalPreview: function() {
+				$("#pbtn"+qn).trigger("click");
+			  },
+			  
+			  preformat: function(text) {
+			  	if (intcalctoproc.hasOwnProperty(qn)) {
+			  		if (!calcformat[qn].match(/inequality/)) {
+			  			text = text.replace(/U/g,"uu");
+			  		} else {
+			  			text = text.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
+			  			if (text.match(/all\s*real/i)) {
+			  				text = "text("+text+")";
+			  			}
+			  		}
+			  	} else if (vlist.hasOwnProperty(qn)) {
+			  		text = AMnumfuncPrepVar(qn, text)[1];
+			  		
+			  	} else if (calcformat.hasOwnProperty(qn)) {
+			  		var format = calcformat[qn];
+			  		if (format.indexOf('list')==-1 && format.indexOf('set')==-1) {
+			  			text = text.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
+			  		}
+			  	}
+			  	return text;
+			  },
+			  
+			  CreatePreview: function () {
+			    this.timeout = null;
+			    if (this.mjPending) return;
+			    if (document.getElementById("tc"+qn)==null) { //string preview
+			    	    var text = document.getElementById("qn"+qn).value;
+			    } else {
+			    	    var text = document.getElementById("tc"+qn).value;
+			    }
+			    if (text === this.oldtext) return;
+			    if (this.mjRunning) {
+			      this.mjPending = true;
+			      MathJax.Hub.Queue(["CreatePreview",this]);
+			    } else {
+			      this.oldtext = text;
+			      this.buffer.innerHTML = "`"+this.preformat(text)+"`";
+			      this.mjRunning = true;
+			      this.RenderBuffer();
+			    }
+			  },
+			
+			  PreviewDone: function () {
+			    this.mjRunning = this.mjPending = false;
+			    this.SwapBuffers();
+			    updateeeddpos();
+			    updateehpos();
+			  }
+			
+			};
+			LivePreviews[qn].callback = MathJax.Callback(["CreatePreview",LivePreviews[qn]]);
+			LivePreviews[qn].callback.autoReset = true;  // make sure it can run more than once
+			LivePreviews[qn].Init();
+		} else {
+			LivePreviews[qn] = {
+				finaldelay: 1000,
+				finaltimeout: null,  // setTimeout id for clicking preview
+			  
+				Update: function (content) {
+				    if (this.finaltimeout) {clearTimeout(this.finaltimeout)}
+				    this.finaltimeout = setTimeout(this.DoFinalPreview,this.finaldelay);
+				  },
+				
+				  RenderNow: function(text) {
+				      var outnode = document.getElementById("p"+qn);
+				      outnode.innerHTML = text;
+				      rendermathnode(outnode);
+				  },
+				  
+				  DoFinalPreview: function() {
+					$("#pbtn"+qn).trigger("click");
+				  }
+			}
+		} 
+	}
+}
+function updateLivePreview(targ) {
+	var qn = targ.id.substr(2);
+	setupLivePreview(qn);
+	LivePreviews[qn].Update();
+}
+
 function normalizemathunicode(str) {
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
 	str = str.replace(/\u2044|\u2215/g, "/");
@@ -9,10 +162,15 @@ function normalizemathunicode(str) {
 	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
 	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
 	str = str.replace(/\bOO\b/i,"oo");
-	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu");
+	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
+	str = str.replace(/α/,"alpha").replace(/β/,"beta").replace(/γ/,"gamma").replace(/δ/,"delta").replace(/ε/,"epsilon").replace(/κ/,"kappa");
+	str = str.replace(/λ/,"lambda").replace(/ρ/,"rho").replace(/τ/,"tau").replace(/χ/,"chi").replace(/ω/,"omega");
+	str = str.replace(/Ω/,"Omega").replace(/Γ/,"Gamma").replace(/Φ/,"Phi").replace(/Δ/,"Delta").replace(/Σ/,"Sigma");
 	return str;
 }
-
+function wrapAMnotice(str) {
+	return '<span class="AMHnotice">'+str+'</span>';
+}
 //handles preview button for calculated type
 function calculate(inputId,outputId,format) {
   var fullstr = document.getElementById(inputId).value;
@@ -39,6 +197,9 @@ function calculate(inputId,outputId,format) {
 		  err += singlevalsyntaxcheck(str,format);
 		  if (str.match(/,/)) {
 		  	  err += _("Invalid use of a comma.");
+		  }
+		  if (format.indexOf('allowxtimes')!=-1) {
+		  	  str = str.replace(/(x|X|\u00D7)/,"*");  
 		  }
 		  if (format.indexOf('mixed')!=-1) {
 		  	  str = str.replace(/_/,' ');
@@ -68,12 +229,12 @@ function calculate(inputId,outputId,format) {
 		  }
 		  if (!isNaN(res) && res!="Infinity") {  
 			  if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-				  str = "`"+str+"` " + err;
+				  str = "`"+str+"` " + wrapAMnotice(err);
 			  } else {
-				  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+". "+err;
+				  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+". "+wrapAMnotice(err);
 			  }
 		  } else if (str!="") {
-			  str = "`"+str+"` = "+_("undefined")+". "+err;
+			  str = "`"+str+"` = "+_("undefined")+". "+wrapAMnotice(err);
 		  }
 	  }
 	  strarr[sc] = str+" ";
@@ -81,11 +242,15 @@ function calculate(inputId,outputId,format) {
   fullstr = strarr.join(', ');
   if (format.indexOf('set')!=-1) {
   	  if (!document.getElementById(inputId).value.match(/^\s*{.*?}\s*$/)) {
-  	  	  fullstr += ("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}");
+  	  	  fullstr += wrapAMnotice(_("syntax error: this answer must be in set notation, a list wrapped in braces like {1,2,3}"));
   	  } else {
   	  	  fullstr = '{'+fullstr+'}';
   	  }
   }
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow(fullstr);
+  /*
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
@@ -94,6 +259,7 @@ function calculate(inputId,outputId,format) {
   if (!noMathRender) {
 	  rendermathnode(outnode);
   }
+  */
 }
 
 //Function to convert inequalities into interval notation
@@ -149,6 +315,7 @@ function intcalculate(inputId,outputId,format) {
 		var pat = str.match(/([a-zA-Z]\(\s*[a-zA-Z]\s*\)|[a-zA-Z]+)/);
 		var ineqvar = (pats != null)?pats[1]:((pat != null)?pat[1]:'');
 	  } else {
+	  	  var origstr = fullstr;
 		  fullstr = fullstr.replace(/\s+/g,'');
 	  }
 	  if (format.indexOf('list')!=-1) {
@@ -173,11 +340,16 @@ function intcalculate(inputId,outputId,format) {
 		  em = str.charAt(str.length-1);
 		  vals = str.substring(1,str.length-1);
 		  vals = vals.split(/,/);
-		  if (vals.length != 2) {
-			  fullstr = _("syntax incomplete");
+		  if (vals.length != 2 || ((sm != '(' && sm != '[') || (em != ')' && em != ']'))) {
+		  	  if(format.indexOf('inequality')!=-1) {
+		  	  	  origstr = origstr.replace('<=','le').replace('>=','ge').replace('<','lt').replace('>','gt');
+		  	  	  fullstr = "`"+origstr+"`: " + wrapAMnotice(_("invalid inequality notation"));
+		  	  } else {
+		  	  	  fullstr = "`"+origstr.replace(/U/g,"uu")+"`: " + wrapAMnotice(_("invalid interval notation"));
+		  	  }
 			  isok = false;
 			  break;
-		  }
+		  } 
 		  for (j=0; j<2; j++) {	
 			  if (vals[j].match(/oo$/) || vals[j].match(/oo\W/)) {
 				  calcvals[j] = vals[j];
@@ -202,7 +374,7 @@ function intcalculate(inputId,outputId,format) {
 				  if (!isNaN(res) && res!="Infinity") {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
-						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+err;
+						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+wrapAMnotice(err);
 					  //} else {
 						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
 					  //}
@@ -210,7 +382,7 @@ function intcalculate(inputId,outputId,format) {
 				  	  calcvals[j] = _("undefined");
 				  }
 				  if (err != '') {
-				  	  fullerr += err;
+				  	  fullerr += wrapAMnotice(err);
 				  }
 				  
 			  }
@@ -246,27 +418,29 @@ function intcalculate(inputId,outputId,format) {
 				 origstr = origstr.replace(/</g,'lt');
 				 origstr = origstr.replace(/>/g,'gt');
 				 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-				 	 fullstr = '`'+origstr + '`'+". "+fullerr;
+				 	 fullstr = '`'+origstr + '`'+". "+wrapAMnotice(fullerr);
 				 } else {
-				 	 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`'+". "+fullerr;
+				 	 fullstr = '`'+origstr + '= ' + calcstrarr.join(' \\ "or" \\ ')+'`'+". "+wrapAMnotice(fullerr);
 				 }
 			 }
 		 } else {
 		 	 if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-				  fullstr = '`'+strarr.join('uu') + '`'+". "+fullerr;	 
+				  fullstr = '`'+strarr.join('uu') + '`'+". "+wrapAMnotice(fullerr);	 
 			 } else {
 			 	 if (format.indexOf('list')!=-1) {
-			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , ')+". "+fullerr; 
+			 	 	 fullstr = '`'+strarr.join(',') + '` = ' + calcstrarr.join(' , ')+". "+wrapAMnotice(fullerr);
 			 	 } else {
-			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ')+". "+fullerr;
+			 	 	 fullstr = '`'+strarr.join('uu') + '` = ' + calcstrarr.join(' U ')+". "+wrapAMnotice(fullerr);
 			 	 }
 			 }
 		 }
 	 }
   }
   
-  
-  var outnode = document.getElementById(outputId);
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow(fullstr);
+  /*var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
   for (var i=0; i<n; i++)
     outnode.removeChild(outnode.firstChild);
@@ -274,6 +448,7 @@ function intcalculate(inputId,outputId,format) {
   if (!noMathRender) {
 	  rendermathnode(outnode);
   }
+  */
 	
 }
 
@@ -291,12 +466,21 @@ function ntuplecalc(inputId,outputId,format) {
 		var NCdepth = 0;
 		var lastcut = 0;
 		var err = ""; 
+		var notationok = true;
+		if (!fullstr.charAt(0).match(/[\(\[\<\{]/)) {
+			notationok=false;		
+		}
 		for (var i=0; i<fullstr.length; i++) {
 			dec = false;
 			if (NCdepth==0) {
 				outcalced += fullstr.charAt(i);
 				lastcut = i+1;
-			} 
+				if (fullstr.charAt(i)==',') {
+					if (!fullstr.charAt(i+1).match(/[\(\[\<\{]/) || !fullstr.charAt(i-1).match(/[\)\]\>\}]/)) {
+						notationok=false;
+					}
+				}
+			}
 			if (fullstr.charAt(i).match(/[\(\[\<\{]/)) {
 				NCdepth++;		
 			} else if (fullstr.charAt(i).match(/[\)\]\>\}]/)) {
@@ -328,15 +512,21 @@ function ntuplecalc(inputId,outputId,format) {
 				lastcut = i+1;
 			}
 		}
+		if (NCdepth!=0) {
+			notationok = false;
+		}
+		if (notationok==false) {
+			err += _("Invalid notation")+". ";
+		}
 		//outstr = '`'+fullstr+'` = '+outcalced;
-		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-			 outstr = '`'+fullstr+'`'+". " + err;
+		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1 || notationok==false) {
+			 outstr = '`'+fullstr+'`'+". " + wrapAMnotice(err);
 		} else {
-			 outstr = '`'+fullstr+'` = '+outcalced +". " + err;
+			 outstr = '`'+fullstr+'` = '+outcalced +". " + wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
-		 var outnode = document.getElementById(outputId);
+		 /*var outnode = document.getElementById(outputId);
 		 var n = outnode.childNodes.length;
 		 for (var i=0; i<n; i++) {
 		    outnode.removeChild(outnode.firstChild);
@@ -344,7 +534,10 @@ function ntuplecalc(inputId,outputId,format) {
 		 outnode.appendChild(document.createTextNode(outstr));
 		 if (!noMathRender) {
 			  rendermathnode(outnode);
-		 }
+		 }*/
+		 var qn = outputId.substr(1);
+		 setupLivePreview(qn);
+		 LivePreviews[qn].RenderNow(outstr);
 	}
 	 return outcalced;
 }
@@ -352,6 +545,7 @@ function ntuplecalc(inputId,outputId,format) {
 //preview for calccomplex
 function complexcalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
+	fullstr = normalizemathunicode(fullstr);
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
 		fullstr = fullstr.toUpperCase();
@@ -390,13 +584,13 @@ function complexcalc(inputId,outputId,format) {
 			}
 		}
 		if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1 || format.indexOf('scinot')!=-1 || format.indexOf('noval')!=-1) {
-			outstr = '`'+fullstr+'`'+". "+err;
+			outstr = '`'+fullstr+'`'+". "+wrapAMnotice(err);
 		} else {
-			outstr = '`'+fullstr+'` = '+outcalced+". "+err;
+			outstr = '`'+fullstr+'` = '+outcalced+". "+wrapAMnotice(err);
 		}
 	}
 	if (outputId != null) {
-		 var outnode = document.getElementById(outputId);
+		 /*var outnode = document.getElementById(outputId);
 		 var n = outnode.childNodes.length;
 		 for (var i=0; i<n; i++) {
 		    outnode.removeChild(outnode.firstChild);
@@ -404,7 +598,10 @@ function complexcalc(inputId,outputId,format) {
 		 outnode.appendChild(document.createTextNode(outstr));
 		 if (!noMathRender) {
 			  rendermathnode(outnode);
-		 }
+		 }*/
+		 var qn = outputId.substr(1);
+		 setupLivePreview(qn);
+		 LivePreviews[qn].RenderNow(outstr);
 	}
 	 return outcalced;
 }
@@ -529,8 +726,9 @@ function matrixcalc(inputId,outputId,rows,cols) {
 			calcstr += "(";
 			for (var col=0; col<cols; col++) {
 				if (col>0) {str += ","; calcstr += ",";}
-				str += document.getElementById(inputId+'-'+count).value;
-				calcstr += calced(document.getElementById(inputId+'-'+count).value);
+				val = normalizemathunicode(document.getElementById(inputId+'-'+count).value);
+				str += val;
+				calcstr += calced(val);
 				count++;
 			}
 			str += ")";
@@ -539,7 +737,7 @@ function matrixcalc(inputId,outputId,rows,cols) {
 		str += "]";
 		calcstr += "]";
 	} else {
-		var str = document.getElementById(inputId).value;
+		var str = normalizemathunicode(document.getElementById(inputId).value);
 		var calcstr = str;
 		var MCdepth = 0;
 		calcstr = calcstr.replace('[','(');
@@ -592,47 +790,53 @@ function mathjsformat(inputId,outputId) {
 
 function stringqpreview(inputId,outputId) {
 	var str = document.getElementById(inputId).value;
-	var outnode = document.getElementById(outputId);
+	
+	var qn = outputId.substr(1);
+	setupLivePreview(qn);
+	LivePreviews[qn].RenderNow("`"+str+"`");
+	
+	/*var outnode = document.getElementById(outputId);
 	var n = outnode.childNodes.length;
 	for (var i=0; i<n; i++)
 		outnode.removeChild(outnode.firstChild);
 	outnode.appendChild(document.createTextNode('`'+str+'`'));
 	if (!noMathRender) {
 		rendermathnode(outnode);
-	}
+	}*/
 }
 
-//preview button for numfunc type
-function AMpreview(inputId,outputId) {
-  var qn = inputId.slice(2);
+function AMnumfuncPrepVar(qn,str) {
   var vl = vlist[qn];
   var fl = flist[qn];
-  vars = vl.split("|");
+  var vars = vl.split("|");
   
-  var str = document.getElementById(inputId).value;
   str = str.replace(/,/g,"");
   str = normalizemathunicode(str);
-   var dispstr = str;
-   
+  var foundaltcap = []; 
+  var dispstr = str; 
+  dispstr = dispstr.replace(/(arcsinh|arccosh|arctanh|arcsech|arccsch|arccoth|arcsin|arccos|arctan|arcsec|arccsc|arccot|sinh|cosh|tanh|sech|csch|coth|sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs|root)/g, functoindex);
   for (var i=0; i<vars.length; i++) {
   	  if (vars[i] == "varE") {
-		  str = str.replace("E","varE");	
-	  } else if (vars[i].charCodeAt(0)>96) { //lowercase
-		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
-			//vars[i] = vars[i].toLowerCase();
-			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
-		  }
+		  str = str.replace("E","varE");
+		  dispstr = dispstr.replace("E","varE");
 	  } else {
-	  	  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
-		   	//vars[i] = vars[i].toLowerCase();
-		   	str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
-		  }
+	  	foundaltcap[i] = false;
+	  	for (var j=0; j<vars.length; j++) {
+	  		if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+	  			foundaltcap[i] = true;
+	  			break;
+	  		}
+	  	}
+	  	if (!foundaltcap[i]) {
+			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+			dispstr = dispstr.replace(new RegExp(vars[i],"gi"),vars[i]);
+		}
 	  }
   }
-  vl = vars.join("|");
- 
+
+  
   //quote out multiletter variables
-  var varstoquote = new Array();
+  var varstoquote = new Array(); var regmod;
   for (var i=0; i<vars.length; i++) {
 	  if (vars[i].length>1) {
 		  var isgreek = false;
@@ -642,30 +846,72 @@ function AMpreview(inputId,outputId) {
 				break;
 			  }
 		  }
+		  if (vars[i].match(/^\w+_\w+$/)) {
+		  	if (!foundaltcap[i]) {
+		  		regmod = "gi";
+		  	} else {
+		  		regmod = "g";
+		  	}
+		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
+		  	var varpts = new RegExp(/^(\w+)_(\w+)$/,regmod).exec(vars[i]);
+		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
+		  	dispstr = dispstr.replace(remvarparen, vars[i]);
+		  	str = str.replace(remvarparen, vars[i]);
+		  	if (varpts[1].length>1) {
+		  		varpts[1] = '"'+varpts[1]+'"';
+		  	} 
+		  	if (varpts[2].length>1) {
+		  		varpts[2] = '"'+varpts[2]+'"';
+		  	} 
+		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
+		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
+		  	str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
+		  	vars[i] = "repvars"+i;
+		  } else if (!isgreek && vars[i]!="varE") {
+			  varstoquote.push(vars[i]);
+		  }
+		  /*
+		  if (!isgreek && vars[i].match(/^\w+_\d*[a-zA-Z]+\w+$/)) {
+		  	if (!foundaltcap[i]) {
+		  		regmod = "gi";
+		  	} else {
+		  		regmod = "g";
+		  	}
+		  	//var varpts = vars[i].match(new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod));
+		  	var varpts = new RegExp(/^(\w+)_(\d*[a-zA-Z]+\w+)$/,regmod).exec(vars[i]);
+		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), '"'+varpts[1]+'"_"'+varpts[2]+'"');
+		  	//this repvars was needed to workaround with mathjs confusion with subscripted variables
+		  	str = str.replace(varpts[0], "repvars"+i);
+		  	vars[i] = "repvars"+i;
+		  }
 		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/) && vars[i]!="varE") {
 			  varstoquote.push(vars[i]);
 		  }
+		  */
 	  }
   }
   if (varstoquote.length>0) {
 	  vltq = varstoquote.join("|");
 	  var reg = new RegExp("("+vltq+")","g");
-	  dispstr = str.replace(reg,"\"$1\"");
-  }
+	  dispstr = dispstr.replace(reg,"\"$1\"");
+  }                                   
   dispstr = dispstr.replace("varE","E");
+  dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);	
   
-  var outnode = document.getElementById(outputId);
-  var n = outnode.childNodes.length;
-  for (var i=0; i<n; i++)
-    outnode.removeChild(outnode.firstChild);
-    outnode.appendChild(document.createTextNode('`'+dispstr+'`'));
-    if (!noMathRender) {
-	rendermathnode(outnode);
-    }
-  //outnode.appendChild(AMparseMath(dispstr));
+  return [str,dispstr];
+}
+
+//preview button for numfunc type
+function AMpreview(inputId,outputId) {
+  var qn = inputId.slice(2);
+  var strprocess = AMnumfuncPrepVar(qn, document.getElementById(inputId).value);
+  str = strprocess[0];
+  dispstr = strprocess[1];
   
   //the following does a quick syntax check of the formula
   
+  var vl = vlist[qn];
+  var fl = flist[qn];
   
   ptlist = pts[qn].split(",");
   var err = '';
@@ -682,10 +928,13 @@ function AMpreview(inputId,outputId) {
 	  str = str.replace(reg,"$1*sin($1+");
   }
   vars = vl.split('|');
+
   var totesteqn = mathjs(str,vl);
+
   while (tstpt<ptlist.length && (isNaN(res) || res=="Infinity")) {
 	  var totest = '';
 	  testvals = ptlist[tstpt].split("~");
+
 	  for (var j=0; j<vars.length; j++) {
 		totest += "var " + vars[j] + "="+testvals[j]+";"; 
 	  }
@@ -714,7 +963,11 @@ function AMpreview(inputId,outputId) {
   }
   if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
   else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
-  outnode.appendChild(document.createTextNode(" " + err));
+  //outnode.appendChild(document.createTextNode(" " + err));
+  
+  var qn = outputId.substr(1);
+  setupLivePreview(qn);
+  LivePreviews[qn].RenderNow('`'+dispstr+'` '+wrapAMnotice(err));
 
 }
 
@@ -768,7 +1021,7 @@ function singlevalsyntaxcheck(str,format) {
 
 function syntaxcheckexpr(str,format,vl) {
 	  var err = '';
-	  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/)) {
+	  if (format.indexOf('notrig')!=-1 && str.match(/(sin|cos|tan|cot|sec|csc)/i)) {
 		  err += _("no trig functions allowed")+". ";
 	  } else if (format.indexOf('nodecimal')!=-1 && str.indexOf('.')!=-1) {
 		  err += _("no decimals allowed")+". ";
@@ -789,13 +1042,19 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += " ("+_("unmatched parens")+"). ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)");
+	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*("+vl+"|\\d+)", "i");
 	  } else {
-	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)");
+	  	  reg = new RegExp("(sqrt|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs)\s*(\\d+)", "i");
 	  }
 	  errstuff = str.match(reg);
 	  if (errstuff!=null) {  
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
+	  }
+	  if (vl) {
+	  	  reg = new RegExp("(arc|sqrt|root|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|e|sign|DNE|oo|"+vl+")", "ig");
+	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
+	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";	  
+	  	  }
 	  }
 	  if (str.match(/\|/)) {
 		  err += _(" Use abs(x) instead of |x| for absolute values")+". ";
@@ -806,7 +1065,7 @@ function syntaxcheckexpr(str,format,vl) {
 	  return err;
 }
 
-var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega'];
+var greekletters = ['alpha','beta','chi','delta','epsilon','gamma','phi','psi','sigma','rho','theta','lambda','mu','nu','omega','tau'];
 var calctoproc = {};
 var intcalctoproc = {};
 var calcformat = {};
@@ -931,7 +1190,7 @@ function doonsubmit(form,type2,skipconfirm) {
 			str = str.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 			str = str.replace(',','*NaN*'); //force eval error
 			//str = str.replace(/,/g,"");
-			if (calcformat[qn].indexOf('scinot')!=-1) {
+			if (calcformat[qn].indexOf('scinot')!=-1 || calcformat[qn].indexOf('allowxtimes')!=-1) {
 				str = str.replace(/(x|X|\u00D7)/,"*");
 			}
 			if (str.match(/^\s*[+-]?\s*((\d+(\.\d*)?)|(\.\d+))\s*%\s*$/)) {//single percent
@@ -997,21 +1256,43 @@ function doonsubmit(form,type2,skipconfirm) {
 		varlist = vlist[qn];
 		
 		vars = varlist.split("|");
-		for (var j=0; j<vars.length; j++) {
-			  if (vars[j] == "varE") {
-			  	  str = str.replace("E","varE");	
-			  } else if (vars[j].charCodeAt(0)>96) { //lowercase
-				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
-					 // vars[j] = vars[j].toLowerCase();
-					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
-				  }
-			  } else {
-				  if (arraysearch(vars[j].toLowerCase(),vars)==-1) {
-					//vars[j] = vars[j].toLowerCase();
-					str = str.replace(new RegExp(vars[j],"gi"),vars[j]);
-				  }
+		for (var i=0; i<vars.length; i++) {
+			foundaltcap = false;
+			for (var j=0; j<vars.length; j++) {
+				if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
+					foundaltcap = true;
+					break;
+				}
+			}
+			if (!foundaltcap) {
+				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
+				regmod = "gi";
+			} else {
+				regmod = "g";
+			}
+			
+			if (vars[i].length>2 && vars[i].match(/^\w+_\w+$/)) {
+				var varpts = vars[i].match(/^(\w+)_(\w+)$/);
+				str = str.replace(new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod), vars[i]);
+				str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
+				vars[i] = "repvars"+i;
+			} else if (vars[i] == "varE") {
+				str = str.replace("E","varE");	
+			}
+			
+			/*else if (vars[i].charCodeAt(0)>96) { //lowercase
+			  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
+				//vars[i] = vars[i].toLowerCase();
+				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
 			  }
-		  }
+			} else {
+			  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
+				//vars[i] = vars[i].toLowerCase();
+				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
+			  }
+			}
+			*/
+		}
 		varlist = vars.join("|");
 		
 		if (fl!='') {
@@ -1133,8 +1414,6 @@ function assessbackgsubmit(qn,noticetgt) {
 		}
 		req.open("POST", assesspostbackurl, true);
 		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		req.setRequestHeader("Content-length", params.length);
-		req.setRequestHeader("Connection", "close");
 		req.onreadystatechange = function() {assessbackgsubmitCallback(qn,noticetgt);}; 
 		req.send(params);  
 	} else {
@@ -1185,7 +1464,7 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 					if (typeof G_vmlCanvasManager != 'undefined') {
 						scripts[i] = scripts[i] + 'G_vmlCanvasManager.initElement(document.getElementById("canvas'+k[1]+'"));';
 					}
-					scripts[i] = scripts[i] + "initCanvases("+k[1]+");";     
+					scripts[i] = scripts[i] + "imathasDraw.initCanvases("+k[1]+");";     
 				    }
 				    eval(scripts[i]);
 			    }
@@ -1196,6 +1475,10 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 		    for (var i=0; i<initstack.length; i++) {
 		    	    var foo = initstack[i]();
 		    }
+		    if (LivePreviews.hasOwnProperty(qn)) {
+		    	 LivePreviews[qn].Init();	    
+		    }
+		    $(window).trigger("ImathasEmbedReload");
 		    initcreditboxes();
 		    
 		    var pagescroll = 0;
@@ -1664,4 +1947,62 @@ function initcreditboxes() {
 }
 initstack.push(initcreditboxes);
 	
-	
+function assessmentTimer(duration, timelimitkickout) {
+	var start = Date.now(), remaining, hours, minutes, seconds, countdowntimer, timestr;
+	function updatetimer() {
+		remaining = duration - Math.floor((Date.now() - start)/1000);
+		if (remaining <= 0) {
+			remaining = 0;
+			clearInterval(countdowntimer);
+			if (timelimitkickout) {
+				document.getElementById('timelimitholder').className = "";
+				document.getElementById('timelimitholder').style.color = "#f00";
+				document.getElementById('timelimitholder').innerHTML = _('Time limit expired - submitting now');
+				document.getElementById('timelimitholder').style.fontSize="300%";
+				if (document.getElementById("qform") == null) {
+					setTimeout("window.location.pathname='"+imasroot+"/assessment/showtest.php?action=skip&superdone=true'",2000); 
+					return;
+				} else {
+					var theform = document.getElementById("qform");
+					var action = theform.getAttribute("action");
+					theform.setAttribute("action",action+'&superdone=true');
+					if (doonsubmit(theform,true,true)) { setTimeout('document.getElementById("qform").submit()',2000);}
+				}
+				return 0;		
+			} else {
+				alert(_('Time Limit has elapsed'));
+			}
+		} // end remaining <= 0
+		seconds = Math.floor((remaining)%60);
+		minutes = Math.floor((remaining/60)%60);
+		hours = Math.floor(remaining/3600);
+		if (hours==0 && minutes <= 5) {document.getElementById("timeremaining").style.color="#f00";}
+		if (hours==0 && minutes==0 && seconds <= 5) {document.getElementById("timeremaining").style.fontSize="150%";}
+		timestr = ((hours>0)?hours+":":"") + ((hours>0 && minutes<10)?"0":"") + minutes+":" + (seconds<10?"0":"")+seconds;
+		document.getElementById("timeremaining").innerHTML = timestr;
+	}
+	countdowntimer = setInterval(updatetimer, 1000);
+	$(document).ready(function() {
+		var s = $("#timerwrap");
+		var pos = s.position();                   
+		$(window).scroll(function() {
+		   var windowpos = $(window).scrollTop();
+		   if (windowpos >= pos.top) {
+		     s.addClass("sticky");
+		   } else {
+		     s.removeClass("sticky");
+		   }
+		 });
+	});
+}
+function toggletimer() {
+	if ($("#timerhide").text()=="[x]") {
+		$("#timercontent").hide();
+		$("#timerhide").text("["+_("Show Timer")+"]");
+		$("#timerhide").attr("title","["+_("Show Timer")+"]");
+	} else {
+		$("#timercontent").show();
+		$("#timerhide").text("[x]");
+		$("#timerhide").attr("title",_("Hide Timer"));
+	}
+}

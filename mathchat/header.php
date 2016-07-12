@@ -19,7 +19,8 @@ window.onload = resizechat;
 </script>
 <![endif]-->
 <script type="text/javascript" src="mathchat.js"></script>
-<script type="text/javascript" src="../javascript/ASCIIsvg.js"></script>
+<script type="text/javascript" src="../javascript/ASCIIsvg_min.js"></script>
+<script type="text/javascript" src="../javascript/mathjs.js"></script>
 <script type="text/javascript">var AMTcgiloc = "<?php echo $mathimgurl;?>";</script>
 <script type="text/javascript">var AScgiloc = "<?php echo $svgimgurl;?>";</script>
 <?php

@@ -180,6 +180,10 @@
 					for (var i=0; i<AMtags.length; i++) {
 						t.math2ascii(AMtags[i]); 
 					}
+					MJtags = ed.dom.select('span[data-asciimath]', o.node);
+					for (var i=0; i<MJtags.length; i++) {
+						t.mathjax2ascii(MJtags[i]); 
+					}
 					AMtags = ed.dom.select('span.AMedit', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						var myAM = AMtags[i].innerHTML;
@@ -357,6 +361,19 @@
 				myAM = "`"+myAM.replace(/\`/g,"")+"`";
 				el.innerHTML = myAM;
 			}
+		},
+		
+		mathjax2ascii : function(el) {
+			var myAM = el.getAttribute("data-asciimath");
+			var attr = el.attributes;
+			var i = attr.length;
+			while (i--) {
+				el.removeAttribute(attr[i].name);
+				console.log(el);
+			}
+			el.className = "AM";
+			el.title = myAM;
+			el.innerHTML = "`"+myAM+"`";
 		},
 		
 		nodeToAM : function(outnode) {
