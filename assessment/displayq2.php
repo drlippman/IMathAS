@@ -202,6 +202,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if (!is_array($answeights)) {
 					$answeights = explode(",",$answeights);
 				}
+				$answeights = array_map('trim', $answeights);
 				$localsum = array_sum($answeights);
 				if ($localsum==0) {$localsum = 1;}
 				foreach ($answeights as $kidx=>$vval) {
@@ -791,6 +792,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			if (!is_array($answeights)) {
 				$answeights = explode(",",$answeights);
 			}
+			$answeights = array_map('trim',$answeights);
 			$localsum = array_sum($answeights);
 			if ($localsum==0) {$localsum = 1;}
 			foreach ($answeights as $kidx=>$vval) {
@@ -1240,7 +1242,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$tip = _('Select all correct answers');
 		if (isset($answers)) {
-			$akeys = explode(',',$answers);
+			$akeys = array_map('trim',explode(',',$answers));
 			foreach($akeys as $akey) {
 				$sa .= '<br/>'.$questions[$akey];
 			}
@@ -1265,7 +1267,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			echo _('Eeek!  $questions or $answers is not defined or needs to be an array');
 			return false;
 		}
-		if (isset($matchlist)) { $matchlist = explode(',',$matchlist);}
+		if (isset($matchlist)) { $matchlist = array_map('trim',explode(',',$matchlist));}
 		if ($noshuffle=="questions" || $noshuffle=='all') {
 			$randqkeys = array_keys($questions);
 		} else {
@@ -1415,7 +1417,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "$leftb<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 		
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 			$tip = _('Enter your answer as a list of values separated by commas: Example: -4, 3, 2') . "<br/>";
 			$eword = _('each value');
@@ -1529,7 +1531,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		$la = explode('$#$',$la);
 		$la = $la[0];
@@ -1638,7 +1640,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$preview .= "<span id=p$qn></span>\n";
 		
 		if (!isset($variables)) { $variables = "x";}
-		$variables = explode(",",$variables);
+		$variables = array_map('trim',explode(",",$variables));
 		$ovar = array();
 		$ofunc = array();
 		for ($i = 0; $i < count($variables); $i++) {
@@ -1659,7 +1661,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$vlist = implode("|",$variables);
 		$flist = implode('|',$ofunc);
 		$out .= "<script type=\"text/javascript\">functoproc[$qn] = 1; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
-		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
+		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
 		
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
@@ -1764,7 +1766,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		$la = explode('$#$',$la);
 		$la = $la[0];
@@ -1868,12 +1870,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['hidepreview'])) {if (is_array($options['hidepreview'])) {$hidepreview = $options['hidepreview'][$qn];} else {$hidepreview = $options['hidepreview'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		if (in_array('list',$ansformats)) {
 			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5i,-3-4i') . "<br/>";
@@ -2245,7 +2247,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['variables'])) {if (is_array($options['variables'])) {$variables = $options['variables'][$qn];} else {$variables = $options['variables'];}}
 		if (!isset($answerformat)) { $answerformat = '';}
 		if (!isset($variables)) { $variables = 'x';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		if (!isset($sz)) { $sz = 20;}
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
@@ -2356,7 +2358,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!isset($answerformat)) {
 			$answerformat = array('line','dot','opendot');
 		} else if (!is_array($answerformat)) {
-			$answerformat = explode(',',$answerformat);
+			$answerformat = array_map('trim',explode(',',$answerformat));
 		}
 		
 		if ($answerformat[0]=='numberline') {
@@ -2373,7 +2375,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if (isset($grid)) {
 			if (!is_array($grid)) {
-				$grid = explode(',',$grid);
+				$grid = array_map('trim',explode(',',$grid));
 			} else if (strpos($grid[0],',')!==false) {//forgot to set as multipart?
 				$grid = array();
 			}
@@ -2644,7 +2646,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			foreach($answers as $ans) {
 				if (is_array($ans)) { continue;} //shouldn't happen, unless user forgot to set question to multipart
 				if ($ans=='') { continue;}
-				$function = explode(',',$ans);
+				$function = array_map('trim',explode(',',$ans));
 				if ($answerformat[0]=='inequality') {
 					if ($function[0]{2}=='=') {
 						$type = 10;
@@ -2857,7 +2859,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (isset($partialcredit)) {
 			if (!is_array($partialcredit)) {
-				$partialcredit = explode(',',$partialcredit);
+				$partialcredit = array_map('trim',explode(',',$partialcredit));
 			}
 			$altanswers = array(); $altweights = array();
 			for ($i=0;$i<count($partialcredit);$i+=2) {
@@ -2899,15 +2901,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answerformat = str_replace('set','list',$answerformat);
 		}
 		if ($answerformat=='exactlist') {
-			$gaarr = explode(',',$givenans);
+			$gaarr = array_map('trim', explode(',',$givenans));
 			$gaarrcnt = count($gaarr);
 			$anarr = explode(',',$answer);
 		} else if ($answerformat=='orderedlist') {
-			$gamasterarr = explode(',',$givenans);
+			$gamasterarr = array_map('trim', explode(',',$givenans));
 			$gaarr = $gamasterarr;
 			$anarr = explode(',',$answer);
 		} else if ($answerformat=='list') {
-			$tmp = explode(',',$givenans);
+			$tmp = array_map('trim', explode(',',$givenans));
 			sort($tmp);
 			$gaarr = array($tmp[0]);
 			for ($i=1;$i<count($tmp);$i++) {
@@ -3233,7 +3235,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$randakeys = array_rand($answers,count($answers));
 			shuffle($randakeys);
 		}
-		if (isset($matchlist)) {$matchlist = explode(',',$matchlist);}
+		if (isset($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}
 		
 		$origla = array();
 		for ($i=0;$i<count($questions);$i++) {
@@ -3320,7 +3322,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		$correct = true;
 		$ansr = substr($answer,2,-2);
@@ -3390,7 +3392,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$givenans = str_replace('∞', 'oo', $givenans);
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		$answer = str_replace(' ','',$answer);
 		
 		if ($anstype=='ntuple') {
@@ -3511,7 +3513,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		if ($anstype=='complex') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calccomplex') {
@@ -3548,9 +3550,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 		}
 					
-		if (!isset($answerformat)) { $answerformat = '';}
-		$ansformats = explode(',',$answerformat);
-		
 		if ($givenans == null) {return 0;}
 		$answer = str_replace(' ','',makepretty($answer));
 		$givenans = str_replace(' ','',$givenans);
@@ -3559,8 +3558,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			return 1;
 		}
 		
-		$gaarr = explode(',',$givenans);
-		$anarr = explode(',',$answer);
+		$gaarr = array_map('trim',explode(',',$givenans));
+		$anarr = array_map('trim',explode(',',$answer));
 	
 		if (count($gaarr)==0) {
 			return 0;
@@ -3639,7 +3638,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$formatok = "nowhole";
 		}
 		
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		if (in_array("scinot",$ansformats)) {
 			$answer = str_replace('xx','*',$answer);
@@ -3648,11 +3647,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = str_replace(array('{','}'),'', $answer);
 			$givenans = str_replace(array('{','}'),'', $givenans);
 			$_POST["tc$qn"] = str_replace(array('{','}'),'', $_POST["tc$qn"]);
-			$ansformats = explode(',', str_replace('set','list',$answerformat));
+			$ansformats = array_map('trim',explode(',', str_replace('set','list',$answerformat)));
 		}
 		//pre-evaluate all instructor expressions - preg match all intervals.  Return array of or options
 		if (in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats) || in_array('list',$ansformats)) {
-			$anarr = explode(',',$answer);
+			$anarr = array_map('trim',explode(',',$answer));
 			foreach ($anarr as $k=>$ananswer) {
 				$aarr = explode(' or ',$ananswer);
 				foreach ($aarr as $j=>$anans) {
@@ -3675,7 +3674,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$anarr[$k] = $aarr;
 			}
 		} else {
-			$aarr = explode(' or ',$answer);
+			$aarr = array_map('trim',explode(' or ',$answer));
 			foreach ($aarr as $j=>$anans) {
 				if ($anans=='') {
 					if (isset($GLOBALS['teacherid'])) {
@@ -3697,17 +3696,17 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 
 		if (in_array('exactlist',$ansformats)) {
-			$gaarr = explode(',',$givenans);
+			$gaarr = array_map('trim',explode(',',$givenans));
 			//$anarr = explode(',',$answer);
-			$orarr = explode(',',$_POST["tc$qn"]);
+			$orarr = array_map('trim',explode(',',$_POST["tc$qn"]));
 		} else if (in_array('orderedlist',$ansformats)) {
-			$gamasterarr = explode(',',$givenans);
+			$gamasterarr = array_map('trim',explode(',',$givenans));
 			$gaarr = $gamasterarr;
 			//$anarr = explode(',',$answer);
 			$orarr = explode(',',$_POST["tc$qn"]);
 		} else if (in_array('list',$ansformats)) {
-			$tmp = explode(',',$givenans);
-			$tmpor = explode(',',$_POST["tc$qn"]);
+			$tmp = array_map('trim',explode(',',$givenans));
+			$tmpor = array_map('trim',explode(',',$_POST["tc$qn"]));
 			asort($tmp);
 			$lastval = null;
 			foreach ($tmp as $i=>$v) {
@@ -3868,7 +3867,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$correct = true;
 		
 		if (!isset($variables)) { $variables = "x";}
-		$variables = explode(",",$variables);
+		$variables = array_map('trim',explode(",",$variables));
 		$ofunc = array();
 		for ($i = 0; $i < count($variables); $i++) {
 			$variables[$i] = trim($variables[$i]);
@@ -3888,7 +3887,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		$vlist = implode("|",$variables);
 		
-		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
+		if (isset($domain)) {$fromto = array_map('trim',explode(",",$domain));} else {$fromto[0]=-10; $fromto[1]=10;}
 		
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
@@ -3906,7 +3905,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			echo 'Your $answer contains an equal sign, but you do not have $answerformat="equation" set. This question probably will not work right.';
 		}
 		
-		$ansarr = explode(' or ',$answer);
+		$ansarr = array_map('trim',explode(' or ',$answer));
 		$partialpts = array_fill(0, count($ansarr), 1);
 		$origanscnt = count($ansarr);
 		if (isset($partialcredit)) {
@@ -4085,8 +4084,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if (!isset($answerformat)) { $answerformat = "normal";}
 		if ($answerformat=='list') {
-			$gaarr = explode(',',$givenans);
-			$anarr = explode(',',$answer);
+			$gaarr = array_map('trim',explode(',',$givenans));
+			$anarr = array_map('trim',explode(',',$answer));
 		} else {
 			$gaarr = array($givenans);
 			$anarr = array($answer);
@@ -4095,7 +4094,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$strflags = explode(",",$strflags);
 		$torem = array();
 		foreach($strflags as $flag) {
-			$pc = explode('=',$flag);
+			$pc = array_map('trim',explode('=',$flag));
 			if ($pc[0]=='ignore_symbol') {
 				$torem[] = $pc[1];
 				continue;
@@ -4247,7 +4246,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($variables)) { $variables = 'x';}
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
-		$ansformats = explode(',',$answerformat);
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		$givenans = normalizemathunicode($givenans);
 		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
@@ -4457,7 +4456,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if (isset($grid)) {
 			if (!is_array($grid)) {
-				$grid = explode(',',$grid);
+				$grid = array_map('trim',explode(',',$grid));
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
@@ -4503,7 +4502,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 		if ($answerformat[0]=="polygon" || $answerformat[0]=='closedpolygon') {
 			foreach ($answers as $key=>$function) {
-				$function = explode(',',$function);
+				$function = array_map('trim',explode(',',$function));
 				$pixx = (evalbasic($function[0]) - $settings[0])*$pixelsperx + $imgborder;
 				$pixy = $settings[7] - (evalbasic($function[1])-$settings[2])*$pixelspery - $imgborder;	
 				$ansdots[$key] = array($pixx,$pixy);
@@ -4608,7 +4607,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ymidp = $ytopix($ymid); //$settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
-				$function = explode(',',$function);
+				$function = array_map('trim',explode(',',$function));
 				//curves: function
 				//	  function, xmin, xmax
 				//dot:  x,y
@@ -5243,7 +5242,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$ymidp = $settings[7] - ($ymid-$settings[2])*$pixelspery - $imgborder;
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
-				$function = explode(',',$function);
+				$function = array_map('trim',explode(',',$function));
 				if ($function[0]{0}=='x' && ($function[0]{1}=='<' || $function[0]{1}=='>')) {
 					$isxequals = true;
 					$function[0] = substr($function[0],1);
@@ -5397,7 +5396,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if ($answerformat[0]=='numberline') {
 			foreach ($answers as $key=>$function) {
 				if ($function=='') { continue; }
-				$function = explode(',',$function);
+				$function = array_map('trim',explode(',',$function));
 				if (count($function)==2 || (count($function)==3 && ($function[2]=='open' || $function[2]=='closed'))) { //is dot
 					$pixx = ($function[0] - $settings[0])*$pixelsperx + $imgborder;
 					$pixy = $settings[7] - ($function[1]-$settings[2])*$pixelspery - $imgborder;	
@@ -5706,7 +5705,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$partweights = array_fill(0,count($scores),1/count($scores));
 		} else {
 			if (!is_array($partweights)) {
-				$partweights = explode(',',$partweights);
+				$partweights = array_map('trim',explode(',',$partweights));
 			}
 		}
 		$totscore = 0;
@@ -5893,7 +5892,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['variables'])) {$variables = $options['variables'];} else { $variables = "x";}
 		$anstypes = $options['anstypes'];
 		if (!is_array($anstypes)) {
-			$anstypes = explode(',',$anstypes);
+			$anstypes = array_map('trim',explode(',',$anstypes));
 		}
 		$la = array();
 		foreach ($anstypes as $i=>$anst) {
@@ -6027,7 +6026,7 @@ function checkreqtimes($tocheck,$rtimes) {
 	}
 	$ignore_case = false;
 	if ($rtimes != '') {
-		$list = explode(",",$rtimes);
+		$list = array_map('trim',explode(",",$rtimes));
 		for ($i=0;$i < count($list);$i+=2) {
 			if ($list[$i]=='' || strlen($list[$i+1])<2) {continue;}
 			$list[$i+1] = trim($list[$i+1]);
