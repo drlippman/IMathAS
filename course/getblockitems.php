@@ -88,10 +88,11 @@
    
   
    //get latepasses
-   if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1) {
-	   $query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   $latepasses = mysql_result($result,0,0);
+   if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1 && isset($studentinfo)) {
+	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+	   //$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //$latepasses = mysql_result($result,0,0);
+	   $latepasses = $studentinfo['latepasses'];
    } else {
 	   $latepasses = 0;
    }

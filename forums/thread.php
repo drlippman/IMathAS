@@ -85,9 +85,9 @@
 		}
 			exit;	
 	}
-	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist,enddate,avail,postinstr,replyinstr FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT name,postby,replyby,settings,groupsetid,sortby,taglist,enddate,avail,postinstr,replyinstr,allowlate FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	list($forumname, $postby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr) = mysql_fetch_row($result);
+	list($forumname, $postby, $replyby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr, $allowlate) = mysql_fetch_row($result);
 	
 	if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 		require("../header.php");
@@ -259,6 +259,49 @@
 			}
 		}
 	}
+	
+	$duedates = '';
+	if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
+		$exception = null; $latepasses = 0;
+		if (isset($studentid)) {
+			$query = "SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid='$forumid' AND userid='$userid' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
+			$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			if (mysql_num_rows($result)>0) {
+				$exception = mysql_fetch_row($result);
+			}
+			$latepasses = $studentinfo['latepasses'];
+		}
+		
+		require_once("../includes/exceptionfuncs.php");
+		$infoline = array('replyby'=>$replyby, 'postby'=>$postby, 'enddate'=>$enddate, 'allowlate'=>$allowlate);
+		list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = getCanUseLatePassForums($exception, $infoline);
+		if ($postby>0 && $postby<2000000000) {
+			if ($postby>$now) { 
+				$duedates .= sprintf(_('New Threads due %s. '), tzdate("D n/j/y, g:i a",$postby));
+			} else {
+				$duedates .= sprintf(_('New Threads were due %s. '), tzdate("D n/j/y, g:i a",$postby));   
+			}
+		}
+		if ($replyby>0 && $replyby<2000000000) {
+			//if ($duedates != '') {$duedates .= '<br/>';}
+			if ($replyby>$now) { 
+				$duedates .= sprintf(_('Replies due %s. '), tzdate("D n/j/y, g:i a",$replyby));
+			} else {
+				$duedates .= sprintf(_('Replies were due %s. '), tzdate("D n/j/y, g:i a",$replyby));   
+			}
+		}
+		//if ($duedates != '' && ($canuselatepassP || $canuselatepassR || $canundolatepass)) {$duedates .= '<br/>';}
+		if ($canuselatepassP || $canuselatepassR) {	
+			$duedates .= " <a href=\"$imasroot/course/redeemlatepassforum.php?cid=$cid&fid=$forumid&from=forum\">". _('Use LatePass'). "</a>";
+			if ($canundolatepass) {
+				$duedates .= ' |';
+			}
+		}
+		if ($canundolatepass) {
+			$duedates .= " <a href=\"$imasroot/course/redeemlatepassforum.php?cid=$cid&fid=$forumid&undo=true&from=forum\">". _('Un-use LatePass'). "</a>";
+		}
+	}
+	
 	$caller = 'thread';
 	if (isset($_GET['modify']) || isset($_GET['remove']) || isset($_GET['move'])) {
 		require("posthandler.php");
@@ -275,6 +318,10 @@
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
 	echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
+	
+	if ($duedates!='') {
+		echo '<p id="forumduedates">'.$duedates.'</p>';
+	}
 	
 	if ($postinstr != '' || $replyinstr != '') {
 		echo '<a href="#" onclick="$(\'#postreplyinstr\').show();$(this).remove();return false;">';

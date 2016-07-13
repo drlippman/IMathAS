@@ -5,6 +5,7 @@
 	require("../validate.php");
 	$cid = $_GET['cid'];
 	$fid = $_GET['fid'];
+	$from = $_GET['from'];
 	
 	$query = "SELECT latepasshrs FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -66,7 +67,6 @@
 					if (($row[3]=='F' && $postn==$row[2] && $replyn==$row[2]) || ($row[3]=='R' && $replyn==$row[2]) || ($row[3]=='P' && $postn==$row[2])) {
 						//returning all the latepasses
 						$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$fid' AND (itemtype='F' OR itemtype='R' OR itemtype='P')";
-						echo $query;
 						mysql_query($query) or die("Query failed : " . mysql_error());
 						$toreturn = $row[2];
 					} else {
@@ -82,18 +82,19 @@
 							$newpostend = $row[0] - $postn*$hours*60*60;
 						}
 						$query = "UPDATE imas_exceptions SET islatepass=islatepass-$toreturn,startdate=$newpostend,enddate=$newreplyend WHERE userid='$userid' AND assessmentid='$fid' AND (itemtype='F' OR itemtype='R' OR itemtype='P')";
-						echo $query;
 						mysql_query($query) or die("Query failed : " . mysql_error());
 					}
 					echo "<p>Returning $toreturn LatePass".($toreturn>1?"es":"")."</p>";
 					$query = "UPDATE imas_students SET latepass=latepass+$toreturn WHERE userid='$userid' AND courseid='$cid'";
-					echo $query;
 					mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
 		}
-		
-		echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
+		if ($from=='forum') {
+			echo "<p><a href=\"../forums/thread.php?cid=$cid&forum=$fid\">Continue</a></p>";
+		} else {
+			echo "<p><a href=\"course.php?cid=$cid\">Continue</a></p>";
+		}
 		
 		require("../footer.php");
 		
@@ -147,8 +148,11 @@
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-		
-		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		if ($from=='forum') {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/forums/thread.php?cid=$cid&forum=$fid");
+		} else {
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
+		}
 
 	} else {
 		//TO HERE - TODO keep going
@@ -207,23 +211,29 @@
 			echo "<p>You have no late passes remaining.</p>";
 		} else if ($canuselatepasspost || $canuselatepassreply) {
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
-			echo "<form method=post action=\"redeemlatepassforum.php?cid=$cid&fid=$fid&confirm=true\">";
+			echo "<form method=post action=\"redeemlatepassforum.php?cid=$cid&fid=$fid&from=$from&confirm=true\">";
 			if ($allowlaten>1) {
 				echo '<p>You may use up to '.($allowlaten-1-$usedlatepasses).' more LatePass(es) on this forum assignment.</p>'; 
 			}
-			echo "<p>You have $numlatepass LatePass(es) remaining.  You can redeem one LatePass for a $hours hour extension on ";
+			echo "<p>You have $numlatepass LatePass(es) remaining.</p>";
+			echo "<p>You can redeem one LatePass for a $hours hour extension on ";
 			if ($canuselatepasspost) {
-				echo " the New Threads due date ";
+				echo " the <b>New Threads</b> due date ";
 				if ($canuselatepassreply) {
 					echo "and";
 				}
 			}
 			if ($canuselatepassreply) {
-				echo " the Replies due date ";
+				echo " the <b>Replies</b> due date ";
 			}
-			echo "for this forum assignment.  Are you sure you want to redeem a LatePass?</p>";
-			echo "<input type=submit value=\"Yes, Redeem LatePass\"/>";
-			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+			echo "for this forum assignment.</p><p>Are you sure you want to redeem a LatePass?</p>";
+			echo "<input type=submit value=\"Yes, Redeem LatePass\"/> ";
+			if ($from=='forum') {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='../forums/thread.php?cid=$cid&forum=$fid'\"/>";
+			} else {
+				echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='course.php?cid=$cid'\"/>";
+				
+			}
 			
 			echo "</form>";
 		} else {

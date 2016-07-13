@@ -60,10 +60,21 @@
 		}
 		exit;
 	}
-	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT settings,replyby,defdisplay,name,points,groupsetid,postby,rubric,tutoredit,enddate,avail,allowlate FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail) = mysql_fetch_row($result);
-	
+	list($forumsettings, $replyby, $defdisplay, $forumname, $pointsposs, $groupset, $postby, $rubric, $tutoredit, $enddate, $avail, $allowlate) = mysql_fetch_row($result);
+	if (($postby>0 && $postby<2000000000) || ($replyby>0 && $replyby<2000000000)) {
+		$query = "SELECT startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE assessmentid='$forumid' AND userid='$userid' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
+		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		if (mysql_num_rows($result)>0) {
+			$exception = mysql_fetch_row($result);
+		} else {
+			$exception = null;
+		}
+		require_once("../includes/exceptionfuncs.php");
+		$infoline = array('replyby'=>$replyby, 'postby'=>$postby, 'enddate'=>$enddate, 'allowlate'=>$allowlate);
+		list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $postby, $replyby, $enddate) = getCanUseLatePassForums($exception, $infoline);
+	}
 	if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 		require("../header.php");
 		echo '<p>This forum is closed.  <a href="course.php?cid='.$cid.'">Return to the course page</a></p>';
