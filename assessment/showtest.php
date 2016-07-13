@@ -944,7 +944,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher']?'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
-			$livepollsig = urlencode(base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true)));
+			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
 		}
 		$placeinhead .= '<script type="text/javascript">
 				if (typeof io != "undefined") {livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");}
