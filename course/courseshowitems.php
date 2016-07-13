@@ -1237,65 +1237,8 @@ function enditem($canedit) {
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			   
 			   //check for exception
-			   $canundolatepassP = false;
-			   $canundolatepassR = false;
-			   $latepasscntP = 0;
-			   $latepasscntR = 0;
-			   if (isset($exceptions[$items[$i]])) {
-			   	   //for forums, exceptions[$items[$i]][0] is used for postby and [1] is used for replyby
-			   	   if (($exceptions[$items[$i]][4]=='P' || $exceptions[$items[$i]][4]=='F') && $exceptions[$items[$i]][0]>0) {
-					   //if latepass and it's before original due date or exception is for more than a latepass past now
-					   if ($exceptions[$items[$i]][2]>0 && ($now < $line['postby'] || $exceptions[$items[$i]][0] > $now + $latepasshrs*60*60)) {
-						   $canundolatepassP = true;
-					   }
-					   if ($exceptions[$items[$i]][2]>0) {
-						   $latepasscntP = max(0,round(($exceptions[$items[$i]][0] - $line['postby'])/($latepasshrs*3600)));
-					   }
-					   $line['postby'] = $exceptions[$items[$i]][0];
-					   if ($line['postby']>$line['enddate']) { //extend enddate if needed to accomodate postby exception
-					   	   $line['enddate'] = $line['postby'];
-					   }
-				   }
-				   if (($exceptions[$items[$i]][4]=='R' || $exceptions[$items[$i]][4]=='F') && $exceptions[$items[$i]][1]>0) {
-					   //if latepass and it's before original due date or exception is for more than a latepass past now
-					   if ($exceptions[$items[$i]][2]>0 && ($now < $line['replyby'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
-						   $canundolatepassR = true;
-					   }
-					   if ($exceptions[$items[$i]][2]>0) {
-						   $latepasscntR = max(0,round(($exceptions[$items[$i]][1] - $line['replyby'])/($latepasshrs*3600)));
-					   }
-					   $line['replyby'] = $exceptions[$items[$i]][1];
-					   if ($line['replyby']>$line['enddate']) { //extend enddate if needed to accomodate postby exception
-					   	   $line['enddate'] = $line['replyby'];
-					   }
-				   }
-			   }
-			   $canundolatepass = false;
-			   if ($exceptions[$items[$i]][4]=='F' && $exceptions[$items[$i]][0]>0 && $exceptions[$items[$i]][1]>0) {
-			   	  $canundolatepass = $canundolatepassP && $canundolatepassR;
-			   } else {
-			   	  $canundolatepass = $canundolatepassP || $canundolatepassR; 
-			   }
-			   $canuselatepassP = false;
-			   $canuselatepassR = false;
-			   if ($line['allowlate']>0 && $latepasses>0 && !isset($sessiondata['stuview'])) {
-			   	   $allowlaten = $line['allowlate']%10;
-			   	   $allowlateon = floor($line['allowlate']/10)%10;
-			   	   if ($allowlateon != 3 && $line['postby']<2000000000 && ($allowlaten==1 || $allowlaten-1>$latepasscntP)) { //it allows post LPs, and can use latepases
-			   	   	   if ($line['allowlate']>=100 && ($now - $line['postby'])<$latepasshrs*3600) { //allow after due date
-			   	   	   	   $canuselatepassP = true;
-			   	   	   } else if ($line['allowlate']<100 && $now < $line['postby']) {
-			   	   	   	   $canuselatepassP = true;
-			   	   	   }
-			   	   }
-			   	   if ($allowlateon != 2 && $line['replyby']<2000000000&& ($allowlaten==1 || $allowlaten-1>$latepasscntR)) { //it allows replies LPs
-			   	   	   if ($line['allowlate']>=100 && ($now - $line['replyby'])<$latepasshrs*3600) { //allow after due date
-			   	   	   	   $canuselatepassR = true;
-			   	   	   } else if ($line['allowlate']<100 && $now < $line['replyby']) {
-			   	   	   	   $canuselatepassR = true;
-			   	   	   }
-			   	   }
-			   }
+			   require_once("../includes/exceptionfuncs.php");
+			   list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = getCanUseLatePassForums(isset($exceptions[$items[$i]])?$exceptions[$items[$i]]:null, $line);
 			   
 			   /*$dofilter = false;
 			   if ($line['grpaid']>0) {
