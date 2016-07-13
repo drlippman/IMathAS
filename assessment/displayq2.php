@@ -2850,7 +2850,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
 		
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
-		$givenans = str_replace('∞', 'oo', $givenans);
+		$givenans = normalizemathunicode($givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		
 		if (isset($requiretimes) && checkreqtimes($givenans,$requiretimes)==0) {
@@ -6361,7 +6361,9 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
-	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷','⋅'), array('(',')','oo','U','/','<=','>=','/','*'), $str);
+	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
+	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
+	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅'), array('(',')','oo','U','<=','>=','*'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;	
 }
