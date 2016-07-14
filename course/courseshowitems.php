@@ -1747,6 +1747,10 @@ function enditem($canedit) {
 				  // return ($exceptions[$item]);
 				   if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
 				   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
+			   } else if (isset($exceptions[$item]) && ($exceptions[$item][4]=='F' || $exceptions[$item][4]=='P' || $exceptions[$item][4]=='R')) {
+			   	   //extend due date if replyby or postby bigger than enddate
+			   	   if ($exceptions[$item][0]>$maxedate) { $maxedate = $exceptions[$item][0];}
+			   	   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
 			   }
 		   }
 	   }
