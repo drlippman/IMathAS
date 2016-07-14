@@ -959,7 +959,6 @@ function gbtable() {
 			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		}
 	}
-	print_r($exceptions);
 	
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
