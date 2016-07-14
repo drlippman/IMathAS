@@ -847,7 +847,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 
   dx = (dx==null?xunitlength:dx*xunitlength);
   dy = (dy==null?dx:dy*yunitlength);
-  fontsize = Math.floor(Math.min(dx/1.5,dy/1.5,16));//alert(fontsize)
+  fontsize = Math.floor(Math.min(Math.abs(dx)/1.5, Math.abs(dy)/1.5,16));//alert(fontsize)
   ticklength = fontsize/4;
   if (xgrid!=null) gdx = xgrid;
   if (ygrid!=null) gdy = ygrid;
@@ -896,7 +896,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	  st += " M"+origin[0]+","+winymin+" "+origin[0]+","+winymax;
   }
   
-  if (dox) {
+  if (dox && dx>0) {
 	  for (x = origin[0]; x<winxmax; x = x+dx)
 	    if (x>=winymin) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
 		   (height-origin[1]-ticklength);
@@ -904,7 +904,7 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
 	   if (x<=winxmax) st += " M"+x+","+(height-origin[1]+ticklength)+" "+x+","+
 		   (height-origin[1]-ticklength);
   }
-  if (doy) {
+  if (doy && dy>0) {
 	  for (y = height-origin[1]; y<winymax; y = y+dy)
 	    if (y>=winymin) st += " M"+(origin[0]+ticklength)+","+y+" "+(origin[0]-ticklength)+","+y;
 	  for (y = height-origin[1]-dy; y>winymin; y = y-dy)
@@ -921,13 +921,13 @@ function axes(dx,dy,labels,gdx,gdy,dox,doy,smallticks) {
     var ddy = floor(1.1-log(ldy)/log(10))+1;
     if (ddy<0) { ddy = 0;}
     if (ddx<0) { ddx = 0;}
-    if (dox) {
+    if (dox && dx>0) {
 	    for (x = (doy?ldx:0); x<=xmax; x = x+ldx)
 	      if (x>=xmin) text([x,ly],chopZ(x.toFixed(ddx)),lxp);
 	    for (x = -ldx; xmin<=x; x = x-ldx)
 	      if (x<=xmax) text([x,ly],chopZ(x.toFixed(ddx)),lxp);
     }
-    if (doy) {
+    if (doy && dy>0) {
 	    for (y = (dox?ldy:0); y<=ymax; y = y+ldy)
 	      if (y>=ymin) text([lx,y],chopZ(y.toFixed(ddy)),lyp);
 	    for (y = -ldy; ymin<=y; y = y-ldy)
