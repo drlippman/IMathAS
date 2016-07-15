@@ -1886,6 +1886,9 @@ These macros are used to test various conditions.  They typically return true or
 <h2><a name="feedbackmacros">Feedback Macros</a></h2>
 These macros are used to select and format feedback messages to students.  They return a string which can be placed in the question text.
 <ul>
+<li><b>getfeedbackbasic(correct msg, incorrect msg, $thisq, [partnum])</b>:  Generates a feedback string based solely on whether the 
+  question was scored correct or not.  Provide the correct and incorrect messages to display, and provide $thisq.  Give a part number for
+  multipart questions to get part-based feedback.</li>
 <li><b>getfeedbacktxt(stuans, feedbacktxt, ans)</b>:  Gives feedback on multiple choice questions.  <br/>
   stuans should be the student answer, obtained from
    $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart. <br/>
