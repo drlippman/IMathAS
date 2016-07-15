@@ -494,6 +494,7 @@ function ASaxes($arg) {
 	if (!$this->isinit) {$this->ASinitPicture();}
 	//$arg = explode(',',$arg);
 	$xscl = 0; $yscl = 0; $xgrid = 0; $ygrid = 0; $dolabels = false; $dogrid = false; $dosmallticks = false;
+	$fqonlyx = false; $fqonlyy = false;
 	$dox = true;
 	$doy = true;
 	if (is_numeric($arg[0])) {
@@ -527,12 +528,16 @@ function ASaxes($arg) {
 		$ygrid = $this->evalifneeded($arg[4]);
 	}
 	if (count($arg)>5) {
-		if ($arg[5]=='off' || $arg[5]=='0') {
+		if ($arg[5]=='fq') {
+			$fqonlyx = true;
+		} else if ($arg[5]=='off' || $arg[5]=='0') {
 			$dox = false;
 		}
 	}
 	if (count($arg)>6) {
-		if ($arg[6]=='off' || $arg[6]=='0') {
+		if ($arg[6]=='fq') {
+			$fqonlyy = true;
+		} else if ($arg[6]=='off' || $arg[6]=='0') {
 			$doy = false;
 		}
 	}
@@ -602,24 +607,28 @@ function ASaxes($arg) {
 		if ($dox) {
 			for ($x=$this->origin[0]+($doy?$xgrid:0); $x<=$this->winxmax; $x += $xgrid) {
 				if ($x>=$this->winxmin) {
-					imageline($this->img,$x,$this->winymin,$x,$this->winymax,$this->$gc);
+					imageline($this->img,$x,$this->winymin,$x,($fqonlyy?$this->height-$this->origin[1]:$this->winymax),$this->$gc);
 				}
 			}
-			for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
-				if ($x<=$this->winxmax) {
-					imageline($this->img,$x,$this->winymin,$x,$this->winymax,$this->$gc);
+			if (!$fqonlyx) {
+				for ($x=$this->origin[0]-$xgrid; $x>=$this->winxmin; $x -= $xgrid) {
+					if ($x<=$this->winxmax) {
+						imageline($this->img,$x,$this->winymin,$x,($fqonlyy?$this->height-$this->origin[1]:$this->winymax),$this->$gc);
+					}
 				}
 			}
 		}
 		if ($doy) {
-			for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
-				if ($y>=$this->winymin) {
-					imageline($this->img,$this->winxmin,$y,$this->winxmax,$y,$this->$gc);
+			if (!$fqonlyy) {
+				for ($y=$this->height - $this->origin[1]+($dox?$ygrid:0); $y<=$this->winymax; $y += $ygrid) {
+					if ($y>=$this->winymin) {
+						imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxin),$y,$this->winxmax,$y,$this->$gc);
+					}
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$ygrid; $y>$this->winymin; $y -= $ygrid) {
 				if ($y<=$this->winymax) {
-					imageline($this->img,$this->winxmin,$y,$this->winxmax,$y,$this->$gc);
+					imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxin),$y,$this->winxmax,$y,$this->$gc);
 				}
 			}
 		}
@@ -655,11 +664,13 @@ function ASaxes($arg) {
 	$ac = $this->axescolor;
 	if ($doy) {
 		if ($this->origin[0]>=$this->winxmin && $this->origin[0]<=$this->winxmax) {
-			imageline($this->img,$this->origin[0],$this->winymin,$this->origin[0],$this->winymax,$this->$ac);
+			imageline($this->img,$this->origin[0],$this->winymin,$this->origin[0],($fqonlyy?$this->height-$this->origin[1]:$this->winymax),$this->$ac);
 			//ticks
-			for ($y=$this->height - $this->origin[1]; $y<=$this->winymax; $y += $yscl) {
-				if ($y>=$this->winymin) {
-					imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->$ac);
+			if (!$fqonlyy) {
+				for ($y=$this->height - $this->origin[1]; $y<=$this->winymax; $y += $yscl) {
+					if ($y>=$this->winymin) {
+						imageline($this->img,$this->origin[0]-$this->ticklength,$y,$this->origin[0]+$this->ticklength,$y,$this->$ac);
+					}
 				}
 			}
 			for ($y=$this->height - $this->origin[1]-$yscl; $y>=$this->winymin; $y -= $yscl) {
@@ -671,16 +682,18 @@ function ASaxes($arg) {
 	}
 	if ($dox) {
 		if ($this->origin[1]>=$this->winymin && $this->origin[1]<=$this->winymax) {
-			imageline($this->img,$this->winxmin,$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->$ac);
+			imageline($this->img,($fqonlyx?$this->origin[0]:$this->winxin),$this->height-$this->origin[1],$this->winxmax,$this->height-$this->origin[1],$this->$ac);
 			//ticks
 			for ($x=$this->origin[0]; $x<=$this->winxmax; $x += $xscl) {
 				if ($x>=$this->winxmin) {
 					imageline($this->img,$x,$this->height- $this->origin[1] -$this->ticklength,$x,$this->height- $this->origin[1] +$this->ticklength,$this->$ac);
 				}
 			}
-			for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
-				if ($x<=$this->winxmax) {
-					imageline($this->img,$x,$this->height-$this->origin[1]-$this->ticklength,$x,$this->height-$this->origin[1]+$this->ticklength,$this->$ac);
+			if (!$fqonlyx) {
+				for ($x=$this->origin[0]-$xscl; $x>=$this->winxmin; $x -= $xscl) {
+					if ($x<=$this->winxmax) {
+						imageline($this->img,$x,$this->height-$this->origin[1]-$this->ticklength,$x,$this->height-$this->origin[1]+$this->ticklength,$this->$ac);
+					}
 				}
 			}
 		}
@@ -712,9 +725,11 @@ function ASaxes($arg) {
 					$this->AStext("[$x,$ly]",$x,$lxp);
 				}
 			}
-			for ($x=-$ldx;$this->xmin<=$x; $x -= $ldx) {
-				if ($x<=$this->xmax) {
-					$this->AStext("[$x,$ly]",$x,$lxp);
+			if (!$fqonlyx) {
+				for ($x=-$ldx;$this->xmin<=$x; $x -= $ldx) {
+					if ($x<=$this->xmax) {
+						$this->AStext("[$x,$ly]",$x,$lxp);
+					}
 				}
 			}
 		}
@@ -724,10 +739,11 @@ function ASaxes($arg) {
 					$this->AStext("[$lx,$y]",$y,$lyp);
 				}
 			}
-			
-			for ($y=-$ldy;$this->ymin<=$y; $y -= $ldy) {
-				if ($y<=$this->ymax) {
-					$this->AStext("[$lx,$y]",$y,$lyp);
+			if (!$fqonlyy) {
+				for ($y=-$ldy;$this->ymin<=$y; $y -= $ldy) {
+					if ($y<=$this->ymax) {
+						$this->AStext("[$lx,$y]",$y,$lyp);
+					}
 				}
 			}
 		}

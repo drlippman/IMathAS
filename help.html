@@ -1664,7 +1664,9 @@ The following macros create graphs or tables:
 		<li><b>dash</b>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
 		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
 		</ul>
-	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both</li>
+	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both. Use "0:-n" (for some value of n) for xmin or ymin to only 
+	       have gridlines and labels after 0, while still using -n to adjust spacing. This is an alternative to using addplotborder to create
+	       first quadrant graphs.</li>
 	<li><b>labels</b>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis.</li>
 	<li><b>grid</b>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><b>width,height</b>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
@@ -2571,7 +2573,9 @@ drawn line from the correct line.
 	    values.  For example, to just set the window, you could use "0,10,0,10"<br/>
 	    If using $answerformat="numberline", set ymin and ymax to 0.<br/>If desired, you can set separate label and grid
 	    spacing using "xmin,xmax,ymin,ymax,xlabel:xgrid,ylabel:ygrid,imagewidth,imageheight".  You can specify axis labels using
-	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight"</dd>
+	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight".  
+	    To create first quadrant graphs, use "0:-n" (for some value of n) for xmin and/or ymin to only have gridlines and labels 
+	    after 0, while still using -n to adjust spacing. </dd>
 <dt>$snaptogrid = spacing (In Common Control)</dt>
 	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
 	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest

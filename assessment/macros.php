@@ -73,6 +73,15 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	for ($i = 1; $i < func_num_args(); $i++) {
 		$settings[$i-1] = func_get_arg($i);
 	}
+	$fqonlyx = false; $fqonlyy = false;
+	if (strpos($settings[0],'0:')!==false) {
+		$fqonlyx = true;
+		$settings[0] = substr($settings[0],2);
+	}
+	if (strpos($settings[2],'0:')!==false) {
+		$fqonlyy = true;
+		$settings[2] = substr($settings[2],2);
+	}	
 	$ymin = $settings[2];
 	$ymax = $settings[3];
 	$noyaxis = false;
@@ -143,8 +152,11 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$commands .= ',0,0';
 		//$commands .= ');';
 	}
+
 	if ($noyaxis==true) {
 		$commands .= ',1,0,1);';
+	} else if ($fqonlyx || $fqonlyy) {
+		$commands .= ','.($fqonlyx?'"fq"':1).','.($fqonlyy?'"fq"':1).');';	
 	} else {
 		$commands .= ');';
 	}

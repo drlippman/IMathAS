@@ -2392,6 +2392,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 				}
 			}
+			$origxmin = $settings[0];
+			if (strpos($settings[0],'0:')===0) {
+				$settings[0] = substr($settings[0],2);
+			}
+			$origymin = $settings[2];
+			if (strpos($settings[2],'0:')===0) {
+				$settings[2] = substr($settings[2],2);
+			}
 			if (strpos($grid[4],'pi')!==false) {
 				$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings[4];
 			}
@@ -2443,13 +2451,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 		}
 		if (!is_array($backg) && substr($backg,0,5)=="draw:") {
-			$plot = showplot("",$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+			$plot = showplot("",$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 			$insat = strpos($plot,');',strpos($plot,'axes'))+2;
 			$plot = substr($plot,0,$insat).str_replace("'",'"',substr($backg,5)).substr($plot,$insat);
 		} else if (!is_array($backg) && $backg=='none') {
 			$plot = showasciisvg("initPicture(0,10,0,10);",$settings[6],$settings[7]);
 		} else {
-			$plot = showplot($backg,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+			$plot = showplot($backg,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 		}
 		if (is_array($settings[4]) && count($settings[4]>2)) {
 			$plot = addlabel($plot,$settings[1],0,$settings[4][2],"black","aboveleft");
@@ -2753,7 +2761,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 				
 			} else {
-				$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+				$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 				if (isset($grid) && strpos($grid[4],'pi')!==false) {
 					$sa = addfractionaxislabels($sa,$grid[4]);
 				}
@@ -4457,11 +4465,27 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($grid)) {
 			if (!is_array($grid)) {
 				$grid = array_map('trim',explode(',',$grid));
+			} else if (strpos($grid[0],',')!==false) {//forgot to set as multipart?
+				$grid = array();
 			}
 			for ($i=0; $i<count($grid); $i++) {
 				if ($grid[$i]!='') {
-					$settings[$i] = evalbasic($grid[$i]);
+					if (strpos($grid[$i],':')!==false) {
+						$pts = explode(':',$grid[$i]);
+						foreach ($pts as $k=>$v) {
+							$pts[$k] = evalbasic($v);
+						}
+						$settings[$i] = implode(':',$pts);
+					} else {
+						$settings[$i] = evalbasic($grid[$i]);
+					}
 				}
+			}
+			if (strpos($settings[0],'0:')===0) {
+				$settings[0] = substr($settings[0],2);
+			}
+			if (strpos($settings[2],'0:')===0) {
+				$settings[2] = substr($settings[2],2);
 			}
 		}
 		if ($answerformat[0]=='numberline') {
