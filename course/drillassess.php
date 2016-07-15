@@ -389,7 +389,6 @@ function countcorrect($sca) {
 }
 
 function countstreak($sca) {
-	print_r($sca);
 	$corr = 0;
 	for ($i=count($sca)-1;$i>-1;$i--) {
 		if ($sca[$i]>.99) {
