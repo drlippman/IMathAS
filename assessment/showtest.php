@@ -645,8 +645,8 @@
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = is_numeric($testsettings['showans']);
 	$showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
-	$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
-	$reviewatend = ($testsettings['testtype']=="EndReview");
+	$noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="EndReviewWholeTest" || $testsettings['testtype']=="NoScores");
+	$reviewatend = ($testsettings['testtype']=="EndReview" || $testsettings['testtype']=="EndReviewWholeTest");
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
 	$useeqnhelper = $testsettings['eqnhelper'];
