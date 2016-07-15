@@ -898,19 +898,18 @@ function AMnumfuncPrepVar(qn,str) {
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);	
   
-  return [str,dispstr];
+  return [str,dispstr,vars.join("|")];
 }
 
 //preview button for numfunc type
 function AMpreview(inputId,outputId) {
   var qn = inputId.slice(2);
   var strprocess = AMnumfuncPrepVar(qn, document.getElementById(inputId).value);
-  str = strprocess[0];
-  dispstr = strprocess[1];
-  
+  var str = strprocess[0];
+  var dispstr = strprocess[1];
+  var vl = strprocess[2];
   //the following does a quick syntax check of the formula
   
-  var vl = vlist[qn];
   var fl = flist[qn];
   
   ptlist = pts[qn].split(",");
@@ -1051,7 +1050,7 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(arc|sqrt|root|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|e|sign|DNE|oo|"+vl+")", "ig");
+	  	  reg = new RegExp("(repvars\\d+|"+vl+"|arc|sqrt|root|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|e|sign|DNE|oo)", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";	  
 	  	  }
