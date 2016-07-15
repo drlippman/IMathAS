@@ -2803,7 +2803,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 			}
 			if (!empty($s3asid)) {
-				require_once("../includes/filehandler.php");
+				require_once(dirname(__FILE__)."/../includes/filehandler.php");
 				
 				if (substr($la,0,5)=="Error") {
 					$out .= "<br/>$la";
@@ -4223,7 +4223,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return ($score);
 		//return $correct;
 	} else if ($anstype == "essay") {
-		require_once("../includes/htmLawed.php");
+		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
 		$htmlawedconfig = array('elements'=>'*-script-form');
 		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
@@ -5734,7 +5734,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$filename = basename($_FILES["qn$qn"]['name']);
 		$filename = preg_replace('/[^\w\.]/','',$filename);
 		$hasfile = false;
-		require_once("../includes/filehandler.php");
+		require_once(dirname(__FILE__)."/../includes/filehandler.php");
 		if (trim($filename)=='') {
 			$found = false;
 			if ($_POST["lf$qn"]!='') {

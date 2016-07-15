@@ -98,6 +98,8 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	}
 	if (isset($_GET['iframe_resize_id'])) {
 		$targetid = preg_replace('/[^\w:.-]/','',$_GET['iframe_resize_id']);
+	} else if (isset($_GET['frame_id'])) {
+		$targetid = preg_replace('/[^\w:.-]/','',$_GET['frame_id']);
 	}
 	$jwtstring = saveAssessData();
 }
@@ -198,12 +200,13 @@ echo '<script type="text/javascript">
 	  var default_height = Math.max(
               document.body.scrollHeight, document.body.offsetHeight,
               document.documentElement.clientHeight, document.documentElement.scrollHeight,
-              document.documentElement.offsetHeight) + 40;
+              document.documentElement.offsetHeight);
 	  window.parent.postMessage( JSON.stringify({
 	      subject: "lti.frameResize",
 	      height: default_height,
 	      iframe_resize_id: "'.$targetid.'",
-	      element_id: "'.$targetid.'"
+	      element_id: "'.$targetid.'",
+	      frame_id: "'.$targetid.'"
 	  }), "*");
 	 }
 	}
@@ -216,6 +219,9 @@ echo '<script type="text/javascript">
 			sendresizemsg();
 		});
 	}
+	$(function() {
+		$(window).on("ImathasEmbedReload", sendresizemsg);
+	});
 </script>';
 }
 
