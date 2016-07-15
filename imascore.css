@@ -181,6 +181,9 @@ div.submit {
 	width: 400px;
 	text-align: right;
 }
+span#leftcontenttoggle {
+	display:none;
+}
 
 @media only screen and (max-width: 760px) {
 	span.form {
