@@ -2329,9 +2329,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			if (isset($options['background'])) {
 				if (is_array($options['background']) && isset($options['background'][$qn])) {
-					$background = $options['background'][$qn];
+					$backg = $options['background'][$qn];
 				} else if (!is_array($options['background'])) {
-					$background = $options['background'];
+					$backg = $options['background'];
 				}
 			}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
@@ -2746,7 +2746,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			
 			if ($backg!='') {
 				if (!is_array($backg) && substr($backg,0,5)=="draw:") {
-					$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 					$insat = strpos($sa,');',strpos($sa,'axes'))+2;
 					$sa = substr($sa,0,$insat).str_replace("'",'"',substr($backg,5)).substr($sa,$insat);
 				} else {
@@ -2754,7 +2754,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						settype($backg,"array");
 					}
 					$saarr = array_merge($saarr,$backg);
-					$sa = showplot($saarr,$settings[0],$settings[1],$settings[2],$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
+					$sa = showplot($saarr,$origxmin,$settings[1],$origymin,$settings[3],$sclinglbl,$sclinggrid,$settings[6],$settings[7]);
 					if (isset($grid) && strpos($grid[4],'pi')!==false) {
 						$sa = addfractionaxislabels($sa,$grid[4]);
 					}
