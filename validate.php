@@ -13,8 +13,9 @@
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);
  
- if ($_SERVER['HTTP_HOST'] != 'localhost') {
- 	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
+ $hostparts = explode('.',$_SERVER['HTTP_HOST']);
+ if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
+ 	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
  }
  if (isset($CFG['GEN']['randfunc'])) {
  	 $randf = $CFG['GEN']['randfunc'];
