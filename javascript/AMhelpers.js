@@ -840,11 +840,8 @@ function AMnumfuncPrepVar(qn,str) {
   for (var i=0; i<vars.length; i++) {
 	  if (vars[i].length>1) {
 		  var isgreek = false;
-		  for (var j=0; j<greekletters.length;j++) {
-			  if (vars[i].toLowerCase()==greekletters[j]) {
-				isgreek = true; 
-				break;
-			  }
+		  if (arraysearch(vars[i].toLowerCase(), greekletters)!=-1) {
+			  isgreek = true; 
 		  }
 		  if (vars[i].match(/^\w+_\w+$/)) {
 		  	if (!foundaltcap[i]) {
@@ -857,10 +854,10 @@ function AMnumfuncPrepVar(qn,str) {
 		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
 		  	dispstr = dispstr.replace(remvarparen, vars[i]);
 		  	str = str.replace(remvarparen, vars[i]);
-		  	if (varpts[1].length>1) {
+		  	if (varpts[1].length>1 && arraysearch(varpts[1].toLowerCase(), greekletters)==-1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	} 
-		  	if (varpts[2].length>1) {
+		  	if (varpts[2].length>1 && arraysearch(varpts[2].toLowerCase(), greekletters)==-1) {
 		  		varpts[2] = '"'+varpts[2]+'"';
 		  	} 
 		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
