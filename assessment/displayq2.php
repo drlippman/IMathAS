@@ -2403,6 +2403,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (strpos($grid[4],'pi')!==false) {
 				$settings[4] = 2*($settings[1] - $settings[0]).':'.$settings[4];
 			}
+		} else {
+			$origxmin = $settings[0];
+			$origymin = $settings[2];
 		}
 		if (!isset($backg)) { $backg = '';}
 				
@@ -2472,6 +2475,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		if ($settings[8]!="") {
 		}
+
 		$bg = getgraphfilename($plot);
 		
 		$dotline = 0;
