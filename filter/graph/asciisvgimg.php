@@ -1000,11 +1000,13 @@ function ASslopefield($arg) {
 	$func = $arg[0];
 	if (count($arg)>1) {
 		$dx = $arg[1];
+		if ($dx*1==0) { $dx = 1;}
 	} else {
 		$dx = 1;
 	}
 	if (count($arg)>2) {
 		$dy = $arg[2];
+		if ($dy*1==0) { $dy = 1;}
 	} else {
 		$dy = 1;
 	}
@@ -1220,8 +1222,8 @@ function outputimage() {
 function evalifneeded($str) {
 	if (is_numeric($str)) {
 		return $str;
-	} else if (preg_match('/[^\d+\-\/\*\.]/',$str)) {
-		return $str;
+	} else if (trim($str)=='' || preg_match('/[^\d+\-\/\*\.]/',$str)) {
+		return 0; //return a value to prevent errors
 	} else {
 		eval("\$ret = $str;");
 		return $ret;
