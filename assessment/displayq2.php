@@ -6385,6 +6385,7 @@ function rawscoretocolor($sc,$aw) {
 }
 
 function normalizemathunicode($str) {
+	$str = preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/', '', $str);
 	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅'), array('(',')','oo','U','<=','>=','*'), $str);
