@@ -305,7 +305,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				$answerbox[$iidx] = str_replace('<select','<select disabled="disabled"',$answerbox[$iidx]);
 			}
 			if (strpos($toevalqtxt,"\$previewloc[$iidx]")===false) {
-				$answerbox[$iidx] .= $previewloc[$iidx];
+				if (strpos($answerbox[$iidx],"previewloctemp$iidx")!==false) {
+					$answerbox[$iidx] = str_replace('<span id="previewloctemp'.$iidx.'"></span>', $previewloc[$iidx], $answerbox[$iidx]);
+				} else {
+					$answerbox[$iidx] .= $previewloc[$iidx];
+				}
 			}
 			if (isset($hideanswerboxes) && $hideanswerboxes==true) {
 				$answerbox[$iidx] = '';
@@ -319,7 +323,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			$answerbox = str_replace('<select','<select disabled="disabled"',$answerbox);
 		}
 		if (strpos($toevalqtxt,'$previewloc')===false) {
-			$answerbox .= $previewloc;
+			if (strpos($answerbox,"previewloctemp$qnidx")!==false) {
+				$answerbox = str_replace('<span id="previewloctemp'.$qnidx.'"></span>', $previewloc, $answerbox);
+			} else {
+				$answerbox .= $previewloc;
+			}
 		}
 		if (isset($hideanswerboxes) && $hideanswerboxes==true) {
 			$answerbox = '';
@@ -1402,8 +1410,24 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		
 		$la = explode('$#$',$la);
 		$la = $la[0];
-		
+		 
 		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = array_map('trim',explode(',',$answerformat));
+		
+		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+			$out .= '<div class="'.$colorbox.'">';
+			if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
+				$specsoln = _('One or more solutions: ');
+			} else {
+				$specsoln = _('One solution: ');
+			}
+			$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'>'.$specsoln;
+			if ($la=='DNE' || $la=='oo') {
+				$la = ''; //don't want to reshow in answerbox
+			}
+		}
+		
+		
 		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
 		if ($displayformat=="point") {
 			$leftb = "(";
@@ -1417,7 +1441,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= "$leftb<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
 		
-		$ansformats = array_map('trim',explode(',',$answerformat));
+		
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 			$tip = _('Enter your answer as a list of values separated by commas: Example: -4, 3, 2') . "<br/>";
 			$eword = _('each value');
@@ -1449,7 +1473,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= 'onKeyUp="updateLivePreview(this)" ';
 		}
 		$out .= "/>$rightb";
-		$out .= getcolormark($colorbox);
+		if (!(in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats))) {
+			$out .= getcolormark($colorbox);
+		}
 		if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
 			if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 				$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','One or more of your answers is equivalent to the correct answer, but is not simplified or is in the wrong format');
@@ -1457,11 +1483,32 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
 			}
 		}
+		
 		$out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />\n";
 		if (!isset($hidepreview)) {
 			$preview .= "<input type=button class=btn id=\"pbtn$qn\" value=\"" . _('Preview') . "\" onclick=\"calculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
 		}
 		$preview .= "$leftb<span id=p$qn></span>$rightb ";
+		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+			$out .= '<span id="previewloctemp'.$qn.'"></span>';
+			$out .= '</label><br/>';
+			
+			$nosoln = _('No solution');
+			$infsoln = _('Infinite number of solutions');
+			$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="DNE" '.($la=='DNE'?'checked':'').'>'.$nosoln.'</label><br/>';
+			if (in_array('nosolninf',$ansformats)) {
+				$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="inf" '.($la=='oo'?'checked':'').'>'.$infsoln.'</label><br/>';
+			}
+			$out .= getcolormark($colorbox);
+			$out .= '</div>';
+			
+			if (preg_match('/^inf/',$answer) || $answer=='oo') {
+				$answer = '"'.$infsoln.'"';
+			}
+			if (preg_match('/^no\s*solution/',$answer) || $answer=='DNE') {
+				$answer = '"'.$nosoln.'"';
+			}
+		}
 		$out .= "<script type=\"text/javascript\">calctoproc[$qn] = 1; calcformat[$qn] = '$answerformat';</script>\n";
 		
 		if (isset($answer)) {
@@ -3635,7 +3682,25 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$givenans = normalizemathunicode($givenans);
-
+		$ansformats = array_map('trim',explode(',',$answerformat));
+		
+		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+			if (preg_match('/^inf/',$answer)) {
+				$answer = 'oo';
+			}
+			if (preg_match('/^no\s*solution/',$answer)) {
+				$answer = 'DNE';
+			}
+			$qs = $_POST["qs$qn"];
+			if ($qs=='DNE') {
+				$givenans = "DNE";
+				$_POST["tc$qn"] = "DNE";
+			} else if ($qs=='inf') {
+				$givenans = "oo";
+				$_POST["tc$qn"] = "oo";
+			}
+		}
+		
 		$GLOBALS['partlastanswer'] = $_POST["tc$qn"].'$#$'.$givenans;
 		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 		if ($answer==='') {
@@ -3650,7 +3715,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$formatok = "nowhole";
 		}
 		
-		$ansformats = array_map('trim',explode(',',$answerformat));
+		
 		
 		if (in_array("scinot",$ansformats)) {
 			$answer = str_replace('xx','*',$answer);
