@@ -8,8 +8,7 @@ $nologo = true;
 
 if (isset($_POST['message'])) {
 	require_once("../includes/htmLawed.php");
-	$htmlawedconfig = array('elements'=>'*-script');
-	$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
+	$_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
 	$_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
 	$msgto = intval($_POST['sendto']);
 	$error = '';

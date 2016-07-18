@@ -126,21 +126,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
 		
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script');
 		if ($_POST['description']=='<p>Enter forum description here</p>') {
 			$_POST['description'] = '';
 		} else {
-			$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+			$_POST['description'] = addslashes(myhtmLawed(stripslashes($_POST['description'])));
 		}
 		if (!isset($_POST['postinstr']) || trim($_POST['postinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['postinstr'])) {
 			$_POST['postinstr'] = '';
 		} else {
-			$_POST['postinstr'] = addslashes(htmLawed(stripslashes($_POST['postinstr']),$htmlawedconfig));
+			$_POST['postinstr'] = addslashes(myhtmLawed(stripslashes($_POST['postinstr'])));
 		}
 		if (!isset($_POST['replyinstr']) || trim($_POST['replyinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['replyinstr'])) {
 			$_POST['replyinstr'] = '';
 		} else {
-			$_POST['replyinstr'] = addslashes(htmLawed(stripslashes($_POST['replyinstr']),$htmlawedconfig));
+			$_POST['replyinstr'] = addslashes(myhtmLawed(stripslashes($_POST['replyinstr'])));
 		}
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";

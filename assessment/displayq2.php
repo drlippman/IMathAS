@@ -4301,8 +4301,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//return $correct;
 	} else if ($anstype == "essay") {
 		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script-form');
-		$givenans = addslashes(htmLawed(stripslashes($givenans),$htmlawedconfig));
+		$givenans = addslashes(myhtmLawed(stripslashes($givenans)));
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}

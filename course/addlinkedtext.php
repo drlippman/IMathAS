@@ -85,8 +85,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$processingerror = false;
 		if ($_POST['linktype']=='text') {
 			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('elements'=>'*-script');
-			$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
+			$_POST['text'] = addslashes(myhtmLawed(stripslashes($_POST['text'])));
 		} else if ($_POST['linktype']=='file') {
 			require_once("../includes/filehandler.php");
 			if ($_FILES['userfile']['name']!='') {
@@ -182,11 +181,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
 		
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script' );
 		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
-			$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+			$_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
 		}
 		$_POST['text'] = trim($_POST['text']);
 		$outcomes = array();

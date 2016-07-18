@@ -235,16 +235,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
 		
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script');
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
-			$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+			$_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
 		}
 		if ($_POST['intro']=='<p>Enter intro/instructions</p>') {
 			$_POST['intro'] = '';
 		} else {
-			$_POST['intro'] = addslashes(htmLawed(stripslashes($_POST['intro']),$htmlawedconfig));
+			$_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
 		}
 		if (isset($_GET['id'])) {  //already have id; update
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups

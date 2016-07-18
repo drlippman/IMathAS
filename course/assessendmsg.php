@@ -27,8 +27,7 @@ if (!isset($imasroot)) {
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script');
-		$endmsg['commonmsg'] = htmLawed(stripslashes($_POST['commonmsg']),$htmlawedconfig);
+		$endmsg['commonmsg'] = myhtmLawed(stripslashes($_POST['commonmsg']));
 		$msgstr = addslashes(serialize($endmsg));
 		if (isset($_POST['aid'])) {
 			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";

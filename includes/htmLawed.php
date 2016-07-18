@@ -1,14 +1,5 @@
 <?php
 
-/*
-htmLawed 1.1.22, 5 March 2016
-Copyright Santosh Patnaik
-Dual licensed with LGPL 3 and GPL 2+
-A PHP Labware internal utility; www.bioinformatics.org/phplabware/internal_utilities/htmLawed
-
-See htmLawed_README.txt/htm                    
-*/
-
 require_once(dirname(__FILE__)."/filehandler.php");
 
 function convertdatauris($in) {
@@ -33,9 +24,29 @@ function convertdatauris($in) {
 	return $in;
 }
 
+function myhtmLawed($t, $NC=1, $S=array()) {
+	$t = convertdatauris($t);
+	$C = array('elements'=>'*-script-form', 'direct_list_nest'=>1);
+	if (is_array($NC)) { //overwrite or append new config
+		foreach ($NC as $k=>$v) {
+			$C[$k] = $v;
+		}
+	}
+	return htmLawed($t, $C, $S);
+}
+
+
+/*
+htmLawed 1.1.22, 5 March 2016
+Copyright Santosh Patnaik
+Dual licensed with LGPL 3 and GPL 2+
+A PHP Labware internal utility; www.bioinformatics.org/phplabware/internal_utilities/htmLawed
+
+See htmLawed_README.txt/htm                    
+*/
+
 
 function htmLawed($t, $C=1, $S=array()){
-$t = convertdatauris($t);
 $C = is_array($C) ? $C : array();
 if(!empty($C['valid_xhtml'])){
  $C['elements'] = empty($C['elements']) ? '*-center-dir-font-isindex-menu-s-strike-u' : $C['elements'];

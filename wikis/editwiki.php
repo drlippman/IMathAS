@@ -70,8 +70,7 @@ if ($cid==0) {
 			
 			//clean up wiki content
 			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('elements'=>'*-script');
-			$wikicontent = htmLawed(stripslashes($_POST['wikicontent']),$htmlawedconfig);
+			$wikicontent = myhtmLawed(stripslashes($_POST['wikicontent']));
 			$wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
 			$wikicontent = preg_replace('/\s+/',' ',$wikicontent);
 			$now = time();

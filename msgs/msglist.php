@@ -68,8 +68,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject'])) {
 			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('elements'=>'*-script');
-			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
+			$_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
 			$_POST['subject'] = addslashes(htmlentities(stripslashes($_POST['subject'])));
 			
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -183,7 +182,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$title = "Re: ".str_replace('"','&quot;',mysql_result($result,0,0));
 				if (isset($_GET['toquote'])) {
 					$message = mysql_result($result,0,1);
-					$message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;
+					$message = '<br/><hr/>In reply to:<br/>'.$message;
 				} else {
 					$message = '';
 				}
@@ -202,7 +201,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				}
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 				
-				$message = '<p> </p><br/><hr/>'.$message;
+				$message = '<br/><hr/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				$courseid = $cid;
 				if (isset($parts[3])) {  //sending out of assessment instructor

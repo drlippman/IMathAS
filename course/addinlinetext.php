@@ -101,8 +101,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
 		
-		$htmlawedconfig = array('elements'=>'*-script');
-		$_POST['text'] = addslashes(htmLawed(stripslashes($_POST['text']),$htmlawedconfig));
+		$_POST['text'] = addslashes(myhtmLawed(stripslashes($_POST['text'])));
 		$outcomes = array();
 		if (isset($_POST['outcomes'])) {
 			foreach ($_POST['outcomes'] as $o) {
