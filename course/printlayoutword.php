@@ -75,6 +75,10 @@ if ($overwriteBody==1) {
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	
+	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
+		$line['intro'] = $introjson[0];
+	}
+	
 	$ioquestions = explode(",",$line['itemorder']);
 	$aname = $line['name'];
 	$questions = array();

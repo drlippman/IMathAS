@@ -482,6 +482,13 @@
 			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']); 
 		}
 	}
+	
+	if (($introjson=json_decode($testsettings['intro'],true))!==null) { //is json intro
+		$testsettings['intro'] = $introjson[0];		
+	} else {
+		$introjson = array();
+	}
+	
 	if (!$isteacher) {
 		$rec = "data-base=\"assessintro-{$line['assessmentid']}\" ";
 		$testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);
@@ -1355,6 +1362,13 @@ if (!isset($_REQUEST['embedpostback'])) {
 				}
 			}
 			$testsettings['intro'] = array_shift($intropieces);
+		}
+	} else if (count($introjson)>1) {
+		$intropieces = array();
+		$introdividers = array();
+		for ($i=1;$i<count($introjson);$i++) {
+			$introdividers[$i] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
+			$intropieces[$i] = $introjson[$i]['text'];
 		}
 	}
 	

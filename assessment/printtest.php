@@ -138,6 +138,12 @@
 	$GLOBALS['useeditor']='reviewifneeded';
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 	
+	if (($introjson=json_decode($testsettings['intro'],true))!==null) { //is json intro
+		$testsettings['intro'] = $introjson[0];		
+	} else {
+		$introjson = array();
+	}
+	
 	$endtext = '';  $intropieces = array();
 	$testsettings['intro'] = preg_replace('/\[PAGE\s+(.*?)\]/', '<h3>$1</h3>', $testsettings['intro']);
 	if (strpos($testsettings['intro'], '[QUESTION')!==false) {
@@ -159,6 +165,12 @@
 		for ($i=1;$i<count($introsplit);$i+=2) {
 			$p = explode('-',$introsplit[$i]);
 			$intropieces[$p[0]] = $introsplit[$i+1];
+		}
+	} else if (count($introjson)>1) {
+		$intropieces = array();
+		$introdividers = array();
+		for ($i=1;$i<count($introjson);$i++) {
+			$intropieces[$introjson[$i]['displayBefore']+1] = $introjson[$i]['text'];
 		}
 	}
 	

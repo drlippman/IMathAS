@@ -42,7 +42,12 @@ if (isset($_POST['mergefrom'])) {
 		if (isset($_POST['addpages'])) {
 			$thisintro .= "<p>[PAGE $thisname]</p>";
 		}
-		$thisintro .= mysql_result($result,0,1);
+		$thisintroraw = mysql_result($result,0,1);
+		if (($introjson=json_decode($thisintroraw,true))!==null) { //is json intro
+			$thisintro .=  = $introjson[0];		
+		} else {
+			$thisintro .= $thisintroraw;
+		}
 		$thisqcnt = 0;
 		if (trim(mysql_result($result,0,0))!='') {
 			$aitems = explode(',',mysql_result($result,0,0));

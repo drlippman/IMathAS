@@ -246,15 +246,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
 		}
 		if (isset($_GET['id'])) {  //already have id; update
+			$query = "SELECT isgroup,intro FROM imas_assessments WHERE id='{$_GET['id']}'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$curassess = mysql_fetch_assoc($result);
+			
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
-				$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_result($result,0,0)>0) {
+				if ($curassess['isgroup']>0) {
 					$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else { //if switching from nogroup to groups and groups already exist, need set agroupids if asids exist already
 				//NOT ALLOWED CURRENTLY
+			}
+			if (($introjson=json_decode($curassess['intro']))!==null) { //is json intro
+				$introjson[0] = stripslashes($_POST['intro']);
+				$_POST['intro'] = addslashes(json_encode($introjson));
 			}
 			
 			$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
@@ -417,6 +423,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$taken = false;
 			
 			$savetitle = _("Create Assessment");
+		}
+		if (($introjson=json_decode($line['intro']))!==null) { //is json intro
+			$line['intro'] = $introjson[0];
 		}
 		if ($line['minscore']>10000) {
 			$line['minscore'] -= 10000;
