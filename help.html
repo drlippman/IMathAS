@@ -2166,9 +2166,11 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also 
 	round your $answer if needed for the $showanswer.</dd>
-<dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
-	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
-	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "nosoln", or "nosolninf"</dt
+	<dd>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
+	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
+	<br/>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"</dd>
 <dt>$partialcredit = array(number,score,[number,score,...]) (In Common Control)</dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
@@ -2226,6 +2228,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<li>list:  a list of answers is expected - ignores duplicate values (1,1,2 is equivalent to 1,2)</li>
 	<li>exactlist: a list of answers is expected - does not ignore duplicates</li>
 	<li>orderedlist: a list of answers is expected - order is important, and duplicates are not ignored</li>
+	<li>nosoln or nosolninf: adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"</li>
 	</ul>
 	</dd>
 <dt>$reltolerance = a decimal value (In Common Control)</dt>
@@ -2669,10 +2673,12 @@ rather than just numbers, such as (5/3, 2/3).
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Common Control)</dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" (In Common Control)</dt>
 	<dd>Requires each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
 <dt>$reltolerance = a decimal value (In Common Control)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
@@ -2748,7 +2754,10 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
-	$answerformat = "list" specifies that the answer will be a list of complex numbers.</dd>
+	$answerformat = "list" specifies that the answer will be a list of complex numbers.
+	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$reltolerance = a decimal value (In Common Control)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>
