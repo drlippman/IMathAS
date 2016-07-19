@@ -788,6 +788,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
 	if (isset($partweights)) {$options['partweights'] = $partweights;}
 	if (isset($partialcredit)) {$options['partialcredit'] = $partialcredit;}
+	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
 	if (isset($anstypes)) {$options['anstypes'] = $anstypes;}
 	
 	$score = 0;
@@ -1415,15 +1416,33 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-			$out .= '<div class="'.$colorbox.'">';
+			$nosoln = _('No solution');
+			$infsoln = _('Infinite number of solutions');
 			if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 				$specsoln = _('One or more solutions: ');
 			} else {
 				$specsoln = _('One solution: ');
 			}
+			
+			if (isset($ansprompt)) {
+				$anspromptp = explode(';', $ansprompt);
+				unset($ansprompt);
+				$specsoln = $anspromptp[0];
+				if (count($anspromptp)>1) {
+					$nosoln = $anspromptp[1];	
+				}
+				if (count($anspromptp)>2) {
+					$infsoln = $anspromptp[2];	
+				}
+			}
+			$out .= '<div class="'.$colorbox.'">';
+			
 			$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="spec" '.(($la!='DNE'&&$la!='oo')?'checked':'').'>'.$specsoln;
 			if ($la=='DNE' || $la=='oo') {
+				$laqs = $la;
 				$la = ''; //don't want to reshow in answerbox
+			} else {
+				$laqs = '';
 			}
 		}
 		
@@ -1493,19 +1512,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= '<span id="previewloctemp'.$qn.'"></span>';
 			$out .= '</label><br/>';
 			
-			$nosoln = _('No solution');
-			$infsoln = _('Infinite number of solutions');
-			$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="DNE" '.($la=='DNE'?'checked':'').'>'.$nosoln.'</label><br/>';
+			$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="DNE" '.($laqs=='DNE'?'checked':'').'>'.$nosoln.'</label><br/>';
 			if (in_array('nosolninf',$ansformats)) {
-				$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="inf" '.($la=='oo'?'checked':'').'>'.$infsoln.'</label><br/>';
+				$out .= '<label><input type="radio" id="qs'.$qn.'" name="qs'.$qn.'" value="inf" '.($laqs=='oo'?'checked':'').'>'.$infsoln.'</label>';
 			}
-			$out .= getcolormark($colorbox);
+			$out .= '<span class="floatright">'.getcolormark($colorbox).'</span>';
 			$out .= '</div>';
 			
-			if (preg_match('/^inf/',$answer) || $answer=='oo') {
+			if (preg_match('/^inf/',$answer) || $answer=='oo' || $answer==$infsoln) {
 				$answer = '"'.$infsoln.'"';
 			}
-			if (preg_match('/^no\s*solution/',$answer) || $answer=='DNE') {
+			if (preg_match('/^no\s*solution/',$answer) || $answer=='DNE' || $answer==$nosoln) {
 				$answer = '"'.$nosoln.'"';
 			}
 		}
@@ -3678,6 +3695,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['requiretimes'])) {if (is_array($options['requiretimes'])) {$requiretimes = $options['requiretimes'][$qn];} else {$requiretimes = $options['requiretimes'];}}
 		if (isset($options['requiretimeslistpart'])) {if (is_array($options['requiretimeslistpart'])) {$requiretimeslistpart = $options['requiretimeslistpart'][$qn];} else {$requiretimeslistpart = $options['requiretimeslistpart'];}}
+		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
 		
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -3685,10 +3703,23 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
-			if (preg_match('/^inf/',$answer)) {
+			$nosoln = _('No solution');
+			$infsoln = _('Infinite number of solutions');
+			if (isset($ansprompt)) {
+				$anspromptp = explode(';', $ansprompt);
+				unset($ansprompt);
+				$specsoln = $anspromptp[0];
+				if (count($anspromptp)>1) {
+					$nosoln = $anspromptp[1];	
+				}
+				if (count($anspromptp)>2) {
+					$infsoln = $anspromptp[2];	
+				}
+			}
+			if (preg_match('/^inf/',$answer) || $answer==$infsoln) {
 				$answer = 'oo';
 			}
-			if (preg_match('/^no\s*solution/',$answer)) {
+			if (preg_match('/^no\s*solution/',$answer) || $answer==$nosoln) {
 				$answer = 'DNE';
 			}
 			$qs = $_POST["qs$qn"];
