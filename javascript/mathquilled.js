@@ -249,7 +249,11 @@ function hideee() {
 	$("#mqee").hide();
 }
 function savemathquill() {
-	$("#"+cureedd.id).val(MQtoAM(mqarea.mathquill('latex')));
+	var AM = MQtoAM(mqarea.mathquill('latex'));
+	$("#"+cureedd.id).val(AM);
+	if (AM!='') {
+		$("#"+cureedd.id).siblings("input[value=spec]").prop("checked",true);
+	}
 	var btn = $("#pbtn"+cureedd.id.substr(2));
 	if (btn) {
 		btn.trigger("click");
