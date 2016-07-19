@@ -1381,7 +1381,7 @@ function assessbackgsubmit(qn,noticetgt) {
 			for (var i=0;i<tags.length;i++) {
 				els.push(tags[i]);
 			}
-			var regex = new RegExp("^(qn|tc)("+qn+"\\b|"+(qn+1)+"\\d{3})");
+			var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
 			for (var i=0;i<els.length;i++) {
 				if (els[i].name.match(regex)) {
 					if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
@@ -1943,7 +1943,20 @@ function initcreditboxes() {
 	});
 }
 initstack.push(initcreditboxes);
-	
+
+function initqsclickchange() {
+	$('input[id^=qs][value=spec]').each(function(i,qsel) {
+		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
+		 .on('keyup.qsclickchange', function(e) {
+			if (e.keyCode != 8 && e.keyCode != 46) {	 
+				$(qsel).prop("checked",true);
+			}
+		 });
+	});
+}
+$(window).on("ImathasEmbedReload", initqsclickchange);
+initstack.push(initqsclickchange);
+
 function assessmentTimer(duration, timelimitkickout) {
 	var start = Date.now(), remaining, hours, minutes, seconds, countdowntimer, timestr;
 	function updatetimer() {

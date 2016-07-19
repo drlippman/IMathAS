@@ -135,7 +135,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=071516b";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=071916";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=012115";?>" type="text/javascript"></script>
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>

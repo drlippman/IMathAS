@@ -1870,12 +1870,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($options['answerformat'])) {if (is_array($options['answerformat'])) {$answerformat = $options['answerformat'][$qn];} else {$answerformat = $options['answerformat'];}}
 		if (isset($options['answer'])) {if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
-		
+		if (isset($options['ansprompt'])) {if (is_array($options['ansprompt'])) {$ansprompt = $options['ansprompt'][$qn];} else {$ansprompt = $options['ansprompt'];}}
+		if (!isset($answerformat)) { $answerformat = '';}
+		$ansformats = array_map('trim',explode(',',$answerformat));
 		if (!isset($sz)) { $sz = 20;}
 		if ($multi>0) { $qn = $multi*1000+$qn;} 
 		
 		
-		if ($answerformat == "list") {
+		if (in_array('list',$ansformats)) {
 			$tip = _('Enter your answer as a list of complex numbers in a+bi form separated with commas.  Example: 2+5.5i,-3-4i') . "<br/>";
 			$shorttip = _('Enter a list of complex numbers');
 		} else {
@@ -1896,6 +1898,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= '/>';
 		$out .= getcolormark($colorbox);
+		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
+			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
+		}
 		if (isset($answer)) {
 			$sa = makepretty($answer);
 		}
