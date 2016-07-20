@@ -16,7 +16,77 @@ function refreshTable() {
          }
          updateqgrpcookie();
 }
-function generateMoveSelect(num,cnt) {
+function generateMoveSelect2(num) {
+	var thisistxt = (itemarray[num][0]=="text");
+	num++; //adjust indexing
+	var sel = "<select id="+num+" onChange=\"moveitem2("+num+")\">";
+	var qcnt = 1; var tcnt = 1; var curistxt = false;
+	for (var i=1; i<=itemarray.length; i++) {
+		curistxt = (itemarray[i-1][0]=="text");
+		sel += "<option value=\""+i+"\" ";
+		if (i==num) {
+			sel += "selected";
+		}
+		if (curistxt) {
+			sel += ">Text"+tcnt+"</option>";
+		} else if (itemarray[i-1].length<5 && itemarray[i-1][0]>1) {
+			sel += ">Q"+qcnt+"-"+(qcnt+itemarray[i-1][0]-1)+"</option>";
+		} else {
+			sel += ">Q"+qcnt+"</option>";
+		}
+		
+		if (!curistxt) {
+			if (itemarray[i-1].length<5) { //is group
+				qcnt += itemarray[i-1][2].length;
+			} else {
+				qcnt++;
+			}
+		} else {
+			tcnt++;
+		}
+		/*
+		curistxt = (itemarray[i-1][0]=="text");
+		if (thisistxt) { //moveselect for text item
+			sel += "<option value=\""+i+"\" ";
+			if (i==num) {
+				sel += "selected";
+			}
+			if (curistxt) {
+				sel += ">Text"+tcnt+"</option>";
+			} else {
+				if (i==itemarray.length) {
+					sel += ">End</option>";
+				} else {
+					sel += ">Q"+qcnt+"</option>";
+				}
+			}
+		} else if (!curistxt) { //if moveselect for question, skip text items
+			sel += "<option value=\""+i+"\" ";
+			if (i==num) {
+				sel += "selected";
+			}
+			if (itemarray[i-1].length<5) {
+				sel += ">Q"+qcnt+"-"+(qcnt+itemarray[i-1][2].length-1)+"</option>";
+			} else {
+				sel += ">Q"+qcnt+"</option>";
+			}
+		}
+		if (!curistxt) {
+			if (itemarray[i-1].length<5) { //is group
+				qcnt += itemarray[i-1][2].length;
+			} else {
+				qcnt++;
+			}
+		} else {
+			tcnt++;
+		}
+		*/
+	}
+	sel += "</select>";
+	return sel;
+}
+
+function generateMoveSelect(num,itemarray) {
 	num++; //adjust indexing
 	var sel = "<select id="+num+" onChange=\"moveitem2("+num+")\">";
 	for (var i=1; i<=cnt; i++) {
@@ -28,6 +98,34 @@ function generateMoveSelect(num,cnt) {
 	}
 	sel += "</select>";
 	return sel;
+}
+
+function generateShowforSelect(num) {
+	var n = 0, i=num;
+	if (i>0 && itemarray[i-1][0]=="text") { //no select unless first in list
+		return '';
+	}
+	while (i<itemarray.length && itemarray[i][0]=="text") {
+		i++;
+	}
+	while (i<itemarray.length && itemarray[i][0]!="text") {
+		i++;
+		n++;
+	}
+	if (n==0) {
+		return '';
+	} else {
+		out = 'Show for <select id="showforn'+num+'" onchange="updateTextShowN('+num+')">';
+		for (j=1;j<=n;j++) {
+			out += '<option value="'+j+'"';
+			if (itemarray[num][2]==j) {
+				out += " selected";
+			}
+			out += '>'+j+"</option>";	
+		}
+		out += '</select>';
+		return out;
+	}
 }
 
 function moveitem2(from) {
@@ -127,7 +225,7 @@ function groupSelected() {
 	var form = document.getElementById("curqform");
 	for (var e = form.elements.length-1; e >-1 ; e--) {
 		var el = form.elements[e];
-		if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
+		if (el.type == 'checkbox' && el.checked && el.value!='ignore' && !el.value.match(":text")) {
 			val = el.value.split(":")[0];
 			if (val.indexOf("-")>-1) { //is group
 				val = val.split("-")[0];
@@ -146,6 +244,7 @@ function groupSelected() {
 		}
 	}
 	if (grplist.length<2) {
+		$("#curqtbl input[type=checkbox]").prop("checked",false);
 		return;
 	}
 	var to = grplist[grplist.length-1];
@@ -170,7 +269,6 @@ function groupSelected() {
 
 function updateGrpN(num) {
 	var nval = Math.floor(document.getElementById("grpn"+num).value*1);
-	console.log(nval);
 	if (nval<1 || isNaN(nval)) { nval = 1;} 
 	document.getElementById("grpn"+num).value = nval;
 	if (nval != itemarray[num][0]) {
@@ -188,22 +286,54 @@ function updateGrpT(num) {
 	
 }
 
+function edittextseg(i) {
+	$("#textsegdescr"+i).html(
+		$('<textarea>').val(itemarray[i][1])
+	).append(
+		$('<button>', {text: "Done", type: "button"}).on("click",function() {savetextseg(i);})
+	);
+}
+
+function savetextseg(i) {
+	itemarray[i][1] = $("#textsegdescr"+i).find("textarea").val();
+	submitChanges();
+}
+function updateTextShowN(i) {
+	itemarray[i][2] = $("#showforn"+i).val();
+	submitChanges();
+}
+/*
+function updateTextseg(i) {
+	itemarray[i][1] = $("#textseg"+i).val();
+}
+*/
+
 function generateOutput() {
 	var out = '';
+	var text_segments = [];
+	var qcnt = 0;
 	for (var i=0; i<itemarray.length; i++) {
-		if (i!=0) {
-			out += ',';
-		}
-		if (itemarray[i].length<5) {  //is group
+		if (itemarray[i][0]=='text') { //is text item
+			//itemarray[i] is ['text',text,displayforN] 
+			text_segments.push({"displayBefore":qcnt,"displayUntil":qcnt+itemarray[i][2]-1,"text":itemarray[i][1]});
+		} else if (itemarray[i].length<5) {  //is group
+			if (out.length>0) {
+				out += ',';
+			}
 			out += itemarray[i][0]+'|'+itemarray[i][1];
 			for (var j=0; j<itemarray[i][2].length; j++) {
 				out += '~'+itemarray[i][2][j][0];
+				qcnt++;
 			}
 		} else {
+			if (out.length>0) {
+				out += ',';
+			}
 			out += itemarray[i][0];
+			qcnt++;
 		}
 	}
-	return out;
+	return [out,text_segments];
 }
 
 function collapseqgrp(i) {
@@ -249,16 +379,22 @@ function generateTable() {
 	}
 	html += "</thead><tbody>";
 	for (var i=0; i<itemcount; i++) {
-		if (itemarray[i].length<5) { //is group
+		curistext = 0;
+		curisgroup = 0;
+		if (itemarray[i][0]=="text") {
+			var curitems = new Array();
+			curitems[0] = itemarray[i];
+			curistext = 1;
+		} else if (itemarray[i].length<5) { //is group
 			curitems = itemarray[i][2];
 			curisgroup = 1;
 		} else {  //not group
 			var curitems = new Array();
 			curitems[0] = itemarray[i];
-			curisgroup = 0;
 		}
 		
-		var ms = generateMoveSelect(i,itemcount);
+		//var ms = generateMoveSelect(i,itemcount);
+		var ms = generateMoveSelect2(i);
 		for (var j=0; j<curitems.length; j++) {
 			if (alt == 0) {
 				curclass = 'even';		
@@ -328,63 +464,78 @@ function generateTable() {
 				}
 				html += "</td>";
 			}
-			
-			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
-			html += "<td class=\"nowrap\"><div";
-			if ((curitems[j][7]&16) == 16) {
-				html += " class=\"ccvid\"";
-			}
-			html += ">";
-			if ((curitems[j][7]&1) == 1) {
-				var showicons = "";
-			} else {
-				var showicons = "_no";
-			}
-			if ((curitems[j][7]&4) == 4) {
-				html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png"/>';
-			}
-			if ((curitems[j][7]&2) == 2) {
-				html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png"/>';
-			}
-			if ((curitems[j][7]&8) == 8) {
-				html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png"/>';
-			}  
-			html += "</div></td>";
-			html += "<td>"+curitems[j][1]+"</td>";
-			if (beentaken) {
-				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
-			} else {
-				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
-			}
-			html += "<td>"+curitems[j][3]+"</td>"; //question type
-			if (curitems[j][4]==9999) { //points
-				html += "<td>"+defpoints+"</td>";
-				curpt = defpoints;
-			} else {
-				html += "<td>"+curitems[j][4]+"</td>";
-				curpt = curitems[j][4];
-			}
-			html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
-			if (curitems[j][5]) {
-				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
-			} else {
-				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
-			}
-			if (beentaken) {
-				html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
-				if (curitems[j][6]==1) {
-					html += "<td><span class='red'>Withdrawn</span></td>";
+			if (curistext==1) {
+				html += "<td colspan=6 id=\"textsegdescr"+i+"\">Text: "+curitems[j][1].substr(0,40)+"</td>"; //description
+				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
+				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
+				html += "<td>"+generateShowforSelect(i)+"</td>";
+				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
+				html += '<td></td>';
+				if (beentaken) {
+					html += "<td></td>";
 				} else {
-					html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
+					html += "<td class=c><a href=\"#\" onclick=\"return removeitem('"+i+"');\">Remove</a></td>";
 				}
 			} else {
-				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
-				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
+				html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
+				html += "<td class=\"nowrap\"><div";
+				if ((curitems[j][7]&16) == 16) {
+					html += " class=\"ccvid\"";
+				}
+				html += ">";
+				if ((curitems[j][7]&1) == 1) {
+					var showicons = "";
+				} else {
+					var showicons = "_no";
+				}
+				if ((curitems[j][7]&4) == 4) {
+					html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png"/>';
+				}
+				if ((curitems[j][7]&2) == 2) {
+					html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png"/>';
+				}
+				if ((curitems[j][7]&8) == 8) {
+					html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png"/>';
+				}  
+				html += "</div></td>";
+				html += "<td>"+curitems[j][1]+"</td>";
+				if (beentaken) {
+					html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
+				} else {
+					html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
+				}
+				html += "<td>"+curitems[j][3]+"</td>"; //question type
+				if (curitems[j][4]==9999) { //points
+					html += "<td>"+defpoints+"</td>";
+					curpt = defpoints;
+				} else {
+					html += "<td>"+curitems[j][4]+"</td>";
+					curpt = curitems[j][4];
+				}
+				html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
+				if (curitems[j][5]) {
+					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
+				} else {
+					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
+				}
+				if (beentaken) {
+					html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
+					if (curitems[j][6]==1) {
+						html += "<td><span class='red'>Withdrawn</span></td>";
+					} else {
+						html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
+					}
+				} else {
+					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
+					html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
+				}
 			}
 			html += "</tr>";
 			ln++;
 		}
-		pttotal += curpt*(curisgroup?itemarray[i][0]:1);
+		if (curistext==0) {
+			pttotal += curpt*(curisgroup?itemarray[i][0]:1);
+		}
 		alt = 1-alt;
 	}
 	html += "</tbody></table>";
@@ -392,6 +543,59 @@ function generateTable() {
 	return html;
 }
 
+function addtextsegment() {
+	itemarray.push(["text","",1,1,1,1]);
+	refreshTable();
+}
+
+function check_textseg_itemarray() {
+	var lastwastext = false, numq, j;
+	for (var i=0;i<itemarray.length;i++) {
+		if (itemarray[i][0]=="text") {//this is text item
+			if (lastwastext) { //make sure shown matches
+				itemarray[i][2] = itemarray[i-1][2];
+			}
+			numq = 0;
+			j = i+1;
+			while (j<itemarray.length && itemarray[j][0]!="text") {
+				numq++;
+				j++;
+			}
+			//make sure isn't bigger than number of q, but is at least 1
+			itemarray[i][2] = Math.max(1, Math.min(itemarray[i][2], numq));
+			
+			lastwastext = true;
+		} else {
+			lastwastext = false;
+		}
+	}
+}
+
+function submitChanges() {
+	var target = "submitnotice";
+	check_textseg_itemarray();
+	document.getElementById(target).innerHTML = ' Saving Changes... ';
+	data=generateOutput();
+	$.ajax({
+		type: "POST",
+		//url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid", 
+		url: AHAHsaveurl,
+		data: {order: data[0], text_order: JSON.stringify(data[1])}
+	})
+	.done(function() {
+		document.getElementById(target).innerHTML='';
+		refreshTable();
+	})
+	.fail(function(xhr, status, errorThrown) {
+	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ 
+			status + "\n" +req.statusText+
+			"\nError: "+errorThrown 
+		itemarray = olditemarray;
+		generateTable();
+	}) 
+}
+
+/*
 function submitChanges() { 
   url = AHAHsaveurl + '&order='+generateOutput();
   var target = "submitnotice";
@@ -424,3 +628,5 @@ function ahahDone(url, target) {
     } 
   } 
 }
+*/
+
