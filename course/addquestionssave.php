@@ -7,7 +7,7 @@
 	if (!isset($teacherid)) {
 		echo "error: validation";
 	}
-	$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT itemorder,viddata,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error()); 
 	$rawitemorder = mysql_result($result,0,0);
 	$viddata = mysql_result($result,0,1);
@@ -18,8 +18,22 @@
 			$curitems[] = $qid;
 		}
 	}
+	$current_intro_json = mysql_result($result,0,2);
+	if (($intro=json_decode($current_intro_json,true))!==null) { //is json intro
+		$current_intro = $intro[0];
+		$text_segments = array_slice($intro,1); //remove initial Intro text
+		$text_segments_json = json_encode($text_segments);
+	} else {
+		$current_intro = $current_intro_json; //it actually isn't JSON
+		$text_segments = null;
+		$text_segments_json = '[]';
+	}
+	$new_text_segments_json = stripslashes($_POST['text_order']);
+file_put_contents("text_order_post_data",$new_text_segments_json);
+	//insert the new_text_segments_json into 
+	$composite_intro_json = json_encode(array($current_intro,json_decode($new_text_segments_json, true)) );
 	
-	$submitted = $_GET['order'];
+	$submitted = $_POST['order'];
 	$submitted = str_replace('~',',',$submitted);
 	$newitems = array();
 	foreach (explode(',',$submitted) as $qid) {
@@ -46,7 +60,7 @@
 			}
 		}
 		
-		$qorder = explode(',',$_GET['order']);
+		$qorder = explode(',',$_POST['order']);
 		$newbynum = array();
 		for ($i=0;$i<count($qorder);$i++) {
 			if (strpos($qorder[$i],'~')!==false) {
@@ -100,8 +114,8 @@
 	$query = "DELETE FROM imas_questions WHERE id IN ('".implode("','",$toremove)."')";
 	mysql_query($query) or die("Query failed : " . mysql_error()); 
 	
-	//store new itemorder
-	$query = "UPDATE imas_assessments SET itemorder='{$_GET['order']}',viddata='$viddata' WHERE id='$aid'";
+	//store new itemorder and intro
+	$query = "UPDATE imas_assessments SET itemorder='{$_POST['order']}',viddata='$viddata', intro='$composite_intro_json' WHERE id='$aid'";
 	mysql_query($query) or die("Query failed : " . mysql_error()); 
 	
 	if (mysql_affected_rows()>0) {

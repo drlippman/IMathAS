@@ -58,6 +58,8 @@ function moveitem2(from) {
 			}
 		}
 	}
+	//TODO update the number of questions a text segment applies to if
+	//     one of its questions moved
 	submitChanges();
 	return false;
 }
@@ -190,20 +192,32 @@ function updateGrpT(num) {
 
 function generateOutput() {
 	var out = '';
+	text_segments = new Array();
 	for (var i=0; i<itemarray.length; i++) {
-		if (i!=0) {
-			out += ',';
-		}
-		if (itemarray[i].length<5) {  //is group
+		if (typeof itemarray[i][0]=="string" 
+				&& itemarray[i][0].charAt(0)=='T') { //is text segment
+			//send [displayBefore,dispayUntil,text] to be used in imas_assessment.intro
+			//TODO verify that i+1 etc are the correct numbers to send back
+			//TODO combine consecutive identical text
+			//text_segments.push([i+1,i+itemarray[i][2]-1,itemarray[i][1]]);
+			text_segments.push({"displayBefore":i+1,"displayUntil":i+itemarray[i][2]-1,"text":itemarray[i][1]});
+		} else if (itemarray[i].length<5) {  //is group
+			if (i!=0) {
+				out += ',';
+			}
 			out += itemarray[i][0]+'|'+itemarray[i][1];
 			for (var j=0; j<itemarray[i][2].length; j++) {
 				out += '~'+itemarray[i][2][j][0];
 			}
 		} else {
+			if (i!=0) {
+				out += ',';
+			}
 			out += itemarray[i][0];
 		}
 	}
-	return out;
+	text_segments_json = JSON.stringify(text_segments);
+	return [out,text_segments_json];
 }
 
 function collapseqgrp(i) {
@@ -249,13 +263,20 @@ function generateTable() {
 	}
 	html += "</thead><tbody>";
 	for (var i=0; i<itemcount; i++) {
-		if (itemarray[i].length<5) { //is group
+		if (typeof itemarray[i][0]=="string" && itemarray[i][0].charAt(0)=='T') { //is text segment
+			var curitems = new Array();
+			curitems[0] = itemarray[i];
+			curistext_segment = 1;
+			curisgroup = 0;
+		} else if (itemarray[i].length<5) { //is group
 			curitems = itemarray[i][2];
 			curisgroup = 1;
+			curistext_segment = 0;
 		} else {  //not group
 			var curitems = new Array();
 			curitems[0] = itemarray[i];
 			curisgroup = 0;
+			curistext_segment = 0;
 		}
 		
 		var ms = generateMoveSelect(i,itemcount);
@@ -329,7 +350,10 @@ function generateTable() {
 				html += "</td>";
 			}
 			
-			html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
+			if (typeof curistext_segment != "undefined" && curistext_segment) {
+				html += "<td colspan=6 ><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][0]+"\"/>"+curitems[j][1]+"</td>"; //description
+			} else {
+				html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
 			html += "<td class=\"nowrap\"><div";
 			if ((curitems[j][7]&16) == 16) {
 				html += " class=\"ccvid\"";
@@ -364,6 +388,7 @@ function generateTable() {
 				html += "<td>"+curitems[j][4]+"</td>";
 				curpt = curitems[j][4];
 			}
+			}
 			html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
 			if (curitems[j][5]) {
 				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
@@ -392,7 +417,7 @@ function generateTable() {
 	return html;
 }
 
-function submitChanges() { 
+function oldSubmitChanges() { 
   url = AHAHsaveurl + '&order='+generateOutput();
   var target = "submitnotice";
   document.getElementById(target).innerHTML = ' Saving Changes... ';
@@ -407,6 +432,29 @@ function submitChanges() {
     req.send(""); 
   } 
 }  
+
+function submitChanges() {
+	var target = "submitnotice";
+	document.getElementById(target).innerHTML = ' Saving Changes... ';
+	data=generateOutput();
+	$.ajax({
+		type: "POST",
+		//url: "$imasroot/course/addquestions.php?cid=$cid&aid=$aid", 
+		url: AHAHsaveurl,
+		data: {order: data[0], text_order: data[1]}
+	})
+	.done(function() {
+		document.getElementById(target).innerHTML='';
+		refreshTable();
+	})
+	.fail(function(xhr, status, errorThrown) {
+	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ 
+			status + "\n" +req.statusText+
+			"\nError: "+errorThrown 
+		itemarray = olditemarray;
+		generateTable();
+	}) 
+}
 
 function ahahDone(url, target) { 
   if (req.readyState == 4) { // only if req is "loaded" 

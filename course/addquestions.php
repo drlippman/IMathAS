@@ -351,8 +351,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=030315\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/editor/tiny_mce_src.js\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/tinymce4/tinymce.min.js?v=111612\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\">var coursetheme = 'default.css'; </script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?v=030315\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\">var coursetheme = 'default.css'; var filePickerCallBackFunc;initeditor('textareas','textsegment'); </script>";
+	$placeinhead .= "\n<script type=\"text/javascript\">$( document ).ready(function() { $('#addtextsegmentbutton').on(\"click\", onAddTextSegmentButton) }); 
+function onAddTextSegmentButton() {
+}
+</script>";
+
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
 	
+	$editor = "textsegmenteditor";
 	
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
@@ -368,7 +379,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$beentaken = false;
 	}
 	
-	$query = "SELECT itemorder,name,defpoints,displaymethod,showhints FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT itemorder,name,defpoints,displaymethod,showhints,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$itemorder = mysql_result($result, 0,0);
 	$page_assessmentName = mysql_result($result,0,1);
@@ -376,6 +387,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$defpoints = mysql_result($result,0,2);
 	$displaymethod = mysql_result($result,0,3);
 	$showhintsdef = mysql_result($result,0,4);
+	$introjson = mysql_result($result,0,5);
+
+	// Format of imas_assessments.intro is a JSON representation like
+	// [ "original (main) intro text",
+	//  { displayBefore:  question number to display before,
+    //    displayUntil:  last question number to display it for
+    //    text:  the actual text to show
+	//  },
+  	//  ...
+	// ]
+
+	if (($intro=json_decode($introjson,true))!==null) { //is json intro
+		$text_segments = array_slice($intro,1); //remove initial Intro text
+		$text_segments_json = json_encode($text_segments);
+	} else {
+		$text_segments = null;
+		$text_segments_json = '[]';
+	}
 	
 	$grp0Selected = "";
 	if (isset($sessiondata['groupopt'.$aid])) {
@@ -395,12 +424,29 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$existingq = array();
 	$apointstot = 0;
 	for ($i = 0; $i < count($items); $i++) {
+		//check whether this question should have any per-question intro text
+		foreach ($text_segments as $text_segment_index=>$text_segment) {
+			$start = $text_segment['displayBefore'];
+			$end = $text_segment['displayUntil'];
+			if ($i+1 >= $start and $i+1 <= $end) {
+				//add a row to display the intro text
+				$row = array("T$text_segment_index",
+								$text_segment['text'],
+								$end-$start+1 ); //number of questions to show for
+				error_log(json_encode($row));
+				if ($i>0) {
+					$jsarr .= ',';
+				}
+				$jsarr .= json_encode($row);
+			}
+		}
+
 		if (strpos($items[$i],'~')!==false) {
 			$subs = explode('~',$items[$i]);
 		} else {
 			$subs[] = $items[$i];
 		}
-		if ($i>0) {
+		if ($i>0 and substr($jsarr,-1)!=',') {
 			$jsarr .= ',';
 		}
 		if (count($subs)>1) {
@@ -1070,6 +1116,7 @@ if ($overwriteBody==1) {
 		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Define End Messages" title="Customize messages to display based on the assessment score" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
+		<input type=button id="addtextsegmentbutton" value="Add Text/Media" title="Insert a video or text before a question" >
 		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		
