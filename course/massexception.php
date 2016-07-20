@@ -132,7 +132,7 @@
 	$placeinhead .= '<style type="text/css">
 	   fieldset { margin-bottom: 10px;}
 	   fieldset legend {font-weight: bold;}
-	   span.form { float:none; display: inline-block; width: 150px;}
+	   span.form { float:none; display: inline-block; width: 140px;}
 	   span.formright { float:none; width: auto; display: inline-block;}
 	   fieldset.split { float:left; }
 	   .optionlist p.list { margin: 7px 0 7px 20px; padding: 0;}
@@ -399,7 +399,7 @@
 		$pbtime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
 		$rbtime = $pbtime;
 		//$etime = tzdate("g:i a",$wk);
-		echo '<span class="form">Exception type?</span><span class="formright"><select name="forumitemtype">';
+		echo '<span class="form">Exception type:</span><span class="formright"><select name="forumitemtype">';
 		echo '<option value="F" checked">Override Post By and Reply By</option>';
 		echo '<option value="P" checked">Override Post By only</option>';
 		echo '<option value="R" checked">Override Reply By only</option></select></span><br class="form"/>';
