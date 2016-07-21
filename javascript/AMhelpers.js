@@ -265,6 +265,7 @@ function calculate(inputId,outputId,format) {
 
 //Function to convert inequalities into interval notation
 function ineqtointerval(strw) {
+	strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	var strpts = strw.split(/or/);
 	for (i=0; i<strpts.length; i++) {
 		str = strpts[i];
@@ -375,7 +376,7 @@ function intcalculate(inputId,outputId,format) {
 				  if (!isNaN(res) && res!="Infinity") {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
-						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+wrapAMnotice(err);
+						  calcvals[j] = (Math.abs(res)<1e-15?0:res).toString();//+wrapAMnotice(err);
 					  //} else {
 						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
 					  //}
@@ -383,7 +384,7 @@ function intcalculate(inputId,outputId,format) {
 				  	  calcvals[j] = _("undefined");
 				  }
 				  if (err != '') {
-				  	  fullerr += wrapAMnotice(err);
+				  	  fullerr += err;
 				  }
 				  
 			  }
