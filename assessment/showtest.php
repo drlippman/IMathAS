@@ -1366,9 +1366,18 @@ if (!isset($_REQUEST['embedpostback'])) {
 	} else if (count($introjson)>1) {
 		$intropieces = array();
 		$introdividers = array();
+		$lastdisplaybefore = -1;
+		$textsegcnt = -1;
 		for ($i=1;$i<count($introjson);$i++) {
-			$introdividers[$i] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
-			$intropieces[$i] = $introjson[$i]['text'];
+			if ($introjson[$i]['displayBefore'] == $lastdisplaybefore) {
+				$intropieces[$textsegcnt] .= $introjson[$i]['text'];
+			} else {
+				$textsegcnt++;
+				$introdividers[$textsegcnt] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
+				$intropieces[$textsegcnt] = $introjson[$i]['text'];
+			}
+			
+			$lastdisplaybefore = $introjson[$i]['displayBefore'];
 		}
 	}
 	

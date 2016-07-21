@@ -377,13 +377,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	// [ "original (main) intro text",
 	//  { displayBefore:  question number to display before,
 	//    displayUntil:  last question number to display it for
-	//    displayAtEnd:  set to true (and don't set displayBefore) to show after last question
 	//    text:  the actual text to show
 	//  },
   	//  ...
 	// ]
 	$text_segments = array();
-	$end_text_segments = array();
 	if (($introjson=json_decode($assessintro,true))!==null) { //is json intro
 		//$text_segments = array_slice($introjson,1); //remove initial Intro text
 		for ($i=0;$i<count($introjson);$i++) {
@@ -392,8 +390,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$text_segments[$introjson[$i]['displayBefore']] = array();
 				}
 				$text_segments[$introjson[$i]['displayBefore']][] = $introjson[$i];
-			} else if (isset($introjson[$i]['displayAtEnd'])) {
-				$end_text_segments[] = $introjson[$i];
 			}
 		}
 	}
@@ -505,12 +501,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$alt = 1-$alt;
 		unset($subs);
 	}
-	foreach ($end_text_segments as $j=>$text_seg) {
-		if ($i>0 || $j>0) {
-			$jsarr .= ',';
+	if (isset($text_segments[$qncnt])) {
+		foreach ($text_segments[$qncnt] as $j=>$text_seg) {
+			//stupid hack: putting a couple extra unused entries in array so length>=5
+			if ($i>0 || $j>0) {
+				$jsarr .= ',';
+			}
+			$jsarr .= '["text", "'.str_replace('"','\\"',$text_seg['text']).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).',1,1,1]';
 		}
-		$jsarr .= '["text", "'.str_replace('"','\\"',$text_seg['text']).'",'.$text_seg['displayBefore'].','.$text_seg['displayUntil'].']';
 	}
+
 	$jsarr .= ']';
 	
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
