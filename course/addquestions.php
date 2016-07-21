@@ -378,6 +378,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//  { displayBefore:  question number to display before,
 	//    displayUntil:  last question number to display it for
 	//    text:  the actual text to show
+	//    ispage: is this is a page break (0 or 1)
+	//    pagetitle: page title text
 	//  },
   	//  ...
 	// ]
@@ -419,7 +421,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {
 				//stupid hack: putting a couple extra unused entries in array so length>=5
-				$jsarr .= '["text", "'.str_replace('"','\\"',$text_seg['text']).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).',1,1,1],';
+				$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
 			}
 		}
 		if (strpos($items[$i],'~')!==false) {
@@ -507,7 +509,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if ($i>0 || $j>0) {
 				$jsarr .= ',';
 			}
-			$jsarr .= '["text", "'.str_replace('"','\\"',$text_seg['text']).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).',1,1,1]';
+			$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
 		}
 	}
 
@@ -1092,6 +1094,7 @@ if ($overwriteBody==1) {
 	<script>
 		var itemarray = <?php echo $jsarr ?>; 
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>; 
+		var displaymethod = "<?php echo $displaymethod;?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
 	</script>
 <?php

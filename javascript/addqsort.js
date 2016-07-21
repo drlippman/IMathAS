@@ -287,20 +287,46 @@ function updateGrpT(num) {
 }
 
 function edittextseg(i) {
-	$("#textsegdescr"+i).html(
-		$('<textarea>').val(itemarray[i][1])
+	var el = $("#textsegdescr"+i).html(
+		$('<textarea>').val(itemarray[i][1]).before("Text: ")
 	).append(
 		$('<button>', {text: "Done", type: "button"}).on("click",function() {savetextseg(i);})
 	);
+	if (itemarray[i][3]==1) {
+		el.prepend(
+			$('<input>', {type:"text"}).val(itemarray[i][4]).after("<br/>")
+		).prepend("Page Title: ");
+	}
 }
 
 function savetextseg(i) {
 	itemarray[i][1] = $("#textsegdescr"+i).find("textarea").val();
+	if (itemarray[i][3]==1) {
+		itemarray[i][4] = $("#textsegdescr"+i).find("input[type=text]").val();
+	}
 	submitChanges();
 }
 function updateTextShowN(i) {
 	itemarray[i][2] = $("#showforn"+i).val();
 	submitChanges();
+}
+
+function chgpagetitle(i) {
+	if ($("#ispagetitle"+i).is(":checked")) {
+		itemarray[i][3] = 1;
+		if (itemarray[i][4]=="") {
+			var words = strip_tags(itemarray[i][1]).split(" ");
+			if (words.length > 2) {
+				itemarray[i][4] = words.slice(0,3).join(" ");
+			}
+		}
+	} else {
+		itemarray[i][3] = 0;
+	}
+	submitChanges();
+}
+function strip_tags(txt) {
+	return $("<div/>").html(txt).text();
 }
 /*
 function updateTextseg(i) {
@@ -315,7 +341,7 @@ function generateOutput() {
 	for (var i=0; i<itemarray.length; i++) {
 		if (itemarray[i][0]=='text') { //is text item
 			//itemarray[i] is ['text',text,displayforN] 
-			text_segments.push({"displayBefore":qcnt,"displayUntil":qcnt+itemarray[i][2]-1,"text":itemarray[i][1]});
+			text_segments.push({"displayBefore":qcnt,"displayUntil":qcnt+itemarray[i][2]-1,"text":itemarray[i][1],"ispage":itemarray[i][3],"pagetitle":itemarray[i][4]});
 		} else if (itemarray[i].length<5) {  //is group
 			if (out.length>0) {
 				out += ',';
@@ -465,10 +491,22 @@ function generateTable() {
 				html += "</td>";
 			}
 			if (curistext==1) {
-				html += "<td colspan=6 id=\"textsegdescr"+i+"\">Text: "+curitems[j][1].substr(0,40)+"</td>"; //description
 				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
 				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
-				html += "<td>"+generateShowforSelect(i)+"</td>";
+				if (displaymethod=="Embed") {
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\">";
+					if (curitems[j][3]==1) {
+						html += "Page Title: "+	strip_tags(curitems[j][4]).substr(0,50)+"<br/>";
+					} 
+					html += "Text: "+strip_tags(curitems[j][1]).substr(0,55)+"</td>"; //description
+					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
+					html += '<label><input type="checkbox" id="ispagetitle'+i+'" onchange="chgpagetitle('+i+')" ';
+					if (curitems[j][3]==1) { html += "checked";}
+					html += '>New page<label></td>';
+				} else {
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\">Text: "+strip_tags(curitems[j][1]).substr(0,55)+"</td>"; //description
+					html += "<td>"+generateShowforSelect(i)+"</td>";
+				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
 				html += '<td></td>';
 				if (beentaken) {
@@ -544,16 +582,19 @@ function generateTable() {
 }
 
 function addtextsegment() {
-	itemarray.push(["text","",1,1,1,1]);
+	itemarray.push(["text","",1,0,"",1]);
 	refreshTable();
 }
 
 function check_textseg_itemarray() {
-	var lastwastext = false, numq, j;
+	var lastwastext = false, numq, j, firstpageloc=-1;
 	for (var i=0;i<itemarray.length;i++) {
 		if (itemarray[i][0]=="text") {//this is text item
-			if (lastwastext) { //make sure shown matches
+			if (lastwastext) { //make sure showN matches
 				itemarray[i][2] = itemarray[i-1][2];
+			}
+			if (itemarray[i][3]==1 && firstpageloc==-1) {
+				firstpageloc = i;
 			}
 			numq = 0;
 			j = i+1;
@@ -567,6 +608,15 @@ function check_textseg_itemarray() {
 			lastwastext = true;
 		} else {
 			lastwastext = false;
+		}
+	}
+	if (firstpageloc>0) {
+		alert("If you are using page titles, you need to have a page title at the beginning.");
+		if (itemarray[0][0]=="text") {
+			itemarray[0][3] = 1;
+			itemarray[0][4] = "First Page";
+		} else {
+			itemarray.unshift(["text","",1,1,"First Page",1]);
 		}
 	}
 }
