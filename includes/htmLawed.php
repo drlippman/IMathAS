@@ -24,14 +24,19 @@ function convertdatauris($in) {
 	return $in;
 }
 
-function myhtmLawed($t, $NC=1, $S=array()) {
+function myhtmLawed($t, $NC=1, $NS='') {
 	$t = convertdatauris($t);
 	$C = array('elements'=>'*-script-form', 'direct_list_nest'=>1);
+	$S = "embed=sscr,script";
 	if (is_array($NC)) { //overwrite or append new config
 		foreach ($NC as $k=>$v) {
 			$C[$k] = $v;
 		}
 	}
+	if ($NS!='') {
+		$S .= ';'.$S;
+	}
+	
 	return htmLawed($t, $C, $S);
 }
 
