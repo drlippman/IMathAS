@@ -2478,15 +2478,16 @@ if (!isset($_REQUEST['embedpostback'])) {
 			//TODO i18n
 			if (strpos($intro,'[QUESTION')===false) {
 				if (isset($intropieces)) {
-					$last = 1;
+					$last = 0;
 					foreach ($introdividers as $k=>$v) {
 						if ($last<$v[1]-1) {
-							for ($j=$last;$j<$v[1];$j++) {
+							for ($j=$last+1;$j<$v[1];$j++) {
 								$intro .= '[QUESTION '.$j.']';
+								$last = $j;
 							}
 						}
 						$intro .= '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
-						for ($j=$v[1];$j<=$v[2];$j++) {
+						for ($j=$v[1];$j<=$v[2] && $j<count($questions);$j++) {
 							$intro .= '[QUESTION '.$j.']';
 							$last = $j;
 						}
