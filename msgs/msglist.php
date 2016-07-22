@@ -273,7 +273,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					}
 				}
 			}
-				
+			
+			$courseid=($cid==0)?$filtercid:$cid;
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -301,7 +302,6 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				
 				$message = '<br/><hr/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
-				$courseid = $cid;
 				if (isset($parts[3])) {  //sending out of assessment instructor
 					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -320,11 +320,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} else if (isset($_GET['title'])) {
 				$title = $_GET['title'];
 				$message = '';
-				$courseid=($cid==0)?$filtercid:$cid;
 			} else {
 				$title = '';
 				$message = '';
-				$courseid=($cid==0)?$filtercid:$cid;
 			}
 			
 			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\"";
@@ -365,6 +363,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
 					}
 				}
+				echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
 			} else {
 				if ($filtercid>0) {
 					echo "<select name=\"to\" id=\"to\">";
