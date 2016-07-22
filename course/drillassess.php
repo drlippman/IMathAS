@@ -205,7 +205,8 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 	}
 }
 
-
+$showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
+$useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";

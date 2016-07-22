@@ -888,56 +888,7 @@
 	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	$useeditor = 1;
 if (!isset($_REQUEST['embedpostback'])) {
-	if ($testsettings['eqnhelper']==1 || $testsettings['eqnhelper']==2) {
-		$placeinhead = '<script type="text/javascript">var eetype='.$testsettings['eqnhelper'].'</script>';
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=062216\"></script>";
-		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-		
-	} else if ($testsettings['eqnhelper']==3 || $testsettings['eqnhelper']==4) {
-		$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
-		if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
-			$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
-				.mathquill-editable.empty { width: 0.5em; }
-				.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
-				.mathquill-rendered-math sup { line-height: .8em; }
-				.mathquill-rendered-math .numerator {float: left; padding: 0;}
-				.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
-				</style><![endif]-->';
-		}
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=071916\"></script>";
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
-		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-		
-	} 
 	
-	//IP: eqntips 
-	if ($testsettings['showtips']==2) {
-		$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
-	}
-	$placeinhead .= '<script type="text/javascript">
-	   function toggleintroshow(n) {
-	      var link = document.getElementById("introtoggle"+n);
-	      var content = document.getElementById("intropiece"+n);
-	      if (link.innerHTML.match("Hide")) {
-	      	   link.innerHTML = link.innerHTML.replace("Hide","Show");
-		   content.style.display = "none";
-	      } else {
-	      	   link.innerHTML = link.innerHTML.replace("Show","Hide");
-		   content.style.display = "block";
-	      }
-	     }
-	     function togglemainintroshow(el) {
-	     	if ($("#intro").hasClass("hidden")) {
-	     		$(el).html("'._("Hide Intro/Instructions").'");
-	     		$("#intro").removeClass("hidden").addClass("intro");
-	     	} else {
-	     		$("#intro").addClass("hidden");
-	     		$(el).html("'._("Show Intro/Instructions").'");
-	     	}
-	     }
-	     </script>';
-
 	$cid = $testsettings['courseid'];
 	if ($testsettings['displaymethod'] == "VideoCue") {
 		//$placeinhead .= '<script src="'.$urlmode.'www.youtube.com/player_api"></script>';
