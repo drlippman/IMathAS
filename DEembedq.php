@@ -65,12 +65,12 @@ if (isset($_GET['showscored'])) {
 	}
 	*/
 	$showans = (!isset($params['showans']) || $params['showans']=='true');
-	
+
 	$lastanswers = array();
 	list($seed, $rawscores, $lastanswers[0]) = explode(';', $params['showscored'], 3);
 	$rawscores = explode('~',$rawscores);
 	$seed = intval($seed);
-	
+
 	displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
 	echo '<script type="text/javascript">
 		$(function() {
@@ -78,7 +78,7 @@ if (isset($_GET['showscored'])) {
 			window.parent.postMessage("action=resize&id='.$qsetid.'&height="+height,"*");
 		});
 		</script>';
-		
+
 } else if (isset($_POST['seed'])) {
 	//time to score the question
 	$seed = intval($_POST['seed']);
@@ -110,13 +110,13 @@ if (isset($_GET['showscored'])) {
 		$rawafter = implode('~',$rawafter);
 	}
 	$lastanswers[0] = stripslashes($lastanswers[0]);
-	
+
 	$pts = getpts($after);
-	
+
 	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 		
 	if (isset($_POST['auth'])) {
-		$query = "SELECT password FROM imas_users WHERE SID='".stripslashes($_POST['auth'])."'";
+		$query = "SELECT password FROM imas_users WHERE SID='".$_POST['auth']."'";
 		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		$row = mysql_fetch_row($result);
 		$sig = $row[0];
@@ -124,7 +124,7 @@ if (isset($_GET['showscored'])) {
 		$sig = '';
 	}
 	$signed = build_signed_querystring($params, $sig);
-	
+
 	echo '<script type="text/javascript">
 	$(function() {
 		window.parent.postMessage("'.$signed.'","*");
@@ -132,7 +132,7 @@ if (isset($_GET['showscored'])) {
 	</script>';
 
 	echo '<p>Saving score... <img src="img/updating.gif"/></p>';
-	
+
 } else {
 	$lastanswers = array();
 	if (isset($_GET['redisplay'])) {
@@ -150,11 +150,11 @@ if (isset($_GET['showscored'])) {
 		echo '<input type="hidden" name="auth" value="'.$_GET['auth'].'"/>';
 	}
 	if (isset($_GET['showhints']) && $_GET['showhints']==0) {
-		$showhints = false;	
+		$showhints = false;
 	} else {
 		$showhints = true;
 	}
-		
+
 	displayq(0, $qsetid, $seed, $doshowans, $showhints, 0);
 	if ($jssubmit) {
 		echo '<input type="submit" id="submitbutton" style="display:none;"/>';
@@ -191,8 +191,8 @@ function getansweights($code,$seed) {
 		if (is_array($weights)) {
 			return $weights;
 		}
-		
-	} 
+
+	}
 	if (!$foundweights) {
 		preg_match('/anstypes\s*=(.*)/',$code,$match);
 		$n = substr_count($match[1],',')+1;
@@ -237,8 +237,8 @@ function printscore($sc,$qsetid,$seed) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
-		
+
+
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
@@ -246,7 +246,7 @@ function printscore($sc,$qsetid,$seed) {
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
-			} else if (!is_numeric($v) || $v==0) { 
+			} else if (!is_numeric($v) || $v==0) {
 				$pm = 'redx';
 			} else if (abs($v-$ptposs[$k])<.011) {
 				$pm = 'gchk';
@@ -257,9 +257,9 @@ function printscore($sc,$qsetid,$seed) {
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
+		//$ptposs = implode(', ',$ptposs);
 		$out = sprintf(_('%1$s out of %2$s (parts: %3$s)'), $pts, $poss, $sc);
-	}	
+	}
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
 		$w = 30;
@@ -267,16 +267,16 @@ function printscore($sc,$qsetid,$seed) {
 		$w = round(30*$pts/$poss);
 	}
 	if ($w==0) {$w=1;}
-	if ($w < 15) { 
+	if ($w < 15) {
 	     $color = "#f".dechex(floor(16*($w)/15))."0";
 	} else if ($w==15) {
 	     $color = '#ff0';
-	} else { 
+	} else {
 	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
 	}
-	
+
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;	
+	return $bar . $out;
 }
 
 function getpts($sc) {
@@ -290,7 +290,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
