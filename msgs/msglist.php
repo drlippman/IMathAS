@@ -52,7 +52,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$limittotagged = 0;
 	}
 	if (isset($_GET['filtercid'])) {
-		$filtercid = $_GET['filtercid'];
+		$filtercid = intval($_GET['filtercid']);
 	} else if ($cid!='admin' && $cid>0) {
 		$filtercid = $cid;
 	} else {
@@ -65,11 +65,55 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	$type = $_GET['type'];
 	
+	if (isset($_GET['getstulist'])) {
+		$cid = intval($_GET['getstulist']);
+		if ($cid==0) { echo '[]'; exit;}
+		
+		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$msgset = mysql_result($result,0,0);
+		$msgmonitor = (floor($msgset/5)&1);
+		$msgset = $msgset%5;
+				
+		$opts = array();
+		if ($isteacher || $msgset<2) {
+			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+			$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
+			$query .= "imas_teachers.courseid='$cid' ORDER BY imas_users.LastName";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$opts[] = "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+			}
+			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+			$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
+			$query .= "imas_tutors.courseid='$cid' ";
+			if (!$isteacher && $studentinfo['section']!=null) {
+				$query .= "AND (imas_tutors.section='".addslashes($studentinfo['section'])."' OR imas_tutors.section='') ";
+			}
+			$query .= "ORDER BY imas_users.LastName";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$opts[] = "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+			} 
+			
+			
+		}
+		if ($isteacher || $msgset==0 || $msgset==2) {
+			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+			$query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
+			$query .= "imas_students.courseid='$cid' ORDER BY imas_users.LastName";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			while ($row = mysql_fetch_row($result)) {
+				$opts[] = "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+			}
+		}
+		echo json_encode($opts);
+		exit;
+	}
 	if (isset($_GET['add'])) {
-		if (isset($_POST['subject'])) {
+		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
 			require_once("../includes/htmLawed.php");
-			$htmlawedconfig = array('elements'=>'*-script');
-			$_POST['message'] = addslashes(htmLawed(stripslashes($_POST['message']),$htmlawedconfig));
+			$_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
 			$_POST['subject'] = addslashes(htmlentities(stripslashes($_POST['subject'])));
 			
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -136,7 +180,28 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					} else {
 						return true;
 					}
-				}</script>';
+				}
+				function updateTo(el) {
+					var newcid = $(el).val();
+					$("#to").hide();
+					if (newcid>0) {
+						$(el).after($("<img>", {src: imasroot+"/img/updating.gif"}));
+						$.ajax({
+							url: "msglist.php?cid=0&getstulist="+newcid,
+							dataType: "json"
+						}).done(function(optarr) {
+							$("#to").empty().append("<option value=\"0\">Select a recipient...</option>");
+							for (var i=0;i<optarr.length;i++) {
+								$("#to").append($(optarr[i]));
+							}
+							$("#to").show();
+							$(el).siblings("img").remove();
+						});
+					} else {
+						$("#to").val(0);
+					}
+				}
+				</script>';
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase ";
 			if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
@@ -170,20 +235,53 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			}
 			
 			
-			if ($cid>0) {
-				$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+			if ($filtercid>0) {
+				$query = "SELECT msgset FROM imas_courses WHERE id='$filtercid'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$msgset = mysql_result($result,0,0);
 				$msgmonitor = (floor($msgset/5)&1);
 				$msgset = $msgset%5;
+			} else {		
+				$course_array = array();
+				$query = "SELECT i_c.id,i_c.name,i_c.msgset,2 AS userrole FROM imas_courses AS i_c JOIN imas_teachers ON ";
+				$query .= "i_c.id=imas_teachers.courseid WHERE imas_teachers.userid='$userid' ";
+				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole FROM imas_courses AS i_c JOIN imas_tutors ON ";
+				$query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid='$userid' ";
+				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole FROM imas_courses AS i_c JOIN imas_students ON ";
+				$query .= "i_c.id=imas_students.courseid WHERE imas_students.userid='$userid' ";
+				$query .= "ORDER BY userrole DESC, name";
+				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				while ($row = mysql_fetch_assoc($result)) {
+					if ($row['userrole']==0 && $row['msgset']%5>=3) {continue;}
+					if (!isset($course_array[$row['userrole']])) {
+						$course_array[$row['userrole']] = array();
+					}
+					$course_array[$row['userrole']][] = $row;
+				}
+				$courseopts = '';
+				for ($i=2;$i>=0;$i--) {
+					if (isset($course_array[$i])) {
+						$courseopts .= '<optgroup label="';
+						if ($i==2) { $courseopts .= _("Teaching"); }
+						else if ($i==1) { $courseopts .= _("Tutoring"); }
+						else if ($i==0) { $courseopts .= _("Student"); }
+						$courseopts .= '">';
+						foreach ($course_array[$i] as $r) {
+							$courseopts .= '<option value="'.$r['id'].'">'.$r['name'].'</option>';
+						}
+						$courseopts .= '</optgroup>';
+					}
+				}
 			}
+			
+			$courseid=($cid==0)?$filtercid:$cid;
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$title = "Re: ".str_replace('"','&quot;',mysql_result($result,0,0));
 				if (isset($_GET['toquote'])) {
 					$message = mysql_result($result,0,1);
-					$message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;
+					$message = '<br/><hr/>In reply to:<br/>'.$message;
 				} else {
 					$message = '';
 				}
@@ -202,9 +300,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				}
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
 				
-				$message = '<p> </p><br/><hr/>'.$message;
+				$message = '<br/><hr/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
-				$courseid = $cid;
 				if (isset($parts[3])) {  //sending out of assessment instructor
 					$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
 					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -223,11 +320,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} else if (isset($_GET['title'])) {
 				$title = $_GET['title'];
 				$message = '';
-				$courseid=$cid;
 			} else {
 				$title = '';
 				$message = '';
-				$courseid=$cid;
 			}
 			
 			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\"";
@@ -268,47 +363,60 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
 					}
 				}
+				echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
 			} else {
-				echo "<select name=\"to\" id=\"to\">";
-				echo '<option value="0">Select a recipient...</option>';
-				if ($isteacher || $msgset<2) {
-					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
-					$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
-					$query .= "imas_teachers.courseid='$cid' ORDER BY imas_users.LastName";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
-						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+				if ($filtercid>0) {
+					echo "<select name=\"to\" id=\"to\">";
+					echo '<option value="0">Select a recipient...</option>';
+					if ($isteacher || $msgset<2) {
+						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+						$query .= "imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND ";
+						$query .= "imas_teachers.courseid='$courseid' ORDER BY imas_users.LastName";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+						}
+						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+						$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
+						$query .= "imas_tutors.courseid='$courseid' ";
+						if (!$isteacher && $studentinfo['section']!=null) {
+							$query .= "AND (imas_tutors.section='".addslashes($studentinfo['section'])."' OR imas_tutors.section='') ";
+						}
+						$query .= "ORDER BY imas_users.LastName";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+						} 
+						
+						
 					}
-					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
-					$query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";
-					$query .= "imas_tutors.courseid='$cid' ";
-					if (!$isteacher && $studentinfo['section']!=null) {
-						$query .= "AND (imas_tutors.section='".addslashes($studentinfo['section'])."' OR imas_tutors.section='') ";
+					if ($isteacher || $msgset==0 || $msgset==2) {
+						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
+						$query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
+						$query .= "imas_students.courseid='$courseid' ORDER BY imas_users.LastName";
+						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+						while ($row = mysql_fetch_row($result)) {
+							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+						}
 					}
-					$query .= "ORDER BY imas_users.LastName";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
-						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
-					} 
 					
-					
+					echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
+					echo "</select>";
+				} else {
+					echo '<select name="courseid" onchange="updateTo(this)">';
+					echo '<option value="0">Select a course...</option>';
+					echo $courseopts;
+					echo '</select><br/>';
+					echo '<select name="to" id="to" style="display:none;">';
+					echo '<option value="0">Select a course...</option></select>';
 				}
-				if ($isteacher || $msgset==0 || $msgset==2) {
-					$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
-					$query .= "imas_users,imas_students WHERE imas_users.id=imas_students.userid AND ";
-					$query .= "imas_students.courseid='$cid' ORDER BY imas_users.LastName";
-					$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-					while ($row = mysql_fetch_row($result)) {
-						echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
-					}
-				}
-				echo "</select>";
+				
 			}
 			
 			
 				
 			echo "</span><br class=form />";
-			echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
+			
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"$title\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
@@ -380,8 +488,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	echo " Message List</div>";
 	echo '<div id="headermsglist" class="pagetitle"><h2>Messages</h2></div>';
 
-	if ($myrights > 5 && $cid>0) {
-		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
+	if ($myrights > 5 && $filtercid>0) {
+		$query = "SELECT msgset FROM imas_courses WHERE id='$filtercid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$msgset = mysql_result($result,0,0);
 		$msgmonitor = (floor($msgset/5)&1);
@@ -389,7 +497,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		if ($msgset<3 || $isteacher) {
 			$cansendmsgs = true;
 		}
-	}	
+	} else if ($myrights > 5 && $filtercid==0) {
+		$cansendmsgs = true;
+	}
+	
 	$actbar = array();
 	
 	if ($cansendmsgs) {

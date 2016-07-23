@@ -43,6 +43,11 @@ if ($scoretype{0}=='t') {
 $itemids = explode(',',$dadata['itemids']);
 $itemdescr = explode(',',$dadata['itemdescr']);
 
+//declare some globals to make things work
+$scores = array();
+$lastanswers = array();
+$rawscores = array();
+
 $query = "SELECT * FROM imas_drillassess_sessions WHERE drillassessid='$daid' AND userid='$userid'";
 $result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)==0) {
@@ -71,15 +76,17 @@ if (mysql_num_rows($result)==0) {
 //score a submitted question
 $showans = false;
 if (isset($_GET['score'])) {
-	list($score,$rawscores) = scoreq(0,$curitemid,$seed,$_POST['qn0']);
+	list($score,$rawscore) = scoreq(0,$curitemid,$seed,$_POST['qn0']);
+	$scores[0] = $score;
+	$rawscores[0] = $rawscore;
 	$lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$curitemid,$seed);
 	if (getpts($score)<.99 && $sa==0) {
 		$showans = true;
 	} else if (getpts($score)<.99 && $sa==4) {
-		unset($lastanswers);
+		$lastanswers = array();
 	} else {
-		unset($lastanswers);
+		$lastanswers = array();
 		$seed = rand(1,9999);
 	}
 	$curscores[] = getpts($score);
@@ -198,7 +205,8 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 	}
 }
 
-
+$showtips = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
+$useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
@@ -382,7 +390,6 @@ function countcorrect($sca) {
 }
 
 function countstreak($sca) {
-	print_r($sca);
 	$corr = 0;
 	for ($i=count($sca)-1;$i>-1;$i--) {
 		if ($sca[$i]>.99) {

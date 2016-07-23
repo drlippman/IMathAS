@@ -1664,7 +1664,9 @@ The following macros create graphs or tables:
 		<li><b>dash</b>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
 		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
 		</ul>
-	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both</li>
+	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both. Use "0:-n" (for some value of n) for xmin or ymin to only 
+	       have gridlines and labels after 0, while still using -n to adjust spacing. This is an alternative to using addplotborder to create
+	       first quadrant graphs.</li>
 	<li><b>labels</b>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis.</li>
 	<li><b>grid</b>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
 	<li><b>width,height</b>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
@@ -1884,6 +1886,9 @@ These macros are used to test various conditions.  They typically return true or
 <h2><a name="feedbackmacros">Feedback Macros</a></h2>
 These macros are used to select and format feedback messages to students.  They return a string which can be placed in the question text.
 <ul>
+<li><b>getfeedbackbasic(correct msg, incorrect msg, $thisq, [partnum])</b>:  Generates a feedback string based solely on whether the 
+  question was scored correct or not.  Provide the correct and incorrect messages to display, and provide $thisq.  Give a part number for
+  multipart questions to get part-based feedback.</li>
 <li><b>getfeedbacktxt(stuans, feedbacktxt, ans)</b>:  Gives feedback on multiple choice questions.  <br/>
   stuans should be the student answer, obtained from
    $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart. <br/>
@@ -2161,9 +2166,11 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also 
 	round your $answer if needed for the $showanswer.</dd>
-<dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
-	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
-	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>
+<dt>$answerformat = "list", "exactlist", "orderedlist", "nosoln", or "nosolninf"</dt
+	<dd>$answerformat = "list", "exactlist", or "orderedlist" specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
+	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.
+	<br/>$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"</dd>
 <dt>$partialcredit = array(number,score,[number,score,...]) (In Common Control)</dt>
 	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
 	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
@@ -2221,6 +2228,8 @@ A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).
 	<li>list:  a list of answers is expected - ignores duplicate values (1,1,2 is equivalent to 1,2)</li>
 	<li>exactlist: a list of answers is expected - does not ignore duplicates</li>
 	<li>orderedlist: a list of answers is expected - order is important, and duplicates are not ignored</li>
+	<li>nosoln or nosolninf: adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"</li>
 	</ul>
 	</dd>
 <dt>$reltolerance = a decimal value (In Common Control)</dt>
@@ -2571,7 +2580,9 @@ drawn line from the correct line.
 	    values.  For example, to just set the window, you could use "0,10,0,10"<br/>
 	    If using $answerformat="numberline", set ymin and ymax to 0.<br/>If desired, you can set separate label and grid
 	    spacing using "xmin,xmax,ymin,ymax,xlabel:xgrid,ylabel:ygrid,imagewidth,imageheight".  You can specify axis labels using
-	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight"</dd>
+	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight".  
+	    To create first quadrant graphs, use "0:-n" (for some value of n) for xmin and/or ymin to only have gridlines and labels 
+	    after 0, while still using -n to adjust spacing. </dd>
 <dt>$snaptogrid = spacing (In Common Control)</dt>
 	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
 	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
@@ -2662,10 +2673,12 @@ rather than just numbers, such as (5/3, 2/3).
 <dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Common Control)</dt>
 	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
 	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
-<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", "nosoln", "nosolninf" (In Common Control)</dt>
 	<dd>Requires each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"
 	</dd>
 <dt>$reltolerance = a decimal value (In Common Control)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
@@ -2741,7 +2754,10 @@ rather than just numbers, such as 1/3+sqrt(2)i.
 	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
 	without decimals (also disallows 10^-2 and 3E-2), or 
 	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
-	$answerformat = "list" specifies that the answer will be a list of complex numbers.</dd>
+	$answerformat = "list" specifies that the answer will be a list of complex numbers.
+	$answerformat = "nosoln" or "nosolninf" adds a list radio buttons for "no solutions" and optionally "infinite solutions". $ansprompt can override the default statements like this:
+	$ansprompt = "One value, x=;No values;Many values"
+	</dd>
 <dt>$reltolerance = a decimal value (In Common Control)</dt>
 	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
 	used by default.</dd>

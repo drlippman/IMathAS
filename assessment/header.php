@@ -117,7 +117,7 @@ if (!isset($sessiondata['mathdisp'])) {
 } 
 echo "<script src=\"$imasroot/javascript/mathjs.js?v=063016\" type=\"text/javascript\"></script>\n";
 if ($sessiondata['graphdisp']==1) {
-	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=052016\" type=\"text/javascript\"></script>\n";
+	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=071516\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
@@ -135,7 +135,7 @@ div { zoom: 1; }
 }
 </style> 
 <![endif]--> 
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=071116";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=072216";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=012115";?>" type="text/javascript"></script>
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
@@ -162,6 +162,32 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	echo '</script>';
 } else {
 	echo '<script type="text/javascript">var usingTinymceEditor = false;</script>';
+}
+if ($useeqnhelper==1 || $useeqnhelper==2) {
+	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=062216\"></script>";
+	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+	
+} else if ($useeqnhelper==3 || $useeqnhelper==4) {
+	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
+	if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
+		echo '<!--[if lte IE 7]><style style="text/css">
+			.mathquill-editable.empty { width: 0.5em; }
+			.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25e  m;}
+			.mathquill-rendered-math sup { line-height: .8em; }
+			.mathquill-rendered-math .numerator {float: left; padding: 0;}
+			.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
+			</style><![endif]-->';
+	}
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=071916\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
+	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+} 
+
+//IP: eqntips 
+if ($showtips==2) {
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
 }
 
 $curdir = rtrim(dirname(__FILE__), '/\\');

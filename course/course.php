@@ -382,7 +382,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 }
   
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=062216\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=071416\"></script>";
 if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -465,7 +465,7 @@ if ($overwriteBody==1) {
 <?php  
 	if ($useleftbar && isset($teacherid)) {
 ?>	
-	<div id="leftcontent" <?php if ($essentialsnavcnt<4) {echo 'class="needed"';}?>>
+	<div id="leftcontent" class="hiddenmobile">
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
@@ -775,10 +775,14 @@ function makeTopMenu() {
 	global $newpostscnt;
 	global $coursenewflag;
 	global $CFG;
-	global $useviewbuttons;
+	global $useviewbuttons, $useleftbar;
 	
 	if ($useviewbuttons && (isset($teacherid) || $previewshift>-1)) {
-		echo '<div id="viewbuttoncont">View: ';
+		echo '<div id="viewbuttoncont">';
+		if ($useleftbar && isset($teacherid)) {
+			echo '<span id="leftcontenttoggle"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
+		}
+		echo 'View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
 		if ($previewshift==-1 && $quickview != 'on') {
 			echo 'class="buttonactive buttoncurveleft"';

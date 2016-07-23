@@ -73,11 +73,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
 		
 		require_once("../includes/htmLawed.php");
-		$htmlawedconfig = array('elements'=>'*-script');
 		if ($_POST['description']=='<p>Enter Wiki description here</p>') {
 			$_POST['description'] = '';
 		} else {
-			$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
+			$_POST['description'] = addslashes(myhtmLawed(stripslashes($_POST['description'])));
 		}
 		if (isset($_GET['id'])) {  //already have id - update
 			$query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";

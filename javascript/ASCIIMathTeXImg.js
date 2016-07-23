@@ -405,7 +405,6 @@ function AMgetSymbol(str) {
   		k++;
   	}
   	st = str.slice(0,k);
-  	console.log(st);
   	if (st=="-" && AMpreviousSymbol==INFIX) {
 	    AMcurrentSymbol = INFIX;
 	    return {input:st, tag:"mo", output:st, ttype:UNARY, func:true, val:true};

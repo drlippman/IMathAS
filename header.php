@@ -9,14 +9,14 @@
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
-<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=070816";?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=071416";?>" type="text/css" />
 <?php if (isset($coursetheme)) { 
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 	}
 	?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=121713";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=070816" media="only screen and (max-width:480px)"/>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css?v=071416" media="only screen and (max-width:480px)"/>
 
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />

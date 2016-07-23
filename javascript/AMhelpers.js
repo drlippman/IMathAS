@@ -155,6 +155,7 @@ function updateLivePreview(targ) {
 }
 
 function normalizemathunicode(str) {
+	str = str.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, "");
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
 	str = str.replace(/\u2044|\u2215/g, "/");
 	str = str.replace(/∞/g,"oo").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/∪/g,"U");
@@ -264,6 +265,7 @@ function calculate(inputId,outputId,format) {
 
 //Function to convert inequalities into interval notation
 function ineqtointerval(strw) {
+	strw = strw.replace(/(\d)\s*,\s*(?=\d{3}\b)/g,"$1");
 	var strpts = strw.split(/or/);
 	for (i=0; i<strpts.length; i++) {
 		str = strpts[i];
@@ -374,7 +376,7 @@ function intcalculate(inputId,outputId,format) {
 				  if (!isNaN(res) && res!="Infinity") {
 					 // if (format.indexOf('fraction')!=-1 || format.indexOf('reducedfraction')!=-1 || format.indexOf('mixednumber')!=-1) {
 						  vals[j] = vals[j];
-						  calcvals[j] = (Math.abs(res)<1e-15?0:res)+wrapAMnotice(err);
+						  calcvals[j] = (Math.abs(res)<1e-15?0:res).toString();//+wrapAMnotice(err);
 					  //} else {
 						//  str = "`"+str+" =` "+(Math.abs(res)<1e-15?0:res)+err;
 					  //}
@@ -382,7 +384,7 @@ function intcalculate(inputId,outputId,format) {
 				  	  calcvals[j] = _("undefined");
 				  }
 				  if (err != '') {
-				  	  fullerr += wrapAMnotice(err);
+				  	  fullerr += err;
 				  }
 				  
 			  }
@@ -840,11 +842,8 @@ function AMnumfuncPrepVar(qn,str) {
   for (var i=0; i<vars.length; i++) {
 	  if (vars[i].length>1) {
 		  var isgreek = false;
-		  for (var j=0; j<greekletters.length;j++) {
-			  if (vars[i].toLowerCase()==greekletters[j]) {
-				isgreek = true; 
-				break;
-			  }
+		  if (arraysearch(vars[i].toLowerCase(), greekletters)!=-1) {
+			  isgreek = true; 
 		  }
 		  if (vars[i].match(/^\w+_\w+$/)) {
 		  	if (!foundaltcap[i]) {
@@ -857,10 +856,10 @@ function AMnumfuncPrepVar(qn,str) {
 		  	var remvarparen = new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod);
 		  	dispstr = dispstr.replace(remvarparen, vars[i]);
 		  	str = str.replace(remvarparen, vars[i]);
-		  	if (varpts[1].length>1) {
+		  	if (varpts[1].length>1 && arraysearch(varpts[1].toLowerCase(), greekletters)==-1) {
 		  		varpts[1] = '"'+varpts[1]+'"';
 		  	} 
-		  	if (varpts[2].length>1) {
+		  	if (varpts[2].length>1 && arraysearch(varpts[2].toLowerCase(), greekletters)==-1) {
 		  		varpts[2] = '"'+varpts[2]+'"';
 		  	} 
 		  	dispstr = dispstr.replace(new RegExp(varpts[0],regmod), varpts[1]+'_'+varpts[2]);
@@ -898,19 +897,18 @@ function AMnumfuncPrepVar(qn,str) {
   dispstr = dispstr.replace("varE","E");
   dispstr = dispstr.replace(/@(\d+)@/g, indextofunc);	
   
-  return [str,dispstr];
+  return [str,dispstr,vars.join("|")];
 }
 
 //preview button for numfunc type
 function AMpreview(inputId,outputId) {
   var qn = inputId.slice(2);
   var strprocess = AMnumfuncPrepVar(qn, document.getElementById(inputId).value);
-  str = strprocess[0];
-  dispstr = strprocess[1];
-  
+  var str = strprocess[0];
+  var dispstr = strprocess[1];
+  var vl = strprocess[2];
   //the following does a quick syntax check of the formula
   
-  var vl = vlist[qn];
   var fl = flist[qn];
   
   ptlist = pts[qn].split(",");
@@ -1051,7 +1049,7 @@ function syntaxcheckexpr(str,format,vl) {
 		  err += "["+_("use function notation")+" - "+_("use $1 instead of $2",errstuff[1]+"("+errstuff[2]+")",errstuff[0])+"]. ";
 	  }
 	  if (vl) {
-	  	  reg = new RegExp("(arc|sqrt|root|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|e|sign|DNE|oo|"+vl+")", "ig");
+	  	  reg = new RegExp("(repvars\\d+|"+vl+"|arc|sqrt|root|ln|log|sinh|cosh|tanh|sech|csch|coth|sin|cos|tan|sec|csc|cot|abs|pi|e|sign|DNE|oo)", "ig");
 	  	  if (str.replace(reg,'').match(/[a-zA-Z]/)) {
 	  	  	err += _(" Check your variables - you might be using an incorrect one")+". ";	  
 	  	  }
@@ -1384,7 +1382,7 @@ function assessbackgsubmit(qn,noticetgt) {
 			for (var i=0;i<tags.length;i++) {
 				els.push(tags[i]);
 			}
-			var regex = new RegExp("^(qn|tc)("+qn+"\\b|"+(qn+1)+"\\d{3})");
+			var regex = new RegExp("^(qn|tc|qs)("+qn+"\\b|"+(qn+1)+"\\d{3})");
 			for (var i=0;i<els.length;i++) {
 				if (els[i].name.match(regex)) {
 					if ((els[i].type!='radio' && els[i].type!='checkbox') || els[i].checked) {
@@ -1946,7 +1944,20 @@ function initcreditboxes() {
 	});
 }
 initstack.push(initcreditboxes);
-	
+
+function initqsclickchange() {
+	$('input[id^=qs][value=spec]').each(function(i,qsel) {
+		$(qsel).siblings('input[type=text]').off('keyup.qsclickchange')
+		 .on('keyup.qsclickchange', function(e) {
+			if (e.keyCode != 8 && e.keyCode != 46) {	 
+				$(qsel).prop("checked",true);
+			}
+		 });
+	});
+}
+$(window).on("ImathasEmbedReload", initqsclickchange);
+initstack.push(initqsclickchange);
+
 function assessmentTimer(duration, timelimitkickout) {
 	var start = Date.now(), remaining, hours, minutes, seconds, countdowntimer, timestr;
 	function updatetimer() {
@@ -2004,5 +2015,25 @@ function toggletimer() {
 		$("#timercontent").show();
 		$("#timerhide").text("[x]");
 		$("#timerhide").attr("title",_("Hide Timer"));
+	}
+}
+function toggleintroshow(n) {
+      var link = document.getElementById("introtoggle"+n);
+      var content = document.getElementById("intropiece"+n);
+      if (link.innerHTML.match("Hide")) {
+	   link.innerHTML = link.innerHTML.replace("Hide","Show");
+	   content.style.display = "none";
+      } else {
+	   link.innerHTML = link.innerHTML.replace("Show","Hide");
+	   content.style.display = "block";
+      }
+}
+function togglemainintroshow(el) {
+	if ($("#intro").hasClass("hidden")) {
+		$(el).html("'._("Hide Intro/Instructions").'");
+		$("#intro").removeClass("hidden").addClass("intro");
+	} else {
+		$("#intro").addClass("hidden");
+		$(el).html("'._("Show Intro/Instructions").'");
 	}
 }

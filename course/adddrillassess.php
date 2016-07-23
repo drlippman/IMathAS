@@ -90,11 +90,10 @@ if (isset($_GET['record'])) {
 	$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
 		
 	require_once("../includes/htmLawed.php");
-	$htmlawedconfig = array('elements'=>'*-script' );
 	if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
 		$_POST['summary'] = '';
 	} else {
-		$_POST['summary'] = addslashes(htmLawed(stripslashes($_POST['summary']),$htmlawedconfig));
+		$_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
 	}
 	
 	if (isset($_POST['descr'])) {

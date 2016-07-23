@@ -98,6 +98,8 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	}
 	if (isset($_GET['iframe_resize_id'])) {
 		$targetid = preg_replace('/[^\w:.-]/','',$_GET['iframe_resize_id']);
+	} else if (isset($_GET['frame_id'])) {
+		$targetid = preg_replace('/[^\w:.-]/','',$_GET['frame_id']);
 	}
 	$jwtstring = saveAssessData();
 }
@@ -143,24 +145,9 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 }
 	
 
-$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
-if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
-	$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
-		.mathquill-editable.empty { width: 0.5em; }
-		.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
-		.mathquill-rendered-math sup { line-height: .8em; }
-		.mathquill-rendered-math .numerator {float: left; padding: 0;}
-		.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
-		</style><![endif]-->';
-}
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
-$placeinhead .= '<style type="text/css"> html,body {margin:0px;} div.question input.btn { margin-left: 10px; } </style>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
                         
 $flexwidth = true; //tells header to use non _fw stylesheet
-$placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
+$placeinhead = '<style type="text/css">html,body {margin:0px;} div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
 
 if ($theme != '') {
 	$sessiondata['coursetheme'] = $theme.'.css';
@@ -198,12 +185,13 @@ echo '<script type="text/javascript">
 	  var default_height = Math.max(
               document.body.scrollHeight, document.body.offsetHeight,
               document.documentElement.clientHeight, document.documentElement.scrollHeight,
-              document.documentElement.offsetHeight) + 40;
+              document.documentElement.offsetHeight);
 	  window.parent.postMessage( JSON.stringify({
 	      subject: "lti.frameResize",
 	      height: default_height,
 	      iframe_resize_id: "'.$targetid.'",
-	      element_id: "'.$targetid.'"
+	      element_id: "'.$targetid.'",
+	      frame_id: "'.$targetid.'"
 	  }), "*");
 	 }
 	}
@@ -216,6 +204,9 @@ echo '<script type="text/javascript">
 			sendresizemsg();
 		});
 	}
+	$(function() {
+		$(window).on("ImathasEmbedReload", sendresizemsg);
+	});
 </script>';
 }
 

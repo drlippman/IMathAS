@@ -20,21 +20,6 @@ $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 3;
 $showtips = 2;
 $useeqnhelper = 4;
-$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
-if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
-	$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
-		.mathquill-editable.empty { width: 0.5em; }
-		.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
-		.mathquill-rendered-math sup { line-height: .8em; }
-		.mathquill-rendered-math .numerator {float: left; padding: 0;}
-		.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
-		</style><![endif]-->';
-}
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
-$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
 
 if (isset($_GET['jssubmit']) && $_GET['jssubmit']==1) {
 	$jssubmit = true;
@@ -131,7 +116,7 @@ if (isset($_GET['showscored'])) {
 	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 
 	if (isset($_POST['auth'])) {
-		//DB $query = "SELECT password FROM imas_users WHERE SID='".stripslashes($_POST['auth'])."'";
+		//DB $query = "SELECT password FROM imas_users WHERE SID='".$_POST['auth']."'";
 		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
@@ -165,7 +150,6 @@ if (isset($_GET['showscored'])) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
 	if (isset($_GET['auth'])) {
-		echo '<input type="hidden" name="auth" value="'.$_GET['auth'].'"/>';
 	}
 	if (isset($_GET['showhints']) && $_GET['showhints']==0) {
 		$showhints = false;

@@ -137,6 +137,14 @@ var AsciisvgDialog = {
 	
 		m_xscl = document.getElementById("xscl").value;
 		m_yscl = document.getElementById("yscl").value;
+		if (m_xscl<0) {
+			m_xscl = -1*m_xscl;
+			document.getElementById("xscl").value = m_xscl;
+		}
+		if (m_yscl<0) {
+			m_yscl = -1*m_yscl;
+			document.getElementById("yscl").value = m_yscl;
+		}
 		if (m_xscl == "") m_xscl = null
 		if (m_yscl == "") m_yscl = null
 		if (document.getElementById("labels").checked) {

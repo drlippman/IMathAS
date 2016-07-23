@@ -20,21 +20,8 @@ $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 6;
 $showtips = 2;
 $useeqnhelper = 4;
-$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
-if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
-	$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
-		.mathquill-editable.empty { width: 0.5em; }
-		.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
-		.mathquill-rendered-math sup { line-height: .8em; }
-		.mathquill-rendered-math .numerator {float: left; padding: 0;}
-		.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
-		</style><![endif]-->';
-}
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
-$placeinhead .= '<style type="text/css"> html,body {margin:0px;} div.question input.btn { margin-left: 10px; } </style>';
-$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
+
+$placeinhead = '<style type="text/css"> html,body {margin:0px;} </style>';
 
 $issigned = false;
 if (isset($_GET['jwt'])) {
@@ -160,13 +147,13 @@ if (isset($QS['showscored'])) {
 		}
 		$rawafter = implode('~',$rawafter);
 	}
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	$lastanswers[0] = $lastanswers[0];
 
 	$pts = getpts($after);
 
 	$params = array('id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 	if (isset($_POST['auth'])) {
-		$params["auth"] = stripslashes($_POST['auth']);
+		$params["auth"] = $_POST['auth'];
 	}
 
 	$signed = JWT::encode($params, $key);
