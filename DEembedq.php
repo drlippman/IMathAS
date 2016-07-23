@@ -147,7 +147,7 @@ if (isset($_GET['showscored'])) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
 	if (isset($_GET['auth'])) {
-		echo '<input type="hidden" name="auth" value="'.$_GET['auth'].'"/>';
+		echo '<input type="hidden" name="auth" value="'.stripslashes($_GET['auth']).'"/>';
 	}
 	if (isset($_GET['showhints']) && $_GET['showhints']==0) {
 		$showhints = false;
