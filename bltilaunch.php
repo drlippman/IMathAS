@@ -886,6 +886,12 @@ if ($stm->rowCount()==0) {
 				//DB while ($row = mysql_fetch_row($result)) {
 				$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$sourcecid));
+
+				$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
+				$query .= "(:courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden)";
+				$cols = explode(',', ':courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden');
+				$stm2 = $DBH->prepare($query);
+
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					//DB $query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
 					//DB $frid = array_shift($row);
@@ -894,14 +900,11 @@ if ($stm->rowCount()==0) {
 					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 					//DB $gbcats[$frid] = mysql_insert_id();
 					$row[0] = $destcid; //change course id
-					$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
-					$query .= "(:courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden)";
-					$cols = explode(',', ':courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden');
+
 					$varmap = array();
 					foreach ($cols as $i=>$col) {
 						$varmap[$col] = $row[$i];
 					}
-					$stm2 = $DBH->prepare($query);
 					$stm2->execute($varmap);
 				}
 				$copystickyposts = true;
@@ -946,6 +949,9 @@ if ($stm->rowCount()==0) {
 					//DB while ($row = mysql_fetch_row($result)) {
 					$stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
 					$stm->execute(array(':courseid'=>$sourcecid));
+
+					$stm2 = $DBH->prepare("INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES (:destcid,:name,:ancestors)");
+
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						if ($row[2]=='') {
 							$row[2] = $row[0];
@@ -957,10 +963,7 @@ if ($stm->rowCount()==0) {
 						//DB $query .= "('$destcid','{$row[1]}','{$row[2]}')";
 						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 						//DB $outcomes[$row[0]] = mysql_insert_id();
-						$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
-						$query .= "(:destcid,:row_1,:row_2)";
-						$stm2 = $DBH->prepare($query);
-						$stm2->execute(array(':destcid'=>$destcid, ':row_1'=>$row[1], ':row_2'=>$row[2]));
+						$stm2->execute(array(':destcid'=>$destcid, ':name'=>$row[1], ':ancestors'=>$row[2]));
 						$outcomes[$row[0]] = $DBH->lastInsertId();
 					}
 					function updateoutcomes(&$arr) {

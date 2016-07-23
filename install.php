@@ -108,16 +108,19 @@ $contents .= '
 
 //no need to change anything from here on
   /* Connecting, selecting database */
-	 $link = mysql_connect($dbserver,$dbusername, $dbpassword) 
-	  or die("<p>Could not connect : " . mysql_error() . "</p></div></body></html>");
-	 mysql_select_db($dbname)
-	  or die("<p>Could not select database</p></div></body></html>");
+	try {
+	 $DBH = new PDO("mysql:host=$dbserver;dbname=$dbname", $dbusername, $dbpassword);
+	 $DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+	 // global $DBH;
+	 $GLOBALS["DBH"] = $DBH;
+	} catch(PDOException $e) {
+	 die("<p>Could not connect to database: <b>" . $e->getMessage() . "</b></p></div></body></html>");
+	}
 
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
-     $query = "set session sql_mode=\'\'";
-     $result = mysql_query($query);
+		$DBH->query("set session sql_mode=\'\'");
 
   //clean up post and get if magic quotes aren\'t on
   function addslashes_deep($value) {

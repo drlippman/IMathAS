@@ -1,5 +1,5 @@
 <?php
-//IMathAS:  Course direct access - redirects to course page or presents 
+//IMathAS:  Course direct access - redirects to course page or presents
 //login / new student page specific for course
 //(c) 2007 David Lippman
 	$curdir = rtrim(dirname(__FILE__), '/\\');
@@ -7,7 +7,7 @@
 		 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
 	 }
  	require_once("$curdir/config.php");
- 
+
  	if (!isset($_GET['cid'])) {
 		echo "Invalid address.  Address must be directaccess.php?cid=###, where ### is your courseid";
 		exit;
@@ -29,37 +29,43 @@
 		require_once("config.php");
 		if ($_POST['SID']=="" || $_POST['firstname']=="" || $_POST['lastname']=="" || $_POST['email']=="" || $_POST['pw1']=="") {
 			$page_newaccounterror .= "Please include all information. ";
-		} 
+		}
 		if ($loginformat!='' && !preg_match($loginformat,$_POST['SID'])) {
 			$page_newaccounterror .= "$loginprompt is invalid. ";
 		} else {
-			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
+			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['SID']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>$_POST['SID']));
+			if ($stm->rowCount()>0) {
 				$page_newaccounterror .= "$loginprompt '{$_POST['SID']}' is already used. ";
-			} 
+			}
 		}
 		if (!preg_match('/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',$_POST['email'])) {
 			$page_newaccounterror .= "Invalid email address. ";
-		} 
-		if ($_POST['pw1'] != $_POST['pw2']) {	
+		}
+		if ($_POST['pw1'] != $_POST['pw2']) {
 			$page_newaccounterror .= "Passwords don't match. ";
-		} 
-		
-		$query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		list($enrollkey,$deflatepass) = mysql_fetch_row($result);
+		}
+
+		//DB $query = "SELECT enrollkey,deflatepass FROM imas_courses WHERE id = '{$_GET['cid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB list($enrollkey,$deflatepass) = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT enrollkey,deflatepass FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['cid']));
+		list($enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
 		if (strlen($enrollkey)>0 && trim($_POST['ekey2'])=='') {
 			$page_newaccounterror .= "Please provide the enrollment key";
 		} else if (strlen($enrollkey)>0) {
 			$keylist = array_map('trim',explode(';',$enrollkey));
-			if (!in_array($_POST['ekey2'], $keylist)) {	
+			if (!in_array($_POST['ekey2'], $keylist)) {
 				$page_newaccounterror .= "Enrollment key is invalid.";
 			} else {
 				$_POST['ekey'] = $_POST['ekey2'];
 			}
-		}	
-		
+		}
+
 		if ($page_newaccounterror=='') {//no error
 			if (isset($CFG['GEN']['newpasswords'])) {
 				require_once("includes/password.php");
@@ -83,18 +89,30 @@
 			} else {
 				$homelayout = '|0,1,2||0,1';
 			}
+			//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
+			//DB $query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $newuserid = mysql_insert_id();
 			$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
-			$query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$newuserid = mysql_insert_id();
+			$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
+			$newuserid = $DBH->lastInsertId();
 			if (strlen($enrollkey)>0 && count($keylist)>1) {
-				$query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','{$_GET['cid']}','{$_POST['ekey2']}','$code','$deflatepass');";		
+				//DB $query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','{$_GET['cid']}','{$_POST['ekey2']}','$code','$deflatepass');";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
+				$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
 			} else {
-				$query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
+				//DB $query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES (:userid, :courseid, :gbcomment, :latepass)");
+				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$_GET['cid'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
 			}
-			mysql_query($query) or die("Query failed : " . mysql_error());
+
 			if ($emailconfirmation) {
-				$id = mysql_insert_id();
+				//DB $id = mysql_insert_id();
+				$id = $DBH->lastInsertId();
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -124,17 +142,26 @@
 	$flexwidth = true;
 	if ($verified) { //already have session
 		if (!isset($studentid) && !isset($teacherid) && !isset($tutorid)) {  //have account, not a student
-			$query = "SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id='{$_GET['cid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($coursename,$enrollkey,$deflatepass) = mysql_fetch_row($result);
+			//DB $query = "SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id='{$_GET['cid']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB list($coursename,$enrollkey,$deflatepass) = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT name,enrollkey,deflatepass FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['cid']));
+			list($coursename,$enrollkey,$deflatepass) = $stm->fetch(PDO::FETCH_NUM);
 			$keylist = array_map('trim',explode(';',$enrollkey));
 			if (strlen($enrollkey)==0 || (isset($_REQUEST['ekey']) && in_array($_REQUEST['ekey'], $keylist))) {
 				if (count($keylist)>1) {
-					$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_GET['cid']}','{$_REQUEST['ekey']}','$deflatepass');";		
+					//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_GET['cid']}','{$_REQUEST['ekey']}','$deflatepass')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:userid, :courseid, :section, :latepass)");
+					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':section'=>$_REQUEST['ekey'], ':latepass'=>$deflatepass));
 				} else {
-					$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_GET['cid']}','$deflatepass');";
+					//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_GET['cid']}','$deflatepass')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,latepass) VALUES (:userid, :courseid, :latepass)");
+					$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':latepass'=>$deflatepass));
 				}
-				mysql_query($query) or die("Query failed : " . mysql_error());
+
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/course.php?cid='. $_GET['cid']);
 				exit;
 			} else {
@@ -158,19 +185,22 @@
 		 if (isset($_COOKIE['mathgraphprefs'])) {
 			 $prefparts = explode('-',$_COOKIE['mathgraphprefs']);
 			 if ($prefparts[0]==2 && $prefparts[1]==2) { //img all
-				$pref = 3;	 
+				$pref = 3;
 			 } else if ($prefparts[0]==2) { //img math
 				 $pref = 4;
 			 } else if ($prefparts[1]==2) { //img graph
 				 $pref = 2;
 			 }
-				 
+
 		 }
-	 
-		$query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$coursename = mysql_result($result,0,0);
-		
+
+		//DB $query = "SELECT name FROM imas_courses WHERE id='{$_GET['cid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $coursename = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['cid']));
+		$coursename = $stm->fetchColumn(0);
+
 		if (isset($CFG['GEN']['directaccessincludepath'])) {
 			$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/".$CFG['GEN']['directaccessincludepath']."infopages.css\" type=\"text/css\">\n";
 		} else {
@@ -189,17 +219,20 @@
 		//echo "<div class=\"breadcrumb\">$breadcrumbbase $coursename Access</div>";
 		echo "<div id=\"header\"><div class=\"vcenter\">$coursename</div></div>";
 		//echo '<span style="float:right;margin-top:10px;">'.$smallheaderlogo.'</span>';
-		
+
 		$cid = intval($_GET['cid']);
 		$curdir = rtrim(dirname(__FILE__), '/\\');
 		if (file_exists("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html")) {
 			require("$curdir/".(isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'')."directaccess$cid.html");
-		} 
-		
-		$query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$enrollkey = mysql_result($result,0,0);
-		
+		}
+
+		//DB $query = "SELECT enrollkey FROM imas_courses WHERE id='{$_GET['cid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $enrollkey = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT enrollkey FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['cid']));
+		$enrollkey = $stm->fetchColumn(0);
+
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'].$querys;?>">
 
@@ -219,21 +252,21 @@ if (strlen($enrollkey)>0) {
 </table>
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
 
-<input type="hidden" id="tzoffset" name="tzoffset" value=""> 
-<input type="hidden" id="tzname" name="tzname" value=""> 
+<input type="hidden" id="tzoffset" name="tzoffset" value="">
+<input type="hidden" id="tzname" name="tzname" value="">
 <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
-<script type="text/javascript">        
-        var thedate = new Date();  
-        document.getElementById("tzoffset").value = thedate.getTimezoneOffset();  
-        var tz = jstz.determine(); 
+<script type="text/javascript">
+        var thedate = new Date();
+        document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
+        var tz = jstz.determine();
         document.getElementById("tzname").value = tz.name();
-</script> 
+</script>
 
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 	function updateloginarea() {
-		setnode = document.getElementById("settings"); 
-		var html = ""; 
+		setnode = document.getElementById("settings");
+		var html = "";
 		html += '<span class=form>Accessibility:</span><span class=formright> ';
 		//html += "<a href='#' onClick=\"window.open('<?php echo $imasroot;?>/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help</a>";
 		html += '<input type="radio" name="access" value="0" <?php if ($pref==0) {echo "checked=1";} ?> />Use visual display<br/>';
@@ -241,7 +274,7 @@ if (strlen($enrollkey)>0) {
 		html += '<input type="radio" name="access" value="4" <?php if ($pref==4) {echo "checked=1";} ?> />Force image-based math<br/>';
 		html += '<input type="radio" name="access" value="3" <?php if ($pref==3) {echo "checked=1";} ?> />Force image based display<br/>';
 		html += '<input type="radio" name="access" value="1">Use text-based display</span><br class=form>';
-		
+
 		if (!MathJaxCompatible) {
 			html += '<input type=hidden name="mathdisp" value="0">';
 		} else {
@@ -254,9 +287,9 @@ if (strlen($enrollkey)>0) {
 		}
 		if (MathJaxCompatible && !ASnoSVG) {
 			html += '<input type=hidden name="isok" value=1>';
-		} 
+		}
 		html += '<div class=submit><input name="submit" type="submit" value="Login"></div>';
-		setnode.innerHTML = html; 
+		setnode.innerHTML = html;
 <?php
 	if ($page_newaccounterror!='') {
 		echo 'document.getElementById("SID").focus();';
@@ -289,7 +322,7 @@ function enablenewstu() {
 <div id="newstu" style="display:<?php echo ($page_newaccounterror!=''?"block":"none");?>;">
 
 <p><b>New Student Enrollment</b></p>
-<?php 
+<?php
 if ($page_newaccounterror!='') {
 	echo '<p style="color:red;">'.$page_newaccounterror.'</p>';
 }
@@ -324,7 +357,7 @@ if (isset($_GET['getsid'])) {
 <?php
 	require("footer.php");
 	}
-	
-	
+
+
 
 ?>
