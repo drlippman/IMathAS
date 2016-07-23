@@ -352,7 +352,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=030315\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
-	
+	$useeditor = "textsegmenteditor";
 	
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
@@ -368,14 +368,33 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$beentaken = false;
 	}
 	
-	$query = "SELECT itemorder,name,defpoints,displaymethod,showhints FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT itemorder,name,defpoints,displaymethod,showhints,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$itemorder = mysql_result($result, 0,0);
-	$page_assessmentName = mysql_result($result,0,1);
+	list($itemorder, $page_assessmentName, $defpoints, $displaymethod, $showhintsdef, $assessintro) = mysql_fetch_row($result);
 	$ln = 1;
-	$defpoints = mysql_result($result,0,2);
-	$displaymethod = mysql_result($result,0,3);
-	$showhintsdef = mysql_result($result,0,4);
+	
+	// Format of imas_assessments.intro is a JSON representation like
+	// [ "original (main) intro text",
+	//  { displayBefore:  question number to display before,
+	//    displayUntil:  last question number to display it for
+	//    text:  the actual text to show
+	//    ispage: is this is a page break (0 or 1)
+	//    pagetitle: page title text
+	//  },
+  	//  ...
+	// ]
+	$text_segments = array();
+	if (($introjson=json_decode($assessintro,true))!==null) { //is json intro
+		//$text_segments = array_slice($introjson,1); //remove initial Intro text
+		for ($i=0;$i<count($introjson);$i++) {
+			if (isset($introjson[$i]['displayBefore'])) {
+				if (!isset($text_segments[$introjson[$i]['displayBefore']])) {
+					$text_segments[$introjson[$i]['displayBefore']] = array();
+				}
+				$text_segments[$introjson[$i]['displayBefore']][] = $introjson[$i];
+			}
+		}
+	}
 	
 	$grp0Selected = "";
 	if (isset($sessiondata['groupopt'.$aid])) {
@@ -394,15 +413,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	$existingq = array();
 	$apointstot = 0;
+	$qncnt = 0;
 	for ($i = 0; $i < count($items); $i++) {
+		if ($i>0) {
+			$jsarr .= ',';
+		}
+		if (isset($text_segments[$qncnt])) {
+			foreach ($text_segments[$qncnt] as $text_seg) {
+				//stupid hack: putting a couple extra unused entries in array so length>=5
+				$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
+			}
+		}
 		if (strpos($items[$i],'~')!==false) {
 			$subs = explode('~',$items[$i]);
 		} else {
 			$subs[] = $items[$i];
 		}
-		if ($i>0) {
-			$jsarr .= ',';
-		}
+		
 		if (count($subs)>1) {
 			if (strpos($subs[0],'|')===false) { //for backwards compat
 				$jsarr .= '[1,0,['; 
@@ -412,6 +439,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				array_shift($subs);
 			}
 		} 
+		$qncnt += count($subs);
 		for ($j=0;$j<count($subs);$j++) {
 			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
 			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
@@ -475,6 +503,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$alt = 1-$alt;
 		unset($subs);
 	}
+	if (isset($text_segments[$qncnt])) {
+		foreach ($text_segments[$qncnt] as $j=>$text_seg) {
+			//stupid hack: putting a couple extra unused entries in array so length>=5
+			if ($i>0 || $j>0) {
+				$jsarr .= ',';
+			}
+			$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
+		}
+	}
+
 	$jsarr .= ']';
 	
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
@@ -954,7 +992,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 /******* begin html output ********/
- require("../header.php");
+require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
@@ -1056,6 +1094,7 @@ if ($overwriteBody==1) {
 	<script>
 		var itemarray = <?php echo $jsarr ?>; 
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>; 
+		var displaymethod = "<?php echo $displaymethod;?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
 	</script>
 <?php
@@ -1070,6 +1109,11 @@ if ($overwriteBody==1) {
 		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
 		<input type=button value="Define End Messages" title="Customize messages to display based on the assessment score" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
+	<?php
+		if (!$beentaken) {
+			echo '<input type=button value="Add Text" onclick="addtextsegment()" title="Insert Text Segment" >';	
+		}
+	?>
 		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
 	</p>
 		

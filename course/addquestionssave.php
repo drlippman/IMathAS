@@ -7,10 +7,10 @@
 	if (!isset($teacherid)) {
 		echo "error: validation";
 	}
-	$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
+	$query = "SELECT itemorder,viddata,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error()); 
-	$rawitemorder = mysql_result($result,0,0);
-	$viddata = mysql_result($result,0,1);
+	list($rawitemorder,$viddata,$current_intro_json) = mysql_fetch_row($result);
+	
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
 	foreach (explode(',',$itemorder) as $qid) {
@@ -19,7 +19,20 @@
 		}
 	}
 	
-	$submitted = $_GET['order'];
+	if (($intro=json_decode($current_intro_json,true))!==null) { //is json intro
+		$current_intro = $intro[0];
+	} else {
+		$current_intro = $current_intro_json; //it actually isn't JSON
+	}
+	$new_text_segments_json = json_decode(stripslashes($_POST['text_order']),true);
+	if (count($new_text_segments_json)>0) {
+		array_unshift($new_text_segments_json, $current_intro);
+		$new_intro = json_encode($new_text_segments_json);
+	} else {
+		$new_intro = $current_intro;
+	}
+	
+	$submitted = $_REQUEST['order'];
 	$submitted = str_replace('~',',',$submitted);
 	$newitems = array();
 	foreach (explode(',',$submitted) as $qid) {
@@ -46,7 +59,7 @@
 			}
 		}
 		
-		$qorder = explode(',',$_GET['order']);
+		$qorder = explode(',',$_REQUEST['order']);
 		$newbynum = array();
 		for ($i=0;$i<count($qorder);$i++) {
 			if (strpos($qorder[$i],'~')!==false) {
@@ -101,7 +114,7 @@
 	mysql_query($query) or die("Query failed : " . mysql_error()); 
 	
 	//store new itemorder
-	$query = "UPDATE imas_assessments SET itemorder='{$_GET['order']}',viddata='$viddata' WHERE id='$aid'";
+	$query = "UPDATE imas_assessments SET itemorder='{$_REQUEST['order']}',viddata='$viddata',intro='".addslashes($new_intro)."' WHERE id='$aid'";
 	mysql_query($query) or die("Query failed : " . mysql_error()); 
 	
 	if (mysql_affected_rows()>0) {

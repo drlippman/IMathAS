@@ -1366,9 +1366,21 @@ if (!isset($_REQUEST['embedpostback'])) {
 	} else if (count($introjson)>1) {
 		$intropieces = array();
 		$introdividers = array();
+		$lastdisplaybefore = -1;
+		$textsegcnt = -1;
 		for ($i=1;$i<count($introjson);$i++) {
-			$introdividers[$i] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
-			$intropieces[$i] = $introjson[$i]['text'];
+			if (isset($introjson[$i]['ispage']) && $introjson[$i]['ispage']==1 && $testsettings['displaymethod'] == "Embed") {
+				$introjson[$i]['text'] = '[PAGE '.strip_tags(str_replace(array("\n","\r","]"),array(' ',' ','&#93;'), $introjson[$i]['pagetitle'])).']'.$introjson[$i]['text'];
+			}
+			if ($introjson[$i]['displayBefore'] == $lastdisplaybefore) {
+				$intropieces[$textsegcnt] .= $introjson[$i]['text'];
+			} else {
+				$textsegcnt++;
+				$introdividers[$textsegcnt] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
+				$intropieces[$textsegcnt] = $introjson[$i]['text'];
+			}
+			
+			$lastdisplaybefore = $introjson[$i]['displayBefore'];
 		}
 	}
 	
@@ -2469,15 +2481,16 @@ if (!isset($_REQUEST['embedpostback'])) {
 			//TODO i18n
 			if (strpos($intro,'[QUESTION')===false) {
 				if (isset($intropieces)) {
-					$last = 1;
+					$last = 0;
 					foreach ($introdividers as $k=>$v) {
 						if ($last<$v[1]-1) {
-							for ($j=$last;$j<$v[1];$j++) {
+							for ($j=$last+1;$j<$v[1];$j++) {
 								$intro .= '[QUESTION '.$j.']';
+								$last = $j;
 							}
 						}
 						$intro .= '<div class="intro" id="intropiece'.$k.'">'.$intropieces[$k].'</div>';
-						for ($j=$v[1];$j<=$v[2];$j++) {
+						for ($j=$v[1];$j<=$v[2] && $j<count($questions);$j++) {
 							$intro .= '[QUESTION '.$j.']';
 							$last = $j;
 						}
@@ -2503,9 +2516,10 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if (!isset($_GET['page'])) { $_GET['page'] = 0;}
 				if ($_GET['page']==0) {
 					$intropages[0] = preg_replace('/<span[^>]*>(&nbsp;|\s)*<\/span>/','',$intropages[0]);
-					if (!preg_match('/^<div\s*class="intro">(\s|&nbsp;|<p[^>]*>(\s*|&nbsp;)*<\/p>)*<\/div>$/', $intropages[0])) {
+					$intropages[0] = preg_replace('/<div class="intro"[^>]*>\s*(&nbsp;|<p[^>]*>(\s|&nbsp;)*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intropages[0]);
+					//if (!preg_match('/^<div\s*class="intro"[^>]*>(\s|&nbsp;|<p[^>]*>(\s*|&nbsp;)*<\/p>)*<\/div>$/', $intropages[0])) {
 						echo $intropages[0];
-					}
+					//}
 				} 
 				$intro =  $intropages[2*$_GET['page']+2];
 				preg_match_all('/\[QUESTION\s+(\d+)\s*\]/',$intro,$matches,PREG_PATTERN_ORDER);
@@ -2623,7 +2637,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$intro = str_replace('[QUESTION '.($i+1).']',$quesout,$intro);
 			}
 			//$intro = preg_replace('/<span[^>]*>(&nbsp;|\s)*<\/span>/','',$intro);
-			$intro = preg_replace('/<div class="intro">\s*(&nbsp;|<p[^>]*>(\s|&nbsp;)*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
+			$intro = preg_replace('/<div class="intro"[^>]*>\s*(&nbsp;|<p[^>]*>(\s|&nbsp;)*<\/p>|<\/p>|\s*)\s*<\/div>/','',$intro);
 			echo $intro;		
 			
 			if ($dopage==true) {
