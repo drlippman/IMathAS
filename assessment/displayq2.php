@@ -6479,7 +6479,7 @@ function getcolormark($c,$wrongformat=false) {
 }
 
 function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, $colorbox) {
-
+	$answerbox = preg_replace('/<label.*?<\/label>/','',$answerbox);  //remove existing ansprompt
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
@@ -6521,10 +6521,10 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	$out .= '<span class="floatright">'.getcolormark($colorbox).'</span>';
 	$out .= '</div>';
 
-	if (preg_match('/^inf/',$answer) || $answer=='oo' || $answer==$infsoln) {
+	if (preg_match('/^inf/',$answer) || $answer==='oo' || $answer===$infsoln) {
 		$answer = '"'.$infsoln.'"';
 	}
-	if (preg_match('/^no\s*solution/',$answer) || $answer=='DNE' || $answer==$nosoln) {
+	if (preg_match('/^no\s*solution/',$answer) || $answer==='DNE' || $answer===$nosoln) {
 		$answer = '"'.$nosoln.'"';
 	}
 
