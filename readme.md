@@ -70,6 +70,18 @@ C validate.php      26
  0 htmlutil.php
  0 JSON.php
  C JWT.php            1
+ C ltiauthstore.php   5
+ C ltioutcomes.php    5
+ 0 OAuth.php 
+ 0 parsedatetime.php
+ 0 password.php
+ 0 rubric.php
+ 0 S3.php
+ C stugroups.php      18
+ 0 tar.class.php  
+ C unenroll.php       30  many hand-santized for simplicity
+ C updateassess.php   4
+ 0 userpics.php   
 
 /util
 
