@@ -12,7 +12,12 @@ The big things to look for:
 - variables should not have "addslashes" applied before insert - that's handled automatically.
 - nor should stripslashes be necessary. The auto-escaping of request variables in config.php will be removed.
 
+Here is a list of files that have been worked on.  Files prefixed with "C" have been converted.
+Files prefixed with "0" did not contain any queries, and can be skipped over.
 
+Once a file has been reviewed, please change the C to R.
+
+````
 /                   done
 C actions.php       39
 C bltilaunch.php    117
@@ -99,3 +104,4 @@ C validate.php      26
 /util
 
 /wikis
+````
