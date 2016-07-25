@@ -1,5 +1,18 @@
 PDO Conversion progress
-Done: 583 / 2757
+Total todo: 2757
+
+Most queries have been semi-automatically converted, and should be fine.  The
+original queries are still in the code, prefixed by `//DB`.
+
+The big things to look for:
+- is $DBH declared as global if the calls are inside a function?
+- if the variable is a complex array reference, like $A[$B[1]], the autoconversion
+  might not have worked.
+- if a query is done in a loop, ideally it only will be "prepared" once
+- variables should not have "addslashes" applied before insert - that's handled automatically.
+- nor should stripslashes be necessary. The auto-escaping of request variables in config.php will be removed.
+
+
 /                   done
 C actions.php       39
 C bltilaunch.php    117
@@ -72,7 +85,7 @@ C validate.php      26
  C JWT.php            1
  C ltiauthstore.php   5
  C ltioutcomes.php    5
- 0 OAuth.php 
+ 0 OAuth.php
  0 parsedatetime.php
  0 password.php
  0 rubric.php
