@@ -5,9 +5,12 @@ if (empty($_GET['linkid'])) {
 	echo "no link id provided";
 	exit;
 }
-$query = "SELECT text,title,points FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-list($text,$title,$points) = mysql_fetch_row($result);
+//DB $query = "SELECT text,title,points FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB list($text,$title,$points) = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id");
+$stm->execute(array(':id'=>$_GET['linkid']));
+list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM);
 $toolparts = explode('~~',substr($text,8));
 $tool = $toolparts[0];
 $linkcustom = $toolparts[1];
@@ -21,16 +24,20 @@ if (isset($toolparts[3])) {
 	$cntingb = $toolparts[4];
 	$tutoredit = $toolparts[5];
 	$gradesecret = $toolparts[6];
-} 
+}
 $tool = intval($tool);
 
-$query = "SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$cid' OR (courseid=0 AND (groupid='$groupid' OR groupid=0)))";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
+//DB $query = "SELECT * from imas_external_tools WHERE id=$tool AND (courseid='$cid' OR (courseid=0 AND (groupid='$groupid' OR groupid=0)))";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
+$stm = $DBH->prepare("SELECT * from imas_external_tools WHERE id=:id AND (courseid=:courseid OR (courseid=0 AND (groupid=:groupid OR groupid=0)))");
+$stm->execute(array(':id'=>$tool, ':courseid'=>$cid, ':groupid'=>$groupid));
+if ($stm->rowCount()==0) {
 	echo '<html><body>Invalid tool</body></html>';
 	exit;
 }
-$line = mysql_fetch_array($result, MYSQL_ASSOC);	
+//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 require_once("blti_util.php");
 $parms = array();
@@ -56,9 +63,12 @@ if (trim($linkcustom)!='') {
 	}
 }
 
-$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-list($firstname,$lastname,$email) = mysql_fetch_row($result);
+//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB list($firstname,$lastname,$email) = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+$stm->execute(array(':id'=>$userid));
+list($firstname,$lastname,$email) = $stm->fetch(PDO::FETCH_NUM);
 $parms['user_id'] = $userid;
 if (($line['privacy']&1)==1) {
 	$parms['lis_person_name_full'] = "$firstname $lastname";

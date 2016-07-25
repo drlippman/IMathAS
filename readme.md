@@ -1,6 +1,6 @@
 PDO Conversion progress
-Done:  / 2757
-  /
+Done: 583 / 2757
+/                   done
 C actions.php       39
 C bltilaunch.php    117
 C calcqtimes.php    10
@@ -33,3 +33,44 @@ C OEAembedq.php     3
 C showlinkedtextpublic.php  5
 C upgrade.PHP       237  lots of logic to check
 C validate.php      26
+
+/assessment
+ 0 asidutil.php
+ C catscores.php      4
+
+ /libs
+  0 all
+
+/course
+
+/diag                 done
+  C index.PHP         18
+
+/filter               done
+ 0 filter.php
+ /basiclti
+  C post.php          3
+  0 blti_util.php
+ /graph
+  0 all
+ /math
+  0 all
+ /simplelti
+  0 all  
+
+/forums
+
+/includes
+ C calendardisp.php   11
+ C copyiteminc.php    63  complex logic changes
+ 0 DEutil.php
+ 0 diff.php
+ C filehandler.php    4   several hand-santized weird queries
+ 0 htmlawed.php
+ 0 htmlutil.php
+ 0 JSON.php
+ C JWT.php            1
+
+/util
+
+/wikis

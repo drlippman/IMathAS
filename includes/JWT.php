@@ -32,7 +32,7 @@ class JWT
      * @return object      The JWT's payload as a PHP object
      * @throws UnexpectedValueException Provided JWT was invalid
      * @throws DomainException          Algorithm was not provided
-     * 
+     *
      * @uses jsonDecode
      * @uses urlsafeB64Decode
      */
@@ -62,10 +62,12 @@ class JWT
                 }
             }
             if ($key===null && isset($payload->auth)) {
-            	$query = "SELECT password FROM imas_users WHERE SID='".mysql_real_escape_string($payload->auth)."'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$row = mysql_fetch_row($result);
-		$key = $row[0];
+            	//DB $query = "SELECT password FROM imas_users WHERE SID='".mysql_real_escape_string($payload->auth)."'";
+		          //DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		          //DB $row = mysql_fetch_row($result);
+            	$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
+            	$stm->execute(array(':SID'=>$payload->auth));
+		          $key = $stm->fetchColumn(0);
             }
             if (!JWT::verify("$headb64.$bodyb64", $sig, $key, $header->alg)) {
                 throw new UnexpectedValueException('Signature verification failed');
@@ -269,4 +271,3 @@ class JWT
     }
 
 }
-

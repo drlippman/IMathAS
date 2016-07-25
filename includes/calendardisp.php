@@ -3,7 +3,7 @@
 if (isset($_GET['calstart'])) {
 	setcookie("calstart".$_GET['cid'], $_GET['calstart']);
 	$_COOKIE["calstart".$_GET['cid']] = $_GET['calstart'];
-}	
+}
 if (isset($_GET['callength'])) {
 	setcookie("callength".$_GET['cid'], $_GET['callength']);
 	$_COOKIE["callength".$_GET['cid']] = $_GET['callength'];
@@ -15,7 +15,7 @@ $havecalcedviewedassess = false;
 $viewedassess = array();
 
 function showcalendar($refpage) {
-
+global $DBH;
 global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess;
 
 $now= time();
@@ -60,7 +60,7 @@ $lastmo = '';
 for ($i=0;$i<7*$callength;$i++) {
 	$row = floor($i/7);
 	$col = $i%7;
-	
+
 	list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$midtoday - ($dayofweek - $i)*24*60*60));
 	if ($thismo==$lastmo) {
 		$hdrs[$row][$col] = $thisday;
@@ -69,7 +69,7 @@ for ($i=0;$i<7*$callength;$i++) {
 		$lastmo = $thismo;
 	}
 	$ids[$row][$col] = "$thismonum-$thisday";
-	
+
 	$dates[$ids[$row][$col]] = $datestr;
 }
 
@@ -79,7 +79,7 @@ for ($i=0;$i<7*$callength;$i++) {
 <?php
 //echo '<div class="floatleft">Jump to <a href="'.$refpage.'.php?calpageshift=0&cid='.$cid.'">Now</a></div>';
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$refpage.php?cid=$cid";
-	
+
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
 echo '<div class="floatright">Show <select id="callength" onchange="changecallength(this)">';
 for ($i=2;$i<26;$i++) {
@@ -106,9 +106,12 @@ $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)
 
 $exceptions = array();
 if (!isset($teacherid)) {
-	$query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid='$userid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid='$userid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid=:userid");
+	$stm->execute(array(':userid'=>$userid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
 	}
 }
@@ -116,16 +119,20 @@ if (!isset($teacherid)) {
 $byid = array();
 $k = 0;
 
-$query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$bestscores_stm = null;
+//DB $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$canundolatepass = false;
 	$latepasscnt = 0;
 	if (isset($exceptions[$row[0]])) {
 		if ($exceptions[$row[0]][2]>0 && ($now < $row[3] || $exceptions[$row[0]][1] > $now + $latepasshrs*60*60)) {
 			$canundolatepass = true;
 		}
-		$latepasscnt = round(($exceptions[$row[0]][1] - $row[3])/($latepasshrs*3600));		   
+		$latepasscnt = round(($exceptions[$row[0]][1] - $row[3])/($latepasshrs*3600));
 		$row[2] = $exceptions[$row[0]][0];
 		$row[3] = $exceptions[$row[0]][1];
 	}
@@ -135,33 +142,39 @@ while ($row = mysql_fetch_row($result)) {
 		continue;
 	}
 	//if enddate is past, and reviewdate is past end of calendar
-	if ($row[3]<$now && $row[4]>$uppertime) { 
+	if ($row[3]<$now && $row[4]>$uppertime) {
 		//continue;
 	}
 	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
 	//if startdate is past now
-	if (($row[2]>$now && !isset($teacherid))) {  
+	if (($row[2]>$now && !isset($teacherid))) {
 		continue;
-	} 
+	}
 	//if past reviewdate
 	if ($row[4]>0 && $now>$row[4] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row[3] && $row[4]==0)
 		//continue;
 	}
-	
+
 	$showgrayedout = false;
 	if (!isset($teacherid) && abs($row[6])>0 && $row[7]>0 && (!isset($exceptions[$row[0]]) || $exceptions[$row[0]][3]==0)) {
-		$query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
-		   $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		   if (mysql_num_rows($r2)==0) {
-		   	   if ($row[6]<0) { 
+			 //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
+		   //DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		   //DB if (mysql_num_rows($r2)==0) {
+			 if ($bestscores_stm===null) { //only prepare once
+			 	$bestscores_stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+			 }
+			 $bestscores_stm->execute(array(':assessmentid'=>$row[7], ':userid'=>$userid));
+		   if ($bestscores_stm->rowCount()==0) {
+		   	   if ($row[6]<0) {
 		   	   	   $showgrayedout = true;
 		   	   } else {
 		   	   	   continue;
 		   	   }
 		   } else {
-			   $scores = explode(';',mysql_result($r2,0,0));
+			   //DB $scores = explode(';',mysql_result($r2,0,0));
+			   $scores = explode(';',$bestscores_stm->fetchColumn(0));
 			   if (round(getpts($scores[0]),1)+.02<abs($row[6])) {
-				   if ($row[6]<0) { 
+				   if ($row[6]<0) {
 					   $showgrayedout = true;
 				   } else {
 					   continue;
@@ -180,7 +193,7 @@ while ($row = mysql_fetch_row($result)) {
 		if ($row[3]<$uppertime && $row[3]>$exlowertime) {  //if going to do a second tag, need to increment.
 			$byid['AR'.$row[0]] = array($moday,$tag,$colors,$json);
 		}
-	} 
+	}
 	if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
 		/*if (isset($gbcats[$row[5]])) {
 			$tag = $gbcats[$row[5]];
@@ -188,24 +201,27 @@ while ($row = mysql_fetch_row($result)) {
 			$tag = '?';
 		}*/
 		$tag = htmlentities($row[10], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-		
+
 		if (!$havecalcedviewedassess && $now>$row[3] && $row[9]>10) {
 			$havecalcedviewedassess = true;
 			$viewedassess = array();
-			$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($r = mysql_fetch_row($r2)) {
+			//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+			//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($r = mysql_fetch_row($r2)) {
+			$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+			$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+			while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 				$viewedassess[] = $r[0];
 			}
-		} 
+		}
 		if (($row[9]%10==1 || $row[9]%10-1>$latepasscnt) && $latepasses>0 && !$showgrayedout &&
 		   ($now < $row[3] || ($row[9]>10 && $now-$row[3]<$latepasshrs*3600 && !in_array($row[0],$viewedassess)))) {
 			$lp = 1;
 		} else {
 			$lp = 0;
 		}
-		
-		
+
+
 		if ($canundolatepass && !$showgrayedout) {
 			$ulp = 1;
 		} else {
@@ -233,15 +249,24 @@ while ($row = mysql_fetch_row($result)) {
 //}
 
 if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
+	//DB $query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$stm = $DBH->prepare("SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>:$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
 } else {
+	//DB $query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ";
+	//DB $query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
+	//DB $query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ";
 	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
-	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid'";
+	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid";
+	$stm = $DBH->prepare($query); //times were calcualated in flow - safe
+	$stm->execute(array(':courseid'=>$cid));
 }
 
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[1]=='##hidden##') {
 		$row[1] = preg_replace('/\s+/',' ',strip_tags($row[3]));
 		if (strlen($row[1])>25) {
@@ -260,20 +285,23 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$tag = htmlentities($row[6], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$json = "{type:\"I\", folder:\"@@@\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	
+
 	$byid['I'.$row[0]] = array($moday,$tag,$colors,$json);
-	
+
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
 if (isset($teacherid)) {
-	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid' ORDER BY title";
+	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid=:courseid ORDER BY title";
 } else {
 	$query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail,target FROM imas_linkedtext WHERE ";
 	$query .= "((avail=1 AND ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime))) OR ";
-	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid='$cid' ORDER BY title";
+	$query .= "(avail=2 AND oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND courseid=:courseid ORDER BY title";
 }
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare($query); //times were calcualated in flow - safe
+$stm->execute(array(':courseid'=>$cid));
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[5]==1) {
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
 	} else {
@@ -299,23 +327,25 @@ while ($row = mysql_fetch_row($result)) {
 	$tag = htmlentities($row[6], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$alink = htmlentities($alink, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$json .= "name:\"$row[1]\", link:\"$alink\", target:{$row[8]}, color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	
+
 	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
 }
 
 if (isset($teacherid)) {
-	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE (enddate>$exlowertime AND enddate<$uppertime) AND avail=1 AND courseid='$cid' ORDER BY name";
+	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE (enddate>$exlowertime AND enddate<$uppertime) AND avail=1 AND courseid=:courseid ORDER BY name";
 } else {
 	$query = "SELECT id,name,enddate,startdate,caltag,avail FROM imas_drillassess WHERE ";
 	$query .= "avail=1 AND (enddate>$exlowertime AND enddate<$uppertime AND startdate<$now) ";
-	$query .= "AND courseid='$cid' ORDER BY name";
+	$query .= "AND courseid=:courseid ORDER BY name";
 }
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare($query); //times were calcualated in flow - safe
+$stm->execute(array(':courseid'=>$cid));
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
-	
+
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	
+
 	$colors = makecolor2($row[3],$row[2],$now);
 	if ($row[7]==2) {
 		$colors = "#0f0";
@@ -326,13 +356,15 @@ while ($row = mysql_fetch_row($result)) {
 	}
 	$tag = htmlentities($row[4], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-	
+
 	$byid['D'.$row[0]] = array($moday,$tag,$colors,$json);
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+$stm = $DBH->prepare($query); //times were calcualated in flow - safe
+$stm->execute(array(':courseid'=>$cid));
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if (($row[4]>$now && !isset($teacherid))) {
 		continue;
 	}
@@ -350,7 +382,7 @@ while ($row = mysql_fetch_row($result)) {
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
 		$byid['FP'.$row[0]] = array($moday,$posttag,$colors,$json);
 	}
-	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid)) 
+	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid))
 		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
 		$colors = makecolor2($row[4],$row[3],$now);
 		$json = "{type:\"FR\", time:\"$time\",";
@@ -361,19 +393,25 @@ while ($row = mysql_fetch_row($result)) {
 		$byid['FR'.$row[0]] = array($moday,$replytag,$colors,$json);
 	}
 }
-$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-$itemorder = unserialize(mysql_result($result,0,0));
+//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+//DB $itemorder = unserialize(mysql_result($result,0,0));
+$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+$stm->execute(array(':id'=>$cid));
+$itemorder = unserialize($stm->fetchColumn(0));
 $itemsimporder = array();
 $itemfolder = array();
 $hiddenitems = array();
 
 flattenitems($itemorder,$itemsimporder,$itemfolder,$hiddenitems,'0');
-	
+
 $itemsassoc = array();
-$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$itemsassoc[$row[0]] = array($row[1],$row[2]);
 }
 
@@ -445,12 +483,13 @@ foreach ($itemsimporder as $item) {
 			$k++;
 		}
 	}
-	
+
 }
 
-$query = "SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid='$cid' ORDER BY title";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
+$stm->execute(array(':courseid'=>$cid));
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
 	$row[0] = htmlentities($row[0], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
@@ -471,7 +510,7 @@ foreach ($dates as $moday=>$val) {
 	}
 }
 $jsarr .= '}';
-		
+
 echo '<script type="text/javascript">';
 echo "cid = $cid;";
 echo "caleventsarr = $jsarr;";
@@ -494,9 +533,9 @@ for ($i=0;$i<count($hdrs);$i++) {
 					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
 				} else if (strpos($info,'type:"A"')!==false) {
 					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
-				} else if (strpos($info,'type:"F')!==false) { 
+				} else if (strpos($info,'type:"F')!==false) {
 					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
-				} else if (strpos($info,'type:"C')!==false) { 
+				} else if (strpos($info,'type:"C')!==false) {
 					echo "<span class=\"calitem\" style=\"background-color: #0ff;\">{$tags[$k]}</span> ";
 				} else { //textitems
 					if (isset($tags[$k])) {
