@@ -904,7 +904,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
 		if (!isset($sz)) { $sz = 20;}
-		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
+		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$out .= "<label for=\"qn$qn\">$ansprompt</label>";
+		}
 		if ($multi>0) { $qn = $multi*1000+$qn; $qstr = ($multi-1).'-'.$qn;} else { $qstr = $qn;}
 
 		if ($displayformat=="point") {
@@ -1422,7 +1424,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
 
-		if (isset($ansprompt)) {$out .= "<label for=\"tc$qn\">$ansprompt</label>";}
+		if (isset($ansprompt) && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$out .= "<label for=\"tc$qn\">$ansprompt</label>";
+		}
 		if ($displayformat=="point") {
 			$leftb = "(";
 			$rightb = ")";
