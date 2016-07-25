@@ -10,18 +10,22 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"$imasroot/admin/admin.php\">Admin</a
 
 if (isset($_GET['removelti'])) {
 	$id = intval($_GET['removelti']);
-	$query = "DELETE FROM imas_ltiusers WHERE id=$id";
-	mysql_query($query) or die("Query failed : " . mysql_error());	
+	//DB $query = "DELETE FROM imas_ltiusers WHERE id=$id";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("DELETE FROM imas_ltiusers WHERE id=:id");
+	$stm->execute(array(':id'=>$id));
 }
 if (isset($_GET['removecourselti'])) {
 	$id = intval($_GET['removecourselti']);
-	$query = "DELETE FROM imas_lti_courses WHERE id=$id";
-	mysql_query($query) or die("Query failed : " . mysql_error());	
+	//DB $query = "DELETE FROM imas_lti_courses WHERE id=$id";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("DELETE FROM imas_lti_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$id));
 }
 
 if (isset($_GET['form'])) {
 	$curBreadcrumb = $curBreadcrumb . " &gt; <a href=\"$imasroot/util/utils.php\">Utils</a> \n";
-	
+
 	if ($_GET['form']=='emu') {
 		require("../header.php");
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; Emulate User</div>';
@@ -39,30 +43,40 @@ if (isset($_GET['form'])) {
 	} else if ($_GET['form']=='lookup') {
 		require("../header.php");
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; User Lookup</div>';
-		
+
 		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID']) || !empty($_POST['email'])) {
 			if (!empty($_POST['SID'])) {
-				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.SID='{$_POST['SID']}'";
+				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.SID=:SID";
 			} else if (!empty($_POST['email'])) {
-				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.email='{$_POST['email']}'";
+				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.email=:email";
 			} else  {
 				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
 				if (!empty($_POST['LastName'])) {
-					$query .= "imas_users.LastName='{$_POST['LastName']}' ";
+					$query .= "imas_users.LastName=:lastname ";
 					if (!empty($_POST['FirstName'])) {
 						$query .= "AND ";
 					}
 				}
 				if (!empty($_POST['FirstName'])) {
-					$query .= "imas_users.FirstName='{$_POST['FirstName']}' ";
+					$query .= "imas_users.FirstName=:firstname ";
 				}
 				$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)==0) {
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':SID'=>$_POST['SID'], ':email'=>$_POST['email'],, ':lastname'=>$_POST['LastName'], ':firstname'=>$_POST['FirstName']));
+			//DB if (mysql_num_rows($result)==0) {
+			if ($stm->rowCount()==0) {
 				echo "No results found";
 			} else {
-				while ($row = mysql_fetch_assoc($result)) {
+				$group_stm = $DBH->prepare('SELECT name FROM imas_groups WHERE id=:id');
+				$stu_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
+				$tutor_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
+				$teach_stm = $DBH->prepare("SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=:userid");
+				$lti_stm = $DBH->prepare("SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=:userid");
+
+				//DB while ($row = mysql_fetch_assoc($result)) {
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					echo '<p><b>'.$row['LastName'].', '.$row['FirstName'].'</b></p>';
 					echo '<form method="post" action="../admin/actions.php?action=resetpwd&id='.$row['id'].'">';
 					echo '<ul><li>Username: <a href="../admin/admin.php?showcourses='.$row['id'].'">'.$row['SID'].'</a></li>';
@@ -70,9 +84,11 @@ if (isset($_GET['form'])) {
 					if ($row['name']!=null) {
 						echo '<li>Group: '.$row['name'].'</li>';
 						if ($row['parent']>0) {
-							$query = 'SELECT name FROM imas_groups WHERE id='.$row['parent'];
-							$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-							$r = mysql_fetch_row($res2);
+							//DB $query = 'SELECT name FROM imas_groups WHERE id='.$row['parent'];
+							//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+							//DB $r = mysql_fetch_row($res2);
+							$group_stm->execute(array(':id'=>$row['parent']));
+							$r = $group_stm->fetch(PDO::FETCH_NUM);
 							echo '<li>Parent Group: '.$r[0].'</li>';
 						}
 					}
@@ -80,50 +96,65 @@ if (isset($_GET['form'])) {
 					echo '<li>Last Login: '.tzdate("n/j/y g:ia", $row['lastaccess']).'</li>';
 					echo '<li>Rights: '.$row['rights'].' <a href="'.$imasroot.'/admin/forms.php?action=chgrights&id='.$row['id'].'">[edit]</a></li>';
 					echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
-					$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
-					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($res2)>0) {
+					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
+					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($res2)>0) {
+					$stu_stm->execute(array(':userid'=>$row['id']));
+					if ($stu_stm->rowCount()>0) {
 						echo '<li>Enrolled as student in: <ul>';
-						while ($r = mysql_fetch_row($res2)) {
+						//DB while ($r = mysql_fetch_row($res2)) {
+						while ($r = $stu_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
 						}
 						echo '</ul></li>';
 					}
-					$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
-					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($res2)>0) {
+					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
+					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($res2)>0) {
+					$tutor_stm->execute(array(':userid'=>$row['id']));
+					if ($tutor_stm->rowCount()>0) {
 						echo '<li>Tutor in: <ul>';
-						while ($r = mysql_fetch_row($res2)) {
+						//DB while ($r = mysql_fetch_row($res2)) {
+						while ($r = $tutor_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
 						}
 						echo '</ul></li>';
-					} 
-					$query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
-					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					}
 					$teachercourses = array();
-					if (mysql_num_rows($res2)>0) {
+					//DB $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=".$row['id'];
+					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($res2)>0) {
+					$teach_stm->execute(array(':userid'=>$row['id']));
+					if ($teach_stm->rowCount()>0) {
 						echo '<li>Teacher in: <ul>';
-						while ($r = mysql_fetch_row($res2)) {
+						//DB while ($r = mysql_fetch_row($res2)) {
+						while ($r = $teach_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li><a target="_blank" href="../course/course.php?cid='.$r[0].'">'.$r[1].' (ID '.$r[0].')</a></li>';
 							$teachercourses[] = $r[0];
 						}
 						echo '</ul></li>';
 					}
-					$query = "SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=".$row['id'];
-					$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($res2)>0) {
+					//DB $query = "SELECT org,id,ltiuserid FROM imas_ltiusers WHERE userid=".$row['id'];
+					//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($res2)>0) {
+					$lti_stm->execute(array(':userid'=>$row['id']));
+					if ($lti_stm->rowCount()>0) {
 						echo '<li>LTI user connections: <ul>';
-						while ($r = mysql_fetch_row($res2)) {
+						//DB while ($r = mysql_fetch_row($res2)) {
+						while ($r = $lti_stm->fetch(PDO::FETCH_NUM)) {
 							echo '<li>key:'.substr($r[0],0,strpos($r[0],':')).', remote userid:'.$r[2].' <a href="utils.php?removelti='.$r[1].'">Remove connection</a></li>';
 						}
 						echo '</ul></li>';
 					}
 					if (count($teachercourses)>0) {
 						$query = "SELECT org,id,courseid,contextid FROM imas_lti_courses WHERE courseid IN (".implode(",",$teachercourses).")";
-						$res2 = mysql_query($query) or die("Query failed : " . mysql_error());
-						if (mysql_num_rows($res2)>0) {
+						//DB $res2 = mysql_query($query) or die("Query failed : " . mysql_error());
+						$lti_c_stm = $DBH->query($query);
+						//DB if (mysql_num_rows($res2)>0) {
+						if ($lti_c_stm->rowCount()>0) {
 							echo '<li>LTI course connections: <ul>';
-							while ($r = mysql_fetch_row($res2)) {
+							//DB while ($r = mysql_fetch_row($res2)) {
+							while ($r = $lti_c_stm->fetch(PDO::FETCH_NUM)) {
 								echo '<li>Course: '.$r[2].', key:'.substr($r[0],0,strpos($r[0],':')).', context:'.$r[3].' <a href="utils.php?removecourselti='.$r[1].'">Remove connection</a></li>';
 							}
 							echo '</ul></li>';
@@ -133,18 +164,18 @@ if (isset($_GET['form'])) {
 					echo '</form>';
 				}
 			}
-			
+
 		} else {
 			echo '<form method="post" action="utils.php?form=lookup">';
 			echo 'Look up user:  LastName: <input type="text" name="LastName" />, FirstName: <input type="text" name="FirstName" />, or username: <input type="text" name="SID"/>, or email: <input type="text" name="email"/>';
 			echo '<input type="submit" value="Go"/>';
-			
+
 		}
 		require("../footer.php");
-		
+
 	}
-	
-	
+
+
 } else {
 	//listing of utilities
 	require("../header.php");

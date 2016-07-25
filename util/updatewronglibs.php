@@ -2,13 +2,16 @@
 require("../validate.php");
 if ($myrights<100) { exit;}
 
-function doquery($vals) {
+function doquery($vals) {  //provide presanitized values
+	global $DBH;
 	$query = "UPDATE imas_library_items AS ili
-	  JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid 
-	  JOIN imas_libraries AS il ON ili.libid=il.id 
+	  JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
+	  JOIN imas_libraries AS il ON ili.libid=il.id
 	  SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN (".implode(',',$vals).")";
-	 $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	 return mysql_affected_rows();
+	 //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	 $stm = $DBH->query($query);
+	 //DB return mysql_affected_rows();
+	 return $stm->rowCount();
 }
 
 if (isset($_POST['data'])) {
@@ -19,7 +22,8 @@ if (isset($_POST['data'])) {
 	foreach ($lines as $line) {
 		$line = str_replace(array("\r","\t"," "),'',$line);
 		list($uqid,$ulibid) = explode('@',$line);
-		$valarray[] = "('$uqid','$ulibid')";
+		if (!ctype_digit($uqid) || !ctype_digit($ulibid)) {continue;} //only use numeric values
+		$valarray[] = "($uqid,$ulibid)";
 		if (count($valarray)==500) {
 			$tot += doquery($valarray);
 			$valarray = array();

@@ -102,6 +102,24 @@ C validate.php      26
  0 userpics.php   
 
 /util
+ C blocksearch.php    1
+ C getqcnt.php        7
+ C getstucnt.php      8   all using safe values
+ C getstucntdet.php   2
+ C itemsearch.php     1
+ C listdeprecated     1
+ C listextref         1
+ C listwronglibs      1
+ C makeconditional    4
+ C mergescores        6
+ C mergestus          4
+ C mergeteachers      18
+ C replacevids        6
+ C rescoreassess      4
+ C updatedeprecated   3
+ C updateextref       3
+ C updatewronglibs    1
+ C utils.php          9
 
 /wikis
 ````
