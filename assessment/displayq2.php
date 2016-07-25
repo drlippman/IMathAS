@@ -2470,7 +2470,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$sclinggrid = $settings[4][1];
 			} else {
 				$sclinglbl = $settings[4];
-				$sclinggrid = 0;
+				if ($sclinglbl>1 && $sclinglbl<6 && ($settings[1]-$settings[0])<10*$sclinglbl) {
+					$sclinggrid = 1;
+				} else {
+					$sclinggrid = 0;
+				}
+
 			}
 		} else {
 			if (strpos($settings[4],':')!==false) {
