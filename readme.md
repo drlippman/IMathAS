@@ -53,7 +53,7 @@ C getpostlist     6
 0 help            0
 C index           12
 0 infoheader.dist
-C install         1   check
+C install         1   check - need to remove addslashes after done
 C installexamples 3
 0 loginpage.dist
 C ltihome         30

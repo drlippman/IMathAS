@@ -194,6 +194,16 @@
 	 mysql_select_db($dbname)
 	  or die("<p>Could not select database</p></div></body></html>");
 
+    // MySQL with PDO_MYSQL
+     try {
+      $DBH = new PDO("mysql:host=$dbserver;dbname=$dbname", $dbusername, $dbpassword);
+      $DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+      // global $DBH;
+      $GLOBALS["DBH"] = $DBH;
+     } catch(PDOException $e) {
+      die("<p>Could not connect to database: <b>" . $e->getMessage() . "</b></p></div></body></html>");
+     }
+     
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
