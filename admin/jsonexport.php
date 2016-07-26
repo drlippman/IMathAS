@@ -27,11 +27,9 @@ if (isset($_GET['cid'])) {
 
   //  exports the modules array as json
   $outputjson = json_encode($output_array);
-  /*header("Content-type: application/json");
+  header("Content-type: application/json");
   header('Content-Disposition: attachment; filename="results.json"');
   header('Content-Length: ' . strlen($outputjson));
-  */
-  echo '<pre>';
   echo $outputjson;
 }
 function parseItemorder($items, $blockname='Main Page') {
