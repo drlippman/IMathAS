@@ -1,5 +1,5 @@
 PDO Conversion progress
-Total todo: 2757
+Total todo: ~2700.  Done: ~830
 
 Most queries have been semi-automatically converted, and should be fine.  The
 original queries are still in the code, prefixed by `//DB`.
@@ -78,7 +78,7 @@ C validate.php      26
 
 /forums
 
-/includes
+/includes             done
  C calendardisp.php   11
  C copyiteminc.php    63  complex logic changes
  0 DEutil.php
@@ -101,7 +101,7 @@ C validate.php      26
  C updateassess.php   4
  0 userpics.php   
 
-/util
+/util                 done
  C blocksearch.php    1
  C getqcnt.php        7
  C getstucnt.php      8   all using safe values
@@ -121,5 +121,9 @@ C validate.php      26
  C updatewronglibs    1
  C utils.php          9
 
-/wikis
+/wikis                done
+ C editwiki           8
+ C viewwiki           16
+ C viewwikipublic     4
+ C wikirev            2
 ````
