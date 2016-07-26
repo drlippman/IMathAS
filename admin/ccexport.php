@@ -29,7 +29,9 @@ echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$
 if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
 	echo '<div class="cpmid"><a href="exportitems.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a></div>';
 }
-
+echo "<div class='cpmid'>
+                    <a href='assessmentExport.php?cid=". $_GET['cid']."' name='button'>Export OEA QTI</a>
+                    </div>";
 $path = realpath("../course/files");
 
 if (isset($_GET['delete'])) {
