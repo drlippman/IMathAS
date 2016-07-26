@@ -73,6 +73,10 @@ C validate        26
   0 all
 
 /course
+ C addassessment    24
+ C addblock         5
+ C addcalendar      6
+ C adddrillassess   14 messy logic on search
 
 /diag              done
   C index          18
