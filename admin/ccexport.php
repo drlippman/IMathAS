@@ -14,7 +14,7 @@ $pagetitle = "CC Export";
 $loadmathfilter = 1;
 $loadgraphfilter = 1;
 if (!defined('ENT_XML1')) {
-	define('ENT_XML1',ENT_QUOTES);	
+	define('ENT_XML1',ENT_QUOTES);
 }
 $placeinhead = '<script type="text/javascript">
  function updatewhichsel(el) {
@@ -22,13 +22,16 @@ $placeinhead = '<script type="text/javascript">
    else {$("#itemselectwrap").hide()};
  }
  </script>';
- 
+
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Common Cartridge Export</div>\n";
 
+echo '<div class="cpmid">';
 if (!isset($CFG['GEN']['noimathasexportfornonadmins']) || $myrights>=75) {
-	echo '<div class="cpmid"><a href="exportitems.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a></div>';
+	echo '<a href="exportitems.php?cid='.$cid.'">Export for another IMathAS system or as a backup for this system</a> | ';
 }
+echo '<a href="jsonexport.php?cid='. $cid.'" name="button">Export OEA JSON</a>';
+echo '</div>';
 
 $path = realpath("../course/files");
 
@@ -43,8 +46,8 @@ if (isset($_GET['delete'])) {
 	} else {
 		$checked = array();
 	}
-	
-	
+
+
 	$linktype = $_POST['type'];
 	$iteminfo = array();
 	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
@@ -52,24 +55,24 @@ if (isset($_GET['delete'])) {
 	while ($row = mysql_fetch_row($r)) {
 		$iteminfo[$row[0]] = array($row[1],$row[2]);
 	}
-	
+
 	$query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
 	$r = mysql_query($query) or die("Query failed : " . mysql_error());
 	$items = unserialize(mysql_result($r,0,0));
-	
+
 	$newdir = $path . '/CCEXPORT'.$cid;
 	mkdir($newdir);
-	
+
 	$manifestorg = '';
 	$manifestres = array();
-	
+
 	$imgcnt = 1;
 	if (substr($mathimgurl,0,4)!='http') {
 		$addmathabs = true;
 	} else {
 		$addmathabs = false;
 	}
-	
+
 	$htmldir = '';
 	$filedir = '';
 	if ($linktype=='canvas') {
@@ -78,7 +81,7 @@ if (isset($_GET['delete'])) {
 		$htmldir = 'wiki_content/';
 		$filedir = 'web_resources/';
 	}
-	
+
 	function filtercapture($str,&$res) {
 		global $newdir,$imgcnt,$imasroot,$addmathabs,$mathimgurl,$filedir,$linktype;
 		$str = forcefiltermath($str);
@@ -93,28 +96,28 @@ if (isset($_GET['delete'])) {
 			$imgcnt++;
 		}
 		if ($linktype=='canvas') {
-			$str = str_replace($imasroot.'/filter/graph/imgs/','$IMS_CC_FILEBASE$/',$str); 
+			$str = str_replace($imasroot.'/filter/graph/imgs/','$IMS_CC_FILEBASE$/',$str);
 		} else {
-			$str = str_replace($imasroot.'/filter/graph/imgs/','',$str); 
+			$str = str_replace($imasroot.'/filter/graph/imgs/','',$str);
 		}
 		if ($addmathabs) {
 			$str = str_replace($mathimgurl,'http://'. $_SERVER['HTTP_HOST']. $mathimgurl, $str);
 		}
 		return $str;
 	}
-	
+
 	$ccnt = 1;
 	$module_meta = '';
-		
-	$toplevelitems = '';	
+
+	$toplevelitems = '';
 	$inmodule = false;
-	
+
 	function getorg($it,$parent,&$res,$ind) {
 		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
 		global $usechecked,$checked;
-		
+
 		$out = '';
-		
+
 		foreach ($it as $k=>$item) {
 			$canvout = '';
 			if (is_array($item)) {
@@ -142,7 +145,7 @@ if (isset($_GET['delete'])) {
 				} else {
 					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
 				}
-				
+
 			} else {
 				if ($usechecked && array_search($item,$checked)===FALSE) {
 					continue;
@@ -180,7 +183,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
-					
+
 					$fp = fopen($newdir.'/'.$htmldir.'inlinetext'.$iteminfo[$item][1].'.html','w');
 					fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 					fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
@@ -211,12 +214,12 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
-					
+
 					//if s3 filehandler, do files as weblinks rather than including the file itself
 					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
 						$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)));
 					}
-					
+
 					if ((substr($row[1],0,4)=="http") && (strpos(trim($row[1])," ")===false)) { //is a web link
 						$alink = trim($row[1]);
 						$fp = fopen($newdir.'/weblink'.$iteminfo[$item][1].'.xml','w');
@@ -243,7 +246,7 @@ if (isset($_GET['delete'])) {
 						$filename = trim(substr(strip_tags($row[1]),5));
 						//copy("../course/files/$filename",$newdir.'/'.$filedir.$filename);
 						copycoursefile($filename, $newdir.'/'.$filedir.basename($filename));
-							
+
 						$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$out .= $ind.'</item>'."\n";
@@ -302,7 +305,7 @@ if (isset($_GET['delete'])) {
 					fwrite($fp,' <text texttype="text/html">'.htmlentities(filtercapture($row[1],$res)).'</text>');
 					fwrite($fp,'</topic>');
 					fclose($fp);
-					
+
 					if ($linktype=='canvas') {
 						$fp = fopen($newdir.'/RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta.xml','w');
 						fwrite($fp,'<?xml version="1.0" encoding="UTF-8"?>
@@ -326,7 +329,7 @@ if (isset($_GET['delete'])) {
 						$resitem .= '</resource>';
 					}
 					$res[] = $resitem;
-					
+
 				} else if ($iteminfo[$item][0]=='Assessment') {
 					$query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -349,7 +352,7 @@ if (isset($_GET['delete'])) {
 								if (strpos($sub[0],'|')===false) { //backwards compat
 									$aitems[$k] = $sub[0];
 									$aitemcnt[$k] = 1;
-									
+
 								} else {
 									$grpparts = explode('|',$sub[0]);
 									$aitems[$k] = $sub[1];
@@ -363,7 +366,7 @@ if (isset($_GET['delete'])) {
 						$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 						$totalpossible = 0;
 						while ($r = mysql_fetch_row($result2)) {
-							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts	
+							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 								if ($r[0]==9999) {
 									$totalpossible += $aitemcnt[$k]*$row[2]; //use defpoints
 								} else {
@@ -424,7 +427,7 @@ if (isset($_GET['delete'])) {
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
-					
+
 					$fp = fopen($newdir.'/'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html','w');
 					fwrite($fp,'<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 					fwrite($fp,'<title>'.htmlentities($row[0]).'</title>');
@@ -433,7 +436,7 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
 					}
 					fwrite($fp,"</head><body>");
-					
+
 					$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='{$iteminfo[$item][1]}' AND stugroupid=0 ORDER BY id DESC LIMIT 1";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					if (mysql_num_rows($r)>0) {
@@ -445,7 +448,7 @@ if (isset($_GET['delete'])) {
 						}
 						fwrite($fp,filtercapture($text,$res));
 					}
-					
+
 					fwrite($fp,'</body></html>');
 					fclose($fp);
 					$resitem =  '<resource href="'.$htmldir.'wikitext'.$iteminfo[$item][1].'.html" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
@@ -471,8 +474,8 @@ if (isset($_GET['delete'])) {
 		    </resource>';
     	}
 	$manifestorg = getorg($items,'0',$manifestres,'  ');
-	
-	
+
+
 	if ($linktype=='canvas') {
 		if ($toplevelitems != '') {
 			$module_meta = '<module identifier="imported">
@@ -482,7 +485,7 @@ if (isset($_GET['delete'])) {
 		$module_meta = '<?xml version="1.0" encoding="UTF-8"?>
 		<modules xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0">
 		'.$module_meta . '</items>  </module> </modules>';
-	
+
 		$fp = fopen($newdir.'/bltiimathas.xml','w');
 		fwrite($fp,'<cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm ="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp ="http://www.imsglobal.org/xsd/imslticp_v1p0">');
 		fwrite($fp,'<blti:title>'.htmlentities($installname,ENT_XML1,'UTF-8',false).'</blti:title>');
@@ -528,7 +531,7 @@ if (isset($_GET['delete'])) {
 ');
 		fclose($fp);
 	}
-	
+
 	$fp = fopen($newdir.'/imsmanifest.xml','w');
 	fwrite($fp,'<?xml version="1.0" encoding="UTF-8" ?>'."\n");
 	fwrite($fp,'<manifest identifier="imathas'.$cid.'" xmlns="http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1" xmlns:lom="http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource" xmlns:lomimscc="http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest" >'."\n");
@@ -556,62 +559,62 @@ if (isset($_GET['delete'])) {
 	fwrite($fp,'</resources>'."\n");
 	fwrite($fp,'</manifest>'."\n");
 	fclose($fp);
-	
+
 	// increase script timeout value
 	ini_set('max_execution_time', 300);
-	
+
 	// create object
 	$zip = new ZipArchive();
-	
-	// open archive 
+
+	// open archive
 	if ($zip->open($path.'/CCEXPORT'.$cid.'.zip', ZIPARCHIVE::CREATE) !== TRUE) {
 	    die ("Could not open archive");
 	}
-	
+
 	/*// initialize an iterator
 	// pass it the directory to be processed
 	$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('../course/files/CCEXPORT'.$cid.'/'));
-	
+
 	// iterate over the directory
 	// add each file found to the archive
 	foreach ($iterator as $key=>$value) {
 		if (basename($key)=='.' || basename($key)=='..') { continue;}
-		$zip->addFile(realpath($key), basename($key)) or die ("ERROR: Could not add file: $key");        
+		$zip->addFile(realpath($key), basename($key)) or die ("ERROR: Could not add file: $key");
 	}
 	*/
 	function addFolderToZip($dir, $zipArchive, $zipdir = ''){
 	    if (is_dir($dir)) {
 		if ($dh = opendir($dir)) {
-	
+
 		    //Add the directory
 		    if(!empty($zipdir)) $zipArchive->addEmptyDir($zipdir);
-		  
+
 		    // Loop through all the files
 		    while (($file = readdir($dh)) !== false) {
-		  
+
 			//If it's a folder, run the function again!
 			if(!is_file($dir . $file)){
 			    // Skip parent and root directories
 			    if( ($file !== ".") && ($file !== "..")){
 				addFolderToZip($dir . $file . "/", $zipArchive, $zipdir . $file . "/");
 			    }
-			  
+
 			}else{
 			    // Add the files
 			    $zipArchive->addFile($dir . $file, $zipdir . $file);
-			  
+
 			}
 		    }
 		}
 	    }
-	} 
+	}
 	addFolderToZip($newdir.'/',$zip);
-	
+
 	// close and save archive
 	$zip->close();
 	rename($path.'/CCEXPORT'.$cid.'.zip',$path.'/CCEXPORT'.$cid.'.imscc');
-	echo "Archive created successfully.";    
-	
+	echo "Archive created successfully.";
+
 	function rrmdir($path) {
 	  if (is_file($path) || is_link($path)) {
 	    unlink($path);
@@ -628,13 +631,13 @@ if (isset($_GET['delete'])) {
 	    rmdir($path);
 	  }
 	 }
- 
+
 	rrmdir($newdir);
-	
+
 	echo "<br/><a href=\"$imasroot/course/files/CCEXPORT$cid.imscc\">Download</a><br/>";
 	echo "Once downloaded, keep things clean and <a href=\"ccexport.php?cid=$cid&delete=true\">Delete</a> the export file off the server.";
 } else {
-	
+
 	function getsubinfo($items,$parent,$pre) {
 		global $ids,$types,$names;
 		foreach($items as $k=>$item) {
@@ -674,7 +677,7 @@ if (isset($_GET['delete'])) {
 		$name = mysql_result($result,0,0);
 		return array($itemtype,$name);
 	}
-	
+
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 
@@ -684,8 +687,8 @@ if (isset($_GET['delete'])) {
 	$names = array();
 
 	getsubinfo($items,'0','');
-	
-	
+
+
 	echo '<h2>Common Cartridge Export</h2>';
 	echo '<p>This feature will allow you to export a v1.1 compliant IMS Common Cartridge export of your course, which can ';
 	echo 'then be loaded into other Learning Management Systems that support this standard.  Inline text, web links, ';
@@ -711,9 +714,9 @@ if (isset($_GET['delete'])) {
 		<option value="select">Select individual items to export</option>
 		</select>
 		<div id="itemselectwrap" style="display:none;">
-	
+
 		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-	
+
 		<table cellpadding=5 class=gb>
 		<thead>
 			<tr><th></th><th>Type</th><th>Title</th></tr>
@@ -723,7 +726,7 @@ if (isset($_GET['delete'])) {
 	$alt=0;
 	for ($i = 0 ; $i<(count($ids)); $i++) {
 		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
-?>		
+?>
 				<td>
 				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>'>
 				</td>
@@ -741,7 +744,7 @@ if (isset($_GET['delete'])) {
 	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in BlackBoard and Moodle)</button></p>";
 	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
 	echo '</form>';
-	
+
 }
 require("../footer.php");
 
