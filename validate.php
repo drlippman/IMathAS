@@ -367,7 +367,7 @@
 	//DB $query .= " FROM imas_users WHERE id='$userid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-  $query .= " FROM imas_users WHERE id=:id"
+  $query .= " FROM imas_users WHERE id=:id";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$userid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);

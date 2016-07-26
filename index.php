@@ -510,7 +510,7 @@ function printMessagesGadget() {
 
 }
 function printPostsGadget() {
-	global $page_newpostlist, $page_coursenames, $postthreads,$imasroot;
+	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot;
 
 	echo '<div class="block">';
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
