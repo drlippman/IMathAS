@@ -100,6 +100,18 @@ C validate        26
  C contentstats     3
  C copyitems        41
  C copyoneitem      6
+ C course           12
+ 0 coursereports
+ C courseshowitems  27
+ C coursetolibrary  2
+ C definebadges     9
+ C deleteassessment 9
+ C deleteblock      5
+ C deletedrillassess  7
+ C deleteforum      11
+ C deleteinlinetext 9
+ C deletelinkedtext 9
+ C deletewiki       8
 
 /diag              done
   C index          18
