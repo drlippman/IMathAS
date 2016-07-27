@@ -30,6 +30,20 @@ Apparently including more variables in the execute than are used in the query wi
 cause an error.  I'm pretty sure I did that a few times, and those will need to
 be fixed.
 
+To review from forum_latepass merge:
+````
+x validate
+x upgrade
+x msg/viewmsg
+x includes/unenroll
+x includes/copyiteminc
+x includes/calendardisp
+x dbsetup
+x bltilaunch
+x actions
+````
+
+Progress
 ````
 /                   done
 C actions         39

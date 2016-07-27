@@ -478,7 +478,7 @@ function outcometable() {
 	//pull exceptions
 	$exceptions = array();
 	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
-	$query .= "imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	$query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	while ($r = mysql_fetch_row($result2)) {
 		if (!isset($sturow[$r[1]])) { continue;}

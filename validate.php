@@ -179,7 +179,11 @@
     $query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
 		if (isset($_GET['cid'])) { $query.= ' AND id=:id'; }
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$_GET['cid']));
+    if (isset($_GET['cid'])) {
+		    $stm->execute(array(':id'=>$_GET['cid']));
+    } else {
+      $stm->execute(array());
+    }
 		if ($stm->rowCount()>0) {
 			$query = "INSERT INTO imas_students (userid,courseid) VALUES ";
 			$i = 0;
@@ -454,16 +458,17 @@
 		} else {
 			$cid = $sessiondata['courseid'];
 		}
-		//DB $query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+		//DB $query = "SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
-		if ($stm->rowCount()>0) {
-      $line = $stm->fetch(PDO::FETCH_ASSOC);
+		$line = $stm->fetch(PDO::FETCH_ASSOC);
+		if ($line != null) {
 			$studentid = $line['id'];
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
 			$studentinfo['section'] = $line['section'];
+			$studentinfo['latepasses'] = $line['latepass'];
 			if ($line['locked']>0) {
 				require("header.php");
 				echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
@@ -536,11 +541,7 @@
 
 			}
 		}
-		//DB $query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons ";
-		//DB $query .= "FROM imas_courses,imas_users WHERE imas_courses.id='$cid' AND imas_users.id=imas_courses.ownerid";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)>0) {
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs ";
 		$query .= "FROM imas_courses JOIN imas_users ON imas_users.id=imas_courses.ownerid WHERE imas_courses.id=:id";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$cid));
@@ -566,6 +567,7 @@
 				$coursedefstime = $coursedeftime;
 			}
 			$picicons = $crow[11];
+			$latepasshrs = $crow[12];
 			if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 			if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 			if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}

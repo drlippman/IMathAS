@@ -108,7 +108,7 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$DBH->query($query); //values already sanitized
-			$query = "DELETE FROM imas_exceptions WHERE assessmentid IN ($aidlist) AND userid IN ($stulist)";
+			$query = "DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN ($aidlist) AND userid IN ($stulist)";
 			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$DBH->query($query); //values already sanitized
 		}
@@ -167,6 +167,9 @@ function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwit
 
 		if (count($tounenroll)>0) {
 			$query = "DELETE FROM imas_grades WHERE gradetype='forum' AND gradetypeid IN ($forumlist) AND userid IN ($stulist)";
+			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
+			$DBH->query($query); //values already sanitized
+			$query = "DELETE FROM imas_exceptions WHERE (itemtype='F' OR itemtype='P' OR itemtype='R') AND assessmentid IN ($forumlist) AND userid IN ($stulist)";
 			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$DBH->query($query); //values already sanitized
 		}

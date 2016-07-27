@@ -1,7 +1,7 @@
 <?php
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 110;
+$latest = 111;
 
 
 @set_time_limit(0);
@@ -1812,6 +1812,23 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 $res = $DBH->query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			 }
+		}
+		if ($last<111) {
+			$query = "ALTER TABLE  `imas_exceptions` ADD `itemtype` CHAR(1) NOT NULL DEFAULT 'A';";
+			$res = $DBH->query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			 }
+			 $query = "ALTER TABLE  `imas_exceptions` ADD INDEX ( `itemtype` )";
+			 $res = $DBH->query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			 }
+			$query = "ALTER TABLE  `imas_forums` ADD `allowlate` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';";
+			$res = $DBH->query($query);
+			 if ($res===false) {
+				 echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			 }
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');

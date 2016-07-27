@@ -941,14 +941,23 @@ function gbtable() {
 	
 	//pull exceptions
 	$exceptions = array();
-	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
-	$query .= "imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	$forumexceptions = array();
+	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
+	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
 	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($r = mysql_fetch_row($result2)) {
-		if (!isset($sturow[$r[1]])) { continue;}
-		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
-		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][6] = ($r[3]>0)?(1+$r[3]):1;
-		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][3] = 10; //will get overwritten later if assessment session exists
+	while ($r = mysql_fetch_assoc($result2)) {
+		if (!isset($sturow[$r['userid']])) { continue;}
+		if ($r['itemtype']=='A') {
+			$exceptions[$r['typeid']][$r['userid']] = array($r['enddate'],$r['islatepass']);	
+			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
+			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
+		} else if ($r['itemtype']=='F' || $r['itemtype']=='P' || $r['itemtype']=='R') {
+			$forumexceptions[$r['typeid']][$r['userid']] = array($r['startdate'],$r['enddate'],$r['islatepass']);	
+			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
+			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
+		}
 	}
 	
 	//Get assessment scores
@@ -1176,6 +1185,19 @@ function gbtable() {
 				$i = $discussidx[$l['gradetypeid']];
 				$row = $sturow[$l['userid']];
 				$col = $discusscol[$l['gradetypeid']];
+				
+				if (isset($forumexceptions[$l['gradetypeid']][$l['userid']])) {
+					$thised = max($forumexceptions[$l['gradetypeid']][$l['userid']][0], $forumexceptions[$l['gradetypeid']][$l['userid']][1]);
+					if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
+						if ($now<$thised) {
+							$gb[0][1][$col][3] = 1;
+						} else {
+							$gb[0][1][$col][3] = 0;
+						}
+					}
+					//TODO:  show latepass link in gradebook?
+				}
+				
 				if ($l['score']!=null) {
 					if (isset($gb[$row][1][$col][0])) {
 						$gb[$row][1][$col][0] += 1*$l['score']; //adding up all forum scores

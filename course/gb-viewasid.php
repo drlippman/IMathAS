@@ -520,7 +520,7 @@
 		}
 		$saenddate = $line['enddate'];
 		unset($exped);
-		$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}'";
+		$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($r2)>0) {
 			$exped = mysql_result($r2,0,0);

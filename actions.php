@@ -1,7 +1,7 @@
 <?php
 	//IMathAS:  Basic Actions
 	//(c) 20006 David Lippman
-ini_set("memory_limit", "104857600");	
+ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
@@ -20,7 +20,7 @@ ini_set("post_max_size", "10485760");
 		 $urlmode = 'http://';
 	}
 	require_once("includes/password.php");
-	
+
 	if ($_GET['action']=="newuser") {
 		require_once("config.php");
 		$error = '';
@@ -60,7 +60,7 @@ ini_set("post_max_size", "10485760");
 			require("footer.php");
 			exit;
 		}
-		
+
 		if (isset($CFG['GEN']['newpasswords'])) {
 			$md5pw = password_hash($_POST['pw1'], PASSWORD_DEFAULT);
 		} else {
@@ -116,15 +116,15 @@ ini_set("post_max_size", "10485760");
 		//DB $query .= "VALUES ('{$_POST['SID']}','$md5pw',$initialrights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot,'$homelayout');";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $newuserid = mysql_insert_id();
-		
+
 		$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, msgnotify, homelayout) ";
 		$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :msgnotify, :homelayout)";
-		
+
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'], 
+		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'],
 			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$homelayout));
 		$newuserid = $DBH->lastInsertId();
-		
+
 		if ($emailconfirmation) {
 			$id = $newuserid
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -145,7 +145,7 @@ ini_set("post_max_size", "10485760");
 			echo "<a href=\"$imasroot/index.php\">Back to main login page</a>\n";
 			require("footer.php");
 			exit;
-			
+
 		} else {
 			$pagetitle = 'Account Created';
 			require("header.php");
@@ -155,19 +155,19 @@ ini_set("post_max_size", "10485760");
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
 			if (trim($_POST['courseid'])!='') {
 				$error = '';
-				
+
 				if (!is_numeric($_POST['courseid'])) {
 					$error = 'Invalid course id';
 				} else {
 					//DB $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['courseid']}' AND (available=0 OR available=2)";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-					
+
 					$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':cid'=>$_POST['courseid']));
 					$line = $stm->fetch(PDO::FETCH_ASSOC);
-					
+
 					if ($line==null) {
 						$error = 'Course not found';
 					} else if (($line['allowunenroll']&2)==2) {
@@ -199,8 +199,8 @@ ini_set("post_max_size", "10485760");
 					echo 'try enrolling again.  You do <b>not</b> need to create another account.</p>';
 				}
 			}
-					
-				
+
+
 			echo "You can now <a href=\"";
 			echo $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php";
 			echo "\">return to the login page</a> and login with your new username and password</p>";
@@ -213,15 +213,15 @@ ini_set("post_max_size", "10485760");
 		//DB $query = "UPDATE imas_users SET rights=10 WHERE id='{$_GET['id']}' AND rights=0";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_affected_rows()>0) {
-		
+
 		$query = "UPDATE imas_users SET rights=10 WHERE id=:id AND rights=0";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':id'=>$_GET['id']));
-		
+
 		if ($stm->rowCount()>0) {
 			require("header.php");
 			echo "Confirmed.  Please <a href=\"index.php\">Log In</a>\n";
-			require("footer.php");	
+			require("footer.php");
 			exit;
 		} else {
 			require("header.php");
@@ -234,26 +234,26 @@ ini_set("post_max_size", "10485760");
 			//DB $query = "SELECT id,email,rights FROM imas_users WHERE SID='{$_POST['username']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
-			
+
 			$query = "SELECT id,email,rights FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':sid'=>$_POST['username']));
 			if ($stm->rowCount()>0) {
 				list($id,$email,$rights) = $stm->fetch(PDO::FETCH_NUM);
 				//DB mysql_fetch_row($result);
-				
+
 				$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 				$code = '';
 				for ($i=0;$i<10;$i++) {
 					$code .= substr($chars,rand(0,61),1);
-				}	
+				}
 				//DB $query = "UPDATE imas_users SET remoteaccess='$code' WHERE id=$id";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				
+
 				$query = "UPDATE imas_users SET remoteaccess=:code WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':code'=>$code, ':id'=>$id));
-				
+
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
@@ -268,7 +268,7 @@ ini_set("post_max_size", "10485760");
 				} else {
 					mail($email,'Password Reset Request',$message,$headers);
 				}
-				
+
 				require("header.php");
 				echo '<p>An email with a password reset link has been sent your email address on record: <b>'.$email.'.</b><br/> ';
 				echo 'If you do not see it in a few minutes, check your spam or junk box to see if the email ended up there.<br/>';
@@ -290,7 +290,7 @@ ini_set("post_max_size", "10485760");
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $realcode = mysql_result($result,0,0);
 			//DB if (mysql_num_rows($result)>0 && $_POST['code']===$realcode && $realcode!='') {
-			
+
 			$query = "SELECT remoteaccess FROM imas_users WHERE id=:id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$_POST['id']));
@@ -304,7 +304,7 @@ ini_set("post_max_size", "10485760");
 					}
 					//DB $query = "UPDATE imas_users SET password='$newpw',remoteaccess='' WHERE id='{$_POST['id']}' LIMIT 1";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					
+
 					$query = "UPDATE imas_users SET password=:newpw,remoteaccess='' WHERE id=:id LIMIT 1";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':id'=>$_POST['id'], ':newpw'=>$newpw));
@@ -322,7 +322,7 @@ ini_set("post_max_size", "10485760");
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $realcode = mysql_result($result,0,0);
 			//DB if (mysql_num_rows($result)>0 && $_GET['code']===$realcode && $realcode!='') {
-				
+
 			$query = "SELECT remoteaccess FROM imas_users WHERE id=:id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$_GET['id']));
@@ -343,18 +343,18 @@ ini_set("post_max_size", "10485760");
 				echo 'the most recent email.</body></html>';
 				exit;
 			}
-				
+
 		}
-	} else if ($_GET['action']=="lookupusername") {    
+	} else if ($_GET['action']=="lookupusername") {
 		require_once("config.php");
 		//DB $query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}' AND SID NOT LIKE 'lti-%'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_num_rows($result)>0) {
-		
+
 		$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID NOT LIKE 'lti-%'";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':email'=>$_POST['email']));
-		if ($stm->rowCount() > 0) {	
+		if ($stm->rowCount() > 0) {
 			echo $stm->rowCount();
 			echo " usernames match this email address and were emailed.  <a href=\"index.php\">Return to login page</a>";
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -378,17 +378,17 @@ ini_set("post_max_size", "10485760");
 			} else {
 				mail($_POST['email'],"$installname Username Request",$message,$headers);
 			}
-			
+
 			exit;
 		} else {
 			//DB $query = "SELECT SID,lastaccess FROM imas_users WHERE email='{$_POST['email']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
-			
+
 			$query = "SELECT SID,lastaccess FROM imas_users WHERE email=:email AND SID LIKE 'lti-%'";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':email'=>$_POST['email']));
-			if ($stm->rowCount() > 0) {	
+			if ($stm->rowCount() > 0) {
 				echo "Your account can only be accessed through your school's learning management system. <a href=\"index.php\">Return to login page</a>";
 			} else {
 				echo "No usernames match this email address <a href=\"index.php\">Return to login page</a>";
@@ -396,7 +396,7 @@ ini_set("post_max_size", "10485760");
 			exit;
 		}
 	}
-	
+
 	require("validate.php");
 	if ($_GET['action']=="logout") {
 		$sessionid = session_id();
@@ -412,7 +412,7 @@ ini_set("post_max_size", "10485760");
 	} else if ($_GET['action']=="chgpwd") {
 		//DB $query = "SELECT password FROM imas_users WHERE id = '$userid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC); 
+		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE id=:uid");
 		$stm->execute(array(':uid'=>$userid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -431,7 +431,7 @@ ini_set("post_max_size", "10485760");
 			echo "</body></html>\n";
 			exit;
 		}
-		
+
 	} else if ($_GET['action']=="enroll") {
 		if ($myrights < 6) {
 			echo "<html><body>\nError: Guests can't enroll in courses</body></html";
@@ -456,7 +456,7 @@ ini_set("post_max_size", "10485760");
 		//DB $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['cid']}' AND (available=0 OR available=2)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-		
+
 		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = :cid AND (available=0 OR available=2)");
 		$stm->execute(array(':cid'=>$_POST['cid']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -519,7 +519,7 @@ ini_set("post_max_size", "10485760");
 				exit;
 			} else {
 				$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
-				if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {		
+				if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {
 					require("header.php");
 					echo $pagetopper;
 					echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -543,12 +543,12 @@ ini_set("post_max_size", "10485760");
 					require("footer.php");
 					exit;
 				}
-				
-				
+
+
 				//$query = "INSERT INTO imas_students (userid,courseid) VALUES ('$userid','{$_POST['cid']}');";
 				//mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-		}	
+		}
 	} else if ($_GET['action']=="unenroll") {
 		if ($myrights < 6) {
 			echo "<html><body>\nError: Guests can't unenroll from courses</body></html";
@@ -584,21 +584,21 @@ ini_set("post_max_size", "10485760");
 				$stm->execute(array(':uid'=>$userid,':aid'=>$row['id']));
 				//DB $query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:aid AND userid=:uid");
+				$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid=:aid AND itemtype='A' AND userid=:uid");
 				$stm->execute(array(':uid'=>$userid,':aid'=>$row['id']));
 			}
 			*/
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid IN (SELECT id FROM imas_assessments WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-			
-			$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE assessmentid IN (SELECT id FROM imas_assessments WHERE courseid=:cid) AND userid=:uid");
+
+			$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE itemtype='A' AND assessmentid IN (SELECT id FROM imas_assessments WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-			
+
 			//DB $query = "DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid='$cid') AND userid='$userid'";
 			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_drillassess_sessions WHERE drillassessid IN (SELECT id FROM imas_drillassess WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-				
+
 			//DB $query = "SELECT id FROM imas_gbitems WHERE courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -607,7 +607,7 @@ ini_set("post_max_size", "10485760");
 			//}
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid= IN (SELECT id FROM imas_gbitems WHERE courseid=:cid) AND userid=:uid");
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-			
+
 			//DB $query = "SELECT id FROM imas_forums WHERE courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -622,7 +622,12 @@ ini_set("post_max_size", "10485760");
 			$query .= "(SELECT ifp.threadid FROM imas_forum_posts AS ifp JOIN imas_forums ON ifp.forumid=imas_forums.id WHERE imas_forums.courseid=:cid)";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
-			
+
+			$query = "DELETE FROM imas_exceptions WHERE (itemtype='F' OR itemtype='P' OR itemtype='R') AND userid=:uid AND assessmentid IN ";
+			$query .= "(SELECT id FROM imas_forums WHERE courseid=:cid)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':uid'=>$userid,':cid'=>$cid));
+
 		}
 	} else if ($_GET['action']=="chguserinfo") {
 		$pagetopper = '';
@@ -677,7 +682,7 @@ ini_set("post_max_size", "10485760");
 				$homelayout[$k] = $deflayout[$k];
 			}
 		}
-				
+
 		$layoutstr = implode('|',$homelayout);
 		if (is_uploaded_file($_FILES['stupic']['tmp_name'])) {
 			processImage($_FILES['stupic'],$userid,200,200);
@@ -690,19 +695,19 @@ ini_set("post_max_size", "10485760");
 		} else {
 			$chguserimg = '';
 		}
-		$_POST['theme'] = str_replace(array('/','..'), '', $_POST['theme']); 
-	
+		$_POST['theme'] = str_replace(array('/','..'), '', $_POST['theme']);
+
 		//DEB $query = "UPDATE imas_users SET FirstName='{$_POST['firstname']}',LastName='{$_POST['lastname']}',email='{$_POST['email']}',msgnotify=$msgnot,qrightsdef=$qrightsdef,deflib='$deflib',usedeflib='$usedeflib',homelayout='$layoutstr',theme='{$_POST['theme']}',listperpage='$perpage'$chguserimg ";
 		//DB $query .= "WHERE id='$userid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		
+
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'], 
+		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'],
 			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$layoutstr, ':qrightsdef'=>$qrightsdef,
 			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>$_POST['theme'], ':listperpage'=>$perpage, ':uid'=>$userid));
-		
+
 		if (isset($_POST['dochgpw'])) {
 			//DB $query = "SELECT password FROM imas_users WHERE id = '$userid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -717,7 +722,7 @@ ini_set("post_max_size", "10485760");
 					$newpw =md5($_POST['newpw1']);
 				}
 				//DB $query = "UPDATE imas_users SET password='$md5pw' WHERE id='$userid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error()); 
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_users SET password = :newpw WHERE id = :uid");
 				$stm->execute(array(':uid'=>$userid, ':newpw'=>$newpw));
 			} else {
@@ -747,7 +752,7 @@ ini_set("post_max_size", "10485760");
 		$tohide = array_diff($all,$checked);
 		$hidelist = implode(',', $tohide);
 		//DB $query = "UPDATE imas_users SET hideonpostswidget='$hidelist' WHERE id='$userid'";
-		//DB mysql_query($query) or die("Query failed : " . mysql_error()); 
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_users SET hideonpostswidget=:hidelist WHERE id= :uid");
 		$stm->execute(array(':uid'=>$userid, ':hidelist'=>$hidelist));
 	} else if ($_GET['action']=="googlegadget") {
@@ -759,12 +764,12 @@ ini_set("post_max_size", "10485760");
 		}
 	}
 	if ($isgb) {
-		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';		
+		echo '<html><body>Changes Recorded.  <input type="button" onclick="top.GB_hide()" value="Done" /></body></html>';
 	} else {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
 	}
-	
-	
-	
+
+
+
 
 ?>

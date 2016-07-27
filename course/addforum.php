@@ -113,6 +113,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$rubric = 0;
 		}
+		$allowlate = 0;
+		if ($_POST['allowlate']>0) {
+			$allowlate = $_POST['allowlate'] + 10*$_POST['allowlateon'];
+			if (isset($_POST['latepassafterdue'])) {
+				$allowlate += 100;
+			}
+		}
 		$outcomes = array();
 		if (isset($_POST['outcomes'])) {
 			foreach ($_POST['outcomes'] as $o) {
@@ -152,14 +159,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',postinstr='{$_POST['postinstr']}',replyinstr='{$_POST['replyinstr']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
 			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,";
-			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric,outcomes='$outcomes' ";
+			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric,outcomes='$outcomes',allowlate=$allowlate ";
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
 			
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}','{$_POST['postinstr']}','{$_POST['replyinstr']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
+			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes,allowlate) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}','{$_POST['postinstr']}','{$_POST['replyinstr']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes',$allowlate);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newforumid = mysql_insert_id();
@@ -259,6 +266,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['rubric'] = 0;
 			$line['postinstr'] = '';
 			$line['replyinstr'] = '';
+			$line['allowlate'] = 0;
 			$gradeoutcomes = array();
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
@@ -383,6 +391,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$outcomearr = array();
 		} else {
 			$outcomearr = unserialize($row[0]);
+			if ($outcomearr==false) {
+				$outcomearr = array();
+			}
 		}
 		$outcomes = array();
 		function flattenarr($ar) {
@@ -400,6 +411,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		
 		$page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
 		$page_tutorSelect['val'] = array(2,0,1);
+		
+		$page_allowlateSelect = array();
+		$page_allowlateSelect['val'][0] = 0;
+		$page_allowlateSelect['label'][0] = "None";
+		$page_allowlateSelect['val'][1] = 1;
+		$page_allowlateSelect['label'][1] = "Unlimited";
+		for ($k=1;$k<9;$k++) {
+			$page_allowlateSelect['val'][] = $k+1;
+			$page_allowlateSelect['label'][] = "Up to $k";
+		}
+		$page_allowlateonSelect = array();
+		$page_allowlateonSelect['val'][0] = 0;
+		$page_allowlateonSelect['label'][0] = "Posts and Replies (1 LatePass for both)";
+		//doesn't work yet
+		//$page_allowlateonSelect['val'][1] = 1;
+		//$page_allowlateonSelect['label'][1] = "Posts or Replies (1 LatePass each)";
+		$page_allowlateonSelect['val'][1] = 2;
+		$page_allowlateonSelect['label'][1] = "Posts only";
+		$page_allowlateonSelect['val'][2] = 3;
+		$page_allowlateonSelect['label'][2] = "Replies only";
 	}
 }
 
@@ -554,7 +585,15 @@ if ($overwriteBody==1) {
 			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 		</span><br class="form" />
 		
-		
+		<span class=form>Allow use of LatePasses?: </span>
+			<span class=formright>
+				<?php
+				writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
+				echo ' on ';
+				writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],floor($line['allowlate']/10)%10);
+				?>
+				<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
+			</span><BR class=form> 
 		
 		<span class="form">Calendar icon:</span>
 		<span class="formright">

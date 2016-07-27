@@ -114,7 +114,7 @@
 //	$query .= "WHERE iu.id = istu.userid AND istu.courseid='$cid' AND iu.id=ias.userid AND ias.assessmentid='$aid'";
 
 	//get exceptions
-	$query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid'";
+	$query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid' AND itemtype='A'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$exceptions = array();
 	while ($row = mysql_fetch_row($result)) {

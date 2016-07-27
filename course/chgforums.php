@@ -39,7 +39,17 @@ if (isset($_POST['checked'])) { //form submitted
 			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
 		}
 		$sets[] = "postby='$postby'";
-	}	
+	}
+	if (isset($_POST['chgallowlate'])) {
+		$allowlate = 0;
+		if ($_POST['allowlate']>0) {
+			$allowlate = $_POST['allowlate'] + 10*$_POST['allowlateon'];
+			if (isset($_POST['latepassafterdue'])) {
+				$allowlate += 100;
+			}
+		}
+		$sets[] = "allowlate=$allowlate";
+	}
 	if (isset($_POST['chgcaltag'])) {
 		$sets[] = "caltag='".$_POST['caltagpost'].'--'.$_POST['caltagreply']."'";
 	}
@@ -207,6 +217,25 @@ $replybytime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 $postbydate = tzdate("m/d/Y",time()+7*24*60*60);
 $postbytime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 
+$page_allowlateSelect = array();
+$page_allowlateSelect['val'][0] = 0;
+$page_allowlateSelect['label'][0] = "None";
+$page_allowlateSelect['val'][1] = 1;
+$page_allowlateSelect['label'][1] = "Unlimited";
+for ($k=1;$k<9;$k++) {
+	$page_allowlateSelect['val'][] = $k+1;
+	$page_allowlateSelect['label'][] = "Up to $k";
+}
+$page_allowlateonSelect = array();
+$page_allowlateonSelect['val'][0] = 0;
+$page_allowlateonSelect['label'][0] = "Posts and Replies (1 LatePass for both)";
+//doesn't work yet
+//$page_allowlateonSelect['val'][1] = 1;
+//$page_allowlateonSelect['label'][1] = "Posts or Replies (1 LatePass each)";
+$page_allowlateonSelect['val'][1] = 2;
+$page_allowlateonSelect['label'][1] = "Posts only";
+$page_allowlateonSelect['val'][2] = 3;
+$page_allowlateonSelect['label'][2] = "Replies only";
 
 //HTML output
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
@@ -309,6 +338,19 @@ foreach($forumitems as $id=>$name) {
 	at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 	
 	</td>
+</tr>
+<tr class="coptr">
+	<td><input type="checkbox" name="chgallowlate" class="chgbox" /></td>
+	<td class="r">Allow use of LatePasses?:</td>
+	<td> 
+		<?php
+		writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],0);
+		echo ' on ';
+		writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],0);
+		?>
+		<br/><label><input type="checkbox" name="latepassafterdue"> Allow LatePasses after due date, within 1 LatePass period</label>
+	</td>
+
 </tr>
 <tr class="coptr">
 	<td><input type="checkbox" name="chgcaltag" class="chgbox" /></td>

@@ -105,15 +105,20 @@ $lowertime = max($now,$exlowertime);
 $uppertime = mktime(0,0,0,$curmonum,$dayofmo - $dayofweek + 7*$callength,$curyr)+$serveroffset;
 
 $exceptions = array();
+$forumexceptions = array();
 if (!isset($teacherid)) {
-	//DB $query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid='$userid'";
+	//DB $query = "SELECT assessmentid,startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid='$userid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,waivereqscore FROM imas_exceptions WHERE userid=:userid");
+	$stm = $DBH->prepare("SELECT assessmentid,startdate,enddate,islatepass,waivereqscore,itemtype FROM imas_exceptions WHERE userid=:userid");
 	$stm->execute(array(':userid'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		if ($row[5]=='A') {
 		$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
+		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
+			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],$row[5]);
 	}
+}
 }
 
 $byid = array();
@@ -360,39 +365,46 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$byid['D'.$row[0]] = array($moday,$tag,$colors,$json);
 }
 
-$query = "SELECT id,name,postby,replyby,startdate,caltag FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
+$query = "SELECT id,name,postby,replyby,startdate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
 $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
 //DB while ($row = mysql_fetch_row($result)) {
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	if (($row[4]>$now && !isset($teacherid))) {
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	if (($row['startdate']>$now && !isset($teacherid))) {
 		continue;
 	}
-	list($posttag,$replytag) = explode('--',$row[5]);
+	//check for exception
+	require_once("exceptionfuncs.php");
+	list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $row['postby'], $row['replyby'], $row['enddate']) = getCanUseLatePassForums(isset($forumexceptions[$row['id']])?$forumexceptions[$row['id']]:null, $row);
+
+	list($posttag,$replytag) = explode('--',$row['caltag']);
 	$posttag = htmlentities($posttag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$replytag = htmlentities($replytag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	if ($row[2]!=2000000000) { //($row[2]>$now || isset($teacherid))
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
-		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-		$colors = makecolor2($row[4],$row[2],$now);
+	if ($row['postby']!=2000000000) { //($row['postby']>$now || isset($teacherid))
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row['postby']));
+		$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+		$colors = makecolor2($row['startdate'],$row['postby'],$now);
 		$json = "{type:\"FP\", time:\"$time\", ";
-		if ($row[2]>$now || isset($teacherid)) {
-			$json .= "id:\"$row[0]\",";
+		//if ($row['postby']>$now || isset($teacherid)) {
+			$json .= "id:\"{$row['id']}\",";
+		//}
+		$json .= 'allowlate:"'.($canuselatepassP?1:0).'",undolate:"'.($canundolatepassP?1:0).'",';
+
+		$json .= "name:\"{$row['name']}\", color:\"".$colors."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
+		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json);
 		}
-		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
-		$byid['FP'.$row[0]] = array($moday,$posttag,$colors,$json);
-	}
-	if ($row[3]!=2000000000) { //($row[3]>$now || isset($teacherid))
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
-		$colors = makecolor2($row[4],$row[3],$now);
+	if ($row['replyby']!=2000000000) { //($row['replyby']>$now || isset($teacherid))
+		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row['replyby']));
+		$colors = makecolor2($row['startdate'],$row['replyby'],$now);
 		$json = "{type:\"FR\", time:\"$time\",";
-		if ($row[3]>$now || isset($teacherid)) {
-			$json .= "id:\"$row[0]\",";
+		//if ($row['replyby']>$now || isset($teacherid)) {
+			$json .= "id:\"{$row['id']}\",";
+		//}
+		$json .= 'allowlate:"'.($canuselatepassR?1:0).'",undolate:"'.($canundolatepassR?1:0).'",';
+		$json .= "name:\"{$row['name']}\", color:\"".$colors."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
+		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json);
 		}
-		$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
-		$byid['FR'.$row[0]] = array($moday,$replytag,$colors,$json);
 	}
-}
 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 //DB $itemorder = unserialize(mysql_result($result,0,0));

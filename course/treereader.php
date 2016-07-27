@@ -186,14 +186,18 @@ if (!$viewall) {
 	}
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
-		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass FROM ";
+		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
 		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
-		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
+		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid='$cid') ";
+		$query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
+		$query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid='$userid' AND ";
+		$query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid='$cid') ";
+		
 		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
+			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
 		}
 	}
 	//update block start/end dates to show blocks containing items with exceptions
@@ -369,7 +373,7 @@ function upsendexceptions(&$items) {
 				if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
 			  }
 		   } else {
-			   if (isset($exceptions[$item])) {
+			   if (isset($exceptions[$item]) && $exceptions[$item][4]=='A') {
 				  // return ($exceptions[$item]);
 				   if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
 				   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}

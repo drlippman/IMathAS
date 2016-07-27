@@ -140,14 +140,14 @@
 			$stm = $DBH->prepare("SELECT id,enddate FROM imas_assessments WHERE name=:name AND courseid=:courseid");
 			$stm->execute(array(':name'=>$aname, ':courseid'=>$line['courseid']));
 			//DB if (mysql_num_rows($res)>0) {
-				//DB list($aid,$due) = mysql_fetch_row($res);
 			if ($stm->rowCount()>0) {
+				//DB list($aid,$due) = mysql_fetch_row($res);
 				list($aid,$due) = $stm->fetch(PDO::FETCH_NUM);
-				//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid'";
+				//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid' AND itemtype='A'";
 				//DB $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB if (mysql_num_rows($res)>0) {
 					//DB $due = mysql_result($res,0,0);
-				$stm = $DBH->prepare("SELECT enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+				$stm = $DBH->prepare("SELECT enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$aid));
 				if ($stm->rowCount()>0) {
 					$due = $stm->fetchColumn(0);
