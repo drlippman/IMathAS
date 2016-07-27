@@ -32,7 +32,7 @@ if (isset($_GET['jwt'])) {
 	         echo "JWT Error: ".$e->getMessage();
 	         exit;
 	}
-	
+
 	if (isset($QS['auth'])) {
 		$issigned = true;
 	}
@@ -79,17 +79,17 @@ require("./assessment/header.php");
 
 if (isset($QS['showscored'])) {
 	//DE is requesting that the question be redisplayed with right/wrong markers
-	
+
 	$lastanswers = array();
 	list($seed, $rawscores, $lastanswers[0]) = explode(';', $QS['showscored'], 3);
 	$rawscores = explode('~',$rawscores);
 	$seed = intval($seed);
-	
+
 	$showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
-	
-	
+
+
 	displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
-		
+
 } else if (isset($_POST['seed'])) {
 	//time to score the question
 	$seed = intval($_POST['seed']);
@@ -116,7 +116,7 @@ if (isset($QS['showscored'])) {
 		}
 		$scoredonsubmit = isset($_POST['showscoredonsubmit']);
 	}
-	
+
 	$lastanswers = array();
 
 	list($score,$rawscores) = scoreq(0,$qsetid,$seed,$_POST['qn0'],1);
@@ -133,7 +133,7 @@ if (isset($QS['showscored'])) {
 		$after = implode('~',$after);
 	}
 	if (strpos($rawscores,'~')===false) {
-		$rawafter = round($scores,1);
+		$rawafter = round($rawscores,1);
 		if ($rawafter < 0) { $rawafter = 0;}
 	} else {
 		$fparts = explode('~',$rawscores);
@@ -145,16 +145,16 @@ if (isset($QS['showscored'])) {
 		$rawafter = implode('~',$rawafter);
 	}
 	$lastanswers[0] = stripslashes($lastanswers[0]);
-	
+
 	$pts = getpts($after);
-	
+
 	$params = array('id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 	if (isset($_POST['auth'])) {
 		$params["auth"] = stripslashes($_POST['auth']);
 	}
-		
+
 	$signed = JWT::encode($params, $key);
-	
+
 	echo '<script type="text/javascript">
 	$(function() {
 		window.parent.postMessage(JSON.stringify({subject: "lti.ext.mom.updateScore", id: '.$qsetid.', score: '.$pts.', redisplay: "'.str_replace('"','\\"',$params["redisplay"]).'", jwt: "'.$signed.'", frame_id: "' . $frameid . '"}), "*");
@@ -162,14 +162,14 @@ if (isset($QS['showscored'])) {
 	</script>';
 	if ($scoredonsubmit) {
 		$rawscores = explode('~',$rawafter);
-		
+
 		$showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
-		
+
 		displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
 	} else {
 		echo '<p>Saving score... <img src="img/updating.gif"/></p>';
 	}
-	
+
 } else {
 	$lastanswers = array();
 	if (isset($QS['redisplay']) && trim($QS['redisplay'])!='') {
@@ -209,11 +209,11 @@ if (isset($QS['showscored'])) {
 		echo '<input type="hidden" name="auth" value="'.$QS['auth'].'"/>';
 	}
 	if (isset($QS['showhints']) && $QS['showhints']==0) {
-		$showhints = false;	
+		$showhints = false;
 	} else {
 		$showhints = true;
 	}
-		
+
 	displayq(0, $qsetid, $seed, $doshowans, $showhints, 0);
 	if ($jssubmit) {
 		echo '<input type="submit" id="submitbutton" style="display:none;"/>';
@@ -230,7 +230,7 @@ if (isset($QS['showscored'])) {
 		echo "<input type=submit name=\"check\" value=\"" . _('Submit') . "\">\n";
 	}
 	echo "</form>\n";
-	
+
 }
 
 echo '<script type="text/javascript">
@@ -270,8 +270,8 @@ function getansweights($code,$seed) {
 		if (is_array($weights)) {
 			return $weights;
 		}
-		
-	} 
+
+	}
 	if (!$foundweights) {
 		preg_match('/anstypes\s*=(.*)/',$code,$match);
 		$n = substr_count($match[1],',')+1;
@@ -316,8 +316,8 @@ function printscore($sc,$qsetid,$seed) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
-		
+
+
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
@@ -325,7 +325,7 @@ function printscore($sc,$qsetid,$seed) {
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
-			} else if (!is_numeric($v) || $v==0) { 
+			} else if (!is_numeric($v) || $v==0) {
 				$pm = 'redx';
 			} else if (abs($v-$ptposs[$k])<.011) {
 				$pm = 'gchk';
@@ -336,9 +336,9 @@ function printscore($sc,$qsetid,$seed) {
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
+		//$ptposs = implode(', ',$ptposs);
 		$out = sprintf(_('%1$s out of %2$s (parts: %3$s)'), $pts, $poss, $sc);
-	}	
+	}
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
 		$w = 30;
@@ -346,16 +346,16 @@ function printscore($sc,$qsetid,$seed) {
 		$w = round(30*$pts/$poss);
 	}
 	if ($w==0) {$w=1;}
-	if ($w < 15) { 
+	if ($w < 15) {
 	     $color = "#f".dechex(floor(16*($w)/15))."0";
 	} else if ($w==15) {
 	     $color = '#ff0';
-	} else { 
+	} else {
 	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
 	}
-	
+
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;	
+	return $bar . $out;
 }
 
 function getpts($sc) {
@@ -369,7 +369,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
