@@ -1,5 +1,5 @@
 PDO Conversion progress
-Total todo: ~2700.  Done: ~930
+Total todo: ~2700.  Done: ~1100
 
 Most queries have been semi-automatically converted, and should be fine.  The
 original queries are still in the code, prefixed by `//DB`.
@@ -29,19 +29,6 @@ $stm->execute(array(":A"=>$A, ":B"=>$B));
 Apparently including more variables in the execute than are used in the query will
 cause an error.  I'm pretty sure I did that a few times, and those will need to
 be fixed.
-
-To review from forum_latepass merge:
-````
-x validate
-x upgrade
-x msg/viewmsg
-x includes/unenroll
-x includes/copyiteminc
-x includes/calendardisp
-x dbsetup
-x bltilaunch
-x actions
-````
 
 Progress
 ````
@@ -79,6 +66,8 @@ C showlinkedtextpublic  5
 C upgrade         237  lots of logic to check
 C validate        26
 
+/admin
+
 /assessment
  0 asidutil
  C catscores      4
@@ -109,7 +98,8 @@ C validate        26
  C chgoffline       6
  C claimbadge       3
  C contentstats     3
-
+ C copyitems        41
+ C copyoneitem      6
 
 /diag              done
   C index          18
