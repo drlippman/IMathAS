@@ -78,6 +78,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					}
 				} 
 			}
+			if (isset($studentid)) {
+				if (time()>$postby) {
+					echo 'Post rejected - it is after the New Threads due date.';
+					exit;
+				}
+			}
 			$query = "INSERT INTO imas_forum_posts (forumid,subject,message,userid,postdate,parent,posttype,isanon,replyby,tag) VALUES ";
 			$query .= "('$forumid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,0,'$type','$isanon',$replyby,'$tag')";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -287,6 +293,12 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				echo '<div id="headerposthandler" class="pagetitle"><h2>Post Reply</h2></div>';
 			} else if ($_GET['modify']=='new') {
 				echo "Add Thread</div>\n";
+				if (isset($studentid)) {
+					if (time()>$postby) {
+						echo 'It is after the New Threads due date.';
+						exit;
+					}
+				}
 				$line['subject'] = "";
 				$line['message'] = "";
 				$line['posttype'] = 0;

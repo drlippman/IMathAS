@@ -405,13 +405,14 @@
 		} else {
 			$cid = $sessiondata['courseid'];
 		}
-		$query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
+		$query = "SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($result, MYSQL_ASSOC);
 		if ($line != null) {
 			$studentid = $line['id'];
 			$studentinfo['timelimitmult'] = $line['timelimitmult'];
 			$studentinfo['section'] = $line['section'];
+			$studentinfo['latepasses'] = $line['latepass'];
 			if ($line['locked']>0) {
 				require("header.php");
 				echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
@@ -471,7 +472,7 @@
 		
 			}
 		}
-		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons ";
+		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs ";
 		$query .= "FROM imas_courses,imas_users WHERE imas_courses.id='$cid' AND imas_users.id=imas_courses.ownerid";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>0) {
@@ -494,6 +495,7 @@
 				$coursedefstime = $coursedeftime;
 			}
 			$picicons = $crow[11];
+			$latepasshrs = $crow[12];
 			if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
 			if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 			if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}

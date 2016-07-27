@@ -534,7 +534,7 @@ switch($_GET['action']) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$line[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$line[0]}'";
+				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$line[0]}' AND itemtype='A'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$line[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
@@ -577,6 +577,10 @@ switch($_GET['action']) {
 				
 				$query = "DELETE FROM imas_forum_threads WHERE forumid='{$row[0]}'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
+				
+				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND (itemtype='F' OR itemtype='P' OR itemtype='R')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
+				
 			}
 			$query = "DELETE FROM imas_forums WHERE courseid='{$_GET['id']}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());

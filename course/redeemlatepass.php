@@ -25,7 +25,7 @@
 			echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 		}
 		echo "Un-use LatePass</div>";
-		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)==0) {
 			echo '<p>Invalid</p>';
@@ -44,16 +44,16 @@
 				} else {
 					if ($now < $enddate) { //before enddate, return all latepasses
 						$n = $row[1];
-						$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+						$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 						mysql_query($query) or die("Query failed : " . mysql_error());
 					} else { //figure how many are unused
 						$n = floor(($row[0] - $now)/($hours*60*60));
 						$newend = $row[0] - $n*$hours*60*60;
 						if ($row[1]>$n) {
-							$query = "UPDATE imas_exceptions SET islatepass=islatepass-$n,enddate=$newend WHERE userid='$userid' AND assessmentid='$aid'";
+							$query = "UPDATE imas_exceptions SET islatepass=islatepass-$n,enddate=$newend WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 							mysql_query($query) or die("Query failed : " . mysql_error());
 						} else {
-							$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+							$query = "DELETE FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 							mysql_query($query) or die("Query failed : " . mysql_error());
 							$n = $row[1];
 						}
@@ -78,7 +78,7 @@
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
 		
-		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$hasexception = false;
 		if (mysql_num_rows($result)==0) {
@@ -96,11 +96,11 @@
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			if (mysql_affected_rows()>0) {
 				if ($hasexception) { //already have exception
-					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid'";
+					$query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				} else {
 					$enddate = $enddate + $addtime;
-					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass) VALUES ('$userid','$aid','$startdate','$enddate',1)";
+					$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,islatepass,itemtype) VALUES ('$userid','$aid','$startdate','$enddate',1,'A')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			}
@@ -129,7 +129,7 @@
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		list($allowlate,$enddate,$startdate) =mysql_fetch_row($result);
 		
-		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
+		$query = "SELECT enddate,islatepass FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$hasexception = false;
 		if (mysql_num_rows($result)==0) {

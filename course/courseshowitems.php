@@ -1232,9 +1232,14 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="Forum") {
 			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby FROM imas_forums WHERE id='$typeid'";
+			   $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby,allowlate FROM imas_forums WHERE id='$typeid'";
 			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   
+			   //check for exception
+			   require_once("../includes/exceptionfuncs.php");
+			   list($canundolatepassP, $canundolatepassR, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']) = getCanUseLatePassForums(isset($exceptions[$items[$i]])?$exceptions[$items[$i]]:null, $line);
+			   
 			   /*$dofilter = false;
 			   if ($line['grpaid']>0) {
 				if (!$viewall) {
@@ -1321,11 +1326,19 @@ function enditem($canedit) {
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   $duedates = "";
-				   if ($line['postby']>$now && $line['postby']!=2000000000) {
-					   $duedates .= sprintf(_('New Threads due %s. '), formatdate($line['postby']));
+				   if ($line['postby']!=2000000000) {
+				   	   if ($line['postby']>$now) { 
+					   	$duedates .= sprintf(_('New Threads due %s. '), formatdate($line['postby']));
+					   } else {
+					   	$duedates .= sprintf(_('New Threads were due %s. '), formatdate($line['postby']));   
+					   }
 				   }
-				   if ($line['replyby']>$now && $line['replyby']!=2000000000) {
-					   $duedates .= sprintf(_('Replies due %s. '), formatdate($line['replyby']));
+				   if ($line['replyby']!=2000000000) {
+				   	   if ($line['replyby']>$now) {
+				   	   	   $duedates .= sprintf(_('Replies due %s. '), formatdate($line['replyby']));
+				   	   } else {
+				   	   	   $duedates .= sprintf(_('Replies were due %s. '), formatdate($line['replyby']));
+				   	   }
 				   }
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   if (($hideicons&8)==0) {
@@ -1347,14 +1360,30 @@ function enditem($canedit) {
 				   }
 				   if ($canedit) {
 					   echo '<span class="instronly">';
+					   if ($line['allowlate']>0) {
+						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> | ';
+					   }
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo " | <a href=\"contentstats.php?cid=$cid&type=F&id=$typeid\">",_('Stats'),'</a>';
 					   
 					   echo '</span>';
-				   }
+				   } else 
 				   if ($duedates!='') {echo "<br/>$duedates";}
+				   if ($line['allowlate']>0 && isset($sessiondata['stuview'])) {
+					echo _(' LatePass Allowed');
+				   } else if (!$canedit) {
+				   	if ($canuselatepassP || $canuselatepassR) {
+				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid\">", _('Use LatePass'), "</a>";
+				   		if ($canundolatepass) {
+				   			echo ' |';
+				   		}
+				   	}
+				   	if ($canundolatepass) {
+				   		echo " <a href=\"redeemlatepassforum.php?cid=$cid&fid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
+				   	}
+				   }
 				   echo filter("</div><div class=itemsum>{$line['description']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 			   } else if ($viewall) {
@@ -1379,6 +1408,9 @@ function enditem($canedit) {
 				    
 				   if ($canedit) {
 					   echo '<span class="instronly">';
+					   if ($line['allowlate']>0) {
+						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> | ';
+					   }
 					   echo "<a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
 					   echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
@@ -1711,10 +1743,14 @@ function enditem($canedit) {
 				if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
 			  }
 		   } else {
-			   if (isset($exceptions[$item])) {
+			   if (isset($exceptions[$item]) && $exceptions[$item][4]=='A') {
 				  // return ($exceptions[$item]);
 				   if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
 				   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
+			   } else if (isset($exceptions[$item]) && ($exceptions[$item][4]=='F' || $exceptions[$item][4]=='P' || $exceptions[$item][4]=='R')) {
+			   	   //extend due date if replyby or postby bigger than enddate
+			   	   if ($exceptions[$item][0]>$maxedate) { $maxedate = $exceptions[$item][0];}
+			   	   if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
 			   }
 		   }
 	   }

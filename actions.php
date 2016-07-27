@@ -475,7 +475,7 @@ ini_set("post_max_size", "10485760");
 			while ($row = mysql_fetch_row($result)) {
 				$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND userid='$userid'";
+				$query = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND itemtype='A' AND userid='$userid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 			
@@ -497,6 +497,8 @@ ini_set("post_max_size", "10485760");
 					$query = "DELETE FROM imas_forum_views WHERE threadid='{$rw2[0]}' AND userid='$userid'";
 					mysql_query($query) or die("Query failed : " . mysql_error());
 				}
+				$q2 = "DELETE FROM imas_exceptions WHERE assessmentid='{$row[0]}' AND (itemtype='F' OR itemtype='P' OR itemtype='R') AND userid='$userid'";
+				mysql_query($q2) or die("Query failed : " . mysql_error());
 			}
 		}
 	} else if ($_GET['action']=="chguserinfo") {
