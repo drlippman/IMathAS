@@ -22,7 +22,7 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_POST['checked'])) { //if the form has been submitted
 		$checked = array();
 		foreach ($_POST['checked'] as $id) {
@@ -31,20 +31,26 @@ if (!(isset($teacherid))) {
 				$checked[] = $id;
 			}
 		}
-		$checkedlist = "'".implode("','",$checked)."'";
-		
+		$checkedlist = implode(',',$checked); //sanitized
+
 		$sets = array();
+		$qarr = array();
 		if (isset($_POST['docopyopt'])) {
 			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
-			
-			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+
+			//DB $query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			//DB $tocopyarr = explode(',',$tocopy);
+			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['copyopt']));
+			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
-				$sets[] = "$item='".addslashes($row[$k])."'";
+				//DB $sets[] = "$item='".addslashes($row[$k])."'";
+				$sets[] = "$item=:$item";
 			}
-			
+
 		} else {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
@@ -89,8 +95,8 @@ if (!(isset($teacherid))) {
 					$showhints = 0;
 				}
 			}
-			
-			
+
+
 			if ($_POST['skippenalty']==10) {
 				$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
 			} else if ($_POST['skippenalty']>0) {
@@ -107,81 +113,125 @@ if (!(isset($teacherid))) {
 			} else {
 				$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 			}
-	
-			
+
+
 			if (isset($_POST['chgtimelimit'])) {
 				$timelimit = $_POST['timelimit']*60;
 				if (isset($_POST['timelimitkickout'])) {
 					$timelimit = -1*$timelimit;
 				}
-				$sets[] = "timelimit='$timelimit'";
+				//DB $sets[] = "timelimit='$timelimit'";
+				$sets[] = "timelimit=:timelimit";
+				$qarr[':timelimit']=>$timelimit;
 			}
 			if (isset($_POST['chgtutoredit'])) {
-				$sets[] = "tutoredit='{$_POST['tutoredit']}'";
+				//DB $sets[] = "tutoredit='{$_POST['tutoredit']}'";
+				$sets[] = "tutoredit=:tutoredit";
+				$qarr[':tutoredit'] = $_POST['tutoredit'];
 			}
 			if (isset($_POST['chgdisplaymethod'])) {
-				$sets[] = "displaymethod='{$_POST['displaymethod']}'";
+				//DB $sets[] = "displaymethod='{$_POST['displaymethod']}'";
+				$sets[] = "displaymethod=:displaymethod";
+				$qarr[':displaymethod'] = $_POST['displaymethod'];
 			}
 			if (isset($_POST['chgdefpoints'])) {
-				$sets[] = "defpoints='{$_POST['defpoints']}'";
+				//DB $sets[] = "defpoints='{$_POST['defpoints']}'";
+				$sets[] = "defpoints=:defpoints";
+				$qarr[':defpoints'] = $_POST['defpoints'];
 			}
 			if (isset($_POST['chgdefattempts'])) {
-				$sets[] = "defattempts='{$_POST['defattempts']}'";
+				//DB $sets[] = "defattempts='{$_POST['defattempts']}'";
+				$sets[] = "defattempts=:defattempts";
+				$qarr[':defattempts'] = $_POST['defattempts'];
 			}
 			if (isset($_POST['chgdefpenalty'])) {
-				$sets[] = "defpenalty='{$_POST['defpenalty']}'";
+				//DB $sets[] = "defpenalty='{$_POST['defpenalty']}'";
+				$sets[] = "defpenalty=:defpenalty";
+				$qarr[':defpenalty'] = $_POST['defpenalty'];
 			}
 			if (isset($_POST['chgfeedback'])) {
-				$sets[] = "deffeedback='$deffeedback'";
+				//DB $sets[] = "deffeedback='$deffeedback'";
+				$sets[] = "deffeedback=:deffeedback";
+				$qarr[':deffeedback'] = $deffeedback;
 			}
 			if (isset($_POST['chggbcat'])) {
-				$sets[] = "gbcategory='{$_POST['gbcat']}'";
+				//DB $sets[] = "gbcategory='{$_POST['gbcat']}'";
+				$sets[] = "gbcategory=:gbcategory";
+				$qarr[':gbcategory'] = $_POST['gbcat'];
 			}
 			if (isset($_POST['chgallowlate'])) {
-				$sets[] = "allowlate='$allowlate'";
+				//DB $sets[] = "allowlate='$allowlate'";
+				$sets[] = "allowlate=:allowlate";
+				$qarr[':allowlate'] = $allowlate;
 			}
 			if (isset($_POST['chgexcpen'])) {
-				$sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
+				//DB $sets[] = "exceptionpenalty='{$_POST['exceptionpenalty']}'";
+				$sets[] = "exceptionpenalty=:exceptionpenalty";
+				$qarr[':exceptionpenalty'] = $_POST['exceptionpenalty'];
 			}
 			if (isset($_POST['chgpassword'])) {
-				$sets[] = "password='{$_POST['assmpassword']}'";
+				//DB $sets[] = "password='{$_POST['assmpassword']}'";
+				$sets[] = "password=:password";
+				$qarr[':password'] = $_POST['assmpassword'];
 			}
 			if (isset($_POST['chghints'])) {
-				$sets[] = "showhints='$showhints'";
+				//DB $sets[] = "showhints='$showhints'";
+				$sets[] = "showhints=:showhints";
+				$qarr[':showhints'] = $showhints;
 			}
 			if (isset($_POST['chgshowtips'])) {
-				$sets[] = "showtips='{$_POST['showtips']}'";
+				//DB $sets[] = "showtips='{$_POST['showtips']}'";
+				$sets[] = "showtips=:showtips";
+				$qarr[':showtips'] = $_POST['showtips'];
 			}
 			if (isset($_POST['chgnoprint'])) {
-				$sets[] = "noprint='{$_POST['noprint']}'";
+				//DB $sets[] = "noprint='{$_POST['noprint']}'";
+				$sets[] = "noprint=:noprint";
+				$qarr[':noprint'] = $_POST['noprint'];
 			}
 			if (isset($_POST['chgisgroup'])) {
-				$sets[] = "isgroup='{$_POST['isgroup']}'";
+				//DB $sets[] = "isgroup='{$_POST['isgroup']}'";
+				$sets[] = "isgroup=:isgroup";
+				$qarr[':isgroup'] = $_POST['isgroup'];
 			}
 			if (isset($_POST['chggroupmax'])) {
-				$sets[] = "groupmax='{$_POST['groupmax']}'";
+				//DB $sets[] = "groupmax='{$_POST['groupmax']}'";
+				$sets[] = "groupmax=:groupmax";
+				$qarr[':groupmax'] = $_POST['groupmax'];
 			}
 			if (isset($_POST['chgcntingb'])) {
-				$sets[] = "cntingb='{$_POST['cntingb']}'";
+				//DB $sets[] = "cntingb='{$_POST['cntingb']}'";
+				$sets[] = "cntingb=:cntingb";
+				$qarr[':cntingb'] = $_POST['cntingb'];
 			}
 			if (isset($_POST['chgminscore'])) {
 				if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
 					$_POST['minscore'] = intval($_POST['minscore'])+10000;
 				}
-				$sets[] = "minscore='{$_POST['minscore']}'";
+				//DB $sets[] = "minscore='{$_POST['minscore']}'";
+				$sets[] = "minscore=:minscore";
+				$qarr[':minscore'] = $_POST['minscore'];
 			}
 			if (isset($_POST['chgshowqcat'])) {
-				$sets[] = "showcat='{$_POST['showqcat']}'";
+				//DB $sets[] = "showcat='{$_POST['showqcat']}'";
+				$sets[] = "showcat=:showcat";
+				$qarr[':showcat'] = $_POST['showqcat'];
 			}
 			if (isset($_POST['chgeqnhelper'])) {
-				$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
+				//DB $sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
+				$sets[] = "eqnhelper=:eqnhelper";
+				$qarr[':eqnhelper'] = $_POST['eqnhelper'];
 			}
-			
+
 			if (isset($_POST['chgcaltag'])) {
 				$caltag = $_POST['caltagact'];
-				$sets[] = "caltag='$caltag'";
+				//DB $sets[] = "caltag='$caltag'";
+				$sets[] = "caltag=:caltag";
+				$qarr[':caltag'] = $caltag;
 				$calrtag = $_POST['caltagrev'];
-				$sets[] = "calrtag='$calrtag'";
+				//DB $sets[] = "calrtag='$calrtag'";
+				$sets[] = "calrtag=:calrtag";
+				$qarr[':calrtag'] = $calrtag;
 			}
 			if (isset($_POST['chgmsgtoinstr'])) {
 				if (isset($_POST['msgtoinstr'])) {
@@ -192,14 +242,18 @@ if (!(isset($teacherid))) {
 			}
 			if (isset($_POST['chgposttoforum'])) {
 				if (isset($_POST['doposttoforum'])) {
-					$sets[] = "posttoforum='{$_POST['posttoforum']}'";
+					//DB $sets[] = "posttoforum='{$_POST['posttoforum']}'";
+					$sets[] = "posttoforum=:posttoforum";
+					$qarr[':posttoforum'] = $_POST['posttoforum'];
 				} else {
 					$sets[] = "posttoforum=0";
 				}
 			}
 			if (isset($_POST['chgdeffb'])) {
 				if (isset($_POST['usedeffb'])) {
-					$sets[] = "deffeedbacktext='{$_POST['deffb']}'";
+					//DB $sets[] = "deffeedbacktext='{$_POST['deffb']}'";
+					$sets[] = "deffeedbacktext=:deffeedbacktext";
+					$qarr[':deffeedbacktext'] = $_POST['deffb'];
 				} else {
 					$sets[] = "deffeedbacktext=''";
 				}
@@ -227,11 +281,13 @@ if (!(isset($teacherid))) {
 				}
 				$shuff .= ")";
 				$sets[] = $shuff;
-				
+
 			}
 		}
 		if (isset($_POST['chgavail'])) {
-			$sets[] = "avail='{$_POST['avail']}'";
+			//DB $sets[] = "avail='{$_POST['avail']}'";
+			$sets[] = "avail=:avail";
+			$qarr[':avail'] = $_POST['avail'];
 		}
 		if (isset($_POST['chgreqscoretype'])) {
 			if ($_POST['reqscoretype']==0) {
@@ -240,36 +296,61 @@ if (!(isset($teacherid))) {
 				$sets[] = 'reqscore=-1*ABS(reqscore)';
 			}
 		}
-		
+
 		if (isset($_POST['chgintro'])) {
-			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
+			//DB $query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['intro']));
+			//DB $sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
+			$sets[] = "intro=:intro";
+			$qarr[':intro'] = $stm->fetchColumn(0);
 		}
 		if (isset($_POST['chgsummary'])) {
-			$query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$sets[] = "summary='".addslashes(mysql_result($result,0,0))."'";
+			//DB $query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT summary FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['summary']));
+			//DB $sets[] = "summary='".addslashes(mysql_result($result,0,0))."'";
+			//DB $sets[] = "summary=$summary";
+			$sets[] = "summary=:summary";
+			$qarr[':summary'] = $stm->fetchColumn(0);
 		}
 		if (isset($_POST['chgdates'])) {
-			$query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
-			$sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
+			//DB $query = "SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id='{$_POST['dates']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT startdate,enddate,reviewdate FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['dates']));
+			$row = $stm->fetch(PDO::FETCH_NUM);
+			//DB $sets[] = "startdate='{$row[0]}',enddate='{$row[1]}',reviewdate='{$row[2]}'";
+			$sets[] = "startdate=:startdate";
+			$qarr[':startdate'] = $row[0];
+			$sets[] = "enddate=:enddate";
+			$qarr[':enddate'] = $row[1];
+			$sets[] = "reviewdate=:reviewdate";
+			$qarr[':reviewdate'] = $row[2];
 		} if (isset($_POST['chgcopyendmsg'])) {
-			$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$sets[] = "endmsg='".addslashes(mysql_result($result,0,0))."'";
+			//DB $query = "SELECT endmsg FROM imas_assessments WHERE id='{$_POST['copyendmsg']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['copyendmsg']));
+			//DB $sets[] = "endmsg='".addslashes(mysql_result($result,0,0))."'";
+			$sets[] = "endmsg=:endmsg";
+			$qarr[':endmsg'] = $stm->fetchColumn(0);
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
-			$query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist);";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist);";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)");
+			$stm->execute($qarr);
 		}
-		
+
 		if (isset($_POST['removeperq'])) {
-			$query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->query("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)");
 		}
 
 		if (isset($_POST['chgendmsg'])) {
@@ -278,7 +359,7 @@ if (!(isset($teacherid))) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		}
 		exit;
-		 
+
 	} else { //DATA MANIPULATION FOR INITIAL LOAD
 		$line['displaymethod']= isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
 		$line['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:10;
@@ -306,12 +387,15 @@ if (!(isset($teacherid))) {
 			$line['defpenalty'] = substr($line['defpenalty'],2);
 		} else {
 			$skippenalty = 0;
-		}	
-		
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
-		$items = unserialize(mysql_result($result,0,0));
+		}
+
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+
+		//DB $items = unserialize(mysql_result($result,0,0));
+		$items = unserialize($stm->fetchColumn(0));
 		$gitypeids = array();
 		$ids = array();
 		$types = array();
@@ -321,47 +405,58 @@ if (!(isset($teacherid))) {
 		$agbcats = array();
 		$prespace = array();
 		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
-		
-		$query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)==0) {
+
+		//DB $query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result)==0) {
+		$stm = $DBH->prepare("SELECT id,name,gbcategory FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
+		$stm->execute(array(':courseid'=>$cid));
+		if ($stm->rowCount()==0) {
 			$page_assessListMsg = "<li>No Assessments to change</li>\n";
 		} else {
 			$page_assessListMsg = "";
 			$i=0;
 			$page_assessSelect = array();
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_assessSelect['val'][$i] = $row[0];
 				$page_assessSelect['label'][$i] = $row[1];
 				$agbcats[$row[0]] = $row[2];
 				$i++;
 			}
-		}	
-		
-		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		}
+
+		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
 		$i=1;
 		$page_gbcatSelect = array();
 		$page_gbcatSelect['val'][0] = 0;
 		$page_gbcatSelect['label'][0] ='Default';
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		//DB if (mysql_num_rows($result)>0) {
+			//DB while ($row = mysql_fetch_row($result)) {
+		if ($stm->rowCount()>0) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
 			}
 		}
-		
+
 		$page_forumSelect = array();
-		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid ORDER BY name");
+		$stm->execute(array(':courseid'=>$cid));
 		$page_forumSelect['val'][0] = 0;
 		$page_forumSelect['label'][0] = "None";
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
 		}
-		
+
 		$page_allowlateSelect = array();
 		$page_allowlateSelect['val'][0] = 0;
 		$page_allowlateSelect['label'][0] = "None";
@@ -372,10 +467,10 @@ if (!(isset($teacherid))) {
 			$page_allowlateSelect['label'][] = "Up to $k";
 		}
 
-		
+
 	}
 }
-	
+
 /******* begin html output ********/
  require("../header.php");
 
@@ -391,7 +486,7 @@ span.show {
 	display: inline;
 }
 table td {
-	border-bottom: 1px solid #ccf;	
+	border-bottom: 1px solid #ccf;
 }
 </style>
 <script type="text/javascript">
@@ -418,10 +513,10 @@ function copyfromtoggle(frm,mark) {
 					tds[i].style.display = "";
 				}
 			}
-				
+
 		} catch(er) {}
 	}
-	
+
 }
 function chkgrp(frm, arr, mark) {
 	  var els = frm.getElementsByTagName("input");
@@ -442,7 +537,7 @@ function chkgbcat(cat) {
 		  if (el.type=='checkbox' && el.id.match(regExp)) {
 	     	       el.checked = true;
 		  }
-	}	
+	}
 }
 function valform() {
 	if ($("#qform input:checkbox[name='checked[]']:checked").length == 0) {
@@ -468,17 +563,17 @@ $(function() {
 			$(this).parents("tr").removeClass("odd");
 		}*/
 	});
-		
+
 })
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerchgassessments" class="pagetitle"><h2>Mass Change Assessment Settings 
+	<div id="headerchgassessments" class="pagetitle"><h2>Mass Change Assessment Settings
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h2></div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
-	<p><b>Be aware</b> that changing default points or penalty after an assessment has been 
+	<p><b>Be aware</b> that changing default points or penalty after an assessment has been
 	 taken will not change the scores of students who have already completed the assessment.<br/>
 	 This page will <i>always</i> show the system default settings; it does not show the current settings for your assessments.</p>
 
@@ -486,8 +581,8 @@ $(function() {
 		<h3>Assessments to Change</h3>
 
 		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
-		Check by gradebook category: 
-		<?php 
+		Check by gradebook category:
+		<?php
 		writeHtmlSelect ("selbygbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
 		?>
 		<ul id="alistul" class=nomark>
@@ -495,7 +590,7 @@ $(function() {
 	echo $page_assessListMsg;
 	$inblock = 0;
 	for ($i = 0 ; $i<(count($ids)); $i++) {
-			
+
 			if (strpos($types[$i],'Block')!==false) {
 				if ($blockout!='' && $blockid==$parents[$i]) {
 					echo "<li>$blockout</li>";
@@ -506,7 +601,7 @@ $(function() {
 				$blockout .='/>';
 				$blockout .= '<i>'.$prespace[$i].$names[$i].'</i>';
 				$blockid = $ids[$i];
-				
+
 			} else {
 				if ($blockout!='' && $blockid==$parents[$i]) {
 					echo "<li>$blockout</li>";
@@ -522,9 +617,9 @@ $(function() {
 				echo $prespace[$i].$names[$i];
 				echo '</li>';
 			}
-			
+
 	}
-	
+
 	/*for ($i=0;$i<count($page_assessSelect['val']);$i++) {
 ?>
 			<li><input type=checkbox name='checked[]' value='<?php echo $page_assessSelect['val'][$i] ?>' checked=checked><?php echo $page_assessSelect['label'][$i] ?></li>
@@ -543,7 +638,7 @@ $(function() {
 			<tr>
 				<td><input type="checkbox" name="chgsummary" class="chgbox"/></td>
 				<td class="r">Summary:</td>
-				<td>Copy from: 
+				<td>Copy from:
 <?php
 	writeHtmlSelect("summary",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
@@ -553,7 +648,7 @@ $(function() {
 			<tr>
 				<td><input type="checkbox" name="chgintro" class="chgbox"/></td>
 				<td class="r">Instructions:</td>
-				<td>Copy from: 
+				<td>Copy from:
 <?php
 	writeHtmlSelect("intro",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
@@ -641,7 +736,7 @@ $(function() {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
 				<td class="r">Default penalty:</td>
-				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
+				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
    					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
 						<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
 						<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -693,14 +788,14 @@ $(function() {
 					</span>
 				</td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
 				<td class="r">Use equation helper?</td>
 				<td>
 				<select name="eqnhelper">
 					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
-				<?php	
+				<?php
 					//phase out unless a default
 					if ($CFG['AMS']['eqnhelper']==1 || $CFG['AMS']['eqnhelper']==2) {
 				?>
@@ -760,7 +855,7 @@ $(function() {
 				<td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
 				<td class="r">Make hard to print?: </td>
 				<td>
-				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes 
+				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes
 				</td>
 			</tr>
 			<tr class="coptr">
@@ -770,13 +865,13 @@ $(function() {
 				<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
 				</td>
 			</tr>
-			
-			
+
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
 				<td class="r">Gradebook category: </td>
 				<td>
-<?php 
+<?php
 writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,null,null," id=gbcat");
 ?>
 
@@ -790,11 +885,11 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 $page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 $page_tutorSelect['val'] = array(2,0,1);
 writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
-			
+
 ?>
 				</td>
 			</tr>
-				
+
 			<tr class="coptr">
 				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
 				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
@@ -804,13 +899,13 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
 				</td>
 			</tr>
-			
-			
+
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
-				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>, 
+				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>,
 				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
 				</td>
 			<tr class="coptr">
@@ -818,9 +913,9 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td class="r">Minimum score to receive credit: </td>
 				<td>
 				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
-				<input type="radio" name="minscoretype" value="0" checked="checked"> Points 
-				<input type="radio" name="minscoretype" value="1"> Percent 
-	
+				<input type="radio" name="minscoretype" value="0" checked="checked"> Points
+				<input type="radio" name="minscoretype" value="1"> Percent
+
 				</td>
 			</tr>
 			<tr class="coptr">
@@ -854,7 +949,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td class="r">All students same version of questions: </td>
 				<td><input type="checkbox" name="samever"></td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
@@ -862,7 +957,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
 				</td>
 			</tr>
-<?php 
+<?php
 /* removed because gets too confusing with group sets
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgisgroup"/></td>
@@ -872,7 +967,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type="radio" name="isgroup" value="2"  />Students can add members without passwords<br/>
 				<input type="radio" name="isgroup" value="3"  />Students cannot add members</td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chggroupmax"/></td>
 				<td class="r">Max group members (if group assessment):</td>
@@ -897,7 +992,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type="checkbox" name="istutorial"/>
 				</td>
 			</tr>
-			<tr>	
+			<tr>
 				<td style="border-top: 1px solid #000"></td>
 				<td class="r" style="border-top: 1px solid #000">Define end of assessment messages?</td>
 				<td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" class="chgbox"/> You will be taken to a page to change these after you hit submit</td>

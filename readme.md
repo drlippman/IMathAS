@@ -87,6 +87,15 @@ C validate        26
  C addrubric        4
  C addvideotimes    3
  C addwiki          9
+ C assessendmsg     2
+ C categorize       8
+ C chgassessments   11
+ C chgblocks        3
+ * chkforums          come back to this after merging forum exception branched
+ C chgoffline       6
+ C claimbadge       3
+ C contentstats     3
+
 
 /diag              done
   C index          18

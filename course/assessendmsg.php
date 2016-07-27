@@ -1,5 +1,5 @@
 <?php
-//IMathAS:  Add end messages 
+//IMathAS:  Add end messages
 //(c) 2008 David Lippman
 
 if (!isset($imasroot)) {
@@ -10,7 +10,7 @@ if (!isset($imasroot)) {
 	}
 }
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_GET['record'])) {
 		$endmsg = array();
 		$endmsg['type'] = $_POST['type'];
@@ -30,21 +30,27 @@ if (!isset($imasroot)) {
 		$endmsg['commonmsg'] = myhtmLawed(stripslashes($_POST['commonmsg']));
 		$msgstr = addslashes(serialize($endmsg));
 		if (isset($_POST['aid'])) {
-			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";
+			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id=:id");
+			$stm->execute(array(':endmsg'=>$msgstr, ':id'=>$_POST['aid']));
 		} else if (isset($_POST['aidlist'])) {
-			$aidlist = "'".implode("','",explode(',',$_POST['aidlist']))."'";
-			$query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id IN ($aidlist)";
+			//DB $aidlist = "'".implode("','",explode(',',$_POST['aidlist']))."'";
+			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id IN ($aidlist)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$aidlist = implode(',', array_map('intval', explode(',',$_POST['aidlist'])));
+			$stm = $DBH->prepare("UPDATE imas_assessments SET endmsg=:endmsg WHERE id IN ($aidlist)");
+			$stm->execute(array(':endmsg'=>$msgstr));
+
 		}
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
-			
-		exit;	
+
+		exit;
 	}
-	
+
 	$pagetitle = "End of Assessment Messages";
 	$useeditor = "commonmsg";
-	
+
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	if (!isset($_POST['checked'])) {
@@ -53,9 +59,12 @@ if (!isset($imasroot)) {
 		echo "&gt; <a href=\"chgassessments.php?cid=$cid\">Mass Change Assessments</a> &gt; End of Assessment Msg</div>\n";
 	}
 	if (!isset($_POST['checked'])) {
-		$query = "SELECT endmsg FROM imas_assessments WHERE id='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$endmsg = mysql_result($result,0,0);
+		//DB $query = "SELECT endmsg FROM imas_assessments WHERE id='{$_GET['aid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $endmsg = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT endmsg FROM imas_assessments WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['aid']));
+		$endmsg = $stm->fetchColumn(0);
 	} else {
 		$endmsg = '';
 		if (count($_POST['checked'])==0) {
@@ -86,7 +95,7 @@ if (!isset($imasroot)) {
 	echo ' />Points <input type="radio" name="type" value="1" ';
 	if ($endmsg['type']==1) { echo 'checked="checked"';}
 	echo ' />Percents</p>';
-	
+
 	echo '<table class="gb"><thead><tr><th>If score is at least</th><th>Display this message</th></tr></thead><tbody>';
 	$i=1;
 	foreach($endmsg['msgs'] as $sc=>$msg) {
@@ -110,7 +119,7 @@ if (!isset($imasroot)) {
 	echo '<div class="submit"><input type="submit" value="'._('Save').'" /></div>';
 	echo '</form>';
 ?>
-<p>Order of entries is not important; the message with highest applicable score will be reported.  
+<p>Order of entries is not important; the message with highest applicable score will be reported.
 The "otherwise, show" message will display if no other score messages are defined.  Use this instead
 of trying to create a 0 score entry</p>
 <?php
