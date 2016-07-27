@@ -112,6 +112,12 @@ C validate        26
  C deleteinlinetext 9
  C deletelinkedtext 9
  C deletewiki       8
+ C delitembyid      24  
+ C drillassess      8
+ C edittoolscores   11
+ 0 embedhelper      
+ 
+
 
 /diag              done
   C index          18
