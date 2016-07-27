@@ -15,13 +15,43 @@ function refreshTable() {
 	      rendermathnode(document.getElementById("curqtbl"));
          }
          updateqgrpcookie();
+	initeditor("selector",".textsegment",null,true /*inline*/,editorSetup);
+	activateLastEditorIfBlank();
 }
+
+//Show the editor toolbar on a newly created text segment
+function activateLastEditorIfBlank() {
+	last_editor = tinymce.editors[tinymce.editors.length-1];
+	if (last_editor.getContent()=="") {
+		tinyMCE.setActive(last_editor);
+		last_editor.fire("focus");
+		last_editor.selection.setCursorLocation();
+	}
+}
+
+//this is called by tinycme during initialization
+function editorSetup(editor) {
+	editor.on("blur", function() {
+		var i=this.id.match(/[0-9]+$/)[0];
+		savetextseg(i);
+	});
+	editor.on("focus", function() {
+		var i=this.id.match(/[0-9]+$/)[0];
+		edittextseg(i);
+	});
+}
+
 function generateMoveSelect2(num) {
 	var thisistxt = (itemarray[num][0]=="text");
 	num++; //adjust indexing
 	var sel = "<select id="+num+" onChange=\"moveitem2("+num+")\">";
 	var qcnt = 1; var tcnt = 1; var curistxt = false;
 	for (var i=1; i<=itemarray.length; i++) {
+		//TODO something goes wrong if there are two text segments at the end of an assignment
+if (typeof itemarray[i-1]=="undefined") {
+	alert("itemarray["+(i-1)+"] undefined "+itemarray.length);
+	continue;
+}
 		curistxt = (itemarray[i-1][0]=="text");
 		sel += "<option value=\""+i+"\" ";
 		if (i==num) {
@@ -287,24 +317,22 @@ function updateGrpT(num) {
 }
 
 function edittextseg(i) {
-	var el = $("#textsegdescr"+i).html(
-		$('<textarea>').val(itemarray[i][1]).before("Text: ")
-	).append(
-		$('<button>', {text: "Done", type: "button"}).on("click",function() {savetextseg(i);})
-	);
+	tinyMCE.get("textsegdesdiv"+i).setContent(itemarray[i][1]);
+
 	if (itemarray[i][3]==1) {
-		el.prepend(
-			$('<input>', {type:"text"}).val(itemarray[i][4]).after("<br/>")
-		).prepend("Page Title: ");
+		tinyMCE.get("textsegdesheader"+i).setContent(itemarray[i][4]);
 	}
 }
 
 function savetextseg(i) {
-	itemarray[i][1] = $("#textsegdescr"+i).find("textarea").val();
-	if (itemarray[i][3]==1) {
-		itemarray[i][4] = $("#textsegdescr"+i).find("input[type=text]").val();
+	if (tinyMCE.get("textsegdesdiv"+i).isDirty() ||
+			(tinyMCE.get("textsegdesheader"+i) && tinyMCE.get("textsegdesheader"+i).isDirty()) ) {
+		itemarray[i][1] = tinyMCE.get("textsegdesdiv"+i).getContent();
+		if (itemarray[i][3]==1) {
+			itemarray[i][4] = tinyMCE.get("textsegdesheader"+i).getContent();
+		}
+		submitChanges();
 	}
-	submitChanges();
 }
 function updateTextShowN(i) {
 	itemarray[i][2] = $("#showforn"+i).val();
@@ -318,6 +346,8 @@ function chgpagetitle(i) {
 			var words = strip_tags(itemarray[i][1]).split(" ");
 			if (words.length > 2) {
 				itemarray[i][4] = words.slice(0,3).join(" ");
+			} else {
+				itemarray[i][4] = "Page title (click to edit)";
 			}
 		}
 	} else {
@@ -388,6 +418,7 @@ function updateqgrpcookie() {
 function generateTable() {
 	olditemarray = itemarray;
 	itemcount = itemarray.length;
+	//string that's unique to each generateTable() call for unique ids
 	var alt = 0;
 	var ln = 0;
 	var pttotal = 0;
@@ -496,15 +527,15 @@ function generateTable() {
 				if (displaymethod=="Embed") {
 					html += "<td colspan=6 id=\"textsegdescr"+i+"\">";
 					if (curitems[j][3]==1) {
-						html += "Page Title: "+	strip_tags(curitems[j][4]).substr(0,50)+"<br/>";
+						html += "<h4 id=\"textsegdesheader"+i+"\" class=\"textsegment\">"+strip_tags(curitems[j][4]).substr(0,50)+"</h2>";
 					} 
-					html += "Text: "+strip_tags(curitems[j][1]).substr(0,55)+"</td>"; //description
+					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+strip_tags(curitems[j][1]).substr(0,55)+"</div></td>"; //description
 					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
 					html += '<label><input type="checkbox" id="ispagetitle'+i+'" onchange="chgpagetitle('+i+')" ';
 					if (curitems[j][3]==1) { html += "checked";}
 					html += '>New page<label></td>';
 				} else {
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\">Text: "+strip_tags(curitems[j][1]).substr(0,55)+"</td>"; //description
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\" ><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+strip_tags(curitems[j][1]).substr(0,55)+"</div></td>"; //description
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
@@ -614,9 +645,9 @@ function check_textseg_itemarray() {
 		alert("If you are using page titles, you need to have a page title at the beginning.");
 		if (itemarray[0][0]=="text") {
 			itemarray[0][3] = 1;
-			itemarray[0][4] = "First Page";
+			itemarray[0][4] = "First Page Title";
 		} else {
-			itemarray.unshift(["text","",1,1,"First Page",1]);
+			itemarray.unshift(["text","",1,1,"First Page Title",1]);
 		}
 	}
 }

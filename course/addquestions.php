@@ -514,6 +514,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	$jsarr .= ']';
+	$jsarr = str_replace("\n",'',$jsarr);
 	
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
@@ -1096,6 +1097,7 @@ if ($overwriteBody==1) {
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>; 
 		var displaymethod = "<?php echo $displaymethod;?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
+		initeditor("selector",".textsegment",null,true /*inline*/,editorSetup);
 	</script>
 <?php
 	}

@@ -281,16 +281,22 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-function initeditor(edmode,edids,css){
+function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
+	var inlinemode = inline || 0;
 	var selectorstr = '';
 	if (edmode=="exact") { //list of IDs
 		selectorstr = '#'+edids.split(/,/).join(",#");
 	} else if (edmode=="textareas") { //class-based selection
 		selectorstr = "textarea."+edids;
+	} else if (edmode=="divs") { //class-based selection
+		selectorstr = "div."+edids;
+	} else if (edmode=="selector") { //flexible selector
+		selectorstr = edids;
 	}
 	var edsetup = {
 		selector: selectorstr,
+		inline: inlinemode,
 		plugins: [
 			"advlist attach image charmap anchor",
 			"searchreplace code link textcolor",
@@ -356,6 +362,9 @@ function initeditor(edmode,edids,css){
 		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
 	} 
+	if (setupfunction) {
+		edsetup.setup = setupfunction;
+	}
 	for (var i in tinymce.editors) {
 		tinymce.editors[i].remove();
 	}
