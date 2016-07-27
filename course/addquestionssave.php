@@ -7,10 +7,13 @@
 	if (!isset($teacherid)) {
 		echo "error: validation";
 	}
-	$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error()); 
-	$rawitemorder = mysql_result($result,0,0);
-	$viddata = mysql_result($result,0,1);
+	//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($rawitemorder, $viddata) = $stm->fetch(PDO::FETCH_NUM);
+	//DB $rawitemorder = mysql_result($result,0,0);
+	//DB $viddata = mysql_result($result,0,1);
 	$itemorder = str_replace('~',',',$rawitemorder);
 	$curitems = array();
 	foreach (explode(',',$itemorder) as $qid) {
@@ -18,7 +21,7 @@
 			$curitems[] = $qid;
 		}
 	}
-	
+
 	$submitted = $_GET['order'];
 	$submitted = str_replace('~',',',$submitted);
 	$newitems = array();
@@ -28,7 +31,7 @@
 		}
 	}
 	$toremove = array_diff($curitems,$newitems);
-	
+
 	if ($viddata != '') {
 		$viddata = unserialize($viddata);
 		$qorder = explode(',',$rawitemorder);
@@ -45,7 +48,7 @@
 				$qidbynum[$i] = $qorder[$i];
 			}
 		}
-		
+
 		$qorder = explode(',',$_GET['order']);
 		$newbynum = array();
 		for ($i=0;$i<count($qorder);$i++) {
@@ -60,13 +63,13 @@
 				$newbynum[$i] = $qorder[$i];
 			}
 		}
-		
+
 		$qidbynumflip = array_flip($qidbynum);
-		
+
 		$newviddata = array();
-		$newviddata[0] = $viddata[0]; 
+		$newviddata[0] = $viddata[0];
 		for ($i=0;$i<count($newbynum);$i++) {   //for each new item
-			$oldnum = $qidbynumflip[$newbynum[$i]];   
+			$oldnum = $qidbynumflip[$newbynum[$i]];
 			$found = false; //look for old item in viddata
 			for ($j=1;$j<count($viddata);$j++) {
 				if (isset($viddata[$j][2]) && $viddata[$j][2]==$oldnum) {
@@ -91,23 +94,27 @@
 			}
 		}
 		//any old items will not get copied.
-		$viddata = addslashes(serialize($newviddata));
-				
-		
+		//DB $viddata = addslashes(serialize($newviddata));
+		$viddata = serialize($newviddata);
 	}
-	
-	//delete any removed questions
-	$query = "DELETE FROM imas_questions WHERE id IN ('".implode("','",$toremove)."')";
-	mysql_query($query) or die("Query failed : " . mysql_error()); 
-	
+
 	//store new itemorder
-	$query = "UPDATE imas_assessments SET itemorder='{$_GET['order']}',viddata='$viddata' WHERE id='$aid'";
-	mysql_query($query) or die("Query failed : " . mysql_error()); 
-	
-	if (mysql_affected_rows()>0) {
+	//DB $query = "UPDATE imas_assessments SET itemorder='{$_GET['order']}',viddata='$viddata' WHERE id='$aid'";
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id AND courseid=:courseid");
+	$stm->execute(array(':itemorder'=>$_GET['order'], ':viddata'=>$viddata, ':id'=>$aid, ':courseid'=>$cid));
+
+	//DB if (mysql_affected_rows()>0) {
+	if ($stm->rowCount()>0) {
+		//delete any removed questions
+		//DB $query = "DELETE FROM imas_questions WHERE id IN ('".implode("','",$toremove)."')";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$toremove = implode(',', array_map('intval', $toremove));
+		$stm = $DBH->query("DELETE FROM imas_questions WHERE id IN ($toremove)");
+
 		echo "OK";
 	} else {
 		echo "error: not saved";
 	}
-	
+
 ?>

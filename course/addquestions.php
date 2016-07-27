@@ -20,7 +20,7 @@ if (isset($_GET['clearattempts']) || isset($_GET['clearqattempts']) || isset($_G
 } else {
 	$curBreadcrumb .= "&gt; Add/Remove Questions\n";
 	//$pagetitle = "Add Inline Text";
-}	
+}
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -29,9 +29,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	
+
 	$cid = $_GET['cid'];
-	$aid = $_GET['aid'];	
+	$aid = $_GET['aid'];
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = $_GET['grp']; writesessiondata();}
 	if (isset($_GET['selfrom'])) {
 		$sessiondata['selfrom'.$aid] = $_GET['selfrom'];
@@ -42,13 +42,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			writesessiondata();
 		}
 	}
-	
+
 	if (isset($teacherid) && isset($_GET['addset'])) {
 		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 			$overwriteBody = 1;
 			$body = "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
 		} else if (isset($_POST['add'])) {
-			include("modquestiongrid.php");	
+			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
@@ -56,19 +56,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$checked = $_POST['nchecked'];
 			foreach ($checked as $qsetid) {
+				//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
+				//DB $query .= "VALUES ('$aid',9999,9999,9999,'$qsetid');";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $qids[] = mysql_insert_id();
 				$query = "INSERT INTO imas_questions (assessmentid,points,attempts,penalty,questionsetid) ";
-				$query .= "VALUES ('$aid',9999,9999,9999,'$qsetid');";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$qids[] = mysql_insert_id();
+				$query .= "VALUES (:assessmentid, :points, :attempts, :penalty, :questionsetid);";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$aid, ':points'=>9999, ':attempts'=>9999, ':penalty'=>9999, ':questionsetid'=>$qsetid));
+				$qids[] = $DBH->lastInsertId();
 			}
 			//add to itemorder
-			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+			//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			$row = $stm->fetch(PDO::FETCH_NUM);
 			if ($row[0]=='') {
 				$itemorder = implode(",",$qids);
 			} else {
-				$itemorder  = $row[0] . "," . implode(",",$qids);	
+				$itemorder  = $row[0] . "," . implode(",",$qids);
 			}
 			$viddata = $row[1];
 			if ($viddata != '') {
@@ -90,13 +98,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if ($finalseg != '') {
 					$viddata[] = $finalseg;
 				}
-				$viddata = addslashes(serialize($viddata));
+				//DB $viddata = addslashes(serialize($viddata));
+				$viddata = serialize($viddata);
 			}
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
-		}	
+		}
 	}
 	if (isset($_GET['modqs'])) {
 		if (!isset($_POST['checked']) && !isset($_POST['qids'])) {
@@ -114,19 +125,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($aid);
-			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='$aid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='$aid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$aid));
+			//DB $query = "DELETE FROM imas_livepoll_status WHERE assessmentid='$aid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$aid));
+			//DB $query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='$aid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$aid));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
 		} else {
-			$overwriteBody = 1; 
-			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['aid']}";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$assessmentname = mysql_result($result,0,0);
+			$overwriteBody = 1;
+			//DB $query = "SELECT name FROM imas_assessments WHERE id={$_GET['aid']}";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $assessmentname = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['aid']));
+			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
@@ -134,7 +154,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid';\"></p>\n";
 		}
 	}
-	/*  
+	/*
 	9/25/14: Doesn't appear to get referenced anywhere
 	if (isset($_GET['clearqattempts'])) {
 		if (isset($_GET['confirmed'])) {
@@ -158,9 +178,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$lastanswers = explode('~',$line['lastanswers']);
 						$bestattempts = explode(',',$line['bestattempts']);
 						$bestlastanswers = explode('~',$line['bestlastanswers']);
-						
+
 						if (strpos($line['scores'],';')===false) {
-							//old format	
+							//old format
 							$scores = explode(',',$line['scores']);
 							$bestscores = explode(',',$line['bestscores']);
 							$scores[$qloc] = -1;
@@ -184,9 +204,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$firstscores[$qloc] = -1;
 							$bestscorelist = implode(',',$bestscores).';'.implode(',',$bestrawscores).';'.implode(',',$firstscores);
 						}
-						
-						
-						
+
+
+
 						$attempts[$qloc] = 0;
 						$lastanswers[$qloc] = '';
 						$bestattempts[$qloc] = 0;
@@ -195,12 +215,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$lalist = addslashes(implode('~',$lastanswers));
 						$bestattemptslist = implode(',',$attempts);
 						$bestlalist = addslashes(implode('~',$lastanswers));
-						
+
 						$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
 						$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist' ";
 						$query .= "WHERE id='{$line['id']}'";
 						mysql_query($query) or die("Query failed : " . mysql_error());
-					} 
+					}
 				}
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 				exit;
@@ -229,11 +249,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$isingroup = false;
 				$toremove = $_GET['withdraw'];
 			}
-			$query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = explode(',',mysql_result($result,0,0));
-			$defpoints = mysql_result($result,0,1);
-			
+			//DB $query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			//DB $itemorder = explode(',',mysql_result($result,0,0));
+			//DB $defpoints = mysql_result($result,0,1);
+			list($itemorder, $defpoints) = $stm-fetch(PDO::FETCH_NUM);
+			$itemorder = explode(',', $itemorder);
+
+
 			$qids = array();
 			if ($isingroup && $_POST['withdrawtype']!='full') { //is group remove
 				$qids = explode('~',$itemorder[$toremove]);
@@ -249,21 +274,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else { //is regular item remove
 				$qids = array($itemorder[$toremove]);
 			}
-			$qidlist = implode(',',$qids);
+			$qidlist = implode(',',array_map('intval',$qids));
 			//withdraw question
 			$query = "UPDATE imas_questions SET withdrawn=1";
 			if ($_POST['withdrawtype']=='zero' || $_POST['withdrawtype']=='groupzero') {
 				$query .= ',points=0';
 			}
-			$query .= " WHERE id IN ($qidlist)"; 
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
+			$query .= " WHERE id IN ($qidlist)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->query($query);
+
 			//get possible points if needed
 			if ($_POST['withdrawtype']=='full' || $_POST['withdrawtype']=='groupfull') {
 				$poss = array();
 				$query = "SELECT id,points FROM imas_questions WHERE id IN ($qidlist)";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->query($query);
+				//DB while ($row = mysql_fetch_row($result)) {
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if ($row[1]==9999) {
 						$poss[$row[0]] = $defpoints;
 					} else {
@@ -271,11 +299,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
-			
+
 			//update assessment sessions
-			$query = "SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT id,questions,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$aid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				//$qarr = explode(',',$row[1]);
 				if (strpos($row[1],';')===false) {
 					$qarr = explode(",",$row[1]);
@@ -307,13 +338,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else {
 					$slist = implode(',',$bestscores );
 				}
-				$query = "UPDATE imas_assessment_sessions SET bestscores='$slist' WHERE id='{$row[0]}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$slist' WHERE id='{$row[0]}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores WHERE id=:id");
+				$stm->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
 			}
-			
+
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
 			exit;
-			
+
 		} else {
 			if (strpos($_GET['withdraw'],'-')!==false) {
 				$isingroup = true;
@@ -336,14 +369,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= '<p>This action can <b>not</b> be undone.</p>';
 			$body .= '<p><input type=submit value="Withdraw Question">';
 			$body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addquestions.php?cid=$cid&aid=$aid'\"></p>\n";
-			
+
 			$body .= '</form>';
 		}
-		
+
 	}
-	
+
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid";
-	
+
 	$placeinhead = "<script type=\"text/javascript\">
 		var previewqaddr = '$imasroot/course/testquestion.php?cid=$cid';
 		var addqaddr = '$address';
@@ -352,31 +385,39 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=030315\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savelibassignflag.php';</script>";
-	
-	
+
+
 	//DEFAULT LOAD PROCESSING GOES HERE
 	//load filter.  Need earlier than usual header.php load
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	require_once("$curdir/../filter/filter.php");
-	
+
+	//DB $query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+	//DB $query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result) > 0) {
 	$query = "SELECT ias.id FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-	$query .= "ias.assessmentid='$aid' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid' LIMIT 1";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result) > 0) {
+	$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid LIMIT 1";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
+	if ($stm->rowCount() > 0) {
 		$beentaken = true;
 	} else {
 		$beentaken = false;
 	}
-	
-	$query = "SELECT itemorder,name,defpoints,displaymethod,showhints FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$itemorder = mysql_result($result, 0,0);
-	$page_assessmentName = mysql_result($result,0,1);
+
+	//DB $query = "SELECT itemorder,name,defpoints,displaymethod,showhints FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT itemorder,name,defpoints,displaymethod,showhints FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($itemorder,$page_assessmentName,$defpoints,$displaymethod,$showhintsdef) = $stm->fetch(PDO::FETCH_NUM);
+	//DB $itemorder = mysql_result($result, 0,0);
+	//DB $page_assessmentName = mysql_result($result,0,1);
+	//DB $defpoints = mysql_result($result,0,2);
+	//DB $displaymethod = mysql_result($result,0,3);
+	//DB $showhintsdef = mysql_result($result,0,4);
 	$ln = 1;
-	$defpoints = mysql_result($result,0,2);
-	$displaymethod = mysql_result($result,0,3);
-	$showhintsdef = mysql_result($result,0,4);
-	
+
 	$grp0Selected = "";
 	if (isset($sessiondata['groupopt'.$aid])) {
 		$grp = $sessiondata['groupopt'.$aid];
@@ -385,7 +426,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$grp = 0;
 		$grp0Selected = " selected";
 	}
-	
+
 	$jsarr = '[';
 	if ($itemorder != '') {
 		$items = explode(",",$itemorder);
@@ -405,22 +446,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if (count($subs)>1) {
 			if (strpos($subs[0],'|')===false) { //for backwards compat
-				$jsarr .= '[1,0,['; 
+				$jsarr .= '[1,0,[';
 			} else {
 				$grpparts = explode('|',$subs[0]);
 				$jsarr .= '['.$grpparts[0].','.$grpparts[1].',[';
 				array_shift($subs);
 			}
-		} 
+		}
 		for ($j=0;$j<count($subs);$j++) {
+			//DB $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
+			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			$query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':id'=>$subs[$j]));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$existingq[] = $line['questionsetid'];
 			if ($j>0) {
 				$jsarr .= ',';
-			} 
+			}
 			//output item array
 			$jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
 			if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid || $adminasteacher) { //can edit without template?
@@ -476,10 +522,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		unset($subs);
 	}
 	$jsarr .= ']';
-	
+
 	//DATA MANIPULATION FOR POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
-	
+
 		//remember search
 		if (isset($_POST['search'])) {
 			$safesearch = trim($_POST['search']);
@@ -517,32 +563,45 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$searchmine = 0;
 			$safesearch = '';
 		}
+		$searchlikevals = array();
 		if (trim($safesearch)=='') {
 			$searchlikes = '';
 		} else {
 			if (substr($safesearch,0,6)=='regex:') {
 				$safesearch = substr($safesearch,6);
-				$searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
+				//DB $searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
+				$searchlikes = "imas_questionset.description REGEXP ? AND ";
+				$searchlikevals[] = $safesearch;
 			} else {
 				$searchterms = explode(" ",$safesearch);
 				$searchlikes = '';
 				foreach ($searchterms as $k=>$v) {
 					if (substr($v,0,5) == 'type=') {
-						$searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
+						//DB $searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
+						$searchlikes .= "imas_questionset.qtype=? AND ";
+						$searchlikevals[] = substr($v,5);
 						unset($searchterms[$k]);
 					}
 				}
-				$searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+				//DB $searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+				$searchlikes = "((imas_questionset.description LIKE ?".str_repeat(" AND imas_questionset.description LIKE ?",count($searchterms)-1).") ";
+				foreach ($searchterms as $t) {
+					$searchlikevals[] = "%$t%";
+				}
 				if (substr($safesearch,0,3)=='id=') {
-					$searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+					//DB $searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+					$searchlikes = "imas_questionset.id=? AND ";
+					$searchlikevals[] = substr($safesearch,3);
 				} else if (is_numeric($safesearch)) {
-					$searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+					//DB $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+					$searchlikes .= "OR imas_questionset.id=?) AND ";
+					$searchlikevals[] = $safesearch;
 				} else {
 					$searchlikes .= ") AND";
 				}
 			}
 		}
-		
+
 		if (isset($_POST['libs'])) {
 			if ($_POST['libs']=='') {
 				$_POST['libs'] = $userdeflib;
@@ -567,11 +626,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			if (isset($CFG['AMS']['guesslib']) && count($existingq)>0) {
 				$maj = count($existingq)/2;
-				$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
-				$query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
-				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$existingqlist = implode(',', $existingq);  //pulled from database, so no quotes needed
+				//DB $query = "SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid";
+				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$stm = $DBH->query("SELECT libid,COUNT(qsetid) FROM imas_library_items WHERE qsetid IN ($existingqlist) GROUP BY libid");
 				$foundmaj = false;
-				while ($row = mysql_fetch_row($result)) {
+				//DB while ($row = mysql_fetch_row($result)) {
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if ($row[1]>=$maj) {
 						$searchlibs = $row[0];
 						$foundmaj = true;
@@ -581,13 +642,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				if (!$foundmaj) {
 					//echo "No maj found";
 					$searchlibs = $userdeflib;
-				}	
+				}
 			} else {
 				$searchlibs = $userdeflib;
 			}
 		}
-		$llist = "'".implode("','",explode(',',$searchlibs))."'";
-		
+		//DB $llist = "'".implode("','",explode(',',$searchlibs))."'";
+		$llist = implode(',',array_map('intval', explode(',',$searchlibs)));
+
 		if (!$beentaken) {
 			//potential questions
 			$libsortorder = array();
@@ -595,10 +657,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$lnamesarr[0] = "Unassigned";
 				$libsortorder[0] = 0;
 			}
-			
-			$query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+
+			//DB $query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT name,id,sortorder FROM imas_libraries WHERE id IN (:llist)");
+			$stm->execute(array(':llist'=>$llist));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$lnamesarr[$row[1]] = $row[0];
 				$libsortorder[$row[1]] = $row[2];
 			}
@@ -607,43 +672,71 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 
 			if (isset($search) && ($searchall==0 || $searchlikes!='')) {
+				$qarr = $searchlikevals;
+				//DB $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
+				//DB $query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
+				//DB $query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
+				//DB $query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
-				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes "; //imas_questionset.description LIKE '%$safesearch%' ";
-				$query .= " (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)";
-		
+				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
+				$query .= " (imas_questionset.ownerid=:ownerid OR imas_questionset.userights>0)";
+				$qarr[] = $userid;
+
 				if ($searchall==0) {
-					$query .= "AND imas_library_items.libid IN ($llist)";
+					$query .= "AND imas_library_items.libid IN ($llist)"; //pre-sanitized
 				}
 				if ($searchmine==1) {
-					$query .= " AND imas_questionset.ownerid='$userid'";
+					//DB $query .= " AND imas_questionset.ownerid='$userid'";
+					$query .= " AND imas_questionset.ownerid=?";
+					$qarr[] = $userid;
 				} else {
-					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userid') "; 
+					$query .= " AND (imas_library_items.libid > 0 OR imas_questionset.ownerid=?) ";
+					$qarr[] = $userid;
 				}
 				$query .= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.id";
 				if ($searchall==1) {
 					$query .= " LIMIT 300";
 				}
+
 				if ($search=='recommend' && count($existingq)>0) {
 					$existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
-					$query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
+					//DB $query = "SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
+						//DB imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
+						//DB FROM imas_questions AS a
+						//DB JOIN imas_questions AS b ON a.assessmentid = b.assessmentid
+						//DB JOIN imas_questions AS c ON b.questionsetid = c.questionsetid
+						//DB AND c.assessmentid ='$aid'
+						//DB JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
+						//DB AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
+						//DB AND imas_questionset.deleted=0
+						//DB AND imas_questionset.replaceby=0
+						//DB WHERE a.questionsetid NOT IN ($existingqlist)
+						//DB GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100";
+					$stm = $DBH->prepare("SELECT a.questionsetid, count( DISTINCT a.assessmentid ) as qcnt,
 						imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.ownerid
-						FROM imas_questions AS a 
-						JOIN imas_questions AS b ON a.assessmentid = b.assessmentid 
+						FROM imas_questions AS a
+						JOIN imas_questions AS b ON a.assessmentid = b.assessmentid
 						JOIN imas_questions AS c ON b.questionsetid = c.questionsetid
-						AND c.assessmentid ='$aid'
+						AND c.assessmentid = :assessmentid
 						JOIN imas_questionset  ON a.questionsetid=imas_questionset.id
-						AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0)
+						AND (imas_questionset.ownerid=:ownerid OR imas_questionset.userights>0)
 						AND imas_questionset.deleted=0
 						AND imas_questionset.replaceby=0
 						WHERE a.questionsetid NOT IN ($existingqlist)
-						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100";
+						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100");
+					$stm->execute(array(':assessmentid'=>$aid, ':ownerid'=>$userid));
+				} else {
+					$stm = $DBH->prepare($query);
+					$stm->execute($qarr);
 				}
-				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-				if (mysql_num_rows($result)==0) {
+				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				//DB if (mysql_num_rows($result)==0) {
+				if ($stm->rowCount()==0) {
 					$noSearchResults = true;
 				} else {
-					$searchlimited = (mysql_num_rows($result)==300);
+					//DB $searchlimited = (mysql_num_rows($result)==300);
+					$searchlimited = ($stm->rowCount()==300);
 
 					$alt=0;
 					$lastlib = -1;
@@ -652,8 +745,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$page_libstouse = array();
 					$page_libqids = array();
 					$page_useavgtimes = false;
-					
-					while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+
+					//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+					while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 						if ($newonly && in_array($line['id'],$existingq)) {
 							continue;
 						}
@@ -665,7 +759,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_questionTable[$i]['desc'] = "<b>".$lnamesarr[$line['libid']]."</b>";
 							$page_questionTable[$i]['preview'] = "";
 							$page_questionTable[$i]['type'] = "";
-							if ($searchall==1) 
+							if ($searchall==1)
 								$page_questionTable[$i]['lib'] = "";
 							$page_questionTable[$i]['times'] = "";
 							$page_questionTable[$i]['mine'] = "";
@@ -678,9 +772,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_libstouse[] = $line['libid'];
 							$lastlib = $line['libid'];
 							$page_libqids[$line['libid']] = array();
-							
-						} 
-						
+
+						}
+
 						if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==1) { //alpha
 							$page_libqids[$line['libid']][$line['id']] = $line['description'];
 						} else { //id
@@ -757,8 +851,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$page_questionTable[$i]['times'] = $times;
 						*/
 						$page_questionTable[$i]['times'] = 0;
-						
-						if ($line['ownerid']==$userid) { 
+
+						if ($line['ownerid']==$userid) {
 							if ($line['userights']==0) {
 								$page_questionTable[$i]['mine'] = "Private";
 							} else {
@@ -766,35 +860,37 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							}
 						} else {
 							$page_questionTable[$i]['mine'] = "";
-						}							
-						
-						
+						}
+
+
 						$page_questionTable[$i]['add'] = "<a href=\"modquestion.php?qsetid={$line['id']}&aid=$aid&cid=$cid\">Add</a>";
-						
+
 						if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userid) {
 							$page_questionTable[$i]['src'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&frompot=1\">Edit</a>";
-						} else { 
+						} else {
 							$page_questionTable[$i]['src'] = "<a href=\"viewsource.php?id={$line['id']}&aid=$aid&cid=$cid\">View</a>";
-						}							
-						
-						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";						
+						}
+
+						$page_questionTable[$i]['templ'] = "<a href=\"moddataset.php?id={$line['id']}&aid=$aid&cid=$cid&template=true\">Template</a>";
 						//$i++;
 						$ln++;
-							
+
 					} //end while
 
 					//pull question useage data
 					if (count($page_questionTable)>0) {
 						$allusedqids = implode(',', array_keys($page_questionTable));
-						$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
-						$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-						while ($row = mysql_fetch_row($result)) {
+						//DB $query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
+						$stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
+						//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+						//DB while ($row = mysql_fetch_row($result)) {
+						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 							$page_questionTable[$row[0]]['times'] = $row[1];
 						}
 					}
-						
-						
-					
+
+
+
 					//sort alpha sorted libraries
 					foreach ($page_libstouse as $libid) {
 						if ($libsortorder[$libid]==1) {
@@ -805,12 +901,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					if ($searchall==1) {
 						$page_libstouse = array_keys($page_libqids);
 					}
-					
+
 				}
 			}
-		
+
 		}
-		
+
 	} else if ($sessiondata['selfrom'.$aid]=='assm') { //select from assessments
 
 		if (isset($_GET['clearassmt'])) {
@@ -823,13 +919,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				writesessiondata();
 			}
 		}
-		
+
 		if (isset($sessiondata['aidstolist'.$aid])) { //list questions
 
 			$aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";
-			$query = "SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT id,name,itemorder FROM imas_assessments WHERE id IN (:aidlist)");
+			$stm->execute(array(':aidlist'=>$aidlist));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$aidnames[$row[0]] = $row[1];
 				$items = str_replace('~',',',$row[2]);
 				if ($items=='') {
@@ -841,13 +940,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$x=0;
 			$page_assessmentQuestions = array();
 			foreach ($sessiondata['aidstolist'.$aid] as $aidq) {
+				//DB $query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
+				//DB $query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)==0) {
 				$query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
-				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)==0) { //maybe defunct aid; if no questions in it, skip it
+				$query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid=:assessmentid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$aidq));
+				if ($stm->rowCount()==0) {
 					continue;
 				}
-				while ($row = mysql_fetch_row($result)) {
+				//DB while ($row = mysql_fetch_row($result)) {
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$qsetid[$row[0]] = $row[1];
 					$descr[$row[0]] = $row[2];
 					$qtypes[$row[0]] = $row[3];
@@ -859,14 +964,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				//pull question useage data
 				if (count($qsetid)>0) {
 					$allusedqids = implode(',', array_unique($qsetid));
-					$query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
-					$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+					//DB $query = "SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid";
+					//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+					$stm = $DBH->query("SELECT questionsetid,COUNT(id) FROM imas_questions WHERE questionsetid IN ($allusedqids) GROUP BY questionsetid");
 					$qsetusecnts = array();
-					while ($row = mysql_fetch_row($result)) {
+					//DB while ($row = mysql_fetch_row($result)) {
+					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						$qsetusecnts[$row[0]] = $row[1];
 					}
 				}
-				
+
 				$page_assessmentQuestions['desc'][$x] = $aidnames[$aidq];
 				$y=0;
 				foreach($aiditems[$aidq] as $qid) {
@@ -908,7 +1015,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
 						}
 					}
-					
+
 					$ln++;
 					$y++;
 				}
@@ -916,18 +1023,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		} else {  //choose assessments
 
-			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$items = unserialize(mysql_result($result,0,0));
-			
+			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $items = unserialize(mysql_result($result,0,0));
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$items = unserialize($stm->fetchColumn(0));
+
 			$itemassoc = array();
+			//DB $query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
+			//DB $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_assoc($result)) {
 			$query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
-			$query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_assoc($result)) {
+			$query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid=:courseid AND ia.id<>:aid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid, ':aid'=>$aid));
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 				$itemassoc[$row['itemid']] = $row;
 			}
-			
+
 			$i=0;
 			$page_assessmentList = array();
 			function addtoassessmentlist($items) {
@@ -959,29 +1074,29 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 if ($overwriteBody==1) {
 	echo $body;
 } else {
-	
-//var_dump($jsarr);	
+
+//var_dump($jsarr);
 ?>
 	<script type="text/javascript">
-		var curcid = <?php echo $cid ?>; 
-		var curaid = <?php echo $aid ?>; 
+		var curcid = <?php echo $cid ?>;
+		var curaid = <?php echo $aid ?>;
 		var defpoints = <?php echo $defpoints ?>;
 		var AHAHsaveurl = '<?php echo $urlmode.$_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ?>/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo $searchlibs;?>';
 	</script>
 	<script type="text/javascript" src="<?php echo $imasroot ?>/javascript/tablesorter.js"></script>
 
-	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>	
+	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 
-	<div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions 
+	<div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h2></div>
-<?php	
-	echo '<div class="cp"><a href="addassessment.php?id='.$_GET['aid'].'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';	
+<?php
+	echo '<div class="cp"><a href="addassessment.php?id='.$_GET['aid'].'&amp;cid='.$cid.'">'._('Assessment Settings').'</a></div>';
 	if ($beentaken) {
-?>	
+?>
 	<h3>Warning</h3>
-	<p>This assessment has already been taken.  Adding or removing questions, or changing a 
+	<p>This assessment has already been taken.  Adding or removing questions, or changing a
 		question's settings (point value, penalty, attempts) now would majorly mess things up.
 		If you want to make these changes, you need to clear all existing assessment attempts
 	</p>
@@ -992,10 +1107,10 @@ if ($overwriteBody==1) {
 ?>
 	<h3>Questions in Assessment - <?php echo $page_assessmentName ?></h3>
 
-<?php	
+<?php
 	if ($itemorder == '') {
 		echo "<p>No Questions currently in assessment</p>\n";
-		
+
 		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
 		echo "<img src=\"$imasroot/img/help.gif\" /> ";
 		echo 'How do I find questions to add?</a>';
@@ -1023,29 +1138,29 @@ if ($overwriteBody==1) {
 		echo " <li>Click the <b>Add</b> button above the question list to add the questions to your assessment</li> ";
 		echo "  </ul>";
 		echo '</div>';
-			
+
 	} else {
-?>	
+?>
 	<form id="curqform" method="post" action="addquestions.php?modqs=true&aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
 <?php
 		if (!$beentaken) {
 			/*
-			Use select boxes to 
+			Use select boxes to
 		<select name=group id=group>
 			<option value="0"<?php echo $grp0Selected ?>>Rearrange questions</option>
 			<option value="1"<?php echo $grp1Selected ?>>Group questions</option>
 		</select>
 		<br/>
 		*/
-?>		
-		
+?>
+
 		Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
-		
+
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
 				<input type=button value="Group" onclick="groupSelected()" />
 			  	<input type="submit" value="Change Settings" />
-		
-<?php			
+
+<?php
 		}
 ?>
 		<span id="submitnotice" style="color:red;"></span>
@@ -1054,8 +1169,8 @@ if ($overwriteBody==1) {
 	</form>
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<script>
-		var itemarray = <?php echo $jsarr ?>; 
-		var beentaken = <?php echo ($beentaken) ? 1:0; ?>; 
+		var itemarray = <?php echo $jsarr ?>;
+		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		document.getElementById("curqtbl").innerHTML = generateTable();
 	</script>
 <?php
@@ -1063,63 +1178,63 @@ if ($overwriteBody==1) {
 	if ($displaymethod=='VideoCue') {
 		echo '<p><input type=button value="Define Video Cues" onClick="window.location=\'addvideotimes.php?cid='.$cid.'&aid='.$aid.'\'"/></p>';
 	}
-?>	
+?>
 	<p>
-		<input type=button value="Done" title="Exit back to course page" onClick="window.location='course.php?cid=<?php echo $cid ?>'"> 
-		<input type=button value="Assessment Settings" title="Modify assessment settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'"> 
-		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
-		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'"> 
+		<input type=button value="Done" title="Exit back to course page" onClick="window.location='course.php?cid=<?php echo $cid ?>'">
+		<input type=button value="Assessment Settings" title="Modify assessment settings" onClick="window.location='addassessment.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>'">
+		<input type=button value="Categorize Questions" title="Categorize questions by outcome or other groupings" onClick="window.location='categorize.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
+		<input type=button value="Create Print Version" onClick="window.location='printtest.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
 		<input type=button value="Define End Messages" title="Customize messages to display based on the assessment score" onClick="window.location='assessendmsg.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>'">
-		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"> 
+		<input type=button value="Preview" title="Preview this assessment" onClick="window.open('<?php echo $imasroot;?>/assessment/showtest.php?cid=<?php echo $cid ?>&id=<?php echo $aid ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))">
 	</p>
-		
-<?php	
+
+<?php
 //<input type=button value="Select Libraries" onClick="libselect()">
-		
+
 	//POTENTIAL QUESTIONS
 	if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
 		if (!$beentaken) {
-?>	
-	
+?>
+
 	<h3>Potential Questions</h3>
 	<form method=post action="addquestions.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>">
-	
-		In Libraries: 
+
+		In Libraries:
 		<span id="libnames"><?php echo $lnames ?></span>
 		<input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
 		<input type="button" value="Select Libraries" onClick="GB_show('Library Select','libtree2.php?libtree=popup&libs='+curlibs,500,500)" />
 		or <input type=button value="Select From Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=assm'">
-		<br> 
-		Search: 
-		<input type=text size=15 name=search value="<?php echo $search ?>"> 
+		<br>
+		Search:
+		<input type=text size=15 name=search value="<?php echo $search ?>">
 		<span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
-		Search all libs</span> 
+		Search all libs</span>
 		<span onmouseover="tipshow(this,'List only questions I own')" onmouseout="tipout()">
 		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
-		Mine only</span> 
+		Mine only</span>
 		<span onmouseover="tipshow(this,'Exclude questions already in assessment')" onmouseout="tipout()">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
-		Exclude added</span> 
+		Exclude added</span>
 		<input type=submit value=Search>
 		<input type=button value="Add New Question" onclick="window.location='moddataset.php?aid=<?php echo $aid ?>&cid=<?php echo $cid ?>'">
-	
+
 	</form>
-<?php			
+<?php
 			if ($searchall==1 && trim($search)=='') {
 				echo "Must provide a search term when searching all libraries";
 			} elseif (isset($search)) {
 				if ($noSearchResults) {
 					echo "<p>No Questions matched search</p>\n";
 				} else {
-?>				
+?>
 		<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
-		
+
 		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
-		
+
 		<table cellpadding="5" id="myTable" class="gb" style="clear:both; position:relative;">
 			<thead>
 				<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th>
@@ -1131,10 +1246,10 @@ if ($overwriteBody==1) {
 				</tr>
 			</thead>
 			<tbody>
-<?php					
+<?php
 				$alt=0;
 				for ($j=0; $j<count($page_libstouse); $j++) {
-					
+
 					if ($searchall==0) {
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 						echo '<td></td>';
@@ -1144,11 +1259,11 @@ if ($overwriteBody==1) {
 						for ($k=0;$k<9;$k++) {echo '<td></td>';}
 						echo '</tr>';
 					}
-					
+
 					for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
 						$qid =$page_libqids[$page_libstouse[$j]][$i];
 						if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-?>						
+?>
 
 					<td><?php echo $page_questionTable[$qid]['checkbox'] ?></td>
 					<td><?php echo $page_questionTable[$qid]['desc'] ?></td>
@@ -1160,15 +1275,15 @@ if ($overwriteBody==1) {
 					<td><?php echo $page_questionTable[$qid]['type'] ?></td>
 <?php
 						if ($searchall==1) {
-?>					
+?>
 					<td><?php echo $page_questionTable[$qid]['lib'] ?></td>
 <?php
 						}
 ?>
-					<td class=c><?php 
+					<td class=c><?php
 					echo $page_questionTable[$qid]['times']; ?>
 					</td>
-					<?php if ($page_useavgtimes) {?><td class="c"><?php 
+					<?php if ($page_useavgtimes) {?><td class="c"><?php
 					if (isset($page_questionTable[$qid]['qdata'])) {
 						echo '<span onmouseover="tipshow(this,\'Avg score on first try: '.round($page_questionTable[$qid]['qdata'][0]).'%';
 						echo '<br/>Avg time on first try: '.round($page_questionTable[$qid]['qdata'][1]/60,1).' min<br/>N='.$page_questionTable[$qid]['qdata'][2].'\')" onmouseout="tipout()">';
@@ -1194,7 +1309,7 @@ if ($overwriteBody==1) {
 				if ($searchall==1 && $searchlimited) {
 					echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
 				}
-?>					
+?>
 			</tbody>
 		</table>
 		<p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
@@ -1202,14 +1317,14 @@ if ($overwriteBody==1) {
 			initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
 		</script>
 	</form>
-	
-<?php 					
+
+<?php
 				}
 			}
-		}	
-		
+		}
+
 	} else if ($sessiondata['selfrom'.$aid]=='assm') { //select from assessments
-?>	
+?>
 
 	<h3>Potential Questions</h3>
 
@@ -1217,18 +1332,18 @@ if ($overwriteBody==1) {
 		if (isset($_POST['achecked']) && (count($_POST['achecked'])==0)) {
 			echo "<p>No Assessments Selected.  Select at least one assessment.</p>";
 		} elseif (isset($sessiondata['aidstolist'.$aid])) { //list questions
-?>		
+?>
 	<form id="selq" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&addset=true">
-		
+
 		<input type=button value="Select Assessments" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&clearassmt=1'">
 		or <input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
 		<br/>
-			
+
 		Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
 		<input name="add" type=submit value="Add" />
 		<input name="addquick" type=submit value="Add Selected (using defaults)">
 		<input type=button value="Preview Selected" onclick="previewsel('selq')" />
-			
+
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
 				<tr>
@@ -1236,11 +1351,11 @@ if ($overwriteBody==1) {
 				</tr>
 			</thead>
 			<tbody>
-<?php			
+<?php
 			$alt=0;
 			for ($i=0; $i<count($page_assessmentQuestions['desc']);$i++) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-?>				
+?>
 				<td></td>
 				<td><b><?php echo $page_assessmentQuestions['desc'][$i] ?></b></td>
 				<td></td>
@@ -1255,14 +1370,14 @@ if ($overwriteBody==1) {
 <?php
 				for ($x=0;$x<count($page_assessmentQuestions[$i]['desc']);$x++) {
 					if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-?>					
+?>
 				<td><?php echo $page_assessmentQuestions[$i]['checkbox'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['desc'][$x] ?></td>
 				<td class="nowrap">
 				  <div <?php if ($page_assessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $page_assessmentQuestions[$i]['extref'][$x] ?></div>
 				</td>
 				<td><?php echo $page_assessmentQuestions[$i]['qsetid'][$x] ?></td>
-				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>					
+				<td><?php echo $page_assessmentQuestions[$i]['preview'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['type'][$x] ?></td>
 				<td class=c><?php echo $page_assessmentQuestions[$i]['times'][$x] ?></td>
 				<td><?php echo $page_assessmentQuestions[$i]['mine'][$x] ?></td>
@@ -1270,11 +1385,11 @@ if ($overwriteBody==1) {
 				<td class=c><?php echo $page_assessmentQuestions[$i]['src'][$x] ?></td>
 				<td class=c><?php echo $page_assessmentQuestions[$i]['templ'][$x] ?></td>
 			</tr>
-					
+
 <?php
 				}
 			}
-?>			
+?>
 			</tbody>
 		</table>
 
@@ -1285,13 +1400,13 @@ if ($overwriteBody==1) {
 
 <?php
 		} else {  //choose assessments
-?>		
+?>
 		<h4>Choose assessments to take questions from</h4>
 		<form id="sela" method=post action="addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>">
 		Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
-		<input type=submit value="Use these Assessments" /> or 
+		<input type=submit value="Use these Assessments" /> or
 		<input type=button value="Select From Libraries" onClick="window.location='addquestions.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>&selfrom=lib'">
-			
+
 		<table cellpadding=5 id=myTable class=gb>
 			<thead>
 			<tr><th></th><th>Assessment</th><th>Summary</th></tr>
@@ -1311,7 +1426,7 @@ if ($overwriteBody==1) {
 <?php
 			}
 ?>
-			
+
 			</tbody>
 		</table>
 		<script type=\"text/javascript\">
@@ -1319,12 +1434,12 @@ if ($overwriteBody==1) {
 		</script>
 	</form>
 
-<?php			
+<?php
 		}
-		
+
 	}
 
-}	
+}
 
 require("../footer.php");
 ?>

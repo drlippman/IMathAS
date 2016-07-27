@@ -77,6 +77,16 @@ C validate        26
  C addblock         5
  C addcalendar      6
  C adddrillassess   14 messy logic on search
+ * addforum            come back to this after merging forum exception branched
+ C addgrades        26
+ C addinlinetext    17
+ C addlinkedtext    13
+ C addoutcomes      12
+ C addquestions     29 messy logic on search like adddrill
+ C addquestionssave 3
+ C addrubric        4
+ C addvideotimes    3
+ C addwiki          9
 
 /diag              done
   C index          18

@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
 } else {
 	$curBreadcrumb .= "&gt; Add Link\n";
 	$pagetitle = "Add Link";
-}	
+}
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
 } else {
@@ -43,14 +43,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
-	$block = $_GET['block'];	
+	$block = $_GET['block'];
 	$page_formActionTag = "addlinkedtext.php?block=$block&cid=$cid&folder=" . $_GET['folder'];
 	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
 	$caltag = $_POST['caltag'];
 	$points = 0;
-	
+
 	if ($_POST['title']!= null) { //if the form has been submitted
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -81,11 +81,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$enddate =  2000000000;
 			$oncal = 0;
 		}
-		
+
 		$processingerror = false;
 		if ($_POST['linktype']=='text') {
 			require_once("../includes/htmLawed.php");
-			$_POST['text'] = addslashes(myhtmLawed(stripslashes($_POST['text'])));
+			//DB $_POST['text'] = addslashes(myhtmLawed(stripslashes($_POST['text'])));
+			$_POST['text'] = myhtmLawed($_POST['text']);
 		} else if ($_POST['linktype']=='file') {
 			require_once("../includes/filehandler.php");
 			if ($_FILES['userfile']['name']!='') {
@@ -111,7 +112,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						} else {
 							$_POST['text'] = "file:$filename";
 						}
-						
+
 					}
 					/*
 					$uploadfile = $uploaddir . $filename;
@@ -121,7 +122,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						$uploadfile=$uploaddir.$filename;
 						$t++;
 					}
-					
+
 					if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
 						//echo "<p>File is valid, and was successfully uploaded</p>\n";
 						$_POST['text'] = "file:$filename";
@@ -133,7 +134,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								break;
 							default:
 								$errormsg = "Try again";
-								break;	
+								break;
 						}
 						$_POST['text'] = "File upload error - $errormsg";
 						$uploaderror = true;
@@ -141,7 +142,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					//$_POST['text'] = "file:$cid-" . basename($_FILES['userfile']['name']);
 					*/
 				}
-				
+
 			} else if (!empty($_POST['curfile'])) {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				///if (!file_exists($uploaddir . $_POST['curfile'])) {
@@ -172,19 +173,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 		}
-		
+
 		if ($points==0 && isset($_POST['hadpoints']) && isset($_GET['id'])) {
-			$query = "DELETE FROM imas_grades WHERE gradetypeid='{$_GET['id']}' AND gradetype='exttool'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "DELETE FROM imas_grades WHERE gradetypeid='{$_GET['id']}' AND gradetype='exttool'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
+			$stm->execute(array(':gradetypeid'=>$_GET['id']));
 		}
-		
-		$_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
-		
+
+		//DB $_POST['title'] = addslashes(htmlentities(stripslashes($_POST['title'])));
+		$_POST['title'] = htmlentities($_POST['title']);
+
 		require_once("../includes/htmLawed.php");
 		if ($_POST['summary']=='<p>Enter summary here (displays on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
-			$_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
+			//DB $_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
+			$_POST['summary'] = myhtmLawed($_POST['summary']);
 		}
 		$_POST['text'] = trim($_POST['text']);
 		$outcomes = array();
@@ -197,15 +202,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$outcomes = implode(',',$outcomes);
 		if (isset($_GET['id'])) {  //already have id; update
-			$query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$text = trim(mysql_result($result,0,0));
+			//DB $query = "SELECT text FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $text = trim(mysql_result($result,0,0));
+			$stm = $DBH->prepare("SELECT text FROM imas_linkedtext WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$text = trim($stm->fetchColumn(0));
 			if (substr($text,0,5)=='file:') { //has file
-				$safetext = addslashes($text);
-				if ($_POST['text']!=$safetext) { //if not same file, delete old if not used
-					$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($result)==1) { 
+				//DB $safetext = addslashes($text);
+				if ($_POST['text']!=$text) { //if not same file, delete old if not used
+					//DB $query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($result)==1) {
+					$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text"; );
+					$stm->execute(array(':text'=>$text));
+					if ($stm->rowCount()==1) {
 						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 						$filename = substr($text,5);
 						deletecoursefile($filename);
@@ -216,28 +227,49 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
-				$query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
-				$query .= "WHERE id='{$_GET['id']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
+				//DB $query .= "WHERE id='{$_GET['id']}'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "UPDATE imas_linkedtext SET title=:title,summary=:summary,text=:text,startdate=:startdate,enddate=:enddate,avail=:avail,";
+				$query .= "oncal=:oncal,caltag=:caltag,target=:target,outcomes=:outcomes,points=:points WHERE id=:id";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'], ':startdate'=>$startdate,
+					':enddate'=>$enddate, ':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag, ':target'=>$_POST['target'],
+					':outcomes'=>$outcomes, ':points'=>$points, ':id'=>$_GET['id']));
 			}
 		} else if (!$processingerror) { //add new
+			//DB $query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) VALUES ";
+			//DB $query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}','$outcomes',$points);";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points) VALUES ";
-			$query .= "('$cid','{$_POST['title']}','{$_POST['summary']}','{$_POST['text']}',$startdate,$enddate,'{$_POST['avail']}','$oncal','$caltag','{$_POST['target']}','$outcomes',$points);";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			$newtextid = mysql_insert_id();
-			
+			$query .= "(:courseid, :title, :summary, :text, :startdate, :enddate, :avail, :oncal, :caltag, :target, :outcomes, :points);";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid, ':title'=>$_POST['title'], ':summary'=>$_POST['summary'], ':text'=>$_POST['text'],
+				':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag,
+				':target'=>$_POST['target'], ':outcomes'=>$outcomes, ':points'=>$points));
+
+			//DB $newtextid = mysql_insert_id();
+			$newtextid = $DBH->lastInsertId();
+
+			//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
+			//DB $query .= "('$cid','LinkedText','$newtextid');";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
-			$query .= "('$cid','LinkedText','$newtextid');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
-			$itemid = mysql_insert_id();
-						
-			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$query .= "(:courseid, 'LinkedText', :typeid);";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid, ':typeid'=>$newtextid));
+
+			//DB $itemid = mysql_insert_id();
+			$itemid = $DBH->lastInsertId();
+
+			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$items = unserialize($line['itemorder']);
-				
+
 			$blocktree = explode('-',$block);
 			$sub =& $items;
 			for ($i=1;$i<count($blocktree);$i++) {
@@ -249,10 +281,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				array_unshift($sub,$itemid);
 			}
 			$itemorder = addslashes(serialize($items));
-			
-			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		
+
+			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
+
 		}
 		if ($uploaderror == true || $processingerror == true) {
 			if ($uploaderror == true) {
@@ -278,9 +312,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$filename = '';
 		$webaddr = '';
 		if (isset($_GET['id'])) {
-			$query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			//DB $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$stm = $DBH->prepare("SELECT * FROM imas_linkedtext WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
 			$gbcat = 0;
@@ -316,7 +353,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$cntingb = $toolparts[4];
 					$tutoredit = $toolparts[5];
 					$gradesecret = $toolparts[6];
-				} 
+				}
 				$line['text'] = "<p>Enter text here</p>";
 			} else {
 				$type = 'text';
@@ -351,8 +388,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$gbcat = 0;
 			$tutoredit = 0;
 			$gradesecret = uniqid();
-		}   
-		
+		}
+
 		$hr = floor($coursedeftime/60)%12;
 		$min = $coursedeftime%60;
 		$am = ($coursedeftime<12*60)?'am':'pm';
@@ -361,7 +398,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$min = $coursedefstime%60;
 		$am = ($coursedefstime<12*60)?'am':'pm';
 		$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-	
+
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
 			$stime = tzdate("g:i a",$startdate);
@@ -371,23 +408,28 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if ($enddate!=2000000000) {
 			$edate = tzdate("m/d/Y",$enddate);
-			$etime = tzdate("g:i a",$enddate);	
+			$etime = tzdate("g:i a",$enddate);
 		} else {
 			$edate = tzdate("m/d/Y",time()+7*24*60*60);
 			$etime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
-		}    
-		
+		}
+
 		if (!isset($_GET['id'])) {
 			$stime = $defstime;
 			$etime = $deftime;
 		}
-		
+
 		$toolvals = array(0);
 		$toollabels = array('Select a tool...');
-		$query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ";
-		$query .= "OR (courseid=0 AND (groupid='$groupid' OR groupid=0)) ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ";
+		//DB $query .= "OR (courseid=0 AND (groupid='$groupid' OR groupid=0)) ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$query = "SELECT id,name FROM imas_external_tools WHERE courseid=:courseid ";
+		$query .= "OR (courseid=0 AND (groupid=:groupid OR groupid=0)) ORDER BY name";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid, ':groupid'=>$groupid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$toolvals[] = $row[0];
 			$toollabels[] = $row[1];
 		}
@@ -395,13 +437,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$type = 'text';
 			$line['text'] = "<p>Invalid tool was selected</p>";
 		}
-		
-		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
 		$page_gbcatSelect = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		//DB if (mysql_num_rows($result)>0) {
+			//DB while ($row = mysql_fetch_row($result)) {
+		if ($stm->rowCount()>0) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
@@ -409,16 +455,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
 		$page_tutorSelect['val'] = array(2,0,1);
-		
-		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 		$outcomenames = array();
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$outcomenames[$row[0]] = $row[1];
 		}
-		$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row[0]=='') {
 			$outcomearr = array();
 		} else {
@@ -437,10 +489,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		flattenarr($outcomearr);
-			
+
 	}
 }
-	
+
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<script type="text/javascript">
@@ -457,14 +509,14 @@ $placeinhead .= '<script type="text/javascript">
  }
  </script>';
  $placeinhead .= '<script type="text/javascript"> function toggleGBdetail(v) { document.getElementById("gbdetail").style.display = v?"block":"none";}</script>';
- 
+
  require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
 } else {
-?> 	
-	
+?>
+
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeraddlinkedtext" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
 
@@ -472,13 +524,13 @@ if ($overwriteBody==1) {
 		<span class=form>Title: </span>
 		<span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$line['title']);?>">
 		</span><BR class=form>
-		
+
 		Summary<BR>
 		<div class=editor>
 			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
 		</div>
 		<br/>
-		
+
 		<span class=form>Link type: </span>
 		<span class="formright">
 		<select id="linktype" name="linktype" onchange="linktypeupdate(this)">
@@ -488,7 +540,7 @@ if ($overwriteBody==1) {
 			<option value="tool" <?php writeHtmlSelected($type,'tool');?>>External Tool</option>
 		</select>
 		</span><br class="form"/>
-		
+
 		<div id="textinput" <?php if ($type != 'text') {echo 'style="display:none;"';}?> >
 			Text<BR>
 			<div class=editor>
@@ -500,7 +552,7 @@ if ($overwriteBody==1) {
 			<span class="formright">
 				<input size="80" name="web" value="<?php echo htmlentities($webaddr);?>" />
 			</span><br class="form">
-			
+
 		</div>
 		<div id="fileinput" <?php if ($type != 'file') {echo 'style="display:none;"';}?>>
 			<span class="form">File</span>
@@ -521,7 +573,7 @@ if ($overwriteBody==1) {
 		<div id="toolinput" <?php if ($type != 'tool') {echo 'style="display:none;"';}?>>
 			<span class="form">External Tool</span>
 			<span class="formright">
-			<?php 
+			<?php
 			if (count($toolvals)>0) {
 				writeHtmlSelect('tool',$toolvals,$toollabels,$selectedtool);
 				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.htmlentities($toolcustom).'" /><br/>';
@@ -546,7 +598,7 @@ if ($overwriteBody==1) {
 			</span><br class="form"/>
 			<span class=form>Gradebook Category:</span>
 				<span class=formright>
-			
+
 	<?php
 		writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 	?>
@@ -563,45 +615,45 @@ if ($overwriteBody==1) {
 	<?php
 		writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
 		echo '<input type="hidden" name="gradesecret" value="'.$gradesecret.'"/>';
-	?>			
+	?>
 			</span><br class="form" />
 			</div>
 		</div>
-		
+
 		<span class="form">Open page in:</span>
 		<span class="formright">
 			<input type=radio name="target" value="0" <?php writeHtmlChecked($line['target'],0);?>/>Current window/tab<br/>
 			<input type=radio name="target" value="1" <?php writeHtmlChecked($line['target'],1);?>/>New window/tab<br/>
 		</span><br class="form"/>
-		
+
 		<span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/>Hide<br/>
 			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/>Show by Dates<br/>
 			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/>Show Always<br/>
 		</span><br class="form"/>
-		
+
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/> 
+			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
 			Always until end date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
-		
+
 		<span class=form>Available Until:</span><span class=formright>
 			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/> Always after start date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
+			<input type=text size=10 name=edate value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
 		</span><BR class=form>
-		
+
 		<span class=form>Place on Calendar?</span>
 		<span class=formright>
 			<input type=radio name="oncal" value=0 <?php writeHtmlChecked($line['oncal'],0); ?> /> No<br/>
@@ -614,8 +666,8 @@ if ($overwriteBody==1) {
 		<span class=form>Place on Calendar?</span>
 		<span class=formright>
 			<input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No<br/>
-			<input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on 
-			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>"> 
+			<input type=radio name="altoncal" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on
+			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a> <br/>
 			With tag: <input name="altcaltag" type=text size=4 value="<?php echo $line['caltag'];?>"/>
@@ -631,9 +683,9 @@ if ($overwriteBody==1) {
 		echo '<input type="hidden" name="hadpoints" value="true"/>';
 	}
 ?>
-		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>	
+		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
 	</form>
-	
+
 	<p><sup>*</sup>Avoid quotes in the filename</p>
 <?php
 }
