@@ -628,7 +628,7 @@
   }
 
   function writesessiondata() {
-	  global $sessiondata,$sessionid;
+	  global $sessiondata,$sessionid,$DBH;
 	  $enc = base64_encode(serialize($sessiondata));
 	  //DB $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
 	  //DB mysql_query($query) or die("Query failed : " . mysql_error());
