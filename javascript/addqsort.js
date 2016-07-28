@@ -47,11 +47,6 @@ function generateMoveSelect2(num) {
 	var sel = "<select id="+num+" onChange=\"moveitem2("+num+")\">";
 	var qcnt = 1; var tcnt = 1; var curistxt = false;
 	for (var i=1; i<=itemarray.length; i++) {
-		//TODO something goes wrong if there are two text segments at the end of an assignment
-if (typeof itemarray[i-1]=="undefined") {
-	alert("itemarray["+(i-1)+"] undefined "+itemarray.length);
-	continue;
-}
 		curistxt = (itemarray[i-1][0]=="text");
 		sel += "<option value=\""+i+"\" ";
 		if (i==num) {
@@ -418,7 +413,10 @@ function updateqgrpcookie() {
 function generateTable() {
 	olditemarray = itemarray;
 	itemcount = itemarray.length;
-	//string that's unique to each generateTable() call for unique ids
+	tinymce.editors = []; // clear any previous editors
+	if (this.collapsed_text_segments === undefined) {
+		this.collapsed_text_segments = true;
+	}
 	var alt = 0;
 	var ln = 0;
 	var pttotal = 0;
@@ -428,7 +426,17 @@ function generateTable() {
 		html += "<th></th>";
 	}
 	html += "<th>Order</th>";
-	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
+	this.getCollapseExpandSymbol = function () {
+		return (this.collapsed_text_segments)?"+":"-";
+	}
+	this.getCollapseExpandLink = function () {
+		return "<a onclick=\"toggleCollapseTextSegments();refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</a>";
+	}
+	this.toggleCollapseTextSegments = function () {
+		this.collapsed_text_segments = !this.collapsed_text_segments;
+		$("#collapseexpandsymbol").html(getCollapseExpandSymbol);
+	};
+	html += "<th>Description <span id=\"collapseexpandlink\">"+this.getCollapseExpandLink()+"</span></th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {
@@ -527,15 +535,28 @@ function generateTable() {
 				if (displaymethod=="Embed") {
 					html += "<td colspan=6 id=\"textsegdescr"+i+"\">";
 					if (curitems[j][3]==1) {
-						html += "<h4 id=\"textsegdesheader"+i+"\" class=\"textsegment\">"+strip_tags(curitems[j][4]).substr(0,50)+"</h2>";
+						var header_contents= curitems[j][4];
+						if (this.collapsed_text_segments) {
+							header_contents= strip_tags(header_contents).substr(0,50);
+						}
+						html += "<h4 id=\"textsegdesheader"+i+"\" class=\"textsegment\">"+header_contents+"</h2>";
 					} 
-					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+strip_tags(curitems[j][1]).substr(0,55)+"</div></td>"; //description
+alert("collapsed: "+this.collapsed_text_segments);
+					var contents = curitems[j][1];
+					if (this.collapsed_text_segments) {
+						contents = strip_tags(contents).substr(0,55);
+					}
+					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+contents+"</div></td>"; //description
 					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
 					html += '<label><input type="checkbox" id="ispagetitle'+i+'" onchange="chgpagetitle('+i+')" ';
 					if (curitems[j][3]==1) { html += "checked";}
 					html += '>New page<label></td>';
 				} else {
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\" ><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+strip_tags(curitems[j][1]).substr(0,55)+"</div></td>"; //description
+					var contents = curitems[j][1];
+					if (this.collapsed_text_segments) {
+						contents = strip_tags(contents).substr(0,55);
+					}
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+contents+"</div></td>"; //description
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
