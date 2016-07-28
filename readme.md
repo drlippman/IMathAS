@@ -124,8 +124,16 @@ C validate        26
  C gb-itemanalysisdetail  4
  C gb-itemresults   4
  C gb-testing       1
- 
-
+ C gb-viewasid      38
+ C gb-viewdrill     2
+ C gbcomments       5
+ C gbsettings       13
+   gbtable.php          old and not used - remove
+ C gbtable2.php     17
+ C getblockitems    6
+ C getblockitemspublic  1
+ C gradeallq        9
+ C gradebook        17
 
 
 /diag              done

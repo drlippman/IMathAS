@@ -96,10 +96,18 @@
 			list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) = generateAssessmentData($adata['itemorder'],$adata['shuffle'],$aid);
 			//$starttime = time();
 			foreach ($stugroupmem as $uid) {
+				//DB $query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
+				//DB $query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist;$scorelist','$attemptslist','$lalist',0,'$scorelist;$scorelist;$scorelist','$attemptslist','$seedlist','$lalist','$scorelist;$scorelist','$attemptslist','$reviewseedlist','$lalist');";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $asid = mysql_insert_id();
 				$query = "INSERT INTO imas_assessment_sessions (userid,agroupid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers) ";
-				$query .= "VALUES ('$uid','$agroupid','$aid','$qlist','$seedlist','$scorelist;$scorelist','$attemptslist','$lalist',0,'$scorelist;$scorelist;$scorelist','$attemptslist','$seedlist','$lalist','$scorelist;$scorelist','$attemptslist','$reviewseedlist','$lalist');";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$asid = mysql_insert_id();
+				$query .= "VALUES (:userid, :agroupid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers);";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':userid'=>$uid, ':agroupid'=>$agroupid, ':assessmentid'=>$aid, ':questions'=>$qlist, ':seeds'=>$seedlist,
+					':scores'=>"$scorelist;$scorelist", ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':starttime'=>0,
+					':bestscores'=>"$scorelist;$scorelist;$scorelist", ':bestattempts'=>$attemptslist, ':bestseeds'=>$seedlist, ':bestlastanswers'=>$lalist,
+					':reviewscores'=>"$scorelist;$scorelist", ':reviewattempts'=>$attemptslist, ':reviewseeds'=>$reviewseedlist, ':reviewlastanswers'=>$lalist));
+				$asid = $DBH->lastInsertId();
 			}
 			$_GET['asid'] = $asid;
 		}
@@ -109,12 +117,18 @@
 	//PROCESS ANY TODOS
 	if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearattempt']=="confirmed") {
+			//DB $query = "SELECT ias.assessmentid,ias.lti_sourcedid FROM imas_assessment_sessions AS ias ";
+			//DB $query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
 			$query = "SELECT ias.assessmentid,ias.lti_sourcedid FROM imas_assessment_sessions AS ias ";
-			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$aid = mysql_result($result,0,0);
-				$ltisourcedid = mysql_result($result,0,1);
+			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id=:id AND ia.courseid=:courseid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':id'=>$_GET['asid'], ':courseid'=>$cid));
+			if ($stm->rowCount()>0) {
+				//DB $aid = mysql_result($result,0,0);
+				//DB $ltisourcedid = mysql_result($result,0,1);
+				list($aid, $ltisourcedid) = $stm->fetch(PDO::FETCH_NUM);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
 					updateLTIgrade('delete',$ltisourcedid,$aid);
@@ -124,10 +138,16 @@
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
 				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 
-				$query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
-				$query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-				//$query .= getasidquery($_GET['asid']);
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "DELETE FROM imas_assessment_sessions";// WHERE id='{$_GET['asid']}'";
+				//DB $query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+				//DB //$query .= getasidquery($_GET['asid']);
+				//DB $query = "DELETE FROM imas_assessment_sessions";
+				//DB $query .= " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "DELETE FROM imas_assessment_sessions";
+				$query .= " WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid"; //$qp[0] is "id" or "agroupid" from getasidquery
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
 			}
 			if ($from=='isolate') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
@@ -157,9 +177,12 @@
 	if (isset($_GET['breakfromgroup']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['breakfromgroup']=="confirmed") {
 			include("../includes/stugroups.php");
-			$query = "SELECT userid,agroupid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+			//DB $query = "SELECT userid,agroupid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT userid,agroupid FROM imas_assessment_sessions WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['asid']));
+			$row = $stm->fetch(PDO::FETCH_NUM);
 			removegroupmember($row[1],$row[0]);
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
@@ -173,19 +196,29 @@
 	if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['clearscores']=="confirmed") {
 
+			//DB $query = "SELECT ias.assessmentid FROM imas_assessment_sessions AS ias ";
+			//DB $query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
 			$query = "SELECT ias.assessmentid FROM imas_assessment_sessions AS ias ";
-			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			if (mysql_num_rows($result)>0) { //check that is the right cid
+			$query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id=:id AND ia.courseid=:courseid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':id'=>$_GET['asid'], ':courseid'=>$cid));
+			if ($stm->rowCount()>0) {
 				//$whereqry = getasidquery($_GET['asid']);
 				$qp = getasidquery($_GET['asid']);
 				//deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
 				deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-				$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-				$query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$seeds = explode(',',mysql_result($result,0,0));
-				$ltisourcedid = mysql_result($result,0,1);
+				//DB $whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+				//DB $query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
+				//DB $query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("SELECT seeds,lti_sourcedid FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
+				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
+				//DB $seeds = explode(',',mysql_result($result,0,0));
+				//DB $ltisourcedid = mysql_result($result,0,1);
+				list($seeds, $ltisourcedid) = $stm->fetch(PDO::FETCH_NUM);
+				$seeds = explode(',', $seeds);
 				if (strlen($ltisourcedid)>1) {
 					require_once("../includes/ltioutcomes.php");
 					updateLTIgrade('update',$ltisourcedid,$aid,0);
@@ -203,10 +236,15 @@
 				$bestseedslist = implode(',',$seeds);
 				$bestlalist = implode('~',$lastanswers);
 
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
-				$query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
-				$query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
+				//DB $query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
+				//DB $query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,reattempting='',";
+				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestseeds=:bestseeds,bestlastanswers=:bestlastanswers ";
+				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':scores'=>"$scorelist;$scorelist",
+					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist");
 			}
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
@@ -227,12 +265,20 @@
 	if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
 		if ($_GET['confirmed']=="true") {
 			$qp = getasidquery($_GET['asid']);
-			$whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+			//DB $whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
 			//$whereqry = getasidquery($_GET['asid']);
 
-			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry ORDER BY id"; //WHERE id='{$_GET['asid']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			//DB $query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry ORDER BY id"; //WHERE id='{$_GET['asid']}'";
+			//DB $query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid ";
+			//DB $query .= "FROM imas_assessment_sessions WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}' ORDER BY id";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid ";
+			$query .= "FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid ORDER BY id";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
+
 			if (strpos($line['scores'],';')===false) {
 				$noraw = true;
 				$scores = explode(",",$line['scores']);
@@ -288,10 +334,16 @@
 				$bestlalist = addslashes(implode('~',$bestlastanswers));
 				$reattemptinglist = implode(',',$reattempting);
 
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-				$query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
-				$query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
+				//DB $query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
+				//DB $query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,";
+				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,reattempting=:reattempting ";
+				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid "
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist,
+					':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':reattempting'=>$reattemptinglist));
 
 				if (strlen($line['lti_sourcedid'])>1) {
 					require_once("../includes/ltioutcomes.php");
@@ -329,9 +381,12 @@
 		require("../assessment/displayq2.php");
 		if (isset($_GET['update']) && ($isteacher || $istutor)) {
 			if (isoktorec()) {
-				$query = "SELECT bestscores FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$bestscores = mysql_result($result,0,0);
+				//DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $bestscores = mysql_result($result,0,0);
+				$stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE id=:id");
+				$stm->execute(array(':id'=>$_GET['asid']));
+				$bestscores = $stm->fetchColumn(0);
 				$bsp = explode(';',$bestscores);
 
 				$scores = array();
@@ -364,17 +419,30 @@
 					$scorelist .= ';'.$bsp[1].';'.$bsp[2];
 				}
 				$feedback = $_POST['feedback'];
-				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
+
 				if (isset($_POST['updategroup'])) {
 					$qp = getasidquery($_GET['asid']);
-					$query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+					//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
+					//DB $query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+					$query = "UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback";
+					$query .=  " WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
 					//$query .= getasidquery($_GET['asid']);
 				} else {
-					$query .= "WHERE id='{$_GET['asid']}'";
+					//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
+					//DB $query .= "WHERE id='{$_GET['asid']}'";
+					$query = "UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback";
+					$query .= "WHERE id=:id";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$_GET['asid']));
 				}
-				$q2 = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-				$res = mysql_query($q2) or die("Query failed : $q2 " . mysql_error());
-				$row = mysql_fetch_row($res);
+				//DB $q2 = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
+				//DB $res = mysql_query($q2) or die("Query failed : $q2 " . mysql_error());
+				//DB $row = mysql_fetch_row($res);
+				$stm = $DBH->prepare("SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id=:id");
+				$stm->execute(array(':id'=>$_GET['asid']));
+				$row = $stm->fetch(PDO::FETCH_NUM);
 				$aid = $row[0];
 				if (strlen($row[1])>1) {
 					//update LTI score
@@ -385,7 +453,7 @@
 				echo "No authority to change scores.";
 				exit;
 			}
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($from=='isolate') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='gisolate') {
@@ -409,31 +477,55 @@
 
 
 		if (isset($_GET['starttime']) && $isteacher) {
-			$query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
+
 			//$query .= getasidquery($_GET['asid']);
 			$qp = getasidquery($_GET['asid']);
-			$query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-			mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB $query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";
+			//DB $query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$query = "UPDATE imas_assessment_sessions SET starttime=:starttime ";
+			$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':starttime'=>$_GET['starttime'], ':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
 		}
 
+		//DB $query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,imas_assessments.defoutcome,";
+		//DB $query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
+		//DB $query .= "FROM imas_assessments,imas_assessment_sessions ";
+		//DB $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}' AND imas_assessments.courseid='$cid'";
+		//DB if (!$isteacher && !$istutor) {
+			//DB $query .= " AND imas_assessment_sessions.userid='$userid'";
+		//DB }
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result)==0) {
 		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,imas_assessments.defoutcome,";
 		$query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
-		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}' AND imas_assessments.courseid='$cid'";
+		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id=:id AND imas_assessments.courseid=:courseid";
 		if (!$isteacher && !$istutor) {
-			$query .= " AND imas_assessment_sessions.userid='$userid'";
+			$query .= " AND imas_assessment_sessions.userid=:userid";
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)==0) {
+		$stm = $DBH->prepare($query);
+		if (!$isteacher && !$istutor) {
+			$stm->execute(array(':id'=>$_GET['asid'], ':courseid'=>$cid, ':userid'=>$userid));
+		} else {
+			$stm->execute(array(':id'=>$_GET['asid'], ':courseid'=>$cid));
+		}
+		if ($stm->rowCount()==0) {
 			echo "uh oh.  Bad assessment id";
 			exit;
 		}
-		$line=mysql_fetch_array($result, MYSQL_ASSOC);
+		//DB $line=mysql_fetch_array($result, MYSQL_ASSOC);
+		$line=$stm->fetch(PDO::FETCH_ASSOC);
 
 		if (!$isteacher && !$istutor) {
+			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+			//DB $query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
-			$query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query .= "(:userid, :courseid, 'gbviewasid', :typeid, :viewtime)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':typeid'=>$line['assessmentid'], ':viewtime'=>$now));
 		}
 
 		echo "<div class=breadcrumb>$breadcrumbbase ";
@@ -462,9 +554,12 @@
 		}
 		echo "Detail</div>";
 		echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
-		$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id='{$_GET['uid']}' AND imas_students.courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT imas_users.FirstName,imas_users.LastName,imas_students.timelimitmult FROM imas_users JOIN imas_students ON imas_users.id=imas_students.userid WHERE imas_users.id=:id AND imas_students.courseid=:courseid");
+		$stm->execute(array(':id'=>$_GET['uid'], ':courseid'=>$cid));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 
 
@@ -482,12 +577,18 @@
 		}
 
 		if ($canedit) {
+			//DB $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
+			//DB $query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
 			$query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
-			$query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			if (mysql_num_rows($result)>0) {
+			$query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid=:assessmentid AND rubric>0)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':assessmentid'=>$line['assessmentid']));
+			if ($stm->rowCount()>0) {
 				$rubrics = array();
-				while ($row = mysql_fetch_row($result)) {
+				//DB while ($row = mysql_fetch_row($result)) {
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$rubrics[] = $row;
 				}
 				echo printrubrics($rubrics);
@@ -507,11 +608,16 @@
 
 		if (($isteacher || $istutor) && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
 			if ($line['agroupid']>0) {
-				$q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
-				$q2 .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$line['agroupid']}' ORDER BY LastName,FirstName";
-				$result = mysql_query($q2) or die("Query failed : " . mysql_error());
+				//DB $q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
+				//DB $q2 .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$line['agroupid']}' ORDER BY LastName,FirstName";
+				//DB $result = mysql_query($q2) or die("Query failed : " . mysql_error());
+				$query = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
+				$query .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid=:assessmentid AND i_a_s.agroupid=:agroupid ORDER BY LastName,FirstName";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$aid, ':agroupid'=>$line['agroupid']));
 				echo "<p>Group members: <ul>";
-				while ($row = mysql_fetch_row($result)) {
+				//DB while ($row = mysql_fetch_row($result)) {
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					echo "<li>{$row[0]}, {$row[1]}</li>";
 				}
 				echo "</ul></p>";
@@ -539,10 +645,14 @@
 		}
 		$saenddate = $line['enddate'];
 		unset($exped);
-		$query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($r2)>0) {
-			$exped = mysql_result($r2,0,0);
+		//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
+		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($r2)>0) {
+			//DB $exped = mysql_result($r2,0,0);
+		$stm2 = $DBH->prepare("SELECT enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$line['assessmentid']));
+		if ($stm2->rowCount()>0) {
+			$exped = $stm2->fetchColumn(0);
 			if ($exped>$saenddate) {
 				$saenddate = $exped;
 			}
@@ -646,17 +756,23 @@
 			echo "</p>";
 		}
 
+		//DB $query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref,iqs.ownerid ";
+		//DB $query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
+		//DB $query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$query = "SELECT iq.id,iq.points,iq.withdrawn,iqs.qtype,iqs.control,iq.rubric,iq.showhints,iqs.extref,iqs.ownerid ";
 		$query .= "FROM imas_questions AS iq, imas_questionset AS iqs ";
-		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid='{$line['assessmentid']}'";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$query .= "WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
 		$totalpossible = 0;
 		$pts = array();
 		$withdrawn = array();
 		$rubric = array();
 		$extref = array();
 		$owners = array();
-		while ($r = mysql_fetch_row($result)) {
+		//DB while ($r = mysql_fetch_row($result)) {
+		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($r[1]==9999) {
 				$pts[$r[0]] = $line['defpoints'];  //use defpoints
 			} else {
@@ -1052,9 +1168,12 @@
 		echo '<p>&nbsp;</p>';
 
 
-		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
-		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-		if (mysql_result($result,0,0)>0) {
+		//DB $query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
+		//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		//DB if (mysql_result($result,0,0)>0) {
+		$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
+		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
+		if ($stm->fetchColumn(0)>0) {
 			include("../assessment/catscores.php");
 			catscores($questions,$scores,$line['defpoints'], $line['defoutcome'],$cid);
 		}
@@ -1069,17 +1188,24 @@
 
 		$isdiag = false;
 		if ($istutor || $isteacher) {
-			$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
+			//DB $query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			$stm = $DBH->prepare("SELECT sel1name,sel2name FROM imas_diags WHERE cid=:cid");
+			$stm->execute(array(':cid'=>$cid));
+			if ($stm->rowCount()>0) {
 				$isdiag = true;
-				list($sel1name,$sel2name) = mysql_fetch_row($result);
+				//DB list($sel1name,$sel2name) = mysql_fetch_row($result);
+				list($sel1name,$sel2name) = $stm->fetch(PDO::FETCH_NUM);
 			}
 		}
 
-		$query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['uid']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 
 		if ($isdiag) {
 			$selparts = explode('~',$row[2]);
@@ -1092,16 +1218,26 @@
 			echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 		}
 
+		//DB $query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessments.endmsg,imas_assessment_sessions.* ";
+		//DB $query .= "FROM imas_assessments,imas_assessment_sessions ";
+		//DB $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $line=mysql_fetch_array($result, MYSQL_ASSOC);
 		$query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessments.endmsg,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
-		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line=mysql_fetch_array($result, MYSQL_ASSOC);
+		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id=:id";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$_GET['asid']));
+		$line=$stm->fetch(PDO::FETCH_ASSOC);
 
 		if (!$isteacher && !$istutor) {
+			//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+			//DB $query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
-			$query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$query .= "(:userid, :courseid, 'gbviewasid', :typeid, :viewtime)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':typeid'=>$line['assessmentid'], ':viewtime'=>$now));
 		}
 
 		$scores = array();
@@ -1110,14 +1246,18 @@
 		foreach(explode(',',$sp[0]) as $k=>$score) {
 			$scores[$qs[$k]] = getpts($score);
 		}
+		//DB $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+		//DB $query .= " AND imas_questions.id IN ({$line['questions']})";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-		$query .= " AND imas_questions.id IN ({$line['questions']})";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$query .= " AND imas_questions.id IN (".implode(',', array_map('intval', $qs)).")";
+		$stm = $DBH->query($query);
 		$i=1;
 		$totpt = 0;
 		$totposs = 0;
 		$qbreakdown = '';
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($i%2!=0) {$qbreakdown .= "<tr class=even>"; } else {$qbreakdown .= "<tr class=odd>";}
 			$qbreakdown .= '<td>';
 			if ($row[3]==1) {
@@ -1174,9 +1314,12 @@
 			}
 		}
 
-		$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
-		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-		if (mysql_result($result,0,0)>0) {
+		//DB $query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
+		//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		//DB if (mysql_result($result,0,0)>0) {
+		$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
+		$stm->execute(array(':assessmentid'=>$line['assessmentid']));
+		if ($stm->fetchColumn(0)>0) {
 			include("../assessment/catscores.php");
 			catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
 		}
@@ -1224,10 +1367,15 @@ function isperfect($sc) {
 	return false;
 }
 function getasidquery($asid) {
-	$query = "SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id='$asid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$agroupid = mysql_result($result,0,0);
-	$aid= mysql_result($result,0,1);
+	global $DBH;
+	//DB $query = "SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id='$asid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $agroupid = mysql_result($result,0,0);
+	//DB $aid= mysql_result($result,0,1);
+	$stm = $DBH->prepare("SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id=:id");
+	$stm->execute(array(':id'=>$asid));
+	$agroupid = $stm->fetchColumn(0);
+	$aid= $stm->fetchColumn(1);
 	if ($agroupid>0) {
 		return array('agroupid',$agroupid,$aid);
 		//return (" WHERE agroupid='$agroupid'");
@@ -1237,9 +1385,13 @@ function getasidquery($asid) {
 	}
 }
 function isasidgroup($asid) {
-	$query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	return (mysql_result($result,0,0)>0);
+	global $DBH;
+	//DB $query = "SELECT agroupid FROM imas_assessment_sessions WHERE id='$asid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB return (mysql_result($result,0,0)>0);
+	$stm = $DBH->prepare("SELECT agroupid FROM imas_assessment_sessions WHERE id=:id");
+	$stm->execute(array(':id'=>$asid));
+	return ($stm->fetchColumn(0)>0);
 }
 function printscore($sc) {
 	if (strpos($sc,'~')===false) {
@@ -1309,35 +1461,55 @@ function sandboxgetweights($code,$seed) {
 }
 
 function getconfirmheader($group=false) {
-	global $isteacher, $istutor, $userid;
+	global $DBH, $isteacher, $istutor, $userid;
 	if ($group) {
 		$out = '<h3>Whole Group</h3>';
 	} else {
-		$query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['uid']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		$out = "<h3>{$row[1]}, {$row[0]}</h3>\n";
 	}
+	//DB $query = "SELECT imas_assessments.name FROM imas_assessments,imas_assessment_sessions ";
+	//DB $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
+	//DB if (!$isteacher && !$istutor) {
+		//DB $query .= " AND imas_assessment_sessions.userid='$userid'";
+	//DB }
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT imas_assessments.name FROM imas_assessments,imas_assessment_sessions ";
-	$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
+	$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id=:id";
 	if (!$isteacher && !$istutor) {
-		$query .= " AND imas_assessment_sessions.userid='$userid'";
+		$query .= " AND imas_assessment_sessions.userid=:userid";
 	}
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$out .= "<h4>".mysql_result($result,0,0)."</h4>";
+	$stm = $DBH->prepare($query);
+	if (!$isteacher && !$istutor) {
+		$stm->execute(array(':id'=>$_GET['asid'], ':userid'=>$userid));
+	} else {
+		$stm->execute(array(':id'=>$_GET['asid']));
+	}
+	//DB $out .= "<h4>".mysql_result($result,0,0)."</h4>";
+	$out .= "<h4>".$stm->fetchColumn(0)."</h4>";
 	return $out;
 }
 
 function isoktorec() {
-	global $isteacher, $istutor;
+	global $DBH,$isteacher, $istutor;
 	$oktorec = false;
 	if ($isteacher) {
 		$oktorec = true;
 	} else if ($istutor) {
+		//DB $query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
+		//DB $query .= "WHERE ias.id='{$_GET['asid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB if (mysql_result($result,0,0)==1) {
 		$query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-		$query .= "WHERE ias.id='{$_GET['asid']}'";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		if (mysql_result($result,0,0)==1) {
+		$query .= "WHERE ias.id=:id";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$_GET['asid']));
+		if ($stm->fetchColumn(0)==1) {
 			$oktorec = true;
 		}
 	}
