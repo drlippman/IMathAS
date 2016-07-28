@@ -22,6 +22,8 @@ $showtips = 2;
 $useeqnhelper = 4;
 $sessiondata['drill']['cid'] = 0;
 $sessiondata['drill']['sa'] = 0;
+$sessiondata['secsalt'] = "12345";
+$cid = "embedq";
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;
@@ -116,8 +118,8 @@ function getansweights($code,$seed) {
 		if (is_array($weights)) {
 			return $weights;
 		}
-		
-	} 
+
+	}
 	if (!$foundweights) {
 		preg_match('/anstypes\s*=(.*)/',$code,$match);
 		$n = substr_count($match[1],',')+1;
@@ -162,8 +164,8 @@ function printscore($sc,$qsetid,$seed) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
-		
+
+
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
@@ -171,7 +173,7 @@ function printscore($sc,$qsetid,$seed) {
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
-			} else if (!is_numeric($v) || $v==0) { 
+			} else if (!is_numeric($v) || $v==0) {
 				$pm = 'redx';
 			} else if (abs($v-$ptposs[$k])<.011) {
 				$pm = 'gchk';
@@ -182,9 +184,9 @@ function printscore($sc,$qsetid,$seed) {
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
+		//$ptposs = implode(', ',$ptposs);
 		$out = sprintf(_('%1$s out of %2$s (parts: %3$s)'), $pts, $poss, $sc);
-	}	
+	}
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
 		$w = 30;
@@ -192,16 +194,16 @@ function printscore($sc,$qsetid,$seed) {
 		$w = round(30*$pts/$poss);
 	}
 	if ($w==0) {$w=1;}
-	if ($w < 15) { 
+	if ($w < 15) {
 	     $color = "#f".dechex(floor(16*($w)/15))."0";
 	} else if ($w==15) {
 	     $color = '#ff0';
-	} else { 
+	} else {
 	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
 	}
-	
+
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;	
+	return $bar . $out;
 }
 
 function getpts($sc) {
@@ -215,7 +217,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}

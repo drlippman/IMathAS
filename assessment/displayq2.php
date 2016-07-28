@@ -481,7 +481,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		if (($qdata['solutionopts']&2)==2 && $qdata['solution']!='') {
 			$addr = $urlmode. $_SERVER['HTTP_HOST'] . "$imasroot/assessment/showsoln.php?id=".$qidx.'&sig='.md5($qidx.$GLOBALS['sessiondata']['secsalt']);
 			$addr .= '&t='.($qdata['solutionopts']&1).'&cid='.$GLOBALS['cid'];
-			echo formpopup("Written Example",$addr,730,500,"button",true,"soln",$qref);
+			echo formpopup(_("Written Example"),$addr,730,500,"button",true,"soln",$qref);
 		}
 		echo '</p></div>';
 	}

@@ -18,6 +18,8 @@ require("./assessment/displayq2.php");
 $sessiondata = array();
 $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 6;
+$sessiondata['secsalt'] = "12345";
+$cid = "embedq";
 $showtips = 2;
 $useeqnhelper = 4;
 

@@ -1,6 +1,13 @@
 <?php
 
-require("../validate.php");
+if ($_GET['cid']==="embedq") {
+	$sessiondata = array();
+	require("../config.php");
+	$cid = "embedq";
+	$sessiondata['secsalt'] = "12345";
+} else {
+	require("../validate.php");
+}
 
 $id = intval($_GET['id']);
 $sig = $_GET['sig'];
