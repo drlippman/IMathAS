@@ -116,7 +116,16 @@ C validate        26
  C drillassess      8
  C edittoolscores   11
  0 embedhelper      
+ C enrollfromothercourse  4
+ C exception        13
+ C gb-aidexport     5
+ C gb-aidexport     4
+ C gb-itemanalysis  7
+ C gb-itemanalysisdetail  4
+ C gb-itemresults   4
+ C gb-testing       1
  
+
 
 
 /diag              done
