@@ -2,7 +2,7 @@
 //IMathAS:  Checks user's login - prompts if none.
 //(c) 2006 David Lippman
  header('P3P: CP="ALL CUR ADM OUR"');
-
+ global $DBH;
  $curdir = rtrim(dirname(__FILE__), '/\\');
  if (!file_exists("$curdir/config.php")) {
 	 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
