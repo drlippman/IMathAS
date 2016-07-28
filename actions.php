@@ -126,7 +126,7 @@ ini_set("post_max_size", "10485760");
 		$newuserid = $DBH->lastInsertId();
 
 		if ($emailconfirmation) {
-			$id = $newuserid
+			$id = $newuserid;
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
