@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <?php
- 
+
 //load filter
 $curdir = rtrim(dirname(__FILE__), '/\\');
 $loadgraphfilter = true;
@@ -23,7 +23,7 @@ function recordanswer(val, qn, part) {
 		qn = (qn+1)*1000 + part;
 	}
 	document.getElementById("qn"+qn).value = val;
-}	
+}
 var imasprevans = [];
 function getlastanswer(qn, part) {
 	if (part != null) {
@@ -80,17 +80,17 @@ if (!isset($sessiondata['mathdisp'])) {
 		}
 		MathJax.Hub.config.extensions.push("InputToDataAttr.js");
 		</script>';
-		//webFont: "STIX-Web", 
+		//webFont: "STIX-Web",
 	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; var mathRenderer = "MathJax"; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>'; 
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; var mathRenderer = "MathJax"; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>';
 	echo '<style type="text/css">span.MathJax { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=061016\" type=\"text/javascript\"></script>\n";
-	
+
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
 			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, skipStartupTypeset: true, messageStyle: "none"});
@@ -99,22 +99,22 @@ if (!isset($sessiondata['mathdisp'])) {
 		}
 		MathJax.Hub.config.extensions.push("InputToDataAttr.js");
 		</script>';
-		// webFont: "STIX-Web", 
+		// webFont: "STIX-Web",
 	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
 	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
 	echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=070816"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex"; function rendermathnode(node) {renderMathInElement(node);}</script>'; 
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex"; function rendermathnode(node) {renderMathInElement(node);}</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2) {
-	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>'; 
+	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?v=092314\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false;var MathJaxCompatible = false;var mathRenderer = \"img\";function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==0) {
-	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';	
-} 
+	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
+}
 echo "<script src=\"$imasroot/javascript/mathjs.js?v=063016\" type=\"text/javascript\"></script>\n";
 if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=071516\" type=\"text/javascript\"></script>\n";
@@ -123,18 +123,18 @@ if ($sessiondata['graphdisp']==1) {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
 ?>
-<!--[if lte IE 6]> 
-<style type="text/css"> 
-div { zoom: 1; } 
+<!--[if lte IE 6]>
+<style type="text/css">
+div { zoom: 1; }
 .clear { line-height: 0;}
 #mqarea { height: 2em;}
-#GB_overlay, #GB_window { 
- position: absolute; 
- top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px'); 
- left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');} 
+#GB_overlay, #GB_window {
+ position: absolute;
+ top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
+ left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');}
 }
-</style> 
-<![endif]--> 
+</style>
+<![endif]-->
 <script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=072216";?>" type="text/javascript"></script>
 <script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=012115";?>" type="text/javascript"></script>
 <!--[if lt IE 9]>
@@ -167,9 +167,9 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<script type="text/javascript">var eetype='.$useeqnhelper.'</script>';
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=062216\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-	
+
 } else if ($useeqnhelper==3 || $useeqnhelper==4) {
-	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
+	echo "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=062416\" type=\"text/css\" />";
 	if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
 		echo '<!--[if lte IE 7]><style style="text/css">
 			.mathquill-editable.empty { width: 0.5em; }
@@ -185,9 +185,9 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 } 
 
-//IP: eqntips 
+//IP: eqntips
 if ($showtips==2) {
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
 }
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
@@ -227,7 +227,7 @@ if (!isset($coursetopbar)) {
 	if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
 	if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
 	$coursetoolset = $sessiondata['coursetoolset'];
-}		
+}
 
 if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) || $sessiondata['intreereader']==false) && $sessiondata['isteacher'] && $coursetopbar[2]==1 && count($coursetopbar[1])>0) {
 	echo '<div id="navlistcont">';
@@ -257,7 +257,7 @@ if (isset($cid) && !isset($flexwidth) && (!isset($sessiondata['intreereader']) |
 	if (in_array(5,$coursetopbar[1])) { //Quickview
 		echo "<li><a href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
-	
+
 	if (in_array(9,$coursetopbar[1]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
