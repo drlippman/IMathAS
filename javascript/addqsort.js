@@ -9,6 +9,17 @@
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
 
+$(document).ready(function() {
+	$("<style type='text/css'> .highlightbackground{ background-color: #F01235;} .highlightborder{border: 1px solid #F01235;} </style>").appendTo("body");
+	$("<style type='text/css'> .mce-dim{ opacity: 0.3;} </style>").appendTo("body");
+	$("<style type='text/css'> .collapsed{ max-height: 2.0em; overflow: hidden;} </style>").appendTo("body");
+	$(window).on("beforeunload",function(){
+		if (anyEditorIsDirty()) {
+			return "You will loose your changes!";
+		}
+	});
+});
+
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
 	 if (usingASCIIMath) {
@@ -31,14 +42,88 @@ function activateLastEditorIfBlank() {
 
 //this is called by tinycme during initialization
 function editorSetup(editor) {
-	editor.on("blur", function() {
-		var i=this.id.match(/[0-9]+$/)[0];
-		savetextseg(i);
+	var i=this.id.match(/[0-9]+$/)[0];
+	editor.addButton('savedb', {
+		text: null,
+		title: "Save All",
+		icon: 'save',
+		classes: "dim savedb savedb"+i, // "mce-dim" and "mce-savedb0"
+		//disabled: true,
+		onclick: function () {
+			var i=editor.id.match(/[0-9]+$/)[0];
+			highlightSaveButton(false);
+			savetextseg(); //Save all text segments
+		},
+		onPostRender: function() {
+			var i=editor.id.match(/[0-9]+$/)[0];
+			updateSaveButtonDimming();
+		}
+    });
+	editor.on("dirty", function() {
+		updateSaveButtonDimming();
 	});
-	editor.on("focus", function() {
+	editor.once("focus", function() {
+		//if the editor hasn't already been activated
 		var i=this.id.match(/[0-9]+$/)[0];
-		edittextseg(i);
+		$("#textsegdesdiv"+i).removeClass("collapsed");
 	});
+	$("div.textsegment").on("mouseleave focusout", function(e) {
+		highlightSaveButton(true);
+	});
+	$("div.textsegment").on("mouseenter click", function(e) {
+		//if rentering the active editor, un-highlight
+		if (tinymce.activeEditor && 
+				tinymce.activeEditor.id === e.currentTarget.id) {
+			highlightSaveButton(false);
+		}
+	});
+}
+
+//Highlight all Save All buttons when the mouse leaves an editor
+function highlightSaveButton(leaving) {
+	if (anyEditorIsDirty()) {
+		var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
+		if (leaving) {
+			$("div.mce-savedb"+i).css("transition","background-color 0s")
+								.addClass("highlightbackground");
+		} else {
+			$("div.mce-savedb"+i).css("transition","background-color 1s ease-out")
+								.removeClass("highlightbackground");
+		}
+	}
+}
+
+//If any editor is dirty, undim the Save All button and
+// highlight that editor
+function updateSaveButtonDimming(dim) {
+	var save_buttons = $("div.mce-savedb");
+	if (tinyMCE.activeEditor && tinyMCE.activeEditor.isDirty()) {
+		$("div.mce-savedb").removeClass("mce-dim");
+		//update tinymce data structure in case other editors haven't
+		// been activated
+		for (index in tinymce.editors) {
+			var editor = tinymce.editors[index];
+			editor.buttons['savedb'].classes =
+				editor.buttons['savedb'].classes.replace(/dim ?/g,"");
+			var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
+			$("#textsegdesdiv"+i).css("transition","border 0s")
+								.removeClass("intro")
+								.addClass("highlightborder");
+		}
+	}
+	//TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
+	// re-dim the Save All button after checking all editors
+}
+
+function anyEditorIsDirty() {
+	var any_dirty = false;
+	for (index in tinymce.editors) {
+		if (tinymce.editors[index].isDirty()) {
+			any_dirty = true;
+			break;
+		}
+	}
+	return any_dirty;
 }
 
 function generateMoveSelect2(num) {
@@ -320,12 +405,21 @@ function edittextseg(i) {
 }
 
 function savetextseg(i) {
-	if (tinyMCE.get("textsegdesdiv"+i).isDirty() ||
-			(tinyMCE.get("textsegdesheader"+i) && tinyMCE.get("textsegdesheader"+i).isDirty()) ) {
-		itemarray[i][1] = tinyMCE.get("textsegdesdiv"+i).getContent();
-		if (itemarray[i][3]==1) {
-			itemarray[i][4] = tinyMCE.get("textsegdesheader"+i).getContent();
+	var any_dirty = false;
+	for (index in tinymce.editors) {
+		var editor = tinymce.editors[index];
+		if (editor.isDirty()) {
+			var i=editor.id.match(/[0-9]+$/)[0];
+			if (editor.id.match("textsegdesdiv")) {
+				itemarray[i][1] = editor.getContent();
+				any_dirty = true;
+			} else if (editor.id.match("textsegdesheader")) {
+				itemarray[i][4] = editor.getContent();
+				any_dirty = true;
+			}
 		}
+	}
+	if (any_dirty) {
 		submitChanges();
 	}
 }
@@ -430,11 +524,16 @@ function generateTable() {
 		return (this.collapsed_text_segments)?"+":"-";
 	}
 	this.getCollapseExpandLink = function () {
-		return "<a onclick=\"toggleCollapseTextSegments();refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</a>";
+		return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
 	}
 	this.toggleCollapseTextSegments = function () {
 		this.collapsed_text_segments = !this.collapsed_text_segments;
 		$("#collapseexpandsymbol").html(getCollapseExpandSymbol);
+		if (this.collapsed_text_segments) {
+			$(".textsegment").addClass("collapsed");
+		} else {
+			$(".textsegment").removeClass("collapsed");
+		}
 	};
 	html += "<th>Description <span id=\"collapseexpandlink\">"+this.getCollapseExpandLink()+"</span></th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
@@ -536,16 +635,10 @@ function generateTable() {
 					html += "<td colspan=6 id=\"textsegdescr"+i+"\">";
 					if (curitems[j][3]==1) {
 						var header_contents= curitems[j][4];
-						if (this.collapsed_text_segments) {
-							header_contents= strip_tags(header_contents).substr(0,50);
-						}
 						html += "<h4 id=\"textsegdesheader"+i+"\" class=\"textsegment\">"+header_contents+"</h2>";
 					} 
 alert("collapsed: "+this.collapsed_text_segments);
 					var contents = curitems[j][1];
-					if (this.collapsed_text_segments) {
-						contents = strip_tags(contents).substr(0,55);
-					}
 					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+contents+"</div></td>"; //description
 					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
 					html += '<label><input type="checkbox" id="ispagetitle'+i+'" onchange="chgpagetitle('+i+')" ';
@@ -553,10 +646,7 @@ alert("collapsed: "+this.collapsed_text_segments);
 					html += '>New page<label></td>';
 				} else {
 					var contents = curitems[j][1];
-					if (this.collapsed_text_segments) {
-						contents = strip_tags(contents).substr(0,55);
-					}
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+contents+"</div></td>"; //description
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div></td>"; //description
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
@@ -687,6 +777,7 @@ function submitChanges() {
 	.done(function() {
 		document.getElementById(target).innerHTML='';
 		refreshTable();
+		updateSaveButtonDimming();
 	})
 	.fail(function(xhr, status, errorThrown) {
 	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ 
