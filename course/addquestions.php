@@ -255,7 +255,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$aid));
 			//DB $itemorder = explode(',',mysql_result($result,0,0));
 			//DB $defpoints = mysql_result($result,0,1);
-			list($itemorder, $defpoints) = $stm-fetch(PDO::FETCH_NUM);
+			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			$itemorder = explode(',', $itemorder);
 
 
