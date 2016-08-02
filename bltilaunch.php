@@ -113,7 +113,7 @@ if (isset($_GET['launch'])) {
 	//DB $query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare('UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id');
-	$stm->execute(array(':lastaccess'=>$now, $sessionid, ':id'=>$userid));
+	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
 	if (isset($_POST['tzname'])) {
 		$tzname = $_POST['tzname'];
