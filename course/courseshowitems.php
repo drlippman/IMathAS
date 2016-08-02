@@ -22,7 +22,7 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
+	   global $DBH, $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
 	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
 	   require_once("../includes/filehandler.php");
 
