@@ -311,9 +311,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				':msgtoinstr'=>$_POST['msgtoinstr'], ':posttoforum'=>$_POST['posttoforum'], ':istutorial'=>$istutorial,
 				':defoutcome'=>$_POST['defoutcome']);
 
-			$stm = $DBH->prepare($query);
-			$stm->execute();
-
 			if ($updategroupset!='') {
 				$query .= ",groupsetid=:groupsetid";
 				$qarr[':groupsetid'] = $updategroupset;
