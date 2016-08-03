@@ -52,7 +52,7 @@ if (isset($_POST['seed'])) {
 		}
 		$after = implode('~',$after);
 	}
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
 	$pts = getpts($after);
 	$page_scoreMsg .= '<script type="text/javascript">
@@ -144,7 +144,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $imasroot;
+	global $imasroot, $DBH;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);

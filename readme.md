@@ -33,17 +33,17 @@ be fixed.
 Progress
 ````
 /                   done
-C actions         39
-C bltilaunch      117
+R actions         39
+R bltilaunch      117
 C calcqtimes      10
 0 canvas          0
 0 canvasnav       0
 0 checkbrowser    0
   config.dist     recheck
 C dbsetup         63   check against config and install when Done
-C DEembedq        3
-C directaccess    8
-C embedq          1
+R DEembedq        3
+R directaccess    8
+R embedq          1
 C footer          1
 C forms           12
 C gethomemenu     2
@@ -124,8 +124,16 @@ C validate        26
  C gb-itemanalysisdetail  4
  C gb-itemresults   4
  C gb-testing       1
- 
-
+ C gb-viewasid      38
+ C gb-viewdrill     2
+ C gbcomments       5
+ C gbsettings       13
+   gbtable.php          old and not used - remove
+ C gbtable2.php     17
+ C getblockitems    6
+ C getblockitemspublic  1
+ C gradeallq        9
+ C gradebook        17
 
 
 /diag              done
