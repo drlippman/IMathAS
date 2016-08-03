@@ -20,32 +20,51 @@ $postid = intval($_GET['postid']);
 $like = intval($_GET['like']);
 
 if ($like==0) {
-	$query = "DELETE FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";	
-	$result = mysql_query($query);
-	$aff =  mysql_affected_rows();
+	//DB $query = "DELETE FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";	
+	//DB $result = mysql_query($query);
+	//DB $aff =  mysql_affected_rows();
+	$stm = $DBH->prepare("DELETE FROM imas_forum_likes WHERE postid=:postid AND userid=:userid";	);
+	$stm->execute(array(':postid'=>$postid, ':userid'=>$userid));
+	$aff =  $stm->rowCount();
 } else {
-	$query = "SELECT id FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";
-	$result = mysql_query($query);
-	if (mysql_num_rows($result)>0) {
+	//DB $query = "SELECT id FROM imas_forum_likes WHERE postid=$postid AND userid='$userid'";
+	//DB $result = mysql_query($query);
+	//DB if (mysql_num_rows($result)>0) {
+	$stm = $DBH->prepare("SELECT id FROM imas_forum_likes WHERE postid=:postid AND userid=:userid");
+	$stm->execute(array(':postid'=>$postid, ':userid'=>$userid));
+	if ($stm->rowCount()>0) {
 		$aff =0;
 	} else {
-		$query = "SELECT threadid FROM imas_forum_posts WHERE id=$postid";
-		$result = mysql_query($query);
-		if (mysql_num_rows($result)==0) {echo "fail";exit;}
-		$threadid = mysql_result($result,0,0);
+		//DB $query = "SELECT threadid FROM imas_forum_posts WHERE id=$postid";
+		//DB $result = mysql_query($query);
+		//DB if (mysql_num_rows($result)==0) {echo "fail";exit;}
+		//DB $threadid = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT threadid FROM imas_forum_posts WHERE id=:id");
+		$stm->execute(array(':id'=>$postid));
+		if ($stm->rowCount()==0) {echo "fail";exit;}
+		$threadid = $stm->fetchColumn(0);
 		
+		//DB $query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
+		//DB $query .= "('$userid',$threadid,$postid,$isteacher)";
+		//DB mysql_query($query);
 		$query = "INSERT INTO imas_forum_likes (userid,threadid,postid,type) VALUES ";
-		$query .= "('$userid',$threadid,$postid,$isteacher)";
-		mysql_query($query);
+		$query .= "(:userid, :threadid, :postid, :type)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid, ':postid'=>$postid, ':type'=>$isteacher));
 		$aff = 1;
 	}
 }
 
 $likes = array(0,0,0);
-$query = "SELECT type,count(*) FROM imas_forum_likes WHERE postid='$postid'";
+//DB $query = "SELECT type,count(*) FROM imas_forum_likes WHERE postid='$postid'";
+//DB $query .= "GROUP BY type";	
+//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$query = "SELECT type,count(*) FROM imas_forum_likes WHERE postid=:postid";
 $query .= "GROUP BY type";	
-$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare($query);
+$stm->execute(array(':postid'=>$postid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$likes[$row[0]] = $row[1];
 }
 $likemsg = 'Liked by ';

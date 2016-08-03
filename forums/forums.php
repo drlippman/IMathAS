@@ -64,23 +64,32 @@
 
 	//get general forum info and page order
 	$now = time();
-	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
-	if (!$isteacher) {
-		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+	//DB $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
+	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid=:courseid";
+	$array = [':courseid'=>$cid];
+	if (!$teacherid) {
+		//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<:now AND imas_forums.enddate>:now2))";
+	  $array= array_merge($array,[':now'=> $now,':now2'=> $now]);
 	}
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($array);
+	$line = $stm->fetchALL(PDO::FETCH_ASSOC);
+	$anyforumsgroup = false;
 	$forumdata = array();
 	$anyforumsgroup = false;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	foreach ($line as  $line) {
 		$forumdata[$line['id']] = $line;
 		if ($line['groupsetid']>0) {
 			$anyforumsgroup = true;
 		}
 	}
 
-	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$itemorder = unserialize(mysql_result($result,0,0));
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$result = $stm->execute(array(':id'=>$cid));
+	$itemorder =  unserialize($stm->fetchColumn(0));
 	$itemsimporder = array();
 	function flattenitems($items,&$addto) {
 		global $itemsimporder;
@@ -95,9 +104,11 @@
 	flattenitems($itemorder,$itemsimporder);
 
 	$itemsassoc = array();
-	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$stm = $DBH->prepare("SELECT id,typeid FROM imas_items WHERE courseid=:courseid AND itemtype='Forum'");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$itemsassoc[$row[0]] = $row[1];
 		if (!in_array($row[0],$itemsimporder)) {
 			//capture any forums that are in imas_items but not imas_courses.itemorder
@@ -194,27 +205,35 @@ if ($searchtype == 'thread') {
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
 	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
-	$query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid='$userid' ";
-
-	$query .= "WHERE imas_forums.courseid='$cid' AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
+	$query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid=:userid ";
+	$query .= "WHERE imas_forums.courseid=:cid AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
+	$arr = array(':userid' => $userid,':cid' => $cid );
 	if ($searchstr != '') {
 		$query .= "AND $searchlikes ";
 	}
 	if ($searchtag != '') {
-		$query .= "AND imas_forum_posts.tag='$searchtag' ";
+		$query .= "AND imas_forum_posts.tag= :searchtag";
+		$arr[':searchtag'] = $searchtag;
 	}
 	if (!$isteacher) {
-		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<:now AND imas_forums.enddate>:now)) ";
+		$arr[':now'] = $now;
+		$arr[':now'] = $now;
 	}
 	if ($anyforumsgroup && !$isteacher) {
-		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid= userid)) ";
+		$arr[':userid'] = $userid;
 	}
 
 	$query .= " ORDER BY imas_forum_threads.lastposttime DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($arr);
+	$result=$stm->fetchALL(PDO::FETCH_ASSOC);
+	
+	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$threaddata = array();
 	$threadids = array();
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	foreach($result as $line) {
 		$threaddata[$line['id']] = $line;
 		$threadids[] = $line['id'];
 	}
@@ -222,9 +241,14 @@ if ($searchtype == 'thread') {
 		echo 'No results';
 	} else {
 		$limthreads = implode(',',$threadids);
-		$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
-		$query .= "WHERE threadid IN ($limthreads) GROUP BY threadid";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+		//DB $query .= "WHERE threadid IN ($limthreads) GROUP BY threadid";
+		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+    $query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
+		$query .= "WHERE threadid IN (:limthreads) GROUP BY threadid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':limthreads'=>$limthreads));
+
 		$postcount = array();
 		$maxdate = array();
 		while ($row = mysql_fetch_row($result)) {
@@ -287,7 +311,7 @@ if ($searchtype == 'thread') {
 	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
 		'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
-		'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png',
+		'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
 		'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png',
 		'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png',
 		'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png');
@@ -304,32 +328,41 @@ if ($searchtype == 'thread') {
 		$searchlikes3 = "(imas_users.LastName LIKE '%".implode("%' AND imas_users.LastName LIKE '%",$searchterms)."%')";
 	}
 
+	//DB $query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
+	//DB $query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
+	//DB $query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
 	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
+	$array= [];
 	if ($anyforumsgroup && !$isteacher) {
 		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
 	}
-	$query .= "WHERE imas_forums.courseid='$cid' ";
+	$query .= "WHERE imas_forums.courseid=:cid ";
+	$array[':cid']= $cid;
 	if ($searchstr != '') {
 		$query .= "AND ($searchlikes OR $searchlikes2 OR $searchlikes3) ";
 	}
 	if ($searchtag != '') {
-		$query .= "AND imas_forum_posts.tag='$searchtag' ";
+		$query .= "AND imas_forum_posts.tag=:searchtag ";
+		$array[':searchtag']= $searchtag;
 	}
 	if (!$isteacher) {
 		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) AND (imas_forums.settings&16)=0 ";
 	}
 	if ($anyforumsgroup && !$isteacher) {
-		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid')) ";
+		$array[':userid']= $userid;
 	}
-
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare($query);
+	$stm->execute($array);
+  $result=$stm->fetchALL(PDO::FETCH_ASSOC);
+	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	if ($result==0) {
 		echo '<p>No results</p>';
 	}
-	while ($line =  mysql_fetch_array($result, MYSQL_ASSOC)) {
+	foreach ($result as $line) {
 		echo "<div class=block>";
 		echo "<b>{$line['subject']}</b>";
 		echo ' (in '.$line['name'].')';
@@ -387,18 +420,35 @@ if ($searchtype == 'thread') {
 	<tbody>
 <?php
 
-	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
-	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
+	//DB $query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+  $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
+	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid=:courseid GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	$result=$stm->fetchALL(PDO::FETCH_NUM);
+	foreach ($result as $row) {
 		$threadcount[$row[0]] = $row[1];
 	}
 
+	// $query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate) AS maxdate FROM imas_forums LEFT JOIN imas_forum_posts ON ";
+	// $query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+	// 
+	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	// var_dump($result);
+	// while ($row = mysql_fetch_row($result)) {
+	// 	$postcount[$row[0]] = $row[1];
+	// 	$maxdate[$row[0]] = $row[2];
+	//NOT WORKING
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) AS postcount,MAX(imas_forum_posts.postdate) AS maxdate FROM imas_forums LEFT JOIN imas_forum_posts ON ";
-	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
-
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forums.courseid=:courseid GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=> $cid));
+	
+	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$result=$stm->fetchALL(PDO::FETCH_NUM);
+	foreach ($result as $row){
 		$postcount[$row[0]] = $row[1];
 		$maxdate[$row[0]] = $row[2];
 	}
@@ -413,16 +463,26 @@ if ($searchtype == 'thread') {
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) GROUP BY imas_forums.id";
 	*/
+	//DB $query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+	//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//DB NOT WORKING
 	$query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid=:courseid ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	if (!isset($teacherid)) {
-		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+  $array = array(':courseid'=>$cid, ':userid'=>$userid);
+if (!isset($teacherid)) {
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid )) ";
+		$array[':userid']=$userid;
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute($array);
+	$result=$stm->fetchALL(PDO::FETCH_NUM);
+	// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	foreach($result as $row) {
 		$newcnt[$row[0]] = $row[1];
 	}
 

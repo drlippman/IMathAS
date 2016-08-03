@@ -94,7 +94,6 @@ R validate        26
 
 /assessment       done
  0 asidutil
-<<<<<<< HEAD
  C catscores      4
  0 checkint  
  C displayq2      5
@@ -107,9 +106,7 @@ R validate        26
  C showtest       60
  C testutil       4
  0 watchvid
-=======
  R catscores      4
->>>>>>> 4bc3a914b5b6faf9527746c6755f206279032ced
 
  /libs          done
   0 all
@@ -249,6 +246,14 @@ R validate        26
   0 all  
 
 /forums
+C forums             7  
+C listlikes          2
+C listviews          2
+C newthreads         6
+C posthandler        53
+C posts              22
+C postsbyname        11
+C recordlikes        5
 
 /includes             done
  C calendardisp     11
