@@ -50,7 +50,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
 
-
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');

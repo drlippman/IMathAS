@@ -458,8 +458,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users";
+			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$subs[$j]));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -919,7 +919,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				writesessiondata();
 			}
 		}
-
 		if (isset($sessiondata['aidstolist'.$aid])) { //list questions
 
 			$aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";
