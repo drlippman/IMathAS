@@ -33,8 +33,8 @@ be fixed.
 Progress
 ````
 /                   done
-C actions         39
-C bltilaunch      117
+R actions         39
+R bltilaunch      117
 C calcqtimes      10
 0 canvas          0
 0 canvasnav       0
