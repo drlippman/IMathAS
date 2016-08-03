@@ -41,7 +41,7 @@ C calcqtimes      10
 0 checkbrowser    0
   config.dist     recheck
 C dbsetup         63   check against config and install when Done
-C DEembedq        3
+R DEembedq        3
 C directaccess    8
 C embedq          1
 C footer          1
