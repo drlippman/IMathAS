@@ -134,6 +134,17 @@ C validate        26
  C getblockitemspublic  1
  C gradeallq        9
  C gradebook        17
+ C improveoerassess 3
+ C isolateassessbygroup 6
+ C isolateassessgrade   7
+ C latepasses       6
+ C libtree          1
+ C libtree2         1
+ C listusers        27
+ C lockstu          5
+ C logingrid        2
+ C managecalitems   4
+ C managelibs       35
 
 
 /diag              done
