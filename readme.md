@@ -42,8 +42,8 @@ C calcqtimes      10
   config.dist     recheck
 C dbsetup         63   check against config and install when Done
 R DEembedq        3
-C directaccess    8
-C embedq          1
+R directaccess    8
+R embedq          1
 C footer          1
 C forms           12
 C gethomemenu     2
