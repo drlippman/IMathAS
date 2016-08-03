@@ -855,7 +855,7 @@ if ($stm->rowCount()==0) {
 				$query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:chatset,:showlatepass,:itemorder,:topbar,:cploc,:available,:theme,:ltisecret,:blockcnt)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
-					':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 					':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
 
@@ -2240,7 +2240,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :chatset, :showlatepass, :itemorder, :topbar, :cploc, :available, :theme, :ltisecret, :blockcnt);";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
-							':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 							':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
 						//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
