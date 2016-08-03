@@ -708,7 +708,7 @@ ini_set("post_max_size", "10485760");
 		$query = "UPDATE imas_users SET FirstName=:FirstName, LastName=:LastName, email=:email, msgnotify=:msgnotify, qrightsdef=:qrightsdef, deflib=:deflib,";
 		$query .= "usedeflib=:usedeflib, homelayout=:homelayout, theme=:theme, listperpage=:listperpage $chguserimg WHERE id=:uid";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw, ':rights'=>$initialrights, ':FirstName'=>$_POST['firstname'],
+		$stm->execute(array(':FirstName'=>$_POST['firstname'],
 			':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':msgnotify'=>$msgnot, ':homelayout'=>$layoutstr, ':qrightsdef'=>$qrightsdef,
 			':deflib'=>$deflib, ':usedeflib'=>$usedeflib, ':theme'=>$_POST['theme'], ':listperpage'=>$perpage, ':uid'=>$userid));
 
@@ -744,7 +744,7 @@ ini_set("post_max_size", "10485760");
 				//DB $query = "UPDATE imas_sessions SET tzname='$tzname' WHERE sessionid='$sessionid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");
-				$stm->execute(array(':tznam'=>$tzname, ':sessionid'=>$sessionid));
+				$stm->execute(array(':tzname'=>$tzname, ':sessionid'=>$sessionid));
 			}
 		}
 	} else if ($_GET['action']=="forumwidgetsettings") {
