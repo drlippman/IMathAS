@@ -35,42 +35,42 @@ Progress
 /                   done
 R actions         39
 R bltilaunch      117
-C calcqtimes      10
+R calcqtimes      10
 0 canvas          0
 0 canvasnav       0
 0 checkbrowser    0
   config.dist     recheck
-C dbsetup         63   check against config and install when Done
+R dbsetup         63 check against config and install when Done
 R DEembedq        3
 R directaccess    8
 R embedq          1
-C footer          1
-C forms           12
+R footer          1
+R forms           12
 C gethomemenu     2
 C getpostlist     6
   getxml            no longer relevant- should be removed
   google-postreader no longer relevant- should be removed
 0 header          0
 0 help            0
-C index           12
+R index           12
 0 infoheader.dist
-C install         1   check - need to remove addslashes after done
-C installexamples 3
+R install         1   check - need to remove addslashes after done  (addslashes are still there... is this for you to remove or us?)
+R installexamples 3
 0 loginpage.dist
 C ltihome         30
 0 ltisessionsetup
 0 multiembedq
 C newinstructor.dist  4
-C OEAembedq       3
+R OEAembedq       3
 C showlinkedtextpublic  5
 C upgrade         237  lots of logic to check
-C validate        26
+R validate        26
 
 /admin
 
 /assessment
  0 asidutil
- C catscores      4
+ R catscores      4
 
  /libs
   0 all
