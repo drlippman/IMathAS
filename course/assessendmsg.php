@@ -14,20 +14,20 @@ if (!isset($imasroot)) {
 	if (isset($_GET['record'])) {
 		$endmsg = array();
 		$endmsg['type'] = $_POST['type'];
-		$endmsg['def'] = stripslashes($_POST['msg'][0]);
+		$endmsg['def'] = $_POST['msg'][0];
 		$i=1;
 		$msgarr = array();
 		while (isset($_POST['sc'][$i]) && !empty($_POST['sc'][$i]) ) {
 			$key = (int)$_POST['sc'][$i];
 			if ($key>0) {
-				$msgarr[$key] = stripslashes($_POST['msg'][$i]);
+				$msgarr[$key] = $_POST['msg'][$i];
 			}
 			$i++;
 		}
 		krsort($msgarr);
 		$endmsg['msgs'] = $msgarr;
 		require_once("../includes/htmLawed.php");
-		$endmsg['commonmsg'] = myhtmLawed(stripslashes($_POST['commonmsg']));
+		$endmsg['commonmsg'] = myhtmLawed($_POST['commonmsg']);
 		$msgstr = addslashes(serialize($endmsg));
 		if (isset($_POST['aid'])) {
 			//DB $query = "UPDATE imas_assessments SET endmsg='$msgstr' WHERE id='{$_POST['aid']}'";

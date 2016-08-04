@@ -81,23 +81,23 @@ R validate        26
  C addcalendar      6
  C adddrillassess   14 messy logic on search
  * addforum            come back to this after merging forum exception branched
- C addgrades        26
- C addinlinetext    17
- C addlinkedtext    13
- C addoutcomes      12
+ R addgrades        26
+ R addinlinetext    17
+ R addlinkedtext    13
+ R addoutcomes      12
  R addquestions     29 messy logic on search like adddrill
- C addquestionssave 3
- C addrubric        4
- C addvideotimes    3
- C addwiki          9
- C assessendmsg     2
- C categorize       8
+ R addquestionssave 3
+ R addrubric        4
+ R addvideotimes    3
+ R addwiki          9
+ R assessendmsg     2
+ R categorize       8
  C chgassessments   11
- C chgblocks        3
+ R chgblocks        3
  * chkforums          come back to this after merging forum exception branched
- C chgoffline       6
- C claimbadge       3
- C contentstats     3
+ R chgoffline       6
+ R claimbadge       3
+ R contentstats     3
  C copyitems        41
  C copyoneitem      6
  C course           12
@@ -123,9 +123,9 @@ R validate        26
  C gb-itemanalysis  7
  C gb-itemanalysisdetail  4
  C gb-itemresults   4
- C gb-testing       1
+ R gb-testing       1
  C gb-viewasid      38
- C gb-viewdrill     2
+ R gb-viewdrill     2
  C gbcomments       5
  C gbsettings       13
    gbtable.php          old and not used - remove
