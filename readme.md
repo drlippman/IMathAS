@@ -78,12 +78,12 @@ R validate        26
 /course
  R addassessment    24
  R addblock         5
- C addcalendar      6
- C adddrillassess   14 messy logic on search
+ R addcalendar      6
+ R adddrillassess   14 messy logic on search
  * addforum            come back to this after merging forum exception branched
- C addgrades        26
- C addinlinetext    17
- C addlinkedtext    13
+ R addgrades        26
+ R addinlinetext    17
+ R addlinkedtext    13
  C addoutcomes      12
  R addquestions     29 messy logic on search like adddrill
  C addquestionssave 3

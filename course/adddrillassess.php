@@ -238,7 +238,7 @@ if (isset($_GET['record'])) {
 		if ($updatebests) {
 			//DB $query .= ",classbests='$bestlist'";
 			$query .= ",classbests=:classbests";
-			$qarr[':classbests']=>$bestlist;
+			$qarr[':classbests']= $bestlist;
 		}
 		$query .= " WHERE id=:id";
 		$qarr[':id'] = $daid;
