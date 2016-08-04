@@ -92,7 +92,7 @@ R validate        26
  R addwiki          9
  R assessendmsg     2
  R categorize       8
- C chgassessments   11
+ R chgassessments   11
  R chgblocks        3
  * chkforums          come back to this after merging forum exception branched
  R chgoffline       6
