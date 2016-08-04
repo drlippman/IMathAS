@@ -27,7 +27,7 @@ function buildExistBlocksArray($items,$parent) {
 	$i=0;
 	foreach ($existblocks as $k=>$name) {
 		$existBlocksVals[$i]=$k;
-		$existBlocksLabels[$i]=stripslashes($name);
+		$existBlocksLabels[$i]=$name;
 		$i++;
 	}
 }
@@ -137,7 +137,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 	}
 	if (isset($existingid)) {  //already have id; update
-		$sub[$existingid]['name'] = htmlentities(stripslashes($_POST['title']));
+		$sub[$existingid]['name'] = htmlentities($_POST['title']);
 		$sub[$existingid]['startdate'] = $startdate;
 		$sub[$existingid]['enddate'] = $enddate;
 		$sub[$existingid]['avail'] = $_POST['avail'];
@@ -148,7 +148,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['grouplimit'] = $grouplimit;
 	} else { //add new
 		$blockitems = array();
-		$blockitems['name'] = htmlentities(stripslashes($_POST['title']));
+		$blockitems['name'] = htmlentities(($_POST['title']);
 		$blockitems['id'] = $blockcnt;
 		$blockitems['startdate'] = $startdate;
 		$blockitems['enddate'] = $enddate;
@@ -195,7 +195,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 
-		$title = stripslashes($blockitems[$existingid]['name']);
+		$title = $blockitems[$existingid]['name'];
 		$title = str_replace('"','&quot;',$title);
 		$startdate = $blockitems[$existingid]['startdate'];
 		$enddate = $blockitems[$existingid]['enddate'];

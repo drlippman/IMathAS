@@ -76,8 +76,8 @@ R validate        26
   0 all
 
 /course
- C addassessment    24
- C addblock         5
+ R addassessment    24
+ R addblock         5
  C addcalendar      6
  C adddrillassess   14 messy logic on search
  * addforum            come back to this after merging forum exception branched
@@ -85,7 +85,7 @@ R validate        26
  C addinlinetext    17
  C addlinkedtext    13
  C addoutcomes      12
- C addquestions     29 messy logic on search like adddrill
+ R addquestions     29 messy logic on search like adddrill
  C addquestionssave 3
  C addrubric        4
  C addvideotimes    3
