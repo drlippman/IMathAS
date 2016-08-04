@@ -148,7 +148,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$sub[$existingid]['grouplimit'] = $grouplimit;
 	} else { //add new
 		$blockitems = array();
-		$blockitems['name'] = htmlentities(($_POST['title']);
+		$blockitems['name'] = htmlentities($_POST['title']);
 		$blockitems['id'] = $blockcnt;
 		$blockitems['startdate'] = $startdate;
 		$blockitems['enddate'] = $enddate;
