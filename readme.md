@@ -46,8 +46,8 @@ R directaccess    8
 R embedq          1
 R footer          1
 R forms           12
-C gethomemenu     2
-C getpostlist     6
+R gethomemenu     2
+R getpostlist     6
   getxml            no longer relevant- should be removed
   google-postreader no longer relevant- should be removed
 0 header          0
@@ -57,10 +57,10 @@ R index           12
 R install         1   check - need to remove addslashes after done  (addslashes are still there... is this for you to remove or us?)
 R installexamples 3
 0 loginpage.dist
-C ltihome         30
+R ltihome         30
 0 ltisessionsetup
 0 multiembedq
-C newinstructor.dist  4
+R newinstructor.dist  4
 R OEAembedq       3
 C showlinkedtextpublic  5
 C upgrade         237  lots of logic to check
