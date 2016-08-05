@@ -728,6 +728,9 @@ function generateTable() {
 		}
 		alt = 1-alt;
 	}
+	if (!beentaken) {
+		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" ></td><td></td><td></td></tr>';
+	}
 	html += "</tbody></table>";
 	document.getElementById("pttotal").innerHTML = pttotal;
 	return html;
