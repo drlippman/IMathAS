@@ -145,6 +145,52 @@ table.gb .cat9 {
 .cattothdr {
 	font-variant: small-caps
 }
+.highlightbackground{
+	background-color: #F01235;
+}
+.highlightborder{
+	border: 1px solid #F01235;
+}
+.mce-dim{
+	opacity: 0.3;
+}
+.collapsed{
+	max-height: 2.5em;
+	overflow: hidden;
+	background-color: #fff; /* must match .intro */
+}
+.collapsedheader {
+	max-height: 1.4em;
+	overflow: hidden;
+}
+.collapsedtextfade {
+	z-index: 10;
+	position: absolute;
+	bottom: 1px;
+	left: 2px;
+	right: 2px;
+	height: 40%;
+	padding: 1px;
+	background-image: linear-gradient(to bottom, transparent, #fff); /* must match .intro */
+}
+.collapsedtextfadeheader {
+	z-index: 10;
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	height: 100%;
+	width: 10%;
+	padding: 1px;
+}
+tr:nth-child(even) div.collapsedtextfadeheader {
+	background-image: linear-gradient(to right, transparent, #dfd);
+	/* final gradient color must match tr.even above */
+}
+tr:nth-child(odd) div.collapsedtextfadeheader {
+	background-image: linear-gradient(to right, transparent, #fff);
+	/* final gradient color must match tr.odd above */
+}
+
 
 /*Fake look of links for Javascript onclicks*/
 span.link {

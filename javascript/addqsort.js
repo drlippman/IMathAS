@@ -10,9 +10,6 @@
 // item,item,n|w/wo~item~item,item
 
 $(document).ready(function() {
-	$("<style type='text/css'> .highlightbackground{ background-color: #F01235;} .highlightborder{border: 1px solid #F01235;} </style>").appendTo("body");
-	$("<style type='text/css'> .mce-dim{ opacity: 0.3;} </style>").appendTo("body");
-	$("<style type='text/css'> .collapsed{ max-height: 2.0em; overflow: hidden;} </style>").appendTo("body");
 	$(window).on("beforeunload",function(){
 		if (anyEditorIsDirty()) {
 			return "You will loose your changes!";
@@ -50,12 +47,10 @@ function editorSetup(editor) {
 		classes: "dim savedb savedb"+i, // "mce-dim" and "mce-savedb0"
 		//disabled: true,
 		onclick: function () {
-			var i=editor.id.match(/[0-9]+$/)[0];
 			highlightSaveButton(false);
 			savetextseg(); //Save all text segments
 		},
 		onPostRender: function() {
-			var i=editor.id.match(/[0-9]+$/)[0];
 			updateSaveButtonDimming();
 		}
     });
@@ -65,7 +60,14 @@ function editorSetup(editor) {
 	editor.once("focus", function() {
 		//if the editor hasn't already been activated
 		var i=this.id.match(/[0-9]+$/)[0];
-		$("#textsegdesdiv"+i).removeClass("collapsed");
+		var editor_id=this.id;
+		if (editor_id.match("textsegdesdiv")) {
+			$("#"+editor_id).removeClass("collapsed");
+			$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
+		} else if (editor_id.match("textsegdesheader")) {
+			$("#"+editor_id).removeClass("collapsedheader");
+			$("#"+editor_id).removeClass("collapsedtextfadeheader");
+		}
 	});
 	$("div.textsegment").on("mouseleave focusout", function(e) {
 		highlightSaveButton(true);
@@ -105,8 +107,8 @@ function updateSaveButtonDimming(dim) {
 			var editor = tinymce.editors[index];
 			editor.buttons['savedb'].classes =
 				editor.buttons['savedb'].classes.replace(/dim ?/g,"");
-			var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
-			$("#textsegdesdiv"+i).css("transition","border 0s")
+			var editor_id=tinymce.activeEditor.id;
+			$("#"+editor_id).css("transition","border 0s")
 								.removeClass("intro")
 								.addClass("highlightborder");
 		}
@@ -530,10 +532,15 @@ function generateTable() {
 		this.collapsed_text_segments = !this.collapsed_text_segments;
 		$("#collapseexpandsymbol").html(getCollapseExpandSymbol);
 		if (this.collapsed_text_segments) {
-			$(".textsegment").addClass("collapsed");
+			$("div.textsegment").addClass("collapsed");
+			$("div.textfade").addClass("collapsedtextfade");
+			$("h4.textsegment").addClass("collapsedheader");
+			$(".textfadeheader").addClass("collapsedtextfadeheader");
 		} else {
-			$(".textsegment").removeClass("collapsed");
+			$(".textsegment").removeClass("collapsed collapsedheader");
+			$(".textfade, .textfadeheader").removeClass("collapsedtextfade collapsedtextfadeheader");
 		}
+		$("#collapseexpandsymbol").html(this.getCollapseExpandSymbol());
 	};
 	html += "<th>Description <span id=\"collapseexpandlink\">"+this.getCollapseExpandLink()+"</span></th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
@@ -635,18 +642,21 @@ function generateTable() {
 					html += "<td colspan=6 id=\"textsegdescr"+i+"\">";
 					if (curitems[j][3]==1) {
 						var header_contents= curitems[j][4];
-						html += "<h4 id=\"textsegdesheader"+i+"\" class=\"textsegment\">"+header_contents+"</h2>";
+						html += "<div style=\"position: relative\"><h4 id=\"textsegdesheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
+						html += "<div id=\"textfadeheader"+i+"\" class=\"textfadeheader collapsedtextfadeheader\"></div></div>";
 					} 
-alert("collapsed: "+this.collapsed_text_segments);
 					var contents = curitems[j][1];
-					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment\">"+contents+"</div></td>"; //description
+					html += "<div style=\"position: relative\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div>"; //description
+					html += "<div id=\"collapsedtextfade"+i+"\" class=\"textfade collapsedtextfade\"></div></div></td>";
 					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
 					html += '<label><input type="checkbox" id="ispagetitle'+i+'" onchange="chgpagetitle('+i+')" ';
 					if (curitems[j][3]==1) { html += "checked";}
 					html += '>New page<label></td>';
 				} else {
 					var contents = curitems[j][1];
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div></td>"; //description
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\" style=\"position: relative\">"; //description
+					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div>";
+					html += "<div id=\"collapsedtextfade"+i+"\" class=\"textfade collapsedtextfade\"></div></td>";
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
