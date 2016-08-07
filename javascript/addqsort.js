@@ -422,6 +422,7 @@ function savetextseg(i) {
 		}
 	}
 	if (any_dirty) {
+		tinymce.activeEditor.hide();
 		submitChanges();
 	}
 }
