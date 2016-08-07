@@ -655,9 +655,9 @@ function generateTable() {
 					html += '>New page<label></td>';
 				} else {
 					var contents = curitems[j][1];
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\" style=\"position: relative\">"; //description
-					html += "<div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div>";
-					html += "<div id=\"collapsedtextfade"+i+"\" class=\"textfade collapsedtextfade\"></div></td>";
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\">"; //description
+					html += "<div style=\"position: relative\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div>";
+					html += "<div id=\"collapsedtextfade"+i+"\" class=\"textfade collapsedtextfade\"></div></div></td>";
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
