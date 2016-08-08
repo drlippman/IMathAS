@@ -29,16 +29,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (trim($_POST['grpname'])=='') {
 			$_POST['grpname'] = 'Unnamed group';
 		}
-		$query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES ('$grpsetid','{$_POST['grpname']}')";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "INSERT INTO imas_stugroups (groupsetid,name) VALUES ('$grpsetid','{$_POST['grpname']}')";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("INSERT INTO imas_stugroups (groupsetid,name) VALUES (:groupsetid, :name)");
+		$stm->execute(array(':groupsetid'=>$grpsetid, ':name'=>$_POST['grpname']));
 		if (!isset($_POST['stutoadd'])) { //if not adding students also
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid&grpsetid={$_GET['grpsetid']}");
 			exit();
 		} else {
-			$_POST['addtogrpid'] = mysql_insert_id();
+			//DB $_POST['addtogrpid'] = mysql_insert_id();
+			$_POST['addtogrpid'] = $DBH->lastInsertId();
 			$_GET['addstutogrp'] = true;
 		}
-	} 
+	}
 	if (isset($_GET['addgrpset'])) {
 		//adding groupset
 		if (isset($_POST['grpsetname'])) {
@@ -46,8 +49,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$_POST['grpsetname'] = 'Unnamed group set';
 			}
 			//if name is set
-			$query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('{$_POST['grpsetname']}','$cid')";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('{$_POST['grpsetname']}','$cid')";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("INSERT INTO imas_stugroupset (name,courseid) VALUES (:name, :courseid)");
+			$stm->execute(array(':name'=>$_POST['grpsetname'], ':courseid'=>$cid));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		}
@@ -60,52 +65,81 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		} else {
-			$query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['delgrpset']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$page_grpsetname = mysql_result($result,0,0);
+			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['delgrpset']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $page_grpsetname = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['delgrpset']));
+			$page_grpsetname = $stm->fetchColumn(0);
 		}
-			
+
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Delete Group Set";
 	} else if (isset($_GET['rengrpset'])) {
-		//renaming groupset	
+		//renaming groupset
 		if (isset($_POST['grpsetname'])) {
 			//if name is set
-			$query = "UPDATE imas_stugroupset SET name='{$_POST['grpsetname']}' WHERE id='{$_GET['rengrpset']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_stugroupset SET name='{$_POST['grpsetname']}' WHERE id='{$_GET['rengrpset']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_stugroupset SET name=:name WHERE id=:id");
+			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$_GET['rengrpset']));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
 			exit();
 		} else {
-			$query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['rengrpset']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$page_grpsetname = mysql_result($result,0,0);
+			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['rengrpset']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $page_grpsetname = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['rengrpset']));
+			$page_grpsetname = $stm->fetchColumn(0);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Rename Group Set";
 	} else if (isset($_GET['copygrpset'])) {
 		//copying groupset
-		$query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['copygrpset']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$grpsetname = addslashes(mysql_result($result,0,0)) . ' (copy)';
-		
-		$query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('$grpsetname','$cid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		$newgrpset = mysql_insert_id();
-		
-		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='{$_GET['copygrpset']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$row[1] = addslashes($row[1]);
-			$query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('{$row[1]}',$newgrpset)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$newstugrp = mysql_insert_id();
+		//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['copygrpset']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $grpsetname = addslashes(mysql_result($result,0,0)) . ' (copy)';
+		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['copygrpset']));
+		$grpsetname = $stm->fetchColumn(0) . ' (copy)';
+
+		//DB $query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('$grpsetname','$cid')";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $newgrpset = mysql_insert_id();
+		$stm = $DBH->prepare("INSERT INTO imas_stugroupset (name,courseid) VALUES (:name, :courseid)");
+		$stm->execute(array(':name'=>$grpsetname, ':courseid'=>$cid));
+		$newgrpset = $DBH->lastInsertId();
+
+		//DB $query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='{$_GET['copygrpset']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid");
+		$stm->execute(array(':groupsetid'=>$_GET['copygrpset']));
+		$ins_grp_stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES (:name, :groupsetid)");
+		$sel_grpmem_stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid");
+
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			//DB $row[1] = addslashes($row[1]);
+			//DB $query = "INSERT INTO imas_stugroups (name,groupsetid) VALUES ('{$row[1]}',$newgrpset)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $newstugrp = mysql_insert_id();
+			$ins_grp_stm->execute(array(':name'=>$row[1], ':groupsetid'=>$newgrpset));
+			$newstugrp = $DBH->lastInsertId();
 			$toadd = array();
-			$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid='{$row[0]}'";
-			$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($sgm = mysql_fetch_row($r2)) {
-				$toadd[] = "('{$sgm[0]}',$newstugrp)";
+			//DB $query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid='{$row[0]}'";
+			//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($sgm = mysql_fetch_row($r2)) {
+			$sel_grpmem_stm->execute(array(':stugroupid'=>$row[0]));
+			$toaddval = array();
+			while ($sgm = $sel_grpmem_stm->fetch(PDO::FETCH_NUM)) {
+				//DB $toadd[] = "('{$sgm[0]}',$newstugrp)";
+				$toadd[] = "(?,?)";
+				array_push($toaddval, $sgm[0], $newstugrp);
 			}
 			if (count($toadd)>0) {
-				$query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ".implode(',',$toadd);
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ".implode(',',$toadd);
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("INSERT INTO imas_stugroupmembers (userid,stugroupid) VALUES ".implode(',',$toadd));
+				$stm->execute($toaddval);
 			}
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid=$cid");
@@ -116,44 +150,61 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if ($_POST['addtogrpid']=='--new--') {
 			//adding a new group; need to ask for group
 			$_GET['addgrp'] = true;
-			$stulist = implode(',',$stustoadd);	
+			$stulist = implode(',',$stustoadd);
 		} else {
 			$grpid = $_POST['addtogrpid'];
 			$loginfo = "instr adding stu to group $grpid. ";
 			if (!is_array($stustoadd)) {
 				$stustoadd = explode(',',$stustoadd);
 			}
-			
+
 			$alreadygroupedstu = array();
-			$stulist = "'".implode("','",$stustoadd)."'";
+			//DB $stulist = "'".implode("','",$stustoadd)."'";
+			$stulist = implode(',', array_map('intval', $stustoadd));
+			//DB $query = "SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id ";
+			//DB $query .= "WHERE i_sg.groupsetid='$grpsetid' AND i_sgm.userid IN ($stulist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id ";
-			$query .= "WHERE i_sg.groupsetid='$grpsetid' AND i_sgm.userid IN ($stulist)";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			$query .= "WHERE i_sg.groupsetid=:groupsetid AND i_sgm.userid IN ($stulist)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':groupsetid'=>$grpsetid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$alreadygroupedstu[] = $row[0];
 			}
 			$stustoadd = array_diff($stustoadd,$alreadygroupedstu);
-			
-			$query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid='$grpid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 			$existinggrpmembers = array();
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT userid FROM imas_stugroupmembers WHERE stugroupid='$grpid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid");
+			$stm->execute(array(':stugroupid'=>$grpid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$existinggrpmembers[] = $row[0];
 			}
-			
+
 			if (count($stustoadd)>0) {
+				$insarr = array();
 				$query = 'INSERT INTO imas_stugroupmembers (stugroupid,userid) VALUES ';
 				for ($i=0;$i<count($stustoadd);$i++) {
 					if ($i>0) {$query .= ',';};
-					$query .= "('$grpid','{$stustoadd[$i]}')";
+					//DB $query .= "('$grpid','{$stustoadd[$i]}')";
+					$query .= "(?,?)";
+					array_push($insarr, $grpid, $stustoadd[$i]);
 					$loginfo .= "adding {$stustoadd[$i]}.";
 				}
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				
-				$query = "SELECT id FROM imas_assessments WHERE groupsetid='$grpsetid'";
-				$resultaid = mysql_query($query) or die("Query failed : " . mysql_error());
-				$stulist = "'".implode("','",$stustoadd)."'";
-				while (($aid = mysql_fetch_row($resultaid)) && $grpsetid>0) {
+				$stm = $DBH->prepare($query);
+				$stm->execute($insarr);
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+				//DB already set above $stulist = "'".implode("','",$stustoadd)."'";
+				//DB $query = "SELECT id FROM imas_assessments WHERE groupsetid='$grpsetid'";
+				//DB $resultaid = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while (($aid = mysql_fetch_row($resultaid)) && $grpsetid>0) {
+				$stm = $DBH->prepare("SELECT id FROM imas_assessments WHERE groupsetid=:groupsetid");
+				$stm->execute(array(':groupsetid'=>$grpsetid));
+				while (($aid = $stm->fetch(PDO::FETCH_NUM)) && $grpsetid>0) {
 					//if asid exists for this grpid, need to update students.
 					//if no asid exists already, but the students we're adding have one, use one (which?) of theirs
 					//otherwise do nothing
@@ -164,7 +215,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 					if (mysql_num_rows($result)>0) {
 						//asid already exists for group - use it
-						$rowgrptest = addslashes_deep(mysql_fetch_row($result)); 
+						$rowgrptest = addslashes_deep(mysql_fetch_row($result));
 						$grpasidexists = true;
 					} else {
 						//use asid from first student assessment
@@ -178,7 +229,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							$rowgrptest = addslashes_deep($row);
 							$rowgrptest[1] = $grpid; //use new groupid
 							while ($row = mysql_fetch_row($result)) { //delete files from everyone else's attempts
-								deleteasidfilesfromstring2($row[7].$row[13],'id',$row[0],$row[1]);	
+								deleteasidfilesfromstring2($row[7].$row[13],'id',$row[0],$row[1]);
 							}
 						}
 					}
@@ -192,7 +243,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						foreach ($stustoadd as $stuid) {
 							$query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
 							$result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
-							if (mysql_num_rows($result)>0) {  
+							if (mysql_num_rows($result)>0) {
 								$loginfo .= "updating ias for $stuid.";
 								$row = mysql_fetch_row($result);
 								$sets = array();
@@ -244,7 +295,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			exit();
 		}
-		
+
 	} else if (isset($_GET['addgrp'])) {
 		$query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -265,10 +316,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$page_grpsetname = mysql_result($result,0,0);
 		}
-			
+
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Delete Group";
 	} else if (isset($_GET['rengrp'])) {
-		//renaming groupset	
+		//renaming groupset
 		if (isset($_POST['grpname'])) {
 			//if name is set
 			$query = "UPDATE imas_stugroups SET name='{$_POST['grpname']}' WHERE id='{$_GET['rengrp']}'";
@@ -298,9 +349,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$page_grpsetname = mysql_result($result,0,0);
-		}	
+		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove all group members";
-		
+
 	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
 		//removing one group member
 		if (isset($_GET['confirm'])) {
@@ -318,16 +369,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$page_grpsetname = mysql_result($result,0,0);
-		}	
+		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">$page_grpsetname</a> &gt; Remove group member";
-		
+
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected, show groups
 		$grpsetid = $_GET['grpsetid'];
 		$query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$page_grpsetname = mysql_result($result,0,0);	
-		
+		$page_grpsetname = mysql_result($result,0,0);
+
 		//$page_grps will be an array, groupid=>name
 		$page_grps = array();
 		$page_grpmembers = array();
@@ -335,7 +386,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid='$grpsetid' ORDER BY id";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			if ($row[1] == 'Unnamed group') { 
+			if ($row[1] == 'Unnamed group') {
 				$row[1] .= " $grpnums";
 				$grpnums++;
 			}
@@ -343,9 +394,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_grpmembers[$row[0]] = array();
 		}
 		$grpids = implode(',',array_keys($page_grps));
-		
+
 		natsort($page_grps);
-		
+
 		$query = "SELECT DISTINCT section FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL ORDER BY section";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)>1) {
@@ -361,7 +412,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$sectionsort = false;
 		}
-		
+
 		//get all students
 		$stunames = array();
 		$hasuserimg = array();
@@ -379,7 +430,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$hasuserimg[$row[0]] = $row[3];
 			$stulocked[$row[0]] = $row[5];
 		}
-		
+
 		//$page_grpmembers will be groupid=>array(  userid=>stuname )
 		$stuuseridsingroup = array();
 		if (count($page_grps)>0) {
@@ -404,10 +455,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_ungrpstu[$uid] = $stunames[$uid];
 		}
 		natcasesort($page_ungrpstu);
-		
+
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; $page_grpsetname";
-			
-	} else { 
+
+	} else {
 		//no groupset selected
 		$page_groupsets = array();
 		$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
@@ -417,7 +468,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$curBreadcrumb .= " &gt; Manage Student Groups";
 	}
-	
+
 
 }
 
@@ -431,7 +482,7 @@ require("../header.php");
 /***** php display blocks are interspersed throughout the html as needed ****/
 if ($overwriteBody==1) {
 	echo $body;
-} else {	
+} else {
 ?>
 	<div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
 	<div id="headermanagestugrps" class="pagetitle"><h2><?php echo $pagetitle ?></h2></div>
@@ -465,13 +516,13 @@ if ($overwriteBody==1) {
 		}
 		if ($used != '') {
 			echo '<p>This set of groups is currently used in the assessments, wikis, and/or forums below.  These items will be set to non-group if this group set is deleted</p><p>';
-			echo "$used</p>";	
+			echo "$used</p>";
 		} else {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
 		echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&delgrpset={$_GET['delgrpset']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
-		
+
 	} else if (isset($_GET['rengrpset'])) {
 		echo '<h4>Rename student group set</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&rengrpset={$_GET['rengrpset']}\">";
@@ -501,7 +552,7 @@ if ($overwriteBody==1) {
 		//echo "<p><input type=button value=\"Yes, Delete\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid&delgrp={$_GET['delgrp']}&confirm=true'\" /> ";
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=$grpsetid'\" /></p>";
 		echo '</form>';
-		
+
 	} else if (isset($_GET['rengrp'])) {
 		echo '<h4>Rename student group</h4>';
 		echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&rengrp={$_GET['rengrp']}\">";
@@ -566,7 +617,7 @@ if ($overwriteBody==1) {
 			echo ' <button type="button" onclick="rotatepics(this)" >'._('View Pictures').'</button><br/>';
 		}
 		echo '</p>';
-		
+
 		if (count($page_grps)==0) {
 			echo '<p>No student groups have been created yet</p>';
 		}
@@ -598,8 +649,8 @@ if ($overwriteBody==1) {
 			}
 			echo '</ul>';
 		}
-			
-		
+
+
 		echo '<h3>Students not in a group yet</h3>';
 		if (count($page_ungrpstu)>0) {
 			echo "<form method=\"post\" action=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid&addstutogrp=true\">";
@@ -648,15 +699,15 @@ if ($overwriteBody==1) {
 				echo "<a href=\"managestugrps.php?cid=$cid&rengrpset={$gs[0]}\">Rename</a> | ";
 				echo "<a href=\"managestugrps.php?cid=$cid&copygrpset={$gs[0]}\">Copy</a> | ";
 				echo "<a href=\"managestugrps.php?cid=$cid&delgrpset={$gs[0]}\">Delete</a>";
-				
+
 				echo '</td></tr>';
 			}
 			echo '</body></table>';
 		}
-		
+
 		echo '<p><button type="button" onclick="window.location.href=\'managestugrps.php?cid='.$cid.'&addgrpset=ask\'">'._('Add new set of groups').'</button></p>';
 	}
-	
+
 }
 
 require("../footer.php");

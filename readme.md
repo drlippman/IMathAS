@@ -145,7 +145,9 @@ C validate        26
  C logingrid        2
  C managecalitems   4
  C managelibs       35
-
+ C manageqset       60
+ ** managestugrps in process
+ 
 
 /diag              done
   C index          18
