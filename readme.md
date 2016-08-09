@@ -68,7 +68,29 @@ C showlinkedtextpublic  5
 C upgrade         237  lots of logic to check
 C validate        26
 
-/admin
+/admin            done
+ C actions        120
+ C admin          5
+ C approvepending 7
+ C ccexport       13
+ C diagonetime    6
+ C diagsetup      6
+ C export         7
+ C exportitems    17
+ C exportlib      7
+ C externaltools  5
+ C forms          19
+ C hidefromcourselist 1
+ C import         16
+ C importitems    24
+ C importlib      18
+ C importstu      4
+ C jsonexport     3
+ C ltioutcomeservice  6
+ C pushoutchg     7
+ C unhidefromcourselist 2
+
+
 
 /assessment
  0 asidutil
@@ -77,7 +99,7 @@ C validate        26
  /libs
   0 all
 
-/course
+/course             done
  C addassessment    24
  C addblock         5
  C addcalendar      6
