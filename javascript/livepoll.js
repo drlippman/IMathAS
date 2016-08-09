@@ -113,7 +113,7 @@ var livepoll = new function() {
 				url: assesspostbackurl+'&action=livepollshowq&qn='+data.qn+'&seed='+data.seed
 			}).done(function(data) {
 				var parsed = preProcess(data);
-				var button = '<div><span id="livepollsubmit"><button type="button" onclick="livepoll.submitQuestion('+qn+')">Submit</button> <span id="livepollsubmitmsg"></span></span></div>';
+				var button = '<div><span id="livepollsubmit"><button type="button" onclick="livepoll.submitQuestion('+qn+')">'+_("Submit")+'</button> <span id="livepollsubmitmsg"></span></span></div>';
 				$("#livepollqcontent").html(parsed.html+button);
 				postProcess('livepollqcontent',parsed.code);
 				curquestion = qn;
@@ -164,7 +164,7 @@ var livepoll = new function() {
 		stucnt = data.cnt;
 		teachcnt = data.teachcnt;
 		if (isteacher) {
-			$("#livepollactivestu").html(data.cnt+" student"+(data.cnt==1?'':'s'));
+			$("#livepollactivestu").html(data.cnt+" " +(data.cnt==1?_('student'):_('students')));
 		} else if (data.teachcnt==0) {
 			showHandler({action: 0, qn: -1});
 		}
@@ -259,7 +259,7 @@ var livepoll = new function() {
 					$("#LPresbar"+partn).width(Math.round(100*datatots[partn]/maxfreq) + "%");
 				}
 			} else {
-				out += '<table class=\"LPres\"><thead><tr><th>Answer</th><th style="min-width:10em">Frequency</th></tr></thead><tbody>';
+				out += '<table class=\"LPres\"><thead><tr><th>'+_("Answer")+'</th><th style="min-width:10em">' + _("Frequency")+'</th></tr></thead><tbody>';
 				for (i=0;i<qdata[curquestion].randkeys.length;i++) {
 					partn = qdata[curquestion].randkeys[i];
 					out += '<tr class="';
@@ -316,7 +316,7 @@ var livepoll = new function() {
 			}
 		} else {
 			var sortedkeys = getSortedKeys(datatots);
-			out += '<table class=\"LPres\"><thead><tr><th>Answer</th><th style="min-width:10em">Frequency</th></tr></thead><tbody>';
+			out += '<table class=\"LPres\"><thead><tr><th>'+_("Answer")+'</th><th style="min-width:10em">'+_("Frequency")+'</th></tr></thead><tbody>';
 			for (var i=0;i<sortedkeys.length;i++) {
 				out += '<tr class="';
 				if (scoredat[sortedkeys[i]]>0) {
@@ -367,8 +367,7 @@ var livepoll = new function() {
 			}
 
 		}
-
-		$("#livepollrcnt").html(rescnt+" result"+(rescnt==1?"":"s")+" received.");
+		$("#livepollrcnt").html(rescnt+" "+(rescnt==1?_("result"):_("results"))+" "+_("received."));
 	}
 
 	function getSortedKeys(obj) {
@@ -402,9 +401,8 @@ var livepoll = new function() {
 			LPtimestart = 0;
 			clearInterval(LPtimer);
 			$("#livepolltopright").text("");
-
-			$("#LPqnumber").text("Question "+(qn+1));
-			$("#livepollqcontent").html("Loading...");
+			$("#LPqnumber").text(_("Question") + " "+(qn+1));
+			$("#livepollqcontent").html(_("Loading..."));
 			$("#livepollrcontent").html("");
 
 			if (typeof forceregen != 'undefined') {
@@ -424,14 +422,14 @@ var livepoll = new function() {
 				$("#LPshowqchkbox").attr("checked", settings.showqonload).trigger("change");
 				$("#LPshowrchkbox").attr("checked", settings.showreslive).trigger("change");
 				$("#LPshowanschkbox").attr("checked", settings.showansonclose).trigger("change");
-				$("#LPshowansmsg").text("Show Answers When Closed");
+				$("#LPshowansmsg").text(_("Show Answers When Closed"));
 				hideSettings();
 
 				var parsed = preProcess(data.html);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
 				$(".sabtn").hide();
-				$("#livepollqcontent").append('<p><a href="#" onclick="livepoll.forceRegen('+qn+');return false;">Clear results and generate a new version of this question</a></p>');
+				$("#livepollqcontent").append('<p><a href="#" onclick="livepoll.forceRegen('+qn+');return false;">' + _("Clear results and generate a new version of this question")+'</a></p>');
 				$("#LPstartq").show();
 
 				qdata[qn] = {choices: data.choices, randkeys: data.randkeys, ans: data.ans.toString(), anstypes: data.anstypes, seed: data.seed, drawinit: data.drawinit, initrdisp:false};
@@ -498,19 +496,19 @@ var livepoll = new function() {
 	function startQuestion() {
 		var qn = curquestion;
 		if (qn<0 || curstate==2 || working) { return;}
-		$("#LPstartq").text("Opening Student Input...");
+		$("#LPstartq").text(_("Opening Student Input..."));
 		working = true;
 		clearInterval(LPtimer);
 		LPtimestart = Date.now();
 		$.ajax({
 			url: assesspostbackurl+'&action=livepollopenq&qn='+qn+'&seed='+qdata[qn].seed+'&startt='+LPtimestart
 		}).done(function(data) {
-			$("#LPstartq").text("Open Student Input").hide();
+			$("#LPstartq").text(_("Open Student Input")).hide();
 			$("#LPstopq").show();
 			LPtimer = setInterval(LPtimerkeeper,1000);
 			curstate = 2;
 			showAnsIfAllowed();
-			$("#LPshowansmsg").text("Show Answers When Closed");
+			$("#LPshowansmsg").text(_("Show Answers When Closed"));
 		}).always(function(data) {
 			working = false;
 		});
@@ -520,7 +518,7 @@ var livepoll = new function() {
 	}
 	function stopQuestion(pushstate) {
 		if (curquestion<0 || curstate!=2 || working) { return;}
-		$("#LPstopq").text("Closing Student Input...");
+		$("#LPstopq").text(_("Closing Student Input..."));
 		working = true;
 		if (typeof pushstate != 'undefined') {
 			var newstate = pushstate;
@@ -534,15 +532,14 @@ var livepoll = new function() {
 			url: assesspostbackurl+'&action=livepollstopq&qn='+curquestion+'&newstate='+newstate,
 			async: (typeof pushstate == 'undefined' || pushstate!=0)
 		}).done(function(data) {
-			$("#LPstopq").text("Close Student Input").hide();
+			$("#LPstopq").text(_("Close Student Input")).hide();
 			$("#LPstartq").show();
 			if (typeof pushstate == 'undefined') {
 				//skip actual closeout on pushstate
 				//new showq callback will handle it.
 				curstate = newstate;
 				clearInterval(LPtimer);
-
-				$("#LPshowansmsg").text("Show Answers");
+				$("#LPshowansmsg").text(_("Show Answers"));
 				showAnsIfAllowed();
 				$("#LPshowrchkbox").attr("checked", settings.showresonclose || $("#LPshowrchkbox").is(":checked")).trigger("change");
 				$(".sabtn").show();
@@ -580,7 +577,7 @@ var livepoll = new function() {
 	}
 
 	this.submitQuestion = function(qn) {
-		$("#livepollsubmitmsg").html("Saving...");
+		$("#livepollsubmitmsg").html(_("Saving..."));
 		if (typeof tinyMCE != 'undefined') {tinyMCE.triggerSave();}
 		doonsubmit();
 		params = {
@@ -619,9 +616,9 @@ var livepoll = new function() {
 			data: params
 		}).done(function(data) {
 			if (data.hasOwnProperty("error")) {
-				$("#livepollsubmitmsg").html("Error: "+data.error);
+				$("#livepollsubmitmsg").html(_("Error") + ": "+data.error);
 			} else {
-				$("#livepollsubmitmsg").html("Saved");
+				$("#livepollsubmitmsg").html(_("Saved"));
 			}
 		});
 
