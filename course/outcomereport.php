@@ -11,9 +11,12 @@ $catfilter = -1;
 $secfilter = -1;
 
 //load outcomes
-$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+$stm->execute(array(':id'=>$cid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 if ($row[0]=='') {
 	$outcomes = array();
 } else {
@@ -24,9 +27,12 @@ if ($row[0]=='') {
 }
 
 $outcomeinfo = array();
-$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
@@ -35,9 +41,12 @@ if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 } else if (isset($sessiondata[$cid.'gbmode'])) {
 	$gbmode =  $sessiondata[$cid.'gbmode'];
 } else {
-	$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$gbmode = mysql_result($result,0,0);
+	//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $gbmode = mysql_result($result,0,0);
+	$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	$gbmode = $stm->fetchColumn(0);
 }
 $hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 
@@ -66,7 +75,7 @@ if (isset($_GET['stu'])) {
 	$report = 'oneoutcome';
 	$qs = '&outcome='.$outcome;
 } else if (isset($_GET['export'])) {
-	$report = 'export';	
+	$report = 'export';
 } else {
 	$report = 'overview';
 	$qs = '';
@@ -106,12 +115,12 @@ if ($report == 'overview') {
 	$placeinhead .= "} else {";
 	$placeinhead .= "document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\"; ";
 	$placeinhead .= "}}\n ";
-	$placeinhead .= "function cancellockcol() {document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n"; 
+	$placeinhead .= "function cancellockcol() {document.cookie = 'ocrhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n";
 	$placeinhead .= '</script>';
 }
 
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/outcomereport.php?cid=$cid".$qs;
-	
+
 $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 	function chgtype() {
 		var type = document.getElementById("typesel").value;
@@ -121,7 +130,7 @@ $placeinhead .= '<script type="text/javascript"> var selfaddr = "'.$address.'";
 
 if ($report != 'export') {
 	require("../header.php");
-	
+
 	$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\"> $coursename</a> &gt; ";
 	$curBreadcrumb .= "<a href=\"addoutcomes.php?cid=$cid\">"._("Course Outcomes")."</a>\n";
 }
@@ -137,11 +146,11 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				$gcnt++;
 				if ($isheader) {
-					$html .= '<th class="cat'.$gcnt.'"><div><span class="cattothdr">'.$oi['name'].'</span></div></th>';	
+					$html .= '<th class="cat'.$gcnt.'"><div><span class="cattothdr">'.$oi['name'].'</span></div></th>';
 					$sarr .= ',"N"';
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$html .= $subhtml;
-					
+
 				} else {
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$tots = $tots + $subtots;
@@ -158,26 +167,26 @@ if ($report=='overview') {
 					$sarr .= ',"N"';
 				} else {
 					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {
-						$html .= '<td><div>'.round(100*$ot[$stu][3][$type][$oi],1).'%</div></td>';	
+						$html .= '<td><div>'.round(100*$ot[$stu][3][$type][$oi],1).'%</div></td>';
 						$tots[] = round(100*$ot[$stu][3][$type][$oi],1);
 					} else {
 						$html .= '<td><div>-</div></td>';
-					}	
+					}
 				}
-				
+
 			}
 		}
 		return array($html, $tots);
 	}
-	
-	
+
+
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; '._("Outcomes Report").'</div>';
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Report")."</h2></div>\n";
-	
+
 	if (count($outcomes)==0) {
 		echo '<p>'._('No outcomes are defined in this course.').'</p>';
 	} else {
-	
+
 		echo '<div class="cpmid">'.$typesel.' ';
 		echo "<input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
 		if ($headerslocked) {
@@ -190,7 +199,7 @@ if ($report=='overview') {
 		echo '</div>';
 		echo "<div id=\"tbl-container\">";
 		echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
-		
+
 		echo '<table id="myTable" class="gb"><thead><tr><th><div>'._('Name').'</div></th><th class="cat0"><div></div></th>';
 		$sarr = '"S",false';
 		list($html,$tots) = printOutcomeRow($outcomes,true,'0');
@@ -200,16 +209,16 @@ if ($report=='overview') {
 			$sarr .= ',"N"';
 		}*/
 		echo '</tr></thead><tbody>';
-		
+
 		$ot = outcometable();
-	
+
 		for ($i=1;$i<count($ot);$i++) {
 			echo '<tr class="'.($i%2==0?'even':'odd').'">';
 			echo '<td><div class="trld"><a href="outcomereport.php?cid='.$cid.'&amp;stu='.$ot[$i][0][1].'&amp;type='.$type.'">'.$ot[$i][0][0].'</a></div></td>';
 			echo '<td><div></div></td>';
 			/*foreach ($outc as $oc) {
 				if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$oc])) {
-					echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';	
+					echo '<td>'.round(100*$ot[$i][3][$type][$oc],1).'%</td>';
 				} else {
 					echo '<td>-</td>';
 				}
@@ -224,11 +233,11 @@ if ($report=='overview') {
 		echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
 	}
 } else if ($report=='oneoutcome') {
-	
+
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Outcome Detail").'</div>';
-	
+
 	$ot = outcometable();
-	
+
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Detail on Outcome: ").$outcomeinfo[$outcome]."</h2></div>\n";
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table id="myTable" class="gb"><thead><tr><th>'._('Name').'</th>';
@@ -250,10 +259,10 @@ if ($report=='overview') {
 			}
 		}
 	}
-	
+
 	$catstolist = array_keys($catstolist);
 	$itemstolist = array_keys($itemstolist);
-	
+
 	foreach ($catstolist as $cat) {
 		echo '<th class="cat'.$ot[0][2][$cat][1].'"><span class="cattothdr">'.$ot[0][2][$cat][0].'</span></th>';
 		$sarr .= ',"N"';
@@ -262,27 +271,27 @@ if ($report=='overview') {
 		echo '<th class="cat'.$ot[0][1][$col][1].'">'.$ot[0][1][$col][0].'</th>';
 		$sarr .= ',"N"';
 	}
-	
+
 	echo '</tr></thead><tbody>';
 	for ($i=1;$i<count($ot);$i++) {
 		echo '<tr class="'.($i%2==0?'even':'odd').'">';
 		echo '<td>'.$ot[$i][0][0].'</td>';
 		if (isset($ot[$i][3][$type]) && isset($ot[$i][3][$type][$outcome])) {
-			echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';	
+			echo '<td>'.round(100*$ot[$i][3][$type][$outcome],1).'%</td>';
 		} else {
 			echo '<td>-</td>';
 		}
-		
+
 		foreach ($catstolist as $col) {
 			if (isset($ot[$i][2][$col]) && isset($ot[$i][2][$col][2*$type][$outcome]) && $ot[$i][2][$col][2*$type+1][$outcome]>0) {
-				echo '<td>'.round(100*$ot[$i][2][$col][2*$type][$outcome]/$ot[$i][2][$col][2*$type+1][$outcome],1).'%</td>';	
+				echo '<td>'.round(100*$ot[$i][2][$col][2*$type][$outcome]/$ot[$i][2][$col][2*$type+1][$outcome],1).'%</td>';
 			} else {
 				echo '<td>-</td>';
 			}
 		}
 		foreach ($itemstolist as $col) {
 			if (isset($ot[$i][1][$col]) && isset($ot[$i][1][$col][0][$outcome])) {
-				echo '<td>'.round(100*$ot[$i][1][$col][0][$outcome]/$ot[$i][1][$col][1][$outcome],1).'%</td>';	
+				echo '<td>'.round(100*$ot[$i][1][$col][0][$outcome]/$ot[$i][1][$col][1][$outcome],1).'%</td>';
 			} else {
 				echo '<td>-</td>';
 			}
@@ -290,17 +299,17 @@ if ($report=='overview') {
 		echo '</tr>';
 	}
 	echo '</tbody></table>';
-	
+
 	echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 } else if ($report=='onestu') {
 	echo '<div class=breadcrumb>'.$curBreadcrumb.' &gt; <a href="outcomereport.php?cid='.$cid.'&amp;type='.$type.'">'._("Outcomes Report").'</a> &gt; '._("Student Detail").'</div>';
-	
+
 	$ot = outcometable($stu);
-	
+
 	echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>"._("Outcomes Student Detail for: ").$ot[1][0][0]."</h2></div>\n";
 	echo '<div class="cpmid">'.$typesel.'</div>';
 	echo '<table class="gb"><thead><tr><th>'._('Outcome').'</th>';
-	
+
 	echo '<th>'._('Total').'</th>';
 	$n = 2;
 	for ($i=0;$i<count($ot[0][2]);$i++) {
@@ -308,7 +317,7 @@ if ($report=='overview') {
 		$n++;
 	}
 	echo '</tr></thead><tbody>';
-	
+
 	$cnt = 0;
 	function printoutcomestu($arr,$ind) {
 		$html = '';
@@ -367,31 +376,31 @@ if ($report=='overview') {
 	}
 	list($html,$tots) = printoutcomestu($outcomes,0);
 	echo $html;
-	
+
 } else if ($report=='export') {
 	header('Content-type: text/csv');
 	header("Content-Disposition: attachment; filename=\"outcomes-$cid.csv\"");
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Pragma: public');
-			
+
 	$gcnt = -1;
 	function outputCSV($arr) {
 		$line = '';
 		foreach ($arr as $val) {
-			 # remove any windows new lines, as they interfere with the parsing at the other end 
-			  $val = str_replace("\r\n", "\n", $val); 
+			 # remove any windows new lines, as they interfere with the parsing at the other end
+			  $val = str_replace("\r\n", "\n", $val);
 			  $val = str_replace("\n", " ", $val);
 			  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
 			  $val = str_replace("&nbsp;"," ",$val);
-		
-			  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-			  if(preg_match("/[\,\"\n\r]/", $val)) { 
-				  $val = '"'.str_replace('"', '""', $val).'"'; 
+
+			  # if a deliminator char, a double quote char or a newline are in the field, add quotes
+			  if(preg_match("/[\,\"\n\r]/", $val)) {
+				  $val = '"'.str_replace('"', '""', $val).'"';
 			  }
 			  $line .= $val.',';
 		}
-		# strip the last deliminator 
-		$line = substr($line, 0, -1); 
+		# strip the last deliminator
+		$line = substr($line, 0, -1);
 		$line .= "\n";
 		return $line;
 	}
@@ -403,7 +412,7 @@ if ($report=='overview') {
 			if (is_array($oi)) { //is outcome group
 				$gcnt++;
 				if ($isheader) {
-					$html[] = $oi['name'];	
+					$html[] = $oi['name'];
 					list($subhtml,$subtots) = getOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
 					$html = array_merge($html, $subhtml);
 				} else {
@@ -421,22 +430,22 @@ if ($report=='overview') {
 					$html[] = $outcomeinfo[$oi];
 				} else {
 					if (isset($ot[$stu][3][$type]) && isset($ot[$stu][3][$type][$oi])) {
-						$html[] = round(100*$ot[$stu][3][$type][$oi],1).'%';	
+						$html[] = round(100*$ot[$stu][3][$type][$oi],1).'%';
 						$tots[] = round(100*$ot[$stu][3][$type][$oi],1);
 					} else {
 						$html[] = '-';
-					}	
+					}
 				}
-				
+
 			}
 		}
 		return array($html, $tots);
 	}
-	
+
 	list($html,$tots) = getOutcomeRow($outcomes,true,'0');
 	array_unshift($html, "Name");
 	echo outputCSV($html);
-		
+
 	$ot = outcometable();
 
 	for ($i=1;$i<count($ot);$i++) {
@@ -445,7 +454,7 @@ if ($report=='overview') {
 		echo outputCSV($html);
 	}
 	exit;
-	
+
 }
 
 require("../footer.php");

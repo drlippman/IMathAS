@@ -1517,6 +1517,7 @@ require("../footer.php");
 
 
 function delqimgs($qsid) {
+  global $DBH;
 	//DB $query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='$qsid'";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {

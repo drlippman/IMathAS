@@ -1,5 +1,5 @@
 PDO Conversion progress
-Total todo: ~2700.  Done: ~1100
+Total todo: ~2700.  Done: ~1825
 
 Most queries have been semi-automatically converted, and should be fine.  The
 original queries are still in the code, prefixed by `//DB`.
@@ -158,7 +158,42 @@ C validate        26
  C modquestion      8
  C modquestiongrid  11
  C modtutorialq     24
-
+ C outcomemap       8
+ C outcomereport    3
+ C outcometable     11
+ C printlayout      6
+ C printlayoutbare  4
+ C printlayoutword  4
+ 0 printtest
+ C public           1
+ C quickdrill       2
+ C rectrack         3
+ C redeemlatepass   16
+ C redeemlatepassforum  13
+ C report-weeklylab 4
+ C reviewlibrary    22
+ C savebrokenqflag  4
+ C savelibassignflag  1
+ C savequickreorder 4
+ C savemsgmodal     5
+ C showcalendar     1
+ C showlicense      1
+ C showlinkedtext   3
+ C showlinkedtextpublic 3
+ C showstugroup     1
+ C testquestion     2
+ C timeshift        11
+ C treereader       11
+ C unenroll         9
+ C uploadgrades     3
+ C uploadmultgrades 8
+ C verifybadge      9
+ C viewactionlog    9
+ C viewemails       1
+ C viewforumgraph   8
+ C viewgrade        1
+ C viewloginlog     2
+ C viewsource       1
 
 
 /diag              done

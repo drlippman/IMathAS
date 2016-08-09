@@ -846,9 +846,10 @@ if ($overwriteBody==1) {
 require("../footer.php");
 
 function delqimgs($qsid) {
+  global $DBH;
   $srch_stm = $DBH->prepare("SELECT id FROM imas_qimages WHERE filename=:filename");
   $del_stm = $DBH->prepare("DELETE FROM imas_qimages WHERE id=:id");
-  
+
 	//DB $query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='$qsid'";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	$stm = $DBH->prepare("SELECT id,filename,var FROM imas_qimages WHERE qsetid=:qsetid");

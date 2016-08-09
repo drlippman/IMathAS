@@ -6,7 +6,7 @@
 		exit;
 	}
 	$cid = intval($_GET['cid']);
-	
+
 	if (isset($_GET['from'])) {
 		$pubcid = $cid;  //swap out cid's before calling validate
 		$cid = intval($_GET['from']);
@@ -25,7 +25,7 @@
 		$fcid = 0;
 		require("../config.php");
 	}
-			
+
 	function findinpublic($items,$id) {
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
@@ -34,7 +34,7 @@
 						return true;
 					}
 				}
-			} 
+			}
 		}
 		return false;
 	}
@@ -52,22 +52,31 @@
 		}
 		return false;
 	}
-	
-	$query = "SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid='{$_GET['id']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$itemid = mysql_result($result,0,0);
-	
-	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$items = unserialize(mysql_result($result,0,0));
+
+	//DB $query = "SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid='{$_GET['id']}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $itemid = mysql_result($result,0,0);
+	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid");
+	$stm->execute(array(':typeid'=>$_GET['id']));
+	$itemid = $stm->fetchColumn(0);
+
+	//DB $query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $items = unserialize(mysql_result($result,0,0));
+	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	list($itemorder,$itemcoursename,$itemcoursetheme) = $stm->fetch(PDO::FETCH_NUM);
+	$items = unserialize($itemorder);
 	if ($fcid==0) {
-		$coursename = mysql_result($result,0,1);
-		$coursetheme = mysql_result($result,0,2);
+		//DB $coursename = mysql_result($result,0,1);
+		//DB $coursetheme = mysql_result($result,0,2);
+		$coursename = $itemcoursename;
+		$coursetheme = $itemcoursetheme;
 		$breadcrumbbase = "<a href=\"public.php?cid=$cid\">$coursename</a> &gt; ";
 	} else {
 		$breadcrumbbase = "$breadcrumbbase <a href=\"course.php?cid=$fcid\">$coursename</a> &gt; ";
 	}
-		
+
 	if (!findinpublic($items,$itemid)) {
 		require("../header.php");
 		echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
@@ -75,24 +84,27 @@
 		exit;
 	}
 	$ispublic = true;
-	
+
 	if (!isset($_GET['id'])) {
 		echo "<html><body>No item specified.</body></html>\n";
 		exit;
 	}
-	$query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$text = mysql_result($result, 0,0);
-	$title = mysql_result($result,0,1);
+	//DB $query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id");
+	$stm->execute(array(':id'=>$_GET['id']));
+	//DB $text = mysql_result($result, 0,0);
+	//DB $title = mysql_result($result,0,1);
+	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
 
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase $titlesimp</div>";
-	
+
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
 	echo filter($text);
 	echo '</div>';
-	
+
 	if (isset($_GET['from'])) {
 		echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Back</a></div>\n";
 	} else if ($fcid>0) {
@@ -100,6 +112,6 @@
 	} else {
 		echo "<div class=right><a href=\"public.php?cid={$_GET['cid']}\">Return to the Public Course Page</a></div>\n";
 	}
-	require("../footer.php");	
+	require("../footer.php");
 
 ?>
