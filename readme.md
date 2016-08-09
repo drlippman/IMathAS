@@ -30,6 +30,8 @@ Apparently including more variables in the execute than are used in the query wi
 cause an error.  I'm pretty sure I did that a few times, and those will need to
 be fixed.
 
+TODO: Error handling / exception catching
+
 Progress
 ````
 /                   done
@@ -146,8 +148,18 @@ C validate        26
  C managecalitems   4
  C managelibs       35
  C manageqset       60
- ** managestugrps in process
- 
+ C managestugrps    44
+ C managetutors     9
+ C masschgdates     15
+ C massexeption     16
+ C masssend         11
+ C mergeassess      16
+ C moddataset       36
+ C modquestion      8
+ C modquestiongrid  11
+ C modtutorialq     24
+
+
 
 /diag              done
   C index          18
