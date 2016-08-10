@@ -231,9 +231,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 						//DB if (mysql_num_rows($result)>0) {
 						$query = "SELECT id,$fieldstocopy ";
-						$query .= "FROM imas_assessment_sessions WHERE userid IN (:stulist) AND assessmentid=:assessmentid";
+						$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid=:assessmentid";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':assessmentid'=>$aid[0], ':stulist'=>$stulist));
+						$stm->execute(array(':assessmentid'=>$aid[0]));
 						if ($stm->rowCount()>0) {
 							//DB $row = mysql_fetch_row($result);
 							$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);

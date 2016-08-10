@@ -120,11 +120,11 @@ if (!(isset($teacherid))) {
 			//delete any data we're overwriting
 			foreach ($gradestodel as $col=>$stus) {
 				if (count($stus)>0) {
-					$stulist = implode(',',$stus);
+					$stulist = implode(',', array_map('intval', $stus));
 					//DB $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid={$gbitemid[$col]} AND userid IN ($stulist)";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid AND userid IN (:stulist)");
-					$stm->execute(array(':gradetypeid'=>$gbitemid[$col], ':stulist'=>$stulist));
+					$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid AND userid IN ($stulist)");
+					$stm->execute(array(':gradetypeid'=>$gbitemid[$col]));
 				}
 			}
 			//now we load in the data!

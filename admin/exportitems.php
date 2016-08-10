@@ -481,8 +481,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		//DB $query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
 		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($r2)) {
-		$stm2 = $DBH->prepare("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN (:qstoexportlist)");
-		$stm2->execute(array(':qstoexportlist'=>$qstoexportlist));
+		$stm2 = $DBH->query("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)");
 		while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 			if ($GLOBALS['filehandertypecfiles'] == 's3') {
 				if (!file_exists("../assessment/qimages".DIRECTORY_SEPARATOR.trim($row[0]))) {

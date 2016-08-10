@@ -32,12 +32,12 @@ if (isset($tutorsection) && $tutorsection!='') {
 }
 
 function getstunames($a) {
+	global $DBH;
 	if (count($a)==0) { return array();}
-	$a = implode(',',$a);
+	$a = implode(',', array_map('intval', $a));
 	//DB $query = "SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($a)";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$stm = $DBH->prepare("SELECT LastName,FirstName,id FROM imas_users WHERE id IN (:a)");
-	$stm->execute(array(':a'=>$a));
+	$stm = $DBH->query("SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($a)");
 	$names = array();
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {

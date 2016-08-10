@@ -505,8 +505,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
 				//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->prepare("SELECT id,control,qtext FROM imas_questionset WHERE id IN (:updatelist)");
-				$stm->execute(array(':updatelist'=>$updatelist));
+				$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)");
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					//DB $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
 					//DB $qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));

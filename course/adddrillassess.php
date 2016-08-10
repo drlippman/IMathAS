@@ -392,8 +392,7 @@ if (!$beentaken) {
 	//DB $query = "SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->prepare("SELECT name,id,sortorder FROM imas_libraries WHERE id IN (:llist)");
-	$stm->execute(array(':llist'=>$llist));
+	$stm = $DBH->query("SELECT name,id,sortorder FROM imas_libraries WHERE id IN ($llist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$lnamesarr[$row[1]] = $row[0];
 		$libsortorder[$row[1]] = $row[2];

@@ -132,7 +132,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.description LIKE :safesearch ";
 			$query .= "AND imas_questionset.ownerid=imas_users.id ";
 			$query .= "AND (imas_users.groupid=:groupid OR imas_questionset.userights>0) ";
-			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN (:llist)";
+			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
 			$qarr = array(':safesearch'=>"%$safesearch%", ':groupid'=>$groupid);
 		} else {
 			//DB $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
@@ -142,7 +142,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
 			$query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE :safesearch ";
 			$query .= "AND (imas_questionset.ownerid=:ownerid OR imas_questionset.userights>0) ";
-			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN (:llist)";
+			$query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
 			$qarr = array(':safesearch'=>"%$safesearch%", ':ownerid'=>$userid);
 		}
 
