@@ -530,7 +530,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_POST['search'])) {
 			$safesearch = trim($_POST['search']);
 			$safesearch = str_replace(' and ', ' ',$safesearch);
-			$search = stripslashes($safesearch);
+			//DB $search = stripslashes($safesearch);
+			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchall'])) {
@@ -553,7 +554,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
 			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
-			$search = stripslashes($safesearch);
+			//DB $search = stripslashes($safesearch);
+			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
 			$searchmine = $sessiondata['searchmine'.$cid];
@@ -921,12 +923,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if (isset($sessiondata['aidstolist'.$aid])) { //list questions
 
-			$aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";
+			//DB $aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";
+			$aidlist = implode(',', array_map('intval', $sessiondata['aidstolist'.$aid]));
 			//DB $query = "SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
-			$stm = $DBH->prepare("SELECT id,name,itemorder FROM imas_assessments WHERE id IN (:aidlist)");
-			$stm->execute(array(':aidlist'=>$aidlist));
+			$stm = $DBH->query("SELECT id,name,itemorder FROM imas_assessments WHERE id IN ($aidlist)");
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$aidnames[$row[0]] = $row[1];
 				$items = str_replace('~',',',$row[2]);
