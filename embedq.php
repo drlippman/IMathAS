@@ -22,6 +22,8 @@ $showtips = 2;
 $useeqnhelper = 4;
 $sessiondata['drill']['cid'] = 0;
 $sessiondata['drill']['sa'] = 0;
+$sessiondata['secsalt'] = "12345";
+$cid = "embedq";
 if (empty($_GET['id'])) {
 	echo 'Need to supply an id';
 	exit;

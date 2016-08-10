@@ -18,6 +18,8 @@ require("./assessment/displayq2.php");
 $sessiondata = array();
 $sessiondata['graphdisp'] = 1;
 $sessiondata['mathdisp'] = 6;
+$sessiondata['secsalt'] = "12345";
+$cid = "embedq";
 $showtips = 2;
 $useeqnhelper = 4;
 
@@ -111,6 +113,7 @@ if (isset($QS['showscored'])) {
 			exit;
 		}
 		$scoredonsubmit = $jwtcheck['scoredonsubmit'];
+    $showans = $jwtcheck['showans'];
 	} else {
 		$key = '';
 		if ($seed<5000) {
@@ -118,6 +121,7 @@ if (isset($QS['showscored'])) {
 			exit;
 		}
 		$scoredonsubmit = isset($_POST['showscoredonsubmit']);
+    $showans = $_POST['showans'];
 	}
 
 	$lastanswers = array();
@@ -136,7 +140,7 @@ if (isset($QS['showscored'])) {
 		$after = implode('~',$after);
 	}
 	if (strpos($rawscores,'~')===false) {
-		$rawafter = round($scores,1);
+		$rawafter = round($rawscores,1);
 		if ($rawafter < 0) { $rawafter = 0;}
 	} else {
 		$fparts = explode('~',$rawscores);
@@ -166,7 +170,8 @@ if (isset($QS['showscored'])) {
 	if ($scoredonsubmit) {
 		$rawscores = explode('~',$rawafter);
 
-		$showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
+		// set above
+    // $showans = (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true'));
 
 		displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
 	} else {
@@ -202,8 +207,15 @@ if (isset($QS['showscored'])) {
 		echo '<input type="hidden" name="showscoredonsubmit" value="1"/>';
 		$scoredonsubmit = true;
 	}
+  if (($issigned || $seed>4999)  && (!isset($QS['showans']) || $QS['showans']=='true')) {
+    echo '<input type="hidden" name="showans" value="1"/>';
+		$showansonsubmit = true;
+  } else {
+    echo '<input type="hidden" name="showans" value="0"/>';
+		$showansonsubmit = false;
+  }
 	if (isset($QS['auth'])) {
-		$verarr = array("id"=>$qsetid, "seed"=>$seed, 'scoredonsubmit'=>$scoredonsubmit);
+		$verarr = array("id"=>$qsetid, "seed"=>$seed, 'scoredonsubmit'=>$scoredonsubmit, 'showans'=>$showansonsubmit);
 		//DB $query = "SELECT password FROM imas_users WHERE SID='".addslashes(stripslashes($QS['auth']))."'";
 		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
