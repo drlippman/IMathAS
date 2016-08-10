@@ -353,7 +353,7 @@ if ($curitem == -1) {
 		$page_formAction = "drillassess.php?cid=$cid&daid=$daid";
 		if ($showans) {
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\"\">\n";
-			echo "<p>" . _("Displaying last question with solution") . "<button name=\"next\" value=\"New Question\"/>" . _("New Question") . "</button></p>\n";
+			echo "<p>" . _("Displaying last question with solution") . "<button type=\"submit\" name=\"next\" value=\"New Question\"/>" . _("New Question") . "</button></p>\n";
 			echo "</form>\n";
 			displayq(0,$curitemid,$seed,2,true,0);
 		} else {
@@ -365,9 +365,9 @@ if ($curitem == -1) {
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction&score=true\" onsubmit=\"doonsubmit()\">\n";
 			displayq(0,$curitemid,$seed,$doshowans,true,0);
 			if ($sa==3) {
-				echo "<button name=\"next\" value=\"Next Question\">" . _("New Question") . "</button>\n";
+				echo "<button type=\"submit\" name=\"next\" value=\"Next Question\">" . _("New Question") . "</button>\n";
 			} else {
-				echo "<button name=\"check\" value=\"Check Answer\">" . _("Check Answer") . "</button>\n";
+				echo "<button type=\"submit\" name=\"check\" value=\"Check Answer\">" . _("Check Answer") . "</button>\n";
 			}
 			echo "</form>\n";
 		}

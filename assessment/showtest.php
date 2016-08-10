@@ -2058,7 +2058,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if ($r=='success') {
 				echo '{success: true}';
 			} else {
-				echo '{error: "$r"}';
+				echo '{error: "'.$r.'"}';
 			}
 			exit;
 
@@ -2096,7 +2096,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if ($r=='success') {
 				echo '{success: true}';
 			} else {
-				echo '{error: "$r"}';
+				echo '{error: "'.$r.'"}';
 			}
 			exit;
 
