@@ -92,11 +92,22 @@ C validate        26
 
 
 
-/assessment
+/assessment       done
  0 asidutil
  C catscores      4
+ 0 checkint  
+ C displayq2      5
+ 0 header
+ C interpret5     2
+ 0 macros
+ 0 mathphp2
+ C printtest      5
+ 0 showsoln
+ C showtest       60
+ C testutil       4
+ 0 watchvid
 
- /libs
+ /libs          done
   0 all
 
 /course             done

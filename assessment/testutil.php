@@ -7,27 +7,40 @@
 //testsettings: assoc array of assessment settings
 //Returns:  id,questionsetid,category,points,penalty,attempts
 function getquestioninfo($qns,$testsettings) {
+	global $DBH;
 	if (!is_array($qns)) {
 		$qns = array($qns);
-	} 
-	$qnlist = "'".implode("','",$qns)."'";	
+	}
+	//DB $qnlist = "'".implode("','",$qns)."'";
+	$qnlist = implode(',', array_map('intval', $qns));
 	if ($testsettings['defoutcome']!=0) {
 		//we'll need to run two simpler queries rather than a single join query
 		$outcomenames = array();
-		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='{$testsettings['courseid']}'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='{$testsettings['courseid']}'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$testsettings['courseid']));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$outcomenames[$row[0]] = $row[1];
 		}
+		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control ";
+		//DB $query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
 		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,iqs.qtype,iqs.control ";
 		$query .= "FROM imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id WHERE iq.id IN ($qnlist)";
+		$stm = $DBH->query($query);
 	} else {
+		//DB $query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
+		//DB $query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
+		//DB $query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
 		$query = "SELECT iq.id,iq.questionsetid,iq.category,iq.points,iq.penalty,iq.attempts,iq.regen,iq.showans,iq.withdrawn,iq.showhints,io.name,iqs.qtype,iqs.control ";
 		$query .= "FROM (imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id) LEFT JOIN imas_outcomes as io ";
 		$query .= "ON iq.category=io.id WHERE iq.id IN ($qnlist)";
+		$stm = $DBH->query($query);
 	}
-	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (is_numeric($line['category'])) {
 			if ($testsettings['defoutcome']!=0) {
 				if ($line['category']==0) {
@@ -56,8 +69,8 @@ function getquestioninfo($qns,$testsettings) {
 					$line['answeights'] = $weights;
 					$foundweights = true;
 				}
-				
-			} 
+
+			}
 			if (!$foundweights) {
 				if (preg_match('/anstypes\s*=(.*)/',$line['control'],$match)) {
 					$n = substr_count($match[1],',')+1;
@@ -76,7 +89,7 @@ function getquestioninfo($qns,$testsettings) {
 		}
 		$line['allowregen'] = 1-floor($line['regen']/3);  //0 if no, 1 if use default
 		$line['regen'] = $line['regen']%3;
-		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0); 
+		$line['showansduring'] = (is_numeric($line['showans']) && $line['showans'] > 0);
 		unset($line['qtype']);
 		unset($line['control']);
 		$out[$line['id']] = $line;
@@ -87,7 +100,7 @@ function getquestioninfo($qns,$testsettings) {
 //evals a portion of the control section to extract the $answeights
 //which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
-	global $seeds,$questions,$attempts;	
+	global $seeds,$questions,$attempts;
 	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
@@ -160,7 +173,7 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 		$skipsome = $penalty{1};
 		$penalty = substr($penalty,2);
 	}
-	if ($penalty == 9999) { 
+	if ($penalty == 9999) {
 		$penalty = $testsettings['defpenalty'];
 		if ($penalty{0}==='L') {
 			$lastonly = true;
@@ -171,7 +184,7 @@ function calcpointsafterpenalty($frac,$qi,$testsettings,$attempts) {
 		}
 	}
 	$rowatt = $qi['attempts'];
-	
+
 	if ($attempts<$rowatt || $rowatt==0) { //has remaining attempts
 		if ($lastonly && $rowatt>0 && $attempts+1<$rowatt) {
 			$penalty = 0;
@@ -209,7 +222,7 @@ function totalpointspossible($qi) {
 	$poss = 0;
 	if (is_array($qi)) {
 		foreach ($questions as $qn) {
-			$poss += $qi[$qn]['points'];		
+			$poss += $qi[$qn]['points'];
 		}
 	}
 	return $poss;
@@ -238,7 +251,7 @@ function getremainingpossible($qn,$qi,$testsettings,$attempts) {
 		} else {
 			$possible = round(array_sum($appts),1);
 		}
-		
+
 	} else {
 		$possible = calcpointsafterpenalty(1,$qi,$testsettings,$attempts);
 	}
@@ -250,7 +263,7 @@ function getremainingpossible($qn,$qi,$testsettings,$attempts) {
 //qi:  getquestioninfo
 //questions: array of question ids
 //attempts: array of attempts on questions, indexed same as questions
-//testsettings: assoc array of assessment settings 
+//testsettings: assoc array of assessment settings
 //returns array indexed same as questions
 function getallremainingpossible($qi,$questions,$testsettings,$attempts) {
 	$rposs = array();
@@ -273,7 +286,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
@@ -326,14 +339,14 @@ function scorestocolors($sc,$pts,$answ,$noraw) {
 			$origansw = $answ;
 			$answ = array_fill(0,count($scarr),1);
 		}
-		
+
 		$out = array();
 		foreach ($scarr as $k=>$v) {
 			if ($answ[$k]==0 || (!$noraw && $origansw[$k]==0)) {
 				$color = '';
 			} else if ($v < 0) {
 				$color = '';
-			} else if ($v==0) { 
+			} else if ($v==0) {
 				$color = 'ansred';
 			} else if ($answ[$k]-$v < .011) {
 				$color = 'ansgrn';
@@ -373,8 +386,8 @@ function printscore($sc,$qn) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
-		
+
+
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 
@@ -392,26 +405,26 @@ function printscore($sc,$qn) {
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
-			} else if (!is_numeric($v) || $v==0) { 
+			} else if (!is_numeric($v) || $v==0) {
 				$pm = 'redx';
 			} else if (abs($v-$ptposs[$k])<.011) {
 				$pm = 'gchk';
 			} else {
 				$pm = 'ychk';
 			}
-			/*if (!is_numeric($v) || $v==0) { 
-				$w = 1; 
+			/*if (!is_numeric($v) || $v==0) {
+				$w = 1;
 			} if ($ptposs[$k]==0) {
-				$w = 14;	
+				$w = 14;
 			} else {
 				$w = round(14*$sc/$ptposs[$k]);
 			}
 			$bar = '<span class="miniscorebarholder">';
-			if ($w < 7) { 
+			if ($w < 7) {
 			     $color = "#f".dechex(floor(16*($w)/7))."0";
 			} else if ($w==7) {
 			     $color = '#ff0';
-			} else { 
+			} else {
 			     $color = "#". dechex(floor(16*(2-$w/7))) . "f0";
 			}
 			$wmt = 14-$w;
@@ -425,9 +438,9 @@ function printscore($sc,$qn) {
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
+		//$ptposs = implode(', ',$ptposs);
 		$out =  "$pts out of $poss (parts: $sc)";
-	}	
+	}
 	if ($hasmanual) {
 		$out .= _(' (* not auto-graded)');
 	}
@@ -438,16 +451,16 @@ function printscore($sc,$qn) {
 		$w = round(30*$pts/$poss);
 	}
 	if ($w==0) {$w=1;}
-	if ($w < 15) { 
+	if ($w < 15) {
 	     $color = "#f".dechex(floor(16*($w)/15))."0";
 	} else if ($w==15) {
 	     $color = '#ff0';
-	} else { 
+	} else {
 	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
 	}
-	
+
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;	
+	return $bar . $out;
 }
 
 //creates display of score  (chg from previous: does not echo self)
@@ -460,27 +473,27 @@ function printscore2($sc) {
 		$sc = str_replace('-1','N/A',$sc);
 		$sc = str_replace('~',', ',$sc);
 		$out =  "$pts (parts: $sc)";
-	}	
-	return $out;	
+	}
+	return $out;
 }
 
 //scores a question
 //qn: question index in questions array
 //qi: getquestioninfo[qid]
-function scorequestion($qn, $rectime=true) { 
-	global $questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
+function scorequestion($qn, $rectime=true) {
+	global $DBH,$questions,$scores,$seeds,$testsettings,$qi,$attempts,$lastanswers,$isreview,$bestquestions,$bestseeds,$bestscores,$bestattempts,$bestlastanswers, $reattempting, $rawscores, $bestrawscores, $firstrawscores;
 	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
-	
+
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$attempts[$qn],$qi[$questions[$qn]]['points']);
-	
+
 	$afterpenalty = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 
 	$rawscore = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,0); //possible
-	
+
 	$noscores = ($testsettings['testtype']=="NoScores");
-	
+
 	//work in progress
 	//need to rework canimprove
 	if (!$regenonreattempt && $attempts[$qn]>0 && strpos($afterpenalty,'~')!==false && !$noscores) {
@@ -512,14 +525,19 @@ function scorequestion($qn, $rectime=true) {
 		} else {
 			$time = 0;  //for all at once display, where time is not useful info
 		}
+		//DB $query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
+		//DB $query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
-		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query .= "(:courseid, :qsetid, :score, :scoredet, :timespent)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$testsettings['courseid'], ':qsetid'=>$qi[$questions[$qn]]['questionsetid'],
+			':score'=>round(100*getpts($unitrawscore)), ':scoredet'=>$rawscores[$qn], ':timespent'=>$time));
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	}
-	
+
 	//$scores[$qn] = $afterpenalty;
 	$attempts[$qn]++;
-	
+
 	$loc = array_search($qn,$reattempting);
 	if ($loc!==false) {
 		array_splice($reattempting,$loc,1);
@@ -533,15 +551,15 @@ function scorequestion($qn, $rectime=true) {
 		$bestlastanswers[$qn] = $lastanswers[$qn];
 		$bestquestions[$qn] = $questions[$qn];
 	}
-	
+
 	return $rawscore;
 }
 
 //records everything but questions array
 //if limit=true, only records lastanswers
-function recordtestdata($limit=false) { 
-	global $isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
-	
+function recordtestdata($limit=false) {
+	global $DBH,$isreview,$questions,$bestquestions,$bestscores,$bestattempts,$bestseeds,$bestlastanswers,$scores,$attempts,$seeds,$lastanswers,$testid,$testsettings,$sessiondata,$reattempting,$timesontask,$lti_sourcedid,$qi,$noraw,$rawscores,$bestrawscores,$firstrawscores;
+
 	if ($noraw) {
 		$bestscorelist = implode(',',$bestscores);
 	} else {
@@ -551,8 +569,8 @@ function recordtestdata($limit=false) {
 	$bestseedslist = implode(',',$bestseeds);
 	$bestlastanswers = str_replace('~','',$bestlastanswers);
 	$bestlalist = implode('~',$bestlastanswers);
-	$bestlalist = addslashes(stripslashes($bestlalist));
-	
+	//DB $bestlalist = addslashes(stripslashes($bestlalist));
+
 	if ($noraw) {
 		$scorelist = implode(',',$scores);
 	} else {
@@ -562,37 +580,51 @@ function recordtestdata($limit=false) {
 	$seedslist = implode(',',$seeds);
 	$lastanswers = str_replace('~','',$lastanswers);
 	$lalist = implode('~',$lastanswers);
-	$lalist = addslashes(stripslashes($lalist));
+	//DB $lalist = addslashes(stripslashes($lalist));
 	$timeslist = implode(',',$timesontask);
-	
+
 	$reattemptinglist = implode(',',$reattempting);
 	$questionlist = implode(',', $questions);
 	$bestquestionlist = implode(',', $bestquestions);
 	if ($questionlist!=$bestquestionlist) {
 		$questionlist .= ';'.$bestquestionlist;
 	}
-	
+
 	$now = time();
 	if ($isreview) {
 		if ($limit) {
-			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
+			//DB $query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
+			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers=:reviewlastanswers ";
+			$qarr = array(':reviewlastanswers'=>$lalist);
 		} else {
-			$query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
-			$query .= "reviewreattempting='$reattemptinglist' ";
+			//DB $query = "UPDATE imas_assessment_sessions SET reviewscores='$scorelist',reviewattempts='$attemptslist',reviewseeds='$seedslist',reviewlastanswers='$lalist',";
+			//DB $query .= "reviewreattempting='$reattemptinglist' ";
+			$query = "UPDATE imas_assessment_sessions SET reviewscores=:reviewscores,reviewattempts=:reviewattempts,reviewseeds=:reviewseeds,reviewlastanswers=:reviewlastanswers,";
+			$query .= "reviewreattempting=:reviewreattempting ";
+			$qarr = array(':reviewscores'=>$scorelist, ':reviewattempts'=>$attemptslist, ':reviewseeds'=>$seedslist, ':reviewlastanswers'=>$lalist, ':reviewreattempting'=>$reattemptinglist);
 		}
 	} else {
 		if ($limit) {
-			$query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist',timeontask='$timeslist' ";
+			//DB $query = "UPDATE imas_assessment_sessions SET lastanswers='$lalist',timeontask='$timeslist' ";
+			$query = "UPDATE imas_assessment_sessions SET lastanswers=:lastanswers,timeontask=:timeontask ";
+			$qarr = array(':lastanswers'=>$lalist, ':timeontask'=>$timeslist);
 		} else {
-			$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
-			$query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
-			$query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist',questions='$questionlist' ";
+			//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
+			//DB $query .= "bestseeds='$bestseedslist',bestattempts='$bestattemptslist',bestscores='$bestscorelist',bestlastanswers='$bestlalist',";
+			//DB $query .= "endtime=$now,reattempting='$reattemptinglist',timeontask='$timeslist',questions='$questionlist' ";
+			$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,seeds=:seeds,lastanswers=:lastanswers,";
+			$query .= "bestseeds=:bestseeds,bestattempts=:bestattempts,bestscores=:bestscores,bestlastanswers=:bestlastanswers,";
+			$query .= "endtime=:endtime,reattempting=:reattempting,timeontask=:timeontask,questions=:questions ";
+			$qarr = array(':scores'=>$scorelist, ':attempts'=>$attemptslist, ':seeds'=>$seedslist, ':lastanswers'=>$lalist,
+				':bestseeds'=>$bestseedslist, ':bestattempts'=>$bestattemptslist, ':bestscores'=>$bestscorelist,
+				':bestlastanswers'=>$bestlalist, ':endtime'=>$now, ':reattempting'=>$reattemptinglist, ':timeontask'=>$timeslist,
+				':questions'=>$questionlist);
 		}
-		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) { 
+		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) {
 			//update lti record.  We only do this for single assessment placements
-			
+
 			require_once("../includes/ltioutcomes.php");
-			
+
 			$total = 0;
 			for ($i =0; $i < count($bestscores);$i++) {
 				if (getpts($bestscores[$i])>0) { $total += getpts($bestscores[$i]);}
@@ -600,16 +632,22 @@ function recordtestdata($limit=false) {
 			$totpossible = totalpointspossible($qi);
 			$grade = round($total/$totpossible,4);
 			$res = updateLTIgrade('update',$lti_sourcedid,$testsettings['id'],$grade);
-			
+
 		}
 	}
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
-		$query .= "WHERE agroupid='{$sessiondata['groupid']}' AND assessmentid='{$testsettings['id']}'";
+		//DB $query .= "WHERE agroupid='{$sessiondata['groupid']}' AND assessmentid='{$testsettings['id']}'";
+		$query .= "WHERE agroupid=:agroupid AND assessmentid=:assessmentid";
+		$qarr[':agroupid']=$sessiondata['groupid'];
+		$qarr[':assessmentid']=$testsettings['id'];
 	} else {
-		$query .= "WHERE id='$testid' LIMIT 1";
+		//DB $query .= "WHERE id='$testid' LIMIT 1";
+		$query .= "WHERE id=:id LIMIT 1";
+		$qarr[':id']=$testid;
 	}
-	
-	mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+	//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
@@ -634,7 +672,7 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 function canimprove($qn) {
 	global $superdone;
 	if ($superdone) { return false;}
-	global $qi,$scores,$attempts,$questions,$testsettings,$seeds,$bestseeds,$bestscores;	
+	global $qi,$scores,$attempts,$questions,$testsettings,$seeds,$bestseeds,$bestscores;
 	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
 		//this fails in the case of partial credit, where last attempt might not be best
@@ -655,12 +693,12 @@ function canimprove($qn) {
 function canimprovebest($qn) {
 	global $superdone;
 	if ($superdone) { return false;}
-	global $qi,$bestscores,$scores,$attempts,$questions,$testsettings;	
+	global $qi,$bestscores,$scores,$attempts,$questions,$testsettings;
 	$remainingposs = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 	if (hasreattempts($qn)) {
 		if (getpts($bestscores[$qn])<$remainingposs) {
 			return true;
-		} 
+		}
 	}
 	return false;
 }
@@ -669,7 +707,7 @@ function canimprovebest($qn) {
 function hasreattempts($qn) {
 	global $superdone;
 	if ($superdone) { return false;}
-	global $qi,$attempts,$questions,$testsettings;	
+	global $qi,$attempts,$questions,$testsettings;
 	if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
 		return true;
 	}
@@ -711,9 +749,9 @@ function basicshowq($qn,$seqinactive=false,$colors=array()) {
 		if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $attempts[$qn]>=$testsettings['showans']) ||
 		    ($qi[$questions[$qn]]['showansduring'] && $attempts[$qn]>=$qi[$questions[$qn]]['showans'])) {$showa = true;} else {$showa=false;}
 	} else {
-		$showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);	
+		$showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);
 	}
-	
+
 	$regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
 	$thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
 	if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
@@ -760,7 +798,7 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 				echo sprintf(_('Points available on this attempt: %1$g of original %2$g'), $pointsremaining, $qi[$questions[$qn]]['points']), '<br/>';
 			}
 		}
-		
+
 		if ($qi[$questions[$qn]]['attempts']==0) {
 			echo _('Unlimited attempts.');
 		} else if ($attempts[$qn]>=$qi[$questions[$qn]]['attempts']) {
@@ -785,11 +823,11 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 				//adjust for rounding
 				$diff = $qi[$questions[$qn]]['points'] - array_sum($ptposs);
 				$ptposs[count($ptposs)-1] += $diff;
-				$ptposs = implode(', ',$ptposs); 
+				$ptposs = implode(', ',$ptposs);
 				echo _('Out of:'), " ($ptposs)";
 			}
 		}
-		
+
 		//if (!$noindivscores) {
 		//	echo "<br/>Score in gradebook: ".printscore2($bestscores[$qn]).".";
 		//}
@@ -836,7 +874,7 @@ function seqshowqinfobar($qn,$toshow) {
 	} else {
 		$qlinktxt = _('Question'). ' ' .($qn+1);
 	}
-	
+
 	if ($qn==$toshow) {
 		echo '<div class="seqqinfocur">';
 		if ((unans($scores[$qn]) && $attempts[$qn]==0) || ($noindivscores && amreattempting($qn))) {
@@ -889,7 +927,7 @@ function seqshowqinfobar($qn,$toshow) {
 				} else {
 					if ($thisscore == $qi[$questions[$qn]]['points']) {
 						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
-					} else if ($thisscore==0) { 
+					} else if ($thisscore==0) {
 						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 					} else {
 						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
@@ -907,7 +945,7 @@ function seqshowqinfobar($qn,$toshow) {
 				} else {
 					if ($thisscore == $qi[$questions[$qn]]['points']) {
 						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
-					} else if ($thisscore==0) { 
+					} else if ($thisscore==0) {
 						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 					} else {
 						echo "<img src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
@@ -935,9 +973,9 @@ function seqshowqinfobar($qn,$toshow) {
 		} else {
 			printf(_('Points available on this attempt: %1$d of original %2$d'), $pointsremaining, $qi[$questions[$qn]]['points']);
 		}
-		
+
 	}
-	
+
 	if ($qn==$toshow && $attempts[$qn]<$qi[$questions[$qn]]['attempts']) {
 		if ($qi[$questions[$qn]]['attempts']==0) {
 			echo ".  ", _('Unlimited attempts');
@@ -1012,7 +1050,7 @@ function embedshowicon($qn) {
 			} else {
 				if ($thisscore == $qi[$questions[$qn]]['points']) {
 					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
-				} else if ($thisscore==0) { 
+				} else if ($thisscore==0) {
 					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 				} else {
 					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
@@ -1028,7 +1066,7 @@ function embedshowicon($qn) {
 			} else {
 				if ($thisscore == $qi[$questions[$qn]]['points']) {
 					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
-				} else if ($thisscore==0) { 
+				} else if ($thisscore==0) {
 					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 				} else {
 					echo "<img class=\"embedicon\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
@@ -1046,7 +1084,7 @@ function newqfromgroup($qn) {
 	//find existing question or group
 	preg_match('/(^|,)([^,]*'.$questions[$qn].'[^,]*)($|,)/', $testsettings['itemorder'], $matches);
 	$q = $matches[2];
-	
+
 	if (strpos($q,'~')!==false) {
 		//grouped.  Repick
 		$sub = explode('~',$q);

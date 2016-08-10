@@ -12,7 +12,7 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $imasroot, $myrights, $showtips, $urlmode, $CFG;
+	global $DBH, $imasroot, $myrights, $showtips, $urlmode, $CFG;
 
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
@@ -41,14 +41,20 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 		$seqinactive = false;
 	}*/
 
-	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id='$qidx'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id='$qidx'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id=:id");
+	$stm->execute(array(':id'=>$qidx));
+	$qdata = $stm->fetch(PDO::FETCH_ASSOC);
 
 	if ($qdata['hasimg']>0) {
-		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qidx'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
+		$stm->execute(array(':qsetid'=>$qidx));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				${$row[0]} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row[1]}\" alt=\"".htmlentities($row[2],ENT_QUOTES)."\" />";
 			} else {
@@ -548,12 +554,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 //inputs: Question number, Question id, rand seed, given answer
 function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
+	global $DBH;
 	unset($abstolerance);
 	srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;
-	$query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	//DB $query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT qtype,control,answer FROM imas_questionset WHERE id=:id");
+	$stm->execute(array(':id'=>$qidx));
+	$qdata = $stm->fetch(PDO::FETCH_ASSOC);
 
 	if (isset($GLOBALS['lastanswers'])) {
 		foreach ($GLOBALS['lastanswers'] as $iidx=>$ar) {
@@ -6112,10 +6122,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 
 
 function getqsetid($questionid) {
+	global $DBH;
+	//DB $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
+	//DB $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $row = mysql_fetch_row($result);
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
-	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
+	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id=:id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':id'=>$questionid));
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	if ($row[2]==null) {
 		return (array($row[0],$row[1]));
 	} else {
@@ -6125,13 +6141,18 @@ function getqsetid($questionid) {
 }
 
 function getallqsetid($questions) {
-	$qids = "'".implode("','",$questions)."'";
+	//DB $qids = "'".implode("','",$questions)."'";
+	$qids = implode(',', array_map('intval', $questions));
 	$order = array_flip($questions);
 	$out = array();
+	//DB $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
+	//DB $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name,imas_questions.id FROM imas_questions LEFT JOIN imas_libraries ";
 	$query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id IN ($qids)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->query($query);
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$out[0][$order[$row[3]]] = $row[0];// = array($row[0],$row[1]);
 		if ($row[2]==null) {
 			$out[1][$order[$row[3]]] = $row[1];
