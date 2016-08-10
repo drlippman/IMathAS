@@ -50,7 +50,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
 
-
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
@@ -312,9 +311,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				':msgtoinstr'=>$_POST['msgtoinstr'], ':posttoforum'=>$_POST['posttoforum'], ':istutorial'=>$istutorial,
 				':defoutcome'=>$_POST['defoutcome']);
 
-			$stm = $DBH->prepare($query);
-			$stm->execute();
-
 			if ($updategroupset!='') {
 				$query .= ",groupsetid=:groupsetid";
 				$qarr[':groupsetid'] = $updategroupset;
@@ -322,24 +318,24 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (isset($_POST['defpoints'])) {
 				//DB $query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
 				$query .= ",defpoints=:defpoints,defpenalty=:defpenalty";
-				$qarr[':defpoints']=>$_POST['defpoints'];
-				$qarr[':defpenalty']=>$_POST['defpenalty'];
+				$qarr[':defpoints'] = $_POST['defpoints'];
+				$qarr[':defpenalty'] = $_POST['defpenalty'];
 			}
 			if (isset($_POST['copyendmsg'])) {
 				//DB $query .= ",endmsg='$endmsg' ";
 				$query .= ",endmsg=:endmsg";
-				$qarr[':endmsg']=>$endmsg;
+				$qarr[':endmsg'] = $endmsg;
 			}
 			if ($_POST['avail']==1) {
 				//DB $query .= ",startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate";
 				$query .= ",startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate";
-				$qarr[':startdate']=>$startdate;
-				$qarr[':enddate']=>$enddate;
-				$qarr[':reviewdate']=>$reviewdate;
+				$qarr[':startdate'] = $startdate;
+				$qarr[':enddate'] = $enddate;
+				$qarr[':reviewdate'] = $reviewdate;
 			}
 			//DB $query .= " WHERE id='{$_GET['id']}';";
 			$query .= " WHERE id=:id";
-			$qarr[':id']=>$_GET['id'];
+			$qarr[':id'] = $_GET['id'];
 
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare($query);

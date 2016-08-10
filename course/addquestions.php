@@ -255,7 +255,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$aid));
 			//DB $itemorder = explode(',',mysql_result($result,0,0));
 			//DB $defpoints = mysql_result($result,0,1);
-			list($itemorder, $defpoints) = $stm-fetch(PDO::FETCH_NUM);
+			list($itemorder, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
 			$itemorder = explode(',', $itemorder);
 
 
@@ -458,8 +458,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
-			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
+			$query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users";
+			$query .= "WHERE imas_questions.id=:id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':id'=>$subs[$j]));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -680,7 +680,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.userights,imas_questionset.qtype,imas_questionset.extref,imas_library_items.libid,imas_questionset.ownerid,imas_questionset.avgtime,imas_questionset.solution,imas_questionset.solutionopts,imas_library_items.junkflag, imas_library_items.id AS libitemid,imas_users.groupid ";
 				$query .= "FROM imas_questionset JOIN imas_library_items ON imas_library_items.qsetid=imas_questionset.id ";
 				$query .= "JOIN imas_users ON imas_questionset.ownerid=imas_users.id WHERE imas_questionset.deleted=0 AND imas_questionset.replaceby=0 AND $searchlikes ";
-				$query .= " (imas_questionset.ownerid=:ownerid OR imas_questionset.userights>0)";
+				$query .= " (imas_questionset.ownerid=? OR imas_questionset.userights>0)";
 				$qarr[] = $userid;
 
 				if ($searchall==0) {
@@ -919,7 +919,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				writesessiondata();
 			}
 		}
-
 		if (isset($sessiondata['aidstolist'.$aid])) { //list questions
 
 			$aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";

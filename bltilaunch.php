@@ -113,7 +113,7 @@ if (isset($_GET['launch'])) {
 	//DB $query = "UPDATE imas_users SET lastaccess='$now' WHERE id='$userid'";
 	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare('UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id');
-	$stm->execute(array(':lastaccess'=>$now, $sessionid, ':id'=>$userid));
+	$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
 	if (isset($_POST['tzname'])) {
 		$tzname = $_POST['tzname'];
@@ -340,7 +340,6 @@ if (isset($_GET['launch'])) {
 					$rights = 10;
 					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify) VALUES ";
 					//DB $query .= "('{$_POST['SID']}','$md5pw',$rights,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}',$msgnot)";
-					$query = "INSERT INTO imas_users (SID,password,rights,FirstName,LastName,email,msgnotify,groupid) VALUES ";
 					$query .= '(:SID,:password,:rights,:FirstName,:LastName,:email,:msgnotify)';
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':SID'=>$_POST['SID'], ':password'=>$md5pw,':rights'=>$rights,
@@ -827,7 +826,7 @@ if ($stm->rowCount()==0) {
 				//create a course
 				//creating a copy of a template course
 				$blockcnt = 1;
-				$itemorder = addslashes(serialize(array()));
+				$itemorder = serialize(array());
 				$randkey = uniqid();
 				$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
 				$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
@@ -856,7 +855,7 @@ if ($stm->rowCount()==0) {
 				$query .= "(:name,:ownerid,:enrollkey,:hideicons,:picicons,:allowunenroll,:copyrights,:msgset,:chatset,:showlatepass,:itemorder,:topbar,:cploc,:available,:theme,:ltisecret,:blockcnt)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
-					':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+					':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 					':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 				$destcid = $DBH->lastInsertId();
 
@@ -924,7 +923,7 @@ if ($stm->rowCount()==0) {
 				} else {
 					$ancestors = intval($sourcecid).','.$ancestors;
 				}
-				$ancestors = addslashes($ancestors);
+				$ancestors = $ancestors;
 				$outcomes = array();
 
 				//DB $query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
@@ -978,7 +977,7 @@ if ($stm->rowCount()==0) {
 					}
 					$outcomesarr = unserialize($outcomesarr);
 					updateoutcomes($outcomesarr);
-					$newoutcomearr = addslashes(serialize($outcomesarr));
+					$newoutcomearr = serialize($outcomesarr);
 				} else {
 					$newoutcomearr = '';
 				}
@@ -989,7 +988,7 @@ if ($stm->rowCount()==0) {
 				require_once("includes/copyiteminc.php");
 				copyallsub($items,'0',$newitems,$gbcats);
 				doaftercopy($sourcecid);
-				$itemorder = addslashes(serialize($newitems));
+				$itemorder = serialize($newitems);
 				//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt',ancestors='$ancestors',outcomes='$newoutcomearr',latepasshrs='$latepasshrs' WHERE id='$destcid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt,ancestors=:ancestors,outcomes=:outcomes,latepasshrs=:latepasshrs WHERE id=:id");
@@ -1091,7 +1090,7 @@ if ($stm->rowCount()==0) {
 					$items = unserialize($stm->fetchColumn(0));
 
 					$items[] = $newitem;
-					$items = addslashes(serialize($items));
+					$items = serialize($items);
 					//DB $query = "UPDATE imas_courses SET itemorder='$items' WHERE id='$cid'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
@@ -1423,7 +1422,7 @@ $sessiondata['ltiorg'] = $SESS['ltiorg'];
 $sessiondata['ltirole'] = $SESS['ltirole'];
 $sessiondata['lti_context_id']  = $SESS['lti_context_id'];
 $sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
-$sessiondata['lti_lis_result_sourcedid']  = stripslashes($SESS['lti_lis_result_sourcedid']);
+$sessiondata['lti_lis_result_sourcedid']  = $SESS['lti_lis_result_sourcedid'];
 $sessiondata['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];
@@ -2215,7 +2214,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						//create a course
 						//creating a copy of a template course
 						$blockcnt = 1;
-						$itemorder = addslashes(serialize(array()));
+						$itemorder = serialize(array());
 						$randkey = uniqid();
 						$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
 						$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
@@ -2241,7 +2240,7 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$query .= "(:name, :ownerid, :enrollkey, :hideicons, :picicons, :allowunenroll, :copyrights, :msgset, :chatset, :showlatepass, :itemorder, :topbar, :cploc, :available, :theme, :ltisecret, :blockcnt);";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':name'=>$_SESSION['lti_context_label'], ':ownerid'=>$userid, ':enrollkey'=>$randkey, ':hideicons'=>$hideicons, ':picicons'=>$picicons,
-							':allowunenroll'=>$unenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
+							':allowunenroll'=>$allowunenroll, ':copyrights'=>$copyrights, ':msgset'=>$msgset, ':chatset'=>$chatset, ':showlatepass'=>$showlatepass, ':itemorder'=>$itemorder,
 							':topbar'=>$topbar, ':cploc'=>$cploc, ':available'=>$avail, ':theme'=>$theme, ':ltisecret'=>$randkey, ':blockcnt'=>$blockcnt));
 						$destcid  = $DBH->lastInsertId();
 						//DB $query = "INSERT INTO imas_teachers (userid,courseid) VALUES ('$userid','$destcid')";
@@ -2631,7 +2630,7 @@ $sessiondata['ltiorg'] = $SESS['ltiorg'];
 $sessiondata['ltirole'] = $SESS['ltirole'];
 $sessiondata['lti_context_id']  = $SESS['lti_context_id'];
 $sessiondata['lti_resource_link_id']  = $SESS['lti_resource_link_id'];
-$sessiondata['lti_lis_result_sourcedid']  = stripslashes($SESS['lti_lis_result_sourcedid']);
+$sessiondata['lti_lis_result_sourcedid']  = $SESS['lti_lis_result_sourcedid'];
 $sessiondata['lti_outcomeurl']  = $SESS['lti_outcomeurl'];
 $sessiondata['lti_context_label'] = $SESS['lti_context_label'];
 $sessiondata['lti_launch_get'] = $SESS['lti_launch_get'];

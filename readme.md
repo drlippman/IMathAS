@@ -35,38 +35,38 @@ TODO: Error handling / exception catching
 Progress
 ````
 /                   done
-C actions         39
-C bltilaunch      117
-C calcqtimes      10
+R actions         39
+R bltilaunch      117
+R calcqtimes      10
 0 canvas          0
 0 canvasnav       0
 0 checkbrowser    0
   config.dist     recheck
-C dbsetup         63   check against config and install when Done
-C DEembedq        3
-C directaccess    8
-C embedq          1
-C footer          1
-C forms           12
-C gethomemenu     2
-C getpostlist     6
+R dbsetup         63 check against config and install when Done
+R DEembedq        3
+R directaccess    8
+R embedq          1
+R footer          1
+R forms           12
+R gethomemenu     2
+R getpostlist     6
   getxml            no longer relevant- should be removed
   google-postreader no longer relevant- should be removed
 0 header          0
 0 help            0
-C index           12
+R index           12
 0 infoheader.dist
-C install         1   check - need to remove addslashes after done
-C installexamples 3
+R install         1   check - need to remove addslashes after done  (addslashes are still there... is this for you to remove or us?)
+R installexamples 3
 0 loginpage.dist
-C ltihome         30
+R ltihome         30
 0 ltisessionsetup
 0 multiembedq
-C newinstructor.dist  4
-C OEAembedq       3
+R newinstructor.dist  4
+R OEAembedq       3
 C showlinkedtextpublic  5
 C upgrade         237  lots of logic to check
-C validate        26
+R validate        26
 
 /admin            done
  C actions        120
@@ -94,6 +94,7 @@ C validate        26
 
 /assessment       done
  0 asidutil
+<<<<<<< HEAD
  C catscores      4
  0 checkint  
  C displayq2      5
@@ -106,6 +107,9 @@ C validate        26
  C showtest       60
  C testutil       4
  0 watchvid
+=======
+ R catscores      4
+>>>>>>> 4bc3a914b5b6faf9527746c6755f206279032ced
 
  /libs          done
   0 all
