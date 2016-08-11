@@ -29,7 +29,8 @@ function buildExistBlocksArray($items,$parent) {
 	$i=0;
 	foreach ($existblocks as $k=>$name) {
 		$existBlocksVals[$i]=$k;
-		$existBlocksLabels[$i]=stripslashes($name);
+		//DB $existBlocksLabels[$i]=stripslashes($name);
+		$existBlocksLabels[$i]=$name;
 		$i++;
 	}
 }
@@ -106,7 +107,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	updateBlocksArray($items,$checked,$sets);
 
-	$itemorder = addslashes(serialize($items));
+	//DB $itemorder = addslashes(serialize($items));
+	$itemorder = serialize($items);
 	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id;");

@@ -55,7 +55,7 @@ if ($myrights<20) {
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[0]) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
 		$scores[0] = $score;
-		$lastanswers[0] = stripslashes($lastanswers[0]);
+		//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
 	} else {
 		$page_scoreMsg = "";

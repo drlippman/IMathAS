@@ -142,9 +142,11 @@ $totn = array_sum($n);
 if ($lastfirstupdate==0) {
 	foreach ($n as $qsid=>$nval) {
 		if ($doslowmethod) {
-			$avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			//DB $avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			$avg = $avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		} else {
-			$avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			//DB $avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			$avg = '0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		}
 		//DB $query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -171,9 +173,11 @@ if ($lastfirstupdate==0) {
 			$n[$qsid] += $oldn;
 		}
 		if ($doslowmethod) {
-			$avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			//DB $avg = addslashes($avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			$avg = $avgtime[$qsid].','.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		} else {
-			$avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			//DB $avg = addslashes('0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid]);
+			$avg = '0,'.$avgfirsttime[$qsid].','.$avgfirstscore[$qsid].','.$n[$qsid];
 		}
 		//DB $query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());

@@ -178,7 +178,8 @@ if (isset($_POST['SID'])) {
 	foreach ($superpw as $k=>$v) {
 		$superpw[$k] = strtolower($v);
 	}
-	$diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
+	//DB $diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
+	$diagSID = $_POST['SID'].'~'.$diagqtr.'~'.$pcid;
 	if ($entrynotunique) {
 		$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
 	}

@@ -119,7 +119,8 @@ if (isset($_POST['createcourse'])) {
 		}
 		//creating a copy of a template course
 		$blockcnt = 1;
-		$itemorder = addslashes(serialize(array()));
+		//DB $itemorder = addslashes(serialize(array()));
+		$itemorder = serialize(array());
 		$randkey = uniqid();
 		$hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
 		$picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
@@ -212,7 +213,8 @@ if (isset($_POST['createcourse'])) {
 		$newitems = array();
 		require("includes/copyiteminc.php");
 		copyallsub($items,'0',$newitems,$gbcats);
-		$itemorder = addslashes(serialize($newitems));
+		//DB $itemorder = addslashes(serialize($newitems));
+		$itemorder = serialize($newitems);
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");

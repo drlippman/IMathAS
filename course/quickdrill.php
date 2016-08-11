@@ -187,7 +187,7 @@ $page_formAction = "quickdrill.php$public";
 $showans = false;
 if (isset($_POST['seed'])) {
 	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$qsetid,$_POST['seed']);
 	if (getpts($score)<1 && $sa==0) {
 		$showans = true;

@@ -410,7 +410,8 @@ if (!(isset($teacherid))) {
 					}
 					array_splice($sub,count($sub),0,$newitems);
 				}
-				$itemorder = addslashes(serialize($items));
+				//DB $itemorder = addslashes(serialize($items));
+				$itemorder = serialize($items);
 				if ($itemorder!='') {
 					//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 					//DB mysql_query($query) or die("Query failed : $query" . mysql_error());

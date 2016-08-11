@@ -47,7 +47,8 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 		if (is_array($item)) {
 			if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
 				$newblock = array();
-				$newblock['name'] = $item['name'].stripslashes($_POST['append']);
+				//DB $newblock['name'] = $item['name'].stripslashes($_POST['append']);
+				$newblock['name'] = $item['name'].$_POST['append'];
 				$newblock['id'] = $blockcnt;
 				$blockcnt++;
 				$newblock['startdate'] = $item['startdate'];

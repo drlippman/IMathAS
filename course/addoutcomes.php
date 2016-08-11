@@ -56,9 +56,9 @@ if (isset($_POST['order'])) {
 					 $block = array("outcomes"=>$subarr);
 				 }
 				 if (substr($pts[0],0,3)=='new') {
-				 	 $name = stripslashes($_POST['newg'.substr($pts[0],6)]);
+				 	 $name = $_POST['newg'.substr($pts[0],6)];
 				 } else {
-				 	 $name = stripslashes($_POST['g'.substr($pts[0],3)]);
+				 	 $name = $_POST['g'.substr($pts[0],3)];
 				 }
 				 $block['name'] = $name;
 				 $outarr[] = $block;
@@ -77,7 +77,7 @@ if (isset($_POST['order'])) {
 			 	 	$seenoutcomes[] = $newid;
 			 	 	$outarr[] = $newid;
 			 	 } else if (isset($curoutcomes[$it])) {
-			 	 	if (stripslashes($_POST['o'.$it])!=$curoutcomes[$it]) {
+			 	 	if ($_POST['o'.$it]!=$curoutcomes[$it]) {
 						 //DB $query = "UPDATE imas_outcomes SET name='{$_POST['o'.$it]}' WHERE id='$it' AND courseid='$cid'";
 						 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 						 $stm = $DBH->prepare("UPDATE imas_outcomes SET name=:name WHERE id=:id AND courseid=:courseid");

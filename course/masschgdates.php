@@ -484,7 +484,8 @@ if ($overwriteBody==1) {
 					$ids[] = $parent.'-'.($k+1);
 					$types[] = "Block";
 					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
-					$names[] = stripslashes($item['name']);
+					//DB $names[] = stripslashes($item['name']);
+					$names[] = $item['name'];
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];
 					$avails[] = $item['avail'];

@@ -122,15 +122,6 @@ $contents .= '
 	  unset($dbpassword);
 		$DBH->query("set session sql_mode=\'\'");
 
-  //clean up post and get if magic quotes aren\'t on
-  function addslashes_deep($value) {
-	return (is_array($value) ? array_map(\'addslashes_deep\', $value) : addslashes($value));
-  }
-  if (!get_magic_quotes_gpc()) {
-   $_GET    = array_map(\'addslashes_deep\', $_GET);
-   $_POST  = array_map(\'addslashes_deep\', $_POST);
-   $_COOKIE = array_map(\'addslashes_deep\', $_COOKIE);
-  }
 ?>';
 $file = fopen('config.php','w');
 $f =  fwrite($file,$contents);

@@ -69,7 +69,7 @@ if ($myrights < 40) {
   $stm = $DBH->prepare($query);
 	$stm->execute($qarr);
 
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error()); 
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$page_courseList = array();
 	$i=0;
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
@@ -125,7 +125,9 @@ if ($myrights < 40) {
 			$query .= " WHERE u.groupid=:groupid ORDER BY d.name";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':groupid'=>$groupid));
-		}
+		} else {
+      $stm = $DBH->query("SELECT id,name,public FROM imas_diags ORDER BY name");
+    }
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
 		//DB while ($row = mysql_fetch_row($result)) {

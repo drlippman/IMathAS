@@ -109,7 +109,7 @@ if (isset($_GET['showscored'])) {
 		}
 		$rawafter = implode('~',$rawafter);
 	}
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 
 	$pts = getpts($after);
 

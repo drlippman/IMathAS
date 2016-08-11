@@ -104,7 +104,7 @@
 						$seedslist = implode(',',$seeds);
 						$lastanswers = str_replace('~','',$lastanswers);
 						$lalist = implode('~',$lastanswers);
-						$lalist = addslashes(stripslashes($lalist));
+						//DB $lalist = addslashes(stripslashes($lalist));
 						$reattemptinglist = implode(',',$reattempting);
 						//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 						//DB $query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";

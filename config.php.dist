@@ -203,7 +203,7 @@
      } catch(PDOException $e) {
       die("<p>Could not connect to database: <b>" . $e->getMessage() . "</b></p></div></body></html>");
      }
-     
+
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
@@ -215,9 +215,9 @@
   function addslashes_deep($value) {
 	return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
   }
-  if (!get_magic_quotes_gpc()) {
-   $_GET    = array_map('addslashes_deep', $_GET);
-   $_POST  = array_map('addslashes_deep', $_POST);
-   $_COOKIE = array_map('addslashes_deep', $_COOKIE);
-  }
+  //DB if (!get_magic_quotes_gpc()) {
+  //DB  $_GET    = array_map('addslashes_deep', $_GET);
+  //DB  $_POST  = array_map('addslashes_deep', $_POST);
+  //DB  $_COOKIE = array_map('addslashes_deep', $_COOKIE);
+  //DB }
 ?>

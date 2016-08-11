@@ -328,10 +328,12 @@
 					$bestscorelist = implode(',',$bestscores);
 				}
 				$attemptslist = implode(",",$attempts);
-				$lalist = addslashes(implode("~",$lastanswers));
+				//DB $lalist = addslashes(implode("~",$lastanswers));
+				$lalist = implode("~",$lastanswers);
 
 				$bestattemptslist = implode(',',$bestattempts);
-				$bestlalist = addslashes(implode('~',$bestlastanswers));
+				//DB $bestlalist = addslashes(implode('~',$bestlastanswers));
+				$bestlalist = implode('~',$bestlastanswers);
 				$reattemptinglist = implode(',',$reattempting);
 
 				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";

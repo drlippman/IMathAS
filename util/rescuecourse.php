@@ -35,7 +35,7 @@ function fixsub(&$items) {
 	}
 	$items = array_values($items);
 }
-fixsub($items); 
+fixsub($items);
 
 $recovereditems = array();
 
@@ -62,20 +62,22 @@ if (count($recovereditems)>0) {
 	array_push($items,$block);
 	echo "recovered ". count($recovereditems) . "items";
 	print_r($items);
-	$itemorder = addslashes(serialize($items));
+	//DB $itemorder = addslashes(serialize($items));
+	$itemorder = serialize($items);
 	$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_GET['cid']}'";
 	mysql_query($query) or die("Query failed : $query" . mysql_error());
 } else {
-	$itemorder = addslashes(serialize($items));
+	//DB $itemorder = addslashes(serialize($items));
+	$itemorder = serialize($items);
 	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='{$_GET['cid']}'";
 	mysql_query($query) or die("Query failed : $query" . mysql_error());
 }
 
 echo "Done";
 
-	
+
 
 //print_r($items);
 
-		
+
 ?>

@@ -57,7 +57,8 @@
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
-		$sub[$existingid]['name'] = stripslashes($val);
+		//DB $sub[$existingid]['name'] = stripslashes($val);
+		$sub[$existingid]['name'] = $val;
 		//DB $itemorder = addslashes(serialize($itemsforblock));
 		$itemorder = serialize($itemsforblock);
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";

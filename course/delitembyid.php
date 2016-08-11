@@ -52,7 +52,7 @@ function delitembyid($itemid) {
 			//DB $safetext = addslashes($text);
 			//DB $query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text"; );
+			$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 			$stm->execute(array(':text'=>$text));
 			//DB if (mysql_num_rows($result)==1) {
 			if ($stm->rowCount()==1) {

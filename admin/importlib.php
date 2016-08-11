@@ -380,12 +380,12 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$libstoadd = $_POST['libs'];
 
 		list($packname,$names,$parents,$libitems,$unique,$lastmoddate) = parselibs($filename);
-		//need to addslashes before SQL insert
-		$names = array_map('addslashes_deep', $names);
-		$parents = array_map('addslashes_deep', $parents);
-		$libitems = array_map('addslashes_deep', $libitems);
-		$unique = array_map('addslashes_deep', $unique);
-		$lastmoddate = array_map('addslashes_deep', $lastmoddate);
+		//DB //need to addslashes before SQL insert
+		//DB $names = array_map('addslashes_deep', $names);
+		//DB $parents = array_map('addslashes_deep', $parents);
+		//DB $libitems = array_map('addslashes_deep', $libitems);
+		//DB $unique = array_map('addslashes_deep', $unique);
+		//DB $lastmoddate = array_map('addslashes_deep', $lastmoddate);
 
 		$root = $_POST['parent'];
 		$librights = $_POST['librights'];

@@ -11,7 +11,7 @@ $aid = $_GET['aid'];
 //form handling
 
 if (isset($_POST['vidid'])) {
-	$_POST = stripslashes_deep($_POST);
+	//DB $_POST = stripslashes_deep($_POST);
 	$vidid = $_POST['vidid'];
 	$data = array();
 	$i = 0;

@@ -71,7 +71,8 @@ END;
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
-		$name = addslashes($line['name']);
+		//DB $name = addslashes($line['name']);
+		$name = $line['name'];
 		$parent = $line['parent'];
 		if ($line['count']==0) {
 			$isempty[$id] = true;

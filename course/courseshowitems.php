@@ -74,7 +74,8 @@ function enditem($canedit) {
 					continue;
 				}
 			}
-			$items[$i]['name'] = stripslashes($items[$i]['name']);;
+			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);;
+			$items[$i]['name'] = $items[$i]['name'];;
 			if ($canedit) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
 			}
@@ -1908,7 +1909,8 @@ function enditem($canedit) {
 	   $now = time() + $previewshift;
 	   for ($i=0;$i<count($items); $i++) {
 		   if (is_array($items[$i])) { //is a block
-			$items[$i]['name'] = stripslashes($items[$i]['name']);
+			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);
+			$items[$i]['name'] = $items[$i]['name'];
 
 			if ($items[$i]['startdate']==0) {
 				$startdate = _('Always');

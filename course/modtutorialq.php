@@ -36,7 +36,7 @@ if (isset($_POST['text'])) {
 	} else {
 		$id = $_GET['id'];
 	}
-	$_POST = stripslashes_deep($_POST);
+	//DB $_POST = stripslashes_deep($_POST);
 	$qtext = stripsmartquotes($_POST['text']);
 	$nparts = intval($_POST['nparts']);
 	$qtypes = array();
@@ -286,8 +286,8 @@ if (isset($_POST['text'])) {
 		}
 	}
 	$qtext = $qtextpre . $qtext;
-	$code = addslashes($code);
-	$qtext = addslashes($qtext);
+	//DB $code = addslashes($code);
+	//DB $qtext = addslashes($qtext);
 
 	if ($id=='new') {
 		$mt = microtime();

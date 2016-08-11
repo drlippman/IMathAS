@@ -28,9 +28,9 @@
 
 header('P3P: CP="ALL CUR ADM OUR"');
 include("config.php");
-if (!get_magic_quotes_gpc()) {
-	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
-}
+//DB if (!get_magic_quotes_gpc()) {
+//DB 	$_REQUEST = array_map('addslashes_deep', $_REQUEST);
+//DB }
 
 
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {

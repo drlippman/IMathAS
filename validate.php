@@ -655,9 +655,9 @@
 		  return 1;
 	  }
   }
-  function stripslashes_deep($value) {
-	return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
-  }
+  //DB function stripslashes_deep($value) {
+	//DB   return (is_array($value) ? array_map('stripslashes_deep', $value) : stripslashes($value));
+  //DB }
   if (!isset($coursename)) {
 	  $coursename = "Course Page";
   }

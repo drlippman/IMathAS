@@ -257,7 +257,8 @@ if (isset($_GET['record'])) {
 	if (isset($_POST['search'])) {
 		$safesearch = $_POST['search'];
 		$safesearch = str_replace(' and ', ' ',$safesearch);
-		$search = stripslashes($safesearch);
+		//DB $search = stripslashes($safesearch);
+		$search = $safesearch;
 		$search = str_replace('"','&quot;',$search);
 		$sessiondata['lastsearch'.$cid] = str_replace(" ","+",$safesearch);
 		if (isset($_POST['searchall'])) {
@@ -334,7 +335,8 @@ require("../header.php");
 
 if (isset($sessiondata['lastsearch'.$cid])) {
 	$safesearch = str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
-	$search = stripslashes($safesearch);
+	//DB $search = stripslashes($safesearch);
+	$search = $safesearch;
 	$search = str_replace('"','&quot;',$search);
 	$searchall = $sessiondata['searchall'.$cid];
 	$searchmine = $sessiondata['searchmine'.$cid];

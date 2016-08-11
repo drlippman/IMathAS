@@ -109,8 +109,10 @@
 		//delete any removed questions
 		//DB $query = "DELETE FROM imas_questions WHERE id IN ('".implode("','",$toremove)."')";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		$toremove = implode(',', array_map('intval', $toremove));
-		$stm = $DBH->query("DELETE FROM imas_questions WHERE id IN ($toremove)");
+		if (count($toremove)>0) {
+			$toremove = implode(',', array_map('intval', $toremove));
+			$stm = $DBH->query("DELETE FROM imas_questions WHERE id IN ($toremove)");
+		}
 
 		echo "OK";
 	} else {

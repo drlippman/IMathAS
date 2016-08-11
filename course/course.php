@@ -82,7 +82,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				array_splice($curblock,$to-1,0,$itemtomove);
 			}
 		}
-		$itemlist = addslashes(serialize($items));
+		//DB $itemlist = addslashes(serialize($items));
+		$itemlist = serialize($items);
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
@@ -255,8 +256,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 				}
-				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
-				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				//DB $sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".$backtrack[$i][0].'</a>';
+				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				$curBreadcrumb .= $backtrack[$i][0];
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
@@ -274,7 +277,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 				}
-				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				$curBreadcrumb .= $backtrack[$i][0];
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}

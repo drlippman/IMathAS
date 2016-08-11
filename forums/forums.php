@@ -1,7 +1,7 @@
 <?php
 	//Listing of all forums for a course - not being used
 	//(c) 2006 David Lippman
-	
+
 	require("../validate.php");
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -10,23 +10,23 @@
 	   exit;
 	}
 	if (isset($teacherid)) {
-		$isteacher = true;	
+		$isteacher = true;
 	} else {
 		$isteacher = false;
 	}
-	
+
 	if (!isset($_GET['cid'])) {
 		exit;
 	}
-	
+
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_POST['searchsubmit'])) {
 		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
 			$_GET['clearsearch'] = true;
 		}
 	}
-	
+
 	if (isset($_GET['clearsearch'])) {
 		unset($sessiondata['forumsearchstr'.$cid]);
 		unset($sessiondata['forumsearchtype'.$cid]);
@@ -48,20 +48,20 @@
 	} else {
 		$searchtype = "none";
 	}
-	
-	
+
+
 	$pagetitle = "Forums";
 	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
-	
+
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
 	if ($searchtype != 'none') {
 		echo "<a href=\"forums.php?cid=$cid&amp;clearsearch=true\">Forum List</a> &gt; ";
-	} 
+	}
 	echo "Forums</div>\n";
-	
+
 	//get general forum info and page order
 	$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
@@ -77,7 +77,7 @@
 			$anyforumsgroup = true;
 		}
 	}
-	
+
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$itemorder = unserialize(mysql_result($result,0,0));
@@ -93,7 +93,7 @@
 		}
 	}
 	flattenitems($itemorder,$itemsimporder);
-	
+
 	$itemsassoc = array();
 	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -104,7 +104,7 @@
 			$itemsimporder[] = $row[0];
 		}
 	}
-	
+
 	$maxitemnum = max($itemsimporder) + 1;
 	//capture any forums that are not in imas_items
 	foreach ($forumdata as $fid=>$line) {
@@ -113,8 +113,8 @@
 		$itemsimporder[] = $maxitemnum;
 		$maxitemnum++;
 	}
-	
-	
+
+
 	//construct tag list selector
 	$taginfo = array();
 	foreach ($itemsimporder as $item) {
@@ -130,7 +130,7 @@
 			foreach ($newtags as $tag) {
 				$taginfo[$catname][] = $tag;
 			}
-		}	
+		}
 	}
 	if (count($taginfo)==0) {
 		$tagfilterselect = '';
@@ -163,14 +163,14 @@
 		echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
 	}
 ?>
-	
-	
+
+
 	<div id="forumsearch">
 	<form method="post" action="forums.php?cid=<?php echo $cid;?>">
 		<p>
-		Search: <input type=text name="search" value="<?php echo $searchstr;?>" /> 
+		Search: <input type=text name="search" value="<?php echo $searchstr;?>" />
 		<input type="radio" name="searchtype" value="thread" <?php if ($searchtype!='posts') {echo 'checked="checked"';}?>/>All thread subjects
-		<input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.  
+		<input type="radio" name="searchtype" value="posts" <?php if ($searchtype=='posts') {echo 'checked="checked"';}?>/>All posts.
 		<?php
 		if ($tagfilterselect != '') {
 			echo "Limit by $tagfilterselect";
@@ -181,7 +181,7 @@
 	</form>
 	</div>
 <?php
-if ($searchtype == 'thread') { 
+if ($searchtype == 'thread') {
 	//doing a search of thread subjects
 	$now = time();
 	if ($searchstr != '') {
@@ -189,17 +189,17 @@ if ($searchtype == 'thread') {
 		$searchterms = explode(" ",addslashes($searchstr));
 		$searchlikes = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
 	}
-	
+
 	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.subject,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_threads.views,imas_forum_posts.tag,imas_forum_posts.isanon,imas_forum_views.tagged ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
 	$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
 	$query .= "LEFT JOIN imas_forum_views ON imas_forum_threads.id=imas_forum_views.threadid AND imas_forum_views.userid='$userid' ";
-	
+
 	$query .= "WHERE imas_forums.courseid='$cid' AND imas_forum_posts.id=imas_forum_posts.threadid "; //these are indexed fields, but parent is not
 	if ($searchstr != '') {
 		$query .= "AND $searchlikes ";
-	} 
+	}
 	if ($searchtag != '') {
 		$query .= "AND imas_forum_posts.tag='$searchtag' ";
 	}
@@ -209,7 +209,7 @@ if ($searchtype == 'thread') {
 	if ($anyforumsgroup && !$isteacher) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	}
-	
+
 	$query .= " ORDER BY imas_forum_threads.lastposttime DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$threaddata = array();
@@ -248,19 +248,19 @@ if ($searchtype == 'thread') {
 			if ($line['tag']!='') { //category tags
 				echo '<span class="forumcattag">'.$line['tag'].'</span> ';
 			}
-			
+
 			if ($line['tagged']==1) {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			} else {
 				echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 			}
-			
+
 			if ($isteacher) {
 				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
 			}
 			if ($isteacher || ($line['userid']==$userid && $allowmod && time()<$postby)) {
 				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&modify={$line['id']}\">Modify</a> ";
-			} 
+			}
 			if ($isteacher || ($allowdel && $line['userid']==$userid && $posts==0)) {
 				echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&remove={$line['id']}\">Remove</a>";
 			}
@@ -277,20 +277,20 @@ if ($searchtype == 'thread') {
 			echo "</td></tr>\n";
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 } else if ($searchtype == 'posts') {
 	//doing a search of all posts
 	if (!isset($CFG['CPS']['itemicons'])) {
 	   $itemicons = array('web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
 		'html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
 		'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
-		'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png', 
-		'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png', 
-		'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png', 
-		'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png'); 
+		'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png',
+		'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png',
+		'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png',
+		'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png');
 	 } else {
 	   $itemicons = $CFG['CPS']['itemicons'];
 	 }
@@ -303,7 +303,7 @@ if ($searchtype == 'thread') {
 		$searchlikes2 = "(imas_forum_posts.subject LIKE '%".implode("%' AND imas_forum_posts.subject LIKE '%",$searchterms)."%')";
 		$searchlikes3 = "(imas_users.LastName LIKE '%".implode("%' AND imas_users.LastName LIKE '%",$searchterms)."%')";
 	}
-	
+
 	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
@@ -313,7 +313,7 @@ if ($searchtype == 'thread') {
 	$query .= "WHERE imas_forums.courseid='$cid' ";
 	if ($searchstr != '') {
 		$query .= "AND ($searchlikes OR $searchlikes2 OR $searchlikes3) ";
-	} 
+	}
 	if ($searchtag != '') {
 		$query .= "AND imas_forum_posts.tag='$searchtag' ";
 	}
@@ -323,7 +323,7 @@ if ($searchtype == 'thread') {
 	if ($anyforumsgroup && !$isteacher) {
 		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	}
-	
+
 	$query .= " ORDER BY imas_forum_posts.postdate DESC";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	if (mysql_num_rows($result)==0) {
@@ -340,7 +340,7 @@ if ($searchtype == 'thread') {
 		}
 		echo "<br/>Posted by: $name, ";
 		echo tzdate("F j, Y, g:i a",$line['postdate']);
-		
+
 		echo "</div><div class=blockitems>";
 		if($line['files']!='') {
 			$fl = explode('@@',$line['files']);
@@ -368,7 +368,7 @@ if ($searchtype == 'thread') {
 		echo "<p><a href=\"posts.php?cid=$cid&forum={$line['forumid']}&thread={$line['threadid']}&page=-4\">Show full thread</a></p>";
 		echo "</div>\n";
 	}
-	
+
 } else {
 	if (count($forumdata)==0) {
 		if ($isteacher) {
@@ -386,7 +386,7 @@ if ($searchtype == 'thread') {
 	</thead>
 	<tbody>
 <?php
-	
+
 	$query = "SELECT imas_forums.id,COUNT(imas_forum_posts.id) FROM imas_forums LEFT JOIN imas_forum_posts ON ";
 	$query .= "imas_forums.id=imas_forum_posts.forumid WHERE imas_forum_posts.parent=0 AND imas_forums.courseid='$cid' GROUP BY imas_forum_posts.forumid ORDER BY imas_forums.id";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -425,7 +425,7 @@ if ($searchtype == 'thread') {
 	while ($row = mysql_fetch_row($result)) {
 		$newcnt[$row[0]] = $row[1];
 	}
-	
+
 	/*$now = time();
 	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -433,7 +433,7 @@ if ($searchtype == 'thread') {
 	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 		$forumdata[$line['id']] = $line;
 	}
-	
+
 	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$itemorder = unserialize(mysql_result($result,0,0));
@@ -449,7 +449,7 @@ if ($searchtype == 'thread') {
 		}
 	}
 	flattenitems($itemorder,$itemsimporder);
-	
+
 	$itemsassoc = array();
 	$query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -494,7 +494,3 @@ if ($searchtype == 'thread') {
 }
 	require("../footer.php");
 ?>
-	
-	
-	
-	

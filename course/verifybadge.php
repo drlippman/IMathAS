@@ -289,7 +289,8 @@ function validatebadge($badgeid, $cid, $req, $userid=0) {
 			$email = $row[2];
 			$data = array($reqnameout, $reqout, $stuout, $metout, $stuname, $email);
 
-			$data = addslashes(serialize($data));
+			//DB $data = addslashes(serialize($data));
+			$data = serialize($data);
 			//DB $query = "UPDATE imas_badgerecords SET data='$data' WHERE badgeid='$badgeid' AND userid='$userid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_affected_rows()==0) {

@@ -214,7 +214,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					//DB $query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB if (mysql_num_rows($result)==1) {
-					$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text"; );
+					$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
 					$stm->execute(array(':text'=>$text));
 					if ($stm->rowCount()==1) {
 						//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
@@ -280,7 +280,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if ($totb=='t') {
 				array_unshift($sub,$itemid);
 			}
-			$itemorder = addslashes(serialize($items));
+			//DB $itemorder = addslashes(serialize($items));
+			$itemorder = serialize($items);
 
 			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -475,6 +476,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$outcomearr = array();
 		} else {
 			$outcomearr = unserialize($row[0]);
+			if ($outcomearr===false) {
+				$outcomearr = array();
+			}
 		}
 		$outcomes = array();
 		function flattenarr($ar) {

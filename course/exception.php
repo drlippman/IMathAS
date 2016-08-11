@@ -62,7 +62,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-		
+
 		//check if exception already exists
 		//DB $query = "SELECT id FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -152,7 +152,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$seedslist = implode(',',$seeds);
 				$lastanswers = str_replace('~','',$lastanswers);
 				$lalist = implode('~',$lastanswers);
-				$lalist = addslashes(stripslashes($lalist));
+				//DB $lalist = addslashes(stripslashes($lalist));
 				$reattemptinglist = implode(',',$reattempting);
 				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
 				//DB $query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";

@@ -310,3 +310,17 @@ R validate        26
  C viewwikipublic     4
  C wikirev            2
 ````
+
+testing
+/admin listing.  show group. show instructor's courses.
+/admin/forms/  add course (no copy).  
+/admin/actions/  add course (no copy).
+add assessment.  
+  Add questions.  
+  remove question.
+  rearrange question.
+  group/ungroup.
+  change question settings
+  add set
+add inlinetext
+add linkedtext: killed itemorder

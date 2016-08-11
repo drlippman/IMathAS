@@ -52,7 +52,8 @@ function getsubinfo($items,$parent,$pre) {
 		if (is_array($item)) {
 			$ids[] = $parent.'-'.($k+1);
 			$types[] = $pre."Block";
-			$names[] = stripslashes($item['name']);
+			//DB $names[] = stripslashes($item['name']);
+			$names[] = $item['name'];
 			getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
 		} else {
 			$ids[] = $item;

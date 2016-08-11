@@ -74,7 +74,8 @@ if (empty($_GET['badgeid'])) {
 			}
 			$i++;
 		}
-		$req = addslashes(serialize($req));
+		//DB $req = addslashes(serialize($req));
+		$req = serialize($req);
 		if ($_GET['badgeid']=='new') {
 			//DB $query = "INSERT INTO imas_badgesettings (name, badgetext, description, longdescription, courseid, requirements) VALUES ('$badgename','$badgetext','$descr','$longdescr','$cid','$req')";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());

@@ -482,7 +482,8 @@
 		echo "<html><body>", _('Error.  Access assessment from course page'), "</body></html>\n";
 		exit;
 	}
-	$testid = addslashes($sessiondata['sessiontestid']);
+	//DB $testid = addslashes($sessiondata['sessiontestid']);
+	$testid = $sessiondata['sessiontestid'];
 	$asid = $testid;
 	$isteacher = $sessiondata['isteacher'];
 	if (isset($sessiondata['actas'])) {
@@ -1589,7 +1590,8 @@ if (!isset($_REQUEST['embedpostback'])) {
 					$done = true;
 				}
 			} else if (isset($_GET['to'])) {
-				$toshow = addslashes($_GET['to']);
+				//DB $toshow = addslashes($_GET['to']);
+				$toshow = $_GET['to'];
 				$done = false;
 			}
 

@@ -88,10 +88,14 @@
 	if (isset($_POST['qtext'])) {
 		require("../includes/filehandler.php");
 		$now = time();
-		$_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
-		$_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
-		$_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
-		$_POST['solution'] = stripsmartquotes(stripslashes($_POST['solution']));
+		//DB $_POST['qtext'] = stripsmartquotes(stripslashes($_POST['qtext']));
+		//DB $_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
+		//DB $_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
+		//DB $_POST['solution'] = stripsmartquotes(stripslashes($_POST['solution']));
+		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
+		$_POST['control'] = stripsmartquotes($_POST['control']);
+		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol']);
+		$_POST['solution'] = stripsmartquotes($_POST['solution']);
 		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
 		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
 
@@ -103,8 +107,8 @@
 			require("../includes/htmLawed.php");
 			$_POST['qtext'] = convertdatauris($_POST['qtext']);
 		}
-		$_POST['qtext'] = addslashes($_POST['qtext']);
-		$_POST['solution'] = addslashes($_POST['solution']);
+		//DB $_POST['qtext'] = addslashes($_POST['qtext']);
+		//DB $_POST['solution'] = addslashes($_POST['solution']);
 
 		//handle help references
 		if (isset($_GET['id']) || isset($_GET['templateid'])) {
@@ -392,7 +396,7 @@
 					//if (move_uploaded_file($_FILES['imgfile']['tmp_name'], $uploadfile)) {
 						//echo "<p>File is valid, and was successfully uploaded</p>\n";
 						$_POST['newimgvar'] = str_replace('$','',$_POST['newimgvar']);
-						$filename = addslashes($filename);
+						//DB $filename = addslashes($filename);
 						//DB $query = "INSERT INTO imas_qimages (var,qsetid,filename,alttext) VALUES ('{$_POST['newimgvar']}','$qsetid','$filename','{$_POST['newimgalt']}')";
 						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 						$stm = $DBH->prepare("INSERT INTO imas_qimages (var,qsetid,filename,alttext) VALUES (:var, :qsetid, :filename, :alttext)");

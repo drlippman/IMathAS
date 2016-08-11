@@ -49,13 +49,15 @@ if (!(isset($teacherid)) && $myrights<75) {
 	//remember search, USED FOR ALL STEPS
 	if (isset($_POST['search'])) {
 		$safesearch = $_POST['search'];
-		$search = stripslashes($safesearch);
+		//DB $search = stripslashes($safesearch);
+		$search = $safesearch;
 		$search = str_replace('"','&quot;',$search);
 		$sessiondata['lastsearch'] = str_replace(" ","+",$safesearch);
 		writesessiondata();
 	} else if (isset($sessiondata['lastsearch'])) {
 		$safesearch = str_replace("+"," ",$sessiondata['lastsearch']);
-		$search = stripslashes($safesearch);
+		//DB $search = stripslashes($safesearch);
+		$search = $safesearch;
 		$search = str_replace('"','&quot;',$search);
 	} else {
 		$search = '';

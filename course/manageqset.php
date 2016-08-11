@@ -827,7 +827,8 @@ if ($myrights<20) {
 		if (isset($_POST['search'])) {
 			$safesearch = trim($_POST['search']);
 			$safesearch = str_replace(' and ', ' ',$safesearch);
-			$search = stripslashes($safesearch);
+			//DB $search = stripslashes($safesearch);
+			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
 			$sessiondata['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
 			if (isset($_POST['searchall'])) {
@@ -861,7 +862,8 @@ if ($myrights<20) {
 			writesessiondata();
 		} else if (isset($sessiondata['lastsearch'.$cid])) {
 			$safesearch = trim($sessiondata['lastsearch'.$cid]); //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
-			$search = stripslashes($safesearch);
+			//DB $search = stripslashes($safesearch);
+			$search = $safesearch;
 			$search = str_replace('"','&quot;',$search);
 			$searchall = $sessiondata['searchall'.$cid];
 			$searchmine = $sessiondata['searchmine'.$cid];

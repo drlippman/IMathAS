@@ -70,7 +70,8 @@
 				if ($finalseg != '') {
 					$viddata[] = $finalseg;
 				}
-				$viddata = addslashes(serialize($viddata));
+				//DB $viddata = addslashes(serialize($viddata));
+				$viddata = serialize($viddata);
 			}
 
 			if ($itemorder == '') {

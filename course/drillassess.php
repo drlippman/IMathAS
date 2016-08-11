@@ -89,7 +89,7 @@ if (isset($_GET['score'])) {
 	list($score,$rawscore) = scoreq(0,$curitemid,$seed,$_POST['qn0']);
 	$scores[0] = $score;
 	$rawscores[0] = $rawscore;
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$curitemid,$seed);
 	if (getpts($score)<.99 && $sa==0) {
 		$showans = true;

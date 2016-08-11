@@ -639,14 +639,15 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		//for ($kidx=0;$kidx<count($_POST);$kidx++) {
 		//	$partnum = ($qnidx+1)*1000 + $kidx;
 			if (isset($_POST["tc$partnum"])) {
-				$stuanswers[$thisq][$kidx] = stripslashes($_POST["tc$partnum"]);
+				//DB $stuanswers[$thisq][$kidx] = stripslashes($_POST["tc$partnum"]);
+				$stuanswers[$thisq][$kidx] = $_POST["tc$partnum"];
 				if ($_POST["qn$partnum"]==='') {
 					$stuanswersval[$thisq][$kidx] = null;
 					$stuanswers[$thisq][$kidx] = null;
 				} else if (is_numeric($_POST["qn$partnum"])) {
 					$stuanswersval[$thisq][$kidx] = floatval($_POST["qn$partnum"]);
 				} else if (substr($_POST["qn$partnum"],0,2)=='[(') { //calcmatrix
-					$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]));
+					$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]);
 					$stuanswersval[$thisq][$kidx] = str_replace(',','|',$stuav);
 				}
 			} else if (isset($_POST["qn$partnum"])) {
@@ -654,14 +655,15 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 					$tmp = array();
 					$spc = 0;
 					while (isset($_POST["qn$partnum-$spc"])) {
-						$tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
+						//DB $tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
+						$tmp[] = $_POST["qn$partnum-$spc"];
 						$spc++;
 					}
 					$stuanswers[$thisq][$kidx] = implode('|',$tmp);
-					$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]));
+					$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$partnum"]);
 					$stuanswersval[$thisq][$kidx] = str_replace(',','|',$stuav);
 				} else {
-					$stuanswers[$thisq][$kidx] = stripslashes_deep($_POST["qn$partnum"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$partnum"]));
+					$stuanswers[$thisq][$kidx] = $_POST["qn$partnum"];
 					if ($_POST["qn$partnum"]==='') {
 						$stuanswersval[$thisq][$kidx] = null;
 						$stuanswers[$thisq][$kidx] = null;
@@ -686,7 +688,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$tmp = array();
 				$spc = 0;
 				while (isset($_POST["qn$partnum-$spc"])) {
-					$tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
+					//DB $tmp[] = stripslashes($_POST["qn$partnum-$spc"]);
+					$tmp[] = $_POST["qn$partnum-$spc"];
 					$spc++;
 				}
 				$stuanswers[$thisq][$kidx] = implode('|',$tmp);
@@ -694,11 +697,12 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 	} else {
 		if (isset($_POST["tc$qnidx"])) {
-			$stuanswers[$thisq] = stripslashes($_POST["tc$qnidx"]);
+			//DB $stuanswers[$thisq] = stripslashes($_POST["tc$qnidx"]);
+			$stuanswers[$thisq] = $_POST["tc$qnidx"];
 			if (is_numeric($_POST["qn$qnidx"])) {
 				$stuanswersval[$thisq] = floatval($_POST["qn$qnidx"]);
 			} else if (substr($_POST["qn$qnidx"],0,2)=='[(') { //calcmatrix
-				$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]));
+				$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]);
 				$stuanswersval[$thisq] = str_replace(',','|',$stuav);
 			}
 		} else if (isset($_POST["qn$qnidx"])) {
@@ -706,14 +710,15 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				$tmp = array();
 				$spc = 0;
 				while (isset($_POST["qn$qnidx-$spc"])) {
-					$tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
+					//DB $tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
+					$tmp[] = $_POST["qn$qnidx-$spc"];
 					$spc++;
 				}
 				$stuanswers[$thisq] = implode('|',$tmp);
-				$stuav = stripslashes(str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]));
+				$stuav = str_replace(array('(',')','[',']'),'',$_POST["qn$qnidx"]);
 				$stuanswersval[$thisq] = str_replace(',','|',$stuav);
 			} else {
-				$stuanswers[$thisq] = stripslashes_deep($_POST["qn$qnidx"]); //preg_replace('/\W+/','',stripslashes($_POST["qn$qnidx"]));
+				$stuanswers[$thisq] = $_POST["qn$qnidx"];
 				if (is_numeric($_POST["qn$qnidx"])) {
 					$stuanswersval[$thisq] = floatval($_POST["qn$qnidx"]);
 				}
@@ -732,7 +737,8 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 			$tmp = array();
 			$spc = 0;
 			while (isset($_POST["qn$qnidx-$spc"])) {
-				$tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
+				//DB $tmp[] = stripslashes($_POST["qn$qnidx-$spc"]);
+				$tmp[] = $_POST["qn$qnidx-$spc"];
 				$spc++;
 			}
 			$stuanswers[$thisq] = implode('|',$tmp);
@@ -2177,7 +2183,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= getcolormark($colorbox);
 			$out .= "</div>";
 		} else {
-			$la = stripslashes($la);
+			//DB $la = stripslashes($la);
 			$la = preg_replace('/%(\w+;)/',"&$1",$la);
 			if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
 				$la = str_replace('&quot;','"',$la);
@@ -4211,7 +4217,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (isset($scoremethod) && $scoremethod=='takeanything' && trim($givenans)!='') {
 			return 1;
 		}
-		$givenans = stripslashes($givenans);
+		//DB $givenans = stripslashes($givenans);
 
 		if (!isset($answerformat)) { $answerformat = "normal";}
 		if ($answerformat=='list') {
@@ -4355,7 +4361,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		//return $correct;
 	} else if ($anstype == "essay") {
 		require_once(dirname(__FILE__)."/../includes/htmLawed.php");
-		$givenans = addslashes(myhtmLawed(stripslashes($givenans)));
+		//DB $givenans = addslashes(myhtmLawed(stripslashes($givenans)));
+		$givenans = myhtmLawed($givenans);
 		$givenans = preg_replace('/&(\w+;)/',"%$1",$givenans);
 		$GLOBALS['partlastanswer'] = $givenans;
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}

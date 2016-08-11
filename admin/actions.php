@@ -79,7 +79,7 @@ switch($_GET['action']) {
 		if ($myrights < 75) { echo "You don't have the authority for this action"; break;}
 		if ($myrights < 100) {
 			//DB $query = "DELETE FROM imas_users WHERE id='{$_GET['id']}' AND groupid='$groupid' AND rights<100";
-			$stm = $DBH->prepare("DELETE FROM imas_users WHERE id=:id AND groupid=:groupid AND rights<100"; );
+			$stm = $DBH->prepare("DELETE FROM imas_users WHERE id=:id AND groupid=:groupid AND rights<100");
 			$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
 		} else {
 			//DB $query = "DELETE FROM imas_users WHERE id='{$_GET['id']}'";
@@ -108,7 +108,7 @@ switch($_GET['action']) {
 
 		//DB $query = "DELETE FROM imas_msgs WHERE msgto='{$_GET['id']}' AND isread>1";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto AND isread>1"; );
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgto=:msgto AND isread>1");
 		$stm->execute(array(':msgto'=>$_GET['id']));
 		//DB $query = "UPDATE imas_msgs SET isread=isread+2 WHERE msgto='{$_GET['id']}' AND isread<2";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -116,7 +116,7 @@ switch($_GET['action']) {
 		$stm->execute(array(':msgto'=>$_GET['id']));
 		//DB $query = "DELETE FROM imas_msgs WHERE msgfrom='{$_GET['id']}' AND isread>1";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND isread>1"; );
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE msgfrom=:msgfrom AND isread>1");
 		$stm->execute(array(':msgfrom'=>$_GET['id']));
 		//DB $query = "UPDATE imas_msgs SET isread=isread+4 WHERE msgfrom='{$_GET['id']}' AND isread<2";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());

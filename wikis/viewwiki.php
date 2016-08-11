@@ -53,7 +53,7 @@ if ($cid==0) {
 		if ($_GET['delall']=='true') {
 			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$id' AND stugroupid='$groupid'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid";	);
+			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=:stugroupid");
 			$stm->execute(array(':wikiid'=>$id, ':stugroupid'=>$groupid));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewwiki.php?cid=$cid&id=$id&grp=$groupid$framed");
 			exit;
