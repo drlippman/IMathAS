@@ -350,3 +350,4 @@ show Roster
   copy emails
 show Gradebook
   single stu gradebook
+  view assessment, change score.  clearq.  

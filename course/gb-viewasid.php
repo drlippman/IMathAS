@@ -239,12 +239,13 @@
 				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
 				//DB $query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
 				//DB $query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,reattempting='',";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,reattempting='',";
 				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestseeds=:bestseeds,bestlastanswers=:bestlastanswers ";
-				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid");
+				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':scores'=>"$scorelist;$scorelist",
-					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist");
+					':bestattempts'=>$bestattemptslist, ':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':bestscores'=>"$bestscorelist;$bestscorelist;$bestscorelist"));
 			}
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 		} else {
@@ -342,11 +343,10 @@
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,";
 				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,reattempting=:reattempting ";
-				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid "
+				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid ";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist,
 					':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':reattempting'=>$reattemptinglist));
-
 				if (strlen($line['lti_sourcedid'])>1) {
 					require_once("../includes/ltioutcomes.php");
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
@@ -354,6 +354,8 @@
 
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 			} else {
+				echo "$clearid";
+				print_r($scores);
 				echo "<p>Error.  Try again.</p>";
 			}
 			//unset($_GET['asid']);
@@ -434,8 +436,7 @@
 				} else {
 					//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
 					//DB $query .= "WHERE id='{$_GET['asid']}'";
-					$query = "UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback";
-					$query .= "WHERE id=:id";
+					$query = "UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$_GET['asid']));
 				}
@@ -1376,8 +1377,7 @@ function getasidquery($asid) {
 	//DB $aid= mysql_result($result,0,1);
 	$stm = $DBH->prepare("SELECT agroupid,assessmentid FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$asid));
-	$agroupid = $stm->fetchColumn(0);
-	$aid= $stm->fetchColumn(1);
+	list($agroupid,$aid) = $stm->fetch(PDO::FETCH_NUM);
 	if ($agroupid>0) {
 		return array('agroupid',$agroupid,$aid);
 		//return (" WHERE agroupid='$agroupid'");
