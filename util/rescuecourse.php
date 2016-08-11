@@ -4,7 +4,7 @@ if ($myrights<100) {
 	exit;
 }
 if (isset($_REQUEST['cid'])) {
-	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
+	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_REQUEST['cid']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$items = unserialize(mysql_result($result,0,0));
 	$blockcnt = mysql_result($result,0,1);
@@ -12,10 +12,16 @@ if (isset($_REQUEST['cid'])) {
 	exit;
 }
 
+$allitems = array();
+$query = "SELECT id FROM imas_items WHERE courseid='{$_REQUEST['cid']}'";
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
+while ($row = mysql_fetch_row($result)) {
+	$allitems[] = $row[0];
+}
 
 $itemsfnd = array();
 function fixsub(&$items) {
-	global $itemsfnd;
+	global $allitems,$itemsfnd;
 	foreach($items as $k=>$item) {
 		if ($item==null) {
 			unset($items[$k]);
@@ -28,6 +34,9 @@ function fixsub(&$items) {
 		} else {
 			if ($item==null || $item=='') {
 				unset($items[$k]);
+			} else if (!in_array($item,$allitems)) {
+				unset($items[$k]);
+				echo "Removed unused item from itemorder<br/>";
 			} else {
 				$itemsfnd[] = $item;
 			}
@@ -35,15 +44,13 @@ function fixsub(&$items) {
 	}
 	$items = array_values($items);
 }
-fixsub($items); 
+fixsub($items);
 
 $recovereditems = array();
 
-$query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
-	if (!in_array($row[0],$itemsfnd)) {
-		$recovereditems[] = $row[0];
+foreach ($allitems as $item) {
+	if (!in_array($item,$itemsfnd)) {
+		$recovereditems[] = $item;
 	}
 }
 
@@ -63,19 +70,19 @@ if (count($recovereditems)>0) {
 	echo "recovered ". count($recovereditems) . "items";
 	print_r($items);
 	$itemorder = addslashes(serialize($items));
-	$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_GET['cid']}'";
+	$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_REQUEST['cid']}'";
 	mysql_query($query) or die("Query failed : $query" . mysql_error());
 } else {
 	$itemorder = addslashes(serialize($items));
-	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='{$_GET['cid']}'";
+	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='{$_REQUEST['cid']}'";
 	mysql_query($query) or die("Query failed : $query" . mysql_error());
 }
 
 echo "Done";
 
-	
+
 
 //print_r($items);
 
-		
+
 ?>

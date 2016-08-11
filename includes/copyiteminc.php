@@ -43,6 +43,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	$now = time();
 	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+	if (mysql_num_rows($result)==0) {return false;}
 	list($itemtype,$typeid) = mysql_fetch_row($result);
 	if ($itemtype == "InlineText") {
 		//$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
@@ -60,7 +61,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$query .= "VALUES ('$cid',$row)";
 		mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$newtypeid = mysql_insert_id();
-		
+
 		$query = "SELECT description,filename,id FROM imas_instr_files WHERE itemid='$typeid'";
 		$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$addedfiles = array();
@@ -70,7 +71,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$row = "'".implode("','",addslashes_deep($row))."'";
 			$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ($row,$newtypeid)";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
-			$addedfiles[$curid] = mysql_insert_id(); 
+			$addedfiles[$curid] = mysql_insert_id();
 		}
 		if (count($addedfiles)>0) {
 			$addedfilelist = array();
@@ -81,7 +82,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$query = "UPDATE imas_inlinetext SET fileorder='$addedfilelist' WHERE id=$newtypeid";
 			mysql_query($query) or die("Query failed :$query " . mysql_error());
 		}
-		
+
 	} else if ($itemtype == "LinkedText") {
 		//$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,startdate,enddate) ";
 		//$query .= "SELECT '$cid',title,summary,text,startdate,enddate FROM imas_linkedtext WHERE id='$typeid'";
@@ -168,14 +169,14 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 					$query .= "('$newtypeid','$userid',0,$now,'{$row[0]}','{$row[1]}','{$row[2]}','{$row[3]}','{$row[4]}')";
 				}
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
+
 				$threadid = mysql_insert_id();
 				$query = "UPDATE imas_forum_posts SET threadid='$threadid' WHERE id='$threadid'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
+
 				$query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES ('$threadid','$newtypeid',$now,'$userid')";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
+
 				$query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ('$userid','$threadid',$now)";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
 			}
@@ -230,14 +231,14 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$forumtopostto = $row['posttoforum'];
 			unset($row['posttoforum']);
 		}
-		
+
 		$reqscoreaid = $row['reqscoreaid'];
 		unset($row['reqscoreaid']);
 		$row['name'] .= stripslashes($_POST['append']);
-		
+
 		$fields = implode(",",array_keys($row));
 		$vals = "'".implode("','",addslashes_deep(array_values($row)))."'";
-		
+
 		$query = "INSERT INTO imas_assessments (courseid,$fields) VALUES ('$cid',$vals)";
 		mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$newtypeid = mysql_insert_id();
@@ -249,14 +250,14 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		}
 		$assessnewid[$typeid] = $newtypeid;
 		$thiswithdrawn = array();
-		
+
 		$query = "SELECT itemorder FROM imas_assessments WHERE id='$typeid'";
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$itemorder = mysql_result($result,0,0);
 		if (trim($itemorder)!='') {
 			$flat = preg_replace('/\d+\|\d+~/','',$itemorder);
 			$flat = str_replace('~',',',$itemorder);
-			
+
 			$query = "SELECT id,questionsetid,points,attempts,penalty,category,regen,showans,showhints,rubric,withdrawn FROM imas_questions WHERE id IN ($flat)";
 			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$inss = array();
@@ -287,13 +288,13 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				$insorder[] = $row['id'];
 			}
 			$idtoorder = array_flip($insorder);
-			
+
 			if (count($inss)>0) {
 				$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans,showhints) ";
 				$query .= "VALUES ".implode(',',$inss);
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 				$firstnewid = mysql_insert_id();
-				
+
 				$aitems = explode(',',$itemorder);
 				$newaitems = array();
 				foreach ($aitems as $k=>$aitem) {
@@ -312,7 +313,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 						$sub = explode('~',$aitem);
 						$newsub = array();
 						$front = 0;
-						if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
+						if (strpos($sub[0],'|')!==false) { //true except for bwards compat
 							$newsub[] = array_shift($sub);
 							$front = 1;
 						}
@@ -329,7 +330,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 							$newsub[] = $firstnewid+$idtoorder[$subi];
 						}
 						if (count($newsub)==$front) {
-							
+
 						} else if (count($newsub)==$front+1) {
 							$newaitems[] = $newsub[$front];
 						} else {
@@ -341,7 +342,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			}
-			
+
 
 			/*
 			$aitems = explode(',',$itemorder);
@@ -374,7 +375,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 				} else {
 					$sub = explode('~',$aitem);
 					$newsub = array();
-					if (strpos($sub[0],'|')!==false) { //true except for bwards compat 
+					if (strpos($sub[0],'|')!==false) { //true except for bwards compat
 						$newsub[] = array_shift($sub);
 					}
 					foreach ($sub as $subi) {
@@ -409,18 +410,18 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 			$query = "UPDATE imas_assessments SET itemorder='$newitemorder' WHERE id='$newtypeid'";
 			mysql_query($query) or die("Query failed : $query" . mysql_error());
 			*/
-			
+
 		}
 	} else if ($itemtype == "Calendar") {
-		$newtypeid = 0;	
-	} 
-	
+		$newtypeid = 0;
+	}
+
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
 	$query .= "VALUES ('$cid','$itemtype',$newtypeid)";
 	mysql_query($query) or die("Query failed :$query " . mysql_error());
-	return (mysql_insert_id());	
+	return (mysql_insert_id());
 }
-	
+
 function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 	global $checked,$blockcnt;
 	foreach ($items as $k=>$item) {
@@ -450,12 +451,15 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			}
 		} else {
 			if (array_search($item,$checked)!==FALSE) {
-				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+				$newitem = copyitem($item,$gbcats,$sethidden);
+				if ($newitem!==false) {
+					$addtoarr[] = $newitem;
+				}
 			}
 		}
 	}
-	
-}	
+
+}
 
 function doaftercopy($sourcecid) {
 	global $cid,$reqscoretrack,$categoryassessmenttrack,$assessnewid,$forumtrack,$posttoforumtrack;
@@ -464,12 +468,12 @@ function doaftercopy($sourcecid) {
 	} else {
 		$samecourse = false;
 	}
-	//update reqscoreaids if possible.  
+	//update reqscoreaids if possible.
 	if (count($reqscoretrack)>0) {
 		foreach ($reqscoretrack as $newid=>$oldreqaid) {
 			//is old reqscoreaid in copied list?
 			if (isset($assessnewid[$oldreqaid])) {
-				$query = "UPDATE imas_assessments SET reqscoreaid='{$assessnewid[$oldreqaid]}' WHERE id='$newid'";	
+				$query = "UPDATE imas_assessments SET reqscoreaid='{$assessnewid[$oldreqaid]}' WHERE id='$newid'";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			} else if (!$samecourse) {
 				$query = "UPDATE imas_assessments SET reqscore=0 WHERE id='$newid'";
@@ -482,7 +486,7 @@ function doaftercopy($sourcecid) {
 		foreach ($categoryassessmenttrack as $newqid=>$oldcategoryaid) {
 			//is oldcategoryaid in copied list?
 			if (isset($assessnewid[$oldcategoryaid])) {
-				$query = "UPDATE imas_questions SET category='AID-{$assessnewid[$oldcategoryaid]}' WHERE id='$newqid'";	
+				$query = "UPDATE imas_questions SET category='AID-{$assessnewid[$oldcategoryaid]}' WHERE id='$newqid'";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			} else if (!$samecourse) { //since that assessment isn't being copied, unclear what category should be
 				$query = "UPDATE imas_assessments SET category=0 WHERE id='$newqid'";
@@ -494,10 +498,10 @@ function doaftercopy($sourcecid) {
 	if (count($posttoforumtrack)>0) {
 		foreach ($posttoforumtrack as $newaid=>$oldforumid) {
 			if (isset($forumtrack[$oldforumid])) {
-				$query = "UPDATE imas_assessments SET posttoforum='{$forumtrack[$oldforumid]}' WHERE id='$newaid'";	
+				$query = "UPDATE imas_assessments SET posttoforum='{$forumtrack[$oldforumid]}' WHERE id='$newaid'";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			} else {
-				$query = "UPDATE imas_assessments SET posttoforum=0 WHERE id='$newaid'";	
+				$query = "UPDATE imas_assessments SET posttoforum=0 WHERE id='$newaid'";
 				mysql_query($query) or die("Query failed : $query" . mysql_error());
 			}
 		}
@@ -533,11 +537,14 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			$addtoarr[] = $newblock;
 		} else {
 			if ($item != null && $item != 0) {
-				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+				$newitem = copyitem($item,$gbcats,$sethidden);
+				if ($newitem!==false) {
+					$addtoarr[] = $newitem;
+				}
 			}
 		}
 	}
-	
+
 }
 
 
@@ -584,7 +591,7 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nb
 	if (!isset($gitypeids)) {
 		$gitypeids = array();
 	}
-	
+
 	foreach($items as $k=>$item) {
 		if (is_array($item)) {
 			$ids[] = $parent.'-'.($k+1);
@@ -602,7 +609,7 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nb
 				continue;
 			}
 			$arr = getiteminfo($item);
-			if ($itemtypelimit!==false && $arr[0]!=$itemtypelimit) {
+			if ($arr[0]===false || ($itemtypelimit!==false && $arr[0]!=$itemtypelimit)) {
 				continue;
 			}
 			$ids[] = $item;
@@ -618,7 +625,7 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nb
 			$sums[] = $arr[2];
 		}
 	}
-}	
+}
 
 function buildexistblocks($items,$parent,$pre='') {
 	global $existblocks;
@@ -636,11 +643,11 @@ function copyrubrics($offlinerubrics=array()) {
 	global $userid,$groupid,$qrubrictrack,$frubrictrack;
 	if (count($qrubrictrack)==0 && count($frubrictrack)==0 && count($offlinerubrics)==0) { return;}
 	$list = implode(',',array_merge($qrubrictrack,$frubrictrack,$offlinerubrics));
-	
+
 	//handle rubrics which I already have access to
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND (ownerid='$userid' OR groupid='$groupid')";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	while ($row = mysql_fetch_row($result)) { 
+	while ($row = mysql_fetch_row($result)) {
 		$qfound = array_keys($qrubrictrack,$row[0]);
 		if (count($qfound)>0) {
 			foreach ($qfound as $qid) {
@@ -663,7 +670,7 @@ function copyrubrics($offlinerubrics=array()) {
 			}
 		}
 	}
-	
+
 	//handle rubrics which I don't already have access to - need to copy them
 	$query = "SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid='$userid' OR groupid='$groupid')";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -685,7 +692,7 @@ function copyrubrics($offlinerubrics=array()) {
 			$newid = mysql_insert_id();
 			//echo "created $newid<br/>";
 		}
-		
+
 		$qfound = array_keys($qrubrictrack,$row[0]);
 		if (count($qfound)>0) {
 			foreach ($qfound as $qid) {
@@ -708,14 +715,14 @@ function copyrubrics($offlinerubrics=array()) {
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
-	}	
+	}
 }
 
 function handleextoolcopy($sourcecid) {
 	//assumes this is a copy into a different course
 	global $cid,$userid,$groupid,$exttooltrack;
 	if (count($exttooltrack)==0) {return;}
-	//$exttooltrack is linked text id => tool id	
+	//$exttooltrack is linked text id => tool id
 	$toolmap = array();
 	$query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
 	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -752,7 +759,7 @@ function handleextoolcopy($sourcecid) {
 		} else if ($row[1]==0 && ($row[2]==0 || $row[2]==$groupid)) {
 			//no need to copy anything - tool will just work
 		} else {
-			//not OK to copy; must disable tool in linked text item	
+			//not OK to copy; must disable tool in linked text item
 			$toupdate = implode(",",array_keys($exttooltrack, $row[0]));
 			$query = "UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)";
 			mysql_query($query) or die("Query failed : " . mysql_error());
