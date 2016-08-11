@@ -20,7 +20,7 @@ $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
 
 $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
-$result = mysql_query($query) or die(_("Query failed") . " : " . mysql_error());
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)==0) {
 	echo _("Invalid drill assessment id");
 	exit;
@@ -49,7 +49,7 @@ $lastanswers = array();
 $rawscores = array();
 
 $query = "SELECT * FROM imas_drillassess_sessions WHERE drillassessid='$daid' AND userid='$userid'";
-$result = mysql_query($query) or die(_("Query failed") . " : " . mysql_error());
+$result = mysql_query($query) or die("Query failed : " . mysql_error());
 if (mysql_num_rows($result)==0) {
 	//new
 	$curitem = -1;
@@ -57,7 +57,7 @@ if (mysql_num_rows($result)==0) {
 	$scorerec = array();
 	$scorerecarr = serialize($scorerec);
 	$query = "INSERT INTO imas_drillassess_sessions (drillassessid,userid,scorerec) VALUES ('$daid','$userid','$scorerecarr')";
-	mysql_query($query) or die(_("Query failed") . " : " . mysql_error());
+	mysql_query($query) or die("Query failed : " . mysql_error());
 	$starttime = 0;
 } else {
 	$sessdata = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -92,7 +92,7 @@ if (isset($_GET['score'])) {
 	$curscores[] = getpts($score);
 	$scorelist = implode(',',$curscores);
 	$query = "UPDATE imas_drillassess_sessions SET curscores='$scorelist',seed='$seed' WHERE id='{$sessdata['id']}'";
-	mysql_query($query) or die(_("Query failed") . " : " . mysql_error());
+	mysql_query($query) or die("Query failed : " . mysql_error());
 	if ($mode=='cntdown') {
 		$page_scoreMsg .= "<p>" . sprintf(_("Current: %d question(s) correct"), countcorrect($curscores)) . "</p>";
 	} else if ($stopattype=='a') {
@@ -102,12 +102,12 @@ if (isset($_GET['score'])) {
 	} else if ($stopattype=='s') {
 		$page_scoreMsg .= "<p>" . sprintf(_("Current: %d question streak (correct in a row) out of %d attempt(s)"), countstreak($curscores), count($curscores)) . "</p>";
 	}
-	
+
 } else {
 	$page_scoreMsg = '';
 }
 
-if (isset($_GET['start'])) {  
+if (isset($_GET['start'])) {
 	//start a new drill on this item from the itemlist
 	$curitem = intval($_GET['start']);
 	$curitemid = $itemids[$curitem];
@@ -116,7 +116,7 @@ if (isset($_GET['start'])) {
 	$scorelist = implode(',',$curscores);
 	$seed = rand(1,9999);
 	$query = "UPDATE imas_drillassess_sessions SET curscores='$scorelist',seed='$seed',starttime=$starttime,curitem=$curitem WHERE id='{$sessdata['id']}'";
-	mysql_query($query) or die(_("Query failed") . " : " . mysql_error());	
+	mysql_query($query) or die("Query failed : " . mysql_error());
 }
 
 //check on time
@@ -128,7 +128,7 @@ if ($mode=='cntup') {
 	$cur = $n - ($now - $starttime);
 }
 if ($mode=='cntdown' && ($cur <=0 || isset($_GET['superdone']))) {
-	$timesup = true;	
+	$timesup = true;
 }
 $timemsg = '';
 if ($cur > 3600) {
@@ -145,7 +145,7 @@ $seconds = $cur;
 $timemsg .= sprintf(_("%d seconds."), $seconds);
 //are we done?
 $drillisdone = false;
-if ($curitem > -1 && (($mode=='cntdown' && $timesup) || 
+if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 		($mode=='cntup' && (
 			($stopattype=='a' && count($curscores)==$n) ||
 			($stopattype=='c' && countcorrect($curscores)==$n) ||
@@ -193,15 +193,15 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 		}
 		$scoremsg .= sprintf(_("in %s"), $timemsg);
 	}
-	
+
 	$scorerec[$curitem][] = $torecscore;
 	$scorerecarr = serialize($scorerec);
 	$query = "UPDATE imas_drillassess_sessions SET curitem=-1,scorerec='$scorerecarr' WHERE id='{$sessdata['id']}'";
-	mysql_query($query) or die(_("Query failed") . " : " . mysql_error());	
+	mysql_query($query) or die("Query failed : " . mysql_error());
 	if ($isnewclassbest) {
 		$bestarr = implode(',',$classbests);
 		$query = "UPDATE imas_drillassess SET classbests='$bestarr' WHERE id='$daid'";
-		mysql_query($query) or die(_("Query failed") . " : " . mysql_error());	
+		mysql_query($query) or die("Query failed : " . mysql_error());
 	}
 }
 
@@ -290,7 +290,7 @@ if ($curitem == -1) {
 	if ($page_scoreMsg != '' && $showscore) {
 		echo '<div class="review">' . _('Score on last question') . ': '.$page_scoreMsg.'</div>';
 	}
-	
+
 	//are we done with this assessment?
 	if ($drillisdone) {
 		echo "<h4>" . _("Drill Complete") . "</h4>";
@@ -298,13 +298,13 @@ if ($curitem == -1) {
 		if (($showtostu&2)==2 && $isnewpbest) {
 			echo '<p>' . _("Congrats! That's a new personal best!") . '</p>';
 		}
-		if (($showtostu&4)==4 && $isnewclassbest) { 
+		if (($showtostu&4)==4 && $isnewclassbest) {
 			echo '<p>' . _("Congrats! That's a new class best!") . '</p>';
 		}
-		
+
 	} else {
 		echo "<script type=\"text/javascript\">\n";
-		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";	
+		echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";
 		echo " function updatetime() {\n";
 		if ($mode=='cntdown') {
 			echo "	  seconds--;\n";
@@ -315,7 +315,7 @@ if ($curitem == -1) {
 		echo "		var theform = document.getElementById(\"qform\");";
 		echo "		var action = theform.getAttribute(\"action\");";
 		echo "		theform.setAttribute(\"action\",action+'&superdone=true');";
-		echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n"; 
+		echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n";
 		//setTimeout('document.getElementById(\"qform\").submit()',1000);} \n";
 		echo "		return 0;";
 		echo "    }";
@@ -339,7 +339,7 @@ if ($curitem == -1) {
 		echo "</script>\n";
 		echo "<div class=right id=timelimitholder>" . _("Time") . ": <span id=\"timer\" style=\"font-size: 120%; color: red;\" ";
 		echo ">$hours:$minutes:$seconds</span></div>\n";
-	
+
 		?>
 		<script type="text/javascript">
 		function focusfirst() {
@@ -349,7 +349,7 @@ if ($curitem == -1) {
 		initstack.push(focusfirst);
 		</script>
 		<?php
-		//not done with assessment. 
+		//not done with assessment.
 		$page_formAction = "drillassess.php?cid=$cid&daid=$daid";
 		if ($showans) {
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\"\">\n";
@@ -376,7 +376,7 @@ if ($curitem == -1) {
 
 echo '</div>';
 require("../footer.php");
-			
+
 
 
 function countcorrect($sca) {
@@ -451,7 +451,7 @@ function sandboxgetweights($code,$seed) {
 		}
 	} else if (!is_array($answeights)) {
 		$answeights =  explode(',',$answeights);
-	} 
+	}
 
 	return $answeights;
 }
@@ -481,7 +481,7 @@ function printscore($sc,$qsetid,$seed) {
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
+
 		$pts = getpts($sc,$poss);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
@@ -490,7 +490,7 @@ function printscore($sc,$qsetid,$seed) {
 			$v = round($v * $poss, 2);
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
-			} else if (!is_numeric($v) || $v==0) { 
+			} else if (!is_numeric($v) || $v==0) {
 				$pm = 'redx';
 			} else if (abs($v-$ptposs[$k])<.011) {
 				$pm = 'gchk';
@@ -501,7 +501,7 @@ function printscore($sc,$qsetid,$seed) {
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
+		//$ptposs = implode(', ',$ptposs);
 		$out =  sprintf(_("%s out of %d (parts: %s)"), $pts, $poss, $sc);
 	}
 
@@ -512,16 +512,16 @@ function printscore($sc,$qsetid,$seed) {
 		$w = round(30*$pts/$poss);
 	}
 	if ($w==0) {$w=1;}
-	if ($w < 15) { 
+	if ($w < 15) {
 	     $color = "#f".dechex(floor(16*($w)/15))."0";
 	} else if ($w==15) {
 	     $color = '#ff0';
-	} else { 
+	} else {
 	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
 	}
-	
+
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;	
+	return $bar . $out;
 }
 
 function getpts($sc,$poss=1) {
@@ -535,7 +535,7 @@ function getpts($sc,$poss=1) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s*$poss;
 			}
 		}
