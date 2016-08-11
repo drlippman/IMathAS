@@ -350,4 +350,9 @@ show Roster
   copy emails
 show Gradebook
   single stu gradebook
-  view assessment, change score.  clearq.  
+    view assessment, change score.  clearq. clear scores. clear attempt.
+    Edit offline in place
+    edit one offline grade
+item analysis page
+  item breakdown
+  grade one q for all

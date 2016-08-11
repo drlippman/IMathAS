@@ -83,6 +83,7 @@
 			$stm->execute(array(':assessmentid'=>$aid));
 		}
 		$cnt = 0;
+		echo $stm->rowCount();
 		//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
@@ -115,8 +116,8 @@
 
 				//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
-				$stm->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
+				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
+				$stm2->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
 
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score

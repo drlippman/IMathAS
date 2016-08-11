@@ -628,7 +628,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($secfilter != -1) {
 			//DB $query .= " AND imas_students.section='$secfilter' ";
 			$query .= " AND imas_students.section=:section ";
-			$qarr[':section']=>$secfilter);
+			$qarr[':section']=$secfilter;
 		}
 		if ($hidelocked) {
 			$query .= ' AND imas_students.locked=0 ';
