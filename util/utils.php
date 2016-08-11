@@ -45,26 +45,31 @@ if (isset($_GET['form'])) {
 		echo '<div class="breadcrumb">'.$curBreadcrumb.' &gt; User Lookup</div>';
 
 		if (!empty($_POST['FirstName']) || !empty($_POST['LastName']) || !empty($_POST['SID']) || !empty($_POST['email'])) {
+			$qarr = array();
 			if (!empty($_POST['SID'])) {
 				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.SID=:SID";
+				$qarr[':SID']=$_POST['SID'];
 			} else if (!empty($_POST['email'])) {
 				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE imas_users.email=:email";
+				$qarr[':email']=$_POST['email'];
 			} else  {
 				$query = "SELECT imas_users.*,imas_groups.name,imas_groups.grouptype,imas_groups.parent FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
 				if (!empty($_POST['LastName'])) {
 					$query .= "imas_users.LastName=:lastname ";
+					$qarr[':lastname']=$_POST['LastName'];
 					if (!empty($_POST['FirstName'])) {
 						$query .= "AND ";
 					}
 				}
 				if (!empty($_POST['FirstName'])) {
 					$query .= "imas_users.FirstName=:firstname ";
+					$qarr[':firstname']=$_POST['FirstName'];
 				}
 				$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			}
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':SID'=>$_POST['SID'], ':email'=>$_POST['email'],, ':lastname'=>$_POST['LastName'], ':firstname'=>$_POST['FirstName']));
+			$stm->execute($qarr);
 			//DB if (mysql_num_rows($result)==0) {
 			if ($stm->rowCount()==0) {
 				echo "No results found";

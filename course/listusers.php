@@ -57,14 +57,16 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$keys = array_keys($_POST['sec']);
 			foreach ($keys as $stuid) {
 				if ($_POST['sec'][$stuid]=='') {
-					$_POST['sec'][$stuid] = "NULL";
-				} else {
-					$_POST['sec'][$stuid] = "'".$_POST['sec'][$stuid]."'";
-				}
+					//DB $_POST['sec'][$stuid] = "NULL";
+					$_POST['sec'][$stuid] = null;
+				//DB } else {
+				//DB 	$_POST['sec'][$stuid] = "'".$_POST['sec'][$stuid]."'";
+			  }
 				if ($_POST['code'][$stuid]=='') {
-					$_POST['code'][$stuid] = "NULL";
-				} else {
-					$_POST['code'][$stuid] = intval($_POST['code'][$stuid]);
+					//DB $_POST['code'][$stuid] = "NULL";
+					$_POST['code'][$stuid] = null;
+				//DB } else {
+				//DB 	$_POST['code'][$stuid] = intval($_POST['code'][$stuid]);
 				}
 			}
 			foreach ($keys as $stuid) {
@@ -239,7 +241,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$query .= "FROM imas_students JOIN imas_users ON imas_students.userid=imas_users.id WHERE imas_students.courseid=:courseid AND imas_users.id IN ($ulist)";
 			$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid);
+			$stm->execute(array(':courseid'=>$cid));
 			$stuemails = array();
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {

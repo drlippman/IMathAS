@@ -33,20 +33,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			$dontdo[] = $row[0];
 		}
 		$vals = array();
-		if (trim($_POST['section'])!='') {
-			$section = ",'".trim($_POST['section'])."'";
-		} else {
-			$section = '';
-		}
 		$qarr = array();
 		$_POST['section'] = trim($_POST['section']);
 		foreach ($todo as $stu) {
 			if (in_array($stu,$dontdo)) {continue;}
 			//DB $vals[] = "($stu,'$cid'$section)";
-			if ($_POST['section']!='') {
-				$vals[] = "(?,?,?)";
-				array_push($qarr, $stu, $cid, $_POST['section']);
-			}
+			$vals[] = "(?,?,?)";
+			array_push($qarr, $stu, $cid, ($_POST['section']!='')?$_POST['section']:null);
 		}
 		if (count($vals)>0) {
 			//DB $query = 'INSERT INTO imas_students (userid,courseid';
@@ -55,11 +48,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 			//DB }
 			//DB $query .= ') VALUES '.implode(',',$vals);
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
-			if ($_POST['section']!='') {
-				$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES '.implode(',', $vals));
-			} else {
-				$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid) VALUES '.implode(',', $vals));
-			}
+			$stm = $DBH->prepare('INSERT INTO imas_students (userid,courseid,section) VALUES '.implode(',', $vals));
 			$stm->execute($qarr);
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/listusers.php?cid=$cid");

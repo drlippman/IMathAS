@@ -1840,7 +1840,7 @@ function enditem($canedit) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   $itemtypes = array();  $iteminfo = array();
 	   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";

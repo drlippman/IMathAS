@@ -4,10 +4,15 @@ if ($myrights<100) {
 	exit;
 }
 if (isset($_REQUEST['cid'])) {
-	$query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$items = unserialize(mysql_result($result,0,0));
-	$blockcnt = mysql_result($result,0,1);
+	//DB $query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $items = unserialize(mysql_result($result,0,0));
+	//DB $blockcnt = mysql_result($result,0,1);
+	$stm = $DBH->prepare("SELECT itemorder,blockcnt FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$_REQUEST['cid']));
+	list($itemorder, $blockcnt) = $stm->fetch(PDO::FETCH_NUM);
+	$items = unserialize($itemorder);
+	if ($items===false) {$items = array();}
 } else {
 	exit;
 }
@@ -39,9 +44,12 @@ fixsub($items);
 
 $recovereditems = array();
 
-$query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id FROM imas_items WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$_REQUEST['cid']));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if (!in_array($row[0],$itemsfnd)) {
 		$recovereditems[] = $row[0];
 	}
@@ -64,13 +72,17 @@ if (count($recovereditems)>0) {
 	print_r($items);
 	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_GET['cid']}'";
-	mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt=blockcnt+1 WHERE id='{$_GET['cid']}'";
+	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=blockcnt+1 WHERE id=:id");
+	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$_REQUEST['cid']));
 } else {
 	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
-	$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='{$_GET['cid']}'";
-	mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='{$_GET['cid']}'";
+	//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+	$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$_REQUEST['cid']));
 }
 
 echo "Done";

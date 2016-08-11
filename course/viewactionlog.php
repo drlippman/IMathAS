@@ -60,74 +60,74 @@ if (count($lookups['as'])>0) {
 	//DB $query = 'SELECT id,name FROM imas_assessments WHERE id IN ('..')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['as'])));
-	$stm = $DBH->query("SELECT id,name FROM imas_assessments WHERE id IN ($lookups)");
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['as'])));
+	$stm = $DBH->query("SELECT id,name FROM imas_assessments WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$asnames[$row[0]] = $row[1];
 	}
 }
 $innames = array();
 if (count($lookups['in'])>0) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['in'])));
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['in'])));
 	//DB $query = 'SELECT id,title FROM imas_inlinetext WHERE id IN ('.implode(',',array_unique($lookups['in'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,title FROM imas_inlinetext WHERE id IN ($lookups)");
+	$stm = $DBH->query("SELECT id,title FROM imas_inlinetext WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$innames[$row[0]] = $row[1];
 	}
 }
 $linames = array();
 if (count($lookups['li'])>0) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['li'])));
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['li'])));
 	//DB $query = 'SELECT id,title FROM imas_linkedtext WHERE id IN ('.implode(',',array_unique($lookups['li'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,title FROM imas_linkedtext WHERE id IN ($lookups)");
+	$stm = $DBH->query("SELECT id,title FROM imas_linkedtext WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$linames[$row[0]] = $row[1];
 	}
 }
 $winames = array();
 if (count($lookups['wi'])>0) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['wi'])));
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['wi'])));
 	//DB $query = 'SELECT id,name FROM imas_wikis WHERE id IN ('.implode(',',array_unique($lookups['wi'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,name FROM imas_wikis WHERE id IN ($lookups)");
+	$stm = $DBH->query("SELECT id,name FROM imas_wikis WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$winames[$row[0]] = $row[1];
 	}
 }
 $exnames = array();
 if (count($lookups['ex'])>0) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['ex'])));
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['ex'])));
 	//DB $query = 'SELECT id,assessmentid FROM imas_questions WHERE id IN ('.implode(',',array_unique($lookups['ex'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,assessmentid FROM imas_questions WHERE id IN ($lookups)");
+	$stm = $DBH->query("SELECT id,assessmentid FROM imas_questions WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$exnames[$row[0]] = $asnames[$row[1]];
 	}
 }
 $fpnames = array();
 if (count($lookups['fo'])>0) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['fo'])));
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['fo'])));
 	//DB $query = 'SELECT id,subject FROM imas_forum_posts WHERE id IN ('.implode(',',array_unique($lookups['fo'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,subject FROM imas_forum_posts WHERE id IN ($lookups)");
+	$stm = $DBH->query("SELECT id,subject FROM imas_forum_posts WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$fpnames[$row[0]] = $row[1];
 	}
 }
 $forumnames = array();
 if (count($lookups['forums'])>0) {
-	$lookups = implode(',', array_map('intval', array_unique($lookups['forums'])));
+	$lookuplist = implode(',', array_map('intval', array_unique($lookups['forums'])));
 	//DB $query = 'SELECT id,name FROM imas_forums WHERE id IN ('.implode(',',array_unique($lookups['forums'])).')';
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($row = mysql_fetch_row($result)) {
-	$stm = $DBH->query("SELECT id,name FROM imas_forums WHERE id IN ($lookups)");
+	$stm = $DBH->query("SELECT id,name FROM imas_forums WHERE id IN ($lookuplist)");
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$forumnames[$row[0]] = $row[1];
 	}

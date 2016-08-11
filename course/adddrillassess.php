@@ -238,7 +238,7 @@ if (isset($_GET['record'])) {
 		if ($updatebests) {
 			//DB $query .= ",classbests='$bestlist'";
 			$query .= ",classbests=:classbests";
-			$qarr[':classbests']=>$bestlist;
+			$qarr[':classbests'] = $bestlist;
 		}
 		$query .= " WHERE id=:id";
 		$qarr[':id'] = $daid;
@@ -739,7 +739,7 @@ foreach ($itemids as $k=>$id) {
 		generateselect(count($itemids),$k);
 		echo '</td>';
 	}
-	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.$itemdescr[$k].'"/></td>';
+	echo '<td><input type="text" size="60" name="descr['.$k.']" value="'.htmlentities($itemdescr[$k]).'"/></td>';
 	echo "<td><input type=button value=\"Preview\" onClick=\"previewq(null,$k,{$itemids[$k]})\"/></td>";
 	if (!$beentaken) {
 		echo '<td><input type="checkbox" name="delitem['.$k.']" value="1"/></td>';

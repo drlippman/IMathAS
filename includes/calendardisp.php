@@ -256,7 +256,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 if (isset($teacherid)) {
 	//DB $query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$stm = $DBH->prepare("SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>:$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid=:courseid");
+	$stm = $DBH->prepare("SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ((oncal=2 AND enddate>$exlowertime AND enddate<$uppertime) OR (oncal=1 AND startdate<$uppertime AND startdate>$exlowertime)) AND (avail=1 OR (avail=2 AND startdate>0)) AND courseid=:courseid");
 	$stm->execute(array(':courseid'=>$cid));
 } else {
 	//DB $query = "SELECT id,title,enddate,text,startdate,oncal,caltag,avail FROM imas_inlinetext WHERE ";

@@ -374,7 +374,7 @@ function gbtable() {
 		$stm2->execute(array(':assessmentid'=>$line['id']));
 		$totalpossible = 0;
 		//DB while ($r = mysql_fetch_row($result2)) {
-		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
+		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 			if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
@@ -1025,12 +1025,19 @@ function gbtable() {
 	//pull exceptions
 	$exceptions = array();
 	$forumexceptions = array();
+	//DB $query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	//DB $query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	//DB $query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
+	//DB $query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
-	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
 	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
-	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($r = mysql_fetch_assoc($result2)) {
+	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
+	$stm2 = $DBH->prepare($query);
+	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
+	//DB while ($r = mysql_fetch_assoc($result2)) {
+	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($sturow[$r['userid']])) { continue;}
 		if ($r['itemtype']=='A') {
 			$exceptions[$r['typeid']][$r['userid']] = array($r['enddate'],$r['islatepass']);
@@ -1063,6 +1070,7 @@ function gbtable() {
 	} else {
 		$stm2->execute(array(':courseid'=>$cid));
 	}
+
 	while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($assessidx[$l['assessmentid']]) || !isset($sturow[$l['userid']]) || !isset($assesscol[$l['assessmentid']])) {
 			continue;

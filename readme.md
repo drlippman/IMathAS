@@ -299,6 +299,7 @@ R validate        26
  C mergeteachers      18
  C replacevids        6
  C rescoreassess      4
+ C rescuecourse       4
  C updatedeprecated   3
  C updateextref       3
  C updatewronglibs    1
@@ -323,4 +324,29 @@ add assessment.
   change question settings
   add set
 add inlinetext
-add linkedtext: killed itemorder
+add linkedtext (file, page of text)
+  view linkedtext item
+add wiki
+  view.  edit.  edit again. view revision history. clear history. current version snapshot
+add drill.  
+  Add question to drill
+  Open drill
+add a block
+show block content: expand, folder, treereader
+delete block
+course page pulldown reorder
+quick view, rearrange, edit, save
+show calendar
+  manage events:add, delete
+show Roster
+  login log
+  activity log
+  login grid
+  assign section/code
+  manage tutors
+  enroll from another course
+  unenroll
+  lock (link and button)
+  copy emails
+show Gradebook
+  single stu gradebook
