@@ -1,15 +1,15 @@
 var i18njs = {
 "not a valid fraction":
-"kein gültiger Bruch",
+"kein gÃ¼ltiger Bruch",
 
 " invalid entry format":
-" ungültiges Eingabeformat",
+" ungÃ¼ltiges Eingabeformat",
 
 "not a valid mixed number":
-"keine gültige gemischte Zahl",
+"keine gÃ¼ltige gemischte Zahl",
 
 "not valid scientific notation":
-"keine gültige wissenschaftliche Schreibweise",
+"keine gÃ¼ltige wissenschaftliche Schreibweise",
 
 "no trig functions allowed":
 "keine trigonometrischen Funktionen erlaubt",
@@ -18,13 +18,13 @@ var i18njs = {
 "keine Dezimalstellen erlaubt",
 
 "syntax incomplete":
-"Syntax unvollständig",
+"Syntax unvollstÃ¤ndig",
 
 "undefined":
 "undefiniert",
 
 "unmatched parens":
-"unvollständige Klammerung",
+"unvollstÃ¤ndige Klammerung",
 
 "use $1 instead of $2":
 "benutzten Sie $1 anstelle von $2",
@@ -48,14 +48,78 @@ var i18njs = {
 "Syntaxfehler: Dies ist keine Gleichung",
 
 "You have already submitted this page.  Please be patient while your submission is processed.":
-"Sie haben diese Seite bereits abgegeben. Bitte gedulden Sie sich, während Ihre Eingabe bearbeitet wird.",
+"Sie haben diese Seite bereits abgegeben. Bitte gedulden Sie sich, wÃ¤hrend Ihre Eingabe bearbeitet wird.",
 
 "Submitting...":
-"Verarbeitung läuft ...",
+"Verarbeitung lÃ¤uft ...",
 
 "Error Submitting.":
 "Fehler bei der Verarbeitung.",
 
 "Submission Error":
-"Verarbeitungfehler"
+"Verarbeitungfehler",
+
+"Show Answers When Closed":
+"Zeige Antworten beim Schliessen",
+
+"Clear results and generate a new version of this question":
+"LÃ¶sche Ergebnisse und generiere eine neue Version dieser Frage",
+
+"Saved":
+"Gespeichert",
+
+"Error":
+"Fehler",
+
+"Show Answers":
+"Zeige Antworten",
+
+"Closing Student Input...":
+"Schliesse Studenteneingabe...",
+
+"Open Student Input":
+"Ã–ffne Studenteneingabe",
+
+"Opening Student Input...":
+"Ã–ffne Studenteneingabe...",
+
+"Close Student Input":
+"Schliesse Studenteneingabe",
+
+"Loading...":
+"Laden...",
+
+"Question":
+"Frage",
+
+"Frequency":
+"Anzahl",
+
+"Answer":
+"Antwort",
+
+"student":
+"Student",
+
+"students":
+"Studenten",
+
+"Waiting for the instructor to start a question":
+"Warten, dass der Dozent eine Frage startet",
+
+"Submit":
+"Abschicken",
+
+"Saving...":
+"Speichern...",
+
+"result":
+"Ergebnis",
+
+"results":
+"Ergebnisse",
+
+"received.":
+"erhalten.",
+
 };
