@@ -47,6 +47,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 	//DB list($itemtype,$typeid) = mysql_fetch_row($result);
 	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
 	$stm->execute(array(':id'=>$itemid));
+	if ($stm->rowCount()==0) {return false;}
 	list($itemtype,$typeid) = $stm->fetch(PDO::FETCH_NUM);
 	if ($itemtype == "InlineText") {
 		//$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate) ";
@@ -576,9 +577,12 @@ function copysub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			}
 		} else {
 			if (array_search($item,$checked)!==FALSE) {
-				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+				$newitem = copyitem($item,$gbcats,$sethidden);
+				if ($newitem!==false) {
+					$addtoarr[] = $newitem;
 			}
 		}
+	}
 	}
 
 }
@@ -672,9 +676,12 @@ function copyallsub($items,$parent,&$addtoarr,$gbcats,$sethidden=false) {
 			$addtoarr[] = $newblock;
 		} else {
 			if ($item != null && $item != 0) {
-				$addtoarr[] = copyitem($item,$gbcats,$sethidden);
+				$newitem = copyitem($item,$gbcats,$sethidden);
+				if ($newitem!==false) {
+					$addtoarr[] = $newitem;
 			}
 		}
+	}
 	}
 
 }
@@ -754,7 +761,7 @@ function getsubinfo($items,$parent,$pre,$itemtypelimit=false,$spacer='|&nbsp;&nb
 				continue;
 			}
 			$arr = getiteminfo($item);
-			if ($itemtypelimit!==false && $arr[0]!=$itemtypelimit) {
+			if ($arr[0]===false || ($itemtypelimit!==false && $arr[0]!=$itemtypelimit)) {
 				continue;
 			}
 			$ids[] = $item;

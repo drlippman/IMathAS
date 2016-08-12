@@ -2700,7 +2700,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				}
 			}
 
-
+			//fix la's that were encoded incorrectly
+			$la = str_replace(',,' , ',' , $la);
+			$la = str_replace(';,' , ';' , $la);
 
 			if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
 			$out .= '</span></div>';

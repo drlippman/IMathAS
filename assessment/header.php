@@ -140,7 +140,7 @@ div { zoom: 1; }
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=071116"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=080416"></script>
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
@@ -183,7 +183,7 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=071916\"></script>";
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
-} 
+}
 
 //IP: eqntips
 if ($showtips==2) {

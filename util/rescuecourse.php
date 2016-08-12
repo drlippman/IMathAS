@@ -17,10 +17,20 @@ if (isset($_REQUEST['cid'])) {
 	exit;
 }
 
+$allitems = array();
+//DB $query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id FROM imas_items WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$_REQUEST['cid']));
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+	$allitems[] = $row[0];
+}
 
 $itemsfnd = array();
 function fixsub(&$items) {
-	global $itemsfnd;
+	global $allitems,$itemsfnd;
 	foreach($items as $k=>$item) {
 		if ($item==null) {
 			unset($items[$k]);
@@ -33,6 +43,9 @@ function fixsub(&$items) {
 		} else {
 			if ($item==null || $item=='') {
 				unset($items[$k]);
+			} else if (!in_array($item,$allitems)) {
+				unset($items[$k]);
+				echo "Removed unused item from itemorder<br/>";
 			} else {
 				$itemsfnd[] = $item;
 			}
@@ -44,14 +57,9 @@ fixsub($items);
 
 $recovereditems = array();
 
-//DB $query = "SELECT id FROM imas_items WHERE courseid='{$_GET['cid']}'";
-//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-//DB while ($row = mysql_fetch_row($result)) {
-$stm = $DBH->prepare("SELECT id FROM imas_items WHERE courseid=:courseid");
-$stm->execute(array(':courseid'=>$_REQUEST['cid']));
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	if (!in_array($row[0],$itemsfnd)) {
-		$recovereditems[] = $row[0];
+foreach ($allitems as $item) {
+	if (!in_array($item,$itemsfnd)) {
+		$recovereditems[] = $item;
 	}
 }
 

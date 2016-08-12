@@ -183,7 +183,7 @@
 				echo $out;
 				echo '<h2>'.$adata['name'].'</h2>';
 				if (strpos($adata['name'],'RPNow') !== false && strpos($_SERVER['HTTP_USER_AGENT'],'RPNow') === false) {
-					echo '<p>This assessment requires the use of Remote Proctor Now (RPNow).</p>';
+					echo '<p>' . _("This assessment requires the use of Remote Proctor Now (RPNow).") . '</p>';
 				} else {
 					echo '<p>', _('Password required for access.'), '</p>';
 					echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?cid={$_GET['cid']}&amp;id={$_GET['id']}\">";
@@ -301,7 +301,7 @@
 				':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':reviewscores'=>$scorelist, ':reviewattempts'=>$attemptslist,
 				':reviewseeds'=>$reviewseedlist, ':reviewlastanswers'=>$lalist, ':agroupid'=>$stugroupid, ':feedback'=>$deffeedbacktext, ':lti_sourcedid'=>$ltisourcedid));
 			if ($result===false) {
-				echo 'Error DupASID. <a href="showtest.php?cid='.$cid.'&aid='.$aid.'">Try again</a>';
+				echo _('Error DupASID.') . ' <a href="showtest.php?cid='.$cid.'&aid='.$aid.'">' . _("Try again") . '</a>';
 			}
 			//DB $sessiondata['sessiontestid'] = mysql_insert_id();
 			$sessiondata['sessiontestid'] = $DBH->lastInsertId();
@@ -1017,14 +1017,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['displaymethod'] == "LivePoll") {
 		$placeinhead = '<script src="https://'.$CFG['GEN']['livepollserver'].':3000/socket.io/socket.io.js"></script>';
 		$placeinhead .= '<script src="'.$imasroot.'/javascript/livepoll.js?v=071116"></script>';
-		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher']?'teachers':'students');
+		$livepollroom = $testsettings['id'].'-'.($sessiondata['isteacher'] ? 'teachers':'students');
 		$now = time();
 		if (isset($CFG['GEN']['livepollpassword'])) {
 			$livepollsig = base64_encode(sha1($livepollroom . $CFG['GEN']['livepollpassword'] . $now,true));
 		}
 		$placeinhead .= '<script type="text/javascript">
 				if (typeof io != "undefined") {livepoll.init("'.$CFG['GEN']['livepollserver'].'","'.$livepollroom.'","'.$now.'","'.$livepollsig.'");}
-				else { $(function() {$("#livepollqcontent").html("<p>Unable to connect to LivePoll Hub.  Please try again later.</p>");});}</script>';
+				else { $(function() {$("#livepollqcontent").html("<p>' . _("Unable to connect to LivePoll Hub.  Please try again later.") . '</p>");});}</script>';
 
 		$placeinhead .= '<style type="text/css">
 			.LPres td, .LPres th {padding: 8px; border: 1px solid #999;}
@@ -1297,11 +1297,13 @@ if (!isset($_REQUEST['embedpostback'])) {
 				$selops .= "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 			}
 			//TODO i18n
-			echo '<p>Each group member (other than the currently logged in student) to be added should select their name ';
+			echo '<p>';
 			if ($testsettings['isgroup']==1) {
-				echo 'and enter their password ';
+				echo _('Each group member (other than the currently logged in student) to be added should select their name and enter their password here.');
+			} else {
+				echo _('Each group member (other than the currently logged in student) to be added should select their name here.');
 			}
-			echo 'here.</p>';
+			echo '</p>';
 			echo '<form method="post" enctype="multipart/form-data" action="showtest.php?addgrpmem=true">';
 			echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 			echo '<input type="hidden" name="disptime" value="'.time().'" />';
@@ -1353,14 +1355,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 	}
 
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
-		echo "<div class=right><span style=\"color:#f00\">Practice Assessment.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
+		echo "<div class=right><span style=\"color:#f00\">" . _("Practice Assessment") . ".</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
 	if (!$isreview && !$superdone && $testsettings['displaymethod']!="LivePoll") {
 		$duetimenote = '';
 		if ($exceptionduedate > 0) {
 			$timebeforedue = $exceptionduedate - time();
 			if ($timebeforedue>0 && ($testsettings['enddate'] - time()) < 0) { //past original due date
-				$duetimenote .= _('This assignment is past the original due date of ').tzdate('D m/d/Y g:i a',$testsettings['enddate']).'. ';
+				$duetimenote .= sprintf(_('This assignment is past the original due date of %s.'), tzdate('D m/d/Y g:i a',$testsettings['enddate']));
 				if ($exceptiontype>0) {
 					$duetimenote .= _('You have used a LatePass');
 				} else {
@@ -1458,11 +1460,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 		}
 		echo ">".(($hours>0)?$hours.":":"")."$minutes:$seconds</span> ", _('remaining'), ".</span></span> <span onclick=\"toggletimer()\" style=\"color:#aaa;\" class=\"clickable\" id=\"timerhide\" title=\"",_('Hide'),"\">[x]</span></div>\n";
 		echo "<script type=\"text/javascript\">\n";
-		echo "assessmentTimer($totremaining,".($timelimitkickout?'true':'false').");";
+		echo "assessmentTimer($totremaining,".($timelimitkickout ? 'true':'false').");";
 		echo "</script>\n";
 		}
 	} else if ($isreview) {
-		echo "<div class=right style=\"color:#f00;clear:right;\">In Review Mode - no scores will be saved<br/><a href=\"showtest.php?regenall=all\">", _('Create new versions of all questions.'), "</a></div>\n";
+		echo "<div class=right style=\"color:#f00;clear:right;\">" . _("In Review Mode - no scores will be saved") . "<br/><a href=\"showtest.php?regenall=all\">", _('Create new versions of all questions.'), "</a></div>\n";
 	} else if ($superdone) {
 		echo "<div class=right>", _('Time limit expired'), "</div>";
 	} else {
@@ -1513,7 +1515,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$now = time();
 			if (isset($_POST['disptime']) && !$isreview) {
 				$used = $now - intval($_POST['disptime']);
-				$timesontask[0] .= (($timesontask[0]=='')?'':'~').$used;
+				$timesontask[0] .= (($timesontask[0]=='') ? '':'~').$used;
 			}
 
 			if (isset($_POST['saveforlater'])) {
@@ -1545,7 +1547,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				} else {
 					if (isset($_POST['disptime']) && !$isreview) {
 						$used = $now - intval($_POST['disptime']);
-						$timesontask[$last] .= (($timesontask[$last]=='')?'':'~').$used;
+						$timesontask[$last] .= (($timesontask[$last]=='') ? '':'~').$used;
 					}
 					$GLOBALS['scoremessages'] = '';
 					$rawscore = scorequestion($last);
@@ -1621,7 +1623,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				} else {
 					if (isset($_POST['disptime']) && !$isreview) {
 						$used = $now - intval($_POST['disptime']);
-						$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+						$timesontask[$qn] .= (($timesontask[$qn]=='') ? '':'~').$used;
 					}
 					$GLOBALS['scoremessages'] = '';
 					$GLOBALS['questionmanualgrade'] = false;
@@ -1702,19 +1704,19 @@ if (!isset($_REQUEST['embedpostback'])) {
 				if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
 					//TODO i18n
 
-					echo "<p>This question, with your last answer";
+					echo "<p>" . _("This question, with your last answer");
 					if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
-						echo " and correct answer";
+						echo _(" and correct answer");
 						$showcorrectnow = true;
 					} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
 						   ($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn])) {
-						echo " and correct answer";
+						echo _(" and correct answer");
 						$showcorrectnow = true;
 					} else {
 						$showcorrectnow = false;
 					}
 
-					echo ', is displayed below</p>';
+					echo _(', is displayed below') . '</p>';
 					if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
 						//$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
 						if (strpos($rawscores[$qn],'~')!==false) {
@@ -1766,7 +1768,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 				}
 				if ($testsettings['testtype']!="NoScores") {
-					echo "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+					echo "<br/><p>". _("When you are done, ") . " <a href=\"showtest.php?action=skip&amp;done=true\">" . _("click here to see a summary of your scores") . "</a>.</p>\n";
 				}
 
 				echo "</div>\n";
@@ -1874,7 +1876,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				} else {
 					if (isset($_POST['disptime']) && !$isreview) {
 						$used = $now - intval($_POST['disptime']);
-						$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+						$timesontask[$qn] .= (($timesontask[$qn]=='') ? '':'~').$used;
 					}
 					$GLOBALS['scoremessages'] = '';
 					$rawscore = scorequestion($qn);
@@ -2013,7 +2015,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			} else {
 				if (isset($_POST['disptime']) && !$isreview) {
 					$used = $now - intval($_POST['disptime']);
-					$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+					$timesontask[$qn] .= (($timesontask[$qn]=='') ? '':'~').$used;
 				}
 				$GLOBALS['scoremessages'] = '';
 				$GLOBALS['questionmanualgrade'] = false;
@@ -2123,23 +2125,23 @@ if (!isset($_REQUEST['embedpostback'])) {
 					echo "<p>", _('No attempts remain on this problem.'), "</p>";
 					if ($showeachscore) {
 						//TODO i18n
-						$msg =  "<p>This question, with your last answer";
+						$msg =  "<p>" . _("This question, with your last answer");
 						if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
-							$msg .= " and correct answer";
+							$msg .= _(" and correct answer");
 							$showcorrectnow = true;
 						} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
 							($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn])) {
-							$msg .= " and correct answer";
+							$msg .= _(" and correct answer");
 							$showcorrectnow = true;
 						} else {
 							$showcorrectnow = false;
 						}
 						if ($showcorrectnow) {
-							echo $msg . ', is displayed below</p>';
+							echo $msg . _(', is displayed below') . '</p>';
 							echo '</div>';
 							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
 						} else {
-							echo $msg . ', is displayed below</p>';
+							echo $msg . -(', is displayed below') . '</p>';
 							echo '</div>';
 							displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
 						}
@@ -2162,7 +2164,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if (strpos($testsettings['intro'],'[PAGE')!==false || $sessiondata['intreereader']) {
 				echo 'embedattemptedtrack["q'.$qn.'"][1]=0;';
 				if (false && $showeachscore) {
-					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn)?"1":"0") . ';';
+					echo 'embedattemptedtrack["q'.$qn.'"][2]='. (canimprove($qn) ? "1":"0") . ';';
 				}
 				if ($showeachscore) {
 					$pts = getpts($bestscores[$qn]);
@@ -2187,7 +2189,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			//} else {
 				if (isset($_POST['disptime']) && !$isreview) {
 					$used = $now - intval($_POST['disptime']);
-					$timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+					$timesontask[$qn] .= (($timesontask[$qn]=='') ? '':'~').$used;
 				}
 				$GLOBALS['scoremessages'] = '';
 				$GLOBALS['questionmanualgrade'] = false;
@@ -2342,29 +2344,29 @@ if (!isset($_REQUEST['embedpostback'])) {
 		} else if ($_GET['action']=='livepollshowqscore') {
 			$qn = $_GET['qn'];
 			if ($LPinf['curquestion'] != $qn || $LPinf['curstate'] != 4) {
-				echo 'wrong question or not open for displaying scored result';
+				echo _('wrong question or not open for displaying scored result');
 				exit;
 			}
 			$colors = array($rawscores[$qn]);
 			if ($showeachscore) {
 				//TODO i18n
-				$msg =  "<p>This question, with your last answer";
+				$msg =  "<p>" . _("This question, with your last answer");
 				if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
-					$msg .= " and correct answer";
+					$msg .= _(" and correct answer");
 					$showcorrectnow = true;
 				} else if (($showansduring && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) ||
 					($qi[$questions[$qn]]['showansduring'] && $qi[$questions[$qn]]['showans']==$attempts[$qn])) {
-					$msg .= " and correct answer";
+					$msg .= _(" and correct answer");
 					$showcorrectnow = true;
 				} else {
 					$showcorrectnow = false;
 				}
 				if ($showcorrectnow) {
-					echo $msg . ', is displayed below</p>';
+					echo $msg . _(', is displayed below') . '</p>';
 					echo '</div>';
 					displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,true,$colors);
 				} else {
-					echo $msg . ', is displayed below</p>';
+					echo $msg . _(', is displayed below') . '</p>';
 					echo '</div>';
 					displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],0,false,$attempts[$qn],false,false,true,$colors);
 				}
@@ -2718,14 +2720,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 						}
 						if ($showeachscore) {
 							//TODO i18n
-							$msg =  "<p>This question, with your last answer";
+							$msg =  "<p>" . _("This question, with your last answer");
 							if ($showcorrectnow) {
-								$msg .= " and correct answer";
+								$msg .= _(" and correct answer");
 							}
 							if ($showcorrectnow) {
-								echo $msg . ', is displayed below</p>';
+								echo $msg . _(', is displayed below') . '</p>';
 							} else {
-								echo $msg . ', is displayed below</p>';
+								echo $msg . _(', is displayed below') . '</p>';
 							}
 						}
 						echo '</div>';
@@ -2761,11 +2763,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if ($dopage==true) {
 				echo '<p>';
 				if ($_GET['page']>0) {
-					echo '<a href="showtest.php?page='.($_GET['page']-1).'">Previous Page</a> ';
+					echo '<a href="showtest.php?page='.($_GET['page']-1).'">' . _("Previous Page") . '</a> ';
 				}
 				if ($_GET['page']<(count($intropages)-1)/2-1) {
 					if ($_GET['page']>0) { echo '| ';}
-					echo '<a href="showtest.php?page='.($_GET['page']+1).'">Next Page</a>';
+					echo '<a href="showtest.php?page='.($_GET['page']+1).'">' . _("Next Page") . '</a>';
 				}
 				echo '</p>';
 			}
@@ -2803,34 +2805,34 @@ if (!isset($_REQUEST['embedpostback'])) {
 						}
 					} else {
 						if ($qi[$questions[$i]]['withdrawn']==1) {
-							echo "<a href=\"#\" data-showq=\"$i\"><span class=\"withdrawn\">Question ". ($i+1) . "</span></a>";
+							echo "<a href=\"#\" data-showq=\"$i\"><span class=\"withdrawn\">". _("Question") . " ". ($i+1) . "</span></a>";
 						} else {
-							echo "<a href=\"#\" data-showq=\"$i\">Question ". ($i+1) . "</a>";
+							echo "<a href=\"#\" data-showq=\"$i\">" . _("Question") . " ". ($i+1) . "</a>";
 						}
 					}
 					echo '</li>';
 				}
 				echo "</ul>";
-				echo '<p><a href="#" onclick="livepoll.showSettings()">Edit Settings</a></p>';
+				echo '<p><a href="#" onclick="livepoll.showSettings()">' . _("Edit Settings") . '</a></p>';
 				echo '</div>';
 				echo '<div class="inset" id="livepollinstrq">';
 				echo '<div id="LPsettings">';
 				echo '<p><label><input type="checkbox" id="LPsettings-dispq" onclick="livepoll.updateSettings()" checked> ';
-				echo ' Show question on this computer before it is opened for student input</label><br/>';
+				echo ' ' . _("Show question on this computer before it is opened for student input") . '</label><br/>';
 				echo '<p><label><input type="checkbox" id="LPsettings-liveres" onclick="livepoll.updateSettings()"> ';
-				echo ' Show results live as students submit answers</label><br/>';
+				echo ' ' . _("Show results live as students submit answers") . '</label><br/>';
 				echo '<p><label><input type="checkbox" id="LPsettings-resafter" onclick="livepoll.updateSettings()" checked> ';
-				echo ' Show results automatically after closing student input</label><br/>';
+				echo ' ' . _("Show results automatically after closing student input") . '</label><br/>';
 				echo '<p><label><input type="checkbox" id="LPsettings-showans" onclick="livepoll.updateSettings()" checked> ';
-				echo ' Show answers automatically after closing student input</label>';
-				echo ' <p><button id="LPhidesettings">Hide Settings</button></p>';
+				echo ' ' . _("Show answers automatically after closing student input") . '</label>';
+				echo ' <p><button id="LPhidesettings">' . _("Hide Settings") . '</button></p>';
 				echo '</div>';
 				echo ' <div>';
-				echo ' <p><b><span id="LPqnumber">Select a Question</span></b></p> ';
-				echo ' <p id="LPperqsettings" style="display:none;"><button id="LPstartq" style="display:none">Open Student Input</button><button id="LPstopq" style="display:none">Close Student Input</button>';
-				echo ' <label><input type="checkbox" id="LPshowqchkbox" checked> Show Question</label> ';
-				echo ' <label><input type="checkbox" id="LPshowrchkbox"> Show Results</label> ';
-				echo ' <label><input type="checkbox" id="LPshowanschkbox" checked> <span id="LPshowansmsg">Show Answers When Closed</span></label> ';
+				echo ' <p><b><span id="LPqnumber">' . _("Select a Question") . '</span></b></p> ';
+				echo ' <p id="LPperqsettings" style="display:none;"><button id="LPstartq" style="display:none">' . _("Open Student Input") . '</button><button id="LPstopq" style="display:none">' . _("Close Student Input") . '</button>';
+				echo ' <label><input type="checkbox" id="LPshowqchkbox" checked> ' . _("Show Question") . '</label> ';
+				echo ' <label><input type="checkbox" id="LPshowrchkbox"> ' . _("Show Results") . '</label> ';
+				echo ' <label><input type="checkbox" id="LPshowanschkbox" checked> <span id="LPshowansmsg">' . _("Show Answers When Closed") . '</span></label> ';
 				echo ' </p></div><br class="clear">';
 				echo ' <div id="livepollqcontent"></div>';
 				echo ' <div id="livepollrwrapper"><p id="livepollrcnt"></p>';
@@ -3032,7 +3034,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				//}
 				echo '<span style="margin-left:8px">';
 				if ($showeachscore) {
-					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." point".(($pgpts==1)?"":"s")."</span> out of $pgposs";
+					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." point".(($pgpts==1) ? "":"s")."</span> out of $pgposs";
 				} else {
 					echo " <span id=\"embednavunans$i\">$cntunans</span> unattempted";
 				}
@@ -3154,35 +3156,35 @@ if (!isset($_REQUEST['embedpostback'])) {
 			}
 			if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
 				if (isset($CFG['TE']['navicons'])) {
-					echo "<img alt=\"untried\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
+					echo "<img alt=\"" . _("untried") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['untried']}\"/> ";
 				} else {
-				echo "<img alt=\"untried\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
+				echo "<img alt=\"" - _("untried") . "\" src=\"$imasroot/img/q_fullbox.gif\"/> ";
 				}
 			} else if (canimprove($i) && !$noindivscores) {
 				if (isset($CFG['TE']['navicons'])) {
 					if ($thisscore==0 || $noindivscores) {
-						echo "<img alt=\"incorrect - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
+						echo "<img alt=\"" . _("incorrect - can retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrywrong']}\"/> ";
 					} else {
-						echo "<img alt=\"partially correct - can retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
+						echo "<img alt=\"" . _("partially correct - can retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['canretrypartial']}\"/> ";
 					}
 				} else {
-				echo "<img alt=\"can retry\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
+				echo "<img alt=\"" . _("can retry"). "\" src=\"$imasroot/img/q_halfbox.gif\"/> ";
 				}
 			} else {
 				if (isset($CFG['TE']['navicons'])) {
 					if (!$showeachscore) {
-						echo "<img alt=\"cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
+						echo "<img alt=\"" . _("cannot retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['noretry']}\"/> ";
 					} else {
 						if ($thisscore == $qi[$questions[$i]]['points']) {
-							echo "<img alt=\"correct\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
+							echo "<img alt=\"" . _("correct") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['correct']}\"/> ";
 						} else if ($thisscore==0) {
-							echo "<img alt=\"incorrect - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
+							echo "<img alt=\"" . _("incorrect - cannot retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['wrong']}\"/> ";
 						} else {
-							echo "<img alt=\"partially correct - cannot retry\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
+							echo "<img alt=\"" . _("partially correct - cannot retry") . "\" src=\"$imasroot/img/{$CFG['TE']['navicons']['partial']}\"/> ";
 						}
 					}
 				} else {
-					echo "<img alt=\"cannot retry\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
+					echo "<img alt=\"" . _("cannot retry") . "\" src=\"$imasroot/img/q_emptybox.gif\"/> ";
 				}
 			}
 

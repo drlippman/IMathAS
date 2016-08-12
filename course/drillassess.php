@@ -6,15 +6,15 @@ require("../validate.php");
 require("../assessment/displayq2.php");
 
 if (!isset($teacherid) && !isset($studentid) && !isset($tutorid)) {
-	echo "You don't have authority to access this item";
+	echo _("You don't have authority to access this item");
 	exit;
 }
 if (empty($_GET['cid']) || empty($_GET['daid'])) {
-	echo "Invalid course id or drill assessment id";
+	echo _("Invalid course id or drill assessment id");
 	exit;
 }
 
-$pagetitle = "Drill Assessment";
+$pagetitle = _("Drill Assessment");
 
 $cid = intval($_GET['cid']);
 $daid = intval($_GET['daid']);
@@ -25,7 +25,7 @@ $daid = intval($_GET['daid']);
 $stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
 $stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
 if ($stm->rowCount()==0) {
-	echo "Invalid drill assessment id";
+	echo _("Invalid drill assessment id");
 	exit;
 }
 //DB $dadata = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -106,13 +106,13 @@ if (isset($_GET['score'])) {
 	$stm = $DBH->prepare("UPDATE imas_drillassess_sessions SET curscores=:curscores,seed=:seed WHERE id=:id");
 	$stm->execute(array(':curscores'=>$scorelist, ':seed'=>$seed, ':id'=>$sessdata['id']));
 	if ($mode=='cntdown') {
-		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." question(s) correct</p>";
+		$page_scoreMsg .= "<p>" . sprintf(_("Current: %d question(s) correct"), countcorrect($curscores)) . "</p>";
 	} else if ($stopattype=='a') {
-		$page_scoreMsg .= "<p>Current: ".count($curscores)." question(s) attempted</p>";
+		$page_scoreMsg .= "<p>" . sprintf(_("Current: %d question(s) attempted"), count($curscores)) . "</p>";
 	} else if ($stopattype=='c') {
-		$page_scoreMsg .= "<p>Current: ".countcorrect($curscores)." question(s) correct out of ".count($curscores)." attempt(s)</p>";
+		$page_scoreMsg .= "<p>" . sprintf(_("Current: %d question(s) correct out of %d attempt(s)"), countcorrect($curscores), count($curscores)) . "</p>";
 	} else if ($stopattype=='s') {
-		$page_scoreMsg .= "<p>Current: ".countstreak($curscores)." question streak (correct in a row) out of ".count($curscores)." attempt(s)</p>";
+		$page_scoreMsg .= "<p>" . sprintf(_("Current: %d question streak (correct in a row) out of %d attempt(s)"), countstreak($curscores), count($curscores)) . "</p>";
 	}
 
 } else {
@@ -148,15 +148,15 @@ $timemsg = '';
 if ($cur > 3600) {
 	$hours = floor($cur/3600);
 	$cur = $cur - 3600*$hours;
-	$timemsg .= "$hours hours, ";
+	$timemsg .= sprintf(_("%d hours, "), $hours);
 } else { $hours = 0;}
 if ($cur > 60) {
 	$minutes = floor($cur/60);
 	$cur = $cur - 60*$minutes;
-	$timemsg .= "$minutes minutes, ";
+	$timemsg .= sprintf(_("%d minutes, "), $minutes);
 } else {$minutes=0;}
 $seconds = $cur;
-$timemsg .= "$seconds seconds.";
+$timemsg .= sprintf(_("%d seconds."), $seconds);
 //are we done?
 $drillisdone = false;
 if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
@@ -170,11 +170,11 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 	$isnewclassbest = false;
 	$scoremsg = '';
 	if ($stopattype=='a') {
-		$scoremsg .= "$n questions completed ";
+		$scoremsg .= sprintf(_("%d questions completed "), $n);
 	} else if ($stopattype=='c') {
-		$scoremsg .= "$n questions answered correctly ";
+		$scoremsg .= sprintf(_("%d questions answered correctly "), $n);
 	} else if ($stopattype=='s') {
-		$scoremsg .= "$n question streak completed ";
+		$scoremsg .= sprintf(_("%d question streak completed "), $n);
 	}
 	if ($torecord=='cc') {
 		$torecscore = countcorrect($curscores);
@@ -185,7 +185,7 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 			$classbests[$curitem] = $torecscore;
 			$isnewclassbest = true;
 		}
-		$scoremsg .= "$torecscore questions answered correctly in $n seconds";
+		$scoremsg .= sprintf(_("%d questions answered correctly in %d seconds"), $torecscore, $n);
 	} else if ($torecord=='c') {
 		$torecscore = count($curscores);
 		if (!isset($scorerec[$curitem]) || $torecscore < min($scorerec[$curitem])) {
@@ -195,7 +195,7 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 			$classbests[$curitem] = $torecscore;
 			$isnewclassbest = true;
 		}
-		$scoremsg .= "out of $torecscore questions attempted";
+		$scoremsg .= sprintf(_("out of %d questions attempted"), $torecscore);
 	} else if ($torecord=='t') {
 		$torecscore = $now - $starttime;
 		if (!isset($scorerec[$curitem]) || $torecscore < min($scorerec[$curitem])) {
@@ -205,7 +205,7 @@ if ($curitem > -1 && (($mode=='cntdown' && $timesup) ||
 			$classbests[$curitem] = $torecscore;
 			$isnewclassbest = true;
 		}
-		$scoremsg .= "in $timemsg";
+		$scoremsg .= sprintf(_("in %s"), $timemsg);
 	}
 
 	$scorerec[$curitem][] = $torecscore;
@@ -228,41 +228,41 @@ $useeqnhelper = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
 $flexwidth = true;
 require("../assessment/header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-echo "&gt; Drill Assessment</div>";
+echo "&gt; " . _("Drill Assessment") . "</div>";
 
-echo '<div id="headerdrillassess" class="pagetitle"><h2>Drill Assessment</h2></div>';
+echo '<div id="headerdrillassess" class="pagetitle"><h2>' . _("Drill Assessment") . '</h2></div>';
 
 echo '<div class="intro">';
-echo '<b>Goal: </b>';
+echo '<b>' . _("Goal: ") . '</b>';
 if ($mode == 'cntdown') {
 	$timelimitmin = floor($n/60);
 	$timelimitsec = $n - $timelimitmin*60;
-	echo 'Answer as many questions correctly as possible in ';
+	echo _('Answer as many questions correctly as possible in ');
 	if ($timelimitmin>0) {
-		echo $timelimitmin . ' minute'. (($timelimitmin>1)?'s':'');
+		echo $timelimitmin . ' ' . (($timelimitmin>1) ? _('minutes') : _('minute'));
 	}
 	if ($timelimitsec>0) {
-		echo ' '.$timelimitsec .' second'. (($timelimitsec>1)?'s':'');
+		echo ' '.$timelimitsec . ' ' . (($timelimitsec>1) ? _('seconds') : _('second'));
 	}
 } else {
 	if ($stopattype=='a') {
-		echo "Attempt $n questions";
+		echo sprintf(_("Attempt %d questions"), $n);
 	} else if ($stopattype=='c') {
-		echo "Get $n questions correct";
+		echo sprintf(_("Get %d questions correct"), $n);
 	} else if ($stopattype=='s') {
-		echo "Get a streak of $n questions correct in a row";
+		echo sprintf(_("Get a streak of %d questions correct in a row"), $n);
 	}
 	if ($torecord=='t') {
-		echo ' in the shortest time possible';
+		echo ' ' . _('in the shortest time possible');
 	} else if ($torecord=='c') {
-		echo ' in the fewest total attempts';
+		echo ' ' . _('in the fewest total attempts');
 	}
 }
 echo '</div>';
 
 //display navigation header
 echo '<div class="navbar" style="width:200px">';
-echo '<h4>Drills</h4>';
+echo '<h4>' . _('Drills') . '</h4>';
 echo '<ul class="qlist">';
 foreach ($itemdescr as $qn=>$descr) {
 	echo '<li>';
@@ -277,19 +277,19 @@ foreach ($itemdescr as $qn=>$descr) {
 		echo '<ul class="qlist">';
 		if (($showtostu&1)==1 && isset($scorerec[$qn])) {
 			//show last score
-			echo '<li>Last score: ' . dispscore($scorerec[$qn][count($scorerec[$qn])-1]).'</li>';
+			echo '<li>' . _('Last score') . ': ' . dispscore($scorerec[$qn][count($scorerec[$qn])-1]).'</li>';
 		}
 		if (($showtostu&2)==2 && isset($scorerec[$qn])) {
 			//show best score
 			if ($torecord=='cc') {
-				echo '<li>Personal best: ' . dispscore(max($scorerec[$qn])).'</li>';
+				echo '<li>' . _('Personal best') . ': ' . dispscore(max($scorerec[$qn])).'</li>';
 			} else {
-				echo '<li>Personal best: ' . dispscore(min($scorerec[$qn])).'</li>';
+				echo '<li>' . _('Personal best') . ': ' . dispscore(min($scorerec[$qn])).'</li>';
 			}
 		}
 		if (($showtostu&4)==4 && $classbests[$qn]!=-1 ) {
 			//show best score
-			echo '<li>Class best: ' . dispscore($classbests[$qn]).'</li>';
+			echo '<li>'. _('Class best') . ': ' . dispscore($classbests[$qn]).'</li>';
 		}
 		echo '</ul>';
 	}
@@ -302,22 +302,22 @@ echo '<div class="inset" style="margin-left:230px;">';
 
 if ($curitem == -1) {
 	//haven't started anything yet
-	echo 'Select a drill to begin';
+	echo _('Select a drill to begin');
 } else {
 	//show last score if we have one
 	if ($page_scoreMsg != '' && $showscore) {
-		echo '<div class="review">Score on last question: '.$page_scoreMsg.'</div>';
+		echo '<div class="review">' . _('Score on last question') . ': '.$page_scoreMsg.'</div>';
 	}
 
 	//are we done with this assessment?
 	if ($drillisdone) {
-		echo "<h4>Drill Complete</h4>";
+		echo "<h4>" . _("Drill Complete") . "</h4>";
 		echo "<p>$scoremsg</p>";
 		if (($showtostu&2)==2 && $isnewpbest) {
-			echo '<p>Congrats! That\'s a new personal best!</p>';
+			echo '<p>' . _("Congrats! That's a new personal best!") . '</p>';
 		}
 		if (($showtostu&4)==4 && $isnewclassbest) {
-			echo '<p>Congrats! That\'s a new class best!</p>';
+			echo '<p>' . _("Congrats! That's a new class best!") . '</p>';
 		}
 
 	} else {
@@ -355,7 +355,7 @@ if ($curitem == -1) {
 		//echo " //updatetime();\n";
 		echo " initstack.push(updatetime);";
 		echo "</script>\n";
-		echo "<div class=right id=timelimitholder>Time: <span id=\"timer\" style=\"font-size: 120%; color: red;\" ";
+		echo "<div class=right id=timelimitholder>" . _("Time") . ": <span id=\"timer\" style=\"font-size: 120%; color: red;\" ";
 		echo ">$hours:$minutes:$seconds</span></div>\n";
 
 		?>
@@ -371,7 +371,7 @@ if ($curitem == -1) {
 		$page_formAction = "drillassess.php?cid=$cid&daid=$daid";
 		if ($showans) {
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\"\">\n";
-			echo "<p>Displaying last question with solution <input type=submit name=\"next\" value=\"New Question\"/></p>\n";
+			echo "<p>" . _("Displaying last question with solution") . "<button type=\"submit\" name=\"next\" value=\"New Question\"/>" . _("New Question") . "</button></p>\n";
 			echo "</form>\n";
 			displayq(0,$curitemid,$seed,2,true,0);
 		} else {
@@ -383,9 +383,9 @@ if ($curitem == -1) {
 			echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction&score=true\" onsubmit=\"doonsubmit()\">\n";
 			displayq(0,$curitemid,$seed,$doshowans,true,0);
 			if ($sa==3) {
-				echo "<input type=submit name=\"next\" value=\"Next Question\">\n";
+				echo "<button type=\"submit\" name=\"next\" value=\"Next Question\">" . _("New Question") . "</button>\n";
 			} else {
-				echo "<input type=submit name=\"check\" value=\"Check Answer\">\n";
+				echo "<button type=\"submit\" name=\"check\" value=\"Check Answer\">" . _("Check Answer") . "</button>\n";
 			}
 			echo "</form>\n";
 		}
@@ -423,9 +423,9 @@ function dispscore($sc) {
 	if ($torecord=='t') {
 		return formattime($sc);
 	} else if ($torecord=='cc') {
-		return $sc . ' correct';
+		return $sc . ' ' . _('correct');
 	} else {
-		return $sc . ' attempts';
+		return $sc . ' ' . _('attempts');
 	}
 }
 
@@ -479,7 +479,7 @@ function printscore($sc,$qsetid,$seed) {
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
-		$out =  "$sc out of $poss";
+		$out =  sprintf(_("%s out of %d"), $sc, $poss);
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
@@ -523,7 +523,7 @@ function printscore($sc,$qsetid,$seed) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs);
-		$out =  "$pts out of $poss (parts: $sc)";
+		$out =  sprintf(_("%s out of %d (parts: %s)"), $pts, $poss, $sc);
 	}
 
 	$bar = '<span class="scorebarholder">';
