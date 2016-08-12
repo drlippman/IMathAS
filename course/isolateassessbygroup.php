@@ -117,7 +117,7 @@
 			//DB $query .= "ON iu.id=isgm.userid AND isgm.stugroupid='{$row[0]}' ORDER BY isgm.id LIMIT 1";
 			//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($r)>0) {
-			if (stu_name===null) {
+			if ($stu_name===null) {
 				$query = "SELECT iu.LastName,iu.FirstName FROM imas_users AS iu JOIN imas_stugroupmembers AS isgm ";
 				$query .= "ON iu.id=isgm.userid AND isgm.stugroupid=:stugroupid ORDER BY isgm.id LIMIT 1";
 				$stu_name = $DBH->prepare($query);
@@ -125,7 +125,7 @@
 			$stu_name->execute(array(':stugroupid'=>$row[0]));
 			if ($stu_name->rowCount()>0) {
 				//DB $row[1] .= ' ('.mysql_result($r,0,0).', '.mysql_result($r,0,1).' &isin;)';
-				$row[1] .= ' ('.implode(', ', $stm->fetch(PDO::FETCH_NUM)).' &isin;)';
+				$row[1] .= ' ('.implode(', ', $stu_name->fetch(PDO::FETCH_NUM)).' &isin;)';
 			}
 		}
 		$groupnames[$row[0]] = $row[1];

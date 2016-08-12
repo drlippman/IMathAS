@@ -137,6 +137,7 @@ function outcometable() {
 	$discuss = array();
 	$startdate = array();
 	$enddate = array();
+	$timelimits = array();
 	$avail = array();
 	$category = array();
 	$name = array();
@@ -161,6 +162,7 @@ function outcometable() {
 		}
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
+		$timelimits[$kcnt] = $line['timelimit'];
 
 		$assessments[$kcnt] = $line['id'];
 
@@ -467,7 +469,7 @@ function outcometable() {
 	$ln = 1;
 	//DB $query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
 	//DB $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
-	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
+	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg ";
 	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid ";
 	$qarr = array(':courseid'=>$cid);
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
@@ -544,8 +546,8 @@ function outcometable() {
 
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
-	//DB $query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
-	//DB $query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid' ";
+	//DB $query = "SELECT ias.id,ias.assessmentid,ias.questions,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid,ia.timelimit FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	//DB $query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
 	//DB if ($limuser>0) {
 		//DB $query .= " AND ias.userid='$limuser' ";
 	//DB }
@@ -583,7 +585,7 @@ function outcometable() {
 		$pts = array();
 		$ptsposs = array();
 		for ($j=0;$j<count($scores);$j++) {
-			if (!isset($qoutcome[$questions[$j]])) {echo "skip"; continue; } //no outcome set - skip it
+			if (!isset($qoutcome[$questions[$j]])) {continue; } //no outcome set - skip it
 			if (!isset($pts[$qoutcome[$questions[$j]]])) {
 				$pts[$qoutcome[$questions[$j]]] = 0;
 			}

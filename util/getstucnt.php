@@ -76,7 +76,8 @@
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$stm = $DBH->query($query);
 	$lastgroup = '';  $grpcnt = 0; $grpdata = '';
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[0] != $lastgroup) {
 			if ($lastgroup != '') {
 				echo "<b>$lastgroup</b>: $grpcnt<br/>";

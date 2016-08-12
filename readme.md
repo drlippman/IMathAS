@@ -371,6 +371,7 @@ show Gradebook
     individual assess exception
     Edit offline in place
     edit one offline grade
+		send message (modal)
   add offline grade
     edit grade one stu
   manage offline: change and delete
@@ -380,6 +381,8 @@ show Gradebook
   Unenroll all
   set GB comment
   print report
+	isolate assess. isolate by group
+
 item analysis page
   item breakdown
   grade one q for all: view, score.  One-at-a-time.
@@ -390,15 +393,16 @@ weeklylab report
 Groups:
   create groupset. rename. copy. delete.
   Add stu to group. remove from group
-  ** to test: assessment copying/handling
+  Add stu to group: assessment copies
 Outcomes:
   create outcomes
 	outcome map
-  view outcome report
+  view outcome report.  Export to CSV
 Manage Questions
   search by term all libs
   search id=
   search mine only
+	mark wrong libs. mark broken
   ** test rest
 Manage Libraries
 	Add library. modify.
@@ -430,6 +434,7 @@ New messages
 Display assessment
 	Print Version
 Edit question. Add new question
+	test question
 Tutorial style editor, Add and edit
 copy course items
 	copy block of items
@@ -445,3 +450,25 @@ Manage groups:
 	Add student to existing group, copies assessment
 Take drill as student
 	view drill scores
+Hide/unhide course from course list
+Review library
+Tree reader
+Utils:
+	lookup. approvepending. stucnt, detstucnt. replace youtube vids.
+	emulate user. list/update extref. list wronglibs
+
+
+TO TEST:
+LTI
+External tools. outcome service
+install, upgrade
+Diagnostic launch
+lib import/export
+delete item with file, delete question with file
+Use latepass
+embedded assess
+OEAembeq, embedq
+Add, use rubrics
+Define video times
+quickdrill
+directaccess
