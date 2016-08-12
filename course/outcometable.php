@@ -551,7 +551,7 @@ function outcometable() {
 	//DB }
 	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
-	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	$query = "SELECT ias.id,ias.assessmentid,ias.questions,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
 	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid=:courseid ";
 	if ($limuser>0) {
 		$query .= " AND ias.userid=:userid ";
@@ -583,7 +583,7 @@ function outcometable() {
 		$pts = array();
 		$ptsposs = array();
 		for ($j=0;$j<count($scores);$j++) {
-			if (!isset($qoutcome[$questions[$j]])) { continue; } //no outcome set - skip it
+			if (!isset($qoutcome[$questions[$j]])) {echo "skip"; continue; } //no outcome set - skip it
 			if (!isset($pts[$qoutcome[$questions[$j]]])) {
 				$pts[$qoutcome[$questions[$j]]] = 0;
 			}

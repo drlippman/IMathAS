@@ -393,7 +393,8 @@ Groups:
   ** to test: assessment copying/handling
 Outcomes:
   create outcomes
-  view outcome report ** test with data
+	outcome map
+  view outcome report
 Manage Questions
   search by term all libs
   search id=
@@ -436,6 +437,7 @@ copy course items
 	copy offline. copy outcomes
 import items (basic)
 Take assessment as student (no group)
+	view category summary at end
 Take assessment as student (group)
 	Add self to group
 	Add another stu to group (copies assessment)
