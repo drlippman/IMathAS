@@ -117,7 +117,7 @@ if (!isset($imasroot)) {
 	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
 	echo '</tbody></table>';
 	echo '<p>After the score-specific message, display this text to everyone:</p>';
-	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" style="width: 100%">';
+	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" id="commonmsg" style="width: 100%">';
 	echo htmlentities($endmsg['commonmsg']);
 	echo '</textarea></div>';
 	echo '<div class="submit"><input type="submit" value="'._('Save').'" /></div>';

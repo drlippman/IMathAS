@@ -403,7 +403,7 @@ if ($overwriteBody==1) {
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts) {
-	global $isfinal,$imasroot;
+	global $DBH,$isfinal,$imasroot;
 	srand($seed);
 
 	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";

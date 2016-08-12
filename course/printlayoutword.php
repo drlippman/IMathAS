@@ -317,7 +317,7 @@ if ($overwriteBody==1) {
 }
 require("../footer.php");
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
-	global $isfinal,$imasroot,$urlmode;
+	global $DBH,$isfinal,$imasroot,$urlmode;
 	srand($seed);
 
 	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";

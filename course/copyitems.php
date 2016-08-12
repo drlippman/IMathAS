@@ -184,17 +184,17 @@ if (!(isset($teacherid))) {
 				//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='{$_POST['ctc']}'";
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
-				$gb_cat_src=null; $gb_cat_ins = null;
+				$gb_cat_src=null; $gb_cat_ins = null; $gb_cat_upd = null;
 				$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$_POST['ctc']));
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					//DB $query = "SELECT id FROM imas_gbcats WHERE courseid='$cid' AND name='{$row[1]}'";
 					//DB $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
 					//DB if (mysql_num_rows($r2)==0) {
 					if ($gb_cat_src===null) {
 						$gb_cat_src = $DBH->prepare("SELECT id FROM imas_gbcats WHERE courseid=:courseid AND name=:name");
 					}
-					$gb_cat_src->execute(array(':courseid'=>$cid, ':name'=>$row[1]));
+					$gb_cat_src->execute(array(':courseid'=>$cid, ':name'=>$row['name']));
 					if ($gb_cat_src->rowCount()==0) {
 						//DB $query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden,calctype) VALUES ";
 						//DB $frid = array_shift($row);
@@ -210,18 +210,20 @@ if (!(isset($teacherid))) {
 							':chop'=>$row['chop'], ':dropn'=>$row['dropn'], ':weight'=>$row['weight'], ':hidden'=>$row['hidden'], ':calctype'=>$row['calctype']));
 
 						//DB $gbcats[$frid] = mysql_insert_id();
-						$gbcats[$frid] = $DBH->lastInsertId();
+						$gbcats[$row['id']] = $DBH->lastInsertId();
 					} else {
 						//DB $rpid = mysql_result($r2,0,0);
 						$rpid = $gb_cat_src->fetchColumn(0);
 						//DB $query = "UPDATE imas_gbcats SET scale='{$row[2]}',scaletype='{$row[3]}',chop='{$row[4]}',dropn='{$row[5]}',weight='{$row[6]}',hidden='{$row[7]}',calctype='{$row[8]}' ";
 						//DB $query .= "WHERE id='$rpid'";
-						$query = "UPDATE imas_gbcats SET scale=:scale,scaletype=:scaletype,chop=:chop,dropn=:dropn,weight=:weight,hidden=:hidden,calctype=:calctype ";
-						$query .= "WHERE id=:id";
-						$stm = $DBH->prepare($query);
-						$stm->execute(array(':scale'=>$row['scale'], ':scaletype'=>$row['scaletype'], ':chop'=>$row['chop'], ':dropn'=>$row['dropn'],
+						if ($gb_cat_upd===null) {
+							$query = "UPDATE imas_gbcats SET scale=:scale,scaletype=:scaletype,chop=:chop,dropn=:dropn,weight=:weight,hidden=:hidden,calctype=:calctype ";
+							$query .= "WHERE id=:id";
+							$gb_cat_upd = $DBH->prepare($query);
+						}
+						$gb_cat_upd->execute(array(':scale'=>$row['scale'], ':scaletype'=>$row['scaletype'], ':chop'=>$row['chop'], ':dropn'=>$row['dropn'],
 							':weight'=>$row['weight'], ':hidden'=>$row['hidden'], ':calctype'=>$row['calctype'], ':id'=>$rpid));
-						$gbcats[$row[0]] = $rpid;
+						$gbcats[$row['id']] = $rpid;
 					}
 				}
 			} else {
@@ -264,6 +266,7 @@ if (!(isset($teacherid))) {
 				//DB while ($row = mysql_fetch_row($result)) {
 				$stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$_POST['ctc']));
+				$out_ins_stm = null;
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					if (isset($outcomes[$row[0]])) { continue;}
 					if ($row[2]=='') {
@@ -276,10 +279,12 @@ if (!(isset($teacherid))) {
 					//DB $query .= "('$cid','{$row[1]}','{$row[2]}')";
 					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 					//DB $outcomes[$row[0]] = mysql_insert_id();
-					$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
-					$query .= "(:courseid, :name, :ancestors)";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':courseid'=>$cid, ':name'=>$row[1], ':ancestors'=>$row[2]));
+					if ($out_ins_stm===null) {
+						$query = "INSERT INTO imas_outcomes (courseid,name,ancestors) VALUES ";
+						$query .= "(:courseid, :name, :ancestors)";
+						$out_ins_stm = $DBH->prepare($query);
+					}
+					$out_ins_stm->execute(array(':courseid'=>$cid, ':name'=>$row[1], ':ancestors'=>$row[2]));
 					$outcomes[$row[0]] = $DBH->lastInsertId();
 					$newoutcomes[] = $outcomes[$row[0]];
 				}
@@ -425,7 +430,7 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric FROM imas_gbitems WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$_POST['ctc']));
-				$insarr = array();
+				$gbi_ins_stm = null;
 				//DB while ($row = mysql_fetch_row($result)) {
 				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 					//DB $rubric = array_pop($row);
@@ -438,11 +443,13 @@ if (!(isset($teacherid))) {
 					}
 					//DB $ins = "('$cid','".implode("','",addslashes_deep($row))."')";
 					//DB $query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES $ins";
-					$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
-					$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
-					$stm = $DBH->prepare($query);
+					if ($gbi_ins_stm === null) {
+						$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
+						$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
+						$stm = $DBH->prepare($query);
+					}
 					$row[':courseid'] = $cid;
-					$stm->execute($row);
+					$gbi_ins_stm->execute($row);
 					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 					if ($rubric>0) {
 						//DB $offlinerubrics[mysql_insert_id()] = $rubric;

@@ -92,9 +92,13 @@
 		//DB $_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
 		//DB $_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
 		//DB $_POST['solution'] = stripsmartquotes(stripslashes($_POST['solution']));
+		foreach (['qcontrol','answer','solution'] as $v) {
+			if (!isset($_POST[$v])) {$_POST[$v] = '';}
+		}
 		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);
 		$_POST['control'] = stripsmartquotes($_POST['control']);
 		$_POST['qcontrol'] = stripsmartquotes($_POST['qcontrol']);
+		$_POST['answer'] = stripsmartquotes($_POST['answer']);
 		$_POST['solution'] = stripsmartquotes($_POST['solution']);
 		$_POST['qtext'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['qtext']);
 		$_POST['solution'] = preg_replace('/<span\s+class="AM"[^>]*>(.*?)<\/span>/sm','$1', $_POST['solution']);
@@ -650,7 +654,6 @@
 					//DB $query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}' AND ownerid='$userid'";
 					$stm = $DBH->prepare("SELECT DISTINCT libid FROM imas_library_items WHERE qsetid=:qsetid AND ownerid=:ownerid");
 					$stm->execute(array(':qsetid'=>$_GET['id'], ':ownerid'=>$userid));
-					}
 				}
 				//$query = "SELECT libid FROM imas_library_items WHERE qsetid='{$_GET['id']}' AND imas_library_items.ownerid='$userid'";
 				//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
@@ -788,7 +791,7 @@
 	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
 		//these scripts are used by the editor to make image-based math work in the editor
 		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
-		if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
+		//if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
 		$placeinhead .= '</script>';
 		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
 	}

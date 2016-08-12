@@ -317,6 +317,7 @@ main page.
 	chg userinfo
 admin listing.  show group. show instructor's courses.
 	add course (no copy).  
+	add course (template: gbcats and outcomes come through)
 	add/remove teacher
 	edit groups
 	LTI provider creds
@@ -324,12 +325,19 @@ admin listing.  show group. show instructor's courses.
 		generate one-time passwords
 	Add new admin
 add assessment.  
-  Add questions.  
+  Add questions: select from libraries, other assessments.
   remove question.
   rearrange question.
   group/ungroup.
   change question settings
   add set
+	clear assess atempts
+	categorize q's
+	end msg
+	print
+		oriignal printtest
+		cut-and-paste
+		word
 add inlinetext
 add linkedtext (file, page of text)
   view linkedtext item
@@ -418,3 +426,8 @@ Sent messages.  filter by course. by recipient
 New messages
 Display assessment
 	Print Version
+Edit question. Add new question
+Tutorial style editor, Add and edit
+copy course items
+	copy block of items
+	copy whole course

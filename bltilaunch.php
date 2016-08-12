@@ -883,12 +883,12 @@ if ($stm->rowCount()==0) {
 				//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$sourcecid'";
 				//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid=:courseid");
+				$stm = $DBH->prepare("SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$sourcecid));
 
-				$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden) VALUES ";
-				$query .= "(:courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden)";
-				$cols = explode(',', ':courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden');
+				$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden,calctype) VALUES ";
+				$query .= "(:courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden,:calctype)";
+				$cols = explode(',', ':courseid,:name,:scale,:scaletype,:chop,:dropn,:weight,:hidden,:calctype');
 				$stm2 = $DBH->prepare($query);
 
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
@@ -898,6 +898,7 @@ if ($stm->rowCount()==0) {
 					//DB $query .= "('$destcid',$irow)";
 					//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 					//DB $gbcats[$frid] = mysql_insert_id();
+					$frid = $row[0];
 					$row[0] = $destcid; //change course id
 
 					$varmap = array();
@@ -905,6 +906,7 @@ if ($stm->rowCount()==0) {
 						$varmap[$col] = $row[$i];
 					}
 					$stm2->execute($varmap);
+					$gbcats[$frid] = $DBH->lastInsertId();
 				}
 				$copystickyposts = true;
 				//DB $query = "SELECT itemorder,ancestors,outcomes,latepasshrs FROM imas_courses WHERE id='$sourcecid'";
