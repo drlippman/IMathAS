@@ -122,7 +122,7 @@
 					//DB $query = "SELECT latepasshrs FROM imas_courses WHERE id='".$cid."'";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $latepasshrs = mysql_result($result,0,0);
-					$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id='".:cid."'");
+					$stm = $DBH->prepare("SELECT latepasshrs FROM imas_courses WHERE id=:cid");
 					$stm->execute(array(':cid'=>$cid));
 					$latepasshrs = $stm->fetchColumn(0);
 
@@ -576,7 +576,7 @@
 			//DB $query = 'SELECT intro FROM imas_assessments WHERE id='.intval($matches[2]);
 			//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			//DB $vals = mysql_fetch_row($result);
-			$stm = $DBH->prepare('SELECT intro FROM imas_assessments WHERE id=:id'));
+			$stm = $DBH->prepare('SELECT intro FROM imas_assessments WHERE id=:id');
 			$stm->execute(array(':id'=>$matches[2]));
 			$vals = $stm->fetch(PDO::FETCH_NUM);
 			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
@@ -1226,7 +1226,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				//DB $query = "INSERT INTO imas_log (time,log) VALUES ($now,'".addslashes($loginfo)."')";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
-				$stm->execute(array(':time'=>$now, ':log'=>$loginfo);
+				$stm->execute(array(':time'=>$now, ':log'=>$loginfo));
 			}
 		} else {
 			echo '<div id="headershowtest" class="pagetitle"><h2>', _('Select group members'), '</h2></div>';

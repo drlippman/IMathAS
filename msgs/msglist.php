@@ -165,7 +165,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				if (isset($_POST['sendunread'])) {
 					$query .= ',isread=(isread&~1)';
 				}
-        $query .= " WHERE id=:id"
+        $query .= " WHERE id=:id";
 				//DB $query .= " WHERE id='{$_GET['replyto']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare($query);
@@ -315,9 +315,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$query = "SELECT i_c.id,i_c.name,i_c.msgset,2 AS userrole FROM imas_courses AS i_c JOIN imas_teachers ON ";
 				$query .= "i_c.id=imas_teachers.courseid WHERE imas_teachers.userid=:userid ";
 				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,1 AS userrole FROM imas_courses AS i_c JOIN imas_tutors ON ";
-				$query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid2=:userid2 ";
+				$query .= "i_c.id=imas_tutors.courseid WHERE imas_tutors.userid=:userid2 ";
 				$query .= "UNION SELECT i_c.id,i_c.name,i_c.msgset,0 AS userrole FROM imas_courses AS i_c JOIN imas_students ON ";
-				$query .= "i_c.id=imas_students.courseid WHERE imas_students.userid3=:userid3 ";
+				$query .= "i_c.id=imas_students.courseid WHERE imas_students.userid=:userid3 ";
 				$query .= "ORDER BY userrole DESC, name";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':userid'=>$userid, ':userid2'=>$userid, ':userid3'=>$userid));

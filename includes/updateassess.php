@@ -29,9 +29,9 @@ function updateassess($aidarr,$removewithdrawn,$doreplaceby) {
 			$query .= " AND ia.courseid=$aidarr";
 		}
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
-		$DBH->query($query); //pre-sanitized
+		$stm = $DBH->query($query); //pre-sanitized
 		//DB $replacedcnt = mysql_affected_rows();
-		$replacedcnt = $DBH->rowCount();
+		$replacedcnt = $stm->rowCount();
 	}
 
 	if ($removewithdrawn) {

@@ -313,9 +313,16 @@ R validate        26
 ````
 
 testing
-/admin listing.  show group. show instructor's courses.
-/admin/forms/  add course (no copy).  
-/admin/actions/  add course (no copy).
+main page.
+	chg userinfo
+admin listing.  show group. show instructor's courses.
+	add course (no copy).  
+	add/remove teacher
+	edit groups
+	LTI provider creds
+	edit diagnostic
+		generate one-time passwords
+	Add new admin
 add assessment.  
   Add questions.  
   remove question.
@@ -351,8 +358,63 @@ show Roster
 show Gradebook
   single stu gradebook
     view assessment, change score.  clearq. clear scores. clear attempt.
+    individual assess exception
     Edit offline in place
     edit one offline grade
+  add offline grade
+    edit grade one stu
+  manage offline: change and delete
+  gb settings. view and categories
+  mass exception:  set, clear
+  Lock
+  Unenroll all
+  set GB comment
+  print report
 item analysis page
   item breakdown
-  grade one q for all
+  grade one q for all: view, score.  One-at-a-time.
+  summary of assessment results
+  assessment results export
+content stats page
+weeklylab report
+Groups:
+  create groupset. rename. copy. delete.
+  Add stu to group. remove from group
+  ** to test: assessment copying/handling
+Outcomes:
+  create outcomes
+  view outcome report ** test with data
+Manage Questions
+  search by term all libs
+  search id=
+  search mine only
+  ** test rest
+Manage Libraries
+	Add library. modify.
+	change parent
+	change rights
+	delete ** test question handling on delete
+Export
+	CC export
+	imathas export
+	export OEA JSON
+Mass chg assessment
+	basic change with a couple items
+Mass change Blocks
+Mass Chg dates
+time shift
+Main message inbox
+	Add new message
+	View message
+	View conversation
+	Reply
+	Flag. Limit to flagged.
+	mark unread.
+	mark read.
+	filter by course. by recipient
+	Use question in message
+	Delete
+Sent messages.  filter by course. by recipient
+New messages
+Display assessment
+	Print Version

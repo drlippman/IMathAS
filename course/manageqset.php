@@ -163,7 +163,7 @@ if ($myrights<20) {
             $query = "UPDATE imas_questionset SET ownerid=:ownerid WHERE id IN ($translist)";
 						$query .= " AND ownerid=:ownerid2";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':ownerid'=>$_POST['newowner'] ':ownerid2'=>$userid));
+						$stm->execute(array(':ownerid'=>$_POST['newowner'], ':ownerid2'=>$userid));
 					} else {
             //DB $query = "UPDATE imas_questionset SET ownerid='{$_POST['newowner']}' WHERE id IN ($translist)";
             $stm = $DBH->prepare("UPDATE imas_questionset SET ownerid=:ownerid WHERE id IN ($translist)");
@@ -911,7 +911,7 @@ if ($myrights<20) {
 				if (substr($safesearch,0,3)=='id=') {
           //DB $searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
 					$searchlikes = "imas_questionset.id=? AND ";
-					$searchlikevals[] = substr($safesearch,3);
+          $searchlikevals = array(substr($safesearch,3));
 				} else if (is_numeric($safesearch)) {
           //DB $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
 					$searchlikes .= "OR imas_questionset.id=?) AND ";
@@ -981,7 +981,7 @@ if ($myrights<20) {
 		//DB $query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 		$query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
 		$query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
-		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND :searchlikes ";
+		$query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
 		$query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
 
 		if ($isadmin) {

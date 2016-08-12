@@ -119,7 +119,7 @@ if (isset($_GET['delete'])) {
 	$inmodule = false;
 
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
+		global $DBH,$iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
 		global $usechecked,$checked;
 
 		$out = '';

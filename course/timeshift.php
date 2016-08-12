@@ -106,28 +106,28 @@ if (!(isset($teacherid))) {
 			}
 			//DB $query = "UPDATE $table SET startdate=startdate+$shift WHERE id='{$row[1]}' AND startdate>0";
 			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$stm = $DBH->prepare("UPDATE $table SET startdate=startdate+:shift WHERE id=:id AND startdate>0");
-			$stm->execute(array(':id'=>$row[1], ':shift'=>$shift));
+			$stm2 = $DBH->prepare("UPDATE $table SET startdate=startdate+:shift WHERE id=:id AND startdate>0");
+			$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
 			//DB $query = "UPDATE $table SET enddate=enddate+$shift WHERE id='{$row[1]}' AND enddate<2000000000";
 			//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-			$stm = $DBH->prepare("UPDATE $table SET enddate=enddate+:shift WHERE id=:id AND enddate<2000000000");
-			$stm->execute(array(':id'=>$row[1], ':shift'=>$shift));
+			$stm2 = $DBH->prepare("UPDATE $table SET enddate=enddate+:shift WHERE id=:id AND enddate<2000000000");
+			$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
 
 			if ($row[0]=="Wiki") {
 				//DB $query = "UPDATE $table SET editbydate=editbydate+$shift WHERE id='{$row[1]}' AND editbydate>0 AND editbydate<2000000000";
 				//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$stm = $DBH->prepare("UPDATE $table SET editbydate=editbydate+:shift WHERE id=:id AND editbydate>0 AND editbydate<2000000000");
-				$stm->execute(array(':id'=>$row[1], ':shift'=>$shift));
+				$stm2 = $DBH->prepare("UPDATE $table SET editbydate=editbydate+:shift WHERE id=:id AND editbydate>0 AND editbydate<2000000000");
+				$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
 			} else if ($row[0]=="Forum") {
 				//DB $query = "UPDATE $table SET replyby=replyby+$shift WHERE id='{$row[1]}' AND replyby>0 AND replyby<2000000000";
 				//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$stm = $DBH->prepare("UPDATE $table SET replyby=replyby+:shift WHERE id=:id AND replyby>0 AND replyby<2000000000");
-				$stm->execute(array(':id'=>$row[1], ':shift'=>$shift));
+				$stm2 = $DBH->prepare("UPDATE $table SET replyby=replyby+:shift WHERE id=:id AND replyby>0 AND replyby<2000000000");
+				$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
 
 				//DB $query = "UPDATE $table SET postby=postby+$shift WHERE id='{$row[1]}' AND postby>0 AND postby<2000000000";
 				//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
-				$stm = $DBH->prepare("UPDATE $table SET postby=postby+:shift WHERE id=:id AND postby>0 AND postby<2000000000");
-				$stm->execute(array(':id'=>$row[1], ':shift'=>$shift));
+				$stm2 = $DBH->prepare("UPDATE $table SET postby=postby+:shift WHERE id=:id AND postby>0 AND postby<2000000000");
+				$stm2->execute(array(':id'=>$row[1], ':shift'=>$shift));
 			}
 		}
 

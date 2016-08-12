@@ -148,12 +148,12 @@
 			//if ($_POST[$row[0]]!='') {
 				if ($comtype=='stu') {
 					//DB $query = "UPDATE imas_students SET gbcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
-					$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment] WHERE id=:id");
-					$stm->execute(array(':gbcomment'=>$_POST[$row[0], ':id'=>$row[0]));
+					$stm2 = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE id=:id");
+					$stm2->execute(array(':gbcomment'=>$_POST[$row[0]], ':id'=>$row[0]));
 				} else if ($comtype=='instr') {
 					//DB $query = "UPDATE imas_students SET gbinstrcomment='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
-					$stm = $DBH->prepare("UPDATE imas_students SET gbinstrcomment=:gbinstrcomment] WHERE id=:id");
-					$stm->execute(array(':gbinstrcomment'=>$_POST[$row[0], ':id'=>$row[0]));
+					$stm2 = $DBH->prepare("UPDATE imas_students SET gbinstrcomment=:gbinstrcomment WHERE id=:id");
+					$stm2->execute(array(':gbinstrcomment'=>$_POST[$row[0]], ':id'=>$row[0]));
 				}
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//}

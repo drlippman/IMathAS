@@ -65,7 +65,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		//DB array_pop($row);
 		//DB $row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag,isplaylist) ";
-		$query .= "VALUES (:courseid,:title,:text,:startdate,:enddate,:avail,:oncal,:caltag,:isplaylist)"
+		$query .= "VALUES (:courseid,:title,:text,:startdate,:enddate,:avail,:oncal,:caltag,:isplaylist)";
 		//DB $query .= "VALUES ('$cid',$row)";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid, ':title'=>$row['title'], ':text'=>$row['text'], ':startdate'=>$row['startdate'],
@@ -259,7 +259,7 @@ function copyitem($itemid,$gbcats,$sethidden=false) {
 		$row['name'] .= stripslashes($_POST['append']);
 		//DB $row = "'".implode("','",addslashes_deep($row))."'";
 		$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) ";
-		$query .= "VALUES (:courseid,:name,:description,:startdate,:enddate,:editbydate,:avail,:settings,:groupsetid)"
+		$query .= "VALUES (:courseid,:name,:description,:startdate,:enddate,:editbydate,:avail,:settings,:groupsetid)";
 		//DB $query .= "VALUES ('$cid',$row)";
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->prepare($query);
@@ -990,7 +990,7 @@ function handleextoolcopy($sourcecid) {
 			$stm2 = $DBH->query("SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)");
 			//DB while ($r = mysql_fetch_row($res)) {
 			while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
-				$text = str_replace('exttool:'.$row['id'].'~~','exttool:'.$toolmap[$row['id'].'~~',$r['text']);
+				$text = str_replace('exttool:'.$row['id'].'~~','exttool:'.$toolmap[$row['id']].'~~',$r['text']);
 				//DB $query = "UPDATE imas_linkedtext SET text='".addslashes($text)."' WHERE id={$r[0]}";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				if ($ext_remap_stm===null) {

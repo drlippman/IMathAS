@@ -203,7 +203,7 @@ if (!(isset($teacherid))) {
 						//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 						if ($gb_cat_ins===null) {
 							$query = "INSERT INTO imas_gbcats (courseid,name,scale,scaletype,chop,dropn,weight,hidden,calctype) VALUES ";
-							$query .= "(:courseid, :name, :scale, :scaletype, :chop, :dropn, :weight, :hidden, :calctype)"
+							$query .= "(:courseid, :name, :scale, :scaletype, :chop, :dropn, :weight, :hidden, :calctype)";
 							$gb_cat_ins = $DBH->prepare($query);
 						}
 						$gb_cat_ins->execute(array(':courseid'=>$cid, ':name'=>$row['name'], ':scale'=>$row['scale'], ':scaletype'=>$row['scaletype'],
@@ -220,7 +220,7 @@ if (!(isset($teacherid))) {
 						$query .= "WHERE id=:id";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':scale'=>$row['scale'], ':scaletype'=>$row['scaletype'], ':chop'=>$row['chop'], ':dropn'=>$row['dropn'],
-							':weight'=>$row['weight'], ':hidden'=>$row['hidden'], ':calctype'=>$row['calctype'] ':id'=>$rpid));
+							':weight'=>$row['weight'], ':hidden'=>$row['hidden'], ':calctype'=>$row['calctype'], ':id'=>$rpid));
 						$gbcats[$row[0]] = $rpid;
 					}
 				}

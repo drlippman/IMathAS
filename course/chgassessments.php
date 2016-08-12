@@ -122,7 +122,7 @@ if (!(isset($teacherid))) {
 				}
 				//DB $sets[] = "timelimit='$timelimit'";
 				$sets[] = "timelimit=:timelimit";
-				$qarr[':timelimit']=>$timelimit;
+				$qarr[':timelimit'] = $timelimit;
 			}
 			if (isset($_POST['chgtutoredit'])) {
 				//DB $sets[] = "tutoredit='{$_POST['tutoredit']}'";

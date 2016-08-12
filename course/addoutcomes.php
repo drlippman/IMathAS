@@ -22,7 +22,7 @@ if (isset($_POST['order'])) {
 	//read in from order
 	$seenoutcomes = array();
 	function additems($list) {
-		 global $curoutcomes, $seenoutcomes, $cid;
+		 global $DBH,$curoutcomes, $seenoutcomes, $cid;
 		 $outarr = array();
 		 $list = substr($list,1,-1);
 		 $i = 0; $nd = 0; $last = 0;
@@ -69,9 +69,7 @@ if (isset($_POST['order'])) {
 			 	 	//DB $query .= "('$cid','{$_POST['newo'.$ocnt]}')";
 			 	 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			 	 	//DB $newid = mysql_insert_id();
-			 	 	$query = "INSERT INTO imas_outcomes (courseid, name) VALUES ";
-			 	 	$query .= "(:cid,:name)";
-			 	 	$stm = $DBH->prepare($query);
+			 	 	$stm = $DBH->prepare("INSERT INTO imas_outcomes (courseid, name) VALUES (:cid,:name)");
 			 	 	$stm->execute(array(':cid'=>$cid, ':name'=>$_POST['newo'.$ocnt]));
 			 	 	$newid = $DBH->lastInsertId();
 			 	 	$seenoutcomes[] = $newid;

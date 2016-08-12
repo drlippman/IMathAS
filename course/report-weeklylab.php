@@ -34,6 +34,7 @@ function getpts($scs) {
 }
 
 function getpointspossible($aid, $itemorder, $defaultpoints) {
+  global $DBH;
 	$aitems = explode(',', $itemorder);
 	$k = 0;
 	$atofind = array();

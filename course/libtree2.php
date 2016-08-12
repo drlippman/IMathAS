@@ -72,7 +72,7 @@ END;
 	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
 		//DB $name = addslashes($line['name']);
-		$name = $line['name'];
+		$name = htmlentities($line['name'], ENT_QUOTES);
 		$parent = $line['parent'];
 		if ($line['count']==0) {
 			$isempty[$id] = true;

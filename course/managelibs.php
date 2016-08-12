@@ -168,7 +168,7 @@ if ($myrights<20) {
 		if (isset($_POST['newrights'])) {
 			if ($_POST['newrights']!='') {
 				//DB $llist = "'".implode("','",explode(',',$_POST['chgrights']))."'";
-        $llist = implode(',', array_map('intval', explode(',',$_POST['chgrights'])));
+				$llist = implode(',', array_map('intval', explode(',',$_POST['chgrights'])));
 				//DB $query = "UPDATE imas_libraries SET userights='{$_POST['newrights']}',lastmoddate=$now WHERE id IN ($llist)";
 				$query = "UPDATE imas_libraries SET userights=:userights,lastmoddate=:lastmoddate WHERE id IN ($llist)";
 				$qarr = array(':userights'=>$_POST['newrights'], ':lastmoddate'=>$now);
@@ -179,11 +179,11 @@ if ($myrights<20) {
 				}
 				if (!$isadmin && !$isgrpadmin) {
 					//DB $query .= " AND ownerid='$userid'";
-          $query .= " AND ownerid=:ownerid";
-          $qarr[':ownerid'] = $userid;
+					$query .= " AND ownerid=:ownerid";
+					$qarr[':ownerid'] = $userid;
 				}
-        $stm = $DBH->prepare($query);
-        $stm->execute($qarr);
+				$stm = $DBH->prepare($query);
+				$stm->execute($qarr);
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
@@ -291,8 +291,8 @@ if ($myrights<20) {
 					//DB $parlist = "'".implode("','",$toset)."'";
           $parlist = implode(',', array_map('intval',$toset));
 					//DB $query = "UPDATE imas_libraries SET parent='{$_POST['libs']}',lastmoddate=$now WHERE id IN ($parlist)";
-					$quer = "UPDATE imas_libraries SET parent=:parent,lastmoddate=:lastmoddate WHERE id IN ($parlist)";
-					$qarr = array(':parent'=>$_POST['libs'], ':lastmoddate'=>$now));
+					$query = "UPDATE imas_libraries SET parent=:parent,lastmoddate=:lastmoddate WHERE id IN ($parlist)";
+					$qarr = array(':parent'=>$_POST['libs'], ':lastmoddate'=>$now);
           if (!$isadmin) {
             //DB $query .= " AND groupid='$groupid'";
             $query .= " AND groupid=:groupid";
@@ -488,7 +488,6 @@ if ($myrights<20) {
         }
 				$query .= " WHERE id=:id";
 
-				}
         if (!$isadmin) {
           //DB $query .= " AND groupid='$groupid'";
           $query .= " AND groupid=:groupid";
