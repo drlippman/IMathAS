@@ -94,7 +94,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$stm->execute(array(':uniqueid'=>$questions[$qid]['uqid']));
 			$questionexists = ($stm->rowCount()>0);
 			if ($questionexists) {
-				list($thisqsetid, $qadddate) = $stm->fetch(PDO::FETH_NUM);
+				list($thisqsetid, $qadddate) = $stm->fetch(PDO::FETCH_NUM);
 			}
 			if ($questionexists && ($_POST['merge']==1 || $_POST['merge']==2)) {
 				//DB $questions[$qid]['qsetid'] = mysql_result($result,0,0);
@@ -590,8 +590,9 @@ if (!(isset($teacherid))) {
 		//DB $ciditemorder = unserialize(mysql_result($result,0,1));
 		$stm = $DBH->prepare("SELECT blockcnt,itemorder FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
-		$blockcnt = $stm->fetchColumn(0);
-		$ciditemorder = unserialize($stm->fetchColumn(1));
+
+		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+		$ciditemorder = unserialize($itemorder);
 		$items = unserialize($itemlist);
 		$newitems = array();
 		$missingfiles = array();

@@ -216,12 +216,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					//DB if (mysql_num_rows($result)>0) {
 					$query = "SELECT $fieldstocopy ";
 					$query .= "FROM imas_assessment_sessions WHERE agroupid=:agroupid AND assessmentid=:assessmentid";
-					$stm = $DBH->prepare($query);
-					$stm->execute(array(':agroupid'=>$grpid, ':assessmentid'=>$aid[0]));
-					if ($stm->rowCount()>0) {
+					$stm2 = $DBH->prepare($query);
+					$stm2->execute(array(':agroupid'=>$grpid, ':assessmentid'=>$aid[0]));
+					if ($stm2->rowCount()>0) {
 						//asid already exists for group - use it
 						//DB $rowgrptest = addslashes_deep(mysql_fetch_row($result));
-						$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
+						$rowgrptest = $stm2->fetch(PDO::FETCH_ASSOC);
 						$grpasidexists = true;
 					} else {
 						//use asid from first student assessment
@@ -232,11 +232,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 						//DB if (mysql_num_rows($result)>0) {
 						$query = "SELECT id,$fieldstocopy ";
 						$query .= "FROM imas_assessment_sessions WHERE userid IN ($stulist) AND assessmentid=:assessmentid";
-						$stm = $DBH->prepare($query);
-						$stm->execute(array(':assessmentid'=>$aid[0]));
-						if ($stm->rowCount()>0) {
+						$stm2 = $DBH->prepare($query);
+						$stm2->execute(array(':assessmentid'=>$aid[0]));
+						if ($stm2->rowCount()>0) {
 							//DB $row = mysql_fetch_row($result);
-							$rowgrptest = $stm->fetch(PDO::FETCH_ASSOC);
+							$rowgrptest = $stm2->fetch(PDO::FETCH_ASSOC);
 							//DB $srcasid = array_shift($row);
 							//DB $rowgrptest = addslashes_deep($row);
 							$srcasid = $rowgrptest['id'];
@@ -261,12 +261,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 							//DB $query = "SELECT id,agroupid FROM imas_assessment_sessions WHERE userid='$stuid' AND assessmentid={$aid[0]}";
 							//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());
 							//DB if (mysql_num_rows($result)>0) {
-							$stm = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
-							$stm->execute(array(':userid'=>$stuid, ':assessmentid'=>$aid[0]));
-							if ($stm->rowCount()>0) {
+							$stm2 = $DBH->prepare("SELECT id,agroupid FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
+							$stm2->execute(array(':userid'=>$stuid, ':assessmentid'=>$aid[0]));
+							if ($stm2->rowCount()>0) {
 								$loginfo .= "updating ias for $stuid.";
 								//DB $row = mysql_fetch_row($result);
-								$row = $stm->fetch(PDO::FETCH_NUM);
+								$row = $stm2->fetch(PDO::FETCH_NUM);
 								$sets = array();
 								foreach ($fieldstocopyarr as $k=>$val) {
 									//DB $sets[] = "$val='{$rowgrptest[$k]}'";
@@ -274,8 +274,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								}
 								$setslist = implode(',',$sets);
 								//DB $query = "UPDATE imas_assessment_sessions SET $setslist WHERE id='{$row[0]}'";
-								$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET $setslist WHERE id=:id");
-								$stm->execute(array(':id'=>$row[0]) + $rowgrptest);
+								$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET $setslist WHERE id=:id");
+								$stm2->execute(array(':id'=>$row[0]) + $rowgrptest);
 								//$query = "UPDATE imas_assessment_sessions SET assessmentid='{$rowgrptest[0]}',agroupid='{$rowgrptest[1]}',questions='{$rowgrptest[2]}'";
 								//$query .= ",seeds='{$rowgrptest[3]}',scores='{$rowgrptest[4]}',attempts='{$rowgrptest[5]}',lastanswers='{$rowgrptest[6]}',";
 								//$query .= "starttime='{$rowgrptest[7]}',endtime='{$rowgrptest[8]}',bestseeds='{$rowgrptest[9]}',bestattempts='{$rowgrptest[10]}',";
@@ -289,8 +289,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								//DB mysql_query($query) or die("Query failed : $query:" . mysql_error());
 								$query = "INSERT INTO imas_assessment_sessions (userid,$fieldstocopy) ";
 								$query .= "VALUES (:stuid,$insrow)";
-								$stm = $DBH->prepare($query);
-								$stm->execute(array(':stuid'=>$stuid) + $rowgrptest);
+								$stm2 = $DBH->prepare($query);
+								$stm2->execute(array(':stuid'=>$stuid) + $rowgrptest);
 							}
 						}
 					}

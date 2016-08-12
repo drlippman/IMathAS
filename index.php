@@ -325,7 +325,7 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //int's from DB - safe
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE useridB=:userid)) ";
+	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid));

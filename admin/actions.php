@@ -602,7 +602,7 @@ switch($_GET['action']) {
 					if ($gbi_ins_stm === null) {
 						$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit) VALUES ";
 						$query .= "(:courseid,:name,:points,:showdate,:gbcategory,:cntingb,:tutoredit)";
-						$stm = $DBH->prepare($query);
+						$gbi_ins_stm = $DBH->prepare($query);
 					}
 					$row[':courseid'] = $cid;
 					$gbi_ins_stm->execute($row);

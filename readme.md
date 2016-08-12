@@ -349,6 +349,8 @@ add drill.
 add a block
 show block content: expand, folder, treereader
 delete block
+single item copy (assessment)
+
 course page pulldown reorder
 quick view, rearrange, edit, save
 show calendar
@@ -365,7 +367,7 @@ show Roster
   copy emails
 show Gradebook
   single stu gradebook
-    view assessment, change score.  clearq. clear scores. clear attempt.
+    view assessment, change score.  clearq. clear scores. clear attempt.  Change score for group.
     individual assess exception
     Edit offline in place
     edit one offline grade
@@ -431,3 +433,13 @@ Tutorial style editor, Add and edit
 copy course items
 	copy block of items
 	copy whole course
+	copy offline. copy outcomes
+import items (basic)
+Take assessment as student (no group)
+Take assessment as student (group)
+	Add self to group
+	Add another stu to group (copies assessment)
+Manage groups:
+	Add student to existing group, copies assessment
+Take drill as student
+	view drill scores

@@ -203,8 +203,8 @@ if (isset($_POST['mergefrom'])) {
 	//DB $items = unserialize(mysql_result($result,0,1));
 	$stm = $DBH->prepare("SELECT blockcnt,itemorder FROM imas_courses WHERE id=:id;");
 	$stm->execute(array(':id'=>$cid));
-	$blockcnt = $stm->fetchColumn(0);
-	$items = unserialize($stm->fetchColumn(1));
+	list($blockcnt, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	$items = unserialize($itemorder);
 	$items[] = $newitemid;
 	//DB $itemorder = addslashes(serialize($items));
 	$itemorder = serialize($items);
