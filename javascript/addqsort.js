@@ -40,11 +40,11 @@ function activateLastEditorIfBlank() {
 //this is called by tinycme during initialization
 function editorSetup(editor) {
 	var i=this.id.match(/[0-9]+$/)[0];
-	editor.addButton('savedb', {
-		text: null,
+	editor.addButton('saveclose', {
+		text: "Close",
 		title: "Save All",
 		icon: 'save',
-		classes: "dim savedb savedb"+i, // "mce-dim" and "mce-savedb0"
+		classes: "dim saveclose saveclose"+i, // "mce-dim" and "mce-saveclose0"
 		//disabled: true,
 		onclick: function () {
 			highlightSaveButton(false);
@@ -57,11 +57,11 @@ function editorSetup(editor) {
 	editor.on("dirty", function() {
 		updateSaveButtonDimming();
 	});
-	editor.once("focus", function() {
-		//if the editor hasn't already been activated
+	editor.on("focus", function() {
 		var i=this.id.match(/[0-9]+$/)[0];
 		var editor_id=this.id;
 		if (editor_id.match("textsegdesdiv")) {
+			expandTextSegment("#"+editor_id);
 			$("#"+editor_id).removeClass("collapsed");
 			$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 		} else if (editor_id.match("textsegdesheader")) {
@@ -86,10 +86,10 @@ function highlightSaveButton(leaving) {
 	if (anyEditorIsDirty()) {
 		var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
 		if (leaving) {
-			$("div.mce-savedb"+i).css("transition","background-color 0s")
+			$("div.mce-saveclose"+i).css("transition","background-color 0s")
 								.addClass("highlightbackground");
 		} else {
-			$("div.mce-savedb"+i).css("transition","background-color 1s ease-out")
+			$("div.mce-saveclose"+i).css("transition","background-color 1s ease-out")
 								.removeClass("highlightbackground");
 		}
 	}
@@ -98,15 +98,15 @@ function highlightSaveButton(leaving) {
 //If any editor is dirty, undim the Save All button and
 // highlight that editor
 function updateSaveButtonDimming(dim) {
-	var save_buttons = $("div.mce-savedb");
+	var save_buttons = $("div.mce-saveclose");
 	if (tinyMCE.activeEditor && tinyMCE.activeEditor.isDirty()) {
-		$("div.mce-savedb").removeClass("mce-dim");
+		$("div.mce-saveclose").removeClass("mce-dim");
 		//update tinymce data structure in case other editors haven't
 		// been activated
 		for (index in tinymce.editors) {
 			var editor = tinymce.editors[index];
-			editor.buttons['savedb'].classes =
-				editor.buttons['savedb'].classes.replace(/dim ?/g,"");
+			editor.buttons['saveclose'].classes =
+				editor.buttons['saveclose'].classes.replace(/dim ?/g,"");
 			var editor_id=tinymce.activeEditor.id;
 			$("#"+editor_id).css("transition","border 0s")
 								.removeClass("intro")
@@ -115,6 +115,27 @@ function updateSaveButtonDimming(dim) {
 	}
 	//TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
 	// re-dim the Save All button after checking all editors
+}
+
+function expandTextSegment(selector) {
+	$(selector).css("max-height","");
+	var natural_height = $(selector)[0].scrollHeight; //TODO check portability
+	//smoothly set the height to the natural height
+	$(selector).animate({height: natural_height},600, function() {
+		//when animation completes, set to auto for editing
+		$(selector).css("height","auto");
+	});
+}
+
+function collapseTextSegment(selector) {
+	var collapsed_height = "2.5em";
+	//smoothly set the height to the collapsed height
+	$(selector).animate({height: collapsed_height},600, function() {
+		//when animation completes, set max-height
+		$(selector).css("max-height",collapsed_height);
+		$(selector).css("height","auto");
+		$(selector).addClass("collapsed");
+	});
 }
 
 function anyEditorIsDirty() {
@@ -533,11 +554,15 @@ function generateTable() {
 		this.collapsed_text_segments = !this.collapsed_text_segments;
 		$("#collapseexpandsymbol").html(getCollapseExpandSymbol);
 		if (this.collapsed_text_segments) {
-			$("div.textsegment").addClass("collapsed");
+			collapseTextSegment("div.textsegment");
 			$("div.textfade").addClass("collapsedtextfade");
 			$("h4.textsegment").addClass("collapsedheader");
 			$(".textfadeheader").addClass("collapsedtextfadeheader");
 		} else {
+			$("div.textsegment").each( function() {
+				//expand each text segment to its natural height
+				expandTextSegment(this);
+			});
 			$(".textsegment").removeClass("collapsed collapsedheader");
 			$(".textfade, .textfadeheader").removeClass("collapsedtextfade collapsedtextfadeheader");
 		}
@@ -730,7 +755,7 @@ function generateTable() {
 		alt = 1-alt;
 	}
 	if (!beentaken) {
-		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" ></td><td></td><td></td></tr>';
+		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" ><img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=addingquestionstoanassessment\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/></td><td></td><td></td></tr>';
 	}
 	html += "</tbody></table>";
 	document.getElementById("pttotal").innerHTML = pttotal;
