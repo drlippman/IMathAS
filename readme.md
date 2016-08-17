@@ -254,6 +254,8 @@ C posthandler        53
 C posts              22
 C postsbyname        11
 C recordlikes        5
+C savetagged         2
+C thread             25
 
 /includes             done
  C calendardisp     11
