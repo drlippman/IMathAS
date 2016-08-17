@@ -197,7 +197,6 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$blockitems = $blockitems[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
-
 		//DB $title = stripslashes($blockitems[$existingid]['name']);
 		$title = $blockitems[$existingid]['name'];
 		$title = str_replace('"','&quot;',$title);
