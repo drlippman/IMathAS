@@ -20,14 +20,20 @@ $(document).ready(function() {
 	// future calls to generateTable()
 	$(document).on("click",".text-segment-button",function(e) {
 
-		var i=e.currentTarget.id.match(/[0-9]+$/)[0];
+		var i = getIndexForSelector("#"+e.currentTarget.id);
 		var type = getTypeForSelector("#"+e.currentTarget.id);
+
+		if (type === "global") {
+			var selector = ".textsegment";
+		} else {
+			var selector = "#textseg"+type+i;
+		}
 
 		//toggle expand/collapse based on title of button
 		if ($("#"+e.currentTarget.id).attr("title") === "Collapse") {
-			collapseAndStyleTextSegment("#textseg"+type+i);
+			collapseAndStyleTextSegment(selector);
 		} else {
-			expandAndStyleTextSegment("#textseg"+type+i) ;
+			expandAndStyleTextSegment(selector) ;
 		}
 	});
 });
@@ -136,14 +142,19 @@ function updateSaveButtonDimming(dim) {
 function expandAndStyleTextSegment(selector) {
 	var i = getIndexForSelector(selector);
 	var type = getTypeForSelector(selector);
-	//Check if this is a header or div
-	expandTextSegment(selector);
+
+	$(selector).each(function(index,element) {
+		expandTextSegment("#"+element.id);
+	});
 	//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 
 	//change the exit/collapse button for the corresponding editor
-	if (i === undefined || i.length === 0) {
-		//TODO expand all
-	}
+	if (i === undefined || type === "global") {
+		//expand all
+		$("#edit-buttonglobal").attr("title","Collapse");
+		$("#edit-button-spanglobal").removeClass("icon-pencil")
+									.addClass("icon-shrink2");
+	} else {
 	var editor = getEditorForSelector(selector);
 	if (editor !== undefined && editor.isDirty()) {
 		$("#edit-button"+type+i).fadeOut();
@@ -151,22 +162,32 @@ function expandAndStyleTextSegment(selector) {
 	$("#edit-button"+type+i).attr("title","Collapse");
 	$("#edit-button-span"+type+i).removeClass("icon-pencil")
 								.addClass("icon-shrink2");
+	}
 }
 
 function collapseAndStyleTextSegment(selector) {
 	var i = getIndexForSelector(selector);
 	var type = getTypeForSelector(selector);
 
-	//Deactivate the editor
-	tinymce.editors["textseg"+type+i].fire("focusout");
+	if (i !== undefined) {
+		//Deactivate the editor
+		tinymce.editors["textseg"+type+i].fire("focusout");
+	}
 
 	collapseTextSegment(selector);
 	//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 
 	//toggle the button
-	$("#edit-button"+type+i).attr("title","Expand and Edit");
-	$("#edit-button-span"+type+i).removeClass("icon-shrink2")
-									.addClass("icon-pencil");
+	if (i === undefined || type === "global") {
+		//collapse all
+		$("#edit-buttonglobal").attr("title","Expand");
+		$("#edit-button-spanglobal").removeClass("icon-shrink2")
+									.addClass("icon-enlarge2");
+	} else {
+		$("#edit-button"+type+i).attr("title","Expand and Edit");
+		$("#edit-button-span"+type+i).removeClass("icon-shrink2")
+										.addClass("icon-pencil");
+	}
 }
 
 //adjust the height/width smoothly (could replace with jquery-ui)
@@ -201,14 +222,13 @@ function expandTextSegment(selector) {
 		$(selector).css("max-width","");
 		$(selector).css("max-height","");
 
-console.log("collapsed"+type);
 		$(selector).removeClass("collapsed"+type);
 		$(selector).css("white-space","");
 
 		//If a single editor was expanded, activate the editor
 		var i = getIndexForSelector(selector);
 		var type = getTypeForSelector(selector);
-		if (i !== undefined && i.length !== 0) {
+		if (i !== undefined && type !== "global") {
 			$("#textseg"+type+i).focus();
 		}
 	});
@@ -240,7 +260,9 @@ function getIndexForSelector(selector) {
 // can be used to find a corresponding class name
 // e.g. textsegesheader3 -> edit-buttonheader3
 function getTypeForSelector(selector) {
-	if (selector.match("header")) {
+	if (selector.match("global")) {
+		var type = "global";
+	} else if (selector.match("header")) {
 		var type = "header";
 	} else {
 		var type = "";
@@ -252,7 +274,7 @@ function getTypeForSelector(selector) {
 function getEditorForSelector(selector) {
 	var i = getIndexForSelector(selector);
 	var type = getTypeForSelector(selector);
-console.log("i: "+i);
+
 	if (i !== undefined && i.length > 0) {
 		var editor = tinymce.editors["textseg"+type+i];
 	}
@@ -672,7 +694,8 @@ function generateTable() {
 		return (this.collapsed_text_segments)?"+":"-";
 	}
 	this.getCollapseExpandLink = function () {
-		return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
+		//return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
+		return "<span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand\" class=\"text-segment-button\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
 	}
 	this.toggleCollapseTextSegments = function () {
 		this.collapsed_text_segments = !this.collapsed_text_segments;
