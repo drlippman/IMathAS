@@ -2435,7 +2435,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					if (strpos($grid[$i],':')!==false) {
 						$pts = explode(':',$grid[$i]);
 						foreach ($pts as $k=>$v) {
-							$pts[$k] = evalbasic($v);
+							if ($v{0}==="h") {
+								$pts[$k] = "h".evalbasic(substr($v,1));
+							} else {
+								$pts[$k] = evalbasic($v);
+							}
 						}
 						$settings[$i] = implode(':',$pts);
 					} else {
@@ -2443,6 +2447,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					}
 				}
 			}
+
 			$origxmin = $settings[0];
 			if (strpos($settings[0],'0:')===0) {
 				$settings[0] = substr($settings[0],2);
@@ -2467,7 +2472,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (strpos($settings[4],':')!==false) {
 				$settings[4] = explode(':',$settings[4]);
 				if ($settings[4][0]{0}=='h') {
-					$sclinglbl = substr($settings[4][0],1).':0:1';
+					$sclinglbl = substr($settings[4][0],1).':0:off';
 				} else {
 					$sclinglbl = $settings[4][0];
 				}
