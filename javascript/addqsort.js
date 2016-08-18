@@ -19,24 +19,29 @@ $(document).ready(function() {
 	//attach handler to Edit/Collapse buttons and all that are created in
 	// future calls to generateTable()
 	$(document).on("click",".text-segment-button",function(e) {
-
-		var i = getIndexForSelector("#"+e.currentTarget.id);
-		var type = getTypeForSelector("#"+e.currentTarget.id);
-
-		if (type === "global") {
-			var selector = ".textsegment";
-		} else {
-			var selector = "#textseg"+type+i;
-		}
-
-		//toggle expand/collapse based on title of button
-		if ($("#"+e.currentTarget.id).attr("title") === "Collapse") {
-			collapseAndStyleTextSegment(selector);
-		} else {
-			expandAndStyleTextSegment(selector) ;
-		}
+		handleClickTextSegmentButton(e);
 	});
 });
+
+//When the Edit/collapse button is clicked, call the appropriate function
+// with the appropriate selector.
+function handleClickTextSegmentButton(e) {
+	var i = getIndexForSelector("#"+e.currentTarget.id);
+	var type = getTypeForSelector("#"+e.currentTarget.id);
+
+	if (type === "global") {
+		var selector = ".textsegment";
+	} else {
+		var selector = "#textseg"+type+i;
+	}
+
+	//toggle expand/collapse based on title of button
+	if ($("#"+e.currentTarget.id).attr("title") === "Collapse") {
+		collapseAndStyleTextSegment(selector);
+	} else {
+		expandAndStyleTextSegment(selector) ;
+	}
+}
 
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
