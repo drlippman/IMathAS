@@ -21,12 +21,13 @@ $(document).ready(function() {
 	$(document).on("click",".text-segment-button",function(e) {
 
 		var i=e.currentTarget.id.match(/[0-9]+$/)[0];
+		var type = getTypeForSelector("#"+e.currentTarget.id);
 
 		//toggle expand/collapse based on title of button
 		if ($("#"+e.currentTarget.id).attr("title") === "Collapse") {
-			collapseAndStyleTextSegment("#textsegdesdiv"+i);
+			collapseAndStyleTextSegment("#textseg"+type+i);
 		} else {
-			expandAndStyleTextSegment("#textsegdesdiv"+i) ;
+			expandAndStyleTextSegment("#textseg"+type+i) ;
 		}
 	});
 });
@@ -74,14 +75,15 @@ function editorSetup(editor) {
 	});
 	editor.on("focus", function() {
 		var i=this.id.match(/[0-9]+$/)[0];
-		if ($("#edit-button"+i).attr("title") === "Expand and Edit") {
-			expandAndStyleTextSegment("#textsegdesdiv"+i) ;
+		var type = getTypeForSelector("#"+this.id);
+		if ($("#edit-button"+type+i).attr("title") === "Expand and Edit") {
+			expandAndStyleTextSegment("#textseg"+type+i) ;
 		}
 	});
-	$("div.textsegment").on("mouseleave focusout", function(e) {
+	$(".textsegment").on("mouseleave focusout", function(e) {
 		highlightSaveButton(true);
 	});
-	$("div.textsegment").on("mouseenter click", function(e) {
+	$(".textsegment").on("mouseenter click", function(e) {
 		//if rentering the active editor, un-highlight
 		if (tinymce.activeEditor && 
 				tinymce.activeEditor.id === e.currentTarget.id) {
@@ -95,6 +97,7 @@ function highlightSaveButton(leaving) {
 	if (anyEditorIsDirty()) {
 		var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
 		if (leaving) {
+			//TODO what aboue h4?
 			$("div.mce-saveclose"+i).css("transition","background-color 0s")
 								.addClass("highlightbackground");
 		} else {
@@ -122,8 +125,9 @@ function updateSaveButtonDimming(dim) {
 								.removeClass("intro")
 								.addClass("highlightborder");
 		}
-		var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
-		$("#edit-button"+i).fadeOut();
+		var i = getIndexForSelector("#"+tinymce.activeEditor.id);
+		var type = getTypeForSelector("#"+tinymce.activeEditor.id);
+		$("#edit-button"+type+i).fadeOut();
 	}
 	//TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
 	// re-dim the Save All button after checking all editors
@@ -133,17 +137,11 @@ function expandAndStyleTextSegment(selector) {
 	var i = getIndexForSelector(selector);
 	var type = getTypeForSelector(selector);
 	//Check if this is a header or div
-	if (selector.match("textsegdesdiv")) {
-		expandTextSegment(selector);
-		//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
-	} else if (selector.match("textsegdesheader")) {
-		expandTextSegment(selector);
-		$(selector).removeClass("collapsedheader");
-		//$("#"+editor_id).removeClass("collapsedtextfadeheader");
-	}
+	expandTextSegment(selector);
+	//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
 
 	//change the exit/collapse button for the corresponding editor
-	if (i.length === 0) {
+	if (i === undefined || i.length === 0) {
 		//TODO expand all
 	}
 	var editor = getEditorForSelector(selector);
@@ -160,19 +158,11 @@ function collapseAndStyleTextSegment(selector) {
 	var type = getTypeForSelector(selector);
 
 	//Deactivate the editor
-	//TODO remove "desdiv" from this class name
-	tinymce.editors["textsegdesdiv"+type+i].fire("focusout");
-	//Check if this is a header or div
-	if (selector.match("textsegdesdiv")) {
-		collapseTextSegment(selector);
-		//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
-	} else if (selector.match("textsegdesheader")) {
-		collapseTextSegment(selector);
-		$(selector).addClass("collapsedheader");
-		//$("#"+editor_id).removeClass("collapsedtextfadeheader");
-	} else {
-console.log("selector didn't match");
-	}
+	tinymce.editors["textseg"+type+i].fire("focusout");
+
+	collapseTextSegment(selector);
+	//$("#collapsedtextfade"+i).removeClass("collapsedtextfade");
+
 	//toggle the button
 	$("#edit-button"+type+i).attr("title","Expand and Edit");
 	$("#edit-button-span"+type+i).removeClass("icon-shrink2")
@@ -181,6 +171,7 @@ console.log("selector didn't match");
 
 //adjust the height/width smoothly (could replace with jquery-ui)
 function expandTextSegment(selector) {
+	var type = getTypeForSelector(selector);
 	//copy max-height/max-width to height/width temporarily
 	var max_height = $(selector).css("max-height");
 	var max_width = parseInt($(selector).css("max-width"));
@@ -201,6 +192,8 @@ function expandTextSegment(selector) {
 	//smoothly set the height to the natural height
 	$(selector).animate({height: natural_height, width: natural_width},500,"linear", function() {
 
+		var type = getTypeForSelector(selector);
+
 		//when animation completes...
 		// remove temporary width/max-width and other styles
 		$(selector).css("height","");
@@ -208,18 +201,21 @@ function expandTextSegment(selector) {
 		$(selector).css("max-width","");
 		$(selector).css("max-height","");
 
-		$(selector).removeClass("collapsed");
+console.log("collapsed"+type);
+		$(selector).removeClass("collapsed"+type);
 		$(selector).css("white-space","");
 
 		//If a single editor was expanded, activate the editor
-		var i = selector.match(/[0-9]+$/)[0];
-		if (i.length !== 0) {
-			$("#textsegdesdiv"+i).focus();
+		var i = getIndexForSelector(selector);
+		var type = getTypeForSelector(selector);
+		if (i !== undefined && i.length !== 0) {
+			$("#textseg"+type+i).focus();
 		}
 	});
 }
 
 function collapseTextSegment(selector) {
+	var type = getTypeForSelector(selector);
 	var collapsed_height = "1.2em"; //must match .collapsed style
 	//smoothly set the height to the collapsed height
 	$(selector).animate({height: collapsed_height},500, function() {
@@ -227,7 +223,7 @@ function collapseTextSegment(selector) {
 		//when animation completes, set max-height
 		$(selector).css("max-height",collapsed_height);
 		$(selector).css("height","");
-		$(selector).addClass("collapsed");
+		$(selector).addClass("collapsed"+type);
 	});
 }
 
@@ -255,13 +251,10 @@ function getTypeForSelector(selector) {
 //translates a selector to the corresponding editor if possible
 function getEditorForSelector(selector) {
 	var i = getIndexForSelector(selector);
+	var type = getTypeForSelector(selector);
 console.log("i: "+i);
 	if (i !== undefined && i.length > 0) {
-		if (selector.match("textsegdesdiv")) {
-			var editor = tinymce.editors["textsegdesiv"+i];
-		} else if (selector.match("textsegdesheader")) {
-			var editor = tinymce.editors["textsegdesheader"+i];
-		}
+		var editor = tinymce.editors["textseg"+type+i];
 	}
 	//return undefined if the selector didn't end in a digit
 	return editor;
@@ -549,10 +542,10 @@ function updateGrpT(num) {
 }
 
 function edittextseg(i) {
-	tinyMCE.get("textsegdesdiv"+i).setContent(itemarray[i][1]);
+	tinyMCE.get("textseg"+i).setContent(itemarray[i][1]);
 
 	if (itemarray[i][3]==1) {
-		tinyMCE.get("textsegdesheader"+i).setContent(itemarray[i][4]);
+		tinyMCE.get("textsegheader"+i).setContent(itemarray[i][4]);
 	}
 }
 
@@ -562,10 +555,12 @@ function savetextseg(i) {
 		var editor = tinymce.editors[index];
 		if (editor.isDirty()) {
 			var i=editor.id.match(/[0-9]+$/)[0];
-			if (editor.id.match("textsegdesdiv")) {
+			var i = getIndexForSelector("#"+editor.id);
+			var type = getTypeForSelector("#"+editor.id);
+			if (type === "") {
 				itemarray[i][1] = editor.getContent();
 				any_dirty = true;
-			} else if (editor.id.match("textsegdesheader")) {
+			} else if (editor.id.match("textsegheader")) {
 				itemarray[i][4] = editor.getContent();
 				any_dirty = true;
 			}
@@ -684,16 +679,16 @@ function generateTable() {
 		$("#collapseexpandsymbol").html(getCollapseExpandSymbol);
 		if (this.collapsed_text_segments) {
 			collapseTextSegment("div.textsegment");
-			$("div.textfade").addClass("collapsedtextfade");
+			//$("div.textfade").addClass("collapsedtextfade");
 			$("h4.textsegment").addClass("collapsedheader");
-			$(".textfadeheader").addClass("collapsedtextfadeheader");
+			//$(".textfadeheader").addClass("collapsedtextfadeheader");
 		} else {
 			$("div.textsegment").each( function() {
 				//expand each text segment to its natural height
 				expandTextSegment(this);
 			});
 			$(".textsegment").removeClass("collapsed collapsedheader");
-			$(".textfade, .textfadeheader").removeClass("collapsedtextfade collapsedtextfadeheader");
+			//$(".textfade, .textfadeheader").removeClass("collapsedtextfade collapsedtextfadeheader");
 		}
 		$("#collapseexpandsymbol").html(this.getCollapseExpandSymbol());
 	};
@@ -797,21 +792,21 @@ function generateTable() {
 					html += "<td colspan=6 id=\"textsegdescr"+i+"\" class=\"description-cell\">";
 					if (curitems[j][3]==1) {
 						var header_contents= curitems[j][4];
-						html += "<div style=\"position: relative\"><h4 id=\"textsegdesheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
-						html += "<div id=\"textfadeheader"+i+"\" class=\"textfadeheader collapsedtextfadeheader\"></div></div>";
+						html += "<div style=\"position: relative\"><h4 id=\"textsegheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
+						html += "<div class=\"text-segment-icon\"><button id=\"edit-buttonheader"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-spanheader"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div>";
 					} 
 					var contents = curitems[j][1];
-					html += "<div class=\"intro intro-like\"><div id=\"textsegdesdiv"+i+"\" class=\"textsegment collapsed\">"+contents+"</div>"; //description
-					html += "<div class=\"text-segment-icon\"><button id=\"edit-button"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-span"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div></td>";
+					html += "<div class=\"intro intro-like\"><div id=\"textseg"+i+"\" class=\"textsegment collapsed\">"+contents+"</div>"; //description
+					html += "<div class=\"text-segment-icon\"><button id=\"edit-button"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-span"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div></div></td>";
 					html += '<td><input type="hidden" id="showforn'+i+'" value="1"/>';
 					html += '<label><input type="checkbox" id="ispagetitle'+i+'" onchange="chgpagetitle('+i+')" ';
 					if (curitems[j][3]==1) { html += "checked";}
 					html += '>New page<label></td>';
 				} else {
 					var contents = curitems[j][1];
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\">"; //description
-					html += "<div style=\"position: relative\"><div id=\"textsegdesdiv"+i+"\" class=\"intro textsegment collapsed\">"+contents+"</div>";
-					html += "<div id=\"collapsedtextfade"+i+"\" class=\"textfade collapsedtextfade\"></div></div></td>";
+					html += "<td colspan=6 id=\"textsegdescr"+i+"\" class=\"description-cell\">"; //description
+					html += "<div class=\"intro intro-like\"><div id=\"textseg"+i+"\" class=\"textsegment collapsed\">"+contents+"</div>";
+					html += "<div class=\"text-segment-icon\"><button id=\"edit-button"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-span"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div></div></td>";
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
 				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';

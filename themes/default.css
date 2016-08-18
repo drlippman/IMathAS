@@ -181,6 +181,7 @@ table.gb .cat9 {
 }
 .collapsedheader {
 	white-space: nowrap;
+	max-width: 93%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	max-height: 1.2em;
