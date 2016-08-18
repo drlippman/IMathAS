@@ -1,0 +1,65 @@
+/*Styles for addquestions.php but initially for addqsort.js */
+.highlightbackground{
+	background-color: #F01235;
+}
+.highlightborder{
+	border: 1px solid #F01235;
+}
+.mce-dim{
+	opacity: 0.3;
+}
+.textsegment {
+	height: auto;
+	padding-left: 3px;
+	padding-bottom: 14px;
+}
+.description-cell {
+	max-width: 0; /* just need any max-width for text-overflow */
+}
+.collapsed {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-height: 1.7em;
+	max-width: 93%;
+	overflow: hidden;
+/*	padding-bottom: 0;*/
+	background-color: #fff; /* must match .intro */
+}
+.intro-like {
+	position: relative;
+	background-color: #fff; /* must match .intro */
+}
+.collapsed * {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.collapsedheader {
+	white-space: nowrap;
+	max-width: 93%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-height: 1.7em;
+}
+div.text-segment-icon {
+	font-size: 0.85em;
+	z-index: 10;
+	position: absolute;
+	bottom: 4px;
+	right: 4px;
+	padding: 0;
+	text-align: right;
+	background: transparent;
+}
+.text-segment-button {
+	cursor: pointer;
+	padding: 1px;
+	margin: 2px;
+	background-color: rgba(255,255,255,0.8);
+	box-shadow: 3px 3px 6px 0 rgba(0,0,0,0.2);
+}
+.text-segment-button:hover {
+	background-color: white;
+	transition-duration: 0.4s;
+	box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.24);
+}
+
