@@ -211,7 +211,7 @@ function expandTextSegment(selector) {
 	$(selector).css("height",max_height);
 	$(selector).css("width",max_width);
 	//smoothly set the height to the natural height
-	$(selector).animate({height: natural_height, width: natural_width},500,"linear", function() {
+	$(selector).animate({height: natural_height, width: natural_width},500, function() {
 
 		var type = getTypeForSelector(selector);
 
@@ -236,7 +236,7 @@ function expandTextSegment(selector) {
 
 function collapseTextSegment(selector) {
 	var type = getTypeForSelector(selector);
-	var collapsed_height = "1.2em"; //must match .collapsed style
+	var collapsed_height = "1.7em"; //must match .collapsed style
 	//smoothly set the height to the collapsed height
 	$(selector).animate({height: collapsed_height},500, function() {
 
@@ -678,9 +678,6 @@ function generateTable() {
 	olditemarray = itemarray;
 	itemcount = itemarray.length;
 	tinymce.editors = []; // clear any previous editors
-	if (this.collapsed_text_segments === undefined) {
-		this.collapsed_text_segments = true;
-	}
 	var alt = 0;
 	var ln = 0;
 	var pttotal = 0;
@@ -690,32 +687,10 @@ function generateTable() {
 		html += "<th></th>";
 	}
 	html += "<th>Order</th>";
-	this.getCollapseExpandSymbol = function () {
-		return (this.collapsed_text_segments)?"+":"-";
-	}
-	this.getCollapseExpandLink = function () {
-		//return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
-		return "<span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand\" class=\"text-segment-button\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
-	}
-	this.toggleCollapseTextSegments = function () {
-		this.collapsed_text_segments = !this.collapsed_text_segments;
-		$("#collapseexpandsymbol").html(getCollapseExpandSymbol);
-		if (this.collapsed_text_segments) {
-			collapseTextSegment("div.textsegment");
-			//$("div.textfade").addClass("collapsedtextfade");
-			$("h4.textsegment").addClass("collapsedheader");
-			//$(".textfadeheader").addClass("collapsedtextfadeheader");
-		} else {
-			$("div.textsegment").each( function() {
-				//expand each text segment to its natural height
-				expandTextSegment(this);
-			});
-			$(".textsegment").removeClass("collapsed collapsedheader");
-			//$(".textfade, .textfadeheader").removeClass("collapsedtextfade collapsedtextfadeheader");
-		}
-		$("#collapseexpandsymbol").html(this.getCollapseExpandSymbol());
-	};
-	html += "<th>Description <span id=\"collapseexpandlink\">"+this.getCollapseExpandLink()+"</span></th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
+	//return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
+	html += "<th>Description";
+	html += " <span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand\" class=\"text-segment-button\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
+	html += "</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
 	} else {
@@ -902,7 +877,7 @@ function generateTable() {
 		alt = 1-alt;
 	}
 	if (!beentaken) {
-		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" ><img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=addingquestionstoanassessment\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/></td><td></td><td></td></tr>';
+		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" ><img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/></td><td></td><td></td></tr>';
 	}
 	html += "</tbody></table>";
 	document.getElementById("pttotal").innerHTML = pttotal;

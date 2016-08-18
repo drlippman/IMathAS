@@ -184,7 +184,7 @@ table.gb .cat9 {
 	max-width: 93%;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	max-height: 1.2em;
+	max-height: 1.7em;
 }
 .collapsedtextfade {
 	z-index: 10;
