@@ -3,6 +3,7 @@
 if ($_GET['cid']==="embedq") {
 	$sessiondata = array();
 	require("../config.php");
+	require("../i18n/i18n.php");
 	$cid = "embedq";
 	$sessiondata['secsalt'] = "12345";
 } else {
