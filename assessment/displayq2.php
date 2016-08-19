@@ -2929,8 +2929,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (is_array($options['partialcredit'][$qn]) || ($multi>0 && is_array($options['partialcredit']))) {$partialcredit = $options['partialcredit'][$qn];} else {$partialcredit = $options['partialcredit'];}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$ansformats = array_map('trim',explode(',',$answerformat));
+		if ($multi>0) { $qn = $multi*1000+$qn;}
 
 		$givenans = normalizemathunicode($givenans);
+
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
 		}
@@ -2969,8 +2971,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$exactsigfig = false;
 			}
 		}
-
-		if ($multi>0) { $qn = $multi*1000+$qn;}
 
 		if ($answer==='') {
 			if (trim($givenans)==='') { return 1;} else { return 0;}
