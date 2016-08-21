@@ -36,7 +36,7 @@ function handleClickTextSegmentButton(e) {
 	}
 
 	//toggle expand/collapse based on title of button
-	if ($("#"+e.currentTarget.id).attr("title") === "Collapse") {
+	if ($("#"+e.currentTarget.id).attr("title").match("Collapse")) {
 		collapseAndStyleTextSegment(selector);
 	} else {
 		expandAndStyleTextSegment(selector) ;
@@ -87,7 +87,9 @@ function editorSetup(editor) {
 	editor.on("focus", function() {
 		var i=this.id.match(/[0-9]+$/)[0];
 		var type = getTypeForSelector("#"+this.id);
-		if ($("#edit-button"+type+i).attr("title") === "Expand and Edit") {
+		var max_height = $("#"+this.id).css("max-height");
+		//if the editor is collapsed, expand it
+		if ( max_height !== undefined && max_height !== "none") {
 			expandAndStyleTextSegment("#textseg"+type+i) ;
 		}
 	});
@@ -133,7 +135,7 @@ function updateSaveButtonDimming(dim) {
 			var editor_id=tinymce.activeEditor.id;
 			$("#"+editor_id).css("transition","border 0s")
 								.removeClass("intro")
-								.addClass("highlightborder");
+								.parent().addClass("highlightborder");
 		}
 		var i = getIndexForSelector("#"+tinymce.activeEditor.id);
 		var type = getTypeForSelector("#"+tinymce.activeEditor.id);
@@ -155,7 +157,7 @@ function expandAndStyleTextSegment(selector) {
 	//change the exit/collapse button for the corresponding editor
 	if (i === undefined || type === "global") {
 		//expand all
-		$("#edit-buttonglobal").attr("title","Collapse");
+		$("#edit-buttonglobal").attr("title","Collapse All");
 		$("#edit-button-spanglobal").removeClass("icon-pencil")
 									.addClass("icon-shrink2");
 	} else {
@@ -184,7 +186,7 @@ function collapseAndStyleTextSegment(selector) {
 	//toggle the button
 	if (i === undefined || type === "global") {
 		//collapse all
-		$("#edit-buttonglobal").attr("title","Expand");
+		$("#edit-buttonglobal").attr("title","Expand All");
 		$("#edit-button-spanglobal").removeClass("icon-shrink2")
 									.addClass("icon-enlarge2");
 	} else {
@@ -725,7 +727,6 @@ function generateTable() {
 	html += "<th>Order</th>";
 	//return "<span onclick=\"toggleCollapseTextSegments();//refreshTable();\" style=\"color: grey; font-weight: normal;\" >[<span id=\"collapseexpandsymbol\">"+this.getCollapseExpandSymbol()+"</span>]</span>";
 	html += "<th>Description";
-	html += " <span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand\" class=\"text-segment-button\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
 	html += "</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
 	if (beentaken) {
 		html += "<th>Clear Attempts</th><th>Withdraw</th>";
@@ -733,6 +734,7 @@ function generateTable() {
 		html += "<th>Template</th><th>Remove</th>";
 	}
 	html += "</thead><tbody>";
+	var text_segment_count = 0;
 	for (var i=0; i<itemcount; i++) {
 		curistext = 0;
 		curisgroup = 0;
@@ -820,11 +822,13 @@ function generateTable() {
 				html += "</td>";
 			}
 			if (curistext==1) {
+				text_segment_count++;
 				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
 				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
 				if (displaymethod=="Embed") {
 					html += "<td colspan=8 id=\"textsegdescr"+i+"\" class=\"description-cell\">";
 					if (curitems[j][3]==1) {
+						text_segment_count++;
 						var header_contents= curitems[j][4];
 						html += "<div style=\"position: relative\"><h4 id=\"textsegheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
 						html += "<div class=\"text-segment-icon\"><button id=\"edit-buttonheader"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-spanheader"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div>";
@@ -911,7 +915,12 @@ function generateTable() {
 		alt = 1-alt;
 	}
 	if (!beentaken) {
-		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" ><img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/></td><td></td><td></td></tr>';
+		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" >';
+		if (text_segment_count > 1) {
+			html += " <span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
+		}
+		html += '<img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/>';
+		html += '</td><td></td><td></td></tr>';
 	}
 	html += "</tbody></table>";
 	document.getElementById("pttotal").innerHTML = pttotal;

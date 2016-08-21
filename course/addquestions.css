@@ -3,7 +3,7 @@
 	background-color: #F01235 !important;
 }
 .highlightborder{
-	border: 1px solid #F01235;
+	border: 1px solid #F01235 !important;
 }
 .mce-dim{
 	opacity: 0.3;
@@ -12,6 +12,7 @@
 	height: auto;
 	padding-left: 3px;
 	padding-bottom: 14px;
+	margin: 0; /* h4 typically has a large margin which isn't needed */
 }
 .description-cell {
 	max-width: 0; /* just need any max-width for text-overflow */
