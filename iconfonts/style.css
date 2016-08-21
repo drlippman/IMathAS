@@ -1,0 +1,92 @@
+@font-face {
+  font-family: 'addquestions';
+  src:  url('fonts/addquestions.eot?7gn2w3');
+  src:  url('fonts/addquestions.eot?7gn2w3#iefix') format('embedded-opentype'),
+    url('fonts/addquestions.ttf?7gn2w3') format('truetype'),
+    url('fonts/addquestions.woff?7gn2w3') format('woff'),
+    url('fonts/addquestions.svg?7gn2w3#addquestions') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"], .mce-i-addquestions-ico {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'addquestions' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mce-i-addquestions-ico {
+	display:inline-block;
+	background:transparent center center;
+	width:16px;
+	height:16px;
+	color:#333;
+}
+
+.icon-pencil:before, .mce-i-pencil:before {
+  content: "\e905";
+}
+.icon-copy:before, .mce-i-copy:before {
+  content: "\e92c";
+}
+.icon-drawer:before, .mce-i-drawer:before {
+  content: "\e95c";
+}
+.icon-enlarge:before, .mce-i-enlarge:before {
+  content: "\e989";
+}
+.icon-shrink:before, .mce-i-shrink:before {
+  content: "\e98a";
+}
+.icon-enlarge2:before, .mce-i-enlarge2:before {
+  content: "\e98b";
+}
+.icon-shrink2:before, .mce-i-shrink2:before {
+  content: "\e98c";
+}
+.icon-equalizer:before, .mce-i-equalizer:before {
+  content: "\e992";
+}
+.icon-equalizer2:before, .mce-i-equalizer2:before {
+  content: "\e993";
+}
+.icon-cogs:before, .mce-i-cogs:before {
+  content: "\e995";
+}
+.icon-bin:before, .mce-i-bin:before {
+  content: "\e9ac";
+}
+.icon-tree:before, .mce-i-tree:before {
+  content: "\e9bc";
+}
+.icon-plus:before, .mce-i-plus:before {
+  content: "\ea0a";
+}
+.icon-minus:before, .mce-i-minus:before {
+  content: "\ea0b";
+}
+.icon-cancel-circle:before, .mce-i-cancel-circle:before {
+  content: "\ea0d";
+}
+.icon-cross:before, .mce-i-cross:before {
+  content: "\ea0f";
+}
+.icon-insert-template:before, .mce-i-template:before {
+  content: "\ea72";
+}
+.icon-embed:before, .mce-i-embed:before {
+  content: "\ea7f";
+}
+.icon-libreoffice:before, .mce-i-libreoffice:before {
+  content: "\eae3";
+}
+
