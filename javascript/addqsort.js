@@ -444,18 +444,20 @@ function moveitem2(from) {
 			}
 		}
 		submitChanges();
-		return false;
 	}
+		return false;
 }
 
 function ungroupitem(from) {
-	locparts = from.split("-");
-	var tomove = itemarray[locparts[0]][2].splice(locparts[1],1);
-	if (itemarray[locparts[0]][2].length==1) {
-		itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
+	if (confirm_textseg_dirty()) {
+		locparts = from.split("-");
+		var tomove = itemarray[locparts[0]][2].splice(locparts[1],1);
+		if (itemarray[locparts[0]][2].length==1) {
+			itemarray[locparts[0]] = itemarray[locparts[0]][2][0];
+		}
+		itemarray.splice(++locparts[0],0,tomove[0]);
+		submitChanges();
 	}
-	itemarray.splice(++locparts[0],0,tomove[0]);
-	submitChanges();
 	return false;
 }
 function removeitem(loc) {
@@ -915,9 +917,9 @@ function generateTable() {
 		alt = 1-alt;
 	}
 	if (!beentaken) {
-		html += '<tr><td></td><td></td><td colspan=8><input type=button value="+ Text" onclick="addtextsegment()" title="Insert Text Segment" >';
+		html += '<tr><td></td><td></td><td colspan=8><button type=\"button\" onclick="addtextsegment()" title="Insert Instructions or Video for Question" class="text-segment-button" id="add-text-button"><span class="icon-plus" style="font-size:0.8em"></span> Text</button>';
 		if (text_segment_count > 1) {
-			html += " <span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
+			html += " <span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button text-segment-button-global\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
 		}
 		html += '<img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/>';
 		html += '</td><td></td><td></td></tr>';

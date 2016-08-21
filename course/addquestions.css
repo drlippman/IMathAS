@@ -51,6 +51,14 @@ div.text-segment-icon {
 	text-align: right;
 	background: transparent;
 }
+#add-text-button, button.text-segment-button-global, button.text-segment-button-global:hover, button.text-segment-button-global:active, button.text-segment-button-global:focus  {
+	background-color: #586EEA; /* or #6E9ADC; #7798f9;*/
+	border-color: #586EEA;
+	font-family: sans-serif;
+	font-color: #fff;
+	font-weight: bold;
+	color: #fff;
+}
 .text-segment-button {
 	cursor: pointer;
 	padding: 1px;
@@ -58,7 +66,7 @@ div.text-segment-icon {
 	background-color: rgba(255,255,255,0.8);
 	box-shadow: 3px 3px 6px 0 rgba(0,0,0,0.2);
 }
-.text-segment-button:hover {
+.text-segment-button:hover, .text-segment-button:focus {
 	background-color: white;
 	transition-duration: 0.4s;
 	box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.24);
