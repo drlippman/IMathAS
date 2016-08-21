@@ -215,7 +215,7 @@ function expandTextSegment(selector) {
 	$(selector).css("height",max_height);
 	$(selector).css("width",max_width);
 	//smoothly set the height to the natural height
-	$(selector).animate({height: natural_height, width: natural_width},500, function() {
+	$(selector).animate({height: natural_height, width: natural_width},200, function() {
 
 		var type = getTypeForSelector(selector);
 
@@ -242,7 +242,7 @@ function collapseTextSegment(selector) {
 	var type = getTypeForSelector(selector);
 	var collapsed_height = "1.7em"; //must match .collapsed style
 	//smoothly set the height to the collapsed height
-	$(selector).animate({height: collapsed_height},500, function() {
+	$(selector).animate({height: collapsed_height},200, function() {
 
 		//when animation completes, set max-height
 		$(selector).css("max-height",collapsed_height);
