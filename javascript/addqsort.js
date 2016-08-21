@@ -108,7 +108,6 @@ function highlightSaveButton(leaving) {
 	if (anyEditorIsDirty()) {
 		var i=tinymce.activeEditor.id.match(/[0-9]+$/)[0];
 		if (leaving) {
-			//TODO what aboue h4?
 			$("div.mce-saveclose"+i).css("transition","background-color 0s")
 								.addClass("highlightbackground");
 		} else {
@@ -397,7 +396,7 @@ function generateShowforSelect(num) {
 	if (n==0) {
 		return '';
 	} else {
-		out = 'Show for <select id="showforn'+num+'" onchange="updateTextShowN('+num+')">';
+		out = 'Show for <select id="showforn'+num+'" onchange="updateTextShowN('+num+','+itemarray[num][2]+')">';
 		for (j=1;j<=n;j++) {
 			out += '<option value="'+j+'"';
 			if (itemarray[num][2]==j) {
@@ -411,35 +410,40 @@ function generateShowforSelect(num) {
 }
 
 function moveitem2(from) {
-	var todo = 0;//document.getElementById("group").value;
-	var to = document.getElementById(from).value;
-	var tomove = itemarray.splice(from-1,1);
-	if (todo==0) { //rearrange
-		itemarray.splice(to-1,0,tomove[0]);
-	} else if (todo==1) { //group
-		if (from<to) {
-			to--;
-		}
-		if (itemarray[to-1].length<5) { //to is already group
-			if (tomove[0].length<5) { //if grouping a group
-				for (var j=0; j<tomove[0][2].length; j++) {
-					itemarray[to-1][2].push(tomove[0][2][j]);
+	if (!confirm_textseg_dirty()) {
+		//if aborted restore the original value and don't save
+		document.getElementById(from).value=from;
+	} else {
+		var todo = 0;//document.getElementById("group").value;
+		var to = document.getElementById(from).value;
+		var tomove = itemarray.splice(from-1,1);
+		if (todo==0) { //rearrange
+			itemarray.splice(to-1,0,tomove[0]);
+		} else if (todo==1) { //group
+			if (from<to) {
+				to--;
+			}
+			if (itemarray[to-1].length<5) { //to is already group
+				if (tomove[0].length<5) { //if grouping a group
+					for (var j=0; j<tomove[0][2].length; j++) {
+						itemarray[to-1][2].push(tomove[0][2][j]);
+					}
+				} else {
+					itemarray[to-1][2].push(tomove[0]);
 				}
-			} else {
-				itemarray[to-1][2].push(tomove[0]);
-			}
-		} else { //to is not group
-			var existing = itemarray[to-1];
-			if (tomove[0].length<5) { //if grouping a group
-				tomove[0][2].push(existing);
-				itemarray[to-1] = tomove[0];
-			} else {
-				itemarray[to-1] = [1,0,[existing,tomove[0]],1];
+			} else { //to is not group
+				var existing = itemarray[to-1];
+				if (tomove[0].length<5) { //if grouping a group
+					tomove[0][2].push(existing);
+					itemarray[to-1] = tomove[0];
+				} else {
+					itemarray[to-1] = [1,0,[existing,tomove[0]],1];
+				}
 			}
 		}
+		submitChanges();
+		return false;
 	}
-	submitChanges();
-	return false;
 }
 
 function ungroupitem(from) {
@@ -454,16 +458,20 @@ function ungroupitem(from) {
 }
 function removeitem(loc) {
 	if (confirm("Are you sure you want to remove this question?")) {
-		doremoveitem(loc);
-		submitChanges();
+		if (confirm_textseg_dirty()) {
+			doremoveitem(loc);
+			submitChanges();
+		}
 	}
 	return false;
 }
 
 function removegrp(loc) {
 	if (confirm("Are you sure you want to remove ALL questions in this group?")) {
-		doremoveitem(loc);
-		submitChanges();
+		if (confirm_textseg_dirty()) {
+			doremoveitem(loc);
+			submitChanges();
+		}
 	}
 	return false;
 }
@@ -480,29 +488,35 @@ function doremoveitem(loc) {
 			itemarray.splice(locparts[0],1);
 		}
 	} else {
+console.log("splice("+loc+",1)");
 		itemarray.splice(loc,1);
 	}
 }
 
 function removeSelected() {
 	if (confirm("Are you sure you want to remove these questions?")) {
-		var form = document.getElementById("curqform");
-		var chgcnt = 0;
-		for (var e = form.elements.length-1; e >-1 ; e--) {
-			var el = form.elements[e];
-			if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
-				val = el.value.split(":");
-				doremoveitem(val[0]); 
-				chgcnt++;
+		if (confirm_textseg_dirty()) {
+			var form = document.getElementById("curqform");
+			var chgcnt = 0;
+			for (var e = form.elements.length-1; e >-1 ; e--) {
+				var el = form.elements[e];
+				if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
+					val = el.value.split(":");
+					doremoveitem(val[0]);
+					chgcnt++;
+				}
 			}
-		}
-		if (chgcnt>0) {
-			submitChanges();
+			if (chgcnt>0) {
+				submitChanges();
+			}
 		}
 	}
 }
 
 function groupSelected() {
+	if (!confirm_textseg_dirty()) {
+		return; //user wants to abort this call
+	}
 	var grplist = new Array;
 	var form = document.getElementById("curqform");
 	for (var e = form.elements.length-1; e >-1 ; e--) {
@@ -549,19 +563,27 @@ function groupSelected() {
 	submitChanges();
 }
 
-function updateGrpN(num) {
-	var nval = Math.floor(document.getElementById("grpn"+num).value*1);
-	if (nval<1 || isNaN(nval)) { nval = 1;} 
-	document.getElementById("grpn"+num).value = nval;
-	if (nval != itemarray[num][0]) {
-		itemarray[num][0] = nval;	
-		submitChanges();
+function updateGrpN(num,old_num) {
+	if (!confirm_textseg_dirty()) {
+		//if aborted, restore old value
+		$("#grpn"+num).val(old_num);
+	} else {
+		var nval = Math.floor(document.getElementById("grpn"+num).value*1);
+		if (nval<1 || isNaN(nval)) { nval = 1;}
+		document.getElementById("grpn"+num).value = nval;
+		if (nval != itemarray[num][0]) {
+			itemarray[num][0] = nval;
+			submitChanges();
+		}
 	}
 }
 
-function updateGrpT(num) {
+function updateGrpT(num,old_type) {
 	
-	if (document.getElementById("grptype"+num).value != itemarray[num][1]) {
+	if (!confirm_textseg_dirty()) {
+		//if aborted, restore old value
+		$("#grptype"+num).val(old_type);
+	} else if (document.getElementById("grptype"+num).value != itemarray[num][1]) {
 		itemarray[num][1] = document.getElementById("grptype"+num).value;	
 		submitChanges();
 	}
@@ -598,26 +620,36 @@ function savetextseg(i) {
 		submitChanges();
 	}
 }
-function updateTextShowN(i) {
-	itemarray[i][2] = $("#showforn"+i).val();
-	submitChanges();
+function updateTextShowN(i,old_i) {
+	if (!confirm_textseg_dirty()) {
+		//if aborted, restore old value
+		$("#showforn"+i).val(old_i);
+	} else {
+		itemarray[i][2] = $("#showforn"+i).val();
+		submitChanges();
+	}
 }
 
 function chgpagetitle(i) {
-	if ($("#ispagetitle"+i).is(":checked")) {
-		itemarray[i][3] = 1;
-		if (itemarray[i][4]=="") {
-			var words = strip_tags(itemarray[i][1]).split(" ");
-			if (words.length > 2) {
-				itemarray[i][4] = words.slice(0,3).join(" ");
-			} else {
-				itemarray[i][4] = "Page title (click to edit)";
-			}
-		}
+	if (!confirm_textseg_dirty()) {
+		//if aborted, toggle back to previous state
+		$("#ispagetitle"+i).prop("checked",!$("#ispagetitle"+i).prop("checked"));
 	} else {
-		itemarray[i][3] = 0;
+		if ($("#ispagetitle"+i).is(":checked")) {
+			itemarray[i][3] = 1;
+			if (itemarray[i][4]=="") {
+				var words = strip_tags(itemarray[i][1]).split(" ");
+				if (words.length > 2) {
+					itemarray[i][4] = words.slice(0,3).join(" ");
+				} else {
+					itemarray[i][4] = "Page title (click to edit)";
+				}
+			}
+		} else {
+			itemarray[i][3] = 0;
+		}
+		submitChanges();
 	}
-	submitChanges();
 }
 function strip_tags(txt) {
 	return $("<div/>").html(txt).text();
@@ -759,8 +791,8 @@ function generateTable() {
 					html += ms;
 					if (curisgroup) {
 						html += "</td><td colspan='"+(beentaken?8:9)+"'><b>Group</b> ";
-						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+")'/> from group of "+curitems.length;
-						html += " <select id='grptype"+i+"' onchange='updateGrpT("+i+")'><option value=0 ";
+						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+","+itemarray[i][0]+")'/> from group of "+curitems.length;
+						html += " <select id='grptype"+i+"' onchange='updateGrpT("+i+","+itemarray[i][1]+")'><option value=0 ";
 						if (itemarray[i][1]==0) { 
 							html += "selected=1";
 						}
@@ -890,8 +922,10 @@ function generateTable() {
 }
 
 function addtextsegment() {
-	itemarray.push(["text","",1,0,"",1]);
-	refreshTable();
+	if (confirm_textseg_dirty()) {
+		itemarray.push(["text","",1,0,"",1]);
+		refreshTable();
+	}
 }
 
 function check_textseg_itemarray() {
@@ -927,6 +961,15 @@ function check_textseg_itemarray() {
 			itemarray.unshift(["text","",1,1,"First Page Title",1]);
 		}
 	}
+}
+
+function confirm_textseg_dirty() {
+	if (anyEditorIsDirty()) {
+		var discard_other_changes = confirm("There are unsaved changes in a question intro text box.  Press OK to discard those changes and continue with the most recent action.  Press Cancel to return to the page without taking any action.");
+	} else {
+		var discard_other_changes = true;
+	}
+	return discard_other_changes;
 }
 
 function submitChanges() {

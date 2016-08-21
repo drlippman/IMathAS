@@ -1084,7 +1084,7 @@ if ($overwriteBody==1) {
 
 		With Selected: <input type=button value="Remove" onclick="removeSelected()" />
 				<input type=button value="Group" onclick="groupSelected()" />
-			  	<input type="submit" value="Change Settings" />
+				<input type="submit" value="Change Settings" onclick="return confirm_textseg_dirty()"/>
 
 <?php
 		}
