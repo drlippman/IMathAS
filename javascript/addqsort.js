@@ -823,7 +823,7 @@ function generateTable() {
 				//html += "<td colspan=7><input type=\"text\" id=\"textseg"+i+"\" onkeyup=\"updateTextseg("+i+")\" value=\""+curitems[j][1]+"\" size=40 /></td>"; //description
 				//html += '<td>Show for <input type="text" id="showforn'+i+'" size="1" value="'+curitems[j][2]+'"/></td>';
 				if (displaymethod=="Embed") {
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\" class=\"description-cell\">";
+					html += "<td colspan=8 id=\"textsegdescr"+i+"\" class=\"description-cell\">";
 					if (curitems[j][3]==1) {
 						var header_contents= curitems[j][4];
 						html += "<div style=\"position: relative\"><h4 id=\"textsegheader"+i+"\" class=\"textsegment collapsedheader\">"+header_contents+"</h4>";
@@ -838,13 +838,11 @@ function generateTable() {
 					html += '>New page<label></td>';
 				} else {
 					var contents = curitems[j][1];
-					html += "<td colspan=6 id=\"textsegdescr"+i+"\" class=\"description-cell\">"; //description
+					html += "<td colspan=8 id=\"textsegdescr"+i+"\" class=\"description-cell\">"; //description
 					html += "<div class=\"intro intro-like\"><div id=\"textseg"+i+"\" class=\"textsegment collapsed\">"+contents+"</div>";
 					html += "<div class=\"text-segment-icon\"><button id=\"edit-button"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-span"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div></div></td>";
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
-				html += '<td class=c><a href="#" onclick="edittextseg('+i+');return false;">Edit</a></td>';
-				html += '<td></td>';
 				if (beentaken) {
 					html += "<td></td>";
 				} else {
