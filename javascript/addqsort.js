@@ -488,7 +488,6 @@ function doremoveitem(loc) {
 			itemarray.splice(locparts[0],1);
 		}
 	} else {
-console.log("splice("+loc+",1)");
 		itemarray.splice(loc,1);
 	}
 }
@@ -500,7 +499,7 @@ function removeSelected() {
 			var chgcnt = 0;
 			for (var e = form.elements.length-1; e >-1 ; e--) {
 				var el = form.elements[e];
-				if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
+				if (el.type == 'checkbox' && el.checked && el.value!='ignore' && el.id.match("qc")) {
 					val = el.value.split(":");
 					doremoveitem(val[0]);
 					chgcnt++;
