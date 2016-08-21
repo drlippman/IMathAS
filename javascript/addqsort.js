@@ -56,7 +56,7 @@ function refreshTable() {
 //Show the editor toolbar on a newly created text segment
 function activateLastEditorIfBlank() {
 	last_editor = tinymce.editors[tinymce.editors.length-1];
-	if (last_editor.getContent()=="") {
+	if (last_editor !== undefined && last_editor.getContent()=="") {
 		tinyMCE.setActive(last_editor);
 		last_editor.fire("focus");
 		last_editor.selection.setCursorLocation();
