@@ -522,7 +522,7 @@ function groupSelected() {
 	var form = document.getElementById("curqform");
 	for (var e = form.elements.length-1; e >-1 ; e--) {
 		var el = form.elements[e];
-		if (el.type == 'checkbox' && el.checked && el.value!='ignore' && !el.value.match(":text")) {
+		if (el.type == 'checkbox' && el.checked && el.value!='ignore' && !el.value.match(":text") && el.id.match("qc")) {
 			val = el.value.split(":")[0];
 			if (val.indexOf("-")>-1) { //is group
 				val = val.split("-")[0];
