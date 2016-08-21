@@ -1,6 +1,6 @@
 /*Styles for addquestions.php but initially for addqsort.js */
 .highlightbackground{
-	background-color: #F01235;
+	background-color: #F01235 !important;
 }
 .highlightborder{
 	border: 1px solid #F01235;
