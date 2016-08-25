@@ -21,7 +21,40 @@ $(document).ready(function() {
 	$(document).on("click",".text-segment-button",function(e) {
 		handleClickTextSegmentButton(e);
 	});
+	$(window).on("scroll",function() {
+		$(".text-segment-button").each(function(index,element) {
+			if ($("#"+element.id).attr("title").match("Collapse")) {
+				followButtonLocation("#"+element.id);
+			}
+		});
+	});
 });
+
+//find position for collapse button in the middle of the visible editor
+// selector is the selector for the button
+function followButtonLocation(selector) {
+	var button_div = $(selector).parent();
+	var $window = $(window);
+	var container = button_div.parent();
+	var container_height = container.height();
+	//If the editor uses a significan portion o fthe page, have
+	// the collapse button stay in view
+	if (container_height >= 0.3 * $window.height() ) {
+		var offset = button_div.position();
+		var sidebar_height = button_div.height();
+		var foffset = container.offset();
+		var	padding = 5;
+		// find the middle of the visible portion of the editor
+		var top_limit = Math.max($window.scrollTop(),foffset.top);
+		var bottom_limit = Math.min($window.scrollTop() + $window.height(),
+							foffset.top + container_height) - sidebar_height;
+		button_div.css("bottom","auto");
+		button_div.stop().animate({
+			top: Math.min((bottom_limit + top_limit)/2 - foffset.top,
+							container_height-sidebar_height - padding),
+		});
+	}
+}
 
 //When the Edit/collapse button is clicked, call the appropriate function
 // with the appropriate selector.
@@ -161,13 +194,13 @@ function expandAndStyleTextSegment(selector) {
 		$("#edit-button-spanglobal").removeClass("icon-pencil")
 									.addClass("icon-shrink2");
 	} else {
-	var editor = getEditorForSelector(selector);
-	if (editor !== undefined && editor.isDirty()) {
-		$("#edit-button"+type+i).fadeOut();
-	}
-	$("#edit-button"+type+i).attr("title","Collapse");
-	$("#edit-button-span"+type+i).removeClass("icon-pencil")
-								.addClass("icon-shrink2");
+		var editor = getEditorForSelector(selector);
+		if (editor !== undefined && editor.isDirty()) {
+			$("#edit-button"+type+i).fadeOut();
+		}
+		$("#edit-button"+type+i).attr("title","Collapse");
+		$("#edit-button-span"+type+i).removeClass("icon-pencil")
+									.addClass("icon-shrink2");
 	}
 }
 
@@ -191,6 +224,7 @@ function collapseAndStyleTextSegment(selector) {
 									.addClass("icon-enlarge2");
 	} else {
 		$("#edit-button"+type+i).attr("title","Expand and Edit");
+		$("#edit-button"+type+i).parent().css({top: "",bottom: ""});
 		$("#edit-button-span"+type+i).removeClass("icon-shrink2")
 										.addClass("icon-pencil");
 	}
@@ -219,6 +253,7 @@ function expandTextSegment(selector) {
 	//smoothly set the height to the natural height
 	$(selector).animate({height: natural_height, width: natural_width},200, function() {
 
+		var i = getIndexForSelector(selector);
 		var type = getTypeForSelector(selector);
 
 		//when animation completes...
@@ -230,6 +265,9 @@ function expandTextSegment(selector) {
 
 		$(selector).removeClass("collapsed"+type);
 		$(selector).css("white-space","");
+
+		//ensure the collapse button is visible
+		followButtonLocation("#edit-button"+type+i);
 
 		//If a single editor was expanded, activate the editor
 		var i = getIndexForSelector(selector);
