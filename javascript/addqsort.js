@@ -279,8 +279,16 @@ function expandTextSegment(selector) {
 }
 
 function collapseTextSegment(selector) {
+	var i = getIndexForSelector(selector);
 	var type = getTypeForSelector(selector);
 	var collapsed_height = "1.7em"; //must match .collapsed style
+	if (i === undefined || type === "global") {
+		var button = $("#edit-buttonglobal");
+	} else {
+		var button = $("#edit-button"+type+i);
+	}
+	var initialdistfromtop = button.offset().top - $(window).scrollTop();
+
 	//smoothly set the height to the collapsed height
 	$(selector).animate({height: collapsed_height},200, function() {
 
@@ -288,6 +296,7 @@ function collapseTextSegment(selector) {
 		$(selector).css("max-height",collapsed_height);
 		$(selector).css("height","");
 		$(selector).addClass("collapsed"+type);
+		$(window).scrollTop(button.offset().top - initialdistfromtop);
 	});
 }
 
