@@ -6556,10 +6556,10 @@ function scorenosolninf($qn, $givenans, $answer, $ansprompt) {
 			$infsoln = $anspromptp[2];
 		}
 	}
-	if (preg_match('/^inf/',$answer) || $answer==$infsoln) {
+	if (preg_match('/^inf/',$answer) || $answer===$infsoln) {
 		$answer = 'oo';
 	}
-	if (preg_match('/^no\s*solution/',$answer) || $answer==$nosoln) {
+	if (preg_match('/^no\s*solution/',$answer) || $answer===$nosoln) {
 		$answer = 'DNE';
 	}
 	$qs = $_POST["qs$qn"];
