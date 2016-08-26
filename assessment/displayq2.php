@@ -977,7 +977,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
-			if ($useeqnhelper && $useeqnhelper>2 && !(isset($scoremethod) && $scoremethod=='acct')) {
+			if ($useeqnhelper && $useeqnhelper>2 && !(isset($scoremethod) && $scoremethod=='acct') && !in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
 				$out .= "onfocus=\"showeebasicdd('qn$qn',0);showehdd('qn$qn','$shorttip','$qnref');\" onblur=\"hideebasice();hideebasicedd();hideeh();\" onclick=\"reshrinkeh('qn$qn')\" ";
 			} else {
 				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
