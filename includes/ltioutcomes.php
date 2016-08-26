@@ -127,9 +127,11 @@ function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consu
 		$headers = explode("\r\n",$header);
 		foreach ($headers as $hdr) {
 			if (strlen($hdr)<2) {continue;}
-			$cmd .= " -H '".str_replace("'","\\'",$hdr)."'";
+			//$cmd .= " -H '".str_replace("'","\\'",$hdr)."'";
+			$cmd .= " -H " . escapeshellarg($hdr);
 		}
-		$cmd .= " -d '" . str_replace("'","\\'",$body) . "' " . "'" . str_replace("'","\\'",$endpoint) . "'";
+		//$cmd .= " -d '" . str_replace("'","\\'",$body) . "' " . "'" . str_replace("'","\\'",$endpoint) . "'";
+		$cmd .= " -d " . escapeshellarg($body) . ' ' . escapeshellarg($endpoint);
 		$cmd .= " > /dev/null 2>&1 &";
 		@exec($cmd, $output, $exit);
 		return ($exit == 0);
