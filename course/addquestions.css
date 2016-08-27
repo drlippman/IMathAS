@@ -51,6 +51,14 @@ div.text-segment-icon {
 	text-align: right;
 	background: transparent;
 }
+div.text-segment-iconglobal {
+	margin: 5px;
+	/* remove some styles used in the general class */
+	display: inline;
+	position: static;
+	bottom: auto;
+	right: auto;
+}
 #add-text-button, button.text-segment-button-global, button.text-segment-button-global:hover, button.text-segment-button-global:active, button.text-segment-button-global:focus  {
 	background-color: #586EEA; /* or #6E9ADC; #7798f9;*/
 	border-color: #586EEA;

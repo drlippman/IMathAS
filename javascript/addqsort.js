@@ -23,9 +23,7 @@ $(document).ready(function() {
 	});
 	$(window).on("scroll",function() {
 		$(".text-segment-button").each(function(index,element) {
-			if ($("#"+element.id).attr("title").match("Collapse")) {
-				followButtonLocation("#"+element.id);
-			}
+			followButtonLocation("#"+element.id);
 		});
 	});
 });
@@ -33,13 +31,30 @@ $(document).ready(function() {
 //find position for collapse button in the middle of the visible editor
 // selector is the selector for the button
 function followButtonLocation(selector) {
+	var i = getIndexForSelector(selector);
+	var type = getTypeForSelector(selector);
+	//text segment which corresponds to this button
+	var text_segment_id = "#textseg"+type+i;
+
+	if ($(text_segment_id).hasClass("collapsingsemaphore")) {
+		//don't start any animations that could complete after the
+		// current collapsing animation completes (race condition)
+		return;
+	}
+
+	//if the editor is collapsed or is a global button, don't do anything
+	if ( i === undefined || type === "global"
+			||  $(text_segment_id).hasClass("collapsed")
+			|| $(text_segment_id).hasClass("collapsedheader") ) {
+		return;
+	}
 	var button_div = $(selector).parent();
 	var $window = $(window);
 	var container = button_div.parent();
 	var container_height = container.height();
-	//If the editor uses a significan portion o fthe page, have
+	//If the editor uses a significant portion of the page, have
 	// the collapse button stay in view
-	if (container_height >= 0.3 * $window.height() ) {
+	//if (container_height >= 0.3 * $window.height() ) {
 		var offset = button_div.position();
 		var sidebar_height = button_div.height();
 		var foffset = container.offset();
@@ -48,12 +63,16 @@ function followButtonLocation(selector) {
 		var top_limit = Math.max($window.scrollTop(),foffset.top);
 		var bottom_limit = Math.min($window.scrollTop() + $window.height(),
 							foffset.top + container_height) - sidebar_height;
+		//position the button_div by its top rather than bottom
+		var initial_top = button_div.css("top");
+		button_div.css("top",initial_top);
 		button_div.css("bottom","auto");
 		button_div.stop().animate({
-			top: Math.min((bottom_limit + top_limit)/2 - foffset.top,
-							container_height-sidebar_height - padding),
+			top: Math.max(padding,
+					Math.min((bottom_limit + top_limit)/2 - foffset.top,
+							container_height-sidebar_height - padding) )
 		});
-	}
+	//}
 }
 
 //When the Edit/collapse button is clicked, call the appropriate function
@@ -219,8 +238,17 @@ function collapseAndStyleTextSegment(selector) {
 	//toggle the button
 	if (i === undefined || type === "global") {
 		//collapse all
+		$(".text-segment-button").attr("title","Expand and Edit");
 		$("#edit-buttonglobal").attr("title","Expand All");
+		//this is sudden but better than letting the button
+		// float out of the editor (poss: use jQueryUI .removeClass(...,200) )
+		$(".text-segment-button").parent().css({top: "",bottom: ""});
+
+		$("span.text-segment-icon").removeClass("icon-shrink2")
+									.removeClass("icon-enlarge2")
+									.addClass("icon-pencil");
 		$("#edit-button-spanglobal").removeClass("icon-shrink2")
+									.removeClass("icon-pencil")
 									.addClass("icon-enlarge2");
 	} else {
 		$("#edit-button"+type+i).attr("title","Expand and Edit");
@@ -250,9 +278,14 @@ function expandTextSegment(selector) {
 	var natural_width = parseInt($(selector).css("width"));
 	$(selector).css("height",max_height);
 	$(selector).css("width",max_width);
+
+	//TODO while expanding, also gradually move collapse button to
+	// middle height and avoid race condition
+
 	//smoothly set the height to the natural height
 	$(selector).animate({height: natural_height, width: natural_width},200, function() {
 
+		// when complete...
 		var i = getIndexForSelector(selector);
 		var type = getTypeForSelector(selector);
 
@@ -270,6 +303,7 @@ function expandTextSegment(selector) {
 		followButtonLocation("#edit-button"+type+i);
 
 		//If a single editor was expanded, activate the editor
+		//TODO remember whether this was a global expand
 		var i = getIndexForSelector(selector);
 		var type = getTypeForSelector(selector);
 		if (i !== undefined && type !== "global") {
@@ -288,6 +322,7 @@ function collapseTextSegment(selector) {
 		var button = $("#edit-button"+type+i);
 	}
 	var initialdistfromtop = button.offset().top - $(window).scrollTop();
+	$(selector).addClass("collapsingsemaphore");
 
 	//smoothly set the height to the collapsed height
 	$(selector).animate({height: collapsed_height},200, function() {
@@ -295,8 +330,17 @@ function collapseTextSegment(selector) {
 		//when animation completes, set max-height
 		$(selector).css("max-height",collapsed_height);
 		$(selector).css("height","");
-		$(selector).addClass("collapsed"+type);
+		$(selector).removeClass("collapsingsemaphore")
+					.addClass("collapsed"+type);
+		//could this be gradual?
 		$(window).scrollTop(button.offset().top - initialdistfromtop);
+
+		if (i === undefined || type === "global") {
+			$(".text-segment-button").parent().css({"top": "","bottom": ""});
+			$(".text-segment-button").each(function(index,element) {
+				followButtonLocation("#"+element.id);
+			});
+		}
 	});
 }
 
@@ -964,9 +1008,9 @@ function generateTable() {
 		alt = 1-alt;
 	}
 	if (!beentaken) {
-		html += '<tr><td></td><td></td><td colspan=8><button type=\"button\" onclick="addtextsegment()" title="Insert Instructions or Video for Question" class="text-segment-button" id="add-text-button"><span class="icon-plus" style="font-size:0.8em"></span> Text</button>';
+		html += '<tr><td></td><td></td><td colspan=8><button type=\"button\" onclick="addtextsegment()" title="Insert Instructions or Video for Question" id="add-text-button"><span class="icon-plus" style="font-size:0.8em"></span> Text</button>';
 		if (text_segment_count > 1) {
-			html += " <span class=\"text-segment-icon\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button text-segment-button-global\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></span>";
+			html += " <div class=\"text-segment-icon text-segment-iconglobal\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button text-segment-button-global\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2 text-segment-icon\"></span></button></div>";
 		}
 		html += '<img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/>';
 		html += '</td><td></td><td></td></tr>';
