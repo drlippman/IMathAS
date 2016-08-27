@@ -1,3 +1,4 @@
+<?php if (!isset($imasroot)) {exit;} ?>
 <!DOCTYPE html>
 <html>
 <head>
