@@ -2,6 +2,13 @@
 require("../validate.php");
 if ($myrights<100) { exit; }
 error_reporting(E_ALL);
+function minify($c) {
+	//$min = httpPost('https://javascript-minifier.com/raw', array('input'=>$c));
+	//alt:
+	$min = httpPost('http://closure-compiler.appspot.com/compile', array('js_code'=>$c, 'compilation_level'=>'SIMPLE_OPTIMIZATIONS', 'output_info'=>'compiled_code', 'output_format'=>'text'));
+
+	return $min;
+}
 function httpPost($url, $data)
 {
     /*$curl = curl_init($url);
@@ -31,17 +38,13 @@ $c .= file_get_contents("../javascript/confirmsubmit.js")."\n";
 $c .= file_get_contents("../javascript/drawing.js")."\n";
 $c .= file_get_contents("../javascript/eqntips.js")."\n";
 
-//do post
-//POST https://javascript-minifier.com/raw?input=...
-$min = httpPost('https://javascript-minifier.com/raw', array('input'=>$c));
-file_put_contents("../javascript/assessment_min.js", $min);
+file_put_contents("../javascript/assessment_min.js", minify($c));
 echo "Wrote assessment_min<br>";
 
 $c = file_get_contents("../javascript/mathquill.js")."\n";
 $c .= file_get_contents("../javascript/mathquilled.js")."\n";
 $c .= file_get_contents("../javascript/AMtoMQ.js")."\n";
 
-$min = httpPost('https://javascript-minifier.com/raw', array('input'=>$c));
-file_put_contents("../javascript/MQbundle_min.js", $min);
+file_put_contents("../javascript/MQbundle_min.js", minify($c));
 echo "Wrote MQbundle_min<br>";
 ?>
