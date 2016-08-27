@@ -193,6 +193,7 @@ function updateSaveButtonDimming(dim) {
 		var i = getIndexForSelector("#"+tinymce.activeEditor.id);
 		var type = getTypeForSelector("#"+tinymce.activeEditor.id);
 		$("#edit-button"+type+i).fadeOut();
+		$("#edit-buttonglobal").fadeOut();
 	}
 	//TODO if tinyMCE's undo is correctly reflected in isDirty(), we could
 	// re-dim the Save All button after checking all editors
