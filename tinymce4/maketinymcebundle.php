@@ -13,6 +13,34 @@
 require("../validate.php");
 if ($myrights<100) {exit;}
 
+function minify($c) {
+	//$min = httpPost('https://javascript-minifier.com/raw', array('input'=>$c));
+	//alt:
+	$min = httpPost('http://closure-compiler.appspot.com/compile', array('js_code'=>$c, 'compilation_level'=>'SIMPLE_OPTIMIZATIONS', 'output_info'=>'compiled_code', 'output_format'=>'text'));
+
+	return $min;
+}
+function httpPost($url, $data)
+{
+    /*$curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($curl);
+    curl_close($curl);
+		*/
+		$options = array(
+	    'http' => array(
+	        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+	        'method'  => 'POST',
+	        'content' => http_build_query($data)
+	    )
+		);
+		$context  = stream_context_create($options);
+		$response = file_get_contents($url, false, $context);
+		return $response;
+}
+
 $tinyMCECompressor = new TinyMCE_Compressor(array());
 $tinyMCECompressor->bundle();
 
@@ -151,6 +179,12 @@ class TinyMCE_Compressor {
 		// Remove UTF-8 BOM
 		if (substr($content, 0, 3) === pack("CCC", 0xef, 0xbb, 0xbf)) {
 			$content = substr($content, 3);
+		}
+		if (substr_count($content,"\n")>5) {
+			$content = minify($content);
+			echo "Minifying $file<br/>";
+		} else {
+			echo "Adding $file<br/>";
 		}
 
 		return $content;
