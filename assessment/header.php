@@ -49,7 +49,8 @@ if (isset($CFG['locale'])) {
 		echo '<script type="text/javascript" src="'.$imasroot.'/i18n/locale/'.$lang.'/messages.js"></script>';
 	}
 }
-echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=062416\"></script>\n";
+//bundled in assessment_min.js
+//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/general.js?ver=062416\"></script>\n";
 if (isset($sessiondata['coursetheme'])) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$sessiondata['coursetheme']);
@@ -118,13 +119,20 @@ if (!isset($sessiondata['mathdisp'])) {
 } else if ($sessiondata['mathdisp']==0) {
 	echo '<script type="text/javascript">var noMathRender = true; var usingASCIIMath = false; var MathJaxCompatible = false; var mathRenderer = "none";function rendermathnode(el) {}</script>';
 }
-echo "<script src=\"$imasroot/javascript/mathjs.js?v=063016\" type=\"text/javascript\"></script>\n";
+//bundled in assessment_min.js
+//echo "<script src=\"$imasroot/javascript/mathjs.js?v=063016\" type=\"text/javascript\"></script>\n";
 if ($sessiondata['graphdisp']==1) {
 	echo "<script src=\"$imasroot/javascript/ASCIIsvg_min.js?v=071516\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIISvg = true;</script>";
 } else {
 	echo "<script type=\"text/javascript\">var usingASCIISvg = false;</script>";
 }
+//bundled in assessment_min.js
+/*
+<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=082616";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=012115";?>" type="text/javascript"></script>
+<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=080416"></script>
+*/
 ?>
 <!--[if lte IE 6]>
 <style type="text/css">
@@ -138,12 +146,12 @@ div { zoom: 1; }
 }
 </style>
 <![endif]-->
-<script src="<?php echo $imasroot . "/javascript/AMhelpers_min.js?v=082616";?>" type="text/javascript"></script>
-<script src="<?php echo $imasroot . "/javascript/confirmsubmit.js?v=012115";?>" type="text/javascript"></script>
+<script src="<?php echo $imasroot . "/javascript/assessment_min.js?v=082616";?>" type="text/javascript"></script>
+
 <!--[if lt IE 9]>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/excanvas_min.js?v=120811"></script><![endif]-->
-<script type="text/javascript" src="<?php echo $imasroot;?>/javascript/drawing_min.js?v=080416"></script>
+
 <?php
 echo "<script type=\"text/javascript\">imasroot = '$imasroot';</script>";
 if (isset($useeditor) && $sessiondata['useed']==1) {
@@ -182,15 +190,17 @@ if ($useeqnhelper==1 || $useeqnhelper==2) {
 			.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
 			</style><![endif]-->';
 	}
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=071916\"></script>";
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
+	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
+	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=071916\"></script>";
+	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
+	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/MQbundle_min.js?v=071916\"></script>";
 	echo '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 }
 
 //IP: eqntips
 if ($showtips==2) {
-	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
+	//bundled in assessment_min.js
+	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=062216\"></script>";
 }
 
 $curdir = rtrim(dirname(__FILE__), '/\\');
