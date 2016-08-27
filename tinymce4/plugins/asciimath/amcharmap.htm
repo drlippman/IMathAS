@@ -3,36 +3,19 @@
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=7" />
 	<title>Math Symbols</title>
-	<script type="text/javascript" src="js/ASCIIMathMLwFallback.js"></script>
+	<link rel="stylesheet" type="text/css" href="amcharmap.css"/>
 	<style type="text/css">
 	td.character {
-	    font-family: Times,serif;
-	    font-size: 14px;
-	    font-weight: bold;
-	    text-align: center;
-	    background: #FFF;
-	    padding: 4px;
+	    background-color: #FFF;
+			padding:4px;
+			text-align: center;
 	}
-	
-	td.character-hilite {
-	    background: Highlight;
-	    color: HighlightText;
+	td.character:hover {
+		background-color: #ddd;
 	}
+
 	</style>
 <script type="text/javascript">
-var oldView = null;
-function View( td, character )               // preview character
-{
-    if (oldView)
-        oldView.className = oldView.className.replace(/\s+character-hilite/, '');
-
-    if (td) {
-        (oldView = td).className += " character-hilite";
-        td.setAttribute("title",character);  // added by Peter Jipsen
-    }
-}
-var waitforAMTcgiloc = true;
-
 
 function init() {
 	AMTcgiloc = top.tinymce.activeEditor.windowManager.getParams().AMTcgiloc;
@@ -50,153 +33,153 @@ function set(val) {
 
 <table border="0" cellspacing="1" cellpadding="0" width="100%" style="cursor: pointer; background: #ADAD9C; border: 1px inset;">
 <tr>
-<td class="character" onMouseOver="View(this,'``')" onClick="javascript:set('')">New</td>
-<td class="character" onMouseOver="View(this,'(x+1)/(x-1)')" onClick="javascript:set('(x+1)/(x-1)')">`(x+1)/(x-1)`</td>
-<td class="character" onMouseOver="View(this,'x^(m+n)')" onClick="javascript:set('x^(m+n)')">`x^(m+n)`</td>
-<td class="character" onMouseOver="View(this,'x_(mn)')" onClick="javascript:set('x_(mn)')">`x_(mn)`</td>
-<td class="character" onMouseOver="View(this,'sqrt(x)')" onClick="javascript:set('sqrt(x)')">`sqrt(x)`</td>
-<td class="character" onMouseOver="View(this,'root(n)(x)')" onClick="javascript:set('root(n)(x)')">`root(n)(x)`</td>
-<td class="character" onMouseOver="View(this,'dy/dx')" onClick="javascript:set('dy/dx')">`dy/dx`</td>
-<td class="character" onMouseOver="View(this,'lim_(x->oo)')" onClick="javascript:set('lim_(x->oo)')">`lim_(x->oo)`</td>
-<td class="character" onMouseOver="View(this,'sum_(n=1)^oo')" onClick="javascript:set('sum_(n=1)^oo')">`sum_(n=1)^oo`</td>
-<td colspan="2" class="character" onMouseOver="View(this,'int_a^bf(x)dx')" onClick="javascript:set('int_a^bf(x)dx')">`int_a^bf(x)dx`</td>
-<td class="character" onMouseOver="View(this,'int')" onClick="javascript:set('int')">`int`</td>
-<td class="character" onMouseOver="View(this,'oint')" onClick="javascript:set('oint')">`oint`</td>
-<td colspan="2" class="character" onMouseOver="View(this,'[[a,b],[c,d]]')" onClick="javascript:set('[[a,b],[c,d]]')">`[[a,b],[c,d]]`</td>
-<td class="character" onMouseOver="View(this,'((n),(k))')" onClick="javascript:set('((n),(k))')">`((n),(k))`</td>
+	<td class="character" onclick="set('')">New</td>
+	<td class="character" onclick="set('(x+1)/(x-1)')" title="(x+1)/(x-1)"><div class="frac"></div></td>
+	<td class="character" onclick="set('x^(m+n)')" title="x^(m+n)"><div class="exp"></div></td>
+	<td class="character" onclick="set('x_(mn)')" title="x_(mn)"><div class="sub"></div></td>
+	<td class="character" onclick="set('sqrt(x)')" title="sqrt(x)"><div class="sqrt"></div></td>
+	<td class="character" onclick="set('root(n)(x)')" title="root(n)(x)"><div class="root"></div></td>
+	<td class="character" onclick="set('dy/dx')" title="dy/dx"><div class="deriv"></div></td>
+	<td class="character" onclick="set('lim_(x->oo)')" title="lim_(x->oo)"><div class="limex"></div></td>
+	<td class="character" onclick="set('sum_(n=1)^oo')" title="sum_(n=1)^oo"><div class="sumex"></div></td>
+	<td colspan=2 class="character" onclick="set('int_a^bf(x)dx')" title="int_a^bf(x)dx"><div class="intex"></div></td>
+	<td class="character" onclick="set('int')" title="int"><div class="int"></div></td>
+	<td class="character" onclick="set('oint')" title="oint"><div class="oint"></div></td>
+	<td colspan=2 class="character" onclick="set('[[a,b],[c,d]]')" title="[[a,b],[c,d]]"><div class="matrix"></div></td>
+	<td class="character" onclick="set('((n),(k))')" title="((n),(k))"><div class="choose"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'*')" onClick="javascript:set('*')">`*`</td>
-<td class="character" onMouseOver="View(this,'**')" onClick="javascript:set('**')">`**`</td>
-<td class="character" onMouseOver="View(this,'//')" onClick="javascript:set('//')">`//`</td>
-<td class="character" onMouseOver="View(this,'\\\\')" onClick="javascript:set('\\\\')">`\\ `</td>
-<td class="character" onMouseOver="View(this,'xx')" onClick="javascript:set('xx')">`xx`</td>
-<td class="character" onMouseOver="View(this,'-:')" onClick="javascript:set('-:')">`-:`</td>
-<td class="character" onMouseOver="View(this,'@')" onClick="javascript:set('@')">`@`</td>
-<td class="character" onMouseOver="View(this,'o+')" onClick="javascript:set('o+')">`o+`</td>
-<td class="character" onMouseOver="View(this,'ox')" onClick="javascript:set('ox')">`ox`</td>
-<td class="character" onMouseOver="View(this,'o.')" onClick="javascript:set('o.')">`o.`</td>
-<td class="character" onMouseOver="View(this,'sum')" onClick="javascript:set('sum')">`sum`</td>
-<td class="character" onMouseOver="View(this,'prod')" onClick="javascript:set('prod')">`prod`</td>
-<td class="character" onMouseOver="View(this,'^^')" onClick="javascript:set('^^')">`^^`</td>
-<td class="character" onMouseOver="View(this,'^^^')" onClick="javascript:set('^^^')">`^^^`</td>
-<td class="character" onMouseOver="View(this,'vv')" onClick="javascript:set('vv')">`vv`</td>
-<td class="character" onMouseOver="View(this,'vvv')" onClick="javascript:set('vvv')">`vvv`</td>
+	<td class="character" onclick="set('*')" title="*"><div class="cdot"></div></td>
+	<td class="character" onclick="set('**')" title="**"><div class="ast"></div></td>
+	<td class="character" onclick="set('//')" title="//"><div class="slash"></div></td>
+	<td class="character" onclick="set('\ ')" title="\ "><div class="backslash"></div></td>
+	<td class="character" onclick="set('xx')" title="xx"><div class="times"></div></td>
+	<td class="character" onclick="set('-:')" title="-:"><div class="div"></div></td>
+	<td class="character" onclick="set('@')" title="@"><div class="at"></div></td>
+	<td class="character" onclick="set('o+')" title="o+"><div class="oplus"></div></td>
+	<td class="character" onclick="set('ox')" title="ox"><div class="otimes"></div></td>
+	<td class="character" onclick="set('o.')" title="o."><div class="odot"></div></td>
+	<td class="character" onclick="set('sum')" title="sum"><div class="sum"></div></td>
+	<td class="character" onclick="set('prod')" title="prod"><div class="prod"></div></td>
+	<td class="character" onclick="set('^^')" title="^^"><div class="wedge"></div></td>
+	<td class="character" onclick="set('^^^')" title="^^^"><div class="bidwedge"></div></td>
+	<td class="character" onclick="set('vv')" title="vv"><div class="vee"></div></td>
+	<td class="character" onclick="set('vvv')" title="vvv"><div class="bigvee"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'!=')" onClick="javascript:set('!=')">`!=`</td>
-<td class="character" onMouseOver="View(this,'&lt;=')" onClick="javascript:set('<=')">`<=`</td>
-<td class="character" onMouseOver="View(this,'&gt;=')" onClick="javascript:set('>=')">`>=`</td>
-<td class="character" onMouseOver="View(this,'-&lt;')" onClick="javascript:set('-<')">`-<`</td>
-<td class="character" onMouseOver="View(this,'&gt;-')" onClick="javascript:set('>-')">`>-`</td>
-<td class="character" onMouseOver="View(this,'in')" onClick="javascript:set('in')">`in`</td>
-<td class="character" onMouseOver="View(this,'!in')" onClick="javascript:set('!in')">`!in`</td>
-<td class="character" onMouseOver="View(this,'sub')" onClick="javascript:set('sub')">`sub`</td>
-<td class="character" onMouseOver="View(this,'sup')" onClick="javascript:set('sup')">`sup`</td>
-<td class="character" onMouseOver="View(this,'sube')" onClick="javascript:set('sube')">`sube`</td>
-<td class="character" onMouseOver="View(this,'supe')" onClick="javascript:set('supe')">`supe`</td>
-<td class="character" onMouseOver="View(this,'O/')" onClick="javascript:set('O/')">`O/`</td>
-<td class="character" onMouseOver="View(this,'nn')" onClick="javascript:set('nn')">`nn`</td>
-<td class="character" onMouseOver="View(this,'nnn')" onClick="javascript:set('nnn')">`nnn`</td>
-<td class="character" onMouseOver="View(this,'uu')" onClick="javascript:set('uu')">`uu`</td>
-<td class="character" onMouseOver="View(this,'uuu')" onClick="javascript:set('uuu')">`uuu`</td>
+	<td class="character" onclick="set('!=')" title="!="><div class="ne"></div></td>
+	<td class="character" onclick="set('<=')" title="<="><div class="le"></div></td>
+	<td class="character" onclick="set('>=')" title=">="><div class="ge"></div></td>
+	<td class="character" onclick="set('-<')" title="-<"><div class="prec"></div></td>
+	<td class="character" onclick="set('>-')" title=">-"><div class="succ"></div></td>
+	<td class="character" onclick="set('in')" title="in"><div class="in"></div></td>
+	<td class="character" onclick="set('!in')" title="!in"><div class="notin"></div></td>
+	<td class="character" onclick="set('sub')" title="sub"><div class="sub"></div></td>
+	<td class="character" onclick="set('sup')" title="sup"><div class="sup"></div></td>
+	<td class="character" onclick="set('sube')" title="sube"><div class="sube"></div></td>
+	<td class="character" onclick="set('supe')" title="supe"><div class="supe"></div></td>
+	<td class="character" onclick="set('O/')" title="O/"><div class="empty"></div></td>
+	<td class="character" onclick="set('nn')" title="nn"><div class="nn"></div></td>
+	<td class="character" onclick="set('nnn')" title="nnn"><div class="nnn"></div></td>
+	<td class="character" onclick="set('uu')" title="uu"><div class="uu"></div></td>
+	<td class="character" onclick="set('uuu')" title="uuu"><div class="uuu"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'and')" onClick="javascript:set('and')">`and`</td>
-<td class="character" onMouseOver="View(this,'or')" onClick="javascript:set('or')">`or`</td>
-<td class="character" onMouseOver="View(this,'not')" onClick="javascript:set('not')">`not`</td>
-<td class="character" onMouseOver="View(this,'=&gt')" onClick="javascript:set('=>')">`=>`</td>
-<td class="character" onMouseOver="View(this,'if')" onClick="javascript:set('if')">`if`</td>
-<td class="character" onMouseOver="View(this,'&lt;=&gt;')" onClick="javascript:set('<=>')">`<=>`</td>
-<td class="character" onMouseOver="View(this,'AA')" onClick="javascript:set('AA')">`AA`</td>
-<td class="character" onMouseOver="View(this,'EE')" onClick="javascript:set('EE')">`EE`</td>
-<td class="character" onMouseOver="View(this,'_|_')" onClick="javascript:set('_|_')">`_|_`</td>
-<td class="character" onMouseOver="View(this,'TT')" onClick="javascript:set('TT')">`TT`</td>
-<td class="character" onMouseOver="View(this,'|--')" onClick="javascript:set('|--')">`|--`</td>
-<td class="character" onMouseOver="View(this,'cong')" onClick="javascript:set('cong')">`cong`</td>
-<td class="character" onMouseOver="View(this,'-=')" onClick="javascript:set('-=')">`-=`</td>
-<td class="character" onMouseOver="View(this,'~=')" onClick="javascript:set('~=')">`~=`</td>
-<td class="character" onMouseOver="View(this,'~~')" onClick="javascript:set('~~')">`~~`</td>
-<td class="character" onMouseOver="View(this,'prop')" onClick="javascript:set('prop')">`prop`</td>
+	<td class="character" onclick="set('and')"><div class="and"></div></td>
+	<td class="character" onclick="set('or')"><div class="or"></div></td>
+	<td class="character" onclick="set('not')"><div class="not"></div></td>
+	<td class="character" onclick="set('=>')"><div class="doubright"></div></td>
+	<td class="character" onclick="set('if')"><div class="if"></div></td>
+	<td class="character" onclick="set('<=>')"><div class="doubleftright"></div></td>
+	<td class="character" onclick="set('AA')"><div class="aa"></div></td>
+	<td class="character" onclick="set('EE')"><div class="ee"></div></td>
+	<td class="character" onclick="set('_|_')"><div class="perp"></div></td>
+	<td class="character" onclick="set('TT')"><div class="tt"></div></td>
+	<td class="character" onclick="set('|--')"><div class="vdash"></div></td>
+	<td class="character" onclick="set('cong')"><div class="cong"></div></td>
+	<td class="character" onclick="set('-=')"><div class="equiv"></div></td>
+	<td class="character" onclick="set('~=')"><div class="approxeq"></div></td>
+	<td class="character" onclick="set('~~')"><div class="approx"></div></td>
+	<td class="character" onclick="set('prop')"><div class="prop"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'&quot;text&quot;')" onClick="javascript:set('&quot;text&quot;')">`"text"`</td>
-<td class="character" onMouseOver="View(this,'quad')" onClick="javascript:set('quad')">`"quad"`</td>
-<td class="character" onMouseOver="View(this,'del')" onClick="javascript:set('del')">`del`</td>
-<td class="character" onMouseOver="View(this,'grad')" onClick="javascript:set('grad')">`grad`</td>
-<td class="character" onMouseOver="View(this,'+-')" onClick="javascript:set('+-')">`+-`</td>
-<td class="character" onMouseOver="View(this,'oo')" onClick="javascript:set('oo')">`oo`</td>
-<td class="character" onMouseOver="View(this,'aleph')" onClick="javascript:set('aleph')">`aleph`</td>
-<td class="character" onMouseOver="View(this,'diamond')" onClick="javascript:set('diamond')">`diamond`</td>
-<td class="character" onMouseOver="View(this,'square')" onClick="javascript:set('square')">`square`</td>
-<td class="character" onMouseOver="View(this,'|__')" onClick="javascript:set('|__')">`|__`</td>
-<td class="character" onMouseOver="View(this,'__|')" onClick="javascript:set('__|')">`__|`</td>
-<td class="character" onMouseOver="View(this,'|~')" onClick="javascript:set('|~')">`|~`</td>
-<td class="character" onMouseOver="View(this,'~|')" onClick="javascript:set('~|')">`~|`</td>
-<td class="character" onMouseOver="View(this,'&lt;&lt;x&gt;&gt')" onClick="javascript:set('<< x>>')">`<< x>>`</td>
-<td class="character" onMouseOver="View(this,'/_')" onClick="javascript:set('/_')">`/_`</td>
-<td class="character" onMouseOver="View(this,':.')" onClick="javascript:set(':.')">`:.`</td>
+	<td class="character" onclick="set('&quot;text&quot;')" title="&quot;text&quot;"><div class="text"></div></td>
+	<td class="character" onclick="set('&quot;quad&quot;')" title="&quot;quad&quot;"><div class="quad"></div></td>
+	<td class="character" onclick="set('del')" title="del"><div class="del"></div></td>
+	<td class="character" onclick="set('grad')" title="grad"><div class="grad"></div></td>
+	<td class="character" onclick="set('+-')" title="+-"><div class="pm"></div></td>
+	<td class="character" onclick="set('oo')" title="oo"><div class="inf"></div></td>
+	<td class="character" onclick="set('aleph')" title="aleph"><div class="aleph"></div></td>
+	<td class="character" onclick="set('diamond')" title="diamond"><div class="diamond"></div></td>
+	<td class="character" onclick="set('square')" title="square"><div class="square"></div></td>
+	<td class="character" onclick="set('|__')" title="|__"><div class="lfloor"></div></td>
+	<td class="character" onclick="set('__|')" title="__|"><div class="rfloor"></div></td>
+	<td class="character" onclick="set('|~')" title="|~"><div class="lceil"></div></td>
+	<td class="character" onclick="set('~|')" title="~|"><div class="rceil"></div></td>
+	<td class="character" onclick="set('<< x>>')" title="<< x>>"><div class="lrvec"></div></td>
+	<td class="character" onclick="set('/_')" title="/_"><div class="angle"></div></td>
+	<td class="character" onclick="set(':.')" title=":."><div class="therefore"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'uarr')" onClick="javascript:set('uarr')">`uarr`</td>
-<td class="character" onMouseOver="View(this,'darr')" onClick="javascript:set('darr')">`darr`</td>
-<td class="character" onMouseOver="View(this,'larr')" onClick="javascript:set('larr')">`larr`</td>
-<td class="character" onMouseOver="View(this,'->')" onClick="javascript:set('->')">`->`</td>
-<td class="character" onMouseOver="View(this,'|->')" onClick="javascript:set('|->')">`|->`</td>
-<td class="character" onMouseOver="View(this,'harr')" onClick="javascript:set('harr')">`harr`</td>
-<td class="character" onMouseOver="View(this,'lArr')" onClick="javascript:set('lArr')">`lArr`</td>
-<td class="character" onMouseOver="View(this,'rArr')" onClick="javascript:set('rArr')">`rArr`</td>
-<td class="character" onMouseOver="View(this,'hArr')" onClick="javascript:set('hArr')">`hArr`</td>
-<td class="character" onMouseOver="View(this,'hata')" onClick="javascript:set('hata')">`hata`</td>
-<td class="character" onMouseOver="View(this,'ula')" onClick="javascript:set('ula')">`ula`</td>
-<td class="character" onMouseOver="View(this,'bara')" onClick="javascript:set('bara')">`bara`</td>
-<td class="character" onMouseOver="View(this,'dota')" onClick="javascript:set('dota')">`dota`</td>
-<td class="character" onMouseOver="View(this,'ddota')" onClick="javascript:set('ddota')">`ddota`</td>
-<td colspan="2" rowspan="2" class="character" onMouseOver="View(this,'{(1 if x>=0),(0 if x<0):}')" onClick="javascript:set('{(1 if x>=0),(0 if x<0):}')">`{(1 if x>=0),(0 if x<0):}`</td>
+	<td class="character" onclick="set('uarr')" title="uarr"><div class="uarr"></div></td>
+	<td class="character" onclick="set('darr')" title="darr"><div class="darr"></div></td>
+	<td class="character" onclick="set('larr')" title="larr"><div class="larr"></div></td>
+	<td class="character" onclick="set('->')" title="->"><div class="rarr"></div></td>
+	<td class="character" onclick="set('|->')" title="|->"><div class="mapsto"></div></td>
+	<td class="character" onclick="set('harr')" title="harr"><div class="harr"></div></td>
+	<td class="character" onclick="set('lArr')" title="lArr"><div class="doubleft"></div></td>
+	<td class="character" onclick="set('rArr')" title="rArr"><div class="doubright"></div></td>
+	<td class="character" onclick="set('hArr')" title="hArr"><div class="doubleftright"></div></td>
+	<td class="character" onclick="set('hata')" title="hata"><div class="hata"></div></td>
+	<td class="character" onclick="set('ula')" title="ula"><div class="ula"></div></td>
+	<td class="character" onclick="set('bara')" title="bara"><div class="bara"></div></td>
+	<td class="character" onclick="set('dota')" title="dota"><div class="dota"></div></td>
+	<td class="character" onclick="set('ddota')" title="ddota"><div class="ddota"></div></td>
+	<td colspan="2" rowspan="2" class="character" onclick="set('{(1 if x>=0),(0 if x<0):}')" title="{(1 if x>=0),(0 if x<0):}"><div class="piecewise"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'NN')" onClick="javascript:set('NN')">`NN`</td>
-<td class="character" onMouseOver="View(this,'ZZ')" onClick="javascript:set('ZZ')">`ZZ`</td>
-<td class="character" onMouseOver="View(this,'QQ')" onClick="javascript:set('QQ')">`QQ`</td>
-<td class="character" onMouseOver="View(this,'RR')" onClick="javascript:set('RR')">`RR`</td>
-<td class="character" onMouseOver="View(this,'CC')" onClick="javascript:set('CC')">`CC`</td>
-<td class="character" onMouseOver="View(this,'bbA')" onClick="javascript:set('bbA')">`bbA`</td>
-<td class="character" onMouseOver="View(this,'bbbA')" onClick="javascript:set('bbbA')">`bbbA`</td>
-<td class="character" onMouseOver="View(this,'ccA')" onClick="javascript:set('ccA')">`ccA`</td>
-<td class="character" onMouseOver="View(this,'frA')" onClick="javascript:set('frA')">`frA`</td>
-<td class="character" onMouseOver="View(this,'sfA')" onClick="javascript:set('sfA')">`sfA`</td>
-<td class="character" onMouseOver="View(this,'ttA')" onClick="javascript:set('ttA')">`ttA`</td>
-<td class="character" onMouseOver="View(this,'veca')" onClick="javascript:set('veca')">`veca`</td>
-<td class="character" onMouseOver="View(this,'stackrel(+)(->)')" onClick="javascript:set('stackrel(+)(->)')">`stackrel(+)(->)`</td>
-<td class="character" onMouseOver="View(this,'upsilon')" onClick="javascript:set('upsilon')">`upsilon`</td>
+	<td class="character" onclick="set('NN')" title="NN"><div class="nn"></div></td>
+	<td class="character" onclick="set('ZZ')" title="ZZ"><div class="zz"></div></td>
+	<td class="character" onclick="set('QQ')" title="QQ"><div class="qq"></div></td>
+	<td class="character" onclick="set('RR')" title="RR"><div class="rr"></div></td>
+	<td class="character" onclick="set('CC')" title="CC"><div class="cc"></div></td>
+	<td class="character" onclick="set('bbA')" title="bbA"><div class="bba"></div></td>
+	<td class="character" onclick="set('bbbA')" title="bbbA"><div class="bbba"></div></td>
+	<td class="character" onclick="set('ccA')" title="ccA"><div class="cca"></div></td>
+	<td class="character" onclick="set('frA')" title="frA"><div class="fra"></div></td>
+	<td class="character" onclick="set('sfA')" title="sfA"><div class="sfa"></div></td>
+	<td class="character" onclick="set('ttA')" title="ttA"><div class="tta"></div></td>
+	<td class="character" onclick="set('veca')" title="veca"><div class="veca"></div></td>
+	<td class="character" onclick="set('stackrel(+)(->)')" title="stackrel(+)(->)"><div class="stackrel"></div></td>
+	<td class="character" onclick="set('upsilon')" title="upsilon"><div class="upsilon"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'alpha')" onClick="javascript:set('alpha')">`alpha`</td>
-<td class="character" onMouseOver="View(this,'beta')" onClick="javascript:set('beta')">`beta`</td>
-<td class="character" onMouseOver="View(this,'gamma')" onClick="javascript:set('gamma')">`gamma`</td>
-<td class="character" onMouseOver="View(this,'Gamma')" onClick="javascript:set('Gamma')">`Gamma`</td>
-<td class="character" onMouseOver="View(this,'delta')" onClick="javascript:set('delta')">`delta`</td>
-<td class="character" onMouseOver="View(this,'Delta')" onClick="javascript:set('Delta')">`Delta`</td>
-<td class="character" onMouseOver="View(this,'epsi')" onClick="javascript:set('epsi')">`epsilon`</td>
-<td class="character" onMouseOver="View(this,'zeta')" onClick="javascript:set('zeta')">`zeta`</td>
-<td class="character" onMouseOver="View(this,'eta')" onClick="javascript:set('eta')">`eta`</td>
-<td class="character" onMouseOver="View(this,'theta')" onClick="javascript:set('theta')">`theta`</td>
-<td class="character" onMouseOver="View(this,'Theta')" onClick="javascript:set('Theta')">`Theta`</td>
-<td class="character" onMouseOver="View(this,'iota')" onClick="javascript:set('iota')">`iota`</td>
-<td class="character" onMouseOver="View(this,'kappa')" onClick="javascript:set('kappa')">`kappa`</td>
-<td class="character" onMouseOver="View(this,'lambda')" onClick="javascript:set('lambda')">`lambda`</td>
-<td class="character" onMouseOver="View(this,'Lambda')" onClick="javascript:set('Lambda')">`Lambda`</td>
-<td class="character" onMouseOver="View(this,'mu')" onClick="javascript:set('mu')">`mu`</td>
+	<td class="character" onclick="set('alpha')" title="alpha"><div class="alpha"></div></td>
+	<td class="character" onclick="set('beta')" title="beta"><div class="beta"></div></td>
+	<td class="character" onclick="set('gamma')" title="gamma"><div class="gamma"></div></td>
+	<td class="character" onclick="set('Gamma')" title="Gamma"><div class="capgamma"></div></td>
+	<td class="character" onclick="set('delta')" title="delta"><div class="delta"></div></td>
+	<td class="character" onclick="set('Delta')" title="Delta"><div class="capdelta"></div></td>
+	<td class="character" onclick="set('epsilon')" title="epsilon"><div class="epsilon"></div></td>
+	<td class="character" onclick="set('zeta')" title="zeta"><div class="zeta"></div></td>
+	<td class="character" onclick="set('eta')" title="eta"><div class="eta"></div></td>
+	<td class="character" onclick="set('theta')" title="theta"><div class="theta"></div></td>
+	<td class="character" onclick="set('Theta')" title="Theta"><div class="captheta"></div></td>
+	<td class="character" onclick="set('iota')" title="iota"><div class="iota"></div></td>
+	<td class="character" onclick="set('kappa')" title="kappa"><div class="kappa"></div></td>
+	<td class="character" onclick="set('lambda')" title="lambda"><div class="lambda"></div></td>
+	<td class="character" onclick="set('Lambda')" title="Lambda"><div class="caplambda"></div></td>
+	<td class="character" onclick="set('mu')" title="mu"><div class="mu"></div></td>
 </tr><tr>
-<td class="character" onMouseOver="View(this,'nu')" onClick="javascript:set('nu')">`nu`</td>
-<td class="character" onMouseOver="View(this,'pi')" onClick="javascript:set('pi')">`pi`</td>
-<td class="character" onMouseOver="View(this,'Pi')" onClick="javascript:set('Pi')">`Pi`</td>
-<td class="character" onMouseOver="View(this,'rho')" onClick="javascript:set('rho')">`rho`</td>
-<td class="character" onMouseOver="View(this,'sigma')" onClick="javascript:set('sigma')">`sigma`</td>
-<td class="character" onMouseOver="View(this,'Sigma')" onClick="javascript:set('Sigma')">`Sigma`</td>
-<td class="character" onMouseOver="View(this,'tau')" onClick="javascript:set('tau')">`tau`</td>
-<td class="character" onMouseOver="View(this,'xi')" onClick="javascript:set('xi')">`xi`</td>
-<td class="character" onMouseOver="View(this,'Xi')" onClick="javascript:set('Xi')">`Xi`</td>
-<td class="character" onMouseOver="View(this,'phi')" onClick="javascript:set('phi')">`phi`</td>
-<td class="character" onMouseOver="View(this,'Phi')" onClick="javascript:set('Phi')">`Phi`</td>
-<td class="character" onMouseOver="View(this,'chi')" onClick="javascript:set('chi')">`chi`</td>
-<td class="character" onMouseOver="View(this,'psi')" onClick="javascript:set('psi')">`psi`</td>
-<td class="character" onMouseOver="View(this,'Psi')" onClick="javascript:set('Psi')">`Psi`</td>
-<td class="character" onMouseOver="View(this,'omega')" onClick="javascript:set('omega')">`omega`</td>
-<td class="character" onMouseOver="View(this,'Omega')" onClick="javascript:set('Omega')">`Omega`</td>
+	<td class="character" onclick="set('nu')" title="nu"><div class="nu"></div></td>
+	<td class="character" onclick="set('pi')" title="pi"><div class="pi"></div></td>
+	<td class="character" onclick="set('Pi')" title="Pi"><div class="cappi"></div></td>
+	<td class="character" onclick="set('rho')" title="rho"><div class="rho"></div></td>
+	<td class="character" onclick="set('sigma')" title="sigma"><div class="sigma"></div></td>
+	<td class="character" onclick="set('Sigma')" title="Sigma"><div class="capsigma"></div></td>
+	<td class="character" onclick="set('tau')" title="tau"><div class="tau"></div></td>
+	<td class="character" onclick="set('xi')" title="xi"><div class="xi"></div></td>
+	<td class="character" onclick="set('Xi')" title="Xi"><div class="capxi"></div></td>
+	<td class="character" onclick="set('phi')" title="phi"><div class="phi"></div></td>
+	<td class="character" onclick="set('Phi')" title="Phi"><div class="capphi"></div></td>
+	<td class="character" onclick="set('chi')" title="chi"><div class="chi"></div></td>
+	<td class="character" onclick="set('psi')" title="psi"><div class="psi"></div></td>
+	<td class="character" onclick="set('Psi')" title="Psi"><div class="cappsi"></div></td>
+	<td class="character" onclick="set('omega')" title="omega"><div class="omega"></div></td>
+	<td class="character" onclick="set('Omega')" title="Omega"><div class="capomega"></div></td>
 </tr>
 </table>
 <input type="button" value="Cancel" onclick="top.tinymce.activeEditor.windowManager.close()"/>
