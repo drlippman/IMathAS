@@ -59,7 +59,7 @@ div.text-segment-iconglobal {
 	bottom: auto;
 	right: auto;
 }
-#add-text-button, button.text-segment-button-global, button.text-segment-button-global:hover, button.text-segment-button-global:active, button.text-segment-button-global:focus  {
+button.text-segment-button-global, button.text-segment-button-global:hover, button.text-segment-button-global:active, button.text-segment-button-global:focus  {
 	background-color: #586EEA; /* or #6E9ADC; #7798f9;*/
 	border-color: #586EEA;
 	font-family: sans-serif;

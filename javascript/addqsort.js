@@ -12,7 +12,8 @@
 $(document).ready(function() {
 	$(window).on("beforeunload",function(){
 		if (anyEditorIsDirty()) {
-			return "You will loose your changes!";
+			//This message might not ever be displayed
+			return "There are unsaved changes in a question intro text box.  Press Leave Page to discard those changes and continue with the most recent action.  Press Stay on Page to return to the page without taking any action.";
 		}
 	});
 
@@ -304,6 +305,7 @@ function expandTextSegment(selector) {
 
 		//If a single editor was expanded, activate the editor
 		//TODO remember whether this was a global expand
+		//     if available, also scroll to keep global button fixed
 		var i = getIndexForSelector(selector);
 		var type = getTypeForSelector(selector);
 		if (i !== undefined && type !== "global") {
