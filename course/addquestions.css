@@ -23,8 +23,6 @@
 	max-height: 1.7em;
 	max-width: 93%;
 	overflow: hidden;
-/*	padding-bottom: 0;*/
-	background-color: #fff; /* must match .intro */
 }
 .intro-like {
 	position: relative;
