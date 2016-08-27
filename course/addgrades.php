@@ -11,7 +11,7 @@
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
 	if (isset($teacherid)) { $isteacher = true;}
-	
+
 	if ($istutor) {
 		$isok = false;
 		if (is_numeric($_GET['gbitem'])) {
@@ -21,7 +21,7 @@
 				$isok = true;
 				$_GET['isolate'] = true;
 			}
-		} 
+		}
 		if (!$isok) {
 			require("../header.php");
 			echo "You don't have authority for this action";
@@ -35,8 +35,8 @@
 		exit;
 	}
 	$cid = $_GET['cid'];
-	
-	
+
+
 	if (isset($_GET['del']) && $isteacher) {
 		if (isset($_GET['confirm'])) {
 			$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['del']}'";
@@ -53,7 +53,7 @@
 			require("../footer.php");
 			exit;
 		}
-		
+
 	}
 	if (isset($_POST['name']) && $isteacher) {
 		require_once("../includes/parsedatetime.php");
@@ -101,10 +101,10 @@
 				$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
 				unset($_POST['newscore'][$row[0]]);
 			}
-			
+
 		}
 	}
-	
+
 	if (isset($_POST['assesssnap'])) {
 		//doing assessment snapshot
 		$query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
@@ -137,7 +137,7 @@
 	} else {
 		///regular submit
 		if (isset($_POST['score'])) {
-			
+
 			foreach($_POST['score'] as $k=>$sc) {
 				if (trim($k)=='') { continue;}
 				$sc = trim($sc);
@@ -151,10 +151,10 @@
 				}
 			}
 		}
-		
+
 		if (isset($_POST['newscore'])) {
 			foreach($_POST['newscore'] as $k=>$sc) {
-				if (trim($k)=='') {continue;}			
+				if (trim($k)=='') {continue;}
 				if ($sc!='') {
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,score,feedback) VALUES ";
 					$query .= "('offline','{$_GET['gbitem']}','$k','$sc','{$_POST['feedback'][$k]}')";
@@ -175,7 +175,7 @@
 		}
 		exit;
 	}
-	
+
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
 	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
@@ -183,10 +183,10 @@
 	} else {
 		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmode = mysql_result($result,0,0);	
+		$gbmode = mysql_result($result,0,0);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
-	
+
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
 	} else {
@@ -200,41 +200,41 @@
 			$secfilter = -1;
 		}
 	}
-	
+
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=121213\"></script>";
-	$placeinhead .= '<style type="text/css">	
+	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
 		 background: white;
 		 border: 1px solid;
 		 padding: 0px;
 		 }
-		
+
 		 .suggestion_list ul
 		 {
 		 padding: 0;
 		 margin: 0;
 		 list-style-type: none;
 		 }
-		
+
 		 .suggestion_list a
 		 {
 		 text-decoration: none;
 		 color: navy;
 		 padding: 5px;
 		 }
-		
+
 		 .suggestion_list .selected
 		 {
 		 background: #99f;
 		 }
-		
+
 		 tr#quickadd td {
 			 border-bottom: 1px solid #000;
 		 }
-		 
-		
+
+
 		 #autosuggest
 		 {
 		 display: none;
@@ -251,15 +251,15 @@
 		echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Averages</a> ";
 	}
 	echo "&gt; Offline Grades</div>";
-	
+
 	if ($_GET['gbitem']=='new') {
 		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Add Offline Grades</h2></div>";
 	} else {
 		echo "<div id=\"headeraddgrades\" class=\"pagetitle\"><h2>Modify Offline Grades</h2></div>";
 	}
-	
+
 	echo "<form id=\"mainform\" method=post action=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}&grades={$_GET['grades']}\">";
-     
+
 	if ($_GET['grades']=='all') {
 	    if (!isset($_GET['isolate'])) {
 		if ($_GET['gbitem']=='new') {
@@ -309,8 +309,11 @@
 			$outcomearr = array();
 		} else {
 			$outcomearr = unserialize($row[0]);
+			if ($outcomearr==false) {
+				$outcomearr = array();
+			}
 		}
-		
+
 		$outcomes = array();
 		function flattenarr($ar) {
 			global $outcomes;
@@ -324,8 +327,8 @@
 			}
 		}
 		flattenarr($outcomearr);
-		
-		
+
+
 ?>
 
 <span class=form>Name:</span><span class=formright><input type=text name="name" value="<?php echo $name;?>"/></span><br class="form"/>
@@ -333,7 +336,7 @@
 <span class=form>Points:</span><span class=formright><input type=text name="points" size=3 value="<?php echo $points;?>"/></span><br class="form"/>
 
 <span class=form>Show grade to students after:</span><span class=formright><input type=radio name="sdatetype" value="0" <?php if ($showdate=='0') {echo "checked=1";}?>/> Always<br/>
-<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+<input type=radio name="sdatetype" value="sdate" <?php if ($showdate!='0') {echo "checked=1";}?>/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 <a href="#" onClick="displayDatePicker('sdate', this); return false"><img src="../img/cal.gif" alt="Calendar"/></A>
 at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR class=form>
 
@@ -347,7 +350,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		}
 		echo ">Default</option>\n";
 		if (mysql_num_rows($result)>0) {
-			
+
 			while ($row = mysql_fetch_row($result)) {
 				echo "<option value=\"{$row[0]}\" ";
 				if ($gbcat==$row[0]) {
@@ -355,10 +358,10 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 				}
 				echo ">{$row[1]}</option>\n";
 			}
-			
-		}	
+
+		}
 		echo "</select></span><br class=form>\n";
-		
+
 		echo "<span class=form>Count: </span><span class=formright>";
 		echo '<input type=radio name="cntingb" value="1" ';
 		if ($cntingb==1) { echo "checked=1";}
@@ -376,19 +379,19 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$tutoredit);
 			echo '</span><br class="form"/>';
 		}
-		
+
 		echo '<span class=form>Use Scoring Rubric</span><span class=formright>';
 		writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$rubric);
 		echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Add new rubric</a> ";
 		echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addg&amp;gbitem={$_GET['gbitem']}\">Edit rubrics</a> ";
 		echo '</span><br class="form"/>';
-		
+
 		if (count($outcomes)>0) {
 			echo '<span class="form">Associate Outcomes:</span></span class="formright">';
 			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
 			echo '</span><br class="form"/>';
 		}
-		
+
 		if ($_GET['gbitem']!='new') {
 			echo "<br class=form /><div class=\"submit\"><input type=submit value=\"Submit\"/> <a href=\"addgrades.php?stu={$_GET['stu']}&gbmode={$_GET['gbmode']}&cid=$cid&del={$_GET['gbitem']}\">Delete Item</a> </div><br class=form />";
 		} else {
@@ -442,7 +445,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		} else {
 			$hassection = false;
 		}
-		
+
 		if ($hassection) {
 			$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -454,7 +457,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		} else {
 			$sortorder = "name";
 		}
-		
+
 		if ($_GET['grades']=='all' && $_GET['gbitem']!='new' && $isteacher) {
 			echo "<p><a href=\"uploadgrades.php?gbmode={$_GET['gbmode']}&cid=$cid&gbitem={$_GET['gbitem']}\">Upload Grades</a></p>";
 		}
@@ -476,7 +479,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 		}
 		if ($_GET['grades']=='all') {
-			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>"; 
+			echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>";
 			echo ' <input type=button value="Add" onClick="sendtoall(0,0);"/> <input type=button value="Multiply" onclick="sendtoall(0,1)"/> <input type=button value="Replace" onclick="sendtoall(0,2)"/></span><br class="form"/>';
 			echo "<span class=form>Add/Replace to all feedback:</span><span class=formright><input type=text size=40 id=\"toallfeedback\"/>";
 			echo ' <input type=button value="Append" onClick="sendtoall(1,0);"/> <input type=button value="Prepend" onclick="sendtoall(1,1)"/> <input type=button value="Replace" onclick="sendtoall(1,2)"/></span><br class="form"/>';
@@ -531,7 +534,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			 $query .= " ORDER BY imas_users.LastName,imas_users.FirstName";
 		}
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
+
 		while ($row = mysql_fetch_row($result)) {
 			if ($row[4]>0) {
 				if ($hidelocked) { continue; }
@@ -558,13 +561,13 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo "<td><textarea cols=60 rows=1 id=\"feedback{$row[0]}\" name=\"feedback[{$row[0]}]\">{$feedback[$row[0]]}</textarea></td>";
 			echo "</tr>";
 		}
-		
+
 		echo "</tbody></table>";
 		if ($hassection) {
 			echo "<script> initSortTable('myTable',Array('S','S',false,false),false);</script>";
-		} 
+		}
 
-	
+
 ?>
 <div class=submit><input type=submit value="Submit"></div></div>
 </form>
@@ -572,10 +575,10 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 <?php
 	$placeinfooter = '<div id="autosuggest"><ul></ul></div>';
 	require("../footer.php");
-	
+
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		if ($sc>0) { 
+		if ($sc>0) {
 			return $sc;
 		} else {
 			return 0;
@@ -584,7 +587,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
@@ -592,5 +595,3 @@ function getpts($sc) {
 	}
 }
 ?>
-
-

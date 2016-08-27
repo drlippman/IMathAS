@@ -74,16 +74,17 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=092314\" type=\"text/javascript\"></script>\n";
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, "messageStyle": "none"});
 		} else {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none"});
 		}
-		MathJax.Hub.config.extensions.push("InputToDataAttr.js");
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
 		//webFont: "STIX-Web",
-	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
-	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; var mathRenderer = "MathJax"; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>';
 	echo '<style type="text/css">span.MathJax { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==6) {
@@ -93,18 +94,20 @@ if (!isset($sessiondata['mathdisp'])) {
 
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, skipStartupTypeset: true, messageStyle: "none"});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		} else {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, skipStartupTypeset: true,messageStyle: "none"});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		}
-		MathJax.Hub.config.extensions.push("InputToDataAttr.js");
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
-		// webFont: "STIX-Web",
-	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
-	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
-	echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
+	//echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
+	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>';
+	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
+	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css"/>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=070816"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; var mathRenderer = "Katex"; function rendermathnode(node) {renderMathInElement(node);}</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';

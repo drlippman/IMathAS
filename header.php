@@ -10,7 +10,7 @@
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=071416";?>" type="text/css" />
-<?php if (isset($coursetheme)) { 
+<?php if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 	}
@@ -20,18 +20,18 @@
 
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />
-<!--[if lte IE 6]> 
-<style> 
-div { zoom: 1; } 
+<!--[if lte IE 6]>
+<style>
+div { zoom: 1; }
 .clearlooks2, .clearlooks2 div { zoom: normal;}
 .clear { line-height: 0;}
-#GB_overlay, #GB_window { 
- position: absolute; 
- top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px'); 
- left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');} 
+#GB_overlay, #GB_window {
+ position: absolute;
+ top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
+ left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');}
 }
 </style>
-<![endif]--> 
+<![endif]-->
 <style type="text/css" media="print">
 div.breadcrumb { display:none;}
 #headerlogo { display:none;}
@@ -66,45 +66,47 @@ if (!isset($sessiondata['mathdisp'])) {
 	}
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, "messageStyle": "none"});
 		} else {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none"});
 		}
-		MathJax.Hub.config.extensions.push("InputToDataAttr.js");
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
-		// webFont: "STIX-Web", 
-	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
-	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>';
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==6) {
 	//Katex experimental
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=071116\" type=\"text/javascript\"></script>\n";
-	
+
 	echo '<script type="text/x-mathjax-config">
 		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, skipStartupTypeset: true});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		} else {
-			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, skipStartupTypeset: true});
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, "messageStyle": "none", skipStartupTypeset: true});
 		}
-		MathJax.Hub.config.extensions.push("InputToDataAttr.js");
+		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
+		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
 		</script>';
-		// webFont: "STIX-Web", 
-	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
-	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
-	echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
-	echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
+	echo '<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"><\/script>\')</script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
+	//echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
+	echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.js"></script>';
+	//echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
+	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css"/>';
 	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js?v=070616"></script>';
-	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) {renderMathInElement(node);}</script>'; 
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) {renderMathInElement(node);}</script>';
 	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	//these scripts are used by the editor to make image-based math work in the editor
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 	if ($mathdarkbg) {echo 'var mathbg = "dark";';}
-	echo '</script>'; 
+	echo '</script>';
 	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=071116\" type=\"text/javascript\"></script>\n";
 	echo "<script type=\"text/javascript\">var usingASCIIMath = false; var AMnoMathML=true; var MathJaxCompatible = false; function rendermathnode(el) {AMprocessNode(el);}</script>";
 } else if ($sessiondata['mathdisp']==2) {
@@ -140,7 +142,7 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 }
 
 
- 
+
 $curdir = rtrim(dirname(__FILE__), '/\\');
 if (isset($CFG['GEN']['headerscriptinclude'])) {
 	require("$curdir/{$CFG['GEN']['headerscriptinclude']}");
@@ -184,7 +186,7 @@ function getactivetab() {
 		$t = 2; $s = 1;
 	} else if (strpos($path,'listusers')!==false || strpos($path,'/latepass')!==false) {
 		$t = 3;
-	} 
+	}
 	return array($t,$s);
 }
 if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopbar[1])>0 && !isset($flexwidth)) {
@@ -220,12 +222,12 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 	if (in_array(7,$coursetopbar[1])) { //Groups
 		echo "<li><a {$a[7]} href=\"$imasroot/course/managestugrps.php?cid=$cid\">Groups</a></li>\n";
 	}
-	
-	
+
+
 	if (in_array(5,$coursetopbar[1])) { //Quick view
 		echo "<li><a {$a[5]} href=\"$imasroot/course/course.php?cid=$cid&quickview=on\">Quick View</a></li>\n";
 	}
-	
+
 	if (in_array(9,$coursetopbar[1]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
@@ -257,7 +259,7 @@ if (isset($cid) && isset($teacherid) && $coursetopbar[2]==1 && count($coursetopb
 		echo "<li><a {$a[1]} href=\"$imasroot/course/gradebook.php?cid=$cid\">Gradebook</a></li> ";
 		$essentialsnavcnt++;
 	}
-	
+
 	if (in_array(9,$coursetopbar[0]) && !isset($haslogout)) { //Log out
 		echo "<li><a href=\"$imasroot/actions.php?action=logout\">Log Out</a></li>";
 	}
@@ -293,10 +295,8 @@ if (!isset($nologo)) {
 		echo '<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">';
 		echo '</div>';
 	}
-	
+
 }
 
 
 ?>
-
-
