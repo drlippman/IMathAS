@@ -66,7 +66,8 @@ if ($isdiag) {
 //$sessiondata['mathdisp'] = 3;
 if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false; var mathRenderer = "none"; function rendermathnode(el) {AMprocessNode(el);};</script>';
-	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
+	//echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_CHTML&rev=2.6.1"></script>';
+	echo '<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>';
 	echo "<script src=\"$imasroot/javascript/mathgraphcheck.js?v=021215\" type=\"text/javascript\"></script>\n";
 } else if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==3) {
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
