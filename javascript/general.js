@@ -709,6 +709,7 @@ function _(txt) {
       
       $allVideos.each(function(){
         var $this = $(this);
+        if ($this.closest(".textsegment").length>0) {return true;}
         $this.parentsUntil(".intro","table").each(function() {
         	$(this).css('width','100%');
         });
@@ -755,7 +756,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 	$(document).on("keydown", function (e) {
-	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea")) {
+	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea, [contenteditable='true']")) {
 		e.preventDefault();
 	    }
 	});
