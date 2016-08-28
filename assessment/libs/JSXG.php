@@ -20,9 +20,17 @@ $allowedmacros[] = "JSXG_addSegment";
 
 ####### BASIC FUNCTION THAT JUST LOADS THE JSXGRAPH SCRIPT
 function loadJSX() {
-    echo '<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>';
+    echo getJSXscript();
 }
-
+function getJSXscript () {
+		//return '<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>'
+		return '<script type="text/javascript">if (typeof JXG === "undefined" && typeof JXGscriptloaded === "undefined") {
+			var jsxgloadscript = document.createElement("script");
+			jsxgloadscript.src = "//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js";
+			document.getElementsByTagName("head")[0].appendChild(jsxgloadscript);
+			JXGscriptloaded = true;
+		}</script>';
+}
 #####################################
 ######### JSXG_createBoard ##########
 # creates a set of axes, and a board to construct on.
@@ -49,12 +57,12 @@ function JSXG_createAxes($label, $ops=array()){
 
 
    // Add JSXGraph Script
-   $out .= "<script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js'></script>";
+   $out .= getJSXscript();
 
    // Create a home for the board
    $cntrd = $ops['centered']!==null ? "" : "margin:auto;";
    // BE CAREFUL - THE ID OF THE DIV BELOW IS BEING USED IN LATER CODE
-   $out .= "<div id='jxgboard_{$label}' style='width:{$width}px; height:{$height}px; {$cntrd}'></div>";
+   $out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:{$width}px; height:{$height}px; {$cntrd}'></div>";
    // Start construction
    $out .= "<script type='text/javascript'>";
    // We build construction function inline, but call it after div.question loads.
@@ -163,9 +171,7 @@ function JSXG_createAxes($label, $ops=array()){
    // Create DOM script element, make it call the construction function af end of div.question
    $out .= "} catch(err){console.log(err);}
           }
-          var boardScript{$label} = document.createElement('script');
-          boardScript{$label}.innerHTML = 'makeBoard{$label}();';
-          $('#jxgboard_{$label}').closest('div.question')[0].appendChild(boardScript{$label});
+					initstack.push(makeBoard{$label});
           </script>"; // End of script
    return $out;
 }
@@ -847,15 +853,13 @@ function JSXG_createPolarAxes($label, $ops=array()){
    $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
 
    // Add JSXGraph Script
-   $out .= "
-   <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js'></script>
-   ";
+   $out .= getJSXscript();
 
    // Create a home for the board
    $cntrd = $ops['centered']!==null ? "" : "margin:auto;";
    // BE CAREFUL - THE ID OF THE DIV BELOW IS BEING USED IN LATER CODE
    $out .= "
-   <div id='jxgboard_{$label}' style='width:{$size}px; height:{$boardHeight}px; {$cntrd}'></div>
+   <div id='jxgboard_{$label}' style='background-color:#FFF; width:{$size}px; height:{$boardHeight}px; {$cntrd}'></div>
    ";
    // Start construction
    $out .= "<script type='text/javascript'>";
@@ -1040,9 +1044,7 @@ function JSXG_createPolarAxes($label, $ops=array()){
    $out .= "
     } catch(err){console.log(err);}
    }
-   var boardScript{$label} = document.createElement('script');
-   boardScript{$label}.innerHTML = 'makeBoard{$label}();';
-   $('#jxgboard_{$label}').closest('div.question')[0].appendChild(boardScript{$label});
+	 initstack.push(makeBoard{$label});
    </script>
    "; // End of script
    return $out;
