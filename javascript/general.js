@@ -281,23 +281,29 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-function initeditor(edmode,edids,css){
+function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
+	var inlinemode = inline || 0;
 	var selectorstr = '';
 	if (edmode=="exact") { //list of IDs
 		selectorstr = '#'+edids.split(/,/).join(",#");
 	} else if (edmode=="textareas") { //class-based selection
 		selectorstr = "textarea."+edids;
+	} else if (edmode=="divs") { //class-based selection
+		selectorstr = "div."+edids;
+	} else if (edmode=="selector") { //flexible selector
+		selectorstr = edids;
 	}
 	var edsetup = {
 		selector: selectorstr,
+		inline: inlinemode,
 		plugins: [
 			"advlist attach image charmap anchor",
 			"searchreplace code link textcolor",
 			"media table paste asciimath asciisvg rollups"
 		],
 		menubar: false,//"edit insert format table tools ",
-		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code",
+		toolbar1: "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor backcolor | code | saveclose",
 		toolbar2: " alignleft aligncenter alignright | bullist numlist outdent indent  | attach link unlink image | table | asciimath asciimathcharmap asciisvg",
 		extended_valid_elements : 'iframe[src|width|height|name|align|allowfullscreen|frameborder],param[name|value],@[sscr]',
 		content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
@@ -356,6 +362,9 @@ function initeditor(edmode,edids,css){
 		edsetup.toolbar1 = "myEdit myInsert styleselect | bold italic underline subscript superscript | forecolor";
 		edsetup.toolbar2 = " alignleft aligncenter | bullist numlist outdent indent  | link unlink image | asciimath asciimathcharmap asciisvg";
 	} 
+	if (setupfunction) {
+		edsetup.setup = setupfunction;
+	}
 	for (var i in tinymce.editors) {
 		tinymce.editors[i].remove();
 	}
@@ -700,6 +709,7 @@ function _(txt) {
       
       $allVideos.each(function(){
         var $this = $(this);
+        if ($this.closest(".textsegment").length>0) {return true;}
         $this.parentsUntil(".intro","table").each(function() {
         	$(this).css('width','100%');
         });
@@ -746,7 +756,7 @@ jQuery(document).ready(function($) {
 		}
 	});
 	$(document).on("keydown", function (e) {
-	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea")) {
+	    if (e.which === 8 && !$(e.target).is("input[type='text']:not([readonly]),input:not([type]):not([readonly]),input[type='password']:not([readonly]), textarea, [contenteditable='true']")) {
 		e.preventDefault();
 	    }
 	});

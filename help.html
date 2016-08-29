@@ -25,7 +25,7 @@ h1,h2,h3 {
 h1 {
 	color: #00f;
 }
-h2,h3,h4 {
+h2,h3,h4,h5,h6 {
 	color: #00c;
 }
 div.h2 {
@@ -42,6 +42,8 @@ dd {
 }
 
 </style>
+<link rel="stylesheet" href="iconfonts/style.css?v=081316" type="text/css" />
+<link rel="stylesheet" href="tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
 </head>
 <body>
 <div class=h1>
@@ -97,6 +99,9 @@ dd {
 			<ul>
 			<li><a href="#assessmentsettings">Assessment Settings</a></li>
 			<li><a href="#addingquestionstoanassessment">Adding Questions to an Assessment</a></li>
+				<ul>
+				<li><a href="#questionintrotext">Adding an Introduction to a Question</a></li>
+				</ul>
 			<li><a href="#addingnewquestions">Adding New Questions</a></li>
 			<li><a href="#categorizequestions">Categorizing Questions</a></li>
 			<li><a href="#printcopies">Making Print Copies</a></li>
@@ -872,6 +877,16 @@ Once added to the assessment you can:
     delete the question from the Question Set.  You can also use the checkboxes and the "With selected, Remove"
     button to remove multiple questions at once.</li>
 </ul>
+
+<div class=h5>
+<h5><a name="questionintrotext">Adding an Introduction to a Question</a></h5>
+<p>In addition to the assignment Introduction, each question can have an individual introduction.  A common example is to display a video and then a related question as part of a video assignment.</p>
+<p>To add a question introduction, click on <span style="font-weight: bold">+ Text</span> below the last question.  An editable text box will appear where you can write instuctions or drag in a video link.  After you edit your text, click the <span class="mce-i-save" style="font-family: tinymce; font-weight: bold">&nbsp;Save All</span> icon in the editor toolbar.  You can expand/collapse each question intro by clicking the <span class="icon-pencil" style="font-weight: bold">&nbsp;Expand and Edit</span> or <span class="icon-shrink2" style="font-weight: bold">&nbsp;Collapse</span> icons in the lower right of the question intro.  Once you modify a question intro, you'll need to save it to collapse it.</p>
+<p>When you click <span class="mce-i-save" style="font-family: tinymce; font-weight: bold">&nbsp;Save All</span>, all changes you have made in any other question intros will also be saved.  If you leave a question intro with unsaved changes, the Save All button will be highlighted.</p>
+<p>A question intro can be displayed for multiple consecutive questions (except on Embedded assignments).  In the <span style="font-weight: bold">Show for</span> selector, select the number of questions that question intro should be used for.</p>
+<p>Embedded assignments can include page titles.  Check the <span style="font-weight: bold">New Page</span> checkbox to add a page title. Then add your title in the editor and save it.</p>
+<p>Below the last questions is an <span class="icon-enlarge2" style="font-weight: bold">&nbsp;Expand All</span> button which will expand all the question intros.  Click on any one to edit it.<p>
+</div>
 
 <p>If students have taken the assessment, you will not be allowed to make as many changes to the assessment, as it
 will mess up existing student attempts.  If you need to change the assessment a lot, you can clear all student attempts.

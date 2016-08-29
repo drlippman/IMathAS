@@ -1,0 +1,100 @@
+/*Styles for addquestions.php but initially for addqsort.js */
+.textsegment {
+	border: 2px solid transparent;
+}
+.highlightbackground button {
+	background-color: #F8F810 !important;
+}
+.highlightborder .textsegment {
+	border: 2px solid #F8F810 !important;
+}
+.textsegment.mce-edit-focus {
+	outline: none !important;
+	border: 2px solid #DDDDFF;
+}
+.mce-dim{
+	opacity: 0.3;
+}
+.textsegment {
+	height: auto;
+	padding: 0px 5px;
+	margin: 0; /* h4 typically has a large margin which isn't needed */
+}
+h4.textsegment {
+	padding: 3px 5px 5px;
+}
+.textsegment.collapsed * {
+	margin: 5px 0px;
+	padding: 0px;
+	font-size: 1em !important;
+}
+.description-cell {
+	max-width: 0; /* just need any max-width for text-overflow */
+}
+.collapsed {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-height: 1.7em;
+	max-width: 93%;
+	overflow: hidden;
+}
+.intro-like {
+	position: relative;
+	background-color: #fff; /* must match .intro */
+}
+.collapsed * {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+.collapsedheader {
+	white-space: nowrap;
+	max-width: 93%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-height: 1.7em;
+}
+div.text-segment-icon {
+	font-size: 0.85em;
+	z-index: 10;
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	padding: 0;
+	text-align: right;
+	background: transparent;
+}
+div.text-segment-iconglobal {
+	margin: 3px;
+	/* remove some styles used in the general class */
+	display: inline;
+	position: static;
+	bottom: auto;
+	right: auto;
+}
+div.text-segment-iconglobal img {
+	vertical-align: middle;
+}
+button.text-segment-button-global, button.text-segment-button-global:hover, button.text-segment-button-global:active, button.text-segment-button-global:focus  {
+	background-color: #586EEA; /* or #6E9ADC; #7798f9;*/
+	border-color: #586EEA;
+	font-family: sans-serif;
+	font-color: #fff;
+	font-weight: bold;
+	color: #fff;
+}
+.text-segment-button {
+	cursor: pointer;
+	padding: 1px;
+	margin: 2px;
+	background-color: rgba(255,255,255,0.8);
+	box-shadow: 3px 3px 6px 0 rgba(0,0,0,0.2);
+}
+.text-segment-button:hover, .text-segment-button:focus {
+	background-color: white;
+	transition-duration: 0.4s;
+	box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.24);
+}
+tr.textsegmentrow td {
+	vertical-align: top;
+	padding-top:5px;
+}

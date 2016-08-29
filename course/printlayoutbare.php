@@ -81,6 +81,9 @@ if ($overwriteBody==1) {
 	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
+		$line['intro'] = $introjson[0];
+	}
 	
 	$ioquestions = explode(",",$line['itemorder']);
 	$aname = $line['name'];
