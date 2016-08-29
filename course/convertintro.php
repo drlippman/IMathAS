@@ -1,7 +1,7 @@
 <?php
 
 require("../validate.php");
-require("../includes/htmlawed.php");
+require("../includes/htmLawed.php");
 $cid = $_GET['cid'];
 $aid = $_GET['aid'];
 
