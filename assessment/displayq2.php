@@ -95,7 +95,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$iidx+1] = null;
 				} else {
-					if (strpos($arvp,'$f$')!==false) {
+					if (strpos($arv,'$f$')!==false) {
 						$tmp = explode('$f$',$arv);
 						$arv = $tmp[0];
 					}
