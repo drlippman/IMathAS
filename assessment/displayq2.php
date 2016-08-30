@@ -569,6 +569,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 					if ($arvp==='') {
 						$stuanswers[$iidx+1][$kidx] = null;
 					} else {
+						if (strpos($arvp,'$f$')!==false) {
+							$tmp = explode('$f$',$arvp);
+							$arvp = $tmp[0];
+						}
 						if (strpos($arvp,'$!$')!==false) {
 							$arvp = explode('$!$',$arvp);
 							$arvp = $arvp[1];
@@ -590,6 +594,10 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 				if ($arv==='' || $arv==='ReGen') {
 					$stuanswers[$iidx+1] = null;
 				} else {
+					if (strpos($arv,'$f$')!==false) {
+						$tmp = explode('$f$',$arv);
+						$arv = $tmp[0];
+					}
 					if (strpos($arv,'$!$')!==false) {
 						$arv = explode('$!$',$arv);
 						$arv = $arv[1];
