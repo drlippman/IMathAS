@@ -22,7 +22,7 @@ if (!(isset($teacherid))) {
 	$body = "You need to log in as a teacher to access this page";
 } else {
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_POST['checked'])) { //if the form has been submitted
 		$checked = array();
 		foreach ($_POST['checked'] as $id) {
@@ -32,11 +32,11 @@ if (!(isset($teacherid))) {
 			}
 		}
 		$checkedlist = "'".implode("','",$checked)."'";
-		
+
 		$sets = array();
 		if (isset($_POST['docopyopt'])) {
 			$tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
-			
+
 			$query = "SELECT $tocopy FROM imas_assessments WHERE id='{$_POST['copyopt']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$row = mysql_fetch_row($result);
@@ -44,7 +44,7 @@ if (!(isset($teacherid))) {
 			foreach ($tocopyarr as $k=>$item) {
 				$sets[] = "$item='".addslashes($row[$k])."'";
 			}
-			
+
 		} else {
 			$turnonshuffle = 0;
 			$turnoffshuffle = 0;
@@ -89,8 +89,8 @@ if (!(isset($teacherid))) {
 					$showhints = 0;
 				}
 			}
-			
-			
+
+
 			if ($_POST['skippenalty']==10) {
 				$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
 			} else if ($_POST['skippenalty']>0) {
@@ -107,8 +107,8 @@ if (!(isset($teacherid))) {
 			} else {
 				$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 			}
-	
-			
+
+
 			if (isset($_POST['chgtimelimit'])) {
 				$timelimit = $_POST['timelimit']*60;
 				if (isset($_POST['timelimitkickout'])) {
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgeqnhelper'])) {
 				$sets[] = "eqnhelper='{$_POST['eqnhelper']}'";
 			}
-			
+
 			if (isset($_POST['chgcaltag'])) {
 				$caltag = $_POST['caltagact'];
 				$sets[] = "caltag='$caltag'";
@@ -227,7 +227,7 @@ if (!(isset($teacherid))) {
 				}
 				$shuff .= ")";
 				$sets[] = $shuff;
-				
+
 			}
 		}
 		if (isset($_POST['chgavail'])) {
@@ -240,7 +240,7 @@ if (!(isset($teacherid))) {
 				$sets[] = 'reqscore=-1*ABS(reqscore)';
 			}
 		}
-		
+
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -266,7 +266,7 @@ if (!(isset($teacherid))) {
 			$query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-		
+
 		if (isset($_POST['removeperq'])) {
 			$query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
 			mysql_query($query) or die("Query failed : " . mysql_error());
@@ -278,7 +278,7 @@ if (!(isset($teacherid))) {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 		}
 		exit;
-		 
+
 	} else { //DATA MANIPULATION FOR INITIAL LOAD
 		$line['displaymethod']= isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
 		$line['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:10;
@@ -306,11 +306,11 @@ if (!(isset($teacherid))) {
 			$line['defpenalty'] = substr($line['defpenalty'],2);
 		} else {
 			$skippenalty = 0;
-		}	
-		
+		}
+
 		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
+
 		$items = unserialize(mysql_result($result,0,0));
 		$gitypeids = array();
 		$ids = array();
@@ -321,7 +321,7 @@ if (!(isset($teacherid))) {
 		$agbcats = array();
 		$prespace = array();
 		getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
-		
+
 		$query = "SELECT id,name,gbcategory FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)==0) {
@@ -336,8 +336,8 @@ if (!(isset($teacherid))) {
 				$agbcats[$row[0]] = $row[2];
 				$i++;
 			}
-		}	
-		
+		}
+
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=1;
@@ -351,7 +351,7 @@ if (!(isset($teacherid))) {
 				$i++;
 			}
 		}
-		
+
 		$page_forumSelect = array();
 		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -361,7 +361,7 @@ if (!(isset($teacherid))) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
 		}
-		
+
 		$page_allowlateSelect = array();
 		$page_allowlateSelect['val'][0] = 0;
 		$page_allowlateSelect['label'][0] = "None";
@@ -372,10 +372,10 @@ if (!(isset($teacherid))) {
 			$page_allowlateSelect['label'][] = "Up to $k";
 		}
 
-		
+
 	}
 }
-	
+
 /******* begin html output ********/
  require("../header.php");
 
@@ -391,7 +391,7 @@ span.show {
 	display: inline;
 }
 table td {
-	border-bottom: 1px solid #ccf;	
+	border-bottom: 1px solid #ccf;
 }
 </style>
 <script type="text/javascript">
@@ -418,10 +418,10 @@ function copyfromtoggle(frm,mark) {
 					tds[i].style.display = "";
 				}
 			}
-				
+
 		} catch(er) {}
 	}
-	
+
 }
 function chkgrp(frm, arr, mark) {
 	  var els = frm.getElementsByTagName("input");
@@ -442,7 +442,7 @@ function chkgbcat(cat) {
 		  if (el.type=='checkbox' && el.id.match(regExp)) {
 	     	       el.checked = true;
 		  }
-	}	
+	}
 }
 function valform() {
 	if ($("#qform input:checkbox[name='checked[]']:checked").length == 0) {
@@ -468,17 +468,17 @@ $(function() {
 			$(this).parents("tr").removeClass("odd");
 		}*/
 	});
-		
+
 })
 </script>
 
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
-	<div id="headerchgassessments" class="pagetitle"><h2>Mass Change Assessment Settings 
+	<div id="headerchgassessments" class="pagetitle"><h2>Mass Change Assessment Settings
 		<img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
 	</h2></div>
 
 	<p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
-	<p><b>Be aware</b> that changing default points or penalty after an assessment has been 
+	<p><b>Be aware</b> that changing default points or penalty after an assessment has been
 	 taken will not change the scores of students who have already completed the assessment.<br/>
 	 This page will <i>always</i> show the system default settings; it does not show the current settings for your assessments.</p>
 
@@ -486,8 +486,8 @@ $(function() {
 		<h3>Assessments to Change</h3>
 
 		Check: <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
-		Check by gradebook category: 
-		<?php 
+		Check by gradebook category:
+		<?php
 		writeHtmlSelect ("selbygbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Select...",-1,' onchange="chkgbcat(this.value);" id="selbygbcat" ');
 		?>
 		<ul id="alistul" class=nomark>
@@ -495,7 +495,7 @@ $(function() {
 	echo $page_assessListMsg;
 	$inblock = 0;
 	for ($i = 0 ; $i<(count($ids)); $i++) {
-			
+
 			if (strpos($types[$i],'Block')!==false) {
 				if ($blockout!='' && $blockid==$parents[$i]) {
 					echo "<li>$blockout</li>";
@@ -506,7 +506,7 @@ $(function() {
 				$blockout .='/>';
 				$blockout .= '<i>'.$prespace[$i].$names[$i].'</i>';
 				$blockid = $ids[$i];
-				
+
 			} else {
 				if ($blockout!='' && $blockid==$parents[$i]) {
 					echo "<li>$blockout</li>";
@@ -522,9 +522,9 @@ $(function() {
 				echo $prespace[$i].$names[$i];
 				echo '</li>';
 			}
-			
+
 	}
-	
+
 	/*for ($i=0;$i<count($page_assessSelect['val']);$i++) {
 ?>
 			<li><input type=checkbox name='checked[]' value='<?php echo $page_assessSelect['val'][$i] ?>' checked=checked><?php echo $page_assessSelect['label'][$i] ?></li>
@@ -543,7 +543,7 @@ $(function() {
 			<tr>
 				<td><input type="checkbox" name="chgsummary" class="chgbox"/></td>
 				<td class="r">Summary:</td>
-				<td>Copy from: 
+				<td>Copy from:
 <?php
 	writeHtmlSelect("summary",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
@@ -553,7 +553,7 @@ $(function() {
 			<tr>
 				<td><input type="checkbox" name="chgintro" class="chgbox"/></td>
 				<td class="r">Instructions:</td>
-				<td>Copy from: 
+				<td>Copy from:
 <?php
 	writeHtmlSelect("intro",$page_assessSelect['val'],$page_assessSelect['label']);
 ?>
@@ -641,7 +641,7 @@ $(function() {
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
 				<td class="r">Default penalty:</td>
-				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>% 
+				<td><input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
    					<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
 						<option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
 						<option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -693,14 +693,14 @@ $(function() {
 					</span>
 				</td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
 				<td class="r">Use equation helper?</td>
 				<td>
 				<select name="eqnhelper">
 					<option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
-				<?php	
+				<?php
 					//phase out unless a default
 					if ($CFG['AMS']['eqnhelper']==1 || $CFG['AMS']['eqnhelper']==2) {
 				?>
@@ -760,7 +760,7 @@ $(function() {
 				<td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
 				<td class="r">Make hard to print?: </td>
 				<td>
-				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes 
+				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes
 				</td>
 			</tr>
 			<tr class="coptr">
@@ -770,13 +770,13 @@ $(function() {
 				<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
 				</td>
 			</tr>
-			
-			
+
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
 				<td class="r">Gradebook category: </td>
 				<td>
-<?php 
+<?php
 writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,null,null," id=gbcat");
 ?>
 
@@ -790,11 +790,13 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 $page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 $page_tutorSelect['val'] = array(2,0,1);
 writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
-			
+
+$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
+
 ?>
 				</td>
 			</tr>
-				
+
 			<tr class="coptr">
 				<td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
 				<td class="r" style="border-bottom: 1px solid #000">Count: </td>
@@ -804,13 +806,13 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input name="cntingb" value="2" type="radio"> Count as Extra Credit
 				</td>
 			</tr>
-			
-			
+
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
-				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>, 
+				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>,
 				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
 				</td>
 			<tr class="coptr">
@@ -818,16 +820,16 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td class="r">Minimum score to receive credit: </td>
 				<td>
 				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
-				<input type="radio" name="minscoretype" value="0" checked="checked"> Points 
-				<input type="radio" name="minscoretype" value="1"> Percent 
-	
+				<input type="radio" name="minscoretype" value="0" checked="checked"> Points
+				<input type="radio" name="minscoretype" value="1"> Percent
+
 				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgdeffb" class="chgbox"/></td>
 				<td class="r">Default Feedback Text: </td>
 				<td>Use? <input type="checkbox" name="usedeffb"><br/>
-				Text: <input type="text" size="60" name="deffb" value="This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items." /></td>
+				Text: <input type="text" size="60" name="deffb" value="<?php echo $deffb;?>" /></td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
@@ -854,7 +856,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td class="r">All students same version of questions: </td>
 				<td><input type="checkbox" name="samever"></td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
 				<td class="r">Penalty for questions done while in exception/LatePass: </td>
@@ -862,7 +864,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
 				</td>
 			</tr>
-<?php 
+<?php
 /* removed because gets too confusing with group sets
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgisgroup"/></td>
@@ -872,7 +874,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type="radio" name="isgroup" value="2"  />Students can add members without passwords<br/>
 				<input type="radio" name="isgroup" value="3"  />Students cannot add members</td>
 			</tr>
-			
+
 			<tr class="coptr">
 				<td><input type="checkbox" name="chggroupmax"/></td>
 				<td class="r">Max group members (if group assessment):</td>
@@ -897,7 +899,7 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<input type="checkbox" name="istutorial"/>
 				</td>
 			</tr>
-			<tr>	
+			<tr>
 				<td style="border-top: 1px solid #000"></td>
 				<td class="r" style="border-top: 1px solid #000">Define end of assessment messages?</td>
 				<td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" class="chgbox"/> You will be taken to a page to change these after you hit submit</td>

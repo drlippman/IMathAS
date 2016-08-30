@@ -362,7 +362,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 			if ($line['deffeedbacktext']=='') {
 				$usedeffb = false;
-				$deffb = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+				$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
 			} else {
 				$usedeffb = true;
 				$deffb = $line['deffeedbacktext'];
@@ -412,7 +412,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']:'R';
 			$line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:2;
 			$usedeffb = false;
-			$deffb = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+			$deffb = _("This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.");
 			$gbcat = 0;
 			$cntingb = 1;
 			$pcntingb = 3;
