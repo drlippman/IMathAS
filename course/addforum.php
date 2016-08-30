@@ -22,7 +22,7 @@ if (isset($_GET['id'])) {
 } else {
 	$curBreadcrumb .= "&gt; Add Forum\n";
 	$pagetitle = "Add Forum";
-} 
+}
 if (isset($_GET['tb'])) {
 	$totb = $_GET['tb'];
 } else {
@@ -38,7 +38,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
-	
+
 	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
 		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
@@ -86,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
 		}
-		
+
 		if ($_POST['cntingb']==0) {
 			$_POST['points'] = 0;
 			$tutoredit = 0;
@@ -97,11 +97,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$_POST['cntingb'] = 0;
 			}
 		}
-		
+
 		if (intval($_POST['points'])==0) {
 			$_POST['cntingb'] = 0;
-		} 
-		
+		}
+
 		$caltag = $_POST['caltagpost'].'--'.$_POST['caltagreply'];
 		if (isset($_POST['usetags'])) {
 			$taglist = trim($_POST['taglist']);
@@ -129,9 +129,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		$outcomes = implode(',',$outcomes);
-		
+
 		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
-		
+
 		require_once("../includes/htmLawed.php");
 		if ($_POST['description']=='<p>Enter forum description here</p>') {
 			$_POST['description'] = '';
@@ -153,7 +153,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$oldgroupsetid = mysql_result($result,0,0);
 			if ($oldgroupsetid!=$_POST['groupsetid']) {
-				//change of groupset; zero out stugroupid 
+				//change of groupset; zero out stugroupid
 				$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
@@ -163,25 +163,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$newforumid = $_GET['id'];
-			
+
 		} else { //add new
 			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes,allowlate) VALUES ";
 			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}','{$_POST['postinstr']}','{$_POST['replyinstr']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes',$allowlate);";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
+
 			$newforumid = mysql_insert_id();
-			
+
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
 			$query .= "('$cid','Forum','$newforumid');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
+
 			$itemid = mysql_insert_id();
-						
+
 			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$items = unserialize($line['itemorder']);
-				
+
 			$blocktree = explode('-',$block);
 			$sub =& $items;
 			for ($i=1;$i<count($blocktree);$i++) {
@@ -195,7 +195,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$itemorder = addslashes(serialize($items));
 			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			
+
 		}
 		$query = "SELECT id FROM imas_forum_subscriptions WHERE forumid='$newforumid' AND userid='$userid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -203,13 +203,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			if (!isset($_POST['subscribe'])) {
 				$query = "DELETE FROM imas_forum_subscriptions WHERE forumid='$newforumid' AND userid='$userid'";
 				mysql_query($query) or die("Query failed : " . mysql_error());
-			}	
+			}
 		} else if (isset($_POST['subscribe'])) {
 			$query = "INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES ('$newforumid','$userid')";
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-			
+
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
 		if (isset($_GET['id'])) { //MODIFY MODE
@@ -285,14 +285,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$cntingb = 0;
 			$line['tutoredit'] = 0;
 			$savetitle = _("Create Forum");
-		}   
-		
+		}
+
 		list($posttag,$replytag) = explode('--',$line['caltag']);
-		
+
 		$page_formActionTag = "?block=$block&cid=$cid&folder=" . $_GET['folder'];
 		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . $_GET['id'] : "";
 		$page_formActionTag .= "&tb=$totb";
-		
+
 		$hr = floor($coursedeftime/60)%12;
 		$min = $coursedeftime%60;
 		$am = ($coursedeftime<12*60)?'am':'pm';
@@ -301,7 +301,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$min = $coursedefstime%60;
 		$am = ($coursedefstime<12*60)?'am':'pm';
 		$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-	
+
 		if ($startdate!=0) {
 			$sdate = tzdate("m/d/Y",$startdate);
 			$stime = tzdate("g:i a",$startdate);
@@ -311,33 +311,33 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		if ($enddate!=2000000000) {
 			$edate = tzdate("m/d/Y",$enddate);
-			$etime = tzdate("g:i a",$enddate);	
+			$etime = tzdate("g:i a",$enddate);
 		} else {
 			$edate = tzdate("m/d/Y",time()+7*24*60*60);
 			$etime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
-		}  
+		}
 		if ($replyby<2000000000 && $replyby>0) {
 			$replybydate = tzdate("m/d/Y",$replyby);
-			$replybytime = tzdate("g:i a",$replyby);	
+			$replybytime = tzdate("g:i a",$replyby);
 		} else {
 			$replybydate = tzdate("m/d/Y",time()+7*24*60*60);
 			$replybytime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
 		}
 		if ($postby<2000000000 && $postby>0) {
 			$postbydate = tzdate("m/d/Y",$postby);
-			$postbytime = tzdate("g:i a",$postby);	
+			$postbytime = tzdate("g:i a",$postby);
 		} else {
 			$postbydate = tzdate("m/d/Y",time()+7*24*60*60);
 			$postbytime = $deftime; // tzdate("g:i a",time()+7*24*60*60);
 		}
-		
+
 		if (!isset($_GET['id'])) {
 			$stime = $defstime;
 			$etime = $deftime;
 			$replybytime = $deftime;
 			$postbytime = $deftime;
 		}
-		
+
 		/*
 		$query = "SELECT id,name FROM imas_assessments WHERE isgroup>0 AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -358,7 +358,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 			$i++;
 		}
-		
+
 		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$page_gbcatSelect = array();
@@ -408,10 +408,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			}
 		}
 		flattenarr($outcomearr);
-		
+
 		$page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
 		$page_tutorSelect['val'] = array(2,0,1);
-		
+
 		$page_allowlateSelect = array();
 		$page_allowlateSelect['val'][0] = 0;
 		$page_allowlateSelect['label'][0] = "None";
@@ -443,10 +443,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 if ($overwriteBody==1) {
 	echo $body;
-} else {  //ONLY INITIAL LOAD HAS DISPLAY 	
+} else {  //ONLY INITIAL LOAD HAS DISPLAY
 
 ?>
-	
+
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headeraddforum" class="pagetitle"><h2><?php echo $pagetitle ?><img src="<?php echo $imasroot ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo $imasroot ?>/help.php?section=forumitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h2></div>
 
@@ -454,13 +454,13 @@ if ($overwriteBody==1) {
 		<span class=form>Name: </span>
 		<span class=formright><input type=text size=60 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span>
 		<BR class=form>
-	
+
 		Description:<BR>
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
 		<?php echo htmlentities($line['description']);?></textarea>
 		</div><br/>
-		
+
 		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
 			echo '<div><script type="text/javascript"> function showpostreply(el) { $("#postreplyinstr").show(); $(el).remove();}</script>';
 			echo '<a href="#" onclick="showpostreply(this);return false">'._('Add Posting / Reply Instructions').'</a>';
@@ -486,25 +486,25 @@ if ($overwriteBody==1) {
 			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
 			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
 		</span><br class="form"/>
-		
+
 		<div id="datediv" style="display:<?php echo ($line['avail']==1)?"block":"none"; ?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/> 
+			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
 			Always until end date<br/>
 			<input type=radio name="sdatetype" value="sdate" <?php  writeHtmlChecked($startdate,'0',1) ?>/>
-			<input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+			<input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 		</span><BR class=form>
-		
+
 		<span class=form>Available Until:</span>
 		<span class=formright>
 			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
 			 Always after start date<br/>
 			<input type=radio name="edatetype" value="edate"  <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-			<input type=text size=10 name=edate value="<?php echo $edate;?>"> 
+			<input type=text size=10 name=edate value="<?php echo $edate;?>">
 			<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime;?>">
@@ -518,38 +518,38 @@ if ($overwriteBody==1) {
 	}
 ?>
 		</span><br class="form"/>
-		
-		
+
+
 		<span class=form>Allow anonymous posts:</span>
 		<span class=formright>
 			<input type=checkbox name="allowanon" value="1" <?php if ($allowanon) { echo "checked=1";}?>/>
 		</span><br class="form"/>
-		
+
 		<span class=form>Allow students to modify posts:</span>
 		<span class=formright>
 			<input type=checkbox name="allowmod" value="1" <?php if ($allowmod) { echo "checked=1";}?>/>
 		</span><br class="form"/>
-		
+
 		<span class=form>Allow students to delete own posts (if no replies):</span>
 		<span class=formright>
 			<input type=checkbox name="allowdel" value="1" <?php if ($allowdel) { echo "checked=1";}?>/>
 		</span><br class="form"/>
-		
+
 		<span class=form>Turn on "liking" posts:</span>
 		<span class=formright>
 			<input type=checkbox name="allowlikes" value="1" <?php if ($allowlikes) { echo "checked=1";}?>/>
 		</span><br class="form"/>
-		
+
 		<span class=form>Viewing before posting:</span>
 		<span class=formright>
 			<input type=checkbox name="viewafterpost" value="1" <?php if ($viewafterpost) { echo "checked=1";}?>/> Prevent students from viewing posts until they have created a thread.<br/><i>You will likely also want to disable modifying posts</i>
 		</span><br class="form"/>
-		
+
 		<span class=form>Get email notify of new posts:</span>
 		<span class=formright>
 			<input type=checkbox name="subscribe" value="1" <?php if ($hassubscrip) { echo "checked=1";}?>/>
 		</span><br class="form"/>
-		
+
 		<span class=form>Default display:</span>
 		<span class=formright>
 			<select name="defdisplay">
@@ -557,34 +557,34 @@ if ($overwriteBody==1) {
 				<option value="2" <?php if ($defdisplay==2) {echo "selected=1";}?>>Condensed</option>
 			</select>
 		</span><br class="form" />
-		
+
 		<span class="form">Sort threads by: </span>
 		<span class="formright">
 			<input type="radio" name="sortby" value="0" <?php writeHtmlChecked($sortby,0);?>/> Thread start date<br/>
 			<input type="radio" name="sortby" value="1" <?php writeHtmlChecked($sortby,1);?>/> Most recent reply date
 		</span><br class="form" />
-		
+
 		<span class=form>Students can create new threads:</span><span class=formright>
 			<input type=radio name="postby" value="Always" <?php if ($postby==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="postby" value="Never" <?php if ($postby==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before: 
+			<input type=radio name="postby" value="Date" <?php if ($postby<2000000000 && $postby>0) { echo "checked=1";}?>/>Before:
 			<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
 			<a href="#" onClick="displayDatePicker('postbydate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=postbytime value="<?php echo $postbytime;?>">
 		</span><br class="form"/>
-		
+
 		<span class=form>Students can reply to posts:</span>
 		<span class=formright>
 			<input type=radio name="replyby" value="Always" <?php if ($replyby==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="replyby" value="Never" <?php if ($replyby==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before: 
+			<input type=radio name="replyby" value="Date" <?php if ($replyby<2000000000 && $replyby>0) { echo "checked=1";}?>/>Before:
 			<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
 			<a href="#" onClick="displayDatePicker('replybydate', this, 'sdate', 'start date'); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
 		</span><br class="form" />
-		
+
 		<span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
 				<?php
@@ -593,15 +593,15 @@ if ($overwriteBody==1) {
 				writeHtmlSelect("allowlateon",$page_allowlateonSelect['val'],$page_allowlateonSelect['label'],floor($line['allowlate']/10)%10);
 				?>
 				<br/><label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>100,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
-			</span><BR class=form> 
-		
+			</span><BR class=form>
+
 		<span class="form">Calendar icon:</span>
 		<span class="formright">
-			New Threads: <input name="caltagpost" type=text size=4 value="<?php echo $posttag;?>"/>, 
-			Replies: <input name="caltagreply" type=text size=4 value="<?php echo $replytag;?>"/>
+			New Threads: <input name="caltagpost" type=text size=8 value="<?php echo $posttag;?>"/>,
+			Replies: <input name="caltagreply" type=text size=8 value="<?php echo $replytag;?>"/>
 		</span><br class="form" />
-		
-		
+
+
 		<span class="form">Count in gradebook?</span>
 		<span class="formright">
 			<input type=radio name="cntingb" value="0" <?php if ($cntingb==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
@@ -616,7 +616,7 @@ if ($overwriteBody==1) {
 		</span><br class="form"/>
 		<span class=form>Gradebook Category:</span>
 			<span class=formright>
-		
+
 <?php
 	writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
 ?>
@@ -625,11 +625,11 @@ if ($overwriteBody==1) {
 			<span class="formright">
 <?php
 	writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
-?>			
+?>
 		</span><br class="form" />
 
 		<span class=form>Use Scoring Rubric</span><span class=formright>
-<?php 
+<?php
     writeHtmlSelect('rubric',$rubric_vals,$rubric_names,$line['rubric']);
     echo " <a href=\"addrubric.php?cid=$cid&amp;id=new&amp;from=addf&amp;fid={$_GET['id']}\">Add new rubric</a> ";
     echo "| <a href=\"addrubric.php?cid=$cid&amp;from=addf&amp;fid={$_GET['id']}\">Edit rubrics</a> ";
@@ -641,7 +641,7 @@ if ($overwriteBody==1) {
 			writeHtmlMultiSelect('outcomes',$outcomes,$outcomenames,$gradeoutcomes,'Select an outcome...');
 			echo '</span><br class="form"/>';
 	}
-	
+
 ?>
 		</div>
 		<span class="form">Forum type:</span>
@@ -651,16 +651,16 @@ if ($overwriteBody==1) {
 		</span><br class="form"/>
 		<span class="form">Categorize posts?</span>
 		<span class="formright">
-			<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?> 
+			<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
 			  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
 			  <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
 			  Enter in format CategoryDescription:category,category,category<br/>
 			  <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
 			  </span>
 		</span><br class="form"/>
-		
+
 		<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
-	</form>	
+	</form>
 	<p>&nbsp;</p>
 	<p>&nbsp;</p>
 <?php

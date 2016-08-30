@@ -812,8 +812,8 @@ $deffb = _("This assessment contains items that are not automatically graded.  Y
 				<td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
 				<td class="r">Calendar icon:</td>
 				<td>
-				Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>,
-				Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
+				Active: <input name="caltagact" type=text size=8 value="<?php echo $line['caltag'];?>"/>,
+				Review: <input name="caltagrev" type=text size=8 value="<?php echo $line['calrtag'];?>"/>
 				</td>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgminscore" class="chgbox"/></td>
