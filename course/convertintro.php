@@ -105,7 +105,7 @@ function convertintro($current_intro) {
 				}
 			}
 		}
-		return $introjson;
+		return array($introjson,$isembed);
 	}
 }
 
@@ -114,11 +114,11 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$converted = array();
 	while ($row = mysql_fetch_row($result)) {
-		$introjson = convertintro($row[0]);
+		list($introjson,$isembed) = convertintro($row[0]);
 		if ($introjson !== false) {
 			$query = "UPDATE imas_assessments SET intro='".addslashes(json_encode($introjson))."' WHERE id='{$row[1]}'";
 			mysql_query($query) or die("Query failed : " . mysql_error());
-			$converted[] = $row[2]; 
+			$converted[] = $row[2];
 		}
 	}
 	require("../header.php");
@@ -133,12 +133,12 @@ if (isset($_GET['confirm']) && $_GET['confirm']=='all') {
 	if (mysql_num_rows($result)==0) {echo "Invalid id"; exit;}
 	list($current_intro_json,$qitemorder) = mysql_fetch_row($result);
 
-	$introjson = convertintro($current_intro_json);
+	list($introjson,$isembed) = convertintro($current_intro_json);
 	if ($introjson===false) {
 		echo 'Already converted, or does not need converting';
 		exit;
 	}
-	
+
 	if (isset($_GET['confirm'])) {
 		$query = "UPDATE imas_assessments SET intro='".addslashes(json_encode($introjson))."' WHERE id='$aid'";
 		mysql_query($query) or die("Query failed : " . mysql_error());
