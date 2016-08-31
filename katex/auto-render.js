@@ -119,8 +119,23 @@ var splitWithDelimiters = function(text, delimiters) {
     }
     return data;
 };
-
+var normalizemathunicode = function(str) {
+	str = str.replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, "");
+	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
+	str = str.replace(/\u2044|\u2215/g, "/");
+	str = str.replace(/∞/g,"oo").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/∪/g,"U");
+	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
+	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
+	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
+	str = str.replace(/\bOO\b/i,"oo");
+	str = str.replace(/θ/,"theta").replace(/φ/,"phi").replace(/π/,"pi").replace(/σ/,"sigma").replace(/μ/,"mu")
+	str = str.replace(/α/,"alpha").replace(/β/,"beta").replace(/γ/,"gamma").replace(/δ/,"delta").replace(/ε/,"epsilon").replace(/κ/,"kappa");
+	str = str.replace(/λ/,"lambda").replace(/ρ/,"rho").replace(/τ/,"tau").replace(/χ/,"chi").replace(/ω/,"omega");
+	str = str.replace(/Ω/,"Omega").replace(/Γ/,"Gamma").replace(/Φ/,"Phi").replace(/Δ/,"Delta").replace(/Σ/,"Sigma");
+	return str;
+}
 var renderMathInText = function(text, delimiters) {
+		text = normalizemathunicode(text);
     var data = splitWithDelimiters(text, delimiters);
 
     var fragment = document.createDocumentFragment();

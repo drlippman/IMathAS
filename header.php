@@ -93,7 +93,7 @@ if (!isset($sessiondata['mathdisp'])) {
 		}
 		MathJax.Ajax.config.path["Local"] = "'.$imasroot.'/mathjax/extensions";
 		MathJax.Hub.config.extensions.push("[Local]/InputToDataAttrCDN.js");
-		MathJax.Hub.Register.StartupHook("End Config", setupKatexAutoRenderWhenReady);
+		MathJax.Hub.Register.StartupHook("Begin Config", setupKatexAutoRenderWhenReady);
 		</script>
 		<script type="text/javascript">
 		function setupKatexAutoRenderWhenReady() {
