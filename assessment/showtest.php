@@ -1317,7 +1317,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			}
 			$testsettings['intro'] = array_shift($intropieces);
 		}
-		$introhaspages = ($testsettings['displaymethod'] == "Embed" && substr($testsettings['intro'],'[PAGE')!==false);
+		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	} else if (count($introjson)>1) {
 		$intropieces = array();
 		$introdividers = array();
@@ -1339,7 +1339,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$lastdisplaybefore = $introjson[$i]['displayBefore'];
 		}
 	} else {
-		$introhaspages = ($testsettings['displaymethod'] == "Embed" && substr($testsettings['intro'],'[PAGE')!==false);
+		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	}
 
 	if (isset($_GET['action'])) {
