@@ -1,9 +1,9 @@
-(function() {
-		
+function setupKatexAutoRender() {
+
 var findEndOfMath = function(delimiter, text, startIndex) {
     // Adapted from
     // https://github.com/Khan/perseus/blob/master/src/perseus-markdown.jsx
-    
+
     var index = startIndex;
     var braceLevel = 0;
 
@@ -131,7 +131,7 @@ var renderMathInText = function(text, delimiters) {
         } else {
             var span = document.createElement("span");
             var math = data[i].data;
-            if (data[i].format == "asciimath") {   
+            if (data[i].format == "asciimath") {
             	    math = "\\displaystyle "+AMTparseAMtoTeX(math);
             } else if (math.indexOf("\\displaystyle")==-1) {
             	    math = "\\displaystyle "+math;
@@ -232,9 +232,9 @@ var renderMathInElement = function(elem, options) {
 };
 
 window.renderMathInElement = renderMathInElement;
-
-})();
-
+window.rendermathnode = function (node) {renderMathInElement(node);}
 $(function() {
-	renderMathInElement(document.body);	
+	renderMathInElement(document.body);
 });
+
+};

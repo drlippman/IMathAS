@@ -1,8 +1,8 @@
 <?php
-//IMathAS:  Checks user's login - prompts if none. 
+//IMathAS:  Checks user's login - prompts if none.
 //(c) 2006 David Lippman
  header('P3P: CP="ALL CUR ADM OUR"');
- 
+
  $curdir = rtrim(dirname(__FILE__), '/\\');
  if (!file_exists("$curdir/config.php")) {
 	 header('Location: http://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/install.php");
@@ -12,7 +12,7 @@
  if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
  ini_set('session.gc_maxlifetime',86400);
  ini_set('auto_detect_line_endings',true);
- 
+
  $hostparts = explode('.',$_SERVER['HTTP_HOST']);
  if ($_SERVER['HTTP_HOST'] != 'localhost' && !is_numeric($hostparts[count($hostparts)-1])) {
  	 session_set_cookie_params(0, '/', '.'.implode('.',array_slice($hostparts,isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-2)));
@@ -22,7 +22,7 @@
  } else {
  	 $randf = 'rand';
  }
- 
+
  session_start();
  $sessionid = session_id();
  if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
@@ -30,7 +30,7 @@
  } else {
  	 $urlmode = 'http://';
  }
- 
+
  $myrights = 0;
  $myspecialrights = 0;
  $ispublic = false;
@@ -43,7 +43,7 @@
  }
  $coursetheme = $defaultcoursetheme; //will be overwritten later if set
  if (!isset($CFG['CPS']['miniicons'])) {
-	$CFG['CPS']['miniicons'] = array( 
+	$CFG['CPS']['miniicons'] = array(
 		 'assess'=>'assess_tiny.png',
 		 'drill'=>'drill_tiny.png',
 		 'inline'=>'inline_tiny.png',
@@ -53,12 +53,12 @@
 		 'folder'=>'folder_tiny.png',
 		 'calendar'=>'1day.png');
  }
- 
- //check for bad sessionids.  
- if (strlen($sessionid)<10) { 
+
+ //check for bad sessionids.
+ if (strlen($sessionid)<10) {
 	 if (function_exists('session_regenerate_id')) { session_regenerate_id(); }
 	echo "Error.  Please <a href=\"$imasroot/index.php\">try again</a>";
-	exit;	 
+	exit;
  }
  $sessiondata = array();
  $query = "SELECT * FROM imas_sessions WHERE sessionid='$sessionid'";
@@ -88,7 +88,7 @@
 		 } else {
 			 $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
 		 }
-		 
+
 		 $sessiondata['useragent'] = $_SERVER['HTTP_USER_AGENT'];
 		 $sessiondata['ip'] = $_SERVER['REMOTE_ADDR'];
 		 $sessiondata['mathdisp'] = $_POST['mathdisp'];
@@ -101,16 +101,16 @@
 		 $enc = base64_encode(serialize($sessiondata));
 		 $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
 		 mysql_query($query) or die("Query failed : " . mysql_error());
-		 
+
 		// $now = time();
 		// $query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		// mysql_query($query) or die("Query failed : " . mysql_error());
-		 
-		 
+
+
 		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
 		 exit;
 	 }
-			 
+
  }
  $hasusername = isset($userid);
  $haslogin = isset($_POST['password']);
@@ -129,19 +129,20 @@
  $verified = false;  $err = '';
  //Just put in username and password, trying to log in
  if ($haslogin && !$hasusername) {
-	  //clean up old sessions
-	 $now = time();
-	 $old = $now - 25*60*60;
-	 $query = "DELETE FROM imas_sessions WHERE time<$old";
-	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	 
+	  $now = time();
+		//clean up old sessions
+	 //REMOVED since deleting old sessions can trigger login on LTI launches over 25 hours
+	 //$old = $now - 25*60*60;
+	 //$query = "DELETE FROM imas_sessions WHERE time<$old";
+	 //$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
 	 	$query = 'SELECT ver FROM imas_dbschema WHERE id=2';
 	 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	 	$guestcnt = mysql_result($result,0,0);
 	 	$query = 'UPDATE imas_dbschema SET ver=ver+1 WHERE id=2';
 	 	mysql_query($query) or die("Query failed : " . mysql_error());
-		
+
 		if (isset($CFG['GEN']['homelayout'])) {
 			$homelayout = $CFG['GEN']['homelayout'];
 		} else {
@@ -151,7 +152,7 @@
 	 	$query .= "VALUES ('guestacct$guestcnt','',5,'Guest','Account','none@none.com',0,'$homelayout')";
 	 	mysql_query($query) or die("Query failed : " . mysql_error());
 	 	$userid = mysql_insert_id();
-	 	
+
 		$query = "SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4";
 		if (isset($_GET['cid'])) { $query.= ' AND id='.intval($_GET['cid']); }
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -165,13 +166,13 @@
 			}
 			mysql_query($query) or die("Query failed : " . mysql_error());
 		}
-	 	
+
 	 	$line['id'] = $userid;
 	 	$line['rights'] = 5;
 	 	$line['groupid'] = 0;
 	 	$_POST['password'] = 'temp';
 	 	if (isset($CFG['GEN']['newpasswords'])) {
-	 		require_once("includes/password.php");		
+	 		require_once("includes/password.php");
 	 		$line['password'] =  password_hash('temp', PASSWORD_DEFAULT);
 	 	} else {
 	 		$line['password'] = md5('temp');
@@ -184,7 +185,7 @@
 	 }
 	// if (($line != null) && ($line['password'] == md5($_POST['password']))) {
 	if (isset($CFG['GEN']['newpasswords'])) {
-	 	require_once("includes/password.php");		
+	 	require_once("includes/password.php");
 	}
 	if (($line != null) && (
 	  ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($line['password'].$_SESSION['challenge']) == $_POST['password']) ||($line['password'] == md5($_POST['password']))))
@@ -205,7 +206,7 @@
 			require("footer.php");
 			exit;
 		 }
-		 
+
 		 //$sessiondata['mathdisp'] = $_POST['mathdisp'];
 		 //$sessiondata['graphdisp'] = $_POST['graphdisp'];
 		 //$sessiondata['useed'] = $_POST['useed'];
@@ -215,55 +216,55 @@
 		 if ($_POST['access']==1) { //text-based
 			 $sessiondata['mathdisp'] = $_POST['mathdisp']; //to allow for accessibility
 			 $sessiondata['graphdisp'] = 0;
-			 $sessiondata['useed'] = 0; 
+			 $sessiondata['useed'] = 0;
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==2) { //img graphs
 		 	 //deprecated
 			 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 			 $sessiondata['graphdisp'] = 2;
-			 $sessiondata['useed'] = checkeditorok(); 
+			 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==4) { //img math
 		 	 //deprecated
 			 $sessiondata['mathdisp'] = 2;
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok(); 
+			 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==3) { //img all
-			 $sessiondata['mathdisp'] = 2;  
+			 $sessiondata['mathdisp'] = 2;
 			 $sessiondata['graphdisp'] = 2;
-			 $sessiondata['useed'] = checkeditorok(); 
+			 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==5) { //mathjax experimental
 		 	 //deprecated, as mathjax is now default
-		 	 $sessiondata['mathdisp'] = 1; 
+		 	 $sessiondata['mathdisp'] = 1;
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok(); 
+			 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if ($_POST['access']==6) { //katex experimental
-		 	 $sessiondata['mathdisp'] = 6; 
+		 	 $sessiondata['mathdisp'] = 6;
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-			 $sessiondata['useed'] = checkeditorok(); 
+			 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else if (!empty($_POST['isok'])) {
-			 $sessiondata['mathdisp'] = 1;  
+			 $sessiondata['mathdisp'] = 1;
 			 $sessiondata['graphdisp'] = 1;
-			 $sessiondata['useed'] = checkeditorok(); 
+			 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 } else {
 		 	 $sessiondata['mathdisp'] = 2-$_POST['mathdisp'];
 		 	 $sessiondata['graphdisp'] = $_POST['graphdisp'];
-		 	 $sessiondata['useed'] = checkeditorok(); 
+		 	 $sessiondata['useed'] = checkeditorok();
 			 $enc = base64_encode(serialize($sessiondata));
 		 }
-		 
+
 		 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		 	 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
 		 } else {
 		 	 $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
 		 }
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		 
+
 		 if (isset($CFG['GEN']['newpasswords']) && strlen($line['password'])==32) { //old password - rehash it
 		 	 $hashpw = password_hash($_POST['password'], PASSWORD_DEFAULT);
 		 	 $query = "UPDATE imas_users SET lastaccess=$now,password='$hashpw' WHERE id=$userid";
@@ -271,7 +272,7 @@
 		 	 $query = "UPDATE imas_users SET lastaccess=$now WHERE id=$userid";
 		 }
 		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		 
+
 		 if (isset($_SERVER['QUERY_STRING'])) {
 			 $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
 		 } else {
@@ -280,8 +281,8 @@
 		 //$now = time();
 		 //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		 //mysql_query($query) or die("Query failed : " . mysql_error());
-			 
-		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);	 
+
+		 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
@@ -292,7 +293,7 @@
 		 if ($line==null) {
 			 $err = "Bad SID";
 		 } else if ($_SESSION['challenge']!=$_POST['challenge']) {
-			 $err = "Bad Challenge (post:{$_POST['challenge']}, sess: ".addslashes($_SESSION['challenge']).")";	 
+			 $err = "Bad Challenge (post:{$_POST['challenge']}, sess: ".addslashes($_SESSION['challenge']).")";
 		 } else {
 			 $err = "Bad PW";
 		 }
@@ -301,9 +302,9 @@
 		 $query .= "('{$_POST['username']}','{$_SESSION['challenge']}','{$_POST['password']}','$err')";
 		 mysql_query($query) or die("Query failed : " . mysql_error());
 		 */
-		 
+
 	 }
-	
+
  }
  //has logged in already
  if ($hasusername) {
@@ -322,7 +323,7 @@
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		$query .= ',listperpage,hasuserimg,theme,specialrights';
 	}
-	$query .= " FROM imas_users WHERE id='$userid'"; 
+	$query .= " FROM imas_users WHERE id='$userid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$username = $line['SID'];
@@ -354,12 +355,12 @@
 	} else if (isset($sessiondata['usefullwidth'])) {
 		$usefullwidth = true;
 	}
-	
+
 	if (isset($_GET['mathjax'])) {
 		$sessiondata['mathdisp'] = 1;
 		writesessiondata();
 	}
-	
+
 	if (isset($_GET['readernavon'])) {
 		$sessiondata['readernavon'] = true;
 		writesessiondata();
@@ -461,7 +462,7 @@
 				$teacherid = $userid;
 				$adminasteacher = true;
 			} else {
-				
+
 				$query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
 				$result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -469,7 +470,7 @@
 					$tutorid = $line['id'];
 					$tutorsection = trim($line['section']);
 				}
-		
+
 			}
 		}
 		$query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs ";
@@ -527,11 +528,11 @@
 				}
 			}
 		}
-	} 
+	}
 	$verified = true;
-	
+
  }
- 
+
  if (!$verified) {
 	if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
 		if (!isset($loginpage)) {
@@ -539,9 +540,9 @@
 		}
 		require($loginpage);
 		exit;
-	} 
+	}
  }
- 
+
  function tzdate($string,$time) {
 	  global $tzoffset, $tzname;
 	  //$dstoffset = date('I',time()) - date('I',$time);
@@ -554,11 +555,13 @@
 	  }
 	  //return gmdate($string, $time-60*$tzoffset);
   }
-  
+
   function writesessiondata() {
 	  global $sessiondata,$sessionid;
 	  $enc = base64_encode(serialize($sessiondata));
-	  $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
+		$now = time();
+		//update session time - reset timeout clock
+	  $query = "UPDATE imas_sessions SET time=$now,sessiondata='$enc' WHERE sessionid='$sessionid'";
 	  mysql_query($query) or die("Query failed : " . mysql_error());
   }
   function checkeditorok() {
@@ -586,13 +589,13 @@
   }
   if (!isset($coursename)) {
 	  $coursename = "Course Page";
-  } 
+  }
   function generaterandstring() {
   	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	$pass = '';
 	for ($i=0;$i<10;$i++) {
 		$pass .= substr($chars,rand(0,61),1);
-	}	
+	}
 	return $pass;
   }
 ?>
