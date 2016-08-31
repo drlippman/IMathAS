@@ -7,7 +7,7 @@ echo '<h3>Question License</h3>';
 if (empty($_GET['id'])) {
 	echo "No IDs specified";
 	exit;
-} 
+}
 
 function getquestionlicense($row) {
 	global $CFG, $sendfrom;
@@ -21,7 +21,7 @@ function getquestionlicense($row) {
 		$license .= '. This work is licensed under the <a href="http://www.imathas.com/communitylicense.html">IMathAS Community License (GPL + CC-BY)</a>.<br/>';
 		$license .= 'The code that generated this question can be obtained by instructors by ';
 		if (isset($CFG['GEN']['meanstogetcode'])) {
-			$licence .= $CFG['GEN']['meanstogetcode'];
+			$license .= $CFG['GEN']['meanstogetcode'];
 		} else {
 			global $sendfrom;
 			$license .= 'emailing '.$sendfrom;
