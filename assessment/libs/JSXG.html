@@ -5,13 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>JSXG</title>
+
+  <style media="screen">
+    pre {
+      font-family: monospace;
+      border: 2px solid rgb(210,210,210);
+      background-color: rgb(240,240,240);
+      border-radius: 8px;
+      padding: 10px;
+      margin: 0px 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>JSXG Macro Library</h1>
   <p>JSXGraph Integration functions, Version 1.0, July 30, 2016. Written by Grant Sander.</p>
   <hr>
   <p>
-    This library provides functions to integrate <a href="http://jsxgraph.uni-bayreuth.de/wp/index.html">JSXGraph</a> into MathAS/MOM. To use the library in a question, make sure to call <pre>loadlibrary("JSXG");</pre> before calling the functions.
+    This library provides functions to integrate <a href="http://jsxgraph.uni-bayreuth.de/wp/index.html">JSXGraph</a> into MathAS/MOM. To use the library in a question, make sure to call
+  </p>
+  <pre>loadlibrary("JSXG");</pre>
+  <p>
+    before calling the functions.
   </p>
   <ul>
     <li><a href="#loadJSX">loadJSX</a></li>
@@ -25,6 +40,7 @@
     <li><a href="#JSXG_addPoint">JSXG_addSegment</a></li>
     <li><a href="#JSXG_createPolarAxes">JSXG_addcreatePolarAxes</a></li>
     <li><a href="#JSXG_addPolar">JSXG_addPolar</a></li>
+    <li><a href="#JSXG_createBlankBoard">JSXG_createBlankBoard</a></li>
   </ul>
 
   <h2><a name="loadJSX">loadJSX()</a></h2>
@@ -65,12 +81,12 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
   </pre>
 
   <!-- addFunction -->
@@ -88,15 +104,15 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['rule']="sin(%a*x)"; $ops['bounds']=[0, "%a"]; $ops['strokeColor']="green";
-    $board = JSXG_addFunction($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule']="sin(%a*x)"; $ops['bounds']=[0, "%a"]; $ops['strokeColor']="green";
+$board = JSXG_addFunction($board, $ops);
   </pre>
 
   <!-- addParametric -->
@@ -114,15 +130,15 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['rule']=["t*cos(%a/5*t)", "sin(t)"]; $ops['bounds']=[-1, "%a"];
-    $board = JSXG_addParametric($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule']=["t*cos(%a/5*t)", "sin(t)"]; $ops['bounds']=[-1, "%a"];
+$board = JSXG_addParametric($board, $ops);
   </pre>
 
   <!-- addText -->
@@ -140,15 +156,15 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['position']=["3*cos(%a)", "3*sin(%a)"]; $ops['text']="math: `x^2/pi`"; $ops['anchor']=["left","bottom"];
-    $board = JSXG_addText($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['position']=["3*cos(%a)", "3*sin(%a)"]; $ops['text']="math: `x^2/pi`"; $ops['anchor']=["left","bottom"];
+$board = JSXG_addText($board, $ops);
   </pre>
 
   <!-- addArrow -->
@@ -164,40 +180,43 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['position']=[0,0,"4*cos(%a)","abs(cos(%a))*sin(%a)"]; $ops['dash']=3; $ops['strokeColor']="red";
-    $board = JSXG_addArrow($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['position']=[0,0,"4*cos(%a)","abs(cos(%a))*sin(%a)"]; $ops['dash']=3; $ops['strokeColor']="red";
+$board = JSXG_addArrow($board, $ops);
   </pre>
 
   <!-- addPoint -->
-  <h2><a name="JSXG_addPoint">JSXG_addPoint($board, $ops)</a></h2>
+  <h2><a name="JSXG_addPoint">JSXG_addPoint($board, $ops, $ref)</a></h2>
   <p>Adds a point to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes(). The position of the point can be linked to an answer box.</p>
   <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
   <ul>
     <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
     <li>$ops['position']=[(float|string) x, (float|string) y] sets the position of the point. Slider values can be used.</li>
-    <li>$ops['draggable']=true will make the point draggable. By default, points are fixed unless they are linked to answerbox.</li>
+    <li>$ops['fixed']=true will make the point fixed. By default, points are moveable.</li>
     <li>$ops['color']=(string) sets the color of the point</li>
     <li>$ops['size']=(int) sets the size of the point. Defaults to 2.</li>
     <li>$ops['face']=(string) sets the face of the point. Defaults to "circle".</li>
     <li>$ops['name']=(string) sets the label of the point. ASCIIMath can be used.</li>
     <li>$ops['answerbox']=[$thisq, (optional) partNumber], if specified, this will like the point's coordinates to an answer box. If the question is not multipart/conditional, use $ops['answerbox']=[$thisq]. If multipart, use $ops['answerbox']=[$thisq, 0] to link to first box, etc..</li>
   </ul>
+  <p>
+    $ref is an optional variable. It will give the point a name for reference, so that you can use it when constructing other elements. If a reference is provided, the point can be reference using the variable "p_$label_$ref" where $label is the label of the board the point lives in, and $ref is the reference you gave the point.
+  </p>
   <h4>Example</h4>
   <p>Set question type to N-Tuple.</p>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[1,1]; $ops['answerbox']=[$thisq]; $ops['name']="`x/pi`";
-    $board = JSXG_addPoint($board, $ops);
+$ops=array(); $ops['position']=[1,1]; $ops['answerbox']=[$thisq]; $ops['name']="`x/pi`";
+$board = JSXG_addPoint($board, $ops, "A");
   </pre>
 
   <!-- addSegment -->
@@ -213,15 +232,15 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['position']=["2*cos(%a)", "2*sin(%a)", "2*cos(%a)+1", "2*sin(%a)"]; $ops['strokeWidth']=4;
-    $board = JSXG_addSegment($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['position']=["2*cos(%a)", "2*sin(%a)", "2*cos(%a)+1", "2*sin(%a)"]; $ops['strokeWidth']=4;
+$board = JSXG_addSegment($board, $ops);
   </pre>
 
   <!-- addSegment -->
@@ -248,9 +267,9 @@
   <p>The created board with have a JS-name of board_$label. </p>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
-    $board = JSXG_createPolarAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
+$board = JSXG_createPolarAxes("plot{$thisq}", $ops);
   </pre>
   <p>Add the $board variable to your Question Text where you want the graph to display.</p>
 
@@ -268,15 +287,38 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
-    $board = JSXG_createPolarAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
+$board = JSXG_createPolarAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[0.1,8,1]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[0.1,8,1]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['rule'] = "t/3*cos(t)"; $ops['bounds']=[0, "%a*pi"];
-    $board = JSXG_addPolar($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule'] = "t/3*cos(t)"; $ops['bounds']=[0, "%a*pi"];
+$board = JSXG_addPolar($board, $ops);
+  </pre>
+
+  <!-- createBlankBoard -->
+  <h2><a name="JSXG_createBlankBoard">JSXG_createBlankBoard($label, $ops)</a></h2>
+  <p>Creates a blank canvas. Similar to JSXG_createAxes(), but doesn't draw axes. $label is the name of the board, and should be unique if there are more than one JSXGraph boards in a question/page.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['size']=[(float) width, (float) height], size of board. Provide width and height (in pixels).</li>
+    <li>$ops['bounds']=[(float) xmin, (float) xmax, (float) ymin, (float) ymax] sets the cartesian bounds of the board.</li>
+    <li>$ops['controls']=['nav-bar', 'zoom', 'no-pan'] adds some navigation options. Include 'nav-bar' to include navigation buttons, 'zoom' for zooming, 'no-pan' to disable panning.</li>
+    <li>$ops['centered']=false will make the board left-justified, otherwise it will be centered.</li>
+  </ul>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[0.1,8,1]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
+
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule'] = "t/3*cos(t)"; $ops['bounds']=[0, "%a*pi"];
+$board = JSXG_addPolar($board, $ops);
   </pre>
 
 
