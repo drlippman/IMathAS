@@ -1,5 +1,6 @@
 <?php
-// JSXGraph Integration functions, Version 1.0, Spring 2016
+// JSXGraph Integration functions, Version 1.0, Fall 2016
+// Grant Sander
 
 
 global $allowedmacros;
@@ -928,116 +929,6 @@ function JSXG_createBlankBoard($label, $ops){
   }
 
   #####################################
-  ######### JSXG_addArrow ##########
-  function JSXG_addArrow($board, $ops=array(), $ref=null){
-    // Get Label string -- so we know how to link elements
-    $labStart = strpos($board, "jxgboard_") + 9;
-    $labEnd = strpos($board, "'", $labStart);
-    $label = substr($board, $labStart, $labEnd - $labStart);
-
-    // Make some default values
-    $p1 = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-    $p2 = $ops['position'][1]!==null ? $ops['position'][1] : 1;
-
-    // attributes
-    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
-
-    if ($ref!==null){
-      $out .= "
-      var vec_{$label}_{$ref} = ";
-    }
-
-    $out .= "board_{$label}.create('arrow', [";
-
-    if (!is_array($p1)){
-      $out .= $p1 . ",";
-    } else {
-       $x1 = $p1[0]; $y1 = $p1[1];
-       $out .= "[";
-      // x1 value
-      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
-        $out .= "function(){
-          var x1s = '{$x1}';";
-        foreach($ops['slider-names'] as $sn){
-          if (strpos($x1, "%{$sn}")>-1){
-            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-          }
-        }
-        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
-      } else {
-        $out .= "{$x1},";
-      }
-      // y1 value
-      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
-        $out .= "function(){
-          var y1s = '{$y1}';";
-        foreach($ops['slider-names'] as $sn){
-          if (strpos($y1, "%{$sn}")>-1){
-            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-          }
-        }
-        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
-      } else {
-        $out .= "{$y1}],";
-      }
-    }
-    if (!is_array($p2)){
-      $out .= $p2 . "],";
-    } else {
-      $x2 = $p2[0]; $y2 = $p2[1];
-      $out .= "[";
-      // x2 value
-      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
-        $out .= "function(){
-          var x2s = '{$x2}';";
-        foreach($ops['slider-names'] as $sn){
-          if (strpos($x2, "%{$sn}")>-1){
-            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-          }
-        }
-        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
-      } else {
-        $out .= "{$x2},";
-      }
-      // y2 value
-      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
-        $out .= "function(){
-          var y2s = '{$y2}';";
-        foreach($ops['slider-names'] as $sn){
-          if (strpos($y2, "%{$sn}")>-1){
-            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-          }
-        }
-        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
-      } else {
-        $out .= "{$y2}]],";
-      }
-    }
-
-    // Set attributes and close up shop.
-    $out .= "{
-              highlight: {$highlight},
-              fixed: {$fixed},
-              strokeColor: '{$color}',
-              strokeWidth: {$strokeWidth},
-              dash: {$dash},
-              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
-            })";
-    if ($ops['attributes']!==null){
-      $out .= ".setAttribute({$ops['attributes']});";
-    } else {
-      $out.=";";
-    }
-
-      // Append new output string to the board string{
-      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
-  }
-
-  #####################################
   ######### JSXG_addPoint ##########
   function JSXG_addPoint($board, $ops=array(), $ref = null){
     // Get Label string -- so we know how to link elements
@@ -1262,6 +1153,116 @@ function JSXG_createBlankBoard($label, $ops){
       $out .= ".setAttribute({$ops['attributes']});";
     } else {
       $out .= ";";
+    }
+
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addArrow ##########
+  function JSXG_addArrow($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    // Make some default values
+    $p1 = $ops['position'][0]!==null ? $ops['position'][0] : 0;
+    $p2 = $ops['position'][1]!==null ? $ops['position'][1] : 1;
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    if ($ref!==null){
+      $out .= "
+      var vec_{$label}_{$ref} = ";
+    }
+
+    $out .= "board_{$label}.create('arrow', [";
+
+    if (!is_array($p1)){
+      $out .= $p1 . ",";
+    } else {
+       $x1 = $p1[0]; $y1 = $p1[1];
+       $out .= "[";
+      // x1 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
+      } else {
+        $out .= "{$y1}],";
+      }
+    }
+    if (!is_array($p2)){
+      $out .= $p2 . "],";
+    } else {
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
+      } else {
+        $out .= "{$y2}]],";
+      }
+    }
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              strokeWidth: {$strokeWidth},
+              dash: {$dash},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out.=";";
     }
 
       // Append new output string to the board string{
@@ -1807,7 +1808,6 @@ function JSXG_createBlankBoard($label, $ops){
       $out .= ";";
     }
 
-
       // Append new output string to the board string{
       return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
   }
@@ -1893,8 +1893,8 @@ function JSXG_createBlankBoard($label, $ops){
                 size: 2
               },
               borders: {
-                fixed: true,
-                highlight: false,
+                fixed: {$fixed},
+                highlight: {$highlight},
                 showInfobox: false,
                 strokeColor: '{$color}',
                 strokeWidth: {$strokeWidth},
@@ -1906,9 +1906,6 @@ function JSXG_createBlankBoard($label, $ops){
     } else {
       $out .= ";";
     }
-
-
-
       // Append new output string to the board string{
       return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
   }
@@ -2004,8 +2001,6 @@ function JSXG_createBlankBoard($label, $ops){
       } else {
         $out .= ";";
       }
-
-
 
       // Append new output string to the board string{
       return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
