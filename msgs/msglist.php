@@ -23,7 +23,7 @@ isread is bitwise:
 Read   Deleted   Deleted by Sender   Tagged
 
 If (isread&2)==2 && (isread&4)==4  then should be deleted
-  
+
 	*/
 	require("../validate.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
@@ -33,13 +33,13 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	   exit;
 	}
 	if (isset($teacherid)) {
-		$isteacher = true;	
+		$isteacher = true;
 	} else {
 		$isteacher = false;
 	}
 	$cansendmsgs = false;
 	$threadsperpage = $listperpage;
-	
+
 	$cid = $_GET['cid'];
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
@@ -64,17 +64,17 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$filteruid = 0;
 	}
 	$type = $_GET['type'];
-	
+
 	if (isset($_GET['getstulist'])) {
 		$cid = intval($_GET['getstulist']);
 		if ($cid==0) { echo '[]'; exit;}
-		
+
 		$query = "SELECT msgset FROM imas_courses WHERE id='$cid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$msgset = mysql_result($result,0,0);
 		$msgmonitor = (floor($msgset/5)&1);
 		$msgset = $msgset%5;
-				
+
 		$opts = array();
 		if ($isteacher || $msgset<2) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -94,9 +94,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$opts[] = "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
-			} 
-			
-			
+			}
+
+
 		}
 		if ($isteacher || $msgset==0 || $msgset==2) {
 			$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -115,13 +115,13 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			require_once("../includes/htmLawed.php");
 			$_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
 			$_POST['subject'] = addslashes(htmlentities(stripslashes($_POST['subject'])));
-			
+
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 			$now = time();
 			$query .= "('{$_POST['subject']}','{$_POST['message']}','{$_POST['to']}','$userid',$now,0,'{$_POST['courseid']}')";
 			mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$msgid = mysql_insert_id();
-			
+
 			if ($_GET['replyto']>0) {
 				$query = "UPDATE imas_msgs SET replied=1";
 				if (isset($_POST['sendunread'])) {
@@ -137,11 +137,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				}
 				$query = "UPDATE imas_msgs SET baseid='$baseid',parent='{$_GET['replyto']}' WHERE id='$msgid'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
-			} 
+			}
 			$query = "SELECT name FROM imas_courses WHERE id='{$_POST['courseid']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$cname = mysql_result($result,0,0);
-			
+
 			$query = "SELECT msgnotify,email FROM imas_users WHERE id='{$_POST['to']}'";
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if (mysql_result($result,0,0)==1) {
@@ -165,7 +165,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($type=='new') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
 			} else {
-				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");				
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
 			}
 			exit;
 		} else {
@@ -216,7 +216,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} else {
 				echo " <a href=\"msglist.php?page=$page&cid=$cid&filtercid=$filtercid\">Message List</a> ";
 			}
-			
+
 			if (isset($_GET['toquote'])) {
 				$replyto = $_GET['toquote'];
 			} else if (isset($_GET['replyto'])) {
@@ -224,7 +224,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} else {
 				$replyto = 0;
 			}
-			
+
 			if ($replyto > 0) {
 				echo "&gt; <a href=\"viewmsg.php?page=$page&type=$type&cid=$cid&filtercid=$filtercid&msgid=$replyto\">Message</a> ";
 				echo "&gt; Reply</div>";
@@ -233,15 +233,15 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				echo "&gt; New Message</div>";
 				echo "<h2>New Message</h2>\n";
 			}
-			
-			
+
+
 			if ($filtercid>0) {
 				$query = "SELECT msgset FROM imas_courses WHERE id='$filtercid'";
 				$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$msgset = mysql_result($result,0,0);
 				$msgmonitor = (floor($msgset/5)&1);
 				$msgset = $msgset%5;
-			} else {		
+			} else {
 				$course_array = array();
 				$query = "SELECT i_c.id,i_c.name,i_c.msgset,2 AS userrole FROM imas_courses AS i_c JOIN imas_teachers ON ";
 				$query .= "i_c.id=imas_teachers.courseid WHERE imas_teachers.userid='$userid' ";
@@ -273,7 +273,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					}
 				}
 			}
-			
+
 			$courseid=($cid==0)?$filtercid:$cid;
 			if (isset($_GET['toquote']) || isset($_GET['replyto'])) {
 				$query = "SELECT title,message,courseid FROM imas_msgs WHERE id='$replyto'";
@@ -299,7 +299,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					    }, $message);
 				}
 				$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-				
+
 				$message = '<br/><hr/>'.$message;
 				//$message .= '<span class="hidden">QREF::'.htmlentities($_GET['quoteq']).'</span>';
 				if (isset($parts[3])) {  //sending out of assessment instructor
@@ -324,7 +324,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$title = '';
 				$message = '';
 			}
-			
+
 			echo "<form method=post action=\"msglist.php?page=$page&type=$type&cid=$cid&add={$_GET['add']}&replyto=$replyto\"";
 			if (!isset($_GET['to'])) {
 				echo " onsubmit=\"return checkrecipient();\"";
@@ -386,9 +386,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						while ($row = mysql_fetch_row($result)) {
 							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
-						} 
-						
-						
+						}
+
+
 					}
 					if ($isteacher || $msgset==0 || $msgset==2) {
 						$query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
@@ -399,9 +399,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
 						}
 					}
-					
-					echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
 					echo "</select>";
+					echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
 				} else {
 					echo '<select name="courseid" onchange="updateTo(this)">';
 					echo '<option value="0">Select a course...</option>';
@@ -410,13 +409,13 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					echo '<select name="to" id="to" style="display:none;">';
 					echo '<option value="0">Select a course...</option></select>';
 				}
-				
+
 			}
-			
-			
-				
+
+
+
 			echo "</span><br class=form />";
-			
+
 			echo "<span class=form><label for=\"subject\">Subject:</label></span>";
 			echo "<span class=formright><input type=text size=50 name=subject id=subject value=\"$title\"></span><br class=form>\n";
 			echo "<span class=form><label for=\"message\">Message:</label></span>";
@@ -429,7 +428,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo '<div class="submit"><button type="submit" name="submit" value="send">'._('Send Message').'</button></div>';
 
 			echo "</span></p>\n";
-			
+
 			if ($msgmonitor==1) {
 				echo "<p><span class=red>Note</span>: Student-to-student messages may be monitored by your instructor</p>";
 			}
@@ -462,7 +461,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		if ($type=='new') {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");
 		} else {
-			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");				
+			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
 		}
 		exit;
 	}
@@ -473,14 +472,14 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
 		mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
-	
+
 	$pagetitle = "Messages";
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/msg.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '". $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savetagged.php?cid=$cid';</script>";
 	$placeinhead .= '<style type="text/css"> tr.tagged {background-color: #dff;}</style>';
 	require("../header.php");
 	$curdir = rtrim(dirname(__FILE__), '/\\');
-	
+
 	echo "<div class=breadcrumb>$breadcrumbbase ";
 	if ($cid>0 && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
 		echo " <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; ";
@@ -500,9 +499,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	} else if ($myrights > 5 && $filtercid==0) {
 		$cansendmsgs = true;
 	}
-	
+
 	$actbar = array();
-	
+
 	if ($cansendmsgs) {
 		$actbar[] = "<button type=\"button\" onclick=\"window.location.href='msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new'\">"._('Send New Message')."</button>";
 	}
@@ -512,14 +511,14 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		$actbar[] = "<a href=\"msglist.php?page=-2&cid=$cid&filtercid=$filtercid&filteruid=$filteruid\">Limit to Tagged</a>";
 	}
 	$actbar[] = "<a href=\"sentlist.php?cid=$cid\">Sent Messages</a>";
-	
+
 	if ($isteacher && $cid>0 && $msgmonitor==1) {
 		$actbar[] = "<a href=\"allstumsglist.php?cid=$cid\">Student Messages</a>";
 	}
 	$actbar[] = '<input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available" />';
 	echo '<div class="cpmid">'.implode(' | ',$actbar).'</div>';
-	
-	
+
+
 	$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread&2)=0";
 	if ($filtercid>0) {
 		$query .= " AND courseid='$filtercid'";
@@ -535,7 +534,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	if ($numpages==0 && $filteruid>0) {
 		//might have changed filtercid w/o changing user.
 		//we'll open up to all users then
-		$filteruid = 0;	
+		$filteruid = 0;
 		$query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread&2)=0";
 		if ($filtercid>0) {
 			$query .= " AND courseid='$filtercid'";
@@ -589,8 +588,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 		echo "<div>$prevnext</div>\n";
 	}
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/msglist.php?cid=$cid&filtercid=";
-	
-	
+
+
 ?>
 <script type="text/javascript">
 function chgfilter() {
@@ -598,7 +597,7 @@ function chgfilter() {
 	var filteruid = document.getElementById("filteruid").value;
 	window.location = "<?php echo $address;?>"+filtercid+"&filteruid="+filteruid;
 }
-</script>	
+</script>
 	<form id="qform" method=post action="msglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
 	<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
 <?php
@@ -638,14 +637,14 @@ function chgfilter() {
 		echo " >{$row[1]}, {$row[2]}</option>";
 	}
 	echo "</select></p>";
-	
+
 ?>
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: <input type=submit name="unread" value="Mark as Unread">
 	<input type=submit name="markread" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">
-	
-			
+
+
 	<table class=gb id="myTable">
 	<thead>
 	<tr><th></th><th>Message</th><th>Replied</th><th></th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th></tr>
@@ -657,7 +656,7 @@ function chgfilter() {
 	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&2)=0 ";
 	if ($filteruid>0) {
 		$query .= "AND imas_msgs.msgfrom='$filteruid' ";
-	} 
+	}
 	if ($filtercid>0) {
 		$query .= "AND imas_msgs.courseid='$filtercid' ";
 	}
@@ -707,7 +706,7 @@ function chgfilter() {
 			$line['LastName'] = "[Deleted]";
 		}
 		echo '</td><td>';
-		
+
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
@@ -715,7 +714,7 @@ function chgfilter() {
 				echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
 			}
 		}
-		
+
 		echo "</td><td>";
 		if (($line['isread']&8)==8) {
 			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
@@ -724,8 +723,8 @@ function chgfilter() {
 		}
 		echo '</td>';
 		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
-		
-		
+
+
 		if ($line['name']==null) {
 			$line['name'] = "[Deleted]";
 		}
@@ -744,9 +743,7 @@ function chgfilter() {
 	if ($cansendmsgs) {
 		echo "<p><button type=\"button\" onclick=\"window.location.href='msglist.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&add=new'\">"._('Send New Message')."</button></p>";
 	}
-	
+
 	echo '<p>&nbsp;</p>';
 	require("../footer.php");
 ?>
-		
-	
