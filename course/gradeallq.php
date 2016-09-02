@@ -2,7 +2,7 @@
 //IMathAS:  Grade all of one question for an assessment
 //(c) 2007 David Lippman
 	require("../validate.php");
-	
+
 	if (!(isset($teacherid))) {
 		require("../header.php");
 		echo "You need to log in as a teacher to access this page";
@@ -13,7 +13,16 @@
 
 	$cid = $_GET['cid'];
 	$stu = $_GET['stu'];
-	$gbmode = $_GET['gbmode'];
+	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
+		$gbmode = $_GET['gbmode'];
+	} else if (isset($sessiondata[$cid.'gbmode'])) {
+		$gbmode =  $sessiondata[$cid.'gbmode'];
+	} else {
+		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$gbmode = mysql_result($result,0,0);
+	}
+	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$aid = $_GET['aid'];
 	$qid = $_GET['qid'];
 	if (isset($_GET['ver'])) {
@@ -26,7 +35,7 @@
 	} else {
 		$page = -1;
 	}
-	
+
 	if (isset($_GET['update'])) {
 		$allscores = array();
 		$grpscores = array();
@@ -62,7 +71,7 @@
 		} else {
 			$onepergroup = false;
 		}
-		
+
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
@@ -99,10 +108,10 @@
 				if (count($sp)>1) {
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
 				}
-				
+
 				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
 				mysql_query($query) or die("Query failed : $query " . mysql_error());
-				
+
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
 					require_once("../includes/ltioutcomes.php");
@@ -115,19 +124,19 @@
 		} else {
 			$page++;
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradeallq.php?stu=$stu&cid=$cid&aid=$aid&qid=$qid&page=$page");
-			
+
 		}
 		exit;
 	}
-	
-	
+
+
 	require("../assessment/displayq2.php");
 	list ($qsetid,$cat) = getqsetid($qid);
-	
+
 	$query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
-	
+
 	if ($isgroup>0) {
 		$groupnames = array();
 		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
@@ -143,9 +152,9 @@
 			if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
 			$groupmembers[$row[0]][] = $row[2].' '.$row[1];
 		}
-			
+
 	}
-	
+
 	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
 	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
 	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
@@ -156,7 +165,7 @@
 	if ($points==9999) {
 		$points = $defpoints;
 	}
-	
+
 	$useeditor='review';
 	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
@@ -232,25 +241,25 @@
 	function hidegroupdup(el) {  //el.checked = one per group
 	   var divs = document.getElementsByTagName("div");
 	   for (var i=0;i<divs.length;i++) {
-	     if (divs[i].className=="groupdup") { 
+	     if (divs[i].className=="groupdup") {
 	         if (el.checked) {
 	               divs[i].style.display = "none";
 	         } else { divs[i].style.display = "block"; }
 	     }
-	    }	
+	    }
 	    var hfours = document.getElementsByTagName("h4");
 	   for (var i=0;i<hfours.length;i++) {
-	     if (hfours[i].className=="person") { 
+	     if (hfours[i].className=="person") {
 	     	hfours[i].style.display = el.checked?"none":"";
-	     } else if (hfours[i].className=="group") { 
+	     } else if (hfours[i].className=="group") {
 	     	hfours[i].style.display = el.checked?"":"none";
 	     }
 	    }
 	    var spans = document.getElementsByTagName("span");
 	   for (var i=0;i<spans.length;i++) {
-	     if (spans[i].className=="person") { 
+	     if (spans[i].className=="person") {
 	     	spans[i].style.display = el.checked?"none":"";
-	     } else if (spans[i].className=="group") { 
+	     } else if (spans[i].className=="group") {
 	     	spans[i].style.display = el.checked?"":"none";
 	     }
 	    }
@@ -298,7 +307,7 @@
 	if ($isgroup>0) {
 		echo '<p><input type="checkbox" name="onepergroup" value="1" onclick="hidegroupdup(this)" /> Grade one per group</p>';
 	}
-	
+
 	echo "<p>";
 	if ($ver=='graded') {
 		echo "<b>Showing Graded Attempts.</b>  ";
@@ -309,20 +318,26 @@
 		echo "<br/><b>Note:</b> Grades and number of attempts used are for the Graded Attempt.  Part points might be inaccurate.";
 	}
 	echo "</p>";
-	
+
 	if ($page!=-1) {
 		$stulist = array();
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+		if ($hidelocked) {
+			$query .= "AND imas_students.locked=0 ";
+		}
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
 			$stulist[] = $row[0].', '.$row[1];
 		}
 	}
-	
+
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
 	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+	if ($hidelocked) {
+		$query .= "AND imas_students.locked=0 ";
+	}
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	if ($page != -1) {
 		$query .= " LIMIT $page,1";
@@ -332,7 +347,7 @@
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
 	if (mysql_num_rows($result)>0) {
-		
+
 	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
@@ -399,7 +414,7 @@
 			}
 			echo "<div ";
 			if (getpts($scores[$loc])==$points) {
-				echo 'class="iscorrect"';	
+				echo 'class="iscorrect"';
 			} else if (getpts($scores[$loc])>0) {
 				echo 'class="isnonzero"';
 			} else if ($scores[$loc]==-1) {
@@ -410,7 +425,7 @@
 			echo '>';
 			$lastanswers[$cnt] = $la[$loc];
 			$teacherreview = $line['userid'];
-			
+
 			if ($qtype=='multipart') {
 				/*if (($p = strpos($qcontrol,'answeights'))!==false) {
 					$p = strpos($qcontrol,"\n",$p);
@@ -434,7 +449,7 @@
 				$diff = $points - array_sum($answeights);
 				$answeights[count($answeights)-1] += $diff;
 			}
-			
+
 			if ($qtype=='multipart') {
 				$GLOBALS['questionscoreref'] = array("ud-{$line['id']}-$loc",$answeights);
 			} else {
@@ -442,18 +457,18 @@
 			}
 			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
 			echo '</div>';
-			
+
 			echo "<div class=review>";
 			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
 			if (!$groupdup) {
 				echo '<span class="group" style="display:none">'.$groupnames[$line['agroupid']].': </span>';
 			}
 			if ($isgroup) {
-				
+
 			}
 			list($pt,$parts) = printscore($scores[$loc]);
-			
-			if ($parts=='') { 
+
+			if ($parts=='') {
 				if ($pt==-1) {
 					$pt = 'N/A';
 				}
@@ -461,7 +476,7 @@
 				if ($rubric != 0) {
 					echo printrubriclink($rubric,$points,"ud-{$line['id']}-$loc","feedback-{$line['id']}",($loc+1));
 				}
-			} 
+			}
 			if ($parts!='') {
 				echo " Parts: ";
 				$prts = explode(', ',$parts);
@@ -475,10 +490,10 @@
 					}
 					echo ' ';
 				}
-				
+
 			}
 			echo " out of $points ";
-			
+
 			if ($parts!='') {
 				$answeights = implode(', ',$answeights);
 				echo "(parts: $answeights) ";
@@ -563,7 +578,7 @@
 					}
 				}
 			}
-			
+
 			//echo " <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}\">Use in Msg</a>";
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
@@ -578,17 +593,17 @@
 	}
 	echo "<input type=\"submit\" value=\"Save Changes\"/> ";
 	}
-	
+
 	echo "</form>";
 	echo '<p>&nbsp;</p>';
-	
 
-	
+
+
 
 	require("../footer.php");
 	function getpts($sc) {
 		if (strpos($sc,'~')===false) {
-			if ($sc>0) { 
+			if ($sc>0) {
 				return $sc;
 			} else {
 				return 0;
@@ -597,7 +612,7 @@
 			$sc = explode('~',$sc);
 			$tot = 0;
 			foreach ($sc as $s) {
-				if ($s>0) { 
+				if ($s>0) {
 					$tot+=$s;
 				}
 			}
@@ -613,10 +628,10 @@
 			$sc = str_replace('-1','N/A',$sc);
 			$sc = str_replace('~',', ',$sc);
 			return array($pts,$sc);
-		}		
+		}
 	}
 function getansweights($qi,$code) {
-	global $seeds,$questions;	
+	global $seeds,$questions;
 	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
@@ -668,5 +683,3 @@ function sandboxgetweights($code,$seed) {
 	return $answeights;
 }
 ?>
-
-
