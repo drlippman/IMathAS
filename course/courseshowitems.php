@@ -1326,14 +1326,14 @@ function enditem($canedit) {
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
 				   $duedates = "";
-				   if ($line['postby']!=2000000000) {
+				   if ($line['postby']!=2000000000 && $line['postby']!=0) {
 				   	   if ($line['postby']>$now) {
 					   	$duedates .= sprintf(_('New Threads due %s. '), formatdate($line['postby']));
 					   } else {
 					   	$duedates .= sprintf(_('New Threads were due %s. '), formatdate($line['postby']));
 					   }
 				   }
-				   if ($line['replyby']!=2000000000) {
+				   if ($line['replyby']!=2000000000 && $line['replyby']!=0) {
 				   	   if ($line['replyby']>$now) {
 				   	   	   $duedates .= sprintf(_('Replies due %s. '), formatdate($line['replyby']));
 				   	   } else {
