@@ -328,12 +328,12 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$y = round($evalyfunc($t),$yrnd);//round(eval("return ($yfunc);"),3);
 				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			} else {
-				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - ($domainlimited?0:5*abs($xmax-$xmin)/$settings[6]);
+				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = round($evalfunc($x),$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
-				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
+				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			}
 
 			if ($i<2 || $i==$stopat-2) {

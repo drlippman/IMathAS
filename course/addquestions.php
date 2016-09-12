@@ -999,6 +999,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 /******* begin html output ********/
+//hack to prevent the page breaking on accessible mode
+$sessiondata['useed'] = 1;
 require("../header.php");
 
 if ($overwriteBody==1) {
