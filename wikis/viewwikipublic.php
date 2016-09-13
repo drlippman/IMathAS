@@ -22,7 +22,7 @@
 		exit;
 	}
 	$id = intval($_GET['id']);
-	
+
 	function findinpublic($items,$id) {
 		foreach ($items as $k=>$item) {
 			if (is_array($item)) {
@@ -31,7 +31,7 @@
 						return true;
 					}
 				}
-			} 
+			}
 		}
 		return false;
 	}
@@ -49,22 +49,29 @@
 		}
 		return false;
 	}
-	
-	$query = "SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid='$id'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$itemid = mysql_result($result,0,0);
-	
-	$query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$items = unserialize(mysql_result($result,0,0));
+
+	//DB $query = "SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid='$id'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $itemid = mysql_result($result,0,0);
+	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='Wiki' AND typeid=:typeid");
+	$stm->execute(array(':typeid'=>$id));
+	$itemid = $stm->fetchColumn(0);
+
+	//DB $query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $items = unserialize(mysql_result($result,0,0));
+	$stm = $DBH->prepare("SELECT itemorder,name,theme FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$items = unserialize($stm->fetchColumn(0));
 	if ($fcid==0) {
-		$coursename = mysql_result($result,0,1);
-		$coursetheme = mysql_result($result,0,2);
+		//DB $coursename = mysql_result($result,0,1);
+		//DB $coursetheme = mysql_result($result,0,2);
+		list($coursename, $coursetheme) = $stm->fetch(PDO::FETCH_NUM);
 		$breadcrumbbase = "<a href=\"$imasroot/course/public.php?cid=$cid\">$coursename</a> &gt; ";
 	} else {
 		$breadcrumbbase = "$breadcrumbbase <a href=\"$imasroot/course/course.php?cid=$fcid\">$coursename</a> &gt; ";
 	}
-		
+
 	if (!findinpublic($items,$itemid)) {
 		require("../header.php");
 		echo "This page does not appear to be publically accessible.  Please return to the <a href=\"../index.php\">Home Page</a> and try logging in.\n";
@@ -72,11 +79,14 @@
 		exit;
 	}
 	$ispublic = true;
-	
-	
-	$query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
+
+
+	//DB $query = "SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id='$id'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $row = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT name,startdate,enddate,editbydate,avail,groupsetid FROM imas_wikis WHERE id=:id");
+	$stm->execute(array(':id'=>$id));
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	$wikiname = $row[0];
 	$now = time();
 	if ($row[5]>0 || $row[4]==0 || ($row[4]==1 && ($now<$row[1] || $now>$row[2]))) {
@@ -85,16 +95,22 @@
 		require("../footer.php");
 		exit;
 	}
-	
+
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase View Wiki</div>";
 	echo '<div id="headerviewwiki" class="pagetitle"><h2>'.$wikiname.'</h2></div>';
-	
+
+	//DB $query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
+	//DB $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
+	//DB $query .= "WHERE i_w_r.wikiid='$id' ORDER BY i_w_r.id DESC LIMIT 1";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $row = mysql_fetch_row($result);
 	$query = "SELECT i_w_r.id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id FROM ";
 	$query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-	$query .= "WHERE i_w_r.wikiid='$id' ORDER BY i_w_r.id DESC LIMIT 1";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
+	$query .= "WHERE i_w_r.wikiid=:wikiid ORDER BY i_w_r.id DESC LIMIT 1";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':wikiid'=>$id));
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	$text = $row[1];
 	if (strlen($text)>6 && substr($text,0,6)=='**wver') {
 		$wikiver = substr($text,6,strpos($text,'**',6)-6);
@@ -102,12 +118,12 @@
 	} else {
 		$wikiver = 1;
 	}
-			
+
 	echo '<div style="padding-left:10px; padding-right: 10px; border: 1px solid #000;">';
 	echo filter($text);
 	echo '</div>';
-	
+
 	echo "<div class=right><a href=\"../course/public.php?cid={$_GET['cid']}\">Return to Public Course Page</a></div>\n";
-	require("../footer.php");	
+	require("../footer.php");
 
 ?>

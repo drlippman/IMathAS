@@ -2,7 +2,6 @@
 //IMathAS:  show items function for main course page
 //(c) 2007 David Lippman
 
-
 function beginitem($canedit,$aname=0) {
 	if ($canedit) {
 		echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
@@ -22,7 +21,7 @@ function enditem($canedit) {
 }
 
   function showitems($items,$parent,$inpublic=false) {
-	   global $teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
+	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$myrights;
 	   global $hideicons,$exceptions,$latepasses,$graphicalicons,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems, $havecalcedviewedassess, $viewedassess;
 	   require_once("../includes/filehandler.php");
 
@@ -75,7 +74,7 @@ function enditem($canedit) {
 					continue;
 				}
 			}
-			$items[$i]['name'] = stripslashes($items[$i]['name']);;
+			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);;
 			if ($canedit) {
 				echo generatemoveselect($i,count($items),$parent,$blocklist);
 			}
@@ -517,9 +516,12 @@ function enditem($canedit) {
 		   } else if ($ispublic && !$inpublic) {
 			   continue;
 		   }
-		   $query = "SELECT itemtype,typeid FROM imas_items WHERE id='{$items[$i]}'";
-		   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+		   //DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='{$items[$i]}'";
+		   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+		   $stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+		   $stm->execute(array(':id'=>$items[$i]));
+		   $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 		   if ($canedit) {
 			   echo generatemoveselect($i,count($items),$parent,$blocklist);
@@ -539,9 +541,12 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="Assessment") {
 			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   //DB $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
+			   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id=:id");
+			   $stm->execute(array(':id'=>$typeid));
+			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 			   //do time limit mult
 			   if (isset($studentinfo['timelimitmult'])) {
 				$line['timelimit'] *= $studentinfo['timelimitmult'];
@@ -593,25 +598,32 @@ function enditem($canedit) {
 			   	   if ($line['reqscore']<0) {
 			   	   	   $showgreyedout = true;
 			   	   }
-				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
-				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   if (mysql_num_rows($result)==0) {
+				   //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
+				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   //DB if (mysql_num_rows($result)==0) {
+				   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
+				   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
+				   if ($stm->rowCount()==0) {
 					   $nothidden = false;
 				   } else {
-					   $scores = explode(';',mysql_result($result,0,0));
+					   //DB $scores = explode(';',mysql_result($result,0,0));
+					   $scores = explode(';',$stm->fetchColumn(0));
 					   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
 					   	   $nothidden = false;
 					   }
 				   }
 			   }
 			   if (!$havecalcedviewedassess && $line['avail']>0 && $line['enddate']<$now && $line['allowlate']>10) {
-				$havecalcedviewedassess = true;
-				$viewedassess = array();
-				$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($r = mysql_fetch_row($r2)) {
-					$viewedassess[] = $r[0];
-				}
+						$havecalcedviewedassess = true;
+						$viewedassess = array();
+						//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+						//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB while ($r = mysql_fetch_row($r2)) {
+						$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+						$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+						while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
+							$viewedassess[] = $r[0];
+						}
 			   }
 
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
@@ -785,7 +797,7 @@ function enditem($canedit) {
 					   if ($line['allowlate']>0) {
 						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
 					   }
-					   echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
+					   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
 					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 					   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid={$items[$i]}\">", _('Copy'), "</a>";
 					   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
@@ -800,9 +812,12 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="InlineText") {
 
 			   $typeid = $line['typeid'];
-			   $query = "SELECT title,text,startdate,enddate,fileorder,avail,isplaylist FROM imas_inlinetext WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   //DB $query = "SELECT title,text,startdate,enddate,fileorder,avail,isplaylist FROM imas_inlinetext WHERE id='$typeid'";
+			   //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $stm = $DBH->prepare("SELECT title,text,startdate,enddate,fileorder,avail,isplaylist FROM imas_inlinetext WHERE id=:id");
+			   $stm->execute(array(':id'=>$typeid));
+			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 			   $isvideo = ($line['isplaylist']>0) && (preg_match_all('/youtu/',$line['text'],$matches)>1 || preg_match_all('/google\.com\/file/',$line['text'],$matches)>1);
 			   if ($isvideo) {
@@ -920,13 +935,17 @@ function enditem($canedit) {
 
 				   }
 				   echo filter("<div class=itemsum>{$line['text']}\n");
-				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
-				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   if (mysql_num_rows($result)>0) {
+				   //DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
+				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   //DB if (mysql_num_rows($result)>0) {
+				   $stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
+				   $stm->execute(array(':itemid'=>$typeid));
+				   if ($stm->rowCount()>0) {
 					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
-					   while ($row = mysql_fetch_row($result)) {
+					   //DB while ($row = mysql_fetch_row($result)) {
+					   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
 					   }
@@ -971,13 +990,17 @@ function enditem($canedit) {
 					   echo '</span>';
 				   }
 				   echo filter("</div><div class=itemsum>{$line['text']}\n");
-				   $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
-				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   if (mysql_num_rows($result)>0) {
+				   //DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='$typeid'";
+				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   //DB if (mysql_num_rows($result)>0) {
+				   $stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
+				   $stm->execute(array(':itemid'=>$typeid));
+				   if ($stm->rowCount()>0) {
 					   echo '<ul class="fileattachlist">';
 					   $filenames = array();
 					   $filedescr = array();
-					   while ($row = mysql_fetch_row($result)) {
+					   //DB while ($row = mysql_fetch_row($result)) {
+					   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						   $filenames[$row[0]] = $row[2];
 						   $filedescr[$row[0]] = $row[1];
 					   }
@@ -994,9 +1017,12 @@ function enditem($canedit) {
 			   }
 		   } else if ($line['itemtype']=="Drill") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT name,summary,startdate,enddate,avail FROM imas_drillassess WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   //DB $query = "SELECT name,summary,startdate,enddate,avail FROM imas_drillassess WHERE id='$typeid'";
+			   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,avail FROM imas_drillassess WHERE id=:id");
+			   $stm->execute(array(':id'=>$typeid));
+			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 			   if (strpos($line['summary'],'<p ')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
@@ -1086,9 +1112,12 @@ function enditem($canedit) {
 			   }
 		   } else if ($line['itemtype']=="LinkedText") {
 			   $typeid = $line['typeid'];
-			   $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   //DB $query = "SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id='$typeid'";
+			   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $stm = $DBH->prepare("SELECT title,summary,text,startdate,enddate,avail,target FROM imas_linkedtext WHERE id=:id");
+			   $stm->execute(array(':id'=>$typeid));
+			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 			   if (strpos($line['summary'],'<p ')!==0 && strpos($line['summary'],'<ul ')!==0 && strpos($line['summary'],'<ol ')!==0) {
 				   $line['summary'] = '<p>'.$line['summary'].'</p>';
@@ -1232,9 +1261,12 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="Forum") {
 			   if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby,allowlate FROM imas_forums WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   //DB $query = "SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby,allowlate FROM imas_forums WHERE id='$typeid'";
+			   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $stm = $DBH->prepare("SELECT id,name,description,startdate,enddate,groupsetid,avail,postby,replyby,allowlate FROM imas_forums WHERE id=:id");
+			   $stm->execute(array(':id'=>$typeid));
+			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 
 			   //check for exception
 			   require_once("../includes/exceptionfuncs.php");
@@ -1424,9 +1456,12 @@ function enditem($canedit) {
 		   } else if ($line['itemtype']=="Wiki") {
 		   	  // if ($ispublic) { continue;}
 			   $typeid = $line['typeid'];
-			   $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
-			   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   //DB $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
+			   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			   $stm = $DBH->prepare("SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id=:id");
+			   $stm->execute(array(':id'=>$typeid));
+			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 			   if ($ispublic && $line['groupsetid']>0) { continue;}
 			   if (strpos($line['description'],'<p ')!==0) {
 				   $line['description'] = '<p>'.$line['description'].'</p>';
@@ -1446,30 +1481,51 @@ function enditem($canedit) {
 			   }
 			   $hasnew = false;
 			   if ($viewall || $line['avail']==2 || ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now)) {
-			   	   if ($line['groupsetid']>0 && !$canedit) {
-			   	   	   $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
-			   	   	   $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='{$line['groupsetid']}'";
-			   	   	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			   	   	   if (mysql_num_rows($result)>0) {
-			   	   	   	   $wikigroupid = mysql_result($result,0,0);
-			   	   	   } else {
-			   	   	   	   $wikigroupid = 0;
-			   	   	   }
-			   	   }
-			   	   $wikilastviews = array();
-			   	   $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
-			   	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   while ($row = mysql_fetch_row($result)) {
+		   	   if ($line['groupsetid']>0 && !$canedit) {
+		   	   	   //DB $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+		   	   	   //DB $query .= "WHERE i_sgm.userid='$userid' AND i_sg.groupsetid='{$line['groupsetid']}'";
+		   	   	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		   	   	   //DB if (mysql_num_rows($result)>0) {
+		   	   	   	   //DB $wikigroupid = mysql_result($result,0,0);
+		   	   	   $query = 'SELECT i_sg.id,i_sg.name FROM imas_stugroups AS i_sg JOIN imas_stugroupmembers as i_sgm ON i_sgm.stugroupid=i_sg.id ';
+		   	   	   $query .= "WHERE i_sgm.userid=:userid AND i_sg.groupsetid=:groupsetid";
+		   	   	   $stm = $DBH->prepare($query);
+		   	   	   $stm->execute(array(':userid'=>$userid, ':groupsetid'=>$line['groupsetid']));
+		   	   	   if ($stm->rowCount()>0) {
+		   	   	   	   $wikigroupid = $stm->fetchColumn(0);
+		   	   	   } else {
+		   	   	   	   $wikigroupid = 0;
+		   	   	   }
+		   	   }
+		   	   $wikilastviews = array();
+		   	   //DB $query = "SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid='$userid' AND wikiid='$typeid'";
+		   	   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   //DB while ($row = mysql_fetch_row($result)) {
+		   	   $stm = $DBH->prepare("SELECT stugroupid,lastview FROM imas_wiki_views WHERE userid=:userid AND wikiid=:wikiid");
+		   	   $stm->execute(array(':userid'=>$userid, ':wikiid'=>$typeid));
+				   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				   	   $wikilastviews[$row[0]] = $row[1];
 				   }
 
-				   $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
-				   if ($line['groupsetid']>0 && !$canedit) { //if group and not instructor limit to group
-				   	   $query .= "AND stugroupid='$wikigroupid' ";
-				   }
+				   //DB $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid='$typeid' ";
+				   //DB if ($line['groupsetid']>0 && !$canedit) {
+				   	   //DB $query .= "AND stugroupid='$wikigroupid' ";
+				   //DB }
+				   //DB $query .= "GROUP BY stugroupid";
+				   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				   $query = "SELECT stugroupid,MAX(time) FROM imas_wiki_revisions WHERE wikiid=:wikiid ";
+				   if ($line['groupsetid']>0 && !$canedit) {
+						 $query .= "AND stugroupid=:stugroupid ";
+					 }
 				   $query .= "GROUP BY stugroupid";
-				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				   while ($row = mysql_fetch_row($result)) {
+				   $stm = $DBH->prepare($query);
+				   if ($line['groupsetid']>0 && !$canedit) {
+						 $stm->execute(array(':wikiid'=>$typeid, ':stugroupid'=>$wikigroupid));
+				   } else {
+						 $stm->execute(array(':wikiid'=>$typeid));
+					 }
+				   //DB while ($row = mysql_fetch_row($result)) {
+				   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				   	   if (!isset($wikilastviews[$row[0]]) || $wikilastviews[$row[0]] < $row[1]) {
 				   	   	   $hasnew = true;
 				   	   	   break;
@@ -1783,55 +1839,77 @@ function enditem($canedit) {
 
    //instructor-only tree-based quick view of full course
    function quickview($items,$parent,$showdates=false,$showlinks=true) {
-	   global $teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
+	   global $DBH,$teacherid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$previewshift,$hideicons,$exceptions,$latepasses,$CFG;
 	   if (!is_array($openblocks)) {$openblocks = array();}
 	   $itemtypes = array();  $iteminfo = array();
-	   $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $itemtypes[$row[0]] = array($row[1],$row[2]);
 	   }
-	   $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,avail FROM imas_assessments WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $id = array_shift($row);
 		   $iteminfo['Assessment'][$id] = $row;
 	   }
-	   $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,title,text,startdate,enddate,avail FROM imas_inlinetext WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $id = array_shift($row);
 		   $iteminfo['InlineText'][$id] = $row;
 	   }
-	   $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,title,startdate,enddate,avail FROM imas_linkedtext WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $id = array_shift($row);
 		   $iteminfo['LinkedText'][$id] = $row;
 	   }
-	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_forums WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $id = array_shift($row);
 		   $iteminfo['Forum'][$id] = $row;
 	   }
 
-	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_wikis WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $id = array_shift($row);
 		   $iteminfo['Wiki'][$id] = $row;
 	   }
-	   $query = "SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid='$cid'";
-	   $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	   while ($row = mysql_fetch_row($result)) {
+	   //DB $query = "SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid='$cid'";
+	   //DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	   //DB while ($row = mysql_fetch_row($result)) {
+	   $stm = $DBH->prepare("SELECT id,name,startdate,enddate,avail FROM imas_drillassess WHERE courseid=:courseid");
+	   $stm->execute(array(':courseid'=>$cid));
+	   while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   $id = array_shift($row);
 		   $iteminfo['Drill'][$id] = $row;
 	   }
 	   $now = time() + $previewshift;
 	   for ($i=0;$i<count($items); $i++) {
 		   if (is_array($items[$i])) { //is a block
-			$items[$i]['name'] = stripslashes($items[$i]['name']);
+			//DB $items[$i]['name'] = stripslashes($items[$i]['name']);
+			$items[$i]['name'] = $items[$i]['name'];
 
 			if ($items[$i]['startdate']==0) {
 				$startdate = _('Always');

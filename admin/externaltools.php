@@ -2,7 +2,7 @@
 require("../validate.php");
 
 $isadmin = false;
-$isgrpadmin = false; 
+$isgrpadmin = false;
 $isteacher = false;
 
 $err = '';
@@ -11,7 +11,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 } elseif (isset($_GET['cid']) && $_GET['cid']=="admin" && $myrights <75) {
  	$err = "You need to log in as an admin to access this page";
 } elseif (!(isset($_GET['cid'])) && $myrights < 75) {
- 	$err = "Please access this page from the menu links only.";	
+ 	$err = "Please access this page from the menu links only.";
 }
 
 if ($err != '') {
@@ -40,38 +40,56 @@ if (isset($_POST['tname'])) {
 	if (isset($_POST['privemail'])) {$privacy += 2;}
 	$_POST['custom'] = str_replace("\n",'&',$_POST['custom']);
 	$_POST['custom'] = preg_replace('/\s/','',$_POST['custom']);
-	
+
 	if (!empty($_POST['tname']) && !empty($_POST['key']) && !empty($_POST['secret'])) {
 		$query = '';
 		if ($_GET['id']=='new') {
+			//DB $query = "INSERT INTO imas_external_tools (name,url,ltikey,secret,custom,privacy,groupid,courseid) VALUES ";
+			//DB $query .= "('{$_POST['tname']}','{$_POST['url']}','{$_POST['key']}','{$_POST['secret']}','{$_POST['custom']}',$privacy";
 			$query = "INSERT INTO imas_external_tools (name,url,ltikey,secret,custom,privacy,groupid,courseid) VALUES ";
-			$query .= "('{$_POST['tname']}','{$_POST['url']}','{$_POST['key']}','{$_POST['secret']}','{$_POST['custom']}',$privacy";
+			$query .= "(:name, :url, :ltikey, :secret, :custom, :privacy, :groupid, :courseid)";
+			$stm = $DBH->prepare($query);
 			if ($isteacher) {
-				$query .= ",$groupid,$cid)";
+				$stm->execute(array(':name'=>$_POST['tname'], ':url'=>$_POST['url'], ':ltikey'=>$_POST['key'], ':secret'=>$_POST['secret'], ':custom'=>$_POST['custom'], ':privacy'=>$privacy, ':groupid'=>$groupid, ':courseid'=>$cid));
 			} else if ($isgrpadmin || ($isadmin && $_POST['scope']==1)) {
-				$query .= ",$groupid,0)";
+				$stm->execute(array(':name'=>$_POST['tname'], ':url'=>$_POST['url'], ':ltikey'=>$_POST['key'], ':secret'=>$_POST['secret'], ':custom'=>$_POST['custom'], ':privacy'=>$privacy, ':groupid'=>$groupid, ':courseid'=>0));
 			} else {
-				$query .= ",0,0)";
+				$stm->execute(array(':name'=>$_POST['tname'], ':url'=>$_POST['url'], ':ltikey'=>$_POST['key'], ':secret'=>$_POST['secret'], ':custom'=>$_POST['custom'], ':privacy'=>$privacy, ':groupid'=>0, ':courseid'=>0));
 			}
 		} else {
-			$query = "UPDATE imas_external_tools SET name='{$_POST['tname']}',url='{$_POST['url']}',ltikey='{$_POST['key']}',";
-			$query .= "secret='{$_POST['secret']}',custom='{$_POST['custom']}',privacy=$privacy";
+			//DB $query = "UPDATE imas_external_tools SET name='{$_POST['tname']}',url='{$_POST['url']}',ltikey='{$_POST['key']}',";
+			//DB $query .= "secret='{$_POST['secret']}',custom='{$_POST['custom']}',privacy=$privacy";
+			$query = "UPDATE imas_external_tools SET name=:name,url=:url,ltikey=:ltikey,";
+			$query .= "secret=:secret,custom=:custom,privacy=:privacy";
+
+			$qarr = array(':name'=>$_POST['tname'], ':url'=>$_POST['url'], ':ltikey'=>$_POST['key'], ':secret'=>$_POST['secret'], ':custom'=>$_POST['custom'], ':privacy'=>$privacy);
 			if ($isadmin) {
 				if ($_POST['scope']==0) {
 					$query .= ',groupid=0';
 				} else {
-					$query .= ",groupid='$groupid'";
+					//DB $query .= ",groupid='$groupid'";
+				  $query .= ",groupid=:groupid";
+					$qarr[':groupid']=$groupid;
 				}
 			}
-			$query .= " WHERE id='{$_GET['id']}' ";
+			//DB $query .= " WHERE id='{$_GET['id']}' ";
+      $query .= " WHERE id=:id ";
+      $qarr[':id'] = $_GET['id'];
 			if ($isteacher) {
-				$query .= "AND courseid='$cid'";
+				//DB $query .= "AND courseid='$cid'";
+        $query .= "AND courseid=:courseid";
+        $qarr[':courseid'] = $cid;
 			} else if ($isgrpadmin) {
-				$query .= "AND groupid='$groupid'";
+				//DB $query .= "AND groupid='$groupid'";
+        $query .= "AND groupid=:groupid2";
+        $qarr[':groupid2'] = $groupid;
 			}
 		}
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
+
+    $stm = $DBH->prepare($query);
+    $stm->execute($qarr);
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
@@ -79,13 +97,20 @@ if (isset($_POST['tname'])) {
 } else if (isset($_GET['delete']) && $_GET['delete']=='true') {
 	$id = intval($_GET['id']);
 	if ($id>0) {
-		$query = "DELETE FROM imas_external_tools WHERE id=$id ";
-		if ($isteacher) {
-			$query .= "AND courseid='$cid'";
+		if ($isadmin) {
+      //DB $query = "DELETE FROM imas_external_tools WHERE id=$id ";
+      $stm = $DBH->prepare("DELETE FROM imas_external_tools WHERE id=:id ");
+      $stm->execute(array(':id'=>$id));
+    } else if ($isteacher) {
+			//DB $query = "DELETE FROM imas_external_tools WHERE id=$id AND courseid='$cid'";
+			$stm = $DBH->prepare("DELETE FROM imas_external_tools WHERE id=:id AND courseid=:courseid");
+			$stm->execute(array(':id'=>$id, ':courseid'=>$cid));
 		} else if ($isgrpadmin) {
-			$query .= "AND groupid='$groupid'";
+			//DB $query = "DELETE FROM imas_external_tools WHERE id=$id AND groupid='$groupid'";
+			$stm = $DBH->prepare("DELETE FROM imas_external_tools WHERE id=:id AND groupid=:groupid");
+			$stm->execute(array(':id'=>$id, ':groupid'=>$groupid));
 		}
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/externaltools.php?cid=$cid$ltfrom");
@@ -103,31 +128,44 @@ if (isset($_POST['tname'])) {
 	if (isset($_GET['delete'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Delete Tool</div>";
 		echo "<h2>Delete Tool</h2>";
-		$query = "SELECT name FROM imas_external_tools WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$name = mysql_result($result,0,0);
-		
+		//DB $query = "SELECT name FROM imas_external_tools WHERE id='{$_GET['id']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $name = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT name FROM imas_external_tools WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$name = $stm->fetchColumn(0);
+
 		echo '<p>Are you SURE you want to delete the tool <b>'.$name.'</b>?  Doing so will break ALL placements of this tool.</p>';
 		echo '<form method="post" action="externaltools.php?cid='.$cid.$ltfrom.'&amp;id='.$_GET['id'].'&amp;delete=true">';
 		echo '<input type=submit value="Yes, I\'m Sure">';
 		echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
 		echo '</form>';
-		
+
 	} else if (isset($_GET['id'])) {
 		echo " &gt; <a href=\"externaltools.php?cid=$cid$ltfrom\">External Tools</a> &gt; Edit Tool</div>";
 		echo "<h2>Edit Tool</h2>";
 		if ($_GET['id']=='new') {
 			$name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = 3; $grp = 0;
 		} else {
-			$query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}'";
-			if ($isteacher) {
-				$query .= " AND courseid='$cid'";
+      $qsel = 'SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools ';
+			if ($isadmin) {
+        //DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}'";
+        $stm = $DBH->prepare($qsel."WHERE id=:id");
+        $stm->execute(array(':id'=>$_GET['id']));
+      } else if ($isteacher) {
+				//DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}' AND courseid='$cid'";
+				$stm = $DBH->prepare($qsel."WHERE id=:id AND courseid=:courseid");
+				$stm->execute(array(':id'=>$_GET['id'], ':courseid'=>$cid));
 			} else if ($isgrpadmin) {
-				$query .= " AND groupid='$groupid'";
+				//DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}' AND groupid='$groupid'";
+				$stm = $DBH->prepare($qsel."WHERE id=:id AND groupid=:groupid");
+				$stm->execute(array(':id'=>$_GET['id'], ':groupid'=>$groupid));
 			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)==0) { die("invalid id");}
-			list($name,$url,$key,$secret,$custom,$privacy,$grp) = mysql_fetch_row($result);
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)==0) { die("invalid id");}
+			//DB list($name,$url,$key,$secret,$custom,$privacy,$grp) = mysql_fetch_row($result);
+			if ($stm->rowCount()==0) { die("invalid id");}
+			list($name,$url,$key,$secret,$custom,$privacy,$grp) = $stm->fetch(PDO::FETCH_NUM);
 			$custom = str_replace('&',"\n",$custom);
 		}
 		$tochg = array('name','url','key','secret','custom');
@@ -139,32 +177,32 @@ if (isset($_POST['tname'])) {
 		<span class="form">Tool Name:</span>
 		<span class="formright"><input type="text" size="40" name="tname" value="<?php echo $name;?>" /></span>
 		<br class="form" />
-		
+
 		<span class="form">Launch URL:</span>
 		<span class="formright"><input type="text" size="40" name="url" value="<?php echo $url;?>" /></span>
 		<br class="form" />
-		
+
 		<span class="form">Key:</span>
 		<span class="formright"><input type="text" size="40" name="key" value="<?php echo $key;?>" /></span>
 		<br class="form" />
-		
+
 		<span class="form">Secret:</span>
 		<span class="formright"><input type="password" size="40" name="secret" value="<?php echo $secret;?>" /></span>
 		<br class="form" />
-		
+
 		<span class="form">Custom Parameters:</span>
 		<span class="formright">
 			<textarea rows="2" cols="30" name="custom"><?php echo $custom;?></textarea>
 		</span>
 		<br class="form" />
-		
+
 		<span class="form">Privacy:</span>
 		<span class="formright">
 		<input type="checkbox" name="privname" value="1" <?php if (($privacy&1)==1) echo 'checked="checked"';?> /> Send name<br/>
 		<input type="checkbox" name="privemail" value="2" <?php if (($privacy&2)==2) echo 'checked="checked"';?> /> Send email
 		</span>
 		<br class="form" />
-<?php	
+<?php
 		if ($isadmin) {
 			echo '<span class="form">Scope of tool:</span><span class="formright">';
 			echo '<input type="radio" name="scope" value="0" '. (($grp==0)?'checked="checked"':'') . '> System-wide<br/>';
@@ -177,24 +215,33 @@ if (isset($_POST['tname'])) {
 	} else {
 		echo " &gt; External Tools</div>";
 		echo "<h2>External Tools</h2>";
-		
+
 		if ($isadmin) {
 			echo '<p><b>System and Group Tools</b></p>';
+			//DB $query = "SELECT iet.id,iet.name,ig.name FROM imas_external_tools as iet LEFT JOIN imas_groups AS ig ON ";
+			//DB $query .= "iet.groupid=ig.id WHERE iet.courseid=0 ORDER BY iet.groupid,iet.name";
 			$query = "SELECT iet.id,iet.name,ig.name FROM imas_external_tools as iet LEFT JOIN imas_groups AS ig ON ";
 			$query .= "iet.groupid=ig.id WHERE iet.courseid=0 ORDER BY iet.groupid,iet.name";
+			$stm = $DBH->query($query);
 		} else if ($isgrpadmin) {
 			echo '<p><b>Group Tools</b></p>';
-			$query = "SELECT id,name FROM imas_external_tools WHERE courseid=0 AND groupid='$groupid' ORDER BY name";
+			//DB $query = "SELECT id,name FROM imas_external_tools WHERE courseid=0 AND groupid='$groupid' ORDER BY name";
+			$stm = $DBH->prepare("SELECT id,name FROM imas_external_tools WHERE courseid=0 AND groupid=:groupid ORDER BY name");
+			$stm->execute(array(':groupid'=>$groupid));
 		} else {
 			echo '<p><b>Course Tools</b></p>';
-			$query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ORDER BY name";
+			//DB $query = "SELECT id,name FROM imas_external_tools WHERE courseid='$cid' ORDER BY name";
+			$stm = $DBH->prepare("SELECT id,name FROM imas_external_tools WHERE courseid=:courseid ORDER BY name");
+			$stm->execute(array(':courseid'=>$cid));
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		echo '<ul class="nomark">';
-		if (mysql_num_rows($result)==0) {
+		//DB if (mysql_num_rows($result)==0) {
+		if ($stm->rowCount()==0) {
 			echo '<li>No tools</li>';
 		} else {
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				echo '<li>'.$row[1];
 				if ($isadmin) {
 					if ($row[2]==null) {
@@ -209,9 +256,7 @@ if (isset($_POST['tname'])) {
 			}
 		}
 		echo '</ul>';
-		echo '<p><a href="externaltools.php?cid='.$cid.'&amp;id=new">Add a Tool</a></p>';	
+		echo '<p><a href="externaltools.php?cid='.$cid.'&amp;id=new">Add a Tool</a></p>';
 	}
 	require("../footer.php");
 }
-	
-

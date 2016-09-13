@@ -50,24 +50,32 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$block = $_GET['block'];
 
-
 	if (isset($_GET['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if ($_GET['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
 			deleteallaidfiles($_GET['id']);
-			$query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$_GET['id']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			$query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$_GET['id']));
+			//DB $query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$_GET['id']}'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$_GET['id']));
+			//DB $query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
+			$stm->execute(array(':assessmentid'=>$_GET['id']));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}");
 			exit;
 		} else {
 			$overwriteBody = 1;
-			$query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$assessmentname = mysql_result($result,0,0);
+			//DB $query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $assessmentname = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$assessmentname = $stm->fetchColumn(0);
 			$body = "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			$body .= "&gt; <a href=\"addassessment.php?cid={$_GET['cid']}&id={$_GET['id']}\">Modify Assessment</a> &gt; Clear Attempts</div>\n";
 			$body .= "<h3>$assessmentname</h3>";
@@ -166,9 +174,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
 		if ($_POST['copyfrom']!=0) {
-			$query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
+			//DB $query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
+			$stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['copyfrom']));
+			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = $stm->fetch(PDO::FETCH_NUM);
 			if (isset($_POST['copyinstr'])) {
 				$_POST['intro'] = $cpintro;
 			}
@@ -181,8 +192,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$reviewdate = $cpreviewdate;
 			}
 			if (isset($_POST['removeperq'])) {
-				$query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid='{$_GET['id']}'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid='{$_GET['id']}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid=:assessmentid");
+				$stm->execute(array(':assessmentid'=>$_GET['id']));
 			}
 		}
 		if ($_POST['deffeedback']=="Practice") {
@@ -203,83 +216,133 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$updategroupset='';
 		if (isset($_GET['id']) && $_POST['isgroup']>0 && $_POST['groupsetid']>0) {
 			$isok = true;
-			$query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_result($result,0,0)==0) {
+			//DB $query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_result($result,0,0)==0) {
+			$stm = $DBH->prepare("SELECT isgroup FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			if ($stm->fetchColumn(0)==0) {
 				//check to see if students have already started assessment
 				//don't really care if groups exist - just whether asids exist
 				//$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
+				//DB $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+				//DB $query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_result($result,0,0)>0) {
 				$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-				$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_result($result,0,0)>0) {//if (mysql_num_rows($result)>0) {
+				$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':assessmentid'=>$_GET['id'], ':courseid'=>$cid));
+				if ($stm->fetchColumn(0)>0) {
 					echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
 					exit;
 				}
 			}
-			$updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+			//DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+			$updategroupset = $_POST['groupsetid'];
+
 		}
 
 		if ($_POST['isgroup']>0 && isset($_POST['groupsetid']) && $_POST['groupsetid']==0) {
 			//create new groupset
-			$query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$_POST['groupsetid'] = mysql_insert_id();
-			$updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+			//DB $query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $_POST['groupsetid'] = mysql_insert_id();
+			$stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
+			$stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$_POST['name']));
+			$_POST['groupsetid'] = $DBH->lastInsertId();
+			//DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+			$updategroupset = $_POST['groupsetid'];
 		}
 
 
 		$caltag = $_POST['caltagact'];
 		$calrtag = $_POST['caltagrev'];
 
-		$_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
+		//DB $_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
+		$_POST['name'] = htmlentities($_POST['name']);
 
 		require_once("../includes/htmLawed.php");
 		if ($_POST['summary']=='<p>Enter summary here (shows on course page)</p>') {
 			$_POST['summary'] = '';
 		} else {
-			$_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
+			//DB $_POST['summary'] = addslashes(myhtmLawed(stripslashes($_POST['summary'])));
+			$_POST['summary'] = myhtmLawed($_POST['summary']);
 		}
 		if ($_POST['intro']=='<p>Enter intro/instructions</p>') {
 			$_POST['intro'] = '';
 		} else {
-			$_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
+			//DB $_POST['intro'] = addslashes(myhtmLawed(stripslashes($_POST['intro'])));
+			$_POST['intro'] = myhtmLawed($_POST['intro']);
 		}
 		if (isset($_GET['id'])) {  //already have id; update
-			$query = "SELECT isgroup,intro FROM imas_assessments WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$curassess = mysql_fetch_assoc($result);
+			$stm = $DBH->prepare("SELECT isgroup,intro FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$curassess = $stm->fetch(PDO::FETCH_ASSOC);
 
 			if ($isgroup==0) { //set agroupid=0 if switching from groups to not groups
 				if ($curassess['isgroup']>0) {
-					$query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid='{$_GET['id']}'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET agroupid=0 WHERE assessmentid=:assessmentid");
+					$stm->execute(array(':assessmentid'=>$_GET['id']));
 				}
 			} else { //if switching from nogroup to groups and groups already exist, need set agroupids if asids exist already
 				//NOT ALLOWED CURRENTLY
 			}
 			if (($introjson=json_decode($curassess['intro']))!==null) { //is json intro
-				$introjson[0] = stripslashes($_POST['intro']);
-				$_POST['intro'] = addslashes(json_encode($introjson));
+				$introjson[0] = $_POST['intro'];
+				$_POST['intro'] = json_encode($introjson);
 			}
 
-			$query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
-			$query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['assmpassword']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
-			$query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb',";
-			$query .= "msgtoinstr='{$_POST['msgtoinstr']}',posttoforum='{$_POST['posttoforum']}',istutorial=$istutorial,defoutcome='{$_POST['defoutcome']}'";
+			//DB $query = "UPDATE imas_assessments SET name='{$_POST['name']}',summary='{$_POST['summary']}',intro='{$_POST['intro']}',timelimit='$timelimit',minscore='{$_POST['minscore']}',isgroup='$isgroup',showhints='$showhints',tutoredit=$tutoredit,eqnhelper='{$_POST['eqnhelper']}',showtips='{$_POST['showtips']}',";
+			//DB $query .= "displaymethod='{$_POST['displaymethod']}',defattempts='{$_POST['defattempts']}',deffeedback='$deffeedback',shuffle='$shuffle',gbcategory='{$_POST['gbcat']}',password='{$_POST['assmpassword']}',cntingb='{$_POST['cntingb']}',showcat='{$_POST['showqcat']}',caltag='$caltag',calrtag='$calrtag',$updategroupset";
+			//DB $query .= "reqscore='{$_POST['reqscore']}',reqscoreaid='{$_POST['reqscoreaid']}',noprint='{$_POST['noprint']}',avail='{$_POST['avail']}',groupmax='{$_POST['groupmax']}',allowlate='{$_POST['allowlate']}',exceptionpenalty='{$_POST['exceptionpenalty']}',ltisecret='{$_POST['ltisecret']}',deffeedbacktext='$deffb',";
+			//DB $query .= "msgtoinstr='{$_POST['msgtoinstr']}',posttoforum='{$_POST['posttoforum']}',istutorial=$istutorial,defoutcome='{$_POST['defoutcome']}'";
+			$query = "UPDATE imas_assessments SET name=:name,summary=:summary,intro=:intro,timelimit=:timelimit,minscore=:minscore,isgroup=:isgroup,showhints=:showhints,tutoredit=:tutoredit,eqnhelper=:eqnhelper,showtips=:showtips,";
+			$query .= "displaymethod=:displaymethod,defattempts=:defattempts,deffeedback=:deffeedback,shuffle=:shuffle,gbcategory=:gbcategory,password=:password,cntingb=:cntingb,showcat=:showcat,caltag=:caltag,calrtag=:calrtag,";
+			$query .= "reqscore=:reqscore,reqscoreaid=:reqscoreaid,noprint=:noprint,avail=:avail,groupmax=:groupmax,allowlate=:allowlate,exceptionpenalty=:exceptionpenalty,ltisecret=:ltisecret,deffeedbacktext=:deffeedbacktext,";
+			$query .= "msgtoinstr=:msgtoinstr,posttoforum=:posttoforum,istutorial=:istutorial,defoutcome=:defoutcome";
+			$qarr = array(':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'], ':timelimit'=>$timelimit,
+				':minscore'=>$_POST['minscore'], ':isgroup'=>$isgroup, ':showhints'=>$showhints, ':tutoredit'=>$tutoredit,
+				':eqnhelper'=>$_POST['eqnhelper'], ':showtips'=>$_POST['showtips'], ':displaymethod'=>$_POST['displaymethod'],
+				':defattempts'=>$_POST['defattempts'], ':deffeedback'=>$deffeedback, ':shuffle'=>$shuffle, ':gbcategory'=>$_POST['gbcat'],
+				':password'=>$_POST['assmpassword'], ':cntingb'=>$_POST['cntingb'], ':showcat'=>$_POST['showqcat'], ':caltag'=>$caltag,
+				':calrtag'=>$calrtag, ':reqscore'=>$_POST['reqscore'], ':reqscoreaid'=>$_POST['reqscoreaid'], ':noprint'=>$_POST['noprint'],
+				':avail'=>$_POST['avail'], ':groupmax'=>$_POST['groupmax'], ':allowlate'=>$_POST['allowlate'],
+				':exceptionpenalty'=>$_POST['exceptionpenalty'], ':ltisecret'=>$_POST['ltisecret'], ':deffeedbacktext'=>$deffb,
+				':msgtoinstr'=>$_POST['msgtoinstr'], ':posttoforum'=>$_POST['posttoforum'], ':istutorial'=>$istutorial,
+				':defoutcome'=>$_POST['defoutcome']);
 
+			if ($updategroupset!='') {
+				$query .= ",groupsetid=:groupsetid";
+				$qarr[':groupsetid'] = $updategroupset;
+			}
 			if (isset($_POST['defpoints'])) {
-				$query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
+				//DB $query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
+				$query .= ",defpoints=:defpoints,defpenalty=:defpenalty";
+				$qarr[':defpoints'] = $_POST['defpoints'];
+				$qarr[':defpenalty'] = $_POST['defpenalty'];
 			}
 			if (isset($_POST['copyendmsg'])) {
-				$query .= ",endmsg='$endmsg' ";
+				//DB $query .= ",endmsg='$endmsg' ";
+				$query .= ",endmsg=:endmsg";
+				$qarr[':endmsg'] = $endmsg;
 			}
 			if ($_POST['avail']==1) {
-				$query .= ",startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate";
+				//DB $query .= ",startdate=$startdate,enddate=$enddate,reviewdate=$reviewdate";
+				$query .= ",startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate";
+				$qarr[':startdate'] = $startdate;
+				$qarr[':enddate'] = $enddate;
+				$qarr[':reviewdate'] = $reviewdate;
 			}
-			$query .= " WHERE id='{$_GET['id']}';";
+			//DB $query .= " WHERE id='{$_GET['id']}';";
+			$query .= " WHERE id=:id";
+			$qarr[':id'] = $_GET['id'];
 
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare($query);
+			$stm->execute($qarr);
 			if ($from=='gb') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid={$_GET['cid']}");
 			} else if ($from=='mcd') {
@@ -292,27 +355,59 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			exit;
 		} else { //add new
 			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}
+			//DB $query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
+			//DB $query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,";
+			//DB $query .= "showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome) VALUES ";
+			//DB $query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
+			//DB $query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
+			//DB $query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['assmpassword']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag','$calrtag',";
+			//DB $query .= "'$isgroup','{$_POST['groupmax']}','{$_POST['groupsetid']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}',";
+			//DB $query .= "'{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg','$deffb','{$_POST['msgtoinstr']}','{$_POST['posttoforum']}',$istutorial,'{$_POST['defoutcome']}');";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 			$query = "INSERT INTO imas_assessments (courseid,name,summary,intro,startdate,enddate,reviewdate,timelimit,minscore,";
-			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,";
-			$query .= "showcat,eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['summary']}','{$_POST['intro']}',$startdate,$enddate,$reviewdate,'$timelimit','{$_POST['minscore']}',";
-			$query .= "'{$_POST['displaymethod']}','{$_POST['defpoints']}','{$_POST['defattempts']}',";
-			$query .= "'{$_POST['defpenalty']}','$deffeedback','$shuffle','{$_POST['gbcat']}','{$_POST['assmpassword']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['showqcat']}','{$_POST['eqnhelper']}','{$_POST['showtips']}','$caltag','$calrtag',";
-			$query .= "'$isgroup','{$_POST['groupmax']}','{$_POST['groupsetid']}','$showhints','{$_POST['reqscore']}','{$_POST['reqscoreaid']}',";
-			$query .= "'{$_POST['noprint']}','{$_POST['avail']}','{$_POST['allowlate']}','{$_POST['exceptionpenalty']}','{$_POST['ltisecret']}','$endmsg','$deffb','{$_POST['msgtoinstr']}','{$_POST['posttoforum']}',$istutorial,'{$_POST['defoutcome']}');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$query .= "displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,";
+			$query .= "eqnhelper,showtips,caltag,calrtag,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,avail,allowlate,";
+			$query .= "exceptionpenalty,ltisecret,endmsg,deffeedbacktext,msgtoinstr,posttoforum,istutorial,defoutcome) VALUES ";
+			$query .= "(:courseid, :name, :summary, :intro, :startdate, :enddate, :reviewdate, :timelimit, :minscore, :displaymethod, ";
+			$query .= ":defpoints, :defattempts, :defpenalty, :deffeedback, :shuffle, :gbcategory, :password, :cntingb, :tutoredit, ";
+			$query .= ":showcat, :eqnhelper, :showtips, :caltag, :calrtag, :isgroup, :groupmax, :groupsetid, :showhints, :reqscore, ";
+			$query .= ":reqscoreaid, :noprint, :avail, :allowlate, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
+			$query .= ":posttoforum, :istutorial, :defoutcome)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
+				':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':timelimit'=>$timelimit,
+				':minscore'=>$_POST['minscore'], ':displaymethod'=>$_POST['displaymethod'], ':defpoints'=>$_POST['defpoints'],
+				':defattempts'=>$_POST['defattempts'], ':defpenalty'=>$_POST['defpenalty'], ':deffeedback'=>$deffeedback,
+				':shuffle'=>$shuffle, ':gbcategory'=>$_POST['gbcat'], ':password'=>$_POST['assmpassword'], ':cntingb'=>$_POST['cntingb'],
+				':tutoredit'=>$tutoredit, ':showcat'=>$_POST['showqcat'], ':eqnhelper'=>$_POST['eqnhelper'], ':showtips'=>$_POST['showtips'],
+				':caltag'=>$caltag, ':calrtag'=>$calrtag, ':isgroup'=>$isgroup, ':groupmax'=>$_POST['groupmax'],
+				':groupsetid'=>$_POST['groupsetid'], ':showhints'=>$showhints, ':reqscore'=>$_POST['reqscore'],
+				':reqscoreaid'=>$_POST['reqscoreaid'], ':noprint'=>$_POST['noprint'], ':avail'=>$_POST['avail'],
+				':allowlate'=>$_POST['allowlate'], ':exceptionpenalty'=>$_POST['exceptionpenalty'], ':ltisecret'=>$_POST['ltisecret'],
+				':endmsg'=>$endmsg, ':deffeedbacktext'=>$deffb, ':msgtoinstr'=>$_POST['msgtoinstr'], ':posttoforum'=>$_POST['posttoforum'],
+				':istutorial'=>$istutorial, ':defoutcome'=>$_POST['defoutcome']));
 
-			$newaid = mysql_insert_id();
+			//DB $newaid = mysql_insert_id();
+			$newaid = $DBH->lastInsertId();
 
+			//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
+			//DB $query .= "('$cid','Assessment','$newaid');";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
-			$query .= "('$cid','Assessment','$newaid');";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$query .= "(:courseid, :itemtype, :typeid);";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid, ':itemtype'=>'Assessment', ':typeid'=>$newaid));
 
-			$itemid = mysql_insert_id();
+			//DB $itemid = mysql_insert_id();
+			$itemid = $DBH->lastInsertId();
 
-			$query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid';";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$items = unserialize($line['itemorder']);
 
 			$blocktree = explode('-',$block);
@@ -326,10 +421,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				array_unshift($sub,$itemid);
 			}
 
-			$itemorder = addslashes(serialize($items));
+			//DB $itemorder = addslashes(serialize($items));
+			$itemorder = serialize($items);
 
-			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid={$_GET['cid']}&aid=$newaid");
 			exit;
 		}
@@ -337,13 +435,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	} else { //INITIAL LOAD
 		if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
+			//DB $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+			//DB $query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
+			//DB $taken = (mysql_result($result,0,0)>0);
 			$query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-			$query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
-			$result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
-			$taken = (mysql_result($result,0,0)>0);
-			$query = "SELECT * FROM imas_assessments WHERE id='{$_GET['id']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':assessmentid'=>$_GET['id'], ':courseid'=>$cid));
+			$taken = ($stm->fetchColumn(0)>0);
+			//DB $query = "SELECT * FROM imas_assessments WHERE id='{$_GET['id']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+			$stm = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['id']));
+			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			list($testtype,$showans) = explode('-',$line['deffeedback']);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
@@ -512,36 +618,48 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$page_formActionTag .= "&folder=" . $_GET['folder'] . "&from=" . $_GET['from'];
 		$page_formActionTag .= "&tb=$totb";
 
-		$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid' ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_assessments WHERE courseid=:courseid ORDER BY name");
+		$stm->execute(array(':courseid'=>$cid));
 		$page_copyFromSelect = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		//DB if (mysql_num_rows($result)>0) {
+			//DB while ($row = mysql_fetch_row($result)) {
+		if ($stm->rowCount()>0) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_copyFromSelect['val'][$i] = $row[0];
 				$page_copyFromSelect['label'][$i] = $row[1];
 				$i++;
 			}
 		}
 
-		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
 		$page_gbcatSelect = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		//DB if (mysql_num_rows($result)>0) {
+			//DB while ($row = mysql_fetch_row($result)) {
+		if ($stm->rowCount()>0) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_gbcatSelect['val'][$i] = $row[0];
 				$page_gbcatSelect['label'][$i] = $row[1];
 				$i++;
 			}
 		}
 
-		$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
 		$page_outcomes = array();
 		$i=0;
-		if (mysql_num_rows($result)>0) {
-			while ($row = mysql_fetch_row($result)) {
+		//DB if (mysql_num_rows($result)>0) {
+			//DB while ($row = mysql_fetch_row($result)) {
+		if ($stm->rowCount()>0) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$page_outcomes[$row[0]] = $row[1];
 				$i++;
 			}
@@ -550,10 +668,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$page_outcomeslist = array(array(0,0));
 		if ($i>0) {//there were outcomes
-			$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
-			$outcomearr = unserialize($row[0]);
+			//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$outcomearr = unserialize($stm->fetchColumn(0));
 
 			function flattenarr($ar) {
 				global $page_outcomeslist;
@@ -571,17 +691,27 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$page_groupsets = array();
 		if ($taken && $line['isgroup']==0) {
+			//DB $query = "SELECT imas_stugroupset.id,imas_stugroupset.name FROM imas_stugroupset LEFT JOIN imas_stugroups ON imas_stugroups.groupsetid=imas_stugroupset.id ";
+			//DB $query .= "LEFT JOIN imas_stugroupmembers ON imas_stugroups.id=imas_stugroupmembers.stugroupid WHERE imas_stugroupset.courseid='$cid' ";
+			//DB $query .= "GROUP BY imas_stugroupset.id HAVING count(imas_stugroupmembers.id)=0";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "SELECT imas_stugroupset.id,imas_stugroupset.name FROM imas_stugroupset LEFT JOIN imas_stugroups ON imas_stugroups.groupsetid=imas_stugroupset.id ";
-			$query .= "LEFT JOIN imas_stugroupmembers ON imas_stugroups.id=imas_stugroupmembers.stugroupid WHERE imas_stugroupset.courseid='$cid' ";
+			$query .= "LEFT JOIN imas_stugroupmembers ON imas_stugroups.id=imas_stugroupmembers.stugroupid WHERE imas_stugroupset.courseid=:courseid ";
 			$query .= "GROUP BY imas_stugroupset.id HAVING count(imas_stugroupmembers.id)=0";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid));
 		} else {
-			$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid'";
+			//DB $query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid");
+			$stm->execute(array(':courseid'=>$cid));
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 		$page_groupsets['val'][0] = 0;
 		$page_groupsets['label'][0] = 'Create new set of groups';
 		$i=1;
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_groupsets['val'][$i] = $row[0];
 			$page_groupsets['label'][$i] = $row[1];
 			$i++;
@@ -591,11 +721,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$page_tutorSelect['val'] = array(2,0,1);
 
 		$page_forumSelect = array();
-		$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid ORDER BY name");
+		$stm->execute(array(':courseid'=>$cid));
 		$page_forumSelect['val'][0] = 0;
 		$page_forumSelect['label'][0] = "None";
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_forumSelect['val'][] = $row[0];
 			$page_forumSelect['label'][] = $row[1];
 		}

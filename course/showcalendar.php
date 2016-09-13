@@ -8,17 +8,17 @@
 	   require("../footer.php");
 	   exit;
 	}
-	
+
 	$cid = $_GET['cid'];
-	
+
 	require("../includes/calendardisp.php");
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=092815\"></script>";
-	
+
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Calendar</div>";
 	echo '<div id="headercalendar" class="pagetitle"><h2>Calendar</h2></div>';
-	
+
 	 if (isset($teacherid)) {
 		echo "<div class=\"cpmid\"><a id=\"mcelink\" href=\"managecalitems.php?from=cal&cid=$cid\">Manage Events</a></div>";
 	 }
@@ -30,19 +30,22 @@
 	} else {
 		$latepasses = 0;
 	}
-	 
-	 $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
-	 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	 $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	 $latepasshrs = $line['latepasshrs']; 
+
+	 //DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
+	 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	 //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	 $stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,topbar,cploc,latepasshrs FROM imas_courses WHERE id=:id");
+	 $stm->execute(array(':id'=>$cid));
+	 $line = $stm->fetch(PDO::FETCH_ASSOC);
+	 $latepasshrs = $line['latepasshrs'];
 	 $msgset = $line['msgset']%5;
-	 
+
 	 showcalendar("showcalendar");
-	
-	 require("../footer.php");	
-	 
-	 
-	 
+
+	 require("../footer.php");
+
+
+
 	 function makecolor2($stime,$etime,$now) {
 	   if (!$GLOBALS['colorshift']) {
 		   return "#ff0";
@@ -67,7 +70,7 @@
 	   }
 	    return $color;
 	 }
-	 
+
 	 function makecolor($etime,$now) {
 	   if (!$GLOBALS['colorshift']) {
 		   return "#ff0";
@@ -85,20 +88,20 @@
 	   return $color;
    }
 	 function formatdate($date) {
-	return tzdate("D n/j/y, g:i a",$date);   
-		//return tzdate("M j, Y, g:i a",$date);   
+	return tzdate("D n/j/y, g:i a",$date);
+		//return tzdate("M j, Y, g:i a",$date);
 	   }
 	function getpts($scs) {
 		$tot = 0;
 		foreach(explode(',',$scs) as $sc) {
 			if (strpos($sc,'~')===false) {
-				if ($sc>0) { 
+				if ($sc>0) {
 					$tot += $sc;
-				} 
+				}
 			} else {
 				$sc = explode('~',$sc);
 				foreach ($sc as $s) {
-					if ($s>0) { 
+					if ($s>0) {
 						$tot+=$s;
 					}
 				}

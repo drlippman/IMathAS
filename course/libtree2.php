@@ -1,6 +1,6 @@
 <?php
 	require_once("../validate.php");
-		
+
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		$isadmin = false;
 		$isgrpadmin = false;
@@ -22,8 +22,8 @@
 <head>
 <title>IMathAS Library Selection</title>
 END;
-	
-	if (isset($coursetheme)) { 
+
+	if (isset($coursetheme)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
 	}
@@ -36,38 +36,43 @@ END;
 <body>
 <form id="libselectform">
 END;
-	} 
+	}
 	echo "<script type=\"text/javascript\">";
+	//DB $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
+	//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
 	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
 	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
+	$stm = $DBH->query($query);
 	//$query = "SELECT id,name,parent FROM imas_libraries ORDER BY parent";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 	if (isset($_GET['select'])) {
 		$select = $_GET['select'];
 	} else if (!isset($select)) {
 		$select = "child";
 	}
-	
+
 	echo "var select = '$select';\n";
 	if (isset($_GET['type'])) {
 		echo "var treebox = '{$_GET['type']}';\n";
 	} else {
 		echo "var treebox = 'checkbox';\n";
 	}
-	
+
 	if (isset($_GET['selectrights'])) {
 		$selectrights = $_GET['selectrights'];
 	} else {
 		$selectrights = 0;
 	}
 	$allsrights = 2+3*$selectrights;
-	
+
 	$rights = array();
 	$sortorder = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
-		$name = addslashes($line['name']);
+		//DB $name = addslashes($line['name']);
+		$name = htmlentities($line['name'], ENT_QUOTES);
 		$parent = $line['parent'];
 		if ($line['count']==0) {
 			$isempty[$id] = true;
@@ -80,13 +85,13 @@ END;
 		$ownerids[$id] = $line['ownerid'];
 		$groupids[$id] = $line['groupid'];
 	}
-	//if parent has lower userights, up them to match child library	
+	//if parent has lower userights, up them to match child library
 	function setparentrights($alibid) {
 		global $rights,$parents;
 		if ($parents[$alibid]>0) {
 			if ($rights[$parents[$alibid]] < $rights[$alibid]) {
 			//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
-				
+
 				$rights[$parents[$alibid]] = $rights[$alibid];
 			}
 			setparentrights($parents[$alibid]);
@@ -95,7 +100,7 @@ END;
 	foreach ($rights as $k=>$n) {
 		setparentrights($k);
 	}
-	
+
 	if (isset($_GET['libs']) && $_GET['libs']!='') {
 		$checked = explode(",",$_GET['libs']);
 	} else if (!isset($checked)) {
@@ -109,7 +114,7 @@ END;
 	}
 	$checked = array_merge($checked,$locked);
 	$toopen = array();
-	
+
 	echo "var tree = {\n";
 	echo " 0:[\n";
 	$donefirst[0] = 2;
@@ -120,7 +125,7 @@ END;
 	} else {
 		echo "[0,8,\"Unassigned\",0,0]";
 	}
-		
+
 	if (isset($ltlibs[0])) {
 		if (isset($base)) {
 			printlist($base);
@@ -128,7 +133,7 @@ END;
 			printlist(0);
 		}
 	}
-		
+
 	function printlist($parent) {
 		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
 		$newchildren = array();
@@ -152,7 +157,7 @@ END;
 			$arr = array_keys($orderarr);
 		}
 		foreach ($arr as $child) {
-			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {	
+			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
 			//if ($rights[$child]>$selectrights || $ownerids[$child]==$userid || $isadmin) {
 				if (!$isadmin) {
 					if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
@@ -163,8 +168,8 @@ END;
 				echo "[$child,{$rights[$child]},'{$names[$child]}',";
 				if (isset($ltlibs[$child])) { //library has children
 					if ($select == "parent" || $select=="all") {
-						if ($_GET['type']=="radio") {				
-							if (in_array($child,$locked)) { //removed the following which prevented creation of sublibraries of "open to all" libs.  Not sure why I had that.   || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
+						if ($_GET['type']=="radio") {
+							if (in_array($child,$locked)) { //removed the following which prevented creation of sublibraries of "open to all" libs.  Not sure why I had that.   || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
 								echo "1,";
 							} else {
 								echo ",";
@@ -172,7 +177,7 @@ END;
 							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
 							echo "]";
 						} else {
-							if (in_array($child,$locked)) { 
+							if (in_array($child,$locked)) {
 								echo "1,";
 							} else {
 								echo ",";
@@ -187,7 +192,7 @@ END;
 				} else {  //no children
 					if ($select == "child" || $select=="all" || $isempty[$child]==true) {
 						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked)) { // || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
+							if (in_array($child,$locked)) { // || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
 								echo "1,";
 							} else {
 								echo ",";
@@ -195,7 +200,7 @@ END;
 							if (in_array($child,$checked)) { echo "1";} //else {echo "0";}
 							echo "]";
 						} else {
-							if (in_array($child,$locked)) { 
+							if (in_array($child,$locked)) {
 								echo "1,";
 							} else {
 								echo ",";
@@ -206,7 +211,7 @@ END;
 					} else {
 						echo "-1,]";
 					}
-					
+
 				}
 			}
 		}
@@ -216,14 +221,14 @@ END;
 			printlist($newchild);
 		}
 	}
-	
+
 	echo "};";
 	echo "</script>";  //end tree definition script
 	if (isset($_GET['base'])) {
 		$base = $_GET['base'];
 	}
 	echo "<input type=button value=\"Uncheck all\" onclick=\"uncheckall(this.form)\"/><br>";
-	
+
 	if (isset($base)) {
 		echo "<input type=hidden name=\"rootlib\" value=$base>{$names[$base]}</span>";
 	} else {
@@ -285,7 +290,7 @@ END;
 		echo "addLoadEvent(function() {initlibtree(true);})";
 	}
 	echo "</script>\n";
-	
+
 	$colorcode =  "<p><b>Color Code</b><br/>";
 	$colorcode .= "<span class=r8>Open to all</span><br/>\n";
 	$colorcode .= "<span class=r4>Closed</span><br/>\n";

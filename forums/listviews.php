@@ -14,10 +14,15 @@ if (!isset($_GET['thread'])) {
 }
 $thread = intval($_GET['thread']);
 
+//DB query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_threads ON imas_forums.id=imas_forum_threads.forumid ";
+//DB $query .= " WHERE imas_forum_threads.id=$thread AND imas_forums.courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
 $query = "SELECT imas_forums.id FROM imas_forums JOIN imas_forum_threads ON imas_forums.id=imas_forum_threads.forumid ";
-$query .= " WHERE imas_forum_threads.id=$thread AND imas_forums.courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-if (mysql_num_rows($result)==0) {
+$query .= "WHERE imas_forum_threads.id=:id AND imas_forums.courseid=:courseid";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':id'=>$thread, ':courseid'=>$cid));
+if ($stm->rowCount()==0) {
 	echo 'Invalid thread';
 	exit;
 }
@@ -27,15 +32,21 @@ require("../header.php");
 
 echo '<h4>'._('Thread Views').'</h4>';
 
+//DB $query = "SELECT iu.LastName,iu.FirstName,ifv.lastview FROM imas_users AS iu JOIN ";
+//DB $query .= "imas_forum_views AS ifv ON iu.id=ifv.userid WHERE ifv.threadid=$thread ORDER BY ifv.lastview";
+//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
 $query = "SELECT iu.LastName,iu.FirstName,ifv.lastview FROM imas_users AS iu JOIN ";
-$query .= "imas_forum_views AS ifv ON iu.id=ifv.userid WHERE ifv.threadid=$thread ORDER BY ifv.lastview";
-$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-if (mysql_num_rows($result)==0) {
+$query .= "imas_forum_views AS ifv ON iu.id=ifv.userid WHERE ifv.threadid=:threadid ORDER BY ifv.lastview";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':threadid'=>$thread));
+if ($stm->rowCount()==0) {
 	echo '<p>'._('No thread views').'</p>';
 } else {
 	echo '<table><thead><tr><th>'._('Name').'</th><th>'._('Last Viewed').'</th></tr></thead>';
 	echo '<tbody>';
-	while ($row = mysql_fetch_assoc($result)) {
+	//DB while ($row = mysql_fetch_assoc($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		echo '<tr><td>'.$row['LastName'].', '.$row['FirstName'].'</td>';
 		echo '<td>'.tzdate("F j, Y, g:i a", $row['lastview']).'</td></tr>';
 	}

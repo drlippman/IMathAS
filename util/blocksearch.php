@@ -18,14 +18,18 @@ function getstr($items,$str,$parent) {
 	return array();
 }
 require("../header.php");
-echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities(stripslashes($_POST['search'])).'"> <input type="submit" value="Search"/></p>';
+//DB echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities(stripslashes($_POST['search'])).'"> <input type="submit" value="Search"/></p>';
+echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities($_POST['search']).'"> <input type="submit" value="Search"/></p>';
 if (isset($_POST['search'])) {
 	echo '<p>';
 	$srch = $_POST['search'];
-	$query = "SELECT id,itemorder,name FROM imas_courses WHERE itemorder LIKE '%$srch%' LIMIT 40";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
-		$items = unserialize($row[1]);	
+	//DB $query = "SELECT id,itemorder,name FROM imas_courses WHERE itemorder LIKE '%$srch%' LIMIT 40";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT id,itemorder,name FROM imas_courses WHERE itemorder LIKE :srch LIMIT 40");
+	$stm->execute(array(':srch'=>"%:srch%"));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+		$items = unserialize($row[1]);
 		$det = getstr($items, $srch, '0');
 		if (count($det)>0) {
 			echo '<a target="_blank" href="'.$imasroot.'/course/course.php?cid='.$row[0].'&folder='.$det[0].'">'.$det[1].'</a> in'.$row[2].'<br/>';

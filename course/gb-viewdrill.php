@@ -27,13 +27,17 @@ if (!isset($teacherid)) {
 	exit;
 }
 
-$query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
+//DB $query = "SELECT * FROM imas_drillassess WHERE id='$daid' AND courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
+$stm = $DBH->prepare("SELECT * FROM imas_drillassess WHERE id=:id AND courseid=:courseid");
+$stm->execute(array(':id'=>$daid, ':courseid'=>$cid));
+if ($stm->rowCount()==0) {
 	echo 'Invalid drill id.';
 	exit;
 }
-$dadata = mysql_fetch_array($result, MYSQL_ASSOC);
+//DB $dadata = mysql_fetch_array($result, MYSQL_ASSOC);
+$dadata = $stm->fetch(PDO::FETCH_ASSOC);
 $n = $dadata['n'];
 $showtype = $dadata['showtype'];
 $scoretype = $dadata['scoretype'];
@@ -59,10 +63,15 @@ if ($dadata['itemdescr']=='') {
 $classbests = explode(',',$dadata['classbests']);
 
 $studata = array();
+//DB $query = "SELECT iu.LastName,iu.FirstName,ids.scorerec FROM imas_drillassess_sessions AS ids ";
+//DB $query .= "JOIN imas_users AS iu ON iu.id=ids.userid WHERE ids.drillassessid=$daid ORDER BY iu.LastName, iu.FirstName";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
 $query = "SELECT iu.LastName,iu.FirstName,ids.scorerec FROM imas_drillassess_sessions AS ids ";
-$query .= "JOIN imas_users AS iu ON iu.id=ids.userid WHERE ids.drillassessid=$daid ORDER BY iu.LastName, iu.FirstName";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+$query .= "JOIN imas_users AS iu ON iu.id=ids.userid WHERE ids.drillassessid=:drillassessid ORDER BY iu.LastName, iu.FirstName";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':drillassessid'=>$daid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$scorerec = unserialize($row[2]);
 	$rowdata = array($row[0].', '.$row[1]);
 	foreach ($itemids as $qn=>$v) {
@@ -72,14 +81,14 @@ while ($row = mysql_fetch_row($result)) {
 			} else {
 				$score =  dispscore(min($scorerec[$qn]));
 			}
-			
+
 			if (isset($_GET['details'])) {
 				$score .= ' ; '.count($scorerec[$qn]).' ; ';
 			} else {
 				$score .= '('.count($scorerec[$qn]).')';
 				$score .= '<br/>';
 			}
-			$score .= dispscore($scorerec[$qn][count($scorerec[$qn])-1]); 
+			$score .= dispscore($scorerec[$qn][count($scorerec[$qn])-1]);
 			if (isset($_GET['details'])) {
 				$score .= ' ; ' . dispscore(round(array_sum($scorerec[$qn])/count($scorerec[$qn]), 1));
 				if (count($scorerec[$qn])>1) {
@@ -98,7 +107,7 @@ while ($row = mysql_fetch_row($result)) {
 $placeinhead = '<script type="text/javascript">function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 $placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}</script>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
-	
+
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Drill Assessment Results</div>";
 echo "<h2>Drill Assessment Results</h2>";
@@ -125,7 +134,7 @@ foreach ($studata as $i=>$sturow) {
 echo '</tbody></table>';
 
 echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
-	
+
 require("../footer.php");
 
 function dispscore($sc) {
@@ -155,4 +164,3 @@ function formattime($cur) {
 	return "$hours:$minutes:$seconds";
 }
 ?>
-

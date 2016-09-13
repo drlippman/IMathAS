@@ -97,9 +97,12 @@ if (isset($QS['showscored'])) {
 	$seed = intval($_POST['seed']);
 	$scoredonsubmit = false;
 	if (isset($_POST['auth'])) {
-		$query = "SELECT password FROM imas_users WHERE SID='{$_POST['auth']}'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT password FROM imas_users WHERE SID='{$_POST['auth']}'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$_POST['auth']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		$key = $row[0];
 		$jwtcheck = json_decode(json_encode(JWT::decode($_POST['jwtchk'], $key)), true);
 		if ($jwtcheck['id'] != $qsetid || $jwtcheck['seed'] != $seed) {
@@ -148,13 +151,13 @@ if (isset($QS['showscored'])) {
 		}
 		$rawafter = implode('~',$rawafter);
 	}
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	$lastanswers[0] = $lastanswers[0];
 
 	$pts = getpts($after);
 
 	$params = array('id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
 	if (isset($_POST['auth'])) {
-		$params["auth"] = stripslashes($_POST['auth']);
+		$params["auth"] = $_POST['auth'];
 	}
 
 	$signed = JWT::encode($params, $key);
@@ -213,10 +216,13 @@ if (isset($QS['showscored'])) {
   }
 	if (isset($QS['auth'])) {
 		$verarr = array("id"=>$qsetid, "seed"=>$seed, 'scoredonsubmit'=>$scoredonsubmit, 'showans'=>$showansonsubmit);
-		$query = "SELECT password FROM imas_users WHERE SID='".addslashes(stripslashes($QS['auth']))."'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$row = mysql_fetch_row($result);
-		$key = $row[0];
+		//DB $query = "SELECT password FROM imas_users WHERE SID='".addslashes(stripslashes($QS['auth']))."'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$QS['auth']));
+		$key = $stm->fetchColumn(0);
+
 		echo '<input type="hidden" name="jwtchk" value="'.JWT::encode($verarr,$key).'"/>';
 		echo '<input type="hidden" name="auth" value="'.$QS['auth'].'"/>';
 	}
@@ -318,9 +324,12 @@ function printscore($sc,$qsetid,$seed) {
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
-		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$control = mysql_result($result,0,0);
+		//DB $query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $control = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qsetid));
+		$control = $stm->fetchColumn(0);
 		$ptposs = getansweights($control,$seed);
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);

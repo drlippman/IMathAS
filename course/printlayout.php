@@ -6,19 +6,19 @@
 require("../validate.php");
 
 
-	
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Print Layout";
 $flexwidth = true;
 
-	
+
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
 	$body = "You need to log in as a teacher to access this page";
-} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
+} else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
 
 }
 
@@ -33,8 +33,8 @@ require("../header.php");
 
 if ($overwriteBody==1) {
 	echo $body;
-} else {		
-	
+} else {
+
 	$cid = $_GET['cid'];
 	$aid = $_GET['aid'];
 	if (isset($_POST['vert'])) {
@@ -49,14 +49,17 @@ if ($overwriteBody==1) {
 		$pw = $_POST['pw'];
 	}
 	$isfinal = isset($_GET['final']);
-	
-	$query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+
+	//DB $query = "SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT itemorder,shuffle,defpoints,name,intro FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if (($introjson=json_decode($line['intro']))!==null) { //is json intro
 		$line['intro'] = $introjson[0];
 	}
-	
+
 	$ioquestions = explode(",",$line['itemorder']);
 	$questions = array();
 	foreach($ioquestions as $k=>$q) {
@@ -89,13 +92,16 @@ if ($overwriteBody==1) {
 			$questions[] = $q;
 		}
 	}
-	
+
 	$points = array();
 	$qn = array();
-	$qlist = "'".implode("','",$questions)."'";
-	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $qlist = "'".implode("','",$questions)."'";
+	$qlist = implode(',', array_map('intval', $questions));
+	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->query("SELECT id,points,questionsetid FROM imas_questions WHERE id IN ($qlist)");
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$points[$row[0]] = $line['defpoints'];
 		} else {
@@ -103,8 +109,8 @@ if ($overwriteBody==1) {
 		}
 		$qn[$row[0]] = $row[2];
 	}
-	
-	
+
+
 	$numq = count($questions);
 	$phs = $ph-0.6;
 	$pws = $pw-0.5;
@@ -177,7 +183,7 @@ if ($overwriteBody==1) {
 			padding: 0px;
 			overflow: hidden;
 		}
-		
+
 		div.cbutn {
 			float: left;
 			padding-left: 5px;
@@ -208,7 +214,7 @@ if ($overwriteBody==1) {
 		}
 	</style>
 	<style type="text/css" media="print">
-	
+
 		div.a,div.b {
 			display: none;
 		}
@@ -222,7 +228,7 @@ if ($overwriteBody==1) {
 		.pageb {
 			border: 0px;
 		}
-		
+
 	</style>
 
 <?php
@@ -238,26 +244,26 @@ if ($overwriteBody==1) {
 		}
 	}
 	include("../assessment/displayq2.php");
-	
-	
+
+
 	//echo "<div class=maintest>\n";
 	echo "<form method=post action=\"printtest.php?cid=$cid&aid=$aid\" onSubmit=\"return packheights()\">\n";
-	
+
 	if ($isfinal) {
 		$copies = $_POST['versions'];
 	} else {
 		$copies = 1;
 	}
-	for ($j=0; $j<$copies; $j++) {		
+	for ($j=0; $j<$copies; $j++) {
 		$seeds = array();
 		if ($line['shuffle']&2) {  //set rand seeds
-			$seeds = array_fill(0,count($questions),rand(1,9999));	
+			$seeds = array_fill(0,count($questions),rand(1,9999));
 		} else {
 			for ($i = 0; $i<count($questions);$i++) {
 				$seeds[] = rand(1,9999);
 			}
 		}
-		
+
 		$headerleft = '';
 		if (isset($_POST['aname'])) {
 			$headerleft .= $line['name'];
@@ -269,15 +275,21 @@ if ($overwriteBody==1) {
 			$headerleft .= "<br/>";
 		}
 		if (isset($_POST['cname'])) {
-			$query = "SELECT name FROM imas_courses WHERE id=$cid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$headerleft .= mysql_result($result,0,0);
+			//DB $query = "SELECT name FROM imas_courses WHERE id=$cid";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $headerleft .= mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$headerleft .= $stm->fetchColumn(0);
 			if (isset($_POST['iname'])) { $headerleft .= ' - ';}
 		}
 		if (isset($_POST['iname'])) {
-			$query = "SELECT LastName FROM imas_users WHERE id=$userid";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$headerleft .= mysql_result($result,0,0);
+			//DB $query = "SELECT LastName FROM imas_users WHERE id=$userid";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $headerleft .= mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT LastName FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$userid));
+			$headerleft .= $stm->fetchColumn(0);
 		}
 		$headerright = '';
 		if (isset($_POST['sname'])) {
@@ -289,7 +301,7 @@ if ($overwriteBody==1) {
 		if (isset($_POST['otherheader'])) {
 			$headerright .= $_POST['otherheadertext'] . '____________________________';
 		}
-		
+
 		echo "<div class=q>\n";
 		if ($isfinal) {
 			echo "<div class=hdrm>\n";
@@ -301,10 +313,10 @@ if ($overwriteBody==1) {
 		echo "</div>\n";
 		if (!$isfinal) {
 			echo "<div class=cbutn><a href=\"printtest.php?cid=$cid&aid=$aid\">Cancel</a></div>\n";
-		} 
+		}
 		echo "</div>\n";
-		
-		
+
+
 		for ($i=0; $i<$numq; $i++) {
 			$sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]]);
 		}
@@ -326,8 +338,8 @@ if ($overwriteBody==1) {
 			if (heights[id]+sp>.5) {
 				heights[id] += sp;
 				document.getElementById("trq"+id).style.height = heights[id]+"in";
-			} 
-			
+			}
+
 		}
 		function packheights() {
 			document.getElementById("heights").value = heights.join(",");
@@ -389,23 +401,29 @@ if ($overwriteBody==1) {
 	echo "</form>\n";
 
 
-}	
+}
 
 require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts) {
-	global $isfinal,$imasroot;
+	global $DBH,$isfinal,$imasroot;
 	srand($seed);
 
-	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$qdata = mysql_fetch_array($result, MYSQL_ASSOC);
-	
+	//DB $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $qdata = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id=:id");
+	$stm->execute(array(':id'=>$qsetid));
+	$qdata = $stm->fetch(PDO::FETCH_ASSOC);
+
 	if ($qdata['hasimg']>0) {
-		$query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";	
+		//DB $query = "SELECT var,filename,alttext FROM imas_qimages WHERE qsetid='$qsetid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
+		$stm->execute(array(':qsetid'=>$qsetid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			${$row[0]} = "<img src=\"$imasroot/assessment/qimages/{$row[1]}\" alt=\"{$row[2]}\" />";
 		}
 	}
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
@@ -417,7 +435,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
 	srand($seed+2);
 	$la = '';
-	
+
 	if (isset($choices) && !isset($questions)) {
 		$questions =& $choices;
 	}
@@ -427,7 +445,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if ($displayformat=="select") {
 		unset($displayformat);
 	}
-	
+
 	//pack options
 	if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
 	if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
@@ -439,7 +457,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
 	if (isset($answersize)) {$options['answersize'] = $answersize;}
 	if (isset($variables)) {$options['variables'] = $variables;}
-	if (isset($domain)) {$options['domain'] = $domain;}	
+	if (isset($domain)) {$options['domain'] = $domain;}
 	if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
 	if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
 	if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
@@ -447,7 +465,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
 	if (isset($grid)) {$options['grid'] = $grid;}
 	if (isset($background)) {$options['background'] = $background;}
-	
+
 	if ($qdata['qtype']=="multipart") {
 		if (!is_array($anstypes)) {
 			$anstypes = explode(",",$anstypes);
@@ -459,7 +477,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	} else {
 		list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
 	}
-	
+
 	echo "<div class=q>";
 	if ($isfinal) {
 		echo "<div class=\"trq$qn\">\n";
@@ -476,7 +494,7 @@ function printq($qn,$qsetid,$seed,$pts) {
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	echo printfilter(filter($evaledqtext));
 	echo "</div>\n"; //end question div
-	
+
 	if (strpos($toevalqtxt,'$answerbox')===false) {
 		if (is_array($answerbox)) {
 			foreach($answerbox as $iidx=>$abox) {
@@ -486,15 +504,15 @@ function printq($qn,$qsetid,$seed,$pts) {
 		} else {  //one question only
 			echo printfilter(filter("<div>$answerbox</div>\n"));
 		}
-		
-		
-	} 
-	
+
+
+	}
+
 	echo "</div>\n"; //end floatl div
-	
+
 	echo "</div>";//end m div
 	if (!$isfinal) {
-		echo "<div class=cbutn>\n";  
+		echo "<div class=cbutn>\n";
 		echo "<p><input type=button value=\"+1\" onclick=\"incspace($qn,1)\"><input type=button value=\"+.5\" onclick=\"incspace($qn,.5)\"><input type=button value=\"+.25\" onclick=\"incspace($qn,.25)\"><input type=button value=\"+.1\" onclick=\"incspace($qn,.1)\"><br/>";
 		echo "<input type=button value=\"-1\" onclick=\"incspace($qn,-1)\"><input type=button value=\"-.5\" onclick=\"incspace($qn,-.5)\"><input type=button value=\"-.25\" onclick=\"incspace($qn,-.25)\"><input type=button value=\"-.1\" onclick=\"incspace($qn,-.1)\"></p>";
 		echo "</div>\n"; //end cbutn div

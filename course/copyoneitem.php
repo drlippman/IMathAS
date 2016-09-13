@@ -22,15 +22,21 @@ if (isset($_GET['noappend'])) {
 }
 $_POST['ctc'] = $cid;
 $gbcats = array();
-$query = "SELECT id FROM imas_gbcats WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id FROM imas_gbcats WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id FROM imas_gbcats WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$gbcats[$row[0]] = $row[0];
 }
 $outcomes = array();
-$query = "SELECT id FROM imas_outcomes WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id FROM imas_outcomes WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id FROM imas_outcomes WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$outcomes[$row[0]] = $row[0];
 }
 
@@ -41,7 +47,8 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 		if (is_array($item)) {
 			if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
 				$newblock = array();
-				$newblock['name'] = $item['name'].stripslashes($_POST['append']);
+				//DB $newblock['name'] = $item['name'].stripslashes($_POST['append']);
+				$newblock['name'] = $item['name'].$_POST['append'];
 				$newblock['id'] = $blockcnt;
 				$blockcnt++;
 				$newblock['startdate'] = $item['startdate'];
@@ -81,22 +88,31 @@ function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
 	}
 }
 
-$query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid';";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$blockcnt = mysql_result($result,0,0);
-$items = unserialize(mysql_result($result,0,1));
+//DB $query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid';";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $blockcnt = mysql_result($result,0,0);
+//DB $items = unserialize(mysql_result($result,0,1));
+$stm = $DBH->prepare("SELECT blockcnt,itemorder FROM imas_courses WHERE id=:id");
+$stm->execute(array(':id'=>$cid));
+list($blockcnt, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+$items = unserialize($itemorder);
 
-mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+$DBH->beginTransaction();
 
 $notimportant = array();
 copysubone($items,'0',false,$notimportant);
 copyrubrics();
 
-$itemorder = addslashes(serialize($items));
-$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-mysql_query($query) or die("Query failed : $query" . mysql_error());
+//DB $itemorder = addslashes(serialize($items));
+$itemorder = serialize($items);
+//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
+$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
+$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
 
-mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-		
+//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+$DBH->commit();
+
 header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 ?>

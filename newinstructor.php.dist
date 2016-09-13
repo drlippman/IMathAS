@@ -1,5 +1,5 @@
 <?php
-	
+
 	require("config.php");
 	$pagetitle = "New instructor account request";
 	$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\"text/css\">\n";
@@ -21,9 +21,12 @@
 		} else if ($_POST['password']!=$_POST['password2']) {
 			echo "<p>Passwords entered do not match.</p>";
 		} else {
-			$query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)>0) {
+			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+			$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
+			$stm->execute(array(':SID'=>$_POST['username']));
+			if ($stm->rowCount()>0) {
 				echo "<p>Username <b>{$_POST['username']}</b> is already in use.  Please try another</p>\n";
 			} else {
 				if (isset($CFG['GEN']['homelayout'])) {
@@ -31,23 +34,32 @@
 				} else {
 					$homelayout = '|0,1,2||0,1';
 				}
-				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
+
 				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once("includes/password.php");
+					require_once("../includes/password.php");
 					$md5pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
 				} else {
 					$md5pw = md5($_POST['password']);
 				}
-				$query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}','$homelayout');";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				$newuserid = mysql_insert_id();
+				//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
+				//DB $query .= "VALUES ('{$_POST['username']}','$md5pw',0,'{$_POST['firstname']}','{$_POST['lastname']}','{$_POST['email']}','$homelayout');";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $newuserid = mysql_insert_id();
+				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
+				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :homelayout);";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':SID'=>$_POST['username'], ':password'=>$md5pw, ':rights'=>0, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':homelayout'=>$homelayout));
+				$newuserid = $DBH->lastInsertId();
 				if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 					$valbits = array();
 					foreach ($CFG['GEN']['enrollonnewinstructor'] as $ncid) {
-						$valbits[] = "('$newuserid','$ncid')";
+					  $ncid = intval($ncid);
+						$valbits[] = "($newuserid,$ncid)";
 					}
-					$query = "INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits);
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits);
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+
+					$stm = $DBH->query("INSERT INTO imas_students (userid,courseid) VALUES ".implode(',',$valbits)); //known INTs - safe
 				}
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -59,16 +71,18 @@
 				$message .= "Phone: {$_POST['phone']} <br/>\n";
 				$message .= "Username: {$_POST['username']} <br/>\n";
 				mail($sendfrom,$subject,$message,$headers);
-				
+
 				$now = time();
-				$query = "INSERT INTO imas_log (time, log) VALUES ($now, 'New Instructor Request: $newuserid:: School: {$_POST['school']} <br/> Phone: {$_POST['phone']} <br/>')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
-				
-				
+				//DB $query = "INSERT INTO imas_log (time, log) VALUES ($now, 'New Instructor Request: $newuserid:: School: {$_POST['school']} <br/> Phone: {$_POST['phone']} <br/>')";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("INSERT INTO imas_log (time, log) VALUES (:now, :log)");
+				$stm->execute(array(':now'=>$now, ':log'=>"New Instructor Request: $newuserid:: School: {$_POST['school']} <br/> Phone: {$_POST['phone']} <br/>"));
+
+
 				$message = "<p>Your new account request has been sent.</p>  ";
 				$message .= "<p>This request is processed by hand, so please be patient.</p>";
 				mail($_POST['email'],$subject,$message,$headers);
-				
+
 				echo $message;
 				require("footer.php");
 				exit;
@@ -81,7 +95,7 @@
 	if (isset($_POST['phone'])) {$phone=$_POST['phone'];} else {$phone='';}
 	if (isset($_POST['school'])) {$school=$_POST['school'];} else {$school='';}
 	if (isset($_POST['username'])) {$username=$_POST['username'];} else {$username='';}
-	
+
 	echo "<h3>New Instructor Account Request</h3>\n";
 	echo "<form method=post action=\"newinstructor.php\">\n";
 	echo "<span class=form>First Name</span><span class=formright><input type=text name=firstname value=\"$firstname\" size=40></span><br class=form />\n";

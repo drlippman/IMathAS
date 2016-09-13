@@ -23,17 +23,22 @@ $att = $_GET['att'];
 
 //pull questionset ids
 $qsids = array();
-$query = "SELECT id,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,questionsetid FROM imas_questions WHERE assessmentid=:assessmentid");
+$stm->execute(array(':assessmentid'=>$aid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$qsids[$row[0]] = $row[1];
 }
 
 //pull question data
 $qsdata = array();
-$query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->query("SELECT id,qtype,control,description FROM imas_questionset WHERE id IN (".implode(',',$qsids).")"); //INT from DB
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$qsdata[$row[0]] = array($row[1],$row[2],$row[3]);
 }
 
@@ -45,12 +50,17 @@ while ($row = mysql_fetch_row($result)) {
 //tally results, grouping by result
 //output results.  For numeric/function, sort by frequency
 
+//DB $query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
+//DB $query .= "WHERE assessmentid='$aid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
-$query .= "WHERE assessmentid='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$query .= "WHERE assessmentid=:assessmentid";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':assessmentid'=>$aid));
 $sessioncnt = 0;
 $qdata = array();
-while ($row = mysql_fetch_row($result)) {
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if (strpos($row[0],';')===false) {
 		$questions = explode(",",$row[0]);
 		//$bestquestions = $questions;
@@ -104,7 +114,7 @@ while ($row = mysql_fetch_row($result)) {
 }
 $scorebarwidth = 60;
 $placeinhead = ' <style type="text/css">
- 
+
 .scorebarinner {
 	height:10px;
 	font-size:1px;
@@ -113,7 +123,7 @@ $placeinhead = ' <style type="text/css">
 	position:relative;
 	left:0px;
 	top:0px;
-	
+
 }
 </style>';
 require("../assessment/header.php");
@@ -122,11 +132,15 @@ echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 echo "&gt; Item Results</div>";
 echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Results: ';
 
-$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$defpoints = mysql_result($result,0,0);
-echo mysql_result($result,0,1).'</h2></div>';
-$itemorder = mysql_result($result,0,2);
+//DB $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+$stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
+$stm->execute(array(':id'=>$aid));
+//DB $defpoints = mysql_result($result,0,0);
+//DB echo mysql_result($result,0,1).'</h2></div>';
+//DB $itemorder = mysql_result($result,0,2);
+list ($defpoints, $aname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+echo $aname.'</h2></div>';
 $itemarr = array();
 $itemnum = array();
 foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -203,7 +217,7 @@ function showresults($q,$qtype) {
 					}
 					disp($q,$type,$i,$al);
 				}
-				
+
 			}
 		} else {
 			if ($qtype=='multans') {
@@ -234,7 +248,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 			if ($part>-1) {
 				if ($varr[1][$part]>0) {
 					$correct[] = $vp;
-				} 
+				}
 			} else {
 				if ($varr[1]>0) {
 					$correct[] = $vp;
@@ -243,7 +257,7 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 			if ($vp!=='') {
 				$res[] = $vp;
 			}
-		}	
+		}
 	}
 	$res = array_count_values($res);
 	$restot = max($res);
@@ -268,13 +282,13 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 			echo '>&nbsp;</span>';
 			echo '</td></tr>';
 		}
-		
+
 	} else {
 		arsort($res);
 		foreach ($res as $ans=>$cnt) {
 			echo '<tr><td>'.$ans.'</td><td>'.$cnt;
 			echo ' <span class="scorebarinner" style="';
-			
+
 			if (in_array($ans,$correct)) {
 				echo 'background:#9f9;';
 			} else {
@@ -284,10 +298,10 @@ function disp($q,$qtype,$part=-1,$answer,$questions=array()) {
 			echo '>&nbsp;</span>';
 			echo '</td></tr>';
 		}
-		
-	}	
+
+	}
 	echo '</tbody></table>';
-}	
+}
 
 
 

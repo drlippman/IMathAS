@@ -1,11 +1,11 @@
 <?php
 	//Displays New Message list
 	//(c) 2009 David Lippman
-	
+
 	//isread is bitwise:
 	//1      2         4                   8
 	//Read   Deleted   Deleted by Sender   Tagged
-	
+
 	require("../validate.php");
 	if ($cid!=0 && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 	   require("../header.php");
@@ -14,44 +14,53 @@
 	   exit;
 	}
 	if (isset($teacherid)) {
-		$isteacher = true;	
+		$isteacher = true;
 	} else {
 		$isteacher = false;
 	}
 	$cansendmsgs = false;
 	$threadsperpage = $listperpage;
-	
+
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_POST['read'])) {
-		$checklist = "'".implode("','",$_POST['checked'])."'";
+		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
+		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$DBH->query($query);
 	}
 	if (isset($_POST['remove'])) {
-		$checklist = "'".implode("','",$_POST['checked'])."'";
+		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
+		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$DBH->query($query);
 		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id IN ($checklist)";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$DBH->query($query);
 	}
 	if (isset($_GET['removeid'])) {
-		$query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&4)=4");
+		$stm->execute(array(':id'=>$_GET['removeid']));
+		//DB $query = "UPDATE imas_msgs SET isread=(isread|2) WHERE id='{$_GET['removeid']}'";
+		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread|2) WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['removeid']));
 	}
-	
+
 	$pagetitle = "New Messages";
 	require("../header.php");
-	
+
 	echo "<div class=breadcrumb><a href=\"../index.php\">Home</a> ";
 	if ($cid>0) {
 		echo "&gt; <a href=\"../course/course.php?cid=$cid\">$coursename</a> ";
 	}
 	echo "&gt; New Message List</div>";
-	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';	
-	
+	echo '<div id="headernewmsglist" class="pagetitle"><h2>New Messages</h2></div>';
+
 ?>
 
 	<form id="qform" method="post" action="newmsglist.php?page=<?php echo $page;?>&cid=<?php echo $cid;?>">
@@ -59,18 +68,26 @@
 	Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
 	With Selected: <input type=submit name="read" value="Mark as Read">
 	<input type=submit name="remove" value="Delete">
-		
+
 <?php
+	//DB $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
+	//DB $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
+	//DB $query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&3)=0 ";
+	//DB $query .= "ORDER BY imas_courses.name, senddate DESC ";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE ";
-	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread&3)=0 ";
+	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread&3)=0 ";
 	$query .= "ORDER BY imas_courses.name, senddate DESC ";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':msgto'=>$userid));
+	if ($stm->rowCount()==0) {
 		echo "<p>No new messages</p>";
 	} else {
 		$lastcourse = '';
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if ($line['name']!=$lastcourse) {
 				if($lastcourse!='') {
 					echo '</tbody></table>';
@@ -119,10 +136,8 @@
 ?>
 	</form>
 <?php
-	
+
 	echo "<p><a href=\"sentlist.php?cid=$cid\">Sent Messages</a></p>";
-	
+
 	require("../footer.php");
 ?>
-		
-	

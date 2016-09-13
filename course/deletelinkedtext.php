@@ -25,74 +25,101 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
-	$block = $_GET['block'];	
-	
+	$block = $_GET['block'];
+
 	if ($_GET['remove']=="really") {
 		require("../includes/filehandler.php");
-		
 		$textid = $_GET['id'];
-		
-		$query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='LinkedText'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$itemid = mysql_result($result,0,0);
-		
-		$query = "DELETE FROM imas_items WHERE id='$itemid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "SELECT text,points FROM imas_linkedtext WHERE id='$textid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
-		$text = trim($row[0]);
-		$points = $row[1];
-		if (substr($text,0,5)=='file:') { //delete file if not used
-			$safetext = addslashes($text);
-			$query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'"; //any others using file?
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			if (mysql_num_rows($result)==1) { 
-				/*$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-				$filename = substr($text,5);
-				if (file_exists($uploaddir . $filename)) {
-					unlink($uploaddir . $filename);
-				}*/
-				deletecoursefile(substr($text,5));
+
+		$DBH->beginTransaction();
+
+		//DB $query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='LinkedText' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $itemid = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='LinkedText' AND courseid=:courseid");
+		$stm->execute(array(':typeid'=>$textid, ':courseid'=>$cid));
+		if ($stm->rowCount()>0) {
+			$itemid = $stm->fetchColumn(0);
+
+			//DB $query = "DELETE FROM imas_items WHERE id='$itemid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
+			$stm->execute(array(':id'=>$itemid));
+
+			//DB $query = "SELECT text,points FROM imas_linkedtext WHERE id='$textid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT text,points FROM imas_linkedtext WHERE id=:id");
+			$stm->execute(array(':id'=>$textid));
+			$row = $stm->fetch(PDO::FETCH_NUM);
+			$text = trim($row[0]);
+			$points = $row[1];
+			if (substr($text,0,5)=='file:') { //delete file if not used
+				//DB $safetext = addslashes($text);
+				//DB $query = "SELECT id FROM imas_linkedtext WHERE text='$safetext'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)==1) {
+				$stm = $DBH->prepare("SELECT id FROM imas_linkedtext WHERE text=:text");
+				$stm->execute(array(':text'=>$text));
+				if ($stm->rowCount()==1) {
+					/*$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+					$filename = substr($text,5);
+					if (file_exists($uploaddir . $filename)) {
+						unlink($uploaddir . $filename);
+					}*/
+					deletecoursefile(substr($text,5));
+				}
 			}
+			if ($points>0) {
+				//DB $query = "DELETE FROM imas_grades WHERE gradetypeid='$textid' AND gradetype='exttool'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool'");
+				$stm->execute(array(':gradetypeid'=>$textid));
+			}
+
+			//DB $query = "DELETE FROM imas_linkedtext WHERE id='$textid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_linkedtext WHERE id=:id");
+			$stm->execute(array(':id'=>$textid));
+
+			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $items = unserialize(mysql_result($result,0,0));
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$_GET['cid']));
+			$items = unserialize($stm->fetchColumn(0));
+
+			$blocktree = explode('-',$block);
+			$sub =& $items;
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+			$key = array_search($itemid,$sub);
+			array_splice($sub,$key,1);
+			//DB $itemorder = addslashes(serialize($items));
+			$itemorder = serialize($items);
+			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
-		if ($points>0) {
-			$query = "DELETE FROM imas_grades WHERE gradetypeid='$textid' AND gradetype='exttool'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-		}
-		
-		$query = "DELETE FROM imas_linkedtext WHERE id='$textid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-					
-		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		
-		$blocktree = explode('-',$block);
-		$sub =& $items;
-		for ($i=1;$i<count($blocktree);$i++) {
-			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-		}
-		$key = array_search($itemid,$sub);
-		array_splice($sub,$key,1);
-		$itemorder = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+		$DBH->commit();
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-	
+
 		exit;
 	} else {
-		$query = "SELECT title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$itemname = mysql_result($result,0,0);
+		//DB $query = "SELECT title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $itemname = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$itemname = $stm->fetchColumn(0);
 	}
 }
-	
-	
 
-	
+
+
+
 /******* begin html output ********/
 require("../header.php");
 
@@ -110,6 +137,4 @@ if ($overwriteBody==1) {
 <?php
 }
 require("../footer.php");
-?> 	
-
-	
+?>

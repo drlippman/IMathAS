@@ -1,4 +1,4 @@
-<?php 
+<?php
 //IMathAS:  Main admin page
 //(c) 2006 David Lippman
 
@@ -7,15 +7,15 @@ require("../validate.php");
 require("../includes/htmlutil.php");
 
 /*** pre-html data manipulation, including function code *******/
- 
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . "Administration";
 
 $curBreadcrumb = "$breadcrumbbase Admin\n";
- 
- 
+
+
  if ($myrights>=75) {
 	 if (isset($_GET['showcourses'])) {
 		 setcookie('showcourses',$_GET['showcourses']);
@@ -35,37 +35,49 @@ $curBreadcrumb = "$breadcrumbbase Admin\n";
 	 } else if (isset($_COOKIE['showusers'])) {
 		 $showusers = $_COOKIE['showusers'];
 	 } else {
-		 $showusers = $groupid; 
+		 $showusers = $groupid;
 	 }
  } else {
 	 $showusers = 0;
  }
- 
-if ($myrights < 40) { 
+
+if ($myrights < 40) {
  	$overwriteBody = 1;
 	$body = "You don't have authority to view this page.";
 } else {
  //data manipulation here
- //data processing for COURSES block 
+ //data processing for COURSES block
+	//DB $query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
+	//DB $query .= "WHERE imas_courses.ownerid=imas_users.id ";
 	$query = "SELECT imas_courses.id,imas_courses.ownerid,imas_courses.name,imas_courses.available,imas_users.FirstName,imas_users.LastName FROM imas_courses,imas_users ";
 	$query .= "WHERE imas_courses.ownerid=imas_users.id ";
+  $qarr = array();
 	if ($myrights<100) { $query .= " AND imas_courses.available<4 ";}
-	if (($myrights >= 40 && $myrights<75) || $showcourses==0) { $query .= " AND imas_courses.ownerid='$userid'";}
+	if (($myrights >= 40 && $myrights<75) || $showcourses==0) {
+    //DB $query .= " AND imas_courses.ownerid='$userid'";
+    $query .= " AND imas_courses.ownerid=:ownerid";
+    $qarr[':ownerid'] = $userid;
+  }
 	if ($myrights >= 75 && $showcourses>0) {
-		$query .= " AND imas_courses.ownerid='$showcourses'";
+		//DB $query .= " AND imas_courses.ownerid='$showcourses'";
+    $query .= " AND imas_courses.ownerid=:ownerid";
+    $qarr[':ownerid'] = $showcourses;
 		$query .= " ORDER BY imas_users.LastName,imas_courses.name";
 	} else {
 		$query .= " ORDER BY imas_courses.name";
 	}
-	
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error()); 
+  $stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$page_courseList = array();
 	$i=0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		$page_courseList[$i]['id'] = $line['id']; 
-		$page_courseList[$i]['name'] = $line['name']; 
-		$page_courseList[$i]['LastName'] = $line['LastName']; 
-		$page_courseList[$i]['FirstName'] = $line['FirstName']; 
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$page_courseList[$i]['id'] = $line['id'];
+		$page_courseList[$i]['name'] = $line['name'];
+		$page_courseList[$i]['LastName'] = $line['LastName'];
+		$page_courseList[$i]['FirstName'] = $line['FirstName'];
 		$page_courseList[$i]['ownerid'] = $line['ownerid'];
 		$page_courseList[$i]['available'] = $line['available'];
 		if (isset($CFG['GEN']['addteachersrights'])) {
@@ -76,63 +88,87 @@ if ($myrights < 40) {
 		$page_courseList[$i]['addRemove'] = ($myrights<$minrights) ? "" : "<a href=\"forms.php?action=chgteachers&id={$line['id']}\" class=\"artl\">Add/Remove</a>";
 		$page_courseList[$i]['transfer'] = ($line['ownerid']!=$userid && $myrights <75) ? "" : "<a href=\"forms.php?action=transfer&id={$line['id']}\" class=\"trl\">Transfer</a>";
 		$i++;
-	} 
-	
+	}
+
 	//get list of teachers for the select box
 	if ($myrights==75) {
-		$query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid='$groupid' ORDER BY LastName,FirstName";
+		//DB $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid='$groupid' ORDER BY LastName,FirstName";
+		$stm = $DBH->prepare("SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid=:groupid ORDER BY LastName,FirstName");
+		$stm->execute(array(':groupid'=>$groupid));
 	} else if ($myrights==100) {
-		$query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
+		//DB $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
+		$stm = $DBH->query("SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName");
 	}
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$i=0;
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_teacherSelectVal[$i] = $row[0];
 		$page_teacherSelectLabel[$i] = $row[1] . ", " . $row[2]. ' ('.$row[3].')';
 		$i++;
 	}
-	
+
 	//data processing for diagnostics block
 	if (($myspecialrights&4)==4 || $myrights == 100) {
-		$query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
+
 		if ($myrights<75) {
-			$query .= " WHERE d.ownerid='$userid'";
+      //DB $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
+			//DB $query .= " WHERE d.ownerid='$userid' ORDER BY d.name";
+      $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
+			$query .= " WHERE d.ownerid=:ownerid ORDER BY d.name";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':ownerid'=>$userid));
 		} else if ($myrights<100) {
-			$query .= " WHERE u.groupid='$groupid'";
-		}
-		$query .= " ORDER BY d.name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+      //DB $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
+			//DB $query .= " WHERE u.groupid='$groupid' ORDER BY d.name";
+      $query = "SELECT d.id,d.name,d.public FROM imas_diags as d JOIN imas_users AS u ON u.id=d.ownerid";
+			$query .= " WHERE u.groupid=:groupid ORDER BY d.name";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':groupid'=>$groupid));
+		} else {
+      $stm = $DBH->query("SELECT id,name,public FROM imas_diags ORDER BY name");
+    }
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$i=0;
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$page_diagnosticsId[$i] = $row[0];
 			$page_diagnosticsName[$i] = $row[1];
 			$page_diagnosticsAvailable[$i] = ($row[2]&1) ? "Yes" : "No";
 			$page_diagnosticsPublic[$i] = ($row[2]&2) ? "Yes" : "No";
-			$i++;		
+			$i++;
 		}
 	}
-	
+
 	//DATA PROCESSING FOR USERS BLOCK
 	if ($myrights < 100) {
 		$page_userBlockTitle = "Group - Non Students";
-		$query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
+		//DB $query = "SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$groupid' ORDER BY LastName";
+		$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid=:groupid ORDER BY LastName");
+		$stm->execute(array(':groupid'=>$groupid));
 	} else {
 		if ($showusers==-1) {
 			$page_userBlockTitle = "Pending Users";
-			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName";
+			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName";
+			$stm = $DBH->query("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights=0 OR rights=12 ORDER BY LastName");
 		} else if (is_numeric($showusers)) {
 			$page_userBlockTitle = "Group Users";
-			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
+			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
+			$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid=:groupid ORDER BY LastName");
+			$stm->execute(array(':groupid'=>$showusers));
 		} else {
 			$page_userBlockTitle = "All Users - $showusers";
-			$query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
+			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)='$showusers' ORDER BY LastName";
+			$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE substring(LastName,1,1)=:showusers ORDER BY LastName");
+			$stm->execute(array(':showusers'=>$showusers));
 		}
 	}
-	
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
+
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+
 	$i=0;
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$page_userDataId[$i] = $line['id'];
 		$page_userDataSid[$i] = $line['SID'];
 		$page_userDataEmail[$i] = $line['email'];
@@ -150,17 +186,19 @@ if ($myrights < 40) {
 		$page_userDataLastAccess[$i] = ($line['lastaccess']>0) ? date("n/j/y g:i a",$line['lastaccess']) : "never" ;
 		$i++;
 	}
-	
+
 	//prepare user select
 	$page_userSelectVal[0] = -1;
 	$page_userSelectLabel[0] = "Pending";
 	$page_userSelectVal[1] = 0;
 	$page_userSelectLabel[1] = "Default";
 	$i=2;
-	$query = "SELECT id,name,parent from imas_groups ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB $query = "SELECT id,name,parent from imas_groups ORDER BY name";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	$stm = $DBH->query("SELECT id,name,parent from imas_groups ORDER BY name");
 	$groupdata = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$groupdata[$row[0]] = $row;
 	}
 	foreach ($groupdata as $row) {
@@ -176,9 +214,9 @@ if ($myrights < 40) {
 		$page_userSelectLabel[$i] = chr($let);
 		$i++;
 	}*/
-	
-	
-} 
+
+
+}
 
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 $placeinhead .= "<script>\nfunction showcourses() { \n";
@@ -192,20 +230,20 @@ $placeinhead .= "}";
 $placeinhead .= '$(function() {$(".artl").attr("title","'._("Add or remove additional teachers").'");';
 $placeinhead .= '$(".sl").attr("title","'._("Modify course settings").'");$(".trl").attr("title","'._("Transfer course ownership to someone else").'");});';
 $placeinhead .= '</script>';
- 
+
  /******* begin html output ********/
  require("../header.php");
 
  if ($overwriteBody==1) {
 	echo $body;
-} else {	
+} else {
 
-?> 
+?>
 	<div class=breadcrumb><?php echo $curBreadcrumb  ?></div>
 	<div id="headeradmin" class="pagetitle"><h2><?php echo $installname ?> Administration</h2></div>
 	<b>Hello <?php echo $username ?></b>
 
-<?php //WRITE OUT COURSES BLOCK ?>	
+<?php //WRITE OUT COURSES BLOCK ?>
 	<h3>Courses</h3>
 	<div class=item>
 	<table class=gb border=0 width="90%">
@@ -219,9 +257,9 @@ $placeinhead .= '</script>';
 	$alt = 0;
 	for ($i=0;$i<count($page_courseList);$i++) {
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
-?>		
+?>
 				<td><a href="../course/course.php?cid=<?php echo $page_courseList[$i]['id'] ?>">
-				<?php 
+				<?php
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '<i>';
 				}
@@ -231,23 +269,23 @@ $placeinhead .= '</script>';
 				if (($page_courseList[$i]['available']&4)==4) {
 					echo '<span style="color:#faa;text-decoration: line-through;">';
 				}
-					
+
 				echo $page_courseList[$i]['name'];
-				
+
 				if (($page_courseList[$i]['available']&1)==1) {
 					echo '</i>';
 				}
 				if (($page_courseList[$i]['available']&2)==2 || ($page_courseList[$i]['available']&4)==4) {
 					echo '</span>';
 				}
-					
+
 				?>
 				</a>
 				</td>
 				<td class=c><?php echo $page_courseList[$i]['id'] ?></td>
 				<td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
 				<td class=c><a href="forms.php?action=modify&id=<?php echo $page_courseList[$i]['id'] ?>" class="sl">Settings</a></td>
-				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td> 
+				<td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td>
 				<td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
 				<td class=c><a href="forms.php?action=delete&id=<?php echo $page_courseList[$i]['id'] ?>">Delete</a></td>
 			</tr>
@@ -256,7 +294,7 @@ $placeinhead .= '</script>';
 ?>
 			</tbody>
 		</table>
-	<input type=button value="Add New Course" onclick="window.location='forms.php?action=addcourse'" /> 
+	<input type=button value="Add New Course" onclick="window.location='forms.php?action=addcourse'" />
 <?php
 	if ($myrights>=75) {
 		if ($showcourses>0) {
@@ -264,28 +302,28 @@ $placeinhead .= '</script>';
 		}
 
 		echo " Show courses of: ";
-		writeHtmlSelect ("seluid",$page_teacherSelectVal,$page_teacherSelectLabel,$showcourses,"Select a user..",0,"onchange=\"showcourses()\"");	
+		writeHtmlSelect ("seluid",$page_teacherSelectVal,$page_teacherSelectLabel,$showcourses,"Select a user..",0,"onchange=\"showcourses()\"");
 	}
 ?>
 	</div>
 
 <?php //END COURSE BLOCK, BEGIN ADMINISTRATION BLOCK ?>
-	
+
 	<h3>Administration</h3>
 	<div class=cp>
 		<A HREF="forms.php?action=chgpwd">Change my password</a><BR>
 		<A HREF="../help.php?section=administration">Help</a><BR>
 		<A HREF="actions.php?action=logout">Log Out</a><BR>
 	</div>
-<?php 
+<?php
 	if($myrights<75 && isset($CFG['GEN']['allowteacherexport'])) {
 ?>
 	<div class=cp>
 	<a href="export.php?cid=admin">Export Question Set</a><BR>
 	<a href="exportlib.php?cid=admin">Export Libraries</a>
 	</div>
-<?php 	
-	} else if($myrights >= 75) { 
+<?php
+	} else if($myrights >= 75) {
 ?>
 	<div class=cp>
 	<span class=column>
@@ -297,9 +335,9 @@ $placeinhead .= '</script>';
 	<a href="../course/managelibs.php?cid=admin">Manage Libraries</a><br>
 	<a href="exportlib.php?cid=admin">Export Libraries</a><BR>
 	<a href="importlib.php?cid=admin">Import Libraries</a></span>
-<?php 
+<?php
 		if ($myrights == 100) {
-?>	
+?>
 	<span class=column>
 	<a href="forms.php?action=listgroups">Edit Groups</a><br/>
 	<a href="forms.php?action=deloldusers">Delete Old Users</a><br/>
@@ -319,11 +357,11 @@ $placeinhead .= '</script>';
 	echo "<a href=\"externaltools.php?cid=admin\">External Tools</a><br/>\n";
 	echo "<a href=\"../util/utils.php\">Admin Utilities</a><br/>\n";
 	echo '</span>';
-	
+
 	?>
-	
+
 <?php
-		} 
+		}
 ?>
 	<div class=clear></div>
 	</div>
@@ -331,7 +369,7 @@ $placeinhead .= '</script>';
 	}
 // END OF ADMINISTRATION BLOCK, BEGIN DIAGNOSTICS BLOCK
 	if(($myspecialrights&4)==4 || $myrights == 100) {
-?>	
+?>
 	<h4>Diagnostics</h4>
 	<div class=item>
 	<table class=gb width="90%" id="diagTable">
@@ -343,8 +381,8 @@ $placeinhead .= '</script>';
         $alt = 0;
 	for ($i=0;$i<count($page_diagnosticsId);$i++) {
 		if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
-?>	
-			
+?>
+
 				<td><a href="<?php echo $imasroot;?>/diag/index.php?id=<?php echo $page_diagnosticsId[$i] ?>">
 				<?php echo $page_diagnosticsName[$i] ?></a></td>
 				<td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
@@ -363,9 +401,9 @@ $placeinhead .= '</script>';
 
 <?php
 	}
-	
+
 	//END DIAGNOSITICS BLOCK, BEGIN USERS BLOCK
-	
+
 	if($myrights >= 75) {
 ?>
 	<h4><?php echo $page_userBlockTitle ?></h4>
@@ -375,7 +413,7 @@ $placeinhead .= '</script>';
 			<tr><th>Name</th><th>Username</th><th>Email</th><th>Rights</th><th>Last Login</th><th>Rights</th><th>Password</th><th>Delete</th></tr>
 		</thead>
 		<tbody>
-<?php 
+<?php
 		for ($i=0;$i<count($page_userDataId);$i++) {
 			if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
 ?>
@@ -396,14 +434,14 @@ $placeinhead .= '</script>';
 		<script type="text/javascript">
 		initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
 		</script>
-		
+
 		<input type=button value="Add New User" onclick="window.location='forms.php?action=newadmin'">
 
-<?php 
+<?php
 		if ($myrights==100) {
-			writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");	
+			writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");
 		}
-	
+
 ?>
 		<p>Passwords reset to: password</p>
 	</div>
@@ -413,5 +451,3 @@ $placeinhead .= '</script>';
 }
  require("../footer.php");
 ?>
-
- 

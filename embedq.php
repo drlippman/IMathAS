@@ -54,7 +54,7 @@ if (isset($_POST['seed'])) {
 		}
 		$after = implode('~',$after);
 	}
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	$lastanswers[0] = $lastanswers[0];
 	$page_scoreMsg =  printscore($after,$qsetid,$_POST['seed']);
 	$pts = getpts($after);
 	$page_scoreMsg .= '<script type="text/javascript">
@@ -146,7 +146,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $imasroot;
+	global $imasroot, $DBH;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -154,9 +154,12 @@ function printscore($sc,$qsetid,$seed) {
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
-		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$control = mysql_result($result,0,0);
+		//DB $query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $control = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qsetid));
+		$control = $stm->fetchColumn(0);
 		$ptposs = getansweights($control,$seed);
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);

@@ -1482,7 +1482,7 @@ function assessbackgsubmitCallback(qn,noticetgt) {
 					}
 				}
 		    /*
-				if (LivePreviews.hasOwnProperty(qn)) {
+		    if (LivePreviews.hasOwnProperty(qn)) {
 		    	 LivePreviews[qn].Init();
 		    }
 				*/

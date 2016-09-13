@@ -1,4 +1,4 @@
-<?php 
+<?php
 //IMathAS:  Course Recent Report
 //(c) 2016 David Cooper, David Lippman
 
@@ -17,13 +17,13 @@ function getpts($scs) {
   foreach(explode(',',$scs) as $sc) {
     $qtot = 0;
     if (strpos($sc,'~')===false) {
-      if ($sc>0) { 
+      if ($sc>0) {
 	$qtot = $sc;
-      } 
+      }
     } else {
       $sc = explode('~',$sc);
       foreach ($sc as $s) {
-	if ($s>0) { 
+	if ($s>0) {
 	  $qtot+=$s;
 	}
       }
@@ -34,7 +34,8 @@ function getpts($scs) {
 }
 
 function getpointspossible($aid, $itemorder, $defaultpoints) {
-	$aitems = explode(',', $itemorder); 
+  global $DBH;
+	$aitems = explode(',', $itemorder);
 	$k = 0;
 	$atofind = array();
 	foreach ($aitems as $v) {
@@ -64,19 +65,22 @@ function getpointspossible($aid, $itemorder, $defaultpoints) {
 			$k++;
 		}
 	}
-	
-	$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-	$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+
+	//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
+	//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$stm2 = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
+	$stm2->execute(array(':assessmentid'=>$aid));
 	$totalpossible = 0;
-	while ($r = mysql_fetch_row($result2)) {
-		if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts	
+	//DB while ($r = mysql_fetch_row($result2)) {
+	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
+		if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts
 			if ($r[0]==9999) {
 				$totalpossible += $aitemcnt[$k]*$defaultpoints; //use defpoints
 			} else {
 				$totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
 			}
 		}
-	}	
+	}
 	return $totalpossible;
 }
 
@@ -95,19 +99,22 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	$overwriteBody=1;
 	$body = _("You need to log in as a teacher to access this page\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-	
+
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
 		$gbmode = $_GET['gbmode'];
 	} else if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmode = mysql_result($result,0,0);
+		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $gbmode = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$gbmode = $stm->fetchColumn(0);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
-	
-	if (isset($_POST['interval'])) { 
+
+	if (isset($_POST['interval'])) {
 		//settings update postback
 		if (!isset($sessiondata['reportsettings-weeklylab'])) {
 			$sessiondata['reportsettings-weeklylab'] = array();
@@ -116,32 +123,32 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$sessiondata['reportsettings-weeklylab'.$cid]['useminscore'] = isset($_POST['useminscore']);
 		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
 		writesessiondata();
-		
+
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/report-weeklylab.php?cid=$cid");
 		exit;
 	}
-	
+
 	if (isset($sessiondata['reportsettings-weeklylab'.$cid])) {
 		$interval = $sessiondata['reportsettings-weeklylab'.$cid]['interval'];
 		$useminscore = $sessiondata['reportsettings-weeklylab'.$cid]['useminscore'];
 		$breakpercent = $sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'];
-		
+
 	} else {
 		$interval = '1week';
 		$useminscore = true;
 		$breakpercent = 75;
 	}
-	
-	$intervalarr = array(	'today'=>'today', 
+
+	$intervalarr = array(	'today'=>'today',
 				'thisweek'=>'this week (since Monday)',
 				'1week'=>'one week (7 days)',
 				'2week'=>'two weeks (14 days)',
 				'4week'=>'one month (30 days)',
 				'alltime'=>'all time');
-	
+
 	list($yr,$month,$day,$dayofweek) = explode('-', date('Y-m-d-w'));
 	$startofday = mktime(0,0,0,$month,$day,$yr);
-	
+
 	if ($interval=='1week' || ($interval=='thisweek' && $dayofweek==0)) {
 		$rangestart = $startofday - 7*24*60*60;
 		$timedescr = 'In the last week (7 days)';
@@ -161,19 +168,23 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$rangestart = 0;
 		$timedescr = 'Since the start of the course';
 	}
-		
+
 	// Set up the main $st array with first and last name for all students
 	// in a class
-	$query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid ='$cid' ";
+	//DB $query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid ='$cid' ";
+	$query = "select userid, firstName, lastName from imas_students as stu join imas_users as iu on iu.id = stu.userid  where courseid=:courseid ";
 	if ($hidelocked) {
 		$query .= "AND stu.locked=0 ";
 	}
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+  $stm = $DBH->prepare($query);
+  $stm->execute(array(':courseid'=>$cid));
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$totalstudents = 0;
 
 	//student data array. Initialize with names and zero out totals and assessment lists
 	$st = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$uid = $line['userid'];
 		$totalstudents++;
 		$st[$uid]['stuname']  = $line['lastName'].', '.$line['firstName'];
@@ -186,20 +197,27 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	//pull assessment data
 	//We're pulling the assessment info (name, itemorder) along with scores to
 	//reduce number of database pulls at the expense of pulling more data
+	//DB $query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ia.id, ia.defpoints, ia.itemorder ";
+	//DB $query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
+	//DB $query .= " where (ia.courseid = '$cid' and endtime > $rangestart ) ";
+	//DB $query .= " order by ias.userid ";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "select ias.userid, ia.name, ia.minscore, ias.bestscores, ia.id, ia.defpoints, ia.itemorder ";
 	$query .= " from imas_assessment_sessions as ias join imas_assessments as ia on assessmentid=ia.id  ";
-	$query .= " where (ia.courseid = '$cid' and endtime > $rangestart ) ";
+	$query .= " where (ia.courseid=:courseid and endtime > :rangestart ) ";
 	$query .= " order by ias.userid ";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error()); 
-	 
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':rangestart'=>$rangestart));
+
 	$assessmentInfo = array();
 	$totalAttemptCount = 0;
-	while($line = mysql_fetch_assoc($result)) {
+	//DB while($line = mysql_fetch_assoc($result)) {
+	while($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$uid = $line['userid'];
 		if (!isset($st[$uid])) { continue; } //not a student we're reporting on
 		$aid = $line['id'];
 		$totalAttemptCount++;
-		
+
 		//store assessment info
 		if (!isset($assessmentInfo[$aid])) {
 			$assessmentInfo[$aid]['name'] = $line['name'];
@@ -212,15 +230,15 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		} else {
 			$assessmentInfo[$aid]['attempts']++;
 		}
-		
+
 		//get student scores
 		$sp = explode(';', $line['bestscores']);   //scores:rawscores
 		$pts = getpts($sp[0]);
-		
+
 		$st[$uid]['totalPointsOnAttempted'] += $pts;
 		$st[$uid]['totalPointsPossibleOnAttempted'] += $assessmentInfo[$aid]['possible'];
 		$assessmentInfo[$aid]['totalPointsEarned'] += $pts;
-		
+
 		if ($assessmentInfo[$aid]['minscore']!=0 && $useminscore) { //use minscore
 			$minscore = $assessmentInfo[$aid]['minscore'];
 			if (($minscore<10000 && $pts<$minscore) || ($minscore>10000 && $pts<($minscore-10000)/100*$assessmentInfo[$aid]['possible'])) {
@@ -243,9 +261,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 				$assessmentInfo[$aid]['gotcreditstulist'][] = $uid;
 			}
 		}
-		
+
 	}
-	
+
 	$totalstudents = count($st);
 	$attemptedstudents = 0;
 	foreach ($st as $user) {
@@ -253,14 +271,14 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 			$attemptedstudents++;
 		}
 	}
-	
+
 	$assessmentcount = count($assessmentInfo);
-	
-	
+
+
 	$curBreadcrumb = $breadcrumbbase;
 	$curBreadcrumb .= "<a href=\"course.php?cid=$cid\">$coursename</a> ";
 	$curBreadcrumb .= "&gt; <a href=\"coursereports.php?cid=$cid\">Course Reports</a> ";
-	
+
 	$placeinhead = '<script type="text/javascript">function toggleList(el) { $(el).find("ul").toggle();}
 		function highlightrow(el) { $(el).addClass("highlight");}
 		function unhighlightrow(el) { $(el).removeClass("highlight");}
@@ -278,7 +296,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 	</script>';
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=062216\"></script>\n";
 }
-	
+
 /******* begin html output ********/
 require("../header.php");
 
@@ -302,7 +320,7 @@ if ($overwriteBody==1) {
 	} else {
 		echo 'Activity is divided into "credit" or "no credit" using a score of '.$breakpercent.'.</p>';
 	}
-	
+
 	echo '<p><a href="#" onclick="toggleadv(this);return false">Edit report settings</a></p>';
 	echo '<fieldset style="display:none;" id="viewfield"><legend>Report Settings</legend>';
 	echo '<form method="post" action="report-weeklylab.php?cid='.$cid.'">';
@@ -316,12 +334,12 @@ if ($overwriteBody==1) {
 	echo '<span class="form">Score to separate credit/no-credit:</span>';
 	echo '<span class="formright"><input type="text" size="3" name="breakpercent" value="'.$breakpercent.'"/>%</span>';
 	echo '<br class="form"/>';
-	
+
 	echo '<div class="submit"><input type="submit" value="Update"/></div>';
-	
+
 	echo '</form></fieldset>';
-	
-	
+
+
 	echo '<h3>'.$timedescr.'</h3>';
 	echo '<table class="gb">';
 	echo '<tr> <td>'.$attemptedstudents.' (out of '.$totalstudents.') </td><td> Students attempted at least one assessment. </td></tr>';
@@ -331,7 +349,7 @@ if ($overwriteBody==1) {
 
 ?>
 <h3>Student Summary: </h3>
-<p>Click a row for details. 
+<p>Click a row for details.
    <button type="button" onclick="expandAllSummaries('stu')">Expand All</button>
    <button type="button" onclick="collapseAllSummaries('stu')">Collapse All</button>
    </p>
@@ -344,7 +362,7 @@ if ($overwriteBody==1) {
    <th> Assessments with No Credit </th>
    <th> Assessments with Credit </th>
 </tr>   </thead><tbody>
-   
+
 <?php
 
 //sort student list
@@ -353,16 +371,16 @@ uasort($st, function($a,$b) {return strcasecmp($a['stuname'],$b['stuname']);});
 $i = 0;
 foreach ($st as $uid=>$stu) {
 	if ($i%2!=0) {
-		echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">"; 
+		echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	} else {
-		echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">"; 
+		echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	}
-	
+
 	echo '<td>'.$stu['stuname'].'</td>';
-	
+
 	$stuattemptedCnt = count($stu['stuCreditAssessList'])+count($stu['stuNocreditAssessList']);
 	echo '<td class="c">'.$stuattemptedCnt.'</td>';
-	
+
 	if ($stu['totalPointsPossibleOnAttempted']>0) {
 		echo '<td>'.$stu['totalPointsOnAttempted'].'/'.$stu['totalPointsPossibleOnAttempted'];
 		echo ' ('. round(100*$stu['totalPointsOnAttempted']/$stu['totalPointsPossibleOnAttempted'],1) .'%)</td>';
@@ -372,7 +390,7 @@ foreach ($st as $uid=>$stu) {
 	echo '<td class="c">';
 	if (count($stu['stuNocreditAssessList']) > 0) {
 		uasort($stu['stuNocreditAssessList'], function($a,$b) {global $assessmentInfo; return strcasecmp($assessmentInfo[$a]['name'],$assessmentInfo[$b]['name']);});
-		
+
 		echo count($stu['stuNocreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuNocreditAssessList'] as $aid) {
@@ -387,7 +405,7 @@ foreach ($st as $uid=>$stu) {
 	echo '<td class="c">';
 	if (count($stu['stuCreditAssessList']) > 0) {
 		uasort($stu['stuCreditAssessList'], function($a,$b) {global $assessmentInfo; return strcasecmp($assessmentInfo[$a]['name'],$assessmentInfo[$b]['name']);});
-		
+
 		echo count($stu['stuCreditAssessList']);
 		echo '<ul class="nomark stuul" style="display:none">';
 		foreach ($stu['stuCreditAssessList'] as $aid) {
@@ -399,7 +417,7 @@ foreach ($st as $uid=>$stu) {
 	}
 	echo '</td>';
 	echo '</tr>';
-	
+
 	$i++;
 }
 ?>
@@ -411,7 +429,7 @@ foreach ($st as $uid=>$stu) {
 
 <h3>Assessment Summary: </h3>
 
-<p>Click a row for details. 
+<p>Click a row for details.
    <button type="button" onclick="expandAllSummaries('as')">Expand All</button>
    <button type="button" onclick="collapseAllSummaries('as')">Collapse All</button>
    </p>
@@ -434,14 +452,14 @@ uasort($assessmentInfo, function($a,$b) {return strcasecmp($a['name'],$b['name']
 $i = 0;
 foreach ($assessmentInfo as $aid=>$ainfo) {
 	if ($i%2!=0) {
-		echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">"; 
+		echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	} else {
-		echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">"; 
+		echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\" onclick=\"toggleList(this)\">";
 	}
-	
+
 	echo '<td>'.$ainfo['name'].'</td>';
 	echo '<td class="c">'. $ainfo['attempts'] .'</td>';
-	
+
 	echo '<td class="c">'. round(100*($ainfo['totalPointsEarned']/$ainfo['attempts'])/$ainfo['possible'],1) .'%</td>';
 
 	echo '<td class="c">';
@@ -472,7 +490,7 @@ foreach ($assessmentInfo as $aid=>$ainfo) {
 	}
 	echo '</td>';
 	echo '</tr>';
-	
+
 	$i++;
 }
 ?>

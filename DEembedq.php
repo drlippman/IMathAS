@@ -109,16 +109,19 @@ if (isset($_GET['showscored'])) {
 		}
 		$rawafter = implode('~',$rawafter);
 	}
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 
 	$pts = getpts($after);
 
 	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
-		
+
 	if (isset($_POST['auth'])) {
-		$query = "SELECT password FROM imas_users WHERE SID='".$_POST['auth']."'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT password FROM imas_users WHERE SID='".$_POST['auth']."'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID");
+		$stm->execute(array(':SID'=>$_POST['auth']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		$sig = $row[0];
 	} else {
 		$sig = '';
@@ -147,7 +150,6 @@ if (isset($_GET['showscored'])) {
 	echo "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=\"hidden\" name=\"seed\" value=\"$seed\" />";
 	if (isset($_GET['auth'])) {
-		echo '<input type="hidden" name="auth" value="'.stripslashes($_GET['auth']).'"/>';
 	}
 	if (isset($_GET['showhints']) && $_GET['showhints']==0) {
 		$showhints = false;
@@ -219,7 +221,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $imasroot;
+	global $imasroot, $DBH;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -227,9 +229,12 @@ function printscore($sc,$qsetid,$seed) {
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
-		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$control = mysql_result($result,0,0);
+		//DB $query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $control = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qsetid));
+		$control = $stm->fetchColumn(0);
 		$ptposs = getansweights($control,$seed);
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);

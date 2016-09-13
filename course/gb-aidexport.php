@@ -13,7 +13,7 @@ if (!$isteacher) {
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		if ($sc>0) { 
+		if ($sc>0) {
 			return $sc;
 		} else {
 			return 0;
@@ -22,7 +22,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
@@ -32,7 +32,7 @@ function getpts($sc) {
 
 function evalqsandbox($seed,$qqqcontrol,$qqqanswer) {
 	$sa = '';
-	
+
 	srand($seed);
 	eval($qqqcontrol);
 	srand($seed+1);
@@ -40,7 +40,7 @@ function evalqsandbox($seed,$qqqcontrol,$qqqanswer) {
 
 	if (isset($anstypes) && !is_array($anstypes)) {
 		$anstypes = explode(",",$anstypes);
-	}	
+	}
 	if (isset($anstypes)) { //is multipart
 		if (isset($showanswer) && !is_array($showanswer)) {
 			$sa = $showanswer;
@@ -75,15 +75,18 @@ if (isset($_POST['options'])) {
 	if (isset($_POST['pts'])) { $dopts = true; $outcol++;}
 	if (isset($_POST['ptpts'])) { $doptpts = true; $outcol++;}
 	if (isset($_POST['ba'])) { $doba = true; $outcol++;}
-	if (isset($_POST['bca'])) { $dobca = true; $outcol++;} 
-	if (isset($_POST['la'])) { $dola = true; $outcol++;} 
-	
+	if (isset($_POST['bca'])) { $dobca = true; $outcol++;}
+	if (isset($_POST['la'])) { $dola = true; $outcol++;}
+
 	//get assessment info
-	$query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$defpoints = mysql_result($result,0,0);
-	$assessname = mysql_result($result,0,1);
-	$itemorder = mysql_result($result,0,2);
+	//DB $query = "SELECT defpoints,name,itemorder FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($defpoints, $assessname, $itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	//DB $defpoints = mysql_result($result,0,0);
+	//DB $assessname = mysql_result($result,0,1);
+	//DB $itemorder = mysql_result($result,0,2);
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -104,9 +107,12 @@ if (isset($_POST['options'])) {
 	//get question info
 	$qpts = array();
 	$qsetids = array();
-	$query = "SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT id,points,questionsetid FROM imas_questions WHERE assessmentid=:assessmentid");
+	$stm->execute(array(':assessmentid'=>$aid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1]==9999) {
 			$qpts[$row[0]] = $defpoints;
 		} else {
@@ -123,14 +129,16 @@ if (isset($_POST['options'])) {
 		require("../assessment/interpret5.php");
 		require("../assessment/macros.php");
 		$qsetidlist = implode(',',$qsetids);
-		$query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->query("SELECT id,qtype,control,answer FROM imas_questionset WHERE id IN ($qsetidlist)"); //INT vals from DB
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$qcontrols[$row[0]] = interpret('control',$row[1],$row[2]);
 			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);
 		}
 	}
-	
+
 	$gb = array();
 	//create headers
 	$gb[0][0] = "Name";
@@ -165,26 +173,37 @@ if (isset($_POST['options'])) {
 			$offset++;
 		}
 	}
-	
+
 	//create row headers
+	//DB $query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
+	//DB $query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid' ";
+	//DB $query .= "ORDER BY iu.LastName, iu.FirstName";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
-	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid' ";
+	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid ";
 	$query .= "ORDER BY iu.LastName, iu.FirstName";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
 	$r = 2;
 	$sturow = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$gb[$r] = array_fill(0,count($gb[0]),'');
 		$gb[$r][0] = $row[2].', '.$row[1];
 		$sturow[$row[0]] = $r;
 		$r++;
 	}
-	
+
 	//pull assessment data
+	//DB $query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
+	//DB $query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestseeds,ias.bestattempts,ias.bestlastanswers,ias.lastanswers,ias.userid FROM imas_assessment_sessions AS ias,imas_students ";
-	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid=:courseid AND ias.assessmentid=:assessmentid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (strpos($line['questions'],';')===false) {
 			$questions = explode(",",$line['questions']);
 			$bestquestions = $questions;
@@ -202,7 +221,7 @@ if (isset($_POST['options'])) {
 		}
 		$r = $sturow[$line['userid']];
 		foreach ($questions as $k=>$ques) {
-			
+
 			$c = $qcol[$ques];
 			$offset = 0;
 			if ($dopts) {
@@ -298,7 +317,7 @@ if (isset($_POST['options'])) {
 						$tmp = explode('$!$',$gb[$r][$c+$offset]);
 						$gb[$r][$c+$offset] = $tmp[1];
 					}
-				} 
+				}
 				if (strpos($gb[$r][$c+$offset],'$#$')) {
 					if (strpos($gb[$r][$c+$offset],'&')) { //is multipart q
 						$laparr = explode('&',$gb[$r][$c+$offset]);
@@ -323,20 +342,20 @@ if (isset($_POST['options'])) {
 	foreach ($gb as $gbline) {
 		$line = '';
 		foreach ($gbline as $val) {
-			 # remove any windows new lines, as they interfere with the parsing at the other end 
-			  $val = str_replace("\r\n", "\n", $val); 
+			 # remove any windows new lines, as they interfere with the parsing at the other end
+			  $val = str_replace("\r\n", "\n", $val);
 			  $val = str_replace("\n", " ", $val);
 			  $val = str_replace(array("<BR>",'<br>','<br/>'), ' ',$val);
 			  $val = str_replace("&nbsp;"," ",$val);
-		
-			  # if a deliminator char, a double quote char or a newline are in the field, add quotes 
-			  if(preg_match("/[\,\"\n\r]/", $val)) { 
-				  $val = '"'.str_replace('"', '""', $val).'"'; 
+
+			  # if a deliminator char, a double quote char or a newline are in the field, add quotes
+			  if(preg_match("/[\,\"\n\r]/", $val)) {
+				  $val = '"'.str_replace('"', '""', $val).'"';
 			  }
 			  $line .= $val.',';
 		}
-		# strip the last deliminator 
-		$line = substr($line, 0, -1); 
+		# strip the last deliminator
+		$line = substr($line, 0, -1);
 		$line .= "\n";
 		echo $line;
 	}
@@ -349,7 +368,7 @@ if (isset($_POST['options'])) {
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; <a href=\"gb-itemanalysis.php?aid=$aid&cid=$cid\">Item Analysis</a> ";
 	echo '&gt; Assessment Export</div>';
 	echo '<div id="headergb-aidexport" class="pagetitle"><h2>Assessment Results Export</h2></div>';
-	
+
 	echo "<form method=\"post\" action=\"gb-aidexport.php?aid=$aid&cid=$cid\">";
 	echo 'What do you want to include in the export:<br/>';
 	echo '<input type="checkbox" name="pts" value="1"/> Points earned<br/>';
@@ -362,6 +381,6 @@ if (isset($_POST['options'])) {
 	//echo '<p class="red"><b>Note</b>: Attempt information from shuffled multiple choice, multiple answer, and matching questions will NOT be correct</p>';
 	echo '</form>';
 	require("../footer.php");
-	
+
 }
 ?>

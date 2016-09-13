@@ -22,7 +22,7 @@ require("../validate.php");
 $cid = $_GET['cid'];
 if (isset($teacherid)) {
 	$isteacher = true;
-} 
+}
 if (isset($tutorid)) {
 	$istutor = true;
 }
@@ -44,18 +44,24 @@ if ($canviewall) {
 	} else if (isset($sessiondata[$cid.'gbmode']) && !isset($_GET['refreshdef'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmode = mysql_result($result,0,0);
+		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $gbmode = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$gbmode = $stm->fetchColumn(0);
 		$sessiondata[$cid.'gbmode'] = $gbmode;
 		writesessiondata();
 	}
 	if (isset($_COOKIE["colorize-$cid"]) && !isset($_GET['refreshdef'])) {
 		$colorize = $_COOKIE["colorize-$cid"];
 	} else {
-		$query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$colorize = mysql_result($result,0,0);
+		//DB $query = "SELECT colorize FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $colorize = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT colorize FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$colorize = $stm->fetchColumn(0);
 		setcookie("colorize-$cid",$colorize);
 	}
 	if (isset($_GET['catfilter'])) {
@@ -94,7 +100,7 @@ if ($canviewall) {
 		$sessiondata[$cid.'catcollapse'] = $overridecollapse;
 		writesessiondata();
 	}
-	
+
 	//Gbmode : Links NC Dates
 	$showpics = floor($gbmode/10000)%10 ; //0 none, 1 small, 2 big
 	$totonleft = ((floor($gbmode/1000)%10)&1) ; //0 right, 1 left
@@ -106,7 +112,7 @@ if ($canviewall) {
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$includelastchange = (((floor($gbmode/10)%10)&4)==4);  //: hide last change, 4: show last change
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all, 3 past and attempted, 4=current only
-	
+
 } else {
 	$secfilter = -1;
 	$catfilter = -1;
@@ -132,15 +138,20 @@ if ($canviewall && isset($_GET['stu'])) {
 if ($isteacher) {
 	if (isset($_GET['togglenewflag'])) {
 		//recording a toggle.  Called via AHAH
-		$query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$newflag = mysql_result($result,0,0);
+		//DB $query = "SELECT newflag FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $newflag = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT newflag FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$newflag = $stm->fetchColumn(0);
 		$newflag = $newflag ^ 1;  //XOR
-		$query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "UPDATE imas_courses SET newflag = $newflag WHERE id='$cid'";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_courses SET newflag=:newflag WHERE id=:id");
+		$stm->execute(array(':newflag'=>$newflag, ':id'=>$cid));
 		if (($newflag&1)==1) {
 			echo 'New';
-		} 
+		}
 		exit;
 	}
 	if (isset($_POST['lockinstead'])) {
@@ -176,12 +187,12 @@ if ($isteacher) {
 	if (isset($_POST['posted']) && $_POST['posted']=='Print Report') {
 		//based on a contribution by Cam Joyce
 		require_once("gbtable2.php");
-		
+
 		$placeinhead = '<style type="text/css" >@media print { .noPrint  { display:none; } }</style>';
 		$placeinhead .= '<script type="text/javascript">addLoadEvent(print);</script>';
 		$flexwidth = true;
 		require("../header.php");
-		
+
 		echo '<div class="noPrint"><a href="#" onclick="window.print(); return false;">Print Reports</a> ';
 		echo '<a href="gradebook.php?'.$_SERVER['QUERY_STRING'].'">', _('Back to Gradebook'), '</a></div>';
 		if( isset($_POST['checked']) ) {
@@ -194,38 +205,50 @@ if ($isteacher) {
 				echo "<div style=\"page-break-after:always\"></div>";
 			}
 			gbstudisp($value[$last]);//no page break after last report
-	
+
 			echo "</div></div></div>";
 		}
 		require("../footer.php");
 		exit;
-		
+
 	}
 	if (isset($_POST['usrcomments']) && $stu>0) {
-			$query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_students SET gbcomment='{$_POST['usrcomments']}' WHERE userid='$stu' AND courseid='$cid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_students SET gbcomment=:gbcomment WHERE userid=:userid AND courseid=:courseid");
+			$stm->execute(array(':gbcomment'=>$_POST['usrcomments'], ':userid'=>$stu, ':courseid'=>$cid));
 			//echo "<p>Comment Updated</p>";
 	}
 	if (isset($_POST['score']) && $stu>0) {
 		foreach ($_POST['score'] as $id=>$val) {
 			if (trim($val)=='') {
-				$query = "DELETE FROM imas_grades WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
+				//DB $query = "DELETE FROM imas_grades WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
+				$stm->execute(array(':userid'=>$stu, ':gradetypeid'=>$id));
 			} else {
-				$query = "UPDATE imas_grades SET score='$val',feedback='{$_POST['feedback'][$id]}' WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
+				//DB $query = "UPDATE imas_grades SET score='$val',feedback='{$_POST['feedback'][$id]}' WHERE userid='$stu' AND gradetypeid='$id' AND gradetype='offline'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE userid=:userid AND gradetypeid=:gradetypeid AND gradetype='offline'");
+				$stm->execute(array(':score'=>$val, ':feedback'=>$_POST['feedback'][$id], ':userid'=>$stu, ':gradetypeid'=>$id));
 			}
-			mysql_query($query) or die("Query failed : " . mysql_error());
+
 		}
 	}
 	if (isset($_POST['newscore']) && $stu>0) {
 		$toins = array();
+		$qarr = array();
 		foreach ($_POST['newscore'] as $id=>$val) {
 			if (trim($val)=="") {continue;}
-			$toins[] = "('$id','offline','$stu','$val','{$_POST['feedback'][$id]}')";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $toins[] = "('$id','offline','$stu','$val','{$_POST['feedback'][$id]}')";
+			$toins[] = "(?,?,?,?,?)";
+			array_push($qarr, $id, 'offline', $stu, $val, $_POST['feedback'][$id]);
 		}
 		if (count($toins)>0) {
 			$query = "INSERT INTO imas_grades (gradetypeid,gradetype,userid,score,feedback) VALUES ".implode(',',$toins);
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare($query);
+			$stm->execute($qarr);
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
@@ -246,21 +269,21 @@ if ($canviewall) {
 	$placeinhead .= 'function chgfilter() { ';
 	$placeinhead .= '       var cat = document.getElementById("filtersel").value; ';
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
-	
+
 	$placeinhead .= "       var toopen = '$address&catfilter=' + cat;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
 	$placeinhead .= "}\n";
-	if ($isteacher) { 
+	if ($isteacher) {
 		$placeinhead .= 'function chgsecfilter() { ';
 		$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
 		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid";
-		
+
 		$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 		$placeinhead .= "  	window.location = toopen; \n";
 		$placeinhead .= "}\n";
 		$placeinhead .= 'function chgnewflag() { ';
 		$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&togglenewflag=true";
-		
+
 		$placeinhead .= "       basicahah('$address','newflag','Recording...');\n";
 		$placeinhead .= "}\n";
 	}
@@ -277,7 +300,7 @@ if ($canviewall) {
 	if ($includeduedate) {
 		$placeinhead .= "     altgbmode += 400;\n";
 	}
-	
+
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid&gbmode=";
 	$placeinhead .= "	var toopen = '$address' + altgbmode;\n";
 	$placeinhead .= "  	window.location = toopen; \n";
@@ -320,14 +343,14 @@ if ($canviewall) {
 							newtxta.value = feedbtd.innerHTML;
 							feedbtd.innerHTML = "";
 							feedbtd.appendChild(newtxta);
-						}					
+						}
 					}
 					document.getElementById("savechgbtn").style.display = "";
 					el.onclick = null;
 				}';
 	}
-	
-	
+
+
 	$placeinhead .= "</script>";
 	$placeinhead .= '<script type="text/javascript">function conditionalColor(table,type,low,high) {
 	var tbl = document.getElementById(table);
@@ -370,10 +393,10 @@ if ($canviewall) {
 						v = v.replace(/[^\d\.]/g,"");
 						var perc = v/poss[i];
 					}
-					
+
 					if (perc<low/100) {
 						tds[i].style.backgroundColor = "#ff9999";
-						
+
 					} else if (perc>high/100) {
 						tds[i].style.backgroundColor = "#99ff99";
 					} else {
@@ -395,14 +418,14 @@ if ($canviewall) {
 			}
 			if (v/poss<low/100) {
 				tds[2].style.backgroundColor = "#ff6666";
-				
+
 			} else if (v/poss>high/100) {
 				tds[2].style.backgroundColor = "#66ff66";
 			} else {
 				tds[2].style.backgroundColor = "#ffffff";
-				
+
 			}
-			
+
 		}
 	}
 }
@@ -425,14 +448,14 @@ function copyemails() {
 	});
 	GB_show("Emails","viewemails.php?cid='.$cid.'&ids="+ids.join("-"),500,500);
 }
-	
+
 </script>';
 }
 
 
 
-		
-			
+
+
 
 if (isset($studentid) || $stu!=0) { //show student view
 	if (isset($studentid)) {
@@ -462,9 +485,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 			}
 			return false;
 		}</script>';
-	
+
 	require("../header.php");
-	
+
 	if (isset($_GET['from']) && $_GET['from']=="listusers") {
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 		echo "&gt; <a href=\"listusers.php?cid=$cid\">List Students</a> &gt ", _('Student Grade Detail'), "</div>\n";
@@ -489,9 +512,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '<option value="0" ';
 		if ($catfilter==0) { echo "selected=1";}
 		echo '>', _('Default'), '</option>';
-		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			echo '<option value="'.$row[0].'"';
 			if ($catfilter==$row[0]) {echo "selected=1";}
 			echo '>'.$row[1].'</option>';
@@ -520,9 +546,9 @@ if (isset($studentid) || $stu!=0) { //show student view
 	}
 	gbstudisp($stu);
 	echo "<p>", _('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
-	
+
 	require("../footer.php");
-	
+
 } else { //show instructor view
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=012811\"></script>\n";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablescroller2.js?v=012514\"></script>\n";
@@ -556,17 +582,17 @@ if (isset($studentid) || $stu!=0) { //show student view
 	//$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
 	//$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
 	$placeinhead .= "}}\n ";
-	$placeinhead .= "function cancellockcol() {document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n"; 
+	$placeinhead .= "function cancellockcol() {document.cookie = 'gblhdr-$cid=0';\n document.getElementById(\"lockbtn\").value = \"" . _('Lock headers') . "\";}\n";
 	$placeinhead .= 'function highlightrow(el) { el.setAttribute("lastclass",el.className); el.className = "highlight";}';
 	$placeinhead .= 'function unhighlightrow(el) { el.className = el.getAttribute("lastclass");}';
 	$placeinhead .= "</script>\n";
 	$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } table.gb tr.highlight { border-bottom:1px solid #333;} table.gb tr {border-bottom:1px solid #fff; } td.trld {display:table-cell;vertical-align:middle;} </style>";
-	
+
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; ", _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
-	
+
 	echo '<div id="headergradebook" class="pagetitle"><h2>', _('Gradebook'), ' <span class="red" id="newflag" style="font-size: 70%" >';
 	if (($coursenewflag&1)==1) {
 		echo _('New');
@@ -613,11 +639,11 @@ if (isset($studentid) || $stu!=0) { //show student view
 		echo '</select>';
 		echo ' | <a href="#" onclick="chgnewflag(); return false;">', _('NewFlag'), '</a>';
 		//echo '<input type="button" value="Pics" onclick="rotatepics()" />';
-		
+
 		echo "<br/>\n";
-		
+
 	}
-	
+
 	echo _('Category:'), ' <select id="filtersel" onchange="chgfilter()">';
 	echo '<option value="-1" ';
 	if ($catfilter==-1) {echo "selected=1";}
@@ -625,9 +651,12 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo '<option value="0" ';
 	if ($catfilter==0) { echo "selected=1";}
 	echo '>', _('Default'), '</option>';
-	$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo '<option value="'.$row[0].'"';
 		if ($catfilter==$row[0]) {echo "selected=1";}
 		echo '>'.$row[1].'</option>';
@@ -655,18 +684,18 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "<option value=1 "; writeHtmlSelected($showpics,1); echo ">", _('Small'), "</option>";
 	echo "<option value=2 "; writeHtmlSelected($showpics,2); echo ">", _('Big'), "</option></select>";
 	if (!$isteacher) {
-	
+
 		echo " | <input type=\"button\" id=\"lockbtn\" onclick=\"lockcol()\" value=\"";
 		if ($headerslocked) {
 			echo _('Unlock headers');
 		} else {
 			echo _('Lock headers');
 		}
-		echo "\"/>\n";	
+		echo "\"/>\n";
 	}
-	
+
 	echo "</div>";
-	
+
 	if ($isteacher) {
 		echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',true)">', _('All'), '</a> <a href="#" onclick="return chkAllNone(\'qform\',\'checked[]\',false)">', _('None'), '</a> ';
 		echo _('With Selected:'), '  <button type="submit" name="posted" value="Print Report" title="',_("Generate printable grade reports"),'">',_('Print Report'),'</button> ';
@@ -686,7 +715,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "</div>";
 	echo _('Meanings:  IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score,  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "\n";
 	require("../footer.php");
-	
+
 	/*if ($isteacher) {
 		echo "<div class=cp>";
 		echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
@@ -699,47 +728,58 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs;
+	global $DBH,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
 	}
 	if ($stu>0) {
-		$query = "SELECT showlatepass,latepasshrs FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		list($showlatepass,$latepasshrs) = mysql_fetch_row($result);
+		//DB $query = "SELECT showlatepass,latepasshrs FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB list($showlatepass,$latepasshrs) = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT showlatepass,latepasshrs FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		list($showlatepass,$latepasshrs) = $stm->fetch(PDO::FETCH_NUM);
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	$gbt = gbtable($stu);
-	
+
 	if ($stu>0) {
 		echo '<div style="font-size:1.1em;font-weight:bold">';
 		if ($isteacher || $istutor) {
 			if ($gbt[1][0][1] != '') {
-				$query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				$usersort = mysql_result($result,0,0);
+				//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $usersort = mysql_result($result,0,0);
+				$stm = $DBH->prepare("SELECT usersort FROM imas_gbscheme WHERE courseid=:courseid");
+				$stm->execute(array(':courseid'=>$cid));
+				$usersort = $stm->fetchColumn(0);
 			} else {
 				$usersort = 1;
 			}
-			
+
 			if ($gbt[1][4][2]==1) {
 				if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 					echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gbt[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
 				} else {
 					echo "<img src=\"$imasroot/course/files/userimg_sm{$gbt[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\"/>";
 				}
-			} 
-			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ";
+			}
+			//DB $query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ";
+			$query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid=:courseid ";
 			if ($usersort==0) {
 				$query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
 			} else {
 				$query .= "ORDER BY iu.LastName,iu.FirstName";
 			}
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':courseid'=>$cid));
+
 			echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
 			$lastsec = '';
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
 					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
@@ -757,24 +797,33 @@ function gbstudisp($stu) {
 			echo ' <span class="small">('.$gbt[1][0][1].')</span>';
 		} else {
 			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
-			
+
 			$viewedassess = array();
-			$query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$stu' AND type='gbviewasid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$stu' AND type='gbviewasid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+			$stm->execute(array(':courseid'=>$cid, ':userid'=>$stu));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$viewedassess[] = $row[0];
 			}
 			$now = time();
 		}
+		//DB $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
+		//DB $query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result)==0) {
 		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
-		$query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		if (mysql_num_rows($result)==0) { //shouldn't happen
+		$query .= "imas_students.userid=imas_users.id AND imas_users.id=:id AND imas_students.courseid=:courseid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$stu, ':courseid'=>$_GET['cid']));
+		if ($stm->rowCount()==0) { //shouldn't happen
 			echo 'Invalid student id';
 			require("../footer.php");
 			exit;
 		}
-		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
+		//DB list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
+		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
 		if ($stusection!='') {
 			echo ' <span class="small">Section: '.$stusection.'.</span>';
 		}
@@ -784,7 +833,7 @@ function gbstudisp($stu) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
 			//echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
 			echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=email&cid=$cid',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
-			
+
 			//echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=msg&cid=$cid',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
 			//remove since redundant with Make Exception button "with selected"
@@ -793,14 +842,14 @@ function gbstudisp($stu) {
 			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
 			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
 			echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
-			echo '</div>';	
+			echo '</div>';
 		} else if ($istutor) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid">';
 			echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
 			echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
-			echo '</div>';	
+			echo '</div>';
 		}
-		
+
 		if (trim($gbcomment)!='' || $isteacher) {
 			if ($isteacher) {
 				echo "<form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">";
@@ -820,7 +869,7 @@ function gbstudisp($stu) {
 		if (!$isteacher && !$istutor) {
 			echo $lpmsg;
 		}
-		
+
 	}
 	echo "<form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$stu\">";
 	//echo "<input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/>";
@@ -856,11 +905,11 @@ function gbstudisp($stu) {
 	if ($stu>0) {
 		echo '<th>', _('Feedback'), '<br/><a href="#" class="small pointer" onclick="return showhideallfb(this);">', _('[Show Feedback]'), '</a></th>';
 		$sarr .= ",'N'";
-	} 
+	}
 	echo '</tr></thead><tbody>';
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden 
+			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -874,16 +923,16 @@ function gbstudisp($stu) {
 			if ($hidepast && $gbt[0][1][$i][3]==0) {
 				continue;
 			}
-			
+
 			echo '<tr class="grid">';
-			if ($stu>0 && $isteacher) { 
+			if ($stu>0 && $isteacher) {
 				if ($gbt[0][1][$i][6]==0) {
 					echo '<td><input type="checkbox" name="assesschk[]" value="'.$gbt[0][1][$i][7] .'" /></td>';
 				} else {
 					echo '<td></td>';
 				}
 			}
-			
+
 			echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0];
 			$afterduelatepass = false;
 			if (!$isteacher && !$istutor && $latepasses>0  &&	(
@@ -896,12 +945,12 @@ function gbstudisp($stu) {
 				if ($now>$gbt[0][1][$i][11]) {
 					$afterduelatepass = true;
 				}
-				
+
 			}
-			
+
 			echo '</td>';
 			echo '<td>';
-			
+
 			if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
 				echo $gbt[0][1][$i][2].'&nbsp;', _('pts'), ' ', _('(Not Counted)');
 			} else {
@@ -913,11 +962,11 @@ function gbstudisp($stu) {
 			if ($gbt[0][1][$i][5]==1 && $gbt[0][1][$i][6]==0) {
 				echo ' (PT)';
 			}
-			
+
 			echo '</td><td>';
-			
+
 			$haslink = false;
-			
+
 			if ($isteacher || $istutor || $gbt[1][1][$i][2]==1) { //show link
 				if ($gbt[0][1][$i][6]==0) {//online
 					if ($stu==-1) { //in averages
@@ -949,7 +998,7 @@ function gbstudisp($stu) {
 							echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[1][4][0]}&gbitem={$gbt[0][1][$i][7]}\">";
 							$haslink = true;
 						}
-					} 
+					}
 				} else if ($gbt[0][1][$i][6]==2) {//discuss
 					if ($stu != -1) {
 						echo "<a href=\"viewforumgrade.php?cid=$cid&stu=$stu&uid={$gbt[1][4][0]}&fid={$gbt[0][1][$i][7]}\">";
@@ -982,7 +1031,7 @@ function gbstudisp($stu) {
 			if ($haslink) { //show link
 				echo '</a>';
 			}
-			if (isset($gbt[1][1][$i][6]) ) {  //($isteacher || $istutor) && 
+			if (isset($gbt[1][1][$i][6]) ) {  //($isteacher || $istutor) &&
 				if ($gbt[1][1][$i][6]>1) {
 					if ($gbt[1][1][$i][6]>2) {
 						echo '<sup>LP ('.($gbt[1][1][$i][6]-1).')</sup>';
@@ -1042,13 +1091,16 @@ function gbstudisp($stu) {
 			echo '</tr>';
 		}
 	}
-	echo '</tbody></table><br/>';	
+	echo '</tbody></table><br/>';
 	if (!$hidepast) {
-		$query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$show = mysql_result($result,0,0);
+		//DB $query = "SELECT stugbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $show = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT stugbmode FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$show = $stm->fetchColumn(0);
 		//echo '</tbody></table><br/>';
-		
+
 		echo '<table class="gb"><thead>';
 		echo '<tr>';
 		echo '<th >', _('Totals'), '</th>';
@@ -1057,7 +1109,7 @@ function gbstudisp($stu) {
 		}
 		if (($show&2)==2) {
 			echo '<th>', _('Past Due and Attempted'), '</th>';
-		} 
+		}
 		if (($show&4)==4) {
 			echo '<th>', _('Past Due and Available'), '</th>';
 		}
@@ -1068,7 +1120,7 @@ function gbstudisp($stu) {
 		echo '</thead><tbody>';
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
 			//$donedbltop = false;
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if ($availshow<2 && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -1150,7 +1202,7 @@ function gbstudisp($stu) {
 						echo '</td>';
 					}
 				}
-				
+
 				echo '</tr>';
 			}
 		}
@@ -1171,7 +1223,7 @@ function gbstudisp($stu) {
 				if (($show&8)==8) {
 					echo '<td>'.$gbt[1][3][2].'/'.$gbt[0][3][2].' ('.$gbt[1][3][5].'%)</td>';
 				}
-				
+
 			} else {
 				echo '<td>', _('Weighted Total'), '</td>';
 				if (($show&1)==1) { echo '<td>'.$gbt[1][3][0].'%</td>';}
@@ -1188,7 +1240,7 @@ function gbstudisp($stu) {
 					echo '<td>'.$gbt[1][3][2].'</td>';
 					echo '<td>'.$gbt[1][3][5] .'%</td>';
 				} else {
-					echo '<td>Weighted Total All %</td>'; 
+					echo '<td>Weighted Total All %</td>';
 					echo '<td></td>';
 					echo '<td>'.$gbt[1][3][2].'%</td>';
 					echo '<td></td>';
@@ -1205,7 +1257,7 @@ function gbstudisp($stu) {
 				echo '<td>'.$gbt[1][3][1].'</td>';
 				echo '<td>'.$gbt[1][3][4] .'%</td>';
 			} else {
-				echo '<td>Weighted Total Past & Current %</td>'; 
+				echo '<td>Weighted Total Past & Current %</td>';
 				echo '<td></td>';
 				echo '<td>'.$gbt[1][3][1].'%</td>';
 				echo '<td></td>';
@@ -1222,7 +1274,7 @@ function gbstudisp($stu) {
 				echo '<td>'.$gbt[1][3][0].'</td>';
 				echo '<td>'.$gbt[1][3][3] .'%</td>';
 			} else {
-				echo '<td>Weighted Total Past Due %</td>'; 
+				echo '<td>Weighted Total Past Due %</td>';
 				echo '<td></td>';
 				echo '<td>'.$gbt[1][3][0].'%</td>';
 				echo '<td></td>';
@@ -1232,7 +1284,7 @@ function gbstudisp($stu) {
 				echo '<td></td>';
 			}
 			echo '</tr>';
-			
+
 			echo '</tr>';
 			echo '<tr class="grid">';
 			if (isset($gbt[0][3][0])) { //using points based
@@ -1241,7 +1293,7 @@ function gbstudisp($stu) {
 				echo '<td>'.$gbt[1][3][6].'</td>';
 				echo '<td>'.$gbt[1][3][8] .'%</td>';
 			} else {
-				echo '<td>Weighted Total ast &amp; Attempted</td>'; 
+				echo '<td>Weighted Total ast &amp; Attempted</td>';
 				echo '<td></td>';
 				echo '<td>'.$gbt[1][3][6].'%</td>';
 				echo '<td></td>';
@@ -1252,8 +1304,8 @@ function gbstudisp($stu) {
 			}
 			echo '</tr>';
 			*/
-			
-			
+
+
 		}
 		echo '</tbody></table><br/>';
 		echo '<p>';
@@ -1262,7 +1314,7 @@ function gbstudisp($stu) {
 		}
 		if (($show&2)==2) {
 			echo _('<b>Past Due and Attempted</b> total includes items whose due date has passed, as well as currently available items you have started working on.'), '<br/>';
-		} 
+		}
 		if (($show&4)==4) {
 			echo _('<b>Past Due and Available</b> total includes items whose due date has passed as well as currently available items, even if you haven\'t starting working on them yet.'), '<br/>';
 		}
@@ -1271,14 +1323,14 @@ function gbstudisp($stu) {
 		}
 		echo '</p>';
 	}
-	
+
 	if ($hidepast && $isteacher && $stu>0) {
 		echo '<p><button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button>';
 		echo '<button type="submit" value="Make Exception" name="massexception" >', _('Make Exception'), '</button> ', _('for selected assessments'), '</p>';
 	}
-	
+
 	echo "</form>";
-	
+
 	echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
 	/*
 	if ($hidepast) {
@@ -1292,7 +1344,7 @@ function gbstudisp($stu) {
 }
 
 function gbinstrdisp() {
-	global $hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin;
+	global $DBH,$hidenc,$showpics,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$avgontop,$hidelocked,$colorize,$urlmode,$overridecollapse,$includeduedate,$lastlogin;
 
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	if ($availshow==4) {
@@ -1308,9 +1360,9 @@ function gbinstrdisp() {
 	//echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n"; in placeinhead
 	echo "<div id=\"tbl-container\">";
 	echo '<div id="bigcontmyTable"><div id="tblcontmyTable">';
-	
+
 	echo '<table class="gb" id="myTable"><thead><tr>';
-	
+
 	$sortarr = array();
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1) {echo '<th><div>&nbsp;</div></th>'; $sortarr[] = 'false';} //for pics
@@ -1325,9 +1377,12 @@ function gbinstrdisp() {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>', _('All'), '</option>';
-			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
@@ -1335,8 +1390,8 @@ function gbinstrdisp() {
 				}
 				echo  ">{$row[0]}</option>";
 			}
-			echo  "</select>";	
-			
+			echo  "</select>";
+
 		} else if ($gbt[0][0][$i]=='Name') {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span><br/>';
 			echo "<select id=\"toggle5\" onchange=\"chgtoggle()\">";
@@ -1352,13 +1407,13 @@ function gbinstrdisp() {
 		}
 	}
 	$n=0;
-	
+
 	//get collapsed gb cat info
 	if (count($gbt[0][2])>1) {
 
 		$collapsegbcat = array();
 		for ($i=0;$i<count($gbt[0][2]);$i++) {
-			
+
 			if (isset($overridecollapse[$gbt[0][2][$i][10]])) {
 				$collapsegbcat[$gbt[0][2][$i][1]] = $overridecollapse[$gbt[0][2][$i][10]];
 			} else {
@@ -1366,7 +1421,7 @@ function gbinstrdisp() {
 			}
 		}
 	}
-	
+
 	if ($totonleft && !$hidepast) {
 		//total totals
 		if ($catfilter<0) {
@@ -1380,7 +1435,7 @@ function gbinstrdisp() {
 			}
 		}
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -1409,11 +1464,11 @@ function gbinstrdisp() {
 				$n++;
 			}
 		}
-		
+
 	}
 	if ($catfilter>-2) {
 		for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden 
+			if (!$isteacher && !$istutor && $gbt[0][1][$i][4]==0) { //skip if hidden
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -1470,14 +1525,14 @@ function gbinstrdisp() {
 				echo "<br/><a class=small href=\"addlinkedtext.php?id={$gbt[0][1][$i][7]}&amp;cid=$cid&amp;from=gb\">", _('[Settings]'), "</a>";
 				echo "<br/><a class=small href=\"edittoolscores.php?stu=$stu&amp;cid=$cid&amp;uid=all&amp;lid={$gbt[0][1][$i][7]}&amp;isolate=true\">", _('[Isolate]'), "</a>";
 			}
-			
+
 			echo '</div></th>';
 			$n++;
 		}
 	}
 	if (!$totonleft && !$hidepast) {
 		if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers	
+			for ($i=0;$i<count($gbt[0][2]);$i++) { //category headers
 				if (($availshow<2 || $availshow==3) && $gbt[0][2][$i][2]>1) {
 					continue;
 				} else if ($availshow==2 && $gbt[0][2][$i][2]==3) {
@@ -1525,9 +1580,9 @@ function gbinstrdisp() {
 	for ($i=1;$i<count($gbt);$i++) {
 		if ($i==1) {$insdiv = "<div>";  $enddiv = "</div>";} else {$insdiv = ''; $enddiv = '';}
 		if ($i%2!=0) {
-			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+			echo "<tr class=even onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 		} else {
-			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">"; 
+			echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
 		}
 		echo '<td class="locked" scope="row"><div class="trld">';
 		if ($gbt[$i][0][0]!="Averages" && $isteacher) {
@@ -1552,14 +1607,14 @@ function gbinstrdisp() {
 			echo '<td>'.$insdiv.'<div class="trld">&nbsp;</div></td>';
 		}
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';	
+			echo '<td class="c">'.$insdiv.$gbt[$i][0][$j].$enddiv .'</td>';
 		}
-		
+
 		if ($totonleft && !$hidepast) {
 			//total totals
 			if ($catfilter<0) {
 				if ($availshow==3) {
-					if ($gbt[$i][0][0]=='Averages') { 
+					if ($gbt[$i][0][0]=='Averages') {
 						if (isset($gbt[$i][3][8])) { //using points based
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 						}
@@ -1568,7 +1623,7 @@ function gbinstrdisp() {
 						if (isset($gbt[$i][3][8])) { //using points based
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv.'</td>';
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-							
+
 						} else {
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 						}
@@ -1584,7 +1639,7 @@ function gbinstrdisp() {
 			}
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
 					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
@@ -1597,7 +1652,7 @@ function gbinstrdisp() {
 							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
-	
+
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo '</span>';
 						}
@@ -1629,15 +1684,15 @@ function gbinstrdisp() {
 							echo '</span>';
 						}
 						echo $enddiv .'</td>';
-					} 
-					
+					}
+
 				}
 			}
 		}
 		//assessment values
 		if ($catfilter>-2) {
 			for ($j=0;$j<count($gbt[0][1]);$j++) {
-				if (!$isteacher && !$istutor && $gbt[0][1][$j][4]==0) { //skip if hidden 
+				if (!$isteacher && !$istutor && $gbt[0][1][$j][4]==0) { //skip if hidden
 					continue;
 				}
 				if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -1666,9 +1721,9 @@ function gbinstrdisp() {
 				if ($gbt[0][1][$j][6]==0) {//online
 					if (isset($gbt[$i][1][$j][0])) {
 						if ($istutor && $gbt[$i][1][$j][4]=='average') {
-							
+
 						} else if ($gbt[$i][1][$j][4]=='average') {
-							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" "; 
+							echo "<a href=\"gb-itemanalysis.php?stu=$stu&amp;cid=$cid&amp;asid={$gbt[$i][1][$j][4]}&amp;aid={$gbt[0][1][$j][7]}\" ";
 							echo "onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
 							echo ">";
 						} else {
@@ -1676,7 +1731,7 @@ function gbinstrdisp() {
 						}
 						if ($gbt[$i][1][$j][3]>9) {
 							$gbt[$i][1][$j][3] -= 10;
-						} 
+						}
 						echo $gbt[$i][1][$j][0];
 						if ($gbt[$i][1][$j][3]==1) {
 							echo ' (NC)';
@@ -1686,7 +1741,7 @@ function gbinstrdisp() {
 							echo ' (OT)';
 						} else if ($gbt[$i][1][$j][3]==4) {
 							echo ' (PT)';
-						} 
+						}
 						if ($istutor && $gbt[$i][1][$j][4]=='average') {
 						} else {
 							echo '</a>';
@@ -1694,7 +1749,7 @@ function gbinstrdisp() {
 						if ($gbt[$i][1][$j][1]==1) {
 							echo '<sup>*</sup>';
 						}
-						
+
 					} else { //no score
 						if ($gbt[$i][0][0]=='Averages') {
 							echo '-';
@@ -1766,7 +1821,7 @@ function gbinstrdisp() {
 							echo '-';
 						}
 					}
-					
+
 				} else if ($gbt[0][1][$j][6]==3) { //exttool
 					if ($isteacher) {
 						if ($gbt[$i][0][0]=='Averages') {
@@ -1807,7 +1862,7 @@ function gbinstrdisp() {
 		if (!$totonleft && !$hidepast) {
 			//category totals
 			if (count($gbt[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
-				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers	
+				for ($j=0;$j<count($gbt[0][2]);$j++) { //category headers
 					if (($availshow<2 || $availshow==3) && $gbt[0][2][$j][2]>1) {
 						continue;
 					} else if ($availshow==2 && $gbt[0][2][$j][2]==3) {
@@ -1820,7 +1875,7 @@ function gbinstrdisp() {
 							echo "<span onmouseover=\"tipshow(this,'", _('5-number summary:'), " {$gbt[0][2][$j][6+$availshow]}')\" onmouseout=\"tipout()\" >";
 						}
 						echo $gbt[$i][2][$j][$availshow].' ('.round(100*$gbt[$i][2][$j][$availshow]/$gbt[0][2][$j][$availshow+3])  .'%)';
-	
+
 						if ($gbt[$i][0][0]=='Averages' && $availshow!=3) {
 							echo '</span>';
 						}
@@ -1853,14 +1908,14 @@ function gbinstrdisp() {
 						}
 						echo $enddiv .'</td>';
 					}
-					
+
 				}
 			}
-			
+
 			//total totals
 			if ($catfilter<0) {
 				if ($availshow==3) {
-					if ($gbt[$i][0][0]=='Averages') { 
+					if ($gbt[$i][0][0]=='Averages') {
 						if (isset($gbt[$i][3][8])) { //using points based
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 						}
@@ -1869,7 +1924,7 @@ function gbinstrdisp() {
 						if (isset($gbt[$i][3][8])) { //using points based
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'/'.$gbt[$i][3][7].$enddiv .'</td>';
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][8] .'%'.$enddiv .'</td>';
-							
+
 						} else {
 							echo '<td class="c">'.$insdiv.$gbt[$i][3][6].'%'.$enddiv .'</td>';
 						}
@@ -1892,7 +1947,7 @@ function gbinstrdisp() {
 	} else {
 		$sarr = array();
 	}
-	
+
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {
 		if ($avgontop) {
@@ -1904,8 +1959,8 @@ function gbinstrdisp() {
 	if ($colorize != '0') {
 		echo '<script type="text/javascript">addLoadEvent( function() {updateColors(document.getElementById("colorsel"));} );</script>';
 	}
-		
-	
+
+
 }
 
 ?>

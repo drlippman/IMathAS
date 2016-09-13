@@ -12,9 +12,12 @@
 	if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmode = mysql_result($result,0,0);
+		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $gbmode = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$gbmode = $stm->fetchColumn(0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
 		$stu = $_GET['stu'];
@@ -26,7 +29,7 @@
 	} else {
 		$from = 'gb';
 	}
-	
+
 	$catfilter = -1;
 	if (isset($tutorsection) && $tutorsection!='') {
 		$secfilter = $tutorsection;
@@ -41,13 +44,13 @@
 			$secfilter = -1;
 		}
 	}
-	
+
 	//Gbmode : Links NC Dates
 	$totonleft = floor($gbmode/1000)%10 ; //0 right, 1 left
 	$links = floor($gbmode/100)%10; //0: view/edit, 1 q breakdown
 	$hidenc = (floor($gbmode/10)%10)%4; //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
 	$availshow = $gbmode%10; //0: past, 1 past&cur, 2 all
-	
+
 	$pagetitle = "Gradebook";
 	$placeinhead = '<script type="text/javascript">';
 	$placeinhead .= '$(function() {$("a[href*=\'gradeallq\']").attr("title","'._('Grade this question for all students').'");});';
@@ -67,11 +70,11 @@
 		echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> ";
 	}
 	echo "&gt; Item Analysis</div>";
-	
+
 	echo '<div class="cpmid"><a href="isolateassessgrade.php?cid='.$cid.'&amp;aid='.$aid.'">View Score List</a></div>';
-	
+
 	echo '<div id="headergb-itemanalysis" class="pagetitle"><h2>Item Analysis: ';
-	
+
 	$qtotal = array();
 	$qcnt = array();
 	$tcnt = array();
@@ -81,13 +84,16 @@
 	$timeontask = array();
 	$attempts = array();
 	$regens = array();
-	
-	$query = "SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = mysql_fetch_row($result);
+
+	//DB $query = "SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT defpoints,name,itemorder,defoutcome,showhints FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($defpoints, $aname, $itemorder, $defoutcome, $showhints) = $stm->fetch(PDO::FETCH_NUM);
 	echo $aname.'</h2></div>';
-	
-	
+
+
 	$itemarr = array();
 	$itemnum = array();
 	foreach (explode(',',$itemorder) as $k=>$itel) {
@@ -105,21 +111,44 @@
 			$itemnum[$itel] = ($k+1);
 		}
 	}
-	
-	$query = "SELECT count(id) FROM imas_students WHERE courseid='$cid' AND locked=0 ";
+
+	//DB $query = "SELECT count(id) FROM imas_students WHERE courseid='$cid' AND locked=0 ";
+	//DB if ($secfilter!=-1) {
+		//DB $query .= " AND imas_students.section='$secfilter' ";
+	//DB }
+	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	//DB $totstucnt = mysql_result($result,0,0);
+	$query = "SELECT count(id) FROM imas_students WHERE courseid=:courseid AND locked=0 ";
 	if ($secfilter!=-1) {
-		$query .= " AND imas_students.section='$secfilter' ";
+		$query .= " AND imas_students.section=:section ";
 	}
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	$totstucnt = mysql_result($result,0,0);
-	
+	$stm = $DBH->prepare($query);
+	if ($secfilter!=-1) {
+		$stm->execute(array(':courseid'=>$cid, ':section'=>$secfilter));
+	} else {
+		$stm->execute(array(':courseid'=>$cid));
+	}
+	$totstucnt = $stm->fetchColumn(0);
+
+	//DB $query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
+	//DB $query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid' AND imas_students.locked=0 ";
+	//DB if ($secfilter!=-1) {
+		//DB $query .= " AND imas_students.section='$secfilter' ";
+	//DB }
+	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT ias.questions,ias.bestscores,ias.bestattempts,ias.bestlastanswers,ias.starttime,ias.endtime,ias.timeontask FROM imas_assessment_sessions AS ias,imas_students ";
-	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid='$cid' AND ias.assessmentid='$aid' AND imas_students.locked=0 ";
+	$query .= "WHERE ias.userid=imas_students.userid AND imas_students.courseid=:courseid AND ias.assessmentid=:assessmentid AND imas_students.locked=0 ";
 	if ($secfilter!=-1) {
-		$query .= " AND imas_students.section='$secfilter' ";
+		$query .= " AND imas_students.section=:section ";
 	}
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$stm = $DBH->prepare($query);
+	if ($secfilter!=-1) {
+		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid, ':section'=>$secfilter));
+	} else {
+		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+	}
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (strpos($line['questions'],';')===false) {
 			$questions = explode(",",$line['questions']);
 		} else {
@@ -154,7 +183,7 @@
 			$totsum = array_sum($timeot[$k]);
 			$timeontask[$ques] += $totsum;
 			$timeotthisstu += $totsum;
-			
+
 		}
 		if ($line['endtime'] >0 && $line['starttime'] > 0) {
 			$timetaken[] = $line['endtime']-$line['starttime'];
@@ -163,21 +192,33 @@
 		}
 		$timeontaskbystu[] = $timeotthisstu;
 	}
-	
+
 	$vidcnt = array();
 	if (count($qcnt)>0) {
-		$qlist = implode(',', array_keys($qcnt));
-		$query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid IN ($qlist)";
+		$qlist = implode(',', array_map('intval', array_keys($qcnt)));
+		//DB $query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$cid' AND ict.courseid='$cid' AND ict.type='extref' AND ict.typeid IN ($qlist)";
+		//DB if ($secfilter!=-1) {
+			//DB $query .= " AND ims.section='$secfilter' ";
+		//DB }
+		//DB $query .= " GROUP BY ict.typeid";
+		//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$query = "SELECT ict.typeid,COUNT(DISTINCT ict.userid) FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid=:courseid AND ict.courseid=:courseid2 AND ict.type='extref' AND ict.typeid IN ($qlist)";
 		if ($secfilter!=-1) {
-			$query .= " AND ims.section='$secfilter' ";
+			$query .= " AND ims.section=:section ";
 		}
 		$query .= " GROUP BY ict.typeid";
-		$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare($query);
+		if ($secfilter!=-1) {
+			$stm->execute(array(':courseid'=>$cid, ':courseid2'=>$cid, ':section'=>$secfilter));
+		} else {
+			$stm->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
+		}
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$vidcnt[$row[0]]=$row[1];
 		}
 	}
-	
+
 	$notstarted = ($totstucnt - count($timetaken));
 	$nonstartedper = round(100*$notstarted/$totstucnt,1);
 	if ($notstarted==0) {
@@ -201,18 +242,23 @@
 	if (count($qtotal)>0) {
 		$i = 1;
 		//$qs = array_keys($qtotal);
-		$qslist = implode(',',$itemarr);
+		$qslist = implode(',', array_map('intval',$itemarr));
+		//DB $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
+		//DB $query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+		//DB $query .= " AND imas_questions.id IN ($qslist)";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($qslist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->query($query);
 		$descrips = array();
 		$points = array();
 		$withdrawn = array();
 		$qsetids = array();
 		$needmanualgrade = array();
 		$showextref = array();
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$descrips[$row[1]] = $row[0];
 			$points[$row[1]] = $row[2];
 			$qsetids[$row[1]] = $row[3];
@@ -232,10 +278,10 @@
 				$showextref[$row[1]] = false;
 			}
 		}
-		
+
 		$avgscore = array();
 		$qs = array();
-		
+
 		foreach ($itemarr as $qid) {
 			if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
 			$pts = $points[$qid];
@@ -251,7 +297,7 @@
 				}
 				$avgscore[$i-1] = $avg;
 				$qs[$i-1] = $qid;
-				
+
 				if ($pts>0) {
 					$pc = round(100*$avg/$pts);
 					$pc2 = round(100*$avg2/$pts);
@@ -260,7 +306,7 @@
 					$pc2 = 'N/A';
 				}
 				$pi = round(100*$qincomplete[$qid]/$qcnt[$qid],1);
-				
+
 				if ($qcnt[$qid] - $qincomplete[$qid]>0) {
 					$avgatt = round($attempts[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
 					$avgreg = round($regens[$qid]/($qcnt[$qid] - $qincomplete[$qid]),2);
@@ -292,7 +338,7 @@
 				$avgreg = "NA";
 				$pc = 0; $pc2 = 0; $pi = "NA";
 			}
-				
+
 			echo "<td>{$itemnum[$qid]}</td><td>";
 			if ($withdrawn[$qid]==1) {
 				echo '<span class="red">Withdrawn</span> ';
@@ -304,7 +350,7 @@
 			}
 			echo ">Grade</a></td>";
 			//echo "<td>$avg/$pts ($pc%)</td>";
-			echo "<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>"; 
+			echo "<td class=\"pointer c\" onclick=\"GB_show('Low Scores','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=score',500,500);return false;\"><b>$pc2%</b></td>";
 			echo "<td class=\"pointer\" onclick=\"GB_show('Most Attempts and Regens','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=att',500,500);return false;\">$avgatt ($avgreg)</td>";
 			echo "<td class=\"pointer c\" onclick=\"GB_show('Incomplete','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=incomp',500,500);return false;\">$pi%</td>";
 			echo "<td class=\"pointer\" onclick=\"GB_show('Most Time','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=time',500,500);return false;\">$avgtot ($avgtota)</td>";
@@ -316,13 +362,13 @@
 				}
 			}
 			echo "<td><input type=button value=\"Preview\" onClick=\"previewq({$qsetids[$qid]})\"/></td>\n";
-			
+
 			echo "</tr>\n";
 			$i++;
 		}
-	
+
 		echo "</tbody></table>\n";
-		echo "<script type=\"text/javascript\">\n";		
+		echo "<script type=\"text/javascript\">\n";
 		echo "initSortTable('myTable',Array('N','S',false,'N','N','N','N','N',false),true);\n";
 		echo "</script>\n";
 		echo "<p>Average time taken on this assessment: ";
@@ -339,31 +385,34 @@
 			echo 0;
 		}
 		echo ' minutes</p>';
-		
+
 	} else {
 		echo '</tbody></table>';
 	}
 	//echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
-	
+
 	echo '<p>Items with grade link <span class="manualgrade">highlighted</span> require manual grading.<br/>';
 	echo "Note: Average Attempts, Regens, and Time only counts those who attempted the problem<br/>";
 	echo 'All averages only include those who have started the assessment</p>';
-	
-	$query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
-	$result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-	if (mysql_result($result,0,0)>0) {
+
+	//DB $query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='$aid' AND category<>'0'";
+	//DB $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+	//DB if (mysql_result($result,0,0)>0) {
+	$stm = $DBH->prepare("SELECT COUNT(id) from imas_questions WHERE assessmentid=:assessmentid AND category<>'0'");
+	$stm->execute(array(':assessmentid'=>$aid));
+	if ($stm->fetchColumn(0)>0) {
 		include("../assessment/catscores.php");
 		catscores($qs,$avgscore,$defpoints,$defoutcome,$cid);
 	}
 	echo '<div class="cpmid">Experimental:<br/>';
 	echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
-	
+
 	echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
 	require("../footer.php");
-	
+
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		if ($sc>0) { 
+		if ($sc>0) {
 			return $sc;
 		} else {
 			return 0;
@@ -372,15 +421,12 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
 		return round($tot,1);
 	}
 }
-	
+
 ?>
-
-
-

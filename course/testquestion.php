@@ -5,14 +5,14 @@
 /*** master php includes *******/
 require("../validate.php");
 require("../assessment/displayq2.php");
-require("../assessment/testutil.php");	
+require("../assessment/testutil.php");
 
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Test Question";
 $asid = 0;
- 
+
 	//CHECK PERMISSIONS AND SET FLAGS
 if ($myrights<20) {
  	$overwriteBody = 1;
@@ -46,7 +46,7 @@ if ($myrights<20) {
 		if ($onlychk==1) {
 		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}',true);";
 		} else {
-		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}');";	
+		  $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$_GET['loc']}');";
 		}
 	}
 
@@ -55,15 +55,15 @@ if ($myrights<20) {
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[0]) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
 		$scores[0] = $score;
-		$lastanswers[0] = stripslashes($lastanswers[0]);
+		//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
-		$scores = array(-1); 
+		$scores = array(-1);
 		$rawscores = array(-1);
 		$_SESSION['choicemap'] = array();
 	}
-	
+
 	$page_formAction = "testquestion.php?cid={$_GET['cid']}&qsetid={$_GET['qsetid']}";
 	if (isset($_POST['usecheck'])) {
 		$page_formAction .=  "&checked=".$_GET['usecheck'];
@@ -77,15 +77,20 @@ if ($myrights<20) {
 	if (isset($_GET['onlychk'])) {
 		$page_formAction .=  "&onlychk=".$_GET['onlychk'];
 	}
-	
-	
+
+
+	//DB $query = "SELECT imas_users.email,imas_questionset.* ";
+	//DB $query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_assoc($result);
 	$query = "SELECT imas_users.email,imas_questionset.* ";
-	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='{$_GET['qsetid']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_assoc($result);
-	
+	$query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id=:id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':id'=>$_GET['qsetid']));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
+
 	$lastmod = date("m/d/y g:i a",$line['lastmoddate']);
-	
+
 	if (isset($CFG['AMS']['showtips'])) {
 		$showtips = $CFG['AMS']['showtips'];
 	} else {
@@ -96,9 +101,11 @@ if ($myrights<20) {
 	} else {
 		$eqnhelper = 0;
 	}
-	
-	$query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='{$_GET['qsetid']}'";
-	$resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	//DB $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='{$_GET['qsetid']}'";
+	//DB $resultLibNames = mysql_query($query) or die("Query failed : " . mysql_error());
+	$resultLibNames = $DBH->prepare("SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid=:qsetid");
+	$resultLibNames->execute(array(':qsetid'=>$_GET['qsetid']));
 }
 
 /******* begin html output ********/
@@ -117,33 +124,33 @@ if ($overwriteBody==1) {
 	?>
 	<script type="text/javascript">
 		var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
-		function submitBrokenFlag(tagged) { 
+		function submitBrokenFlag(tagged) {
 		  url = BrokenFlagsaveurl + tagged;
-		  if (window.XMLHttpRequest) { 
-		    req = new XMLHttpRequest(); 
-		  } else if (window.ActiveXObject) { 
-		    req = new ActiveXObject("Microsoft.XMLHTTP"); 
-		  } 
-		  if (typeof req != 'undefined') { 
-		    req.onreadystatechange = function() {submitBrokenFlagDone(tagged);}; 
-		    req.open("GET", url, true); 
-		    req.send(""); 
-		  } 
-		}  
-		
-		function submitBrokenFlagDone(tagged) { 
-		  if (req.readyState == 4) { // only if req is "loaded" 
-		    if (req.status == 200) { // only if "OK" 
+		  if (window.XMLHttpRequest) {
+		    req = new XMLHttpRequest();
+		  } else if (window.ActiveXObject) {
+		    req = new ActiveXObject("Microsoft.XMLHTTP");
+		  }
+		  if (typeof req != 'undefined') {
+		    req.onreadystatechange = function() {submitBrokenFlagDone(tagged);};
+		    req.open("GET", url, true);
+		    req.send("");
+		  }
+		}
+
+		function submitBrokenFlagDone(tagged) {
+		  if (req.readyState == 4) { // only if req is "loaded"
+		    if (req.status == 200) { // only if "OK"
 			    if (req.responseText=='OK') {
 				    toggleBrokenFlagmsg(tagged);
 			    } else {
 				    alert(req.responseText);
 				    alert("Oops, error toggling the flag");
 			    }
-		    } else { 
-			   alert(" Couldn't save changes:\n"+ req.status + "\n" +req.statusText); 
-		    } 
-		  } 
+		    } else {
+			   alert(" Couldn't save changes:\n"+ req.status + "\n" +req.statusText);
+		    }
+		  }
 		}
 		function toggleBrokenFlagmsg(tagged) {
 			document.getElementById("brokenmsgbad").style.display = (tagged==1)?"block":"none";
@@ -190,7 +197,7 @@ if ($overwriteBody==1) {
 		  function togglechk(ischk) {
 			  if (numchked!=-1) {
 				if (ischk) {
-					numchked++;	
+					numchked++;
 				} else {
 					numchked--;
 				}
@@ -221,7 +228,7 @@ if ($overwriteBody==1) {
 	echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
 	echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
 	echo "</form>\n";
-	
+
 	echo '<code id="qhtml" style="display:none">';
 	$message = displayq(0,$_GET['qsetid'],$seed,false,false,0,true);
 	$message = printfilter(forcefiltergraph($message));
@@ -229,7 +236,7 @@ if ($overwriteBody==1) {
 	$message = str_replacE('`','\`',$message);
 	echo htmlentities($message);
 	echo '</code>';
-				
+
 	if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
 		echo "<p>Question id: {$_GET['qsetid']}.  <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$_GET['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
 	} else {
@@ -245,7 +252,7 @@ if ($overwriteBody==1) {
 		echo '<p style="color:red;">This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
 		echo 'by searching all libraries with the ID number as the search term</p>';
 	}
-	
+
 	echo '<p id="brokenmsgbad" style="color:red;display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
 	echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
 	echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
@@ -256,11 +263,12 @@ if ($overwriteBody==1) {
 	if ($line['otherattribution']!='') {
 		echo '<br/>Other Attribution: '.$line['otherattribution'];
 	}
-	echo '</p>';	
+	echo '</p>';
 
 	echo '<p>Question is in these libraries:';
 	echo '<ul>';
-	while ($row = mysql_fetch_row($resultLibNames)) {
+	//DB while ($row = mysql_fetch_row($resultLibNames)) {
+	while ($row = $resultLibNames->fetch(PDO::FETCH_NUM)) {
 		echo '<li>'.$row[0];
 		if ($myrights==100) {
 			echo ' ('.$row[1].', '.$row[2].')';
@@ -268,21 +276,20 @@ if ($overwriteBody==1) {
 		echo '</li>';
 	}
 	echo '</ul></p>';
-	
+
 	if ($line['ancestors']!='') {
 		echo "<p>Derived from: {$line['ancestors']}";
 		if ($line['ancestorauthors']!='') {
-			echo '<br/>Created by: '.$line['ancestorauthors'];	
+			echo '<br/>Created by: '.$line['ancestorauthors'];
 		}
 		echo "</p>";
 	} else if ($line['ancestorauthors']!='') {
-		echo '<p>Derived from work by: '.$line['ancestorauthors'].'</p>';	
-	} 
+		echo '<p>Derived from work by: '.$line['ancestorauthors'].'</p>';
+	}
 	if ($myrights==100) {
 		echo '<p>UniqueID: '.$line['uniqueid'].'</p>';
 	}
 }
 require("../footer.php");
-	
+
 ?>
-	

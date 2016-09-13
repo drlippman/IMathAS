@@ -8,25 +8,37 @@ $nologo = true;
 
 if (isset($_POST['message'])) {
 	require_once("../includes/htmLawed.php");
-	$_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
-	$_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
+	//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
+	//DB $_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
+	$_POST['message'] = myhtmLawed($_POST['message']);
+	$_POST['subject'] = strip_tags($_POST['subject']);
 	$msgto = intval($_POST['sendto']);
 	$error = '';
 	if ($_POST['sendtype']=='msg') {
 		$now = time();
+		//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
+		//DB $query .= "('{$_POST['subject']}','{$_POST['message']}','$msgto','$userid',$now,0,'$cid')";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-		$query .= "('{$_POST['subject']}','{$_POST['message']}','$msgto','$userid',$now,0,'$cid')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$_POST['message'], ':msgto'=>$msgto, ':msgfrom'=>$userid,
+			':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
 		$success = _('Message sent');
 	} else if ($_POST['sendtype']=='email') {
-		$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id=$msgto";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id=$msgto";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$msgto));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		$row[2] = trim($row[2]);
 		if ($row[2]!='' && $row[2]!='none@none.com') {
 			$addy = "{$row[0]} {$row[1]} <{$row[2]}>";
-			$subject = stripslashes($_POST['subject']);
-			$message = stripslashes($_POST['message']);
+			//DB $subject = stripslashes($_POST['subject']);
+			//DB $message = stripslashes($_POST['message']);
+			$subject = $_POST['subject'];
+			$message = $_POST['message'];
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
@@ -34,9 +46,12 @@ if (isset($_POST['message'])) {
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode  . $_SERVER['HTTP_HOST'].'/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-			$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$userid));
+			$row = $stm->fetch(PDO::FETCH_NUM);
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
 			$headers .= "From: $self\r\n";
 			mail($addy,$subject,$message,$headers);
@@ -53,12 +68,15 @@ if (isset($_POST['message'])) {
 	}
 	echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
 	require("../footer.php");
-	exit;	
+	exit;
 } else {
 	$msgto = intval($_GET['to']);
-	$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id=$msgto";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($firstname, $lastname, $email) = mysql_fetch_row($result);
+	//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id=$msgto";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB list($firstname, $lastname, $email) = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+	$stm->execute(array(':id'=>$msgto));
+	list($firstname, $lastname, $email) = $stm->fetch(PDO::FETCH_NUM);
 	$useeditor = "message";
 	require("../header.php");
 	if ($_GET['sendtype']=='msg') {
@@ -68,20 +86,23 @@ if (isset($_POST['message'])) {
 		echo '<h2>New Email</h2>';
 		$to = "$lastname, $firstname ($email)";
 	}
-	
+
 	if (isset($_GET['quoteq'])) {
 		require("../assessment/displayq2.php");
 		$parts = explode('-',$_GET['quoteq']);
 		$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
 		$message = printfilter(forcefiltergraph($message));
 		$message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
-		
+
 		$message = '<p> </p><br/><hr/>'.$message;
 		$courseid = $cid;
 		if (isset($parts[3])) {  //sending to instructor
-			$query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+			//DB $query = "SELECT name FROM imas_assessments WHERE id='".intval($parts[3])."'";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$parts[3]));
+			//DB $title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',mysql_result($result,0,0));
+			$title = 'Question about #'.($parts[0]+1).' in '.str_replace('"','&quot;',$stm->fetchColumn(0));
 			if ($_GET['to']=='instr') {
 				unset($_GET['to']);
 				$msgset = 1; //force instructor only list
@@ -98,8 +119,8 @@ if (isset($_POST['message'])) {
 		$message = '';
 		$courseid=$cid;
 	}
-	
-	
+
+
 	echo '<form method="post" action="sendmsgmodal.php?cid='.$cid.'">';
 	echo '<input type="hidden" name="sendto" value="'.$msgto.'"/>';
 	echo '<input type="hidden" name="sendtype" value="'.$_GET['sendtype'].'"/>';

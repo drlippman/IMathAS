@@ -6,7 +6,7 @@ require("../validate.php");
 $cid = $_GET['cid'];
 if (isset($teacherid)) {
 	$isteacher = true;
-} 
+}
 if (isset($tutorid)) {
 	$istutor = true;
 }
@@ -16,7 +16,7 @@ if ($isteacher || $istutor) {
 	$canviewall = false;
 }
 if ($isteacher || $istutor) {
-	
+
 	if (isset($_GET['timefilter'])) {
 		$timefilter = $_GET['timefilter'];
 		$sessiondata[$cid.'timefilter'] = $timefilter;
@@ -49,10 +49,10 @@ if ($isteacher || $istutor) {
 		}
 	}
 	//Gbmode : Links NC Dates
-	$totonleft = 0 ; 
-	$links = 0; 
-	$hidenc = 2; 
-	$availshow = 1; 
+	$totonleft = 0 ;
+	$links = 0;
+	$hidenc = 2;
+	$availshow = 1;
 	$catfilter = -1;
 
 } else {
@@ -155,14 +155,14 @@ echo "Meanings:   NC-no credit";
 function gbinstrdisp() {
 	global $isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
 	$hidenc = 1;
-	$gbt = gbtable();     
+	$gbt = gbtable();
 	//print_r($gbt);
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
 	echo "<div id=\"tbl-container\">";
 	echo "<table class=gb id=myTable><thead><tr>";
 	$n=0;
-	
-	
+
+
 	for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
 		if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
 		echo '<th>'.$gbt[0][0][$i];
@@ -170,9 +170,12 @@ function gbinstrdisp() {
 			echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
 			if ($secfilter==-1) {echo  'selected=1';}
 			echo  '>All</option>';
-			$query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT DISTINCT section FROM imas_students WHERE courseid=:courseid ORDER BY section");
+			$stm->execute(array(':courseid'=>$cid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[0]=='') { continue;}
 				echo  "<option value=\"{$row[0]}\" ";
 				if ($row[0]==$secfilter) {
@@ -180,19 +183,19 @@ function gbinstrdisp() {
 				}
 				echo  ">{$row[0]}</option>";
 			}
-			echo  "</select>";	
-			
+			echo  "</select>";
+
 		} else if ($gbt[0][0][$i]=='Name') {
 			echo '<br/><span class="small">N='.(count($gbt)-2).'</span>';
 		}
 		echo '</th>';
-		
+
 		$n++;
 	}
-	
-	
+
+
 	for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
-		if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden 
+		if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
 			continue;
 		}
 		if ($hidenc==1 && $gbt[0][1][$i][4]==0) { //skip NC
@@ -200,8 +203,8 @@ function gbinstrdisp() {
 		} else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
 			continue;
 		}
-		
-		
+
+
 		//name and points
 		echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'<br/>';
 		if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
@@ -227,33 +230,33 @@ function gbinstrdisp() {
 				echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
 			}
 		}
-		
+
 		echo '</th>';
 		$n++;
 	}
-	
+
 	echo '</tr></thead><tbody>';
 	//create student rows
 	for ($i=1;$i<count($gbt)-1;$i++) {
 		if ($i%2!=0) {
-			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">"; 
+			echo "<tr class=even onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='even'\">";
 		} else {
-			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">"; 
+			echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
 		}
 		echo '<td class="locked" scope="row">';
-		
+
 		echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
 		echo $gbt[$i][0][0];
 		echo '</a></td>';
-		
+
 		for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
-			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';	
+			echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
 		}
-		
+
 		//assessment values
-		
+
 		for ($j=0;$j<count($gbt[0][1]);$j++) {
-			if ($gbt[0][1][$j][4]==0) { //skip if hidden 
+			if ($gbt[0][1][$j][4]==0) { //skip if hidden
 				continue;
 			}
 			if ($hidenc==1 && $gbt[0][1][$j][4]==0) { //skip NC
@@ -261,8 +264,8 @@ function gbinstrdisp() {
 			} else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
 				continue;
 			}
-			
-			
+
+
 			echo '<td class="c">';
 			if (isset($gbt[$i][1][$j][5])) {
 				echo '<span style="font-style:italic">';
@@ -277,7 +280,7 @@ function gbinstrdisp() {
 					echo $gbt[$i][1][$j][0];
 					if ($gbt[$i][1][$j][3]==1) {
 						echo ' (NC)';
-					} 
+					}
 					/*else if ($gbt[$i][1][$j][3]==2) {
 						echo ' (IP)';
 					} else if ($gbt[$i][1][$j][3]==3) {
@@ -330,7 +333,7 @@ function gbinstrdisp() {
 			}
 			echo '</td>';
 		}
-		
+
 	}
 	echo "</tbody></table>";
 	if ($n>0) {
@@ -339,13 +342,13 @@ function gbinstrdisp() {
 		$sarr = array();
 	}
 	array_unshift($sarr,"'S'");
-	
+
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {
 		echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
 	}
-		
-	
+
+
 }
 
 ?>

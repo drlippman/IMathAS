@@ -55,11 +55,13 @@ $pagetitle = "Quick Drill";
 
 if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 	$qids = array_keys($sessiondata['drillresults']);
-	$list = implode(',',$qids);
-	$query = "SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description";
-	$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+	$list = implode(',', array_map('intval', $qids));
+	//DB $query = "SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description";
+	//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+	$stm = $DBH->query("SELECT id,description FROM imas_questionset WHERE id IN ($list) ORDER BY description");
 	$out = '';
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$out .= "<p><b>{$row[1]}</b><ul>";
 		foreach ($sessiondata['drillresults'][$row[0]] as $item) {
 			$out .= '<li>';
@@ -86,7 +88,7 @@ if (isset($_GET['showresults']) && is_array($sessiondata['drillresults'])) {
 		if (isset($_GET['public']) && isset($_POST['stuname'])) {
 			$stuname = $_POST['stuname'];
 		} else {
-			$stuname = $userfullname;	
+			$stuname = $userfullname;
 		}
 		$headers  = 'MIME-Version: 1.0' . "\r\n";
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -116,13 +118,13 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 		$nc = $sessiondata['drill']['nc'];
 	}
 	$scores = $sessiondata['drill']['scores'];
-	
+
 	$showscore = ($sa==0 || $sa==1 || $sa==4);
 	if (($mode=='cntup' || $mode=='cntdown') && $starttime==0)  {
 		$sessiondata['drill']['starttime'] = time();
 		$starttime = time();
 	}
-	
+
 } else {
 	//first access - load into sessiondata and refresh
 	if (empty($_GET['id']) || $_GET['id']=='new') {
@@ -148,11 +150,11 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	}
 	$sessiondata['drill']['mode'] = 'std';
 	$sessiondata['drill']['scores'] = array();
-		
+
 	if (!empty($_GET['t'])) {
 		$sessiondata['drill']['time'] = $_GET['t'];
 		$sessiondata['drill']['mode'] = 'cntdown';
-	} 
+	}
 	if (!empty($_GET['n'])) {
 		$sessiondata['drill']['n'] = $_GET['n'];
 		$sessiondata['drill']['mode'] = 'cntup';
@@ -169,7 +171,7 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 	}
 	$sessiondata['coursetheme'] = $coursetheme;
 	writesessiondata();
-	
+
 	if ($sessiondata['drill']['mode']=='cntup' || $sessiondata['drill']['mode']=='cntdown') {
 		echo '<html><body>';
 		echo "<a href=\"" . $urlmode. $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php$public\">Start</a>";
@@ -185,7 +187,7 @@ $page_formAction = "quickdrill.php$public";
 $showans = false;
 if (isset($_POST['seed'])) {
 	list($score,$rawscores) = scoreq(0,$qsetid,$_POST['seed'],$_POST['qn0']);
-	$lastanswers[0] = stripslashes($lastanswers[0]);
+	//DB $lastanswers[0] = stripslashes($lastanswers[0]);
 	$page_scoreMsg =  printscore($score,$qsetid,$_POST['seed']);
 	if (getpts($score)<1 && $sa==0) {
 		$showans = true;
@@ -229,7 +231,7 @@ if ($mode=='cntup' || $mode=='cntdown') {
 		$cur = $timelimit - ($now - $starttime);
 	}
 	if ($mode=='cntdown' && ($cur <=0 || isset($_GET['superdone']))) {
-		$timesup = true;	
+		$timesup = true;
 	}
 	if ($cur > 3600) {
 		$hours = floor($cur/3600);
@@ -244,7 +246,7 @@ if ($mode=='cntup' || $mode=='cntdown') {
 
 if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed their n questions
 	//print end-of-drill message for student
-	//show time taken	
+	//show time taken
 	echo "<p>$n questions completed in ";
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
@@ -263,12 +265,12 @@ if (isset($n) && count($scores)==$n && !$showans) {  //if student has completed 
 
 if (isset($nc) && $curscore==$nc) {  //if student has completed their nc questions correctly
 	//print end-of-drill message for student
-	//show time taken	
+	//show time taken
 	echo "<p>$nc questions completed correctly in ";
 	if ($hours>0) { echo "$hours hours ";}
 	if ($minutes>0) { echo "$minutes minutes ";}
 	echo "$seconds seconds</p>";
-	
+
 	echo "<p>".count($scores)." tries used</p>";
 	$addr = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/quickdrill.php?id=$qsetid&cid=$cid&sa=$sa&nc=$nc$publica";
 	echo "<p><a href=\"$addr\">Again</a></p>";
@@ -315,7 +317,7 @@ if ($showscore) {
 }
 if ($mode=='cntup' || $mode=='cntdown') {
 	echo "<script type=\"text/javascript\">\n";
-	echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";	
+	echo " hours = $hours; minutes = $minutes; seconds = $seconds; done=false;\n";
 	echo " function updatetime() {\n";
 	if ($mode=='cntdown') {
 		echo "	  seconds--;\n";
@@ -326,7 +328,7 @@ if ($mode=='cntup' || $mode=='cntdown') {
 	echo "		var theform = document.getElementById(\"qform\");";
 	echo "		var action = theform.getAttribute(\"action\");";
 	echo "		theform.setAttribute(\"action\",action+'&superdone=true');";
-	echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n"; 
+	echo "		if (doonsubmit(theform,true,true)) { theform.submit(); } \n";
 	//setTimeout('document.getElementById(\"qform\").submit()',1000);} \n";
 	echo "		return 0;";
 	echo "    }";
@@ -360,7 +362,7 @@ function focusfirst() {
    }
    if (el == null) {
    	   el = document.getElementById("tc1000");
-   } 
+   }
    if (el == null) {
    	   el = document.getElementById("qn1000");
    }
@@ -412,8 +414,8 @@ function getansweights($code,$seed) {
 		if (is_array($weights)) {
 			return $weights;
 		}
-		
-	} 
+
+	}
 	if (!$foundweights) {
 		preg_match('/anstypes\s*=(.*)/',$line['control'],$match);
 		$n = substr_count($match[1],',')+1;
@@ -440,7 +442,7 @@ function sandboxgetweights($code,$seed) {
 }
 
 function printscore($sc,$qsetid,$seed) {
-	global $imasroot;
+	global $DBH,$imasroot;
 	$poss = 1;
 	if (strpos($sc,'~')===false) {
 		$sc = str_replace('-1','N/A',$sc);
@@ -448,19 +450,22 @@ function printscore($sc,$qsetid,$seed) {
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
-		$query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
-		$result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
-		$control = mysql_result($result,0,0);
+		//DB $query = "SELECT control FROM imas_questionset WHERE id='$qsetid'";
+		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());
+		//DB $control = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT control FROM imas_questionset WHERE id=:id");
+		$stm->execute(array(':id'=>$qsetid));
+		$control = $stm->fetchColumn(0);
 		$ptposs = getansweights($control,$seed);
-		
+
 		for ($i=0; $i<count($ptposs)-1; $i++) {
 			$ptposs[$i] = round($ptposs[$i]*$poss,2);
 		}
 		//adjust for rounding
 		$diff = $poss - array_sum($ptposs);
 		$ptposs[count($ptposs)-1] += $diff;
-		
-		
+
+
 		$pts = getpts($sc);
 		$sc = str_replace('-1','N/A',$sc);
 		//$sc = str_replace('~',', ',$sc);
@@ -468,7 +473,7 @@ function printscore($sc,$qsetid,$seed) {
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
 				$pm = 'gchk';
-			} else if (!is_numeric($v) || $v==0) { 
+			} else if (!is_numeric($v) || $v==0) {
 				$pm = 'redx';
 			} else if (abs($v-$ptposs[$k])<.011) {
 				$pm = 'gchk';
@@ -479,9 +484,9 @@ function printscore($sc,$qsetid,$seed) {
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);
-		//$ptposs = implode(', ',$ptposs); 
+		//$ptposs = implode(', ',$ptposs);
 		$out =  "$pts out of $poss (parts: $sc)";
-	}	
+	}
 	$bar = '<span class="scorebarholder">';
 	if ($poss==0) {
 		$w = 30;
@@ -489,16 +494,16 @@ function printscore($sc,$qsetid,$seed) {
 		$w = round(30*$pts/$poss);
 	}
 	if ($w==0) {$w=1;}
-	if ($w < 15) { 
+	if ($w < 15) {
 	     $color = "#f".dechex(floor(16*($w)/15))."0";
 	} else if ($w==15) {
 	     $color = '#ff0';
-	} else { 
+	} else {
 	     $color = "#". dechex(floor(16*(2-$w/15))) . "f0";
 	}
-	
+
 	$bar .= '<span class="scorebarinner" style="background-color:'.$color.';width:'.$w.'px;">&nbsp;</span></span> ';
-	return $bar . $out;	
+	return $bar . $out;
 }
 
 function getpts($sc) {
@@ -512,7 +517,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
@@ -539,12 +544,12 @@ function linkgenerator() {
 	 if (mode!='none' && val=='') { alert("need to specify N"); return false;}
 	 var url = baseaddr + '?id=' + id + '&sa='+sa;
 	 if (cid != '') {
-		url += '&cid='+cid;	 
+		url += '&cid='+cid;
 	 }
 	 if (mode != 'none') {
 		 url += '&'+mode+'='+val;
 	 }
-	 document.getElementById("output").innerHTML = "<p>URL to use: "+url+"</p><p><a href=\""+url+"\" target=\"_blank\">Try it</a></p>"; 
+	 document.getElementById("output").innerHTML = "<p>URL to use: "+url+"</p><p><a href=\""+url+"\" target=\"_blank\">Try it</a></p>";
  }
  </script>
  </head>
@@ -574,10 +579,10 @@ function linkgenerator() {
 <div id="output"></div>
 </body>
 </html>
- 
+
 
 	<?php
-	
+
 }
 
 ?>

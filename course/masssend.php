@@ -12,114 +12,149 @@
 		$toignore = array();
 		if (intval($_POST['aidselect'])!=0) {
 			$limitaid = $_POST['aidselect'];
+			//DB $query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
+			//DB $query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitaid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
 			$query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
-			$query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitaid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			$query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid=:assessmentid";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':assessmentid'=>$limitaid));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$toignore[] = $row[0];
 			}
 		}
 		require_once("../includes/htmLawed.php");
-		$_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
-		$_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
+		//DB $_POST['message'] = addslashes(myhtmLawed(stripslashes($_POST['message'])));
+		//DB $_POST['subject'] = addslashes(strip_tags(stripslashes($_POST['subject'])));
+		$_POST['message'] = myhtmLawed($_POST['message']);
+		$_POST['subject'] = strip_tags($_POST['subject']);
+
 		if ($_GET['masssend']=="Message") {
 			$now = time();
-			$tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$query = "SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)";
-			
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
+			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
+			//DB $query = "SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)");
 			$emailaddys = array();
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[2],$toignore)) {
 					$fullnames[$row[2]] = $row[1]. ', '.$row[0];
-					$firstnames[$row[2]] = addslashes($row[0]);
-					$lastnames[$row[2]] = addslashes($row[1]);
+					//DB $firstnames[$row[2]] = addslashes($row[0]);
+					//DB $lastnames[$row[2]] = addslashes($row[1]);
+					$firstnames[$row[2]] = $row[0];
+					$lastnames[$row[2]] = $row[1];
+
 					if ($row[3]==1) {
 						$emailaddys[$row[2]] = "{$row[0]} {$row[1]} <{$row[4]}>";
 					}
 				}
 			}
-			
+
 			$tolist = explode(',',$_POST['tolist']);
-			
+
 			if (isset($_POST['savesent'])) {
 				$isread = 0;
 			} else {
 				$isread = 4;
 			}
-			
-			$query = "SELECT FirstName,LastName FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$from = mysql_result($result,0,0).' '.mysql_result($result,0,1);
+
+			//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='$userid'";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB $from = mysql_result($result,0,0).' '.mysql_result($result,0,1);
+			$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$userid));
+			$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 			$headers .= "From: $sendfrom\r\n";
 			$messagep1 = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
 			$messagep1 .= "<p>You've received a new message</p><p>From: $from<br />Course: $coursename.</p>\r\n";
-			$messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
+			//DB $messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
+			$messagep1 .= "<p>Subject: ".$_POST['subject']."</p>";
 			$messagep1 .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/msgs/viewmsg.php?cid=$cid&msgid=";
 			$messagep2 = "\">";
 			$messagep2 .= "View Message</a></p>\r\n";
 			$messagep2 .= "<p>If you do not wish to receive email notification of new messages, please ";
 			$messagep2 .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
 			$messagep2 .= "user preferences</a></p>\r\n";
-			
+
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
+					//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
+					//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $msgid = mysql_insert_id();
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-					$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
-					$msgid = mysql_insert_id();
+					$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
+						':senddate'=>$now, ':isread'=>$isread, ':courseid'=>$cid));
+					$msgid = $DBH->lastInsertId();
 					if (isset($emailaddys[$msgto])) {
 						mail($emailaddys[$msgto],'New message notification',$messagep1.$msgid.$messagep2,$headers);
 					}
 				}
 			}
-			
+
 			$tolist = array();
 			if ($_POST['self']=="self") {
 				$tolist[] = $userid;
 			} else if ($_POST['self']=="allt") {
-				$query = "SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
+				//DB $query = "SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while ($row = mysql_fetch_row($result)) {
+				$stm = $DBH->prepare("SELECT imas_users.id FROM imas_teachers,imas_users WHERE imas_teachers.courseid=:courseid AND imas_teachers.userid=imas_users.id ");
+				$stm->execute(array(':courseid'=>$cid));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$tolist[] = $row[0];
 				}
 			}
 			$sentto = implode('<br/>',$fullnames);
-			$message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
-			
+			//DB $message = $_POST['message'] . addslashes("<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n");
+			$message = $_POST['message'] . "<p>Instructor note: Message sent to these students from course $coursename: <br/> $sentto </p>\n";
+
 			foreach ($tolist as $msgto) {
+				//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
+				//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,0,'$cid')";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
-				$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,0,'$cid')";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
 			}
-			
+
 		} else {
-					
+
 			//$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 			//$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id";
-			$tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$query = "SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)";
-			
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
+			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
+			//DB $query = "SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->query("SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)");
 			$emailaddys = array();
-			while ($row = mysql_fetch_row($result)) {
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (!in_array($row[3],$toignore)) {
 					$emailaddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";
 					$firstnames[] = $row[0];
 					$lastnames[] = $row[1];
 				}
 			}
-			
+
 			//if (isset($_POST['limit']) && $_POST['aidselect']!=0) {
 				$sentto = implode('<br/>',$emailaddys);
 			//} else {
 			//	$sentto = "All students";
 			//}
-			$subject = stripslashes($_POST['subject']);
-			$message = stripslashes($_POST['message']);
+			//DB $subject = stripslashes($_POST['subject']);
+			//DB $message = stripslashes($_POST['message']);
+			$subject = $_POST['subject'];
+			$message = $_POST['message'];
 			$sessiondata['mathdisp']=2;
 			$sessiondata['graphdisp']=2;
 			require("../filter/filter.php");
@@ -127,9 +162,12 @@
 			$message = preg_replace('/<img([^>])*src="\//','<img $1 src="'.$urlmode  . $_SERVER['HTTP_HOST'].'/',$message);
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-			$query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+			//DB $query = "SELECT FirstName,LastName,email FROM imas_users WHERE id='$userid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT FirstName,LastName,email FROM imas_users WHERE id=:id");
+			$stm->execute(array(':id'=>$userid));
+			$row = $stm->fetch(PDO::FETCH_NUM);
 			$self = "{$row[0]} {$row[1]} <{$row[2]}>";
 			//$headers .= "From: $self\r\n";
 			$headers .= "From: $sendfrom\r\n";
@@ -145,16 +183,22 @@
 					mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastnames[$k],$firstnames[$k]),$message),$headers);
 				}
 			}
-			
-			
+
+
 			$message .= "<p>Instructor note: Email sent to these students from course $coursename: <br/> $sentto </p>\n";
 			if ($_POST['self']=="allt") {
+				//DB $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
+				//DB $query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
+				//DB $query .= "AND imas_users.id<>'$userid'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while ($row = mysql_fetch_row($result)) {
 				$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
-				$query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$cid' AND imas_teachers.userid=imas_users.id ";
-				$query .= "AND imas_users.id<>'$userid'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$teacheraddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";	
+				$query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid=:courseid AND imas_teachers.userid=imas_users.id ";
+				$query .= "AND imas_users.id<>:userid";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$teacheraddys[] = "{$row[0]} {$row[1]} <{$row[2]}>";
 				}
 				$message .= "<p>A copy was also emailed to all instructors for this course</p>\n";
 			}
@@ -220,16 +264,19 @@
 			echo '<span class="form"><label for="savesent">Save in sent messages?</label></span>';
 			echo '<span class="formright"><input type="checkbox" name="savesent" checked="checked" /></span><br class="form" />';
 		}
-			
-		
+
+
 		echo "<span class=form><label for=\"limit\">Limit send: </label></span>";
 		echo "<span class=formright>";
 		echo "to students who haven't completed: ";
 		echo "<select name=\"aidselect\" id=\"aidselect\">\n";
 		echo "<option value=\"0\">Don't limit - send to all</option>\n";
-		$query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			echo "<option value=\"{$line['id']}\" ";
 			if (isset($_GET['aid']) && ($_GET['aid']==$line['id'])) {echo "SELECTED";}
 			echo ">{$line['name']}</option>\n";
@@ -239,16 +286,19 @@
 		echo "</span><br class=form />\n";
 		echo "<div class=submit><input type=submit value=\"Send $sendtype\"></div>\n";
 		echo "</form>\n";
-		$tolist = "'".implode("','",$_POST['checked'])."'";
-		$query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $tolist = "'".implode("','",$_POST['checked'])."'";
+		$tolist = implode(',', array_map('intval', $_POST['checked']));
+		//DB $query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($tolist) ORDER BY LastName,FirstName");
 		echo '<p>Unless limited, message will be sent to:<ul>';
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			echo "<li>{$row[0]}, {$row[1]} ({$row[2]})</li>";
 		}
 		echo '</ul>';
 		require("../footer.php");
 		exit;
 	}
-		
+
 ?>

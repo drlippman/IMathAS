@@ -14,10 +14,10 @@ ul {
 		exit;
 	}
 	$now = time();
-	
-	
-	$start = $now - 60*60*24*30; 
-	$end = $now; 
+
+
+	$start = $now - 60*60*24*30;
+	$end = $now;
 	if (isset($_GET['start'])) {
 		$parts = explode('-',$_GET['start']);
 		if (count($parts)==3) {
@@ -26,28 +26,30 @@ ul {
 	} else if (isset($_GET['days'])) {
 		$start = $now - 60*60*24*intval($_GET['days']);
 	}
-	
+
 	if (isset($_GET['end'])) {
 		$parts = explode('-',$_GET['end']);
 		if (count($parts)==3) {
 			$end = mktime(0,0,0,$parts[0],$parts[1],$parts[2]);
-		} 	 
+		}
 	}
-	
+
 	echo '<h2>Enrollments from '.date('M j, Y',$start).' to '.date('M j, Y',$end).'</h2>';
 	echo '<p>This will list all students who last accessed the course between those dates.</p>';
-	
+
 	echo '<p>Courses marked with <sup>*</sup> have more than one instructor, and the enrollments have already been counted earlier so will be omitted</p>';
-	
+
 	/*if (isset($CFG['GEN']['guesttempaccts'])) {
 		$skipcid = $CFG['GEN']['guesttempaccts'];
 	} else {
 		$skipcid = array();
 	}
-	
-	$query = "SELECT id FROM imas_courses WHERE (istemplate&4)=4";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+
+	//DB $query = "SELECT id FROM imas_courses WHERE (istemplate&4)=4";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->query("SELECT id FROM imas_courses WHERE (istemplate&4)=4");
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$skipcid[] = $row[0];
 	}
 	$skipcids = implode(',',$skipcid);
@@ -60,11 +62,13 @@ ul {
 	$query .= "JOIN imas_courses AS c ON t.courseid=c.id ";
 	$query .= "JOIN imas_users as u ";
 	$query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id,c.id ORDER BY g.name,u.LastName,u.FirstName,c.name";
-	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$stm = $DBH->query($query);
 	$lastgroup = '';  $grpcnt = 0; $grpdata = '';  $lastuser = ''; $userdata = '';
 	$seencid = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[1].', '.$row[2]!=$lastuser) {
 			if ($lastuser != '') {
 				$grpdata .= '<li><b>'.$lastuser.'</b><ul>';
@@ -98,7 +102,7 @@ ul {
 	$lastuser = $row[1].', '.$row[2];
 	echo "<p><b>$lastgroup</b>: $grpcnt";
 	echo '<ul>'.$grpdata.'</ul></p>';
-	
+
 ?>
 </body>
 </html>

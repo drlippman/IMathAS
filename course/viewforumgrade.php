@@ -4,28 +4,31 @@
 
 	require("../validate.php");
 	$cid = intval($_GET['cid']);
-	
+
 	if (isset($teacherid)) {
 		$isteacher = true;
 	} else {
 		$isteacher = false;
 	}
 	$istutor = isset($tutorid);
-	
+
 	$stu = intval($_GET['stu']);
-	
+
 	if ($isteacher || $istutor) {
-		$uid = intval($_GET['uid']);	
+		$uid = intval($_GET['uid']);
 	} else {
 		$uid = $userid;
 	}
 	$forumid = intval($_GET['fid']);
-	
+
 	if (($isteacher || $istutor) && (isset($_POST['score']) || isset($_POST['newscore']))) {
 		if ($istutor) {
-			$query = "SELECT tutoredit FROM imas_forums WHERE id='$forumid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$row = mysql_fetch_row($result);
+			//DB $query = "SELECT tutoredit FROM imas_forums WHERE id='$forumid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT tutoredit FROM imas_forums WHERE id=:id");
+			$stm->execute(array(':id'=>$forumid));
+			$row = $stm->fetch(PDO::FETCH_NUM);
 			if ($row[0]!=1) {
 				exit; //not auth for score change
 			}
@@ -38,14 +41,17 @@
 				if (trim($v)=='') {unset($keys[$k]);}
 			}
 			if (count($keys)>0) {
-				$kl = implode(',',$keys);
-				$query = "SELECT refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid' AND refid IN ($kl)";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while($row = mysql_fetch_row($result)) {
+				$kl = implode(',', array_map('intval', $keys));
+				//DB $query = "SELECT refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid' AND refid IN ($kl)";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while($row = mysql_fetch_row($result)) {
+				$stm = $DBH->prepare("SELECT refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid AND refid IN ($kl)");
+				$stm->execute(array(':gradetypeid'=>$forumid, ':userid'=>$uid));
+				while($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$_POST['score'][$row[0]] = $_POST['newscore'][$row[0]];
 					unset($_POST['newscore'][$row[0]]);
 				}
-				
+
 			}
 		}
 		if (isset($_POST['score'])) {
@@ -53,75 +59,94 @@
 				if (trim($k)=='') {continue;}
 				$sc = trim($sc);
 				if ($sc!='') {
-					$query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "UPDATE imas_grades SET score='$sc',feedback='{$_POST['feedback'][$k]}' WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_grades SET score=:score,feedback=:feedback WHERE refid=:refid AND gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid");
+					$stm->execute(array(':score'=>$sc, ':feedback'=>$_POST['feedback'][$k], ':refid'=>$k, ':gradetypeid'=>$forumid, ':userid'=>$uid));
 				} else {
-					$query = "DELETE FROM imas_grades WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "DELETE FROM imas_grades WHERE refid='$k' AND gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("DELETE FROM imas_grades WHERE refid=:refid AND gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid");
+					$stm->execute(array(':refid'=>$k, ':gradetypeid'=>$forumid, ':userid'=>$uid));
 				}
 			}
 		}
 		if (isset($_POST['newscore'])) {
 			foreach($_POST['newscore'] as $k=>$sc) {
-				if (trim($k)=='') {continue;}			
+				if (trim($k)=='') {continue;}
 				if ($sc!='') {
+					//DB $query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
+					//DB $query .= "('forum','$forumid','$k','$uid','$sc','{$_POST['feedback'][$k]}')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$query = "INSERT INTO imas_grades (gradetype,gradetypeid,refid,userid,score,feedback) VALUES ";
-					$query .= "('forum','$forumid','$k','$uid','$sc','{$_POST['feedback'][$k]}')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					$query .= "(:gradetype, :gradetypeid, :refid, :userid, :score, :feedback)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':refid'=>$k, ':userid'=>$uid, ':score'=>$sc, ':feedback'=>$_POST['feedback'][$k]));
 				}
 			}
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid=$cid");
 		exit;
 	}
-	
+
 	$pagetitle = "View Forum Grade";
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Gradebook</a> ";
 	echo "&gt; View Forum Grade</div>";
-	
+
+	//DB $query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit,i_f.enddate FROM imas_users AS iu, imas_forums as i_f ";
+	//DB $query .= "WHERE iu.id='$uid' AND i_f.id='$forumid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $row = mysql_fetch_row($result);
 	$query = "SELECT iu.LastName,iu.FirstName,i_f.name,i_f.points,i_f.tutoredit,i_f.enddate FROM imas_users AS iu, imas_forums as i_f ";
-	$query .= "WHERE iu.id='$uid' AND i_f.id='$forumid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
+	$query .= "WHERE iu.id=:uid AND i_f.id=:fid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':uid'=>$uid, ':fid'=>$forumid));
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	$possiblepoints = $row[3];
 	$tutoredit = $row[4];
 	$caneditscore = (isset($teacherid) || (isset($tutorid) && $tutoredit==1));
 	$showlink = ($caneditscore || time()<$row[5]);
-	
+
 	echo '<div id="headerviewforumgrade" class="pagetitle"><h2>View Forum Grade</h2></div>';
 	echo "<p>Grades on forum <b>{$row[2]}</b> for <b>{$row[1]} {$row[0]}</b></p>";
-	
+
 	if ($istutor && $tutoredit==2) {
 		echo '<p>No access to scores for this forum</p>';
 		require("../footer.php");
 		exit;
 	}
-	
+
 	$scores = array();
-	$query = "SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $query = "SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid='$forumid' AND userid='$uid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT score,feedback,refid FROM imas_grades WHERE gradetype='forum' AND gradetypeid=:gradetypeid AND userid=:userid");
+	$stm->execute(array(':gradetypeid'=>$forumid, ':userid'=>$uid));
 	$totalpts = 0;
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$scores[$row[2]] = $row;
 		$totalpts += $row[0];
 	}
-	
+
 	if ($possiblepoints==0) {
 		echo '<p>This forum is not a graded forum</p>';
 	} else {
 		echo "<p>Total:  $totalpts out of $possiblepoints</p>";
 	}
-	
+
 	if ($caneditscore) {
 		echo "<form method=\"post\" action=\"viewforumgrade.php?cid=$cid&fid=$forumid&stu=$stu&uid=$uid\">";
 	}
-	
+
 	echo '<table class="gb"><thead><tr><th>Post</th><th>Points</th><th>Private Feedback</th></tr></thead><tbody>';
-	$query = "SELECT id,threadid,subject FROM imas_forum_posts WHERE forumid='$forumid' AND userid='$uid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT id,threadid,subject FROM imas_forum_posts WHERE forumid='$forumid' AND userid='$uid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT id,threadid,subject FROM imas_forum_posts WHERE forumid=:forumid AND userid=:userid");
+	$stm->execute(array(':forumid'=>$forumid, ':userid'=>$uid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		echo "<tr><td>";
 		if ($showlink) {
 			echo "<a href=\"$imasroot/forums/posts.php?cid=$cid&forum=$forumid&thread={$row[1]}\">";
@@ -147,7 +172,7 @@
 				echo "<td>-</td>";
 			}
 			echo '<td>'.$scores[$row[0]][1].'</td>';
-		} 
+		}
 		echo "</tr>";
 	}
 	if ($caneditscore || isset($scores[0])) {
@@ -164,7 +189,7 @@
 		} else {
 			echo '<td>'.$scores[0][0].'</td>';
 			echo '<td>'.$scores[0][1].'</td>';
-		} 
+		}
 		echo "</tr>";
 	}
 	echo '</tbody></table>';
@@ -174,5 +199,3 @@
 	}
 	require("../footer.php");
 ?>
-	
-	

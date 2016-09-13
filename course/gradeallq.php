@@ -14,13 +14,16 @@
 	$cid = $_GET['cid'];
 	$stu = $_GET['stu'];
 	if (isset($_GET['gbmode']) && $_GET['gbmode']!='') {
-		$gbmode = $_GET['gbmode'];
+	$gbmode = $_GET['gbmode'];
 	} else if (isset($sessiondata[$cid.'gbmode'])) {
 		$gbmode =  $sessiondata[$cid.'gbmode'];
 	} else {
-		$query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gbmode = mysql_result($result,0,0);
+		//DB $query = "SELECT defgbmode FROM imas_gbscheme WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $gbmode = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT defgbmode FROM imas_gbscheme WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$gbmode = $stm->fetchColumn(0);
 	}
 	$hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
 	$aid = $_GET['aid'];
@@ -72,15 +75,29 @@
 			$onepergroup = false;
 		}
 
+		//DB $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
+		//DB $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
+		//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		//DB if ($page != -1 && isset($_GET['userid'])) {
+			//DB $query .= " AND userid='{$_POST['userid']}'";
+		//DB }
+		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions ";
-		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid='$aid' ";
+		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 		if ($page != -1 && isset($_GET['userid'])) {
-			$query .= " AND userid='{$_POST['userid']}'";
+			$query .= " AND userid=:userid";
 		}
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$stm = $DBH->prepare($query);
+		if ($page != -1 && isset($_GET['userid'])) {
+			$stm->execute(array(':assessmentid'=>$aid, ':userid'=>$_POST['userid']));
+		} else {
+			$stm->execute(array(':assessmentid'=>$aid));
+		}
 		$cnt = 0;
-		while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		echo $stm->rowCount();
+		//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
 				$sp = explode(';',$line['bestscores']);
 				$scores = explode(",",$sp[0]);
@@ -109,8 +126,10 @@
 					$scorelist .= ';'.$sp[1].';'.$sp[2];
 				}
 
-				$query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
-				mysql_query($query) or die("Query failed : $query " . mysql_error());
+				//DB $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback' WHERE id='{$line['id']}'";
+				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+				$stm2 = $DBH->prepare("UPDATE imas_assessment_sessions SET bestscores=:bestscores,feedback=:feedback WHERE id=:id");
+				$stm2->execute(array(':bestscores'=>$scorelist, ':feedback'=>$feedback, ':id'=>$line['id']));
 
 				if (strlen($line['lti_sourcedid'])>1) {
 					//update LTI score
@@ -133,35 +152,48 @@
 	require("../assessment/displayq2.php");
 	list ($qsetid,$cat) = getqsetid($qid);
 
-	$query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
+	//DB $query = "SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	//DB list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT name,defpoints,isgroup,groupsetid,deffeedbacktext FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	list($aname,$defpoints,$isgroup,$groupsetid,$deffbtext) = $stm->fetch(PDO::FETCH_NUM);
 
 	if ($isgroup>0) {
 		$groupnames = array();
-		$query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
+		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid");
+		$stm->execute(array(':groupsetid'=>$groupsetid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$groupnames[$row[0]] = $row[1];
 		}
 		$grplist = implode(',',array_keys($groupnames));
 		$groupmembers = array();
-		$query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->query("SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName");
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
 			$groupmembers[$row[0]][] = $row[2].' '.$row[1];
 		}
 
 	}
 
+	//DB $query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
+	//DB $query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$query = "SELECT imas_questions.points,imas_questionset.control,imas_questions.rubric,imas_questionset.qtype FROM imas_questions,imas_questionset ";
-	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-	$points = mysql_result($result,0,0);
-	$qcontrol = mysql_result($result,0,1);
-	$rubric = mysql_result($result,0,2);
-	$qtype = mysql_result($result,0,3);
+	$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':id'=>$qid));
+	list ($points, $qcontrol, $rubric, $qtype) = $stm->fetch(PDO::FETCH_NUM);
+	//DB $points = mysql_result($result,0,0);
+	//DB $qcontrol = mysql_result($result,0,1);
+	//DB $rubric = mysql_result($result,0,2);
+	//DB $qtype = mysql_result($result,0,3);
 	if ($points==9999) {
 		$points = $defpoints;
 	}
@@ -286,11 +318,17 @@
 	}
 	</script>
 <?php
+	//DB $query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
+	//DB $query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB if (mysql_num_rows($result)>0) {
+		//DB echo printrubrics(array(mysql_fetch_row($result)));
 	$query = "SELECT imas_rubrics.id,imas_rubrics.rubrictype,imas_rubrics.rubric FROM imas_rubrics JOIN imas_questions ";
-	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id='$qid'";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	if (mysql_num_rows($result)>0) {
-		echo printrubrics(array(mysql_fetch_row($result)));
+	$query .= "ON imas_rubrics.id=imas_questions.rubric WHERE imas_questions.id=:id";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':id'=>$qid));
+	if ($stm->rowCount()>0) {
+		echo printrubrics(array($stm->fetch(PDO::FETCH_NUM)));
 	}
 	if ($page==-1) {
 		echo '<button type=button id="hctoggle" onclick="hidecorrect()">'._('Hide Questions with Perfect Scores').'</button>';
@@ -321,34 +359,48 @@
 
 	if ($page!=-1) {
 		$stulist = array();
+		//DB $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
+		//DB $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+		//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
 		$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
-		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+		$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 		if ($hidelocked) {
 			$query .= "AND imas_students.locked=0 ";
 		}
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$stulist[] = $row[0].', '.$row[1];
 		}
 	}
 
+	//DB $query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
+	//DB $query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+	//DB $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	$query = "SELECT imas_users.LastName,imas_users.FirstName,imas_assessment_sessions.* FROM imas_users,imas_assessment_sessions,imas_students ";
-	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid='$cid' AND imas_assessment_sessions.assessmentid='$aid' ";
+	$query .= "WHERE imas_assessment_sessions.userid=imas_users.id AND imas_students.userid=imas_users.id AND imas_students.courseid=:courseid AND imas_assessment_sessions.assessmentid=:assessmentid ";
 	if ($hidelocked) {
 		$query .= "AND imas_students.locked=0 ";
 	}
 	$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	if ($page != -1) {
+		$page = intval($page);
 		$query .= " LIMIT $page,1";
 	}
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':assessmentid'=>$aid));
+	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$cnt = 0;
 	$onepergroup = array();
 	require_once("../includes/filehandler.php");
-	if (mysql_num_rows($result)>0) {
+	//DB if (mysql_num_rows($result)>0) {
+	if ($stm->rowCount()>0) {
 
-	while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
 		}
