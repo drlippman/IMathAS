@@ -292,6 +292,9 @@
 			 $enc = base64_encode(serialize($sessiondata));
 		 }
 
+		 if (!isset($_POST['tzoffset'])) {
+			 $_POST['tzoffset'] = 0;
+		 }
 		 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
 		 	 //DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
        //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
