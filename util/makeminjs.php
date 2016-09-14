@@ -31,12 +31,12 @@ function httpPost($url, $data)
 }
 
 //build assessment javascript min file
-$c = file_get_contents("../javascript/general.js")."\n";
-$c .= file_get_contents("../javascript/mathjs.js")."\n";
-$c .= file_get_contents("../javascript/AMhelpers.js")."\n";
-$c .= file_get_contents("../javascript/confirmsubmit.js")."\n";
-$c .= file_get_contents("../javascript/drawing.js")."\n";
-$c .= file_get_contents("../javascript/eqntips.js")."\n";
+$c = minify(file_get_contents("../javascript/general.js"))."\n";
+$c .= minify(file_get_contents("../javascript/mathjs.js"))."\n";
+$c .= minify(file_get_contents("../javascript/AMhelpers.js"))."\n";
+$c .= minify(file_get_contents("../javascript/confirmsubmit.js"))."\n";
+$c .= minify(file_get_contents("../javascript/drawing.js"))."\n";
+$c .= minify(file_get_contents("../javascript/eqntips.js"))."\n";
 
 file_put_contents("../javascript/assessment_min.js", $c);
 echo "Wrote assessment_min<br>";
@@ -45,6 +45,6 @@ $c = file_get_contents("../javascript/mathquill.js")."\n";
 $c .= file_get_contents("../javascript/mathquilled.js")."\n";
 $c .= file_get_contents("../javascript/AMtoMQ.js")."\n";
 
-file_put_contents("../javascript/MQbundle_min.js", $c);
+file_put_contents("../javascript/MQbundle_min.js", minify($c));
 echo "Wrote MQbundle_min<br>";
 ?>
