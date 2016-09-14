@@ -40,7 +40,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		if ($isteacher) {
 			$type = $_POST['type'];
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
-				$replyby = "NULL";
+				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
 				$replyby = 2000000000;
 			} else if ($_POST['replyby']=="Never") {
@@ -51,7 +51,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		} else {
 			$type = 0;
-			$replyby = "NULL";
+			$replyby = null;
 		}
 		if (isset($_POST['tag'])) {
 			$tag = $_POST['tag'];
@@ -610,30 +610,30 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
 				echo "<span class=form>Post Type:</span><span class=formright>\n";
 				echo "<input type=radio name=type value=0 ";
-				if ($line['posttype']==0) { echo "checked=1";}
+				if ($line['posttype']==0) { echo "checked=1 ";}
 				echo ">Regular<br>\n";
 				echo "<input type=radio name=type value=1 ";
-				if ($line['posttype']==1) { echo "checked=1";}
+				if ($line['posttype']==1) { echo "checked=1 ";}
 				echo ">Displayed at top of list<br>\n";
 				echo "<input type=radio name=type value=2 ";
-				if ($line['posttype']==2) { echo "checked=1";}
+				if ($line['posttype']==2) { echo "checked=1 ";}
 				echo ">Displayed at top and locked (no replies)<br>\n";
 				echo "<input type=radio name=type value=3 ";
-				if ($line['posttype']==3) { echo "checked=1";}
+				if ($line['posttype']==3) { echo "checked=1 ";}
 				echo ">Displayed at top and students can only see their own replies\n";
 				echo "</span><br class=form>";
 				echo "<span class=form>Allow replies: </span><span class=formright>\n";
 				echo "<input type=radio name=replyby value=\"null\" ";
-				if ($line['replyby']==null) { echo "checked=1";}
+				if ($line['replyby']==null) { echo "checked=1 ";}
 				echo "/>Use default<br/>";
 				echo "<input type=radio name=replyby value=\"Always\" ";
-				if ($line['replyby']==2000000000) { echo "checked=1";}
+				if ($line['replyby']==2000000000) { echo "checked=1 ";}
 				echo "/>Always<br/>";
 				echo "<input type=radio name=replyby value=\"Never\" ";
-				if ($line['replyby']==='0') { echo "checked=1";}
+				if ($line['replyby']==='0') { echo "checked=1 ";}
 				echo "/>Never<br/>";
 				echo "<input type=radio name=replyby value=\"Date\" ";
-				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1";}
+				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1 ";}
 				echo "/>Before: ";
 				echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
