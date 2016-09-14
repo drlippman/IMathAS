@@ -547,6 +547,7 @@ function ntuplecalc(inputId,outputId,format) {
 //preview for calccomplex
 function complexcalc(inputId,outputId,format) {
 	var fullstr = document.getElementById(inputId).value;
+	var outcalced, outstr, err;
 	fullstr = normalizemathunicode(fullstr);
 	fullstr = fullstr.replace(/\s+/g,'');
 	if (fullstr.match(/DNE/i)) {
@@ -554,7 +555,7 @@ function complexcalc(inputId,outputId,format) {
 		outcalced = 'DNE';
 		outstr = 'DNE';
 	} else {
-		var outcalced = ''; var err='';
+		outcalced = ''; err='';
 		var arr = fullstr.split(',');
 		for (var cnt=0; cnt<arr.length; cnt++) {
 			var prep = mathjs(arr[cnt],'i');

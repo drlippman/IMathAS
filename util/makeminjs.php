@@ -38,13 +38,13 @@ $c .= file_get_contents("../javascript/confirmsubmit.js")."\n";
 $c .= file_get_contents("../javascript/drawing.js")."\n";
 $c .= file_get_contents("../javascript/eqntips.js")."\n";
 
-file_put_contents("../javascript/assessment_min.js", minify($c));
+file_put_contents("../javascript/assessment_min.js", $c);
 echo "Wrote assessment_min<br>";
 
 $c = file_get_contents("../javascript/mathquill.js")."\n";
 $c .= file_get_contents("../javascript/mathquilled.js")."\n";
 $c .= file_get_contents("../javascript/AMtoMQ.js")."\n";
 
-file_put_contents("../javascript/MQbundle_min.js", minify($c));
+file_put_contents("../javascript/MQbundle_min.js", $c);
 echo "Wrote MQbundle_min<br>";
 ?>
