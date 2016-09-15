@@ -138,38 +138,54 @@ if (isset($_POST['options'])) {
 			$qanswers[$row[0]] = interpret('answer',$row[1],$row[3]);
 		}
 	}
+	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
+	$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	if ($stm->fetchColumn(0)>0) {
+		$hassection = true;
+	} else {
+		$hassection = false;
+	}
 
 	$gb = array();
 	//create headers
 	$gb[0][0] = "Name";
 	$gb[1][0] = "";
+	if ($hassection) {
+		$gb[0][1] = "Section";
+		$gb[1][1] = "";
+		$initoffset = 2;
+	} else {
+		$initoffset = 1;
+	}
 	$qcol = array();
 	foreach ($itemarr as $k=>$q) {
-		$qcol[$q] = 1 + $outcol*$k;
+		$qcol[$q] = $initoffset + $outcol*$k;
 		$offset = 0;
 		if ($dopts) {
-			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
-			$gb[1][1 + $outcol*$k + $offset] = "Points (".$qpts[$q]." possible)";
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Points (".$qpts[$q]." possible)";
 			$offset++;
 		}
 		if ($doptpts) {
-			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
-			$gb[1][1 + $outcol*$k + $offset] = "Part Points (".$qpts[$q]." possible)";
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Part Points (".$qpts[$q]." possible)";
 			$offset++;
 		}
 		if ($doba) {
-			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
-			$gb[1][1 + $outcol*$k + $offset] = "Scored Answer";
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Scored Answer";
 			$offset++;
 		}
 		if ($dobca) {
-			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
-			$gb[1][1 + $outcol*$k + $offset] = "Scored Correct Answer";
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Scored Correct Answer";
 			$offset++;
 		}
 		if ($dola) {
-			$gb[0][1 + $outcol*$k + $offset] = "Question ".$itemnum[$q];
-			$gb[1][1 + $outcol*$k + $offset] = "Last Answer";
+			$gb[0][$initoffset + $outcol*$k + $offset] = "Question ".$itemnum[$q];
+			$gb[1][$initoffset + $outcol*$k + $offset] = "Last Answer";
 			$offset++;
 		}
 	}
@@ -179,9 +195,13 @@ if (isset($_POST['options'])) {
 	//DB $query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$cid' ";
 	//DB $query .= "ORDER BY iu.LastName, iu.FirstName";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$query = "SELECT iu.id,iu.FirstName,iu.LastName FROM imas_users AS iu JOIN ";
+	$query = "SELECT iu.id,iu.FirstName,iu.LastName,imas_students.section FROM imas_users AS iu JOIN ";
 	$query .= "imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid ";
-	$query .= "ORDER BY iu.LastName, iu.FirstName";
+	if ($hassection) {
+		$query .= "ORDER BY imas_students.section,iu.LastName, iu.FirstName";
+	} else {
+		$query .= "ORDER BY iu.LastName, iu.FirstName";
+	}
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
 	$r = 2;
@@ -190,6 +210,9 @@ if (isset($_POST['options'])) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$gb[$r] = array_fill(0,count($gb[0]),'');
 		$gb[$r][0] = $row[2].', '.$row[1];
+		if ($hassection) {
+			$gb[$r][1] = $row[3];
+		}
 		$sturow[$row[0]] = $r;
 		$r++;
 	}
