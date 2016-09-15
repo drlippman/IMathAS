@@ -6175,6 +6175,7 @@ function getqsetid($questionid) {
 }
 
 function getallqsetid($questions) {
+	global $DBH;
 	//DB $qids = "'".implode("','",$questions)."'";
 	$qids = implode(',', array_map('intval', $questions));
 	$order = array_flip($questions);

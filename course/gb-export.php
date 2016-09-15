@@ -188,7 +188,7 @@
 
 
 function gbinstrexport() {
-	global $hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt,$includetimes;
+	global $DBH,$hidenc,$nopt,$isteacher,$cid,$gbmode,$stu,$availshow,$isdiag,$catfilter,$secfilter,$totonleft,$commentloc,$pointsln,$lastlogin,$logincnt,$includetimes;
 	$gbt = gbtable();
 	$gbo = array();
 	//print_r($gbt);
@@ -537,7 +537,7 @@ function gbinstrexport() {
 
 //HTML formatted, for Excel import?
 function gbinstrdisp() {
-	global $hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
+	global $DBH,$hidenc,$isteacher,$istutor,$cid,$gbmode,$stu,$availshow,$catfilter,$secfilter,$totonleft,$imasroot,$isdiag,$tutorsection,$commentloc,$pointsln,$logincnt,$includetimes;
 
 	if ($availshow==4) {
 		$availshow=1;

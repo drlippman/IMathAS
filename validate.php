@@ -632,7 +632,7 @@
   }
 
   function writesessiondata() {
-	  global $sessiondata,$sessionid,$DBH;
+	  global $DBH,$sessiondata,$sessionid;
 	  $enc = base64_encode(serialize($sessiondata));
 	  $now = time();
 	  //DB $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";

@@ -153,7 +153,7 @@ echo "Meanings:   NC-no credit";
 
 
 function gbinstrdisp() {
-	global $isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
 	$hidenc = 1;
 	$gbt = gbtable();
 	//print_r($gbt);
