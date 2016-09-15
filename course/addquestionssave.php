@@ -29,6 +29,13 @@
 	}
 	$new_text_segments_json = json_decode($_REQUEST['text_order'],true);
 	if (count($new_text_segments_json)>0) {
+		require_once("../includes/htmLawed.php");
+		foreach ($new_text_segments_json as $k=>$seg) {
+			$new_text_segments_json[$k]['text'] = myhtmlawed($seg['text']);
+			if (isset($new_text_segments_json[$k]['pagetitle'])) {
+				$new_text_segments_json[$k]['pagetitle'] = strip_tags($seg['pagetitle']);
+			}
+		}
 		array_unshift($new_text_segments_json, $current_intro);
 		$new_intro = json_encode($new_text_segments_json);
 	} else {
