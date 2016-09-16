@@ -333,10 +333,9 @@ ini_set("post_max_size", "10485760");
 			//DB $realcode = mysql_result($result,0,0);
 			//DB if (mysql_num_rows($result)>0 && $_GET['code']===$realcode && $realcode!='') {
 
-			$query = "SELECT remoteaccess FROM imas_users WHERE id=:id";
-			$stm = $DBH->prepare($query);
+			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_GET['id']));
-			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+			$row = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($row !== false && $row['remoteaccess']!='' && $row['remoteaccess']===$_GET['code']) {
 				echo '<html><body><form method="post" action="actions.php?action=resetpw">';
 				echo '<input type="hidden" name="code" value="'.$_GET['code'].'"/>';
