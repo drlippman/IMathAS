@@ -102,7 +102,7 @@
 				//DB $query = "INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES ('$userid','{$_GET['cid']}','{$_POST['ekey2']}','$code','$deflatepass');";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,gbcomment,latepass) VALUES (:userid, :courseid, :section, :gbcomment, :latepass)");
-				$stm->execute(array(':userid'=>$userid, ':courseid'=>$_GET['cid'], ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
+				$stm->execute(array(':userid'=>$newuserid, ':courseid'=>$_GET['cid'], ':section'=>$_POST['ekey2'], ':gbcomment'=>$code, ':latepass'=>$deflatepass));
 			} else {
 				//DB $query = "INSERT INTO imas_students (userid,courseid,gbcomment,latepass) VALUES ('$newuserid','{$_GET['cid']}','$code','$deflatepass');";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
