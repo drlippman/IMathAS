@@ -5962,11 +5962,27 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			//if($GLOBALS['isreview']) {echo 'TRUE';}
 			if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
 				$randstr = '';
-				for ($i=0; $i<6; $i++) {
+				/*using rand was messing up the disp/score regen sequence of multipart
+				  for ($i=0; $i<6; $i++) {
 					$n = rand(0,61);
 					if ($n<10) { $randstr .= chr(48+$n);}
 					else if ($n<36) { $randstr .= chr(65 + $n-10);}
 					else { $randstr .= chr(97 + $n-36);}
+				}*/
+				$chars = 'abcdefghijklmnopqrstuwvxyzABCDEFGHIJKLMNOPQRSTUWVXYZ0123456789';
+				$m = microtime(true);
+				$res = '';
+				$in = floor($m)%1000000000;
+				while ($in>0) {
+					$i = $in % 62;
+					$in = floor($in/62);
+					$randstr .= $chars[$i];
+				}
+				$in = floor(10000*($m-floor($m)));
+				while ($in>0) {
+					$i = $in % 62;
+					$in = floor($in/62);
+					$randstr .= $chars[$i];
 				}
 				//in case "same random seed" is selected, students can overwrite their own
 				//files. Avoid this.
