@@ -281,7 +281,7 @@ function chkAllNone(frmid, arr, mark, skip) {
   return false;
 }
 
-var tinyMCEPreInit = {base: imasroot+"/tinymce4/"};
+var tinyMCEPreInit = {base: imasroot+"/tinymce4"};
 function initeditor(edmode,edids,css,inline,setupfunction){
 	var cssmode = css || 0;
 	var inlinemode = inline || 0;

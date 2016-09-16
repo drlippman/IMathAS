@@ -145,7 +145,9 @@ if (isset($useeditor) && $sessiondata['useed']==1) {
 	} else {
 		echo 'var filePickerCallBackFunc = null;';
 	}
-	echo 'initeditor("exact","'.$useeditor.'");';
+	if ($useeditor!="noinit") {
+		echo 'initeditor("exact","'.$useeditor.'");';
+	}
 	echo '</script>';
 }
 

@@ -788,17 +788,19 @@
 	/// Start display ///
 	$pagetitle = "Question Editor";
 	$placeinhead = '';
-	if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
+	/*if ($sessiondata['mathdisp']==1 || $sessiondata['mathdisp']==2 || $sessiondata['mathdisp']==3) {
 		//these scripts are used by the editor to make image-based math work in the editor
 		$placeinhead .= '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';
 		//if ($mathdarkbg) {$placeinhead .=  'var mathbg = "dark";';}
 		$placeinhead .= '</script>';
 		$placeinhead .= "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=082911\" type=\"text/javascript\"></script>\n";
+		$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
 	}
+	*/
+	$useeditor = "noinit";
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/codemirror-compressed.js"></script>';
 	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/codemirror/imathas.js"></script>';
 	$placeinhead .= '<link rel="stylesheet" href="'.$imasroot.'/javascript/codemirror/codemirror_min.css">';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/tinymce4/tinymce.min.js?v=111612"></script>';
 
 	$placeinhead .= '<script src="//sagecell.sagemath.org/embedded_sagecell.js"></script>'.PHP_EOL;
 	$placeinhead .= '<script type="text/javascript">
