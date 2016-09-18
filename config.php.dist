@@ -193,7 +193,7 @@
      } catch(PDOException $e) {
       die("<p>Could not connect to database: <b>" . $e->getMessage() . "</b></p></div></body></html>");
      }
-		 $DBH->query("set session sql_mode=\'\'");
+		 $DBH->query("set session sql_mode=''");
 
 	  unset($dbserver);
 	  unset($dbusername);
