@@ -584,13 +584,13 @@
 			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
 		}
 	}
-	
+
 	if (($introjson=json_decode($testsettings['intro'],true))!==null) { //is json intro
-		$testsettings['intro'] = $introjson[0];		
+		$testsettings['intro'] = $introjson[0];
 	} else {
 		$introjson = array();
 	}
-	
+
 	if (!$isteacher) {
 		$rec = "data-base=\"assessintro-{$line['assessmentid']}\" ";
 		$testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);
@@ -1525,7 +1525,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	} else {
 		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	}
-	
+
 	if (isset($_GET['action'])) {
 		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
 			echo '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
@@ -2437,7 +2437,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
 		}
 		if ($testsettings['isgroup']>0) {
-			$testsettings['intro'] .= "<p><span style=\"color:red;\">" . _('This is a group assessment.  Any changes effect all group members.') . "</span><br/>";
+			$testsettings['intro'] .= "<p><span style=\"color:red;\">" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
 			if (!$isteacher || isset($sessiondata['actas'])) {
 				$testsettings['intro'] .= _('Group Members:') . " <ul>";
 
