@@ -614,9 +614,6 @@ for ($i=0;$i<count($hdrs);$i++) {
 				} else {
 					$style = ' style="background-color:'.$colors[$k].'"';
 				}
-				if ($editingon && isset($names[$k])) {
-					$tags[$k] = $names[$k];
-				}
 				//echo $assess[$ids[$i][$j]][$k];
 				echo "<span class=\"calitem\" id=\"".$itemidref[$k]."\" $style>";
 				if ($editingon) {
@@ -632,7 +629,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 					}
 				}
 				echo '<span class="calitemtitle">';
-				if ($editingon && isset($names[$k])) {
+				if ($editingon && isset($names[$k]) && trim($names[$k])!='') {
 					echo $names[$k];
 				} else if (isset($tags[$k])) {
 					echo $tags[$k];
