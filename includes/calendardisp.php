@@ -147,20 +147,20 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	}
 	//2: start, 3: end, 4: review
 	//if enddate past end of calendar
-	if ($row[3]>$uppertime && ($row[4]==0 || $row[4]>$uppertime || $row[4]<$row[3])) {
+	if (!$editingon && $row[3]>$uppertime && ($row[4]==0 || $row[4]>$uppertime || $row[4]<$row[3])) {
 		continue;
 	}
 	//if enddate is past, and reviewdate is past end of calendar
-	if ($row[3]<$now && $row[4]>$uppertime) {
+	if (!$editingon && $row[3]<$now && $row[4]>$uppertime) {
 		//continue;
 	}
 	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
 	//if startdate is past now
-	if (($row[2]>$now && !isset($teacherid))) {
+	if (!$editingon && ($row[2]>$now && !isset($teacherid))) {
 		continue;
 	}
 	//if past reviewdate
-	if ($row[4]>0 && $now>$row[4] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row[3] && $row[4]==0)
+	if (!$editingon && $row[4]>0 && $now>$row[4] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row[3] && $row[4]==0)
 		//continue;
 	}
 
@@ -191,7 +191,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   }
 		   }
 	}
-	if ($row[4]<$uppertime && (($row[4]>0 && $now>$row[3]) || $editingon)) { //has review, and we're past enddate
+	if ($row[4]<$uppertime && $row[4]>$exlowertime && (($row[4]>0 && $now>$row[3]) || $editingon)) { //has review, and we're past enddate
 		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[4]));
 		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		$tag = htmlentities($row[11], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
@@ -203,13 +203,13 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$byid['AR'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
 		//}
 	}
+	$tag = htmlentities($row[10], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
 		/*if (isset($gbcats[$row[5]])) {
 			$tag = $gbcats[$row[5]];
 		} else {
 			$tag = '?';
 		}*/
-		$tag = htmlentities($row[10], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 
 		if (!$havecalcedviewedassess && $now>$row[3] && $row[9]>10) {
 			$havecalcedviewedassess = true;
@@ -249,10 +249,10 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ((($now>$row[3] && $now>$row[4]) || $showgrayedout) && !isset($teacherid)) { $json .= 'inactive:true,';}
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 		$byid['AE'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
-		if ($editingon && $row[2]>$exlowertime && $row[2]<$uppertime) {
-			$json = "{type:\"AS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
-			$byid['AS'.$row[0]] = array(tzdate('Y-n-j',$row[2]) ,$tag,'',$json,$row[1]);
-		}
+	}
+	if ($editingon && $row[2]>$exlowertime && $row[2]<$uppertime) {
+		$json = "{type:\"AS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+		$byid['AS'.$row[0]] = array(tzdate('Y-n-j',$row[2]) ,$tag,'',$json,$row[1]);
 	}
 }
 // 4/4/2011, changing tthis to code block below.  Not sure why change on 10/23 was made :/
