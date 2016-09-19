@@ -643,7 +643,7 @@ for ($i=0;$i<count($hdrs);$i++) {
 				if ($editingon && $type=='E') {
 					echo '<span class="icon-enddate"></span>';
 				}
-				echo '</span>';
+				echo '</span> ';
 			}
 		}
 		echo "</div></div></td>";
