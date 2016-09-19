@@ -16,7 +16,7 @@ $viewedassess = array();
 
 function showcalendar($refpage) {
 global $DBH;
-global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess;
+global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess, $editingon;
 
 $now= time();
 if ($previewshift!=-1) {
@@ -38,8 +38,12 @@ if (!isset($_COOKIE['callength'.$cid])) {
 } else {
 	$callength = $_COOKIE['callength'.$cid];
 }
+if (!isset($editingon)) {
+	$editingon = false;
+}
 
 $today = $today + $pageshift*7*$callength*24*60*60;
+
 
 $dayofweek = tzdate('w',$today);
 $curmonum = tzdate('n',$today);
@@ -61,14 +65,14 @@ for ($i=0;$i<7*$callength;$i++) {
 	$row = floor($i/7);
 	$col = $i%7;
 
-	list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$midtoday - ($dayofweek - $i)*24*60*60));
+	list($thisyear,$thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('Y|M|j|n|l F j, Y',$midtoday - ($dayofweek - $i)*24*60*60));
 	if ($thismo==$lastmo) {
 		$hdrs[$row][$col] = $thisday;
 	} else {
 		$hdrs[$row][$col] = "$thismo $thisday";
 		$lastmo = $thismo;
 	}
-	$ids[$row][$col] = "$thismonum-$thisday";
+	$ids[$row][$col] = "$thisyear-$thismonum-$thisday";
 
 	$dates[$ids[$row][$col]] = $datestr;
 }
@@ -81,7 +85,7 @@ for ($i=0;$i<7*$callength;$i++) {
 $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/$refpage.php?cid=$cid";
 
 echo '<script type="text/javascript">var calcallback = "'.$address.'";</script>';
-echo '<div class="floatright">Show <select id="callength" onchange="changecallength(this)">';
+echo '<div class="floatright"><span class="calupdatenotice red"></span> Show <select id="callength" onchange="changecallength(this)">';
 for ($i=2;$i<26;$i++) {
 	echo '<option value="'.$i.'" ';
 	if ($i==$callength) {echo 'selected="selected"';}
@@ -114,11 +118,11 @@ if (!isset($teacherid)) {
 	$stm->execute(array(':userid'=>$userid));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($row[5]=='A') {
-		$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
+			$exceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4]);
 		} else if ($row[5]=='F' || $row[5]=='P' || $row[5]=='R') {
 			$forumexceptions[$row[0]] = array($row[1],$row[2],$row[3],$row[4],$row[5]);
+		}
 	}
-}
 }
 
 $byid = array();
@@ -187,17 +191,17 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   }
 		   }
 	}
-	if ($row[4]<$uppertime && $row[4]>0 && $now>$row[3]) { //has review, and we're past enddate
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
+	if ($row[4]<$uppertime && (($row[4]>0 && $now>$row[3]) || $editingon)) { //has review, and we're past enddate
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[4]));
 		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		$tag = htmlentities($row[11], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-		if ($now<$row[4]) { $colors = '#99f';} else {$colors = '#ccc';}
-		$json = "{type:\"AR\", time:\"$time\", tag:\"$tag\", ";
+		if ($editingon) {$colors='';} else {if ($now<$row[4]) { $colors = '#99f';} else {$colors = '#ccc';}}
+		$json = "{type:\"AR\", typeref:\"$row[0]\", time:\"$time\", tag:\"$tag\", ";
 		if ($now<$row[4] || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
 		$json .=  "color:\"".$colors."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
-		if ($row[3]<$uppertime && $row[3]>$exlowertime) {  //if going to do a second tag, need to increment.
-			$byid['AR'.$row[0]] = array($moday,$tag,$colors,$json);
-		}
+		//if (($row[3]<$uppertime && $row[3]>$exlowertime) || $editingon) {  //if going to do a second tag, need to increment.
+			$byid['AR'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+		//}
 	}
 	if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
 		/*if (isset($gbcats[$row[5]])) {
@@ -232,18 +236,23 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		} else {
 			$ulp = 0;
 		}
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[3]));
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[3]));
 		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		if ($showgrayedout) {
 			$colors = '#ccc';
 		} else {
 			$colors = makecolor2($row[2],$row[3],$now);
 		}
-		$json = "{type:\"A\", time:\"$time\", ";
+		if ($editingon) {$colors='';}
+		$json = "{type:\"AE\", typeref:\"$row[0]\", time:\"$time\", ";
 		if ($now<$row[3] || $row[4]>$now || isset($teacherid) || $lp==1) { $json .= "id:\"$row[0]\",";}
 		if ((($now>$row[3] && $now>$row[4]) || $showgrayedout) && !isset($teacherid)) { $json .= 'inactive:true,';}
 		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-		$byid['A'.$row[0]] = array($moday,$tag,$colors,$json);
+		$byid['AE'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+		if ($editingon && $row[2]>$exlowertime && $row[2]<$uppertime) {
+			$json = "{type:\"AS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+			$byid['AS'.$row[0]] = array(tzdate('Y-n-j',$row[2]) ,$tag,'',$json,$row[1]);
+		}
 	}
 }
 // 4/4/2011, changing tthis to code block below.  Not sure why change on 10/23 was made :/
@@ -279,19 +288,36 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		}
 	}
 	if ($row[5]==1) {
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[4]));
+		if ($row[7]==2) {
+			$datefield = 'O';
+		} else {
+			$datefield = 'S';
+		}
 	} else {
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
+		$datefield = 'E';
 	}
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$colors = makecolor2($row[4],$row[2],$now);
 	if ($row[7]==2) {
 		$colors = "#0f0";
 	}
+	if ($editingon) {$colors='';}
 	$tag = htmlentities($row[6], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	$json = "{type:\"I\", folder:\"@@@\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
+	$json = "{type:\"I$datefield\", typeref:\"$row[0]\", folder:\"@@@\", time:\"$time\", id:\"$row[0]\", name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 
-	$byid['I'.$row[0]] = array($moday,$tag,$colors,$json);
+	$byid['I'.$datefield.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+
+	if ($editingon && $datefield != 'O' && $row[7]==1) {
+		if ($datefield=='S' && $row[2]>$exlowertime && $row[2]<$uppertime) {
+			$json = "{type:\"IE\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+			$byid['IE'.$row[0]] = array(tzdate('Y-n-j',$row[2]),$tag,$colors,$json,$row[1]);
+		} else if ($datefield=='E' && $row[4]>$exlowertime && $row[4]<$uppertime) {
+			$json = "{type:\"IS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+			$byid['IS'.$row[0]] = array(tzdate('Y-n-j',$row[4]),$tag,$colors,$json,$row[1]);
+		}
+	}
 
 }
 //$query = "SELECT id,title,enddate,text,startdate,oncal,caltag FROM imas_linkedtext WHERE ((oncal=2 AND enddate>$lowertime AND enddate<$uppertime AND startdate<$now) OR (oncal=1 AND startdate<$now AND startdate>$exlowertime)) AND avail=1 AND courseid='$cid'";
@@ -308,9 +334,15 @@ $stm->execute(array(':courseid'=>$cid));
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[5]==1) {
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[4]));
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[4]));
+		if ($row[7]==2) {
+			$datefield = 'O';
+		} else {
+			$datefield = 'S';
+		}
 	} else {
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
+		$datefield = 'E';
 	}
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	 if ((substr($row[3],0,4)=="http") && (strpos($row[3]," ")===false)) { //is a web link
@@ -325,7 +357,8 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[7]==2) {
 		$colors = "#0f0";
 	}
-	$json = "{type:\"L\", time:\"$time\", ";
+	if ($editingon) {$colors='';}
+	$json = "{type:\"L$datefield\", typeref:\"$row[0]\", time:\"$time\", ";
 	if (isset($teacherid) || ($now<$row[2] && $now>$row[4]) || $row[7]==2) {
 		$json .= "id:\"$row[0]\", ";
 	}
@@ -333,7 +366,16 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$alink = htmlentities($alink, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$json .= "name:\"$row[1]\", link:\"$alink\", target:{$row[8]}, color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 
-	$byid['L'.$row[0]] = array($moday,$tag,$colors,$json);
+	$byid['L'.$datefield.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+	if ($editingon && $datefield != 'O' && $row[7]==1) {
+		if ($datefield=='S' && $row[2]>$exlowertime && $row[2]<$uppertime) {
+			$json = "{type:\"LE\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+			$byid['LE'.$row[0]] = array(tzdate('Y-n-j',$row[2]),$tag,$colors,$json,$row[1]);
+		} else if ($datefield=='E' && $row[4]>$exlowertime && $row[4]<$uppertime) {
+			$json = "{type:\"LS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+			$byid['LS'.$row[0]] = array(tzdate('Y-n-j',$row[4]),$tag,$colors,$json,$row[1]);
+		}
+	}
 }
 
 if (isset($teacherid)) {
@@ -347,7 +389,7 @@ $stm = $DBH->prepare($query); //times were calcualated in flow - safe
 $stm->execute(array(':courseid'=>$cid));
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
+	list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
 
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 
@@ -355,14 +397,19 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[7]==2) {
 		$colors = "#0f0";
 	}
-	$json = "{type:\"D\", time:\"$time\", ";
+	if ($editingon) {$colors='';}
+	$json = "{type:\"DE\", typeref:\"$row[0]\", time:\"$time\", ";
 	if (isset($teacherid) || ($now<$row[2] && $now>$row[3]) || $row[5]==2) {
 		$json .= "id:\"$row[0]\", ";
 	}
 	$tag = htmlentities($row[4], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$json .= "name:\"$row[1]\", color:\"".$colors."\", tag:\"$tag\"".((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
 
-	$byid['D'.$row[0]] = array($moday,$tag,$colors,$json);
+	$byid['DE'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+	if ($editingon && $row[3]>$exlowertime && $row[3]<$uppertime) {
+		$json = "{type:\"DS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
+		$byid['DS'.$row[0]] = array(tzdate('Y-n-j',$row[3]),$tag,'',$json,$row[1]);
+	}
 }
 
 $query = "SELECT id,name,postby,replyby,startdate,caltag,allowlate FROM imas_forums WHERE enddate>$exlowertime AND ((postby>$exlowertime AND postby<$uppertime) OR (replyby>$exlowertime AND replyby<$uppertime)) AND avail>0 AND courseid=:courseid ORDER BY name";
@@ -380,31 +427,42 @@ while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	list($posttag,$replytag) = explode('--',$row['caltag']);
 	$posttag = htmlentities($posttag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$replytag = htmlentities($replytag, ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+	$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	if ($row['postby']!=2000000000) { //($row['postby']>$now || isset($teacherid))
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row['postby']));
-		$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['postby']));
 		$colors = makecolor2($row['startdate'],$row['postby'],$now);
-		$json = "{type:\"FP\", time:\"$time\", ";
+		if ($editingon) {$colors='';}
+		$json = "{type:\"FP\", typeref:\"{$row['id']}\", time:\"$time\", ";
 		//if ($row['postby']>$now || isset($teacherid)) {
 			$json .= "id:\"{$row['id']}\",";
 		//}
 		$json .= 'allowlate:"'.($canuselatepassP?1:0).'",undolate:"'.($canundolatepassP?1:0).'",';
 
 		$json .= "name:\"{$row['name']}\", color:\"".$colors."\", tag:\"$posttag\"".((isset($teacherid))?", editlink:true":"")."}";
-		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json);
-		}
+		$byid['FP'.$row['id']] = array($moday,$posttag,$colors,$json,$row['name']);
+	}
 	if ($row['replyby']!=2000000000) { //($row['replyby']>$now || isset($teacherid))
-		list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row['replyby']));
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['replyby']));
 		$colors = makecolor2($row['startdate'],$row['replyby'],$now);
-		$json = "{type:\"FR\", time:\"$time\",";
+		if ($editingon) {$colors='';}
+		$json = "{type:\"FR\", typeref:\"{$row['id']}\", time:\"$time\",";
 		//if ($row['replyby']>$now || isset($teacherid)) {
 			$json .= "id:\"{$row['id']}\",";
 		//}
 		$json .= 'allowlate:"'.($canuselatepassR?1:0).'",undolate:"'.($canundolatepassR?1:0).'",';
 		$json .= "name:\"{$row['name']}\", color:\"".$colors."\", tag:\"$replytag\"".((isset($teacherid))?", editlink:true":"")."}";
-		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json);
-		}
+		$byid['FR'.$row['id']] = array($moday,$replytag,$colors,$json,$row['name']);
 	}
+	$tag = substr($row[1],0,8);
+	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
+		$json = "{type:\"FS\", typeref:\"{$row['id']}\", name:\"{$row['name']}\", tag:\"F\"}";
+		$byid['FS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']),$tag,'',$json,$row['name']);
+	}
+	if ($editingon && $row['enddate']>$exlowertime && $row['enddate']<$uppertime) {
+		$json = "{type:\"FE\", typeref:\"{$row['id']}\", name:\"{$row['name']}\", tag:\"F\"}";
+		$byid['FE'.$row['id']] = array(tzdate('Y-n-j',$row['enddate']),$tag,'',$json,$row['name']);
+	}
+}
 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 //DB $itemorder = unserialize(mysql_result($result,0,0));
@@ -430,6 +488,8 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 $assess = array();
 $colors = array();
 $tags = array();
+$names = array();
+$itemidref = array();
 $k = 0;
 foreach ($itemsimporder as $item) {
 	if (isset($hiddenitems[$item]) && !isset($teacherid)) {
@@ -437,76 +497,85 @@ foreach ($itemsimporder as $item) {
 		continue;
 	}
 	if ($itemsassoc[$item][0]=='Assessment') {
-		if (isset($byid['A'.$itemsassoc[$item][1]])) {
-			$moday = $byid['A'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['A'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['A'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['A'.$itemsassoc[$item][1]][3];
-			$k++;
-		}
-		if (isset($byid['AR'.$itemsassoc[$item][1]])) {
-			$moday = $byid['AR'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['AR'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['AR'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['AR'.$itemsassoc[$item][1]][3];
-			$k++;
+		foreach (array('S','E','R') as $datetype) {
+			if (isset($byid['A'.$datetype.$itemsassoc[$item][1]])) {
+				$moday = $byid['A'.$datetype.$itemsassoc[$item][1]][0];
+				$itemidref[$k] = 'A'.$datetype.$itemsassoc[$item][1];
+				$tags[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][1];
+				$colors[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][2];
+				$assess[$moday][$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][3];
+				$names[$k] = $byid['A'.$datetype.$itemsassoc[$item][1]][4];
+				$k++;
+			}
 		}
 	} else if ($itemsassoc[$item][0]=='Forum') {
-		if (isset($byid['FP'.$itemsassoc[$item][1]])) {
-			$moday = $byid['FP'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['FP'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['FP'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['FP'.$itemsassoc[$item][1]][3];
-			$k++;
-		}
-		if (isset($byid['FR'.$itemsassoc[$item][1]])) {
-			$moday = $byid['FR'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['FR'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['FR'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['FR'.$itemsassoc[$item][1]][3];
-			$k++;
+		foreach (array('S','E','P','R') as $datetype) {
+			if (isset($byid['F'.$datetype.$itemsassoc[$item][1]])) {
+				$moday = $byid['F'.$datetype.$itemsassoc[$item][1]][0];
+				$itemidref[$k] = 'F'.$datetype.$itemsassoc[$item][1];
+				$tags[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][1];
+				$colors[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][2];
+				$assess[$moday][$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][3];
+				$names[$k] = $byid['F'.$datetype.$itemsassoc[$item][1]][4];
+				$k++;
+			}
 		}
 	} else if ($itemsassoc[$item][0]=='InlineText') {
-		if (isset($byid['I'.$itemsassoc[$item][1]])) {
-			$moday = $byid['I'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['I'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['I'.$itemsassoc[$item][1]][2];
-			if (isset($itemfolder[$item])) {
-				$assess[$moday][$k] = str_replace('@@@',$itemfolder[$item],$byid['I'.$itemsassoc[$item][1]][3]);
-			} else {
-				$assess[$moday][$k] = str_replace('"@@@"','null',$byid['I'.$itemsassoc[$item][1]][3]);
+		foreach (array('S','E','O') as $datetype) {
+			if (isset($byid['I'.$datetype.$itemsassoc[$item][1]])) {
+				$moday = $byid['I'.$datetype.$itemsassoc[$item][1]][0];
+				$itemidref[$k] = 'I'.$datetype.$itemsassoc[$item][1];
+				$tags[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][1];
+				$colors[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][2];
+				if (isset($itemfolder[$item])) {
+					$assess[$moday][$k] = str_replace('@@@',$itemfolder[$item],$byid['I'.$datetype.$itemsassoc[$item][1]][3]);
+				} else {
+					$assess[$moday][$k] = str_replace('"@@@"','null',$byid['I'.$datetype.$itemsassoc[$item][1]][3]);
+				}
+				$names[$k] = $byid['I'.$datetype.$itemsassoc[$item][1]][4];
+				$k++;
 			}
-			$k++;
 		}
 	} else if ($itemsassoc[$item][0]=='LinkedText') {
-		if (isset($byid['L'.$itemsassoc[$item][1]])) {
-			$moday = $byid['L'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['L'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['L'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['L'.$itemsassoc[$item][1]][3];
-			$k++;
+		foreach (array('S','E','O') as $datetype) {
+			if (isset($byid['L'.$datetype.$itemsassoc[$item][1]])) {
+				$moday = $byid['L'.$datetype.$itemsassoc[$item][1]][0];
+				$itemidref[$k] = 'L'.$datetype.$itemsassoc[$item][1];
+				$tags[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][1];
+				$colors[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][2];
+				$assess[$moday][$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][3];
+				$names[$k] = $byid['L'.$datetype.$itemsassoc[$item][1]][4];
+				$k++;
+			}
 		}
 	} else if ($itemsassoc[$item][0]=='Drill') {
-		if (isset($byid['D'.$itemsassoc[$item][1]])) {
-			$moday = $byid['D'.$itemsassoc[$item][1]][0];
-			$tags[$k] = $byid['D'.$itemsassoc[$item][1]][1];
-			$colors[$k] = $byid['D'.$itemsassoc[$item][1]][2];
-			$assess[$moday][$k] = $byid['D'.$itemsassoc[$item][1]][3];
-			$k++;
+		foreach (array('S','E') as $datetype) {
+			if (isset($byid['D'.$datetype.$itemsassoc[$item][1]])) {
+				$moday = $byid['D'.$datetype.$itemsassoc[$item][1]][0];
+				$itemidref[$k] = 'D'.$datetype.$itemsassoc[$item][1];
+				$tags[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][1];
+				$colors[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][2];
+				$assess[$moday][$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][3];
+				$names[$k] = $byid['D'.$datetype.$itemsassoc[$item][1]][4];
+				$k++;
+			}
 		}
 	}
 
 }
 
-$stm = $DBH->prepare("SELECT title,tag,date FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
+$stm = $DBH->prepare("SELECT title,tag,date,id FROM imas_calitems WHERE date>$exlowertime AND date<$uppertime and courseid=:courseid ORDER BY title");
 $stm->execute(array(':courseid'=>$cid));
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	list($moday,$time) = explode('~',tzdate('n-j~g:i a',$row[2]));
+	list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[2]));
 	$row[0] = htmlentities($row[0], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 	$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	$assess[$moday][$k] = "{type:\"C\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";
+	$assess[$moday][$k] = "{type:\"CD\", typeref:\"$row[3]\", time:\"$time\", tag:\"$row[1]\", name:\"$row[0]\"}";
 	$tags[$k] = $row[1];
+	$names[$k] = $row[0];
+	$colors[$k]='';
+  $itemidref[$k] = 'CD'.$row[3];
 	$k++;
 }
 
@@ -540,22 +609,41 @@ for ($i=0;$i<count($hdrs);$i++) {
 		}
 		if (isset($assess[$ids[$i][$j]])) {
 			foreach ($assess[$ids[$i][$j]] as $k=>$info) {
+				if ($colors[$k]=='') {
+					$style = '';
+				} else {
+					$style = ' style="background-color:'.$colors[$k].'"';
+				}
+				if ($editingon && isset($names[$k])) {
+					$tags[$k] = $names[$k];
+				}
 				//echo $assess[$ids[$i][$j]][$k];
-				if (strpos($info,'type:"AR"')!==false) {
-					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
-				} else if (strpos($info,'type:"A"')!==false) {
-					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
-				} else if (strpos($info,'type:"F')!==false) {
-					echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
-				} else if (strpos($info,'type:"C')!==false) {
-					echo "<span class=\"calitem\" style=\"background-color: #0ff;\">{$tags[$k]}</span> ";
-				} else { //textitems
-					if (isset($tags[$k])) {
-						echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">{$tags[$k]}</span> ";
-					} else {
-						echo "<span class=\"calitem\" style=\"background-color:".$colors[$k].";\">!</span> ";
+				echo "<span class=\"calitem\" id=\"".$itemidref[$k]."\" $style>";
+				if ($editingon) {
+					$type = $itemidref[$k]{1};
+					if ($type=='S') {
+						echo '<span class="icon-startdate"></span>';
+					} else if ($type=='R' && $itemidref[$k]{0}=='A') {
+						echo '<span class="icon-eye2"></span>';
+					} else if ($type=='P') {
+						echo '<span class="icon-forumpost"></span>';
+					} else if ($type=='R' && $itemidref[$k]{0}=='F') {
+						echo '<span class="icon-forumreply"></span>';
 					}
 				}
+				echo '<span class="calitemtitle">';
+				if ($editingon && isset($names[$k])) {
+					echo $names[$k];
+				} else if (isset($tags[$k])) {
+					echo $tags[$k];
+				} else {
+					echo '!';
+				}
+				echo '</span>';
+				if ($editingon && $type=='E') {
+					echo '<span class="icon-enddate"></span>';
+				}
+				echo '</span>';
 			}
 		}
 		echo "</div></div></td>";
