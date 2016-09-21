@@ -465,7 +465,7 @@
 		//DB $query = "SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+		$stm = $DBH->prepare("SELECT id,locked,timelimitmult,section,latepass,lastaccess FROM imas_students WHERE userid=:userid AND courseid=:courseid");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 		if ($line != null) {
@@ -481,7 +481,7 @@
 				exit;
 			} else {
 				$now = time();
-				if (!isset($sessiondata['lastaccess'.$cid])) {
+				if (!isset($sessiondata['lastaccess'.$cid]) || $now-$sessiondata['lastaccess'.$cid] > 24*3600) {
 					//DB $query = "UPDATE imas_students SET lastaccess='$now' WHERE id=$studentid";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_students SET lastaccess=:lastaccess WHERE id=:id");
