@@ -3660,7 +3660,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
 		}
-
 		if ($anstype=='complex') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calccomplex') {
@@ -3741,7 +3740,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$gaparts[0] = floatval($cparts[0]);
 					$gaparts[1] = floatval($cparts[1]);
 				}
-
 				if (count($ansparts)!=count($gaparts)) {
 					break;
 				}
@@ -6294,6 +6292,7 @@ function parsesloppycomplex($v) {
 function parsecomplex($v) {
 	$v = str_replace(' ','',$v);
 	$v = str_replace(array('sin','pi'),array('s$n','p$'),$v);
+	$v = preg_replace('/\((\d+\*?i|i)\)\/(\d+)/','$1/$2',$v);
 	$len = strlen($v);
 	//preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
 	//if (count($matches[0])>1) {
@@ -6345,8 +6344,8 @@ function parsecomplex($v) {
 				} else {
 					return _('error - invalid form');
 				}
-				$imag = str_replace('-*','-',$imag);
-				$imag = str_replace('+*','+',$imag);
+				$imag = str_replace('-*','-1*',$imag);
+				$imag = str_replace('+*','+1*',$imag);
 			} else if ($p-$L>1) {
 				$imag = substr($v,$L,$p-$L);
 				$real = substr($v,0,$L) . substr($v,$p+1);
@@ -6381,6 +6380,7 @@ function parsecomplex($v) {
 			} else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
 				$imag = $imag{0}.'1'.substr($imag,1);
 			}
+			$imag = str_replace('*/','/',$imag);
 			if (substr($imag,-1)=='*') {
 				$imag = substr($imag,0,-1);
 			}
