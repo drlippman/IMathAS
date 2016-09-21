@@ -84,10 +84,9 @@ if (isset($_POST['tname'])) {
         $query .= "AND groupid=:groupid2";
         $qarr[':groupid2'] = $groupid;
 			}
+			$stm = $DBH->prepare($query);
+	    $stm->execute($qarr);
 		}
-
-    $stm = $DBH->prepare($query);
-    $stm->execute($qarr);
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 	}
