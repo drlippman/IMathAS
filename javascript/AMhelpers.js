@@ -612,6 +612,7 @@ function complexcalc(inputId,outputId,format) {
 function parsecomplex(v) {
 	var real,imag,c,nd,p,R,L;
 	v = v.replace(/\s/,'');
+	v = v.replace(/\((\d+\*?i|i)\)\/(\d+)/g,'$1/$2');
 	v = v.replace(/sin/,'s$n');
 	v = v.replace(/pi/,'p$');
 	var len = v.length;
@@ -651,8 +652,19 @@ function parsecomplex(v) {
 				}
 			}
 			//which is bigger?
-			if (p-L>1 && R-p>1) {
-				return _('error - invalid form');
+			if (p-L>0 && R-p>0 && (R==len || L==0)) {
+				if (R==len) { //real + AiB
+					real = v.substr(0,L);
+					imag = v.substr(L,p-L);
+				} else if (L==0) {
+					real = v.substr(R);
+					imag = v.substr(0,p);
+				} else {
+					return _('error - invalid form');
+				}
+				imag += '*'+v.substr(p+1+(v.charAt(p+1)=='*'?1:0),R-p-1);
+				imag = imag.replace("-*","-1*").replace("+*","+1*");
+				imag = imag.replace(/(\+|-)1\*(.+)/g,'$1$2');
 			} else if (p-L>1) {
 				imag = v.substr(L,p-L);
 				real = v.substr(0,L) + v.substr(p+1);
@@ -701,6 +713,7 @@ function parsecomplex(v) {
 		real = real.replace("p$","pi");
 		imag = imag.replace("s$n","sin");
 		imag = imag.replace("p$","pi");
+		imag = imag.replace(/\*\//g,"/");
 		return [real,imag];
 	}
 }
