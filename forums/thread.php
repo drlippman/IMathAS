@@ -243,7 +243,7 @@ if (isset($_GET['search']) && trim($_GET['search'])!='') {
 		//DB $query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
 		$query = "SELECT imas_forums.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.isanon FROM imas_forum_posts,imas_forums,imas_users ";
 		$query .= "WHERE imas_forum_posts.forumid=imas_forums.id ";
-		$array = [];
+		$array = array();
 		if (!$canviewall) {
 			//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) AND (imas_forums.settings&16)=0 ";
 			$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) AND (imas_forums.settings&16)=0 ";

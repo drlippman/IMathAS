@@ -15,7 +15,7 @@ $now = time();
 //DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime FROM imas_forum_threads ";
 $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-$array =[];
+$array = array();
 if (!isset($teacherid)) {
   $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 }
@@ -79,7 +79,7 @@ if (isset($_GET['markallread'])) {
         //DB $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
         //DB $query .= ",('$userid','$tid',$now)";
         $query = "INSERT INTO imas_forum_views (userid,threadid,lastview) VALUES ";
-        $array =[];
+        $array = array();
 
         $first = true;
         foreach($toinsert as $i=>$tid) {
