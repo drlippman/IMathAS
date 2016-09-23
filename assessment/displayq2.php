@@ -2532,10 +2532,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if ($snaptogrid>0) {
 			list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
-			if (($newwidth - $settings[6])/$settings[6]<.1) {
+			if (abs($newwidth - $settings[6])/$settings[6]<.1) {
 				$settings[6] = $newwidth;
 			}
-			if (($newheight- $settings[7])/$settings[7]<.1) {
+			if (abs($newheight- $settings[7])/$settings[7]<.1) {
 				$settings[7] = $newheight;
 			}
 		}
