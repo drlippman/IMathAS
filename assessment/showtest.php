@@ -1421,11 +1421,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['timelimit']>0 && !$isreview && !$superdone) {
 		$now = time();
 		$totremaining = $testsettings['timelimit']-($now - $starttime);
-		$remaining = $totremaining;
-		if ($timebeforedue < $remaining) {
-			$remaining = $timebeforedue - 5;
+		if ($timebeforedue < $totremaining) {
+			$totremaining = $timebeforedue - 5;
 			$restrictedtimelimit = true;
 		}
+		$remaining = $totremaining;
 		if ($testsettings['timelimit']>3600) {
 			$tlhrs = floor($testsettings['timelimit']/3600);
 			$tlrem = $testsettings['timelimit'] % 3600;
@@ -1459,6 +1459,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$remaining = $remaining - 60*$minutes;
 		} else {$minutes=0;}
 		$seconds = $remaining;
+		if ($minutes<10 && $hours>0) {
+			$minutes = "0".$minutes;
+		}
+		if ($seconds<10) {
+			$seconds = "0".$seconds;
+		}
 		echo "<div class=right id=timelimitholder><span id=\"timercontent\">", _('Timelimit'), ": $tlwrds. ";
 		if (!isset($_GET['action']) && $restrictedtimelimit) {
 			echo '<span style="color:#0a0;">', _('Time limit shortened because of due date'), '</span> ';
