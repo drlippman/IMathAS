@@ -86,16 +86,18 @@ if (!(isset($teacherid)) && $myrights<75) {
 
 	//DB $query = "SELECT id,description,qtype FROM imas_questionset WHERE id IN ($clist)";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$stm = $DBH->query("SELECT id,description,qtype FROM imas_questionset WHERE id IN ($clist)");
 	$i=0;
 	$page_pChecked = array();
 
 	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
-		$page_pChecked[$i]['id'] = $line['id'];
-		$page_pChecked[$i]['description'] = $line['description'];
-		$page_pChecked[$i]['qtype'] = $line['qtype'];
-		$i++;
+	if (count($checked)>0) {
+		$stm = $DBH->query("SELECT id,description,qtype FROM imas_questionset WHERE id IN ($clist)");
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$page_pChecked[$i]['id'] = $line['id'];
+			$page_pChecked[$i]['description'] = $line['description'];
+			$page_pChecked[$i]['qtype'] = $line['qtype'];
+			$i++;
+		}
 	}
 
 	//GRAB LIST OF LIBS/QUESTIONS, USED IN STEP 1 AND 2
