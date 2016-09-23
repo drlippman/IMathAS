@@ -6317,6 +6317,7 @@ function parsecomplex($v) {
 					break;
 				}
 			}
+			if ($L<0) {$L=0;}
 			//look right
 			$nd = 0;
 
