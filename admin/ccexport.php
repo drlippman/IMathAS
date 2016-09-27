@@ -389,7 +389,7 @@ if (isset($_GET['delete'])) {
 						$stm2->execute(array(':assessmentid'=>$iteminfo[$item][1]));
 						$totalpossible = 0;
 						//DB while ($r = mysql_fetch_row($result2)) {
-						while ($r = $stm->fetch(PDO::FETCH_NUM)) {
+						while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 								if ($r[0]==9999) {
 									$totalpossible += $aitemcnt[$k]*$row[2]; //use defpoints
