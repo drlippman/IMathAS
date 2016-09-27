@@ -10,6 +10,10 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
+function lensort($a,$b) {
+	return strlen($b)-strlen($a);
+}
+
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
 	global $DBH, $imasroot, $myrights, $showtips, $urlmode, $CFG;
@@ -1710,6 +1714,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (count($ovar)==0) {
 			$ovar[] = "x";
 		}
+
+		usort($variables,'lensort');
+		usort($ofunc,'lensort');
 		$vlist = implode("|",$variables);
 		$flist = implode('|',$ofunc);
 		$out .= "<script type=\"text/javascript\">functoproc[$qn] = 1; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
@@ -4039,13 +4046,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
 			}
 		}
-		if (count($ofunc)>0) {
-			$flist = implode("|",$ofunc);
-			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
-		}
 		if (($v = array_search('E', $variables))!==false) {
 			$variables[$v] = 'varE';
 			$answer = str_replace('E','varE',$answer);
+		}
+		usort($variables,'lensort');
+
+		if (count($ofunc)>0) {
+			usort($ofunc,'lensort');
+			$flist = implode("|",$ofunc);
+			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
 		}
 		$vlist = implode("|",$variables);
 

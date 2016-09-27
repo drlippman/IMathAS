@@ -9,7 +9,7 @@ var arccsc = function(x) { return arcsin(1/x) };
 var arccot = function(x) { return arctan(1/x) };
 var sinh = function(x) { return (Math.exp(x)-Math.exp(-x))/2 };
 var cosh = function(x) { return (Math.exp(x)+Math.exp(-x))/2 };
-var tanh = 
+var tanh =
   function(x) { return (Math.exp(x)-Math.exp(-x))/(Math.exp(x)+Math.exp(-x)) };
 var sech = function(x) { return 1/cosh(x) };
 var csch = function(x) { return 1/sinh(x) };
@@ -115,25 +115,25 @@ function mathjs(st,varlist) {
 	  var reg = new RegExp("([^a-df-zA-Z#])("+varlist+")([^a-df-zA-Z#])","g");
 	  st = st.replace(reg,"$1($2)$3");
 	  var reg = new RegExp("([^a-df-zA-Z#\(])("+varlist+")([^a-df-zA-Z#\)])","g"); //do second time for overlap, like 5x+f(3)
-	  st = st.replace(reg,"$1($2)$3");	  
+	  st = st.replace(reg,"$1($2)$3");
 	  var reg = new RegExp("^("+varlist+")([^a-df-zA-Z])","g");
 	  st = st.replace(reg,"($1)$2");
 	  var reg = new RegExp("([^a-df-zA-Z])("+varlist+")$","g");
 	  st = st.replace(reg,"$1($2)");
-	  st = st.replace(new RegExp("\(("+varlist+")\)","g"), function(match) {
-		for (var i=0; i<vararr.length;i++) {
-			if (vararr[i]==match) { return '(@v'+i+'@)';}	//esc var so regex's below don't interfere
+	  st = st.replace(new RegExp("\\(("+varlist+")\\)","g"), function(match,p1) {
+		 for (var i=0; i<vararr.length;i++) {
+			if (vararr[i]==p1) { return '(@v'+i+'@)';}	//esc var so regex's below don't interfere
 		 }});
 	  st = st.replace(/@(\d+)@/g, indextofunc);
   }
-  
+
   st = st.replace(/([0-9])\s+([0-9])/g,"$1*$2");
   st = st.replace(/#/g,"");
   st = st.replace(/\s/g,"");
   st = st.replace(/log_([a-zA-Z\d\.]+)\(/g,"nthlog($1,");
   st = st.replace(/log_\(([a-zA-Z\/\d\.]+)\)\(/g,"nthlog($1,");
   st = st.replace(/log/g,"logten");
-  
+
   if (st.indexOf("^-1")!=-1) {
     st = st.replace(/sin\^-1/g,"arcsin");
     st = st.replace(/cos\^-1/g,"arccos");
@@ -152,26 +152,26 @@ function mathjs(st,varlist) {
   st = st.replace(/root\((\d+)\)\(/g,"nthroot($1,");
   //st = st.replace(/E/g,"(EE)");
   st = st.replace(/([0-9])E([\-0-9])/g,"$1(EE)$2");
-  
+
   st = st.replace(/^e$/g,"(E)");
   st = st.replace(/pi/g,"(pi)");
-  
+
   st = st.replace(/@v(\d+)@/g, function(match,contents) {
   	return vararr[contents];
        });
-  
+
   st = st.replace(/^e([^a-zA-Z])/g,"(E)$1");
   st = st.replace(/([^a-zA-Z])e$/g,"$1(E)");
-  
+
   st = st.replace(/([^a-zA-Z])e(?=[^a-zA-Z])/g,"$1(E)");
   st = st.replace(/([0-9])([\(a-zA-Z])/g,"$1*$2");
   st = st.replace(/(!)([0-9\(])/g,"$1*$2");
   //want to keep scientific notation
   st= st.replace(/([0-9])\*\(EE\)([\-0-9])/,"$1e$2");
 
-  
+
   st = st.replace(/\)([\(0-9a-zA-Z]|\.\d+)/g,"\)*$1");
-  
+
   var i,j,k, ch, nested;
   while ((i=st.indexOf("^"))!=-1) {
 
@@ -201,7 +201,7 @@ function mathjs(st,varlist) {
       j--;
       while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
-    } else { 
+    } else {
       return "Error: incorrect syntax in "+st+" at position "+j;
     }
     //find right argument
@@ -240,7 +240,7 @@ function mathjs(st,varlist) {
 		k++;
 	      }
       }
-    } else { 
+    } else {
       return "Error: incorrect syntax in "+st+" at position "+k;
     }
     st = st.slice(0,j+1)+"safepow("+st.slice(j+1,i)+","+st.slice(i+1,k)+")"+
@@ -273,11 +273,10 @@ function mathjs(st,varlist) {
       j--;
       while (j>=0 && ((ch=st.charAt(j))>="a" && ch<="z" || ch>="A" && ch<="Z"))
         j--;
-    } else { 
+    } else {
       return "Error: incorrect syntax in "+st+" at position "+j;
     }
     st = st.slice(0,j+1)+"factorial("+st.slice(j+1,i)+")"+st.slice(i+1);
   }
   return st;
 }
-
