@@ -1015,6 +1015,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 			echo "<p>", _('<a href="showtest.php?regenall=missed">Try similar problems</a> for all questions with less than perfect scores where allowed.'), "</p>";
 		}
 	}
+	if (!$noscores) {
+		echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
+	}
 }
 
 function embedshowicon($qn) {

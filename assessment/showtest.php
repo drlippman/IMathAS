@@ -1861,9 +1861,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 						echo "</p>";
 					}
 					if (hasreattempts($next)) {
-						//if ($showeachscore) {
+						if ($reattemptduring) {
 							echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">", _('Reattempt this question'), "</a></p>\n";
-						//}
+						}
 						$reattemptsremain = true;
 					}
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
