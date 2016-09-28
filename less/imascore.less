@@ -1,3 +1,11 @@
+//The file less/imascore.less is the LESS source file for 
+// generating imascore.css 
+//Rather than edit imascore.css, edit less/imascore.less
+// and run "grunt less".
+//See http://lesscss.org/features/ for LESS preprocessor syntax.
+
+@import "headercomments";
+
 html {
 	
 }
@@ -293,24 +301,6 @@ table.cal {
 	border-collapse: collapse;
 	width: 100%;
 }
-table.cal thead th {
-	text-align: center;
-	background-color: #ddf;
-	border: 1px solid #000;
-}
-table.cal td {
-	border: 1px solid #000;
-	width: 14%;
-	height: 2.5em;
-	vertical-align: top;
-}
-.day {
-	font-size: 80%;
-	background-color: #ddf;
-}
-.today {
-	background-color: #fdd;
-}
 div.center {
 	text-align: center;
 }
@@ -326,7 +316,7 @@ div.td {
 }
 */
 img.faded {
-	filter: alpha(opacity: 30);
+	filter: alpha(opacity=30);
 	KHTMLOpacity: .3;
 	MozOpacity: .3;
 	opacity: .3;
