@@ -10,6 +10,7 @@ $allowedmacros = $mathfuncs;
 require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
+
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
 	global $DBH, $imasroot, $myrights, $showtips, $urlmode, $CFG;
@@ -1710,6 +1711,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (count($ovar)==0) {
 			$ovar[] = "x";
 		}
+
+		usort($variables,'lensort');
+		usort($ofunc,'lensort');
 		$vlist = implode("|",$variables);
 		$flist = implode('|',$ofunc);
 		$out .= "<script type=\"text/javascript\">functoproc[$qn] = 1; vlist[$qn]=\"$vlist\"; flist[$qn]=\"$flist\";</script>\n";
@@ -2532,10 +2536,10 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		if ($snaptogrid>0) {
 			list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
-			if (($newwidth - $settings[6])/$settings[6]<.1) {
+			if (abs($newwidth - $settings[6])/$settings[6]<.1) {
 				$settings[6] = $newwidth;
 			}
-			if (($newheight- $settings[7])/$settings[7]<.1) {
+			if (abs($newheight- $settings[7])/$settings[7]<.1) {
 				$settings[7] = $newheight;
 			}
 		}
@@ -3660,7 +3664,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt);
 		}
-
 		if ($anstype=='complex') {
 			$GLOBALS['partlastanswer'] = $givenans;
 		} else if ($anstype=='calccomplex') {
@@ -3741,7 +3744,6 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$gaparts[0] = floatval($cparts[0]);
 					$gaparts[1] = floatval($cparts[1]);
 				}
-
 				if (count($ansparts)!=count($gaparts)) {
 					break;
 				}
@@ -4041,13 +4043,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
 			}
 		}
-		if (count($ofunc)>0) {
-			$flist = implode("|",$ofunc);
-			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
-		}
 		if (($v = array_search('E', $variables))!==false) {
 			$variables[$v] = 'varE';
 			$answer = str_replace('E','varE',$answer);
+		}
+		usort($variables,'lensort');
+
+		if (count($ofunc)>0) {
+			usort($ofunc,'lensort');
+			$flist = implode("|",$ofunc);
+			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
 		}
 		$vlist = implode("|",$variables);
 
@@ -5109,17 +5114,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			}
 
 			$scores = array();
-			if ((count($dots)+count($odots))==0) {
-				$extradots = 0;
-			} else {
-				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
-			}
 
 			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($dots); $i++) {
 					if (($dots[$i][0]-$ansdot[0])*($dots[$i][0]-$ansdot[0]) + ($dots[$i][1]-$ansdot[1])*($dots[$i][1]-$ansdot[1]) <= 25*max(1,$reltolerance)) {
-						$scores[$key] = 1-$extradots;
+						$scores[$key] = 1;
 						break;
 					}
 				}
@@ -5128,7 +5128,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($odots); $i++) {
 					if (($odots[$i][0]-$ansodot[0])*($odots[$i][0]-$ansodot[0]) + ($odots[$i][1]-$ansodot[1])*($odots[$i][1]-$ansodot[1]) <= 25*max(1,$reltolerance)) {
-						$scores[$key] = 1-$extradots;
+						$scores[$key] = 1;
 						break;
 					}
 				}
@@ -5402,8 +5402,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					break;
 				}
 			}
-			$extrastuffpenalty = max((count($tplines)-count($answers))/(max(count($answers),count($tplines))),0);
-
+			$extrastuffpenalty = max((count($tplines)+count($dots)+count($odots)-count($answers))/(max(count($answers),count($tplines)+count($dots)+count($odots))),0);
 		} else if ($answerformat[0]=="inequality") {
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
 			/*$x1 = 1/3*$settings[0] + 2/3*$settings[1];
@@ -5629,6 +5628,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			} else {
 				$extradots = max((count($dots) + count($odots) - count($ansdots) - count($ansodots))/(count($dots)+count($odots)),0);
 			}
+
 			$defpttol = 5;
 			foreach ($ansdots as $key=>$ansdot) {
 				$scores[$key] = 0;
@@ -6294,6 +6294,7 @@ function parsesloppycomplex($v) {
 function parsecomplex($v) {
 	$v = str_replace(' ','',$v);
 	$v = str_replace(array('sin','pi'),array('s$n','p$'),$v);
+	$v = preg_replace('/\((\d+\*?i|i)\)\/(\d+)/','$1/$2',$v);
 	$len = strlen($v);
 	//preg_match_all('/(\bi|i\b)/',$v,$matches,PREG_OFFSET_CAPTURE);
 	//if (count($matches[0])>1) {
@@ -6318,6 +6319,7 @@ function parsecomplex($v) {
 					break;
 				}
 			}
+			if ($L<0) {$L=0;}
 			//look right
 			$nd = 0;
 
@@ -6345,8 +6347,8 @@ function parsecomplex($v) {
 				} else {
 					return _('error - invalid form');
 				}
-				$imag = str_replace('-*','-',$imag);
-				$imag = str_replace('+*','+',$imag);
+				$imag = str_replace('-*','-1*',$imag);
+				$imag = str_replace('+*','+1*',$imag);
 			} else if ($p-$L>1) {
 				$imag = substr($v,$L,$p-$L);
 				$real = substr($v,0,$L) . substr($v,$p+1);
@@ -6381,6 +6383,7 @@ function parsecomplex($v) {
 			} else if (($imag{0}=='+' || $imag{0}=='-') && $imag{1}=='/') {
 				$imag = $imag{0}.'1'.substr($imag,1);
 			}
+			$imag = str_replace('*/','/',$imag);
 			if (substr($imag,-1)=='*') {
 				$imag = substr($imag,0,-1);
 			}

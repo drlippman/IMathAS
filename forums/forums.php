@@ -338,7 +338,7 @@ if ($searchtype == 'thread') {
 	$query = "SELECT imas_forums.id AS forumid,imas_forum_posts.id,imas_forum_posts.threadid,imas_forum_posts.subject,imas_forum_posts.message,imas_users.FirstName,imas_users.LastName,imas_forum_posts.postdate,imas_forums.name,imas_forum_posts.files,imas_forum_posts.isanon ";
 	$query .= "FROM imas_forum_posts JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id ";
 	$query .= "JOIN imas_users ON imas_users.id=imas_forum_posts.userid ";
-	$array= [];
+	$array = array();
 	if ($anyforumsgroup && !$isteacher) {
 		$query .= "JOIN imas_forum_threads ON imas_forum_threads.id=imas_forum_posts.threadid ";
 	}

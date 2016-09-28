@@ -36,7 +36,7 @@
 				}
 
 				if (isset($CFG['GEN']['newpasswords'])) {
-					require_once("../includes/password.php");
+					require_once("./includes/password.php");
 					$md5pw = password_hash($_POST['password'], PASSWORD_DEFAULT);
 				} else {
 					$md5pw = md5($_POST['password']);
@@ -48,7 +48,7 @@
 				$query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, homelayout) ";
 				$query .= "VALUES (:SID, :password, :rights, :FirstName, :LastName, :email, :homelayout);";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':SID'=>$_POST['username'], ':password'=>$md5pw, ':rights'=>0, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':homelayout'=>$homelayout));
+				$stm->execute(array(':SID'=>$_POST['username'], ':password'=>$md5pw, ':rights'=>12, ':FirstName'=>$_POST['firstname'], ':LastName'=>$_POST['lastname'], ':email'=>$_POST['email'], ':homelayout'=>$homelayout));
 				$newuserid = $DBH->lastInsertId();
 				if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 					$valbits = array();

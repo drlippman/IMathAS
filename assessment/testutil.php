@@ -1000,7 +1000,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 		echo "<p>", _('Assessment is complete with perfect score.'), "</p>";
 	}
 	if ($hasreattempts) {
-		if ($noindivscores) {
+		if ($noscores) {
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions where allowed'), "</p>";
+		} else if ($noindivscores) {
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
 		} else {
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions missed where allowed'), "</p>";
@@ -1014,6 +1016,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 		} else {
 			echo "<p>", _('<a href="showtest.php?regenall=missed">Try similar problems</a> for all questions with less than perfect scores where allowed.'), "</p>";
 		}
+	}
+	if (!$noscores) {
+		echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 	}
 }
 

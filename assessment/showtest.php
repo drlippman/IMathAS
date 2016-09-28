@@ -584,13 +584,13 @@
 			$testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
 		}
 	}
-	
+
 	if (($introjson=json_decode($testsettings['intro'],true))!==null) { //is json intro
-		$testsettings['intro'] = $introjson[0];		
+		$testsettings['intro'] = $introjson[0];
 	} else {
 		$introjson = array();
 	}
-	
+
 	if (!$isteacher) {
 		$rec = "data-base=\"assessintro-{$line['assessmentid']}\" ";
 		$testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);
@@ -783,7 +783,7 @@
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 					//$scores[$i] = -1;
-					if ($noindivscores) { //clear scores if
+					if ($noindivscores && !$reattemptduring) { //clear scores if could have viewed
 						$bestscores[$i] = -1;
 						$bestrawscores[$i] = -1;
 					}
@@ -1421,11 +1421,11 @@ if (!isset($_REQUEST['embedpostback'])) {
 	if ($testsettings['timelimit']>0 && !$isreview && !$superdone) {
 		$now = time();
 		$totremaining = $testsettings['timelimit']-($now - $starttime);
-		$remaining = $totremaining;
-		if ($timebeforedue < $remaining) {
-			$remaining = $timebeforedue - 5;
+		if ($timebeforedue < $totremaining) {
+			$totremaining = $timebeforedue - 5;
 			$restrictedtimelimit = true;
 		}
+		$remaining = $totremaining;
 		if ($testsettings['timelimit']>3600) {
 			$tlhrs = floor($testsettings['timelimit']/3600);
 			$tlrem = $testsettings['timelimit'] % 3600;
@@ -1459,6 +1459,12 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$remaining = $remaining - 60*$minutes;
 		} else {$minutes=0;}
 		$seconds = $remaining;
+		if ($minutes<10 && $hours>0) {
+			$minutes = "0".$minutes;
+		}
+		if ($seconds<10) {
+			$seconds = "0".$seconds;
+		}
 		echo "<div class=right id=timelimitholder><span id=\"timercontent\">", _('Timelimit'), ": $tlwrds. ";
 		if (!isset($_GET['action']) && $restrictedtimelimit) {
 			echo '<span style="color:#0a0;">', _('Time limit shortened because of due date'), '</span> ';
@@ -1525,7 +1531,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 	} else {
 		$introhaspages = ($testsettings['displaymethod'] == "Embed" && strpos($testsettings['intro'],'[PAGE')!==false);
 	}
-	
+
 	if (isset($_GET['action'])) {
 		if ($_GET['action']=="skip" || $_GET['action']=="seq") {
 			echo '<div class="right"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
@@ -1638,6 +1644,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$toshow+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Continue'), '" />';
@@ -1855,9 +1869,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 						echo "</p>";
 					}
 					if (hasreattempts($next)) {
-						//if ($showeachscore) {
+						if ($reattemptduring) {
 							echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">", _('Reattempt this question'), "</a></p>\n";
-						//}
+						}
 						$reattemptsremain = true;
 					}
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
@@ -2030,7 +2044,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 					}
 					echo '<hr class="seq"/>';
 				}
-
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 			}
 		} else if ($_GET['action']=='embeddone') {
 			$shown = showscores($questions,$attempts,$testsettings);
@@ -2437,7 +2458,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
 		}
 		if ($testsettings['isgroup']>0) {
-			$testsettings['intro'] .= "<p><span style=\"color:red;\">" . _('This is a group assessment.  Any changes effect all group members.') . "</span><br/>";
+			$testsettings['intro'] .= "<p><span style=\"color:red;\">" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
 			if (!$isteacher || isset($sessiondata['actas'])) {
 				$testsettings['intro'] .= _('Group Members:') . " <ul>";
 
@@ -2480,10 +2501,26 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$numdisplayed = 0;
 
 			for ($i = 0; $i < count($questions); $i++) {
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				if (unans($bestscores[$i]) || amreattempting($i) || unans($scores[$i])) {
 					basicshowq($i);
 					showqinfobar($i,true,false,1);
 					$numdisplayed++;
+				}
+			}
+			if (isset($intropieces)) {
+				foreach ($introdividers as $k=>$v) {
+					if ($v[1]==$i+1) {//right divider
+						echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+						break;
+					}
 				}
 			}
 			$reattempting = array();
@@ -2515,6 +2552,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				basicshowq($i);
 				showqinfobar($i,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Next'), '" />';
@@ -2609,6 +2654,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 					}
 
 					echo '<hr class="seq"/>';
+				}
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
 				}
 				echo '</form>';
 			}

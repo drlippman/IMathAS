@@ -3401,4 +3401,8 @@ function sign($a,$str=false) {
 	}
 }
 
+function lensort($a,$b) {
+	return strlen($b)-strlen($a);
+}
+
 ?>

@@ -191,11 +191,11 @@ ini_set("post_max_size", "10485760");
 							if (count($keylist)>1) {
 								//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
-								$array = [':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']];
+								$array = array(':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']);
 							} else {
 								//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
-								$array = [':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':latepass'=>$line['deflatepass']];
+								$array = array(':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':latepass'=>$line['deflatepass']);
 							}
 							$stm = $DBH->prepare($query);
 							$stm->execute($array);
@@ -538,11 +538,11 @@ ini_set("post_max_size", "10485760");
 					if (count($keylist)>1) {
 						//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_POST['cid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 						$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
-						$array = [':uid'=>$userid, ':cid'=>$_POST['cid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']];
+						$array = array(':uid'=>$userid, ':cid'=>$_POST['cid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']);
 					} else {
 						//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_POST['cid']}','{$line['deflatepass']}');";
 						$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
-						$array = [':uid'=>$userid, ':cid'=>$_POST['cid'], ':latepass'=>$line['deflatepass']];
+						$array = array(':uid'=>$userid, ':cid'=>$_POST['cid'], ':latepass'=>$line['deflatepass']);
 					}
 					$stm = $DBH->prepare($query);
 					$stm->execute($array);

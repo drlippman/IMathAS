@@ -879,7 +879,7 @@ function copyrubrics($offlinerubrics=array()) {
 			//DB $rub = "'".implode("','",$rubrow)."'";
 			//DB $query = "INSERT INTO imas_rubrics (ownerid,groupid,name,rubrictype,rubric) VALUES ";
 						//DB $query .= "($userid,-1,$rub)";
-			$rub_ins_stm->execute(array(':ownerid'=>$ownerid, ':name'=>$srcrub['name'], ':rubrictype'=>$srcrub['rubrictype'], ':rubric'=>$srcrub['rubric']));
+			$rub_ins_stm->execute(array(':ownerid'=>$userid, ':name'=>$srcrub['name'], ':rubrictype'=>$srcrub['rubrictype'], ':rubric'=>$srcrub['rubric']));
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $newid = mysql_insert_id();
 			$newid = $DBH->lastInsertId();

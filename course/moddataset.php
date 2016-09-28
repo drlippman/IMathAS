@@ -92,7 +92,7 @@
 		//DB $_POST['control'] = addslashes(stripsmartquotes(stripslashes($_POST['control'])));
 		//DB $_POST['qcontrol'] = addslashes(stripsmartquotes(stripslashes($_POST['qcontrol'])));
 		//DB $_POST['solution'] = stripsmartquotes(stripslashes($_POST['solution']));
-		foreach (['qcontrol','answer','solution'] as $v) {
+		foreach (array('qcontrol','answer','solution') as $v) {
 			if (!isset($_POST[$v])) {$_POST[$v] = '';}
 		}
 		$_POST['qtext'] = stripsmartquotes($_POST['qtext']);

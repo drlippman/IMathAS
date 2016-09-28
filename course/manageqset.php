@@ -1016,7 +1016,7 @@ if ($myrights<20) {
       $qarr[] = $userid;
     }
 		$query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id ";
-		if ($searchall==1) {
+		if ($searchall==1 || (($isadmin || $isgrpadmin) && $llist{0}=='0')) {
 			$query .= " LIMIT 300";
 		}
 		//DB $resultLibs = mysql_query($query) or die("Query failed : " . mysql_error
@@ -1505,7 +1505,7 @@ function getnextprev(formn,loc) {
 				$ln++;
 			}
 		}
-		if ($searchall==1 && $searchlimited) {
+		if ($searchlimited) {
 			echo '<tr><td></td><td><i>'._('Search cut off at 300 results').'</i></td></tr>';
 		}
 		echo "</tbody></table>\n";

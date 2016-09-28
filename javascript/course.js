@@ -95,16 +95,11 @@ function toggleblock(event,bnum,folder) {
 function showcalcontents(el) {
 	var html = '';
 	if (typeof el == 'number') {
-		var calwalk = new Date();
-		//calwalk.setTime(el);
-		//for (var j=0; j<28; j++) {
 		for (moday in caleventsarr) {
-			//moday = (calwalk.getMonth()+1) + '-' + (calwalk.getDate());
 			if (caleventsarr[moday].data!=null) {
 				html += '<div style="background-color:#ddf;">'+caleventsarr[moday].date + '</div>';
 				html += showcalcontentsid(moday);
 			}
-			//calwalk.setDate(calwalk.getDate()+1);
 		}
 
 	} else if (caleventsarr[el.id]!=null) {
@@ -119,12 +114,9 @@ function showcalcontents(el) {
 	}
 
 	document.getElementById('caleventslist').innerHTML = html;
-	var alltd = document.getElementsByTagName("td");
-	for (var i=0;i<alltd.length;i++) {
-		alltd[i].style.backgroundColor = '#fff';
-	}
+	$("table.cal td").removeClass("today");
 	if (typeof el != 'number') {
-		el.style.backgroundColor = '#fdd';
+		$(el).addClass("today");
 	}
 }
 
@@ -133,8 +125,17 @@ function showcalcontentsid(elid) {
 	if (caleventsarr[elid].data!=null) {
 		html += '<ul class=qview style="margin-top: 2px;">';
 		for (var i=0; i<caleventsarr[elid].data.length; i++) {
-			if (caleventsarr[elid].data[i].type=='A') {
-				html += '<li><span class="calitem" style="background-color:'+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
+			if (!caleventsarr[elid].data[i].hasOwnProperty("time")) {
+				//minimal listing for editing purposes
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
+				html += caleventsarr[elid].data[i].name;
+				if (caleventsarr[elid].data[i].type.charAt(1)=='S') {
+					html += ". " + _("Available After Date");
+				} else if (caleventsarr[elid].data[i].type.charAt(1)=='E') {
+					html += ". " + _("Available Until Date");
+				}
+			} else if (caleventsarr[elid].data[i].type=='AE') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null && !caleventsarr[elid].data[i].hasOwnProperty('inactive')) {
 					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'"';
 					if (caleventsarr[elid].data[i].timelimit!=null) {
@@ -162,10 +163,10 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='AR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+';padding: 0px 5px 0px 5px;">'+caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) {
 					//html += '<a onclick="recclick(\'assessviacal\','+caleventsarr[elid].data[i].id+',\''+caleventsarr[elid].data[i].id+'\');" ';
-					html += 'href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
+					html += '<a href="../assessment/showtest.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
 				} else {
 					html += caleventsarr[elid].data[i].name;
@@ -176,8 +177,8 @@ function showcalcontentsid(elid) {
 					html += ' <a href="isolateassessgrade.php?cid='+cid+'&aid='+caleventsarr[elid].data[i].id+'">Grades</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='I') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type.charAt(0)=='I') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].folder != null) {
 					html += '<a href="../course/course.php?cid='+cid+'&folder='+caleventsarr[elid].data[i].folder+'#inline'+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -188,8 +189,8 @@ function showcalcontentsid(elid) {
 					html += ' <a href="addinlinetext.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='L') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type.charAt(0)=='L') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) {
 
 					if (caleventsarr[elid].data[i].link=='') {
@@ -214,7 +215,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FP') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) {
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -233,7 +234,7 @@ function showcalcontentsid(elid) {
 				}
 				html += '</li>';
 			} else if (caleventsarr[elid].data[i].type=='FR') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id!=null) {
 					html += '<a href="../forums/thread.php?cid='+cid+'&forum='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -251,8 +252,8 @@ function showcalcontentsid(elid) {
 					html += ' <a href="addforum.php?cid='+cid+'&id='+caleventsarr[elid].data[i].id+'">Modify</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='D') {
-				html += '<li><span class="calitem" style="background-color: '+caleventsarr[elid].data[i].color+'; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type=='DE') {
+				html += '<li><span class="calitem" '+(caleventsarr[elid].data[i].color==""?"":('style="background-color:'+caleventsarr[elid].data[i].color+'"'))+'>'+ caleventsarr[elid].data[i].tag+'</span> ';
 				if (caleventsarr[elid].data[i].id != null) {
 					html += '<a href="../course/drillassess.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">';
 					html += caleventsarr[elid].data[i].name + '</a>';
@@ -264,8 +265,8 @@ function showcalcontentsid(elid) {
 					html += ' <a href="gb-viewdrill.php?cid='+cid+'&daid='+caleventsarr[elid].data[i].id+'">Scores</a>';
 				}
 				html += '</li>';
-			} else if (caleventsarr[elid].data[i].type=='C') {
-				html += '<li><span class="calitem" style="background-color: #0ff; padding: 0px 5px 0px 5px;">'+ caleventsarr[elid].data[i].tag+'</span> ';
+			} else if (caleventsarr[elid].data[i].type=='CD') {
+				html += '<li><span class="calitem">'+ caleventsarr[elid].data[i].tag+'</span> ';
 				html += caleventsarr[elid].data[i].name;
 				html += '</li>';
 			}

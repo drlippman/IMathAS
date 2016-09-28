@@ -666,13 +666,16 @@ function enditem($canedit) {
 				   } else {
 					   $tlwrds = '';
 				   }
-
 				   echo "<div class=title><b><a href=\"../assessment/showtest.php?id=$typeid&cid=$cid\" ";
 				   /*if (isset($studentid)) {
 				   	   echo "data-base=\"assess-$typeid\" ";
 				   }*/ //moved to showtest
 				   if ($tlwrds != '') {
-					   echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
+						 if ($line['timelimit'] > $line['enddate'] - $now) {
+							 echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s, but that will be restricted by the upcoming due date. Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
+						 } else {
+							 echo "onclick='return confirm(\"", sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds), "\")' ";
+						 }
 				   }
 				   echo ">{$line['name']}</a></b>";
 				   if ($line['enddate']!=2000000000) {
