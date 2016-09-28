@@ -152,13 +152,15 @@
 	echo "<div class=breadcrumb>Print Ready Version</div>";
 
 	if (($introjson=json_decode($testsettings['intro'],true))!==null) { //is json intro
-		$testsettings['intro'] = $introjson[0];		
+		$testsettings['intro'] = $introjson[0];
 	} else {
 		$introjson = array();
 	}
-	
+
 	$endtext = '';  $intropieces = array();
 	$testsettings['intro'] = preg_replace('/\[PAGE\s+(.*?)\]/', '<h3>$1</h3>', $testsettings['intro']);
+	$intropieces = array();
+	$introdividers = array();
 	if (strpos($testsettings['intro'], '[QUESTION')!==false) {
 		//embedded type
 		$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$testsettings['intro']);
@@ -180,13 +182,26 @@
 			$intropieces[$p[0]] = $introsplit[$i+1];
 		}
 	} else if (count($introjson)>1) {
-		$intropieces = array();
-		$introdividers = array();
+		$lastdisplaybefore = -1;
+		$textsegcnt = -1;
 		for ($i=1;$i<count($introjson);$i++) {
-			$intropieces[$introjson[$i]['displayBefore']+1] = $introjson[$i]['text'];
-	}
-	}
+			if (isset($introjson[$i]['ispage']) && $introjson[$i]['ispage']==1 && $testsettings['displaymethod'] == "Embed") {
+				$introjson[$i]['text'] = '<h2>'.strip_tags(str_replace(array("\n","\r","]"),array(' ',' ','&#93;'), $introjson[$i]['pagetitle'])).'</h2>'.$introjson[$i]['text'];
+			}
+			if ($introjson[$i]['displayBefore'] == $lastdisplaybefore) {
+				$intropieces[$textsegcnt] .= $introjson[$i]['text'];
+			} else {
+				$textsegcnt++;
+				$introdividers[$textsegcnt] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
+				$intropieces[$textsegcnt] = $introjson[$i]['text'];
+			}
 
+			$lastdisplaybefore = $introjson[$i]['displayBefore'];
+		}
+		if ($lastdisplaybefore==count($questions)) {
+			$endtext = $intropieces[$textsegcnt];
+		}
+	}
 
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	if ($isteacher && !$scoredview) {
@@ -208,8 +223,10 @@
 		$cat = $qi[$questions[$i]]['category'];
 
 		$showa = $isteacher;
-		if (isset($intropieces[$i+1])) {
-			echo '<div class="intro">'.$intropieces[$i+1].'</div>';
+		foreach ($introdividers as $k=>$v) {
+			if ($v[1]==$i+1) {
+				echo '<div class="intro">'.filter($intropieces[$k]).'</div>';
+			}
 		}
 		echo '<div class="nobreak">';
 		if (isset($_GET['descr'])) {
@@ -335,6 +352,6 @@
 
 	}
 	if ($endtext != '') {
-		echo '<div class="intro">'.$endtext.'</div>';
+		echo '<div class="intro">'.filter($endtext).'</div>';
 	}
 ?>

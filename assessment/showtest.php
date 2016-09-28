@@ -1644,6 +1644,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$toshow+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				basicshowq($toshow);
 				showqinfobar($toshow,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Continue'), '" />';
@@ -2036,7 +2044,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 					}
 					echo '<hr class="seq"/>';
 				}
-
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 			}
 		} else if ($_GET['action']=='embeddone') {
 			$shown = showscores($questions,$attempts,$testsettings);
@@ -2486,10 +2501,26 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$numdisplayed = 0;
 
 			for ($i = 0; $i < count($questions); $i++) {
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				if (unans($bestscores[$i]) || amreattempting($i) || unans($scores[$i])) {
 					basicshowq($i);
 					showqinfobar($i,true,false,1);
 					$numdisplayed++;
+				}
+			}
+			if (isset($intropieces)) {
+				foreach ($introdividers as $k=>$v) {
+					if ($v[1]==$i+1) {//right divider
+						echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+						break;
+					}
 				}
 			}
 			$reattempting = array();
@@ -2521,6 +2552,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 				echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 				echo '<input type="hidden" name="disptime" value="'.time().'" />';
 				echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
+				}
 				basicshowq($i);
 				showqinfobar($i,true,true,2);
 				echo '<input type="submit" class="btn" value="', _('Next'), '" />';
@@ -2615,6 +2654,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 					}
 
 					echo '<hr class="seq"/>';
+				}
+				if (isset($intropieces)) {
+					foreach ($introdividers as $k=>$v) {
+						if ($v[1]==$i+1) {//right divider
+							echo '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+							break;
+						}
+					}
 				}
 				echo '</form>';
 			}
