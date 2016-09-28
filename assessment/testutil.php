@@ -1000,7 +1000,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 		echo "<p>", _('Assessment is complete with perfect score.'), "</p>";
 	}
 	if ($hasreattempts) {
-		if ($noindivscores) {
+		if ($noscores) {
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions where allowed'), "</p>";
+		} else if ($noindivscores) {
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
 		} else {
 			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions missed where allowed'), "</p>";

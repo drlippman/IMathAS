@@ -783,7 +783,7 @@
 			for ($i = 0; $i<count($questions); $i++) {
 				if ($attempts[$i]<$qi[$questions[$i]]['attempts'] || $qi[$questions[$i]]['attempts']==0) {
 					//$scores[$i] = -1;
-					if ($noindivscores) { //clear scores if
+					if ($noindivscores && !$reattemptduring) { //clear scores if could have viewed
 						$bestscores[$i] = -1;
 						$bestrawscores[$i] = -1;
 					}
