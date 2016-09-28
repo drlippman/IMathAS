@@ -2,8 +2,8 @@
 //(c) 2006 David Lippman
 
 //define these to be overwritten later in case the corresponding options aren't used
-var updateeeddpos = function() { };
-var updateehpos = function() { };
+function updateeeddpos() {}
+function updateehpos() {}
 
 var LivePreviews = [];
 function setupLivePreview(qn) {
