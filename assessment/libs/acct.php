@@ -4,7 +4,7 @@
 //June 2013
 
 global $allowedmacros;
-array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeaccttable2","makeTchart","scoreTchart","makestatement","scorestatement","makeinventory","scoreinventory","makeTchartsfromjournal","scoreTchartsfromjournal","makeledgerfromjournal","maketrialbalance","maketrialbalancefromjournal","scoretrialbalance","scoretrialbalancefromjournal","totalsfromjournal","prettyacct");
+array_push($allowedmacros,"makejournal","scorejournal","makeaccttable","makeaccttable2","makeaccttable3","makeTchart","scoreTchart","makestatement","scorestatement","makeinventory","scoreinventory","makeTchartsfromjournal","scoreTchartsfromjournal","makeledgerfromjournal","maketrialbalance","maketrialbalancefromjournal","scoretrialbalance","scoretrialbalancefromjournal","totalsfromjournal","prettyacct");
 
 //makestatement(statement array, start number, options, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
 //statement array form:
@@ -768,6 +768,141 @@ function makeaccttable2($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes,
 	
 }
 
+//makeaccttable3(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $questions, $answerformat, $answerboxsize, $opts)
+//headers:  array(title, colspan, title, colspan,...) or array(title,title,title) or array of these for multiple headers
+//coltypes: array(true if scores, false if fixed), one for each column  (use 2 to add dollar signs when not already in column values)
+//fixedrows: array(title, colspan, title, colspan,...), ignores coltypes
+//columsn: an array for each column of fixed values or answer values
+//opts: optionsal array of options:
+//   $opts['totrow']: row to treat as totals row (decorates above and below with lines) - optional
+//   $opts['class']: class to use for table
+//   $opts['questions'][n] = array of pull-down options for column n
+function makeaccttable3($headers, $coltypes, $fixedrows, $cols, $sn, &$anstypes, &$answer, &$showanswer, &$displayformat, &$questions, &$answerformat, &$answerboxsize, $opts=array()) {
+	if ($anstypes === null) { $anstypes = array();}
+	if ($answer === null) { $answer = array();}
+	if ($showanswer === null) { $showanswer = '';}
+	if ($displayformat === null) { $displayformat = array();}
+	if (isset($opts['totrow'])) { $totrow = $opts['totrow'];} else {$totrow = -1;}
+	if (isset($opts['class'])) { $tblclass = $opts['class'];} else {$tblclass = 'gridded';}
+	
+	$maxsize = array();  $hasdecimals = false;
+	for ($j=0;$j<count($coltypes);$j++) {
+		if ($coltypes[$j]==false) {continue;} //fixed column
+		$maxsize[$j] = 0;
+		for ($i=0;$i<count($cols[$j]);$i++) {
+			$sl = strlen($cols[$j][$i]);
+			if ($sl>$maxsize[$j]) { $maxsize[$j] = $sl;}
+			if (!$hasdecimals && strpos($cols[$j][$i],'.')!==false) { $hasdecimals = true;}
+		}
+		$maxsize[$j] += floor(($maxsize[$j]-0.5)/3);  //add size to account for commas
+	}
+	if (count($headers)!=0) {
+		if (!is_array($headers[0])) {
+			$headers = array($headers);
+		}
+		$out = '<table class="'.$tblclass.'"><thead>';
+		foreach ($headers as $hdr) {
+			$out .= '<tr>';
+			if (isset($hdr[1]) && is_numeric($hdr[1])) {
+				for ($i=0;$i<count($hdr);$i+=2) {
+					$out .= '<th';
+					if ($hdr[$i+1]>1) {
+						$out .= ' colspan="'.$hdr[$i+1].'"';
+					}
+					$out .= '>'.$hdr[$i].'</th>';
+				}
+			} else {
+				for ($i=0;$i<count($hdr);$i++) {
+					$out .= '<th>'.$hdr[$i].'</th>';
+				}
+			}
+			$out .= '</tr>';
+		}
+		'</thead>';
+	} else {
+		$out = '<table class="'.$tblclass.'">';
+	}
+	$out .= '<tbody>';
+	$sa = $out;
+	foreach ($fixedrows as $fr) {
+		$out .= '<tr>';  $sa .= '<tr>';
+		foreach ($fr as $el) {
+			$out .= '<td class="r">'.$el.'</td>';  $sa .= '<td class="r">'.$el.'</td>';
+		}
+		$out .= '</tr>';  $sa .= '</tr>';
+	}
+	for ($i=0;$i<count($cols[0]);$i++) {
+		$out .= '<tr>';  $sa .= '<tr>';
+		for ($j=0;$j<count($coltypes);$j++) {
+			if ($i+1==$totrow) {
+				$dec = ' style="border-bottom: 3px double #000;"';
+			} else if ($i==$totrow) {
+				$dec = ' style="border-bottom: 3px double #000;"';
+			} else {
+				$dec = '';
+			}
+			if ($coltypes[$j]==false) {//fixed
+				if ($cols[$j][$i]{0}==' ') { $cols[$j][$i] = '&nbsp;'.$cols[$j][$i];}
+				$out .= "<td$dec>".$cols[$j][$i].'</td>';
+				$sa .= "<td$dec>".$cols[$j][$i].'</td>';
+				
+			} else {
+				if ($i==$totrow && !isset($cols[$j][$i])) {
+					$thistot = 0;
+					for ($k=0;$k<$totrow;$k++) {
+						$thistot += $cols[$j][$k];
+					}
+					$cols[$j][$i] = $thistot;
+				}
+	
+				if ($cols[$j][$i]==='nobox') {$out .= "<td$dec></td>"; $sa.= "<td$dec></td>"; continue;}
+				if (substr($cols[$j][$i],0,6)=='fixed:') {$f = substr($cols[$j][$i],6); $out .= "<td$dec>$f</td>"; $sa.= "<td$dec>$f</td>"; continue;}
+				
+				$out .= '<td'.$dec.' class="r">'.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'').'[AB'.$sn.']</td>';
+				$sa .= '<td'.$dec.' class="r">'.(($cols[$j][$i]{0}=='$'||$coltypes[$j]===2)?'$':'');
+				
+				$answer[$sn] = $cols[$j][$i];
+				if ($cols[$j][$i]!=='') {
+					if (is_numeric(str_replace(array('$',','),'',$cols[$j][$i]))) {
+						$cols[$j][$i] = str_replace(array('$',','),'',$cols[$j][$i]) * 1;
+						if ($hasdecimals) {
+							$sa .= number_format($cols[$j][$i],2,'.',',');
+						} else {
+							$sa .= number_format($cols[$j][$i]);
+						}
+					} else {
+						$sa .= $cols[$j][$i];
+					}
+				}
+				$sa .= '</td>';
+				if ($cols[$j][$i]!='' && isset($opts['questions']) && isset($opts['questions'][$j])) {
+					$anstypes[$sn] = 'string';
+					$displayformat[$sn] = 'select';
+					$questions[$sn] = $opts['questions'][$j];
+				} else {
+					$answerboxsize[$sn] = $maxsize[$j];
+					$displayformat[$sn] = 'alignright';
+					$answerformat[$sn] = 'parenneg';
+					if ($cols[$j][$i]!='') {
+						$anstypes[$sn] = 'number';
+					} else {
+						$anstypes[$sn] = 'string';
+					}
+				}
+				$sn++;
+			}
+		}
+		
+		$out .= '</tr>';
+		$sa .= '</tr>';
+	}
+	$out .= '</tbody></table>';
+	$sa .= '</tbody></table>';
+	$showanswer .= $sa.'<p>&nbsp;</p>';
+	
+	return $out;	
+	
+}
 
 
 //makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize)
