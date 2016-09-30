@@ -154,7 +154,7 @@ if ($myrights < 40) {
 		} else if (is_numeric($showusers)) {
 			$page_userBlockTitle = "Group Users";
 			//DB $query = "SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid='$showusers' ORDER BY LastName";
-			$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 10 AND groupid=:groupid ORDER BY LastName");
+			$stm = $DBH->prepare("SELECT id,SID,FirstName,LastName,email,rights,lastaccess FROM imas_users WHERE rights > 11 AND rights<>76 AND groupid=:groupid ORDER BY LastName");
 			$stm->execute(array(':groupid'=>$showusers));
 		} else {
 			$page_userBlockTitle = "All Users - $showusers";
