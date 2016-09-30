@@ -160,7 +160,6 @@
 	$endtext = '';  $intropieces = array();
 	$testsettings['intro'] = preg_replace('/\[PAGE\s+(.*?)\]/', '<h3>$1</h3>', $testsettings['intro']);
 	$intropieces = array();
-	$introdividers = array();
 	if (strpos($testsettings['intro'], '[QUESTION')!==false) {
 		//embedded type
 		$intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$testsettings['intro']);
@@ -182,6 +181,8 @@
 			$intropieces[$p[0]] = $introsplit[$i+1];
 		}
 	} else if (count($introjson)>1) {
+		$introdividers = array();
+		$intropcs = array();
 		$lastdisplaybefore = -1;
 		$textsegcnt = -1;
 		for ($i=1;$i<count($introjson);$i++) {
@@ -189,17 +190,21 @@
 				$introjson[$i]['text'] = '<h2>'.strip_tags(str_replace(array("\n","\r","]"),array(' ',' ','&#93;'), $introjson[$i]['pagetitle'])).'</h2>'.$introjson[$i]['text'];
 			}
 			if ($introjson[$i]['displayBefore'] == $lastdisplaybefore) {
-				$intropieces[$textsegcnt] .= $introjson[$i]['text'];
+				$intropcs[$textsegcnt] .= $introjson[$i]['text'];
 			} else {
 				$textsegcnt++;
 				$introdividers[$textsegcnt] = array(0,$introjson[$i]['displayBefore']+1, $introjson[$i]['displayUntil']+1);
-				$intropieces[$textsegcnt] = $introjson[$i]['text'];
+				$intropcs[$textsegcnt] = $introjson[$i]['text'];
 			}
 
 			$lastdisplaybefore = $introjson[$i]['displayBefore'];
 		}
 		if ($lastdisplaybefore==count($questions)) {
-			$endtext = $intropieces[$textsegcnt];
+			$endtext = $intropcs[$textsegcnt];
+		}
+		//restructure into the format needed for printtest
+		foreach ($introdividers as $k=>$v) {
+			$intropieces[$v[1]] = $intropcs[$k];
 		}
 	}
 
@@ -223,10 +228,8 @@
 		$cat = $qi[$questions[$i]]['category'];
 
 		$showa = $isteacher;
-		foreach ($introdividers as $k=>$v) {
-			if ($v[1]==$i+1) {
-				echo '<div class="intro">'.filter($intropieces[$k]).'</div>';
-			}
+		if (isset($intropieces[$i+1])) {
+			echo '<div class="intro">'.filter($intropieces[$i+1]).'</div>';
 		}
 		echo '<div class="nobreak">';
 		if (isset($_GET['descr'])) {
