@@ -852,13 +852,13 @@ function showquestioncontactlinks($qn) {
 	global $testsettings,$imasroot,$qi,$seeds,$questions;
 	$out = '';
 	if ($testsettings['msgtoinstr']==1) {
-		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$testsettings['ver']}&to=instr\">". _('Message instructor about this question'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid={$testsettings['courseid']}&add=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}&to=instr\">". _('Message instructor about this question'). "</a>";
 	}
 	if ($testsettings['posttoforum']>0) {
 		if ($out != '') {
 			$out .= "<br/>";
 		}
-		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$testsettings['ver']}\">". _('Post this question to forum'). "</a>";
+		$out .= "<a target=\"_blank\" href=\"$imasroot/forums/thread.php?cid={$testsettings['courseid']}&forum={$testsettings['posttoforum']}&modify=new&quoteq=$qn-{$qi[$questions[$qn]]['questionsetid']}-{$seeds[$qn]}-{$testsettings['id']}-{$GLOBALS['assessver']}\">". _('Post this question to forum'). "</a>";
 	}
 	return $out;
 }
