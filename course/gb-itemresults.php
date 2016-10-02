@@ -53,7 +53,7 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 //DB $query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
 //DB $query .= "WHERE assessmentid='$aid'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-$query = "SELECT questions,seeds,lastanswers,scores FROM imas_assessment_sessions ";
+$query = "SELECT questions,seeds,lastanswers,scores,ver FROM imas_assessment_sessions ";
 $query .= "WHERE assessmentid=:assessmentid";
 $stm = $DBH->prepare($query);
 $stm->execute(array(':assessmentid'=>$aid));
@@ -61,6 +61,7 @@ $sessioncnt = 0;
 $qdata = array();
 //DB while ($row = mysql_fetch_row($result)) {
 while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+	$GLOBALS['assessver'] = $row[4];
 	if (strpos($row[0],';')===false) {
 		$questions = explode(",",$row[0]);
 		//$bestquestions = $questions;

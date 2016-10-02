@@ -32,10 +32,10 @@ function getpts($sc) {
 
 function evalqsandbox($seed,$qqqcontrol,$qqqanswer) {
 	$sa = '';
-
-	srand($seed);
+	global $RND;
+	$RND->srand($seed);
 	eval($qqqcontrol);
-	srand($seed+1);
+	$RND->srand($seed+1);
 	eval($qqqanswer);
 
 	if (isset($anstypes) && !is_array($anstypes)) {

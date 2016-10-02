@@ -9,7 +9,7 @@
   - show results on submit, allow reattempts
   - No Show Answers
 
-    
+
   - On initial page load:
     - choose seed.  fill $seeds array for group
     - Display "try new version of this/these problem(s)" button
@@ -44,7 +44,7 @@ if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTT
  	 $urlmode = 'http://';
 }
 
- 
+
 function saveAssessData() {
 	global $qids, $seeds, $rawscores, $attempts, $lastanswers, $sameseed, $theme, $targetid, $JWTsecret;
 	$JWTsess['qids'] = $qids;
@@ -79,7 +79,7 @@ if (isset($JWTsess->qids) && (!isset($_GET['id']) || $_GET['id']==implode('-',$J
 	$targetid = $JWTsess->targetid;
 } else {
 	$qids = explode("-",$_GET['id']);
-	
+
 	if (isset($_GET['sameseed']) && $_GET['sameseed']==1) {
 		$seeds = array_fill(0,count($qids), rand(5000,9999));
 		$sameseed = 1;
@@ -109,23 +109,24 @@ foreach ($qids as $i=>$v) {
 foreach ($seeds as $i=>$v) {
 	$seeds[$i] = intval($v);
 }
-require("./assessment/displayq2.php");                 
+require("./assessment/displayq2.php");
+$GLOBALS['assessver'] = 1;
 
 if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	//load filter
 	$loadgraphfilter = true;
 	require_once("./filter/filter.php");
-	
+
 	//need question ids, attempts, seeds.  Put in query string, or??
 	$qn = $_POST['toscore'];
 	$colors = array();
 	$GLOBALS['scoremessages'] = '';
 	$GLOBALS['questionmanualgrade'] = false;
-	
+
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qids[$qn],$seeds[$qn],$_POST["qn$qn"],$attempts[$qn],1);
 	$attempts[$qn]++;
 	$jwtstring = saveAssessData();
-	
+
 	if (strpos($rawscores[$qn],'~')!==false) {
 		$colors = explode('~',$rawscores[$qn]);
 	} else {
@@ -138,14 +139,14 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
 	echo '<input type="hidden" id="verattempts'.$qn.'" value="'.$attempts[$qn].'"/>';
 	echo $quesout;
-	
+
 	//"save" session
 	echo '<script type="text/javscript">$("#asidverify").val("'.$jwtstring.'");</script>';
 	exit;
 }
-	
 
-                        
+
+
 $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead = '<style type="text/css">html,body {margin:0px;} div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
 
@@ -155,12 +156,12 @@ if ($theme != '') {
 require("./assessment/header.php");
 
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
-			
+
 echo '<input type="hidden" id="asidverify" value="'.$jwtstring.'"/>';
 echo '<input type="hidden" id="disptime" value="'.time().'"/>';
 echo '<input type="hidden" id="isreview" value="0"/>';
 echo '<p><a href="multiembedq.php?id='.$_GET['id'].'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'&amp;iframe_resize_id='.$targetid.'">Try Another Version of ';
-if (count($qids)>1) { 
+if (count($qids)>1) {
 	echo 'These Questions</a></p>';
 } else {
 	echo 'This Question</a></p>';
@@ -176,7 +177,7 @@ foreach ($qids as $i=>$qid) {
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 	echo $quesout;
 	echo '<input type="hidden" id="verattempts'.$i.'" value="'.$attempts[$i].'"/>';
-	echo '</div>';			
+	echo '</div>';
 }
 if ($targetid != '') {
 echo '<script type="text/javascript">

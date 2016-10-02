@@ -411,7 +411,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					require_once("../assessment/displayq2.php");
 					$showa = false;
 					$parts = explode('-',$_GET['quoteq']);
-					if (count($parts)==5) {
+					$GLOBALS['assessver'] = $parts[4];
+					if (count($parts)==6) {
 						//wants to show ans
 						//DB $query = "SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$parts[3]}'";
 						//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());

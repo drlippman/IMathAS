@@ -954,7 +954,7 @@ function rrand($min,$max,$p) {
 	if (($s = strpos( (string) $p,'.'))!==false) { $rn = max($rn, strlen((string) $p) - $s - 1); }
 	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
 
-	return( round($min + $p*rand(0,($max-$min)/$p), $rn));
+	return( round($min + $p*$GLOBALS['RND']->rand(0,($max-$min)/$p), $rn));
 }
 
 
@@ -962,7 +962,7 @@ function rands($min,$max,$n) {
 	if (func_num_args()!=3) { echo "rands expects 3 arguments"; return $min;}
 	if ($max < $min) {echo "Need min&lt;max"; return $min;}
 	for ($i = 0; $i < $n; $i++) {
-		$r[$i] = rand($min,$max);
+		$r[$i] = $GLOBALS['RND']->rand($min,$max);
 	}
 	return $r;
 }
@@ -977,7 +977,7 @@ function rrands($min,$max,$p,$n) {
 	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
 
 	for ($i = 0; $i < $n; $i++) {
-		$r[$i] = round($min + $p*rand(0,($max-$min)/$p), $rn);
+		$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,($max-$min)/$p), $rn);
 	}
 	return $r;
 }
@@ -988,7 +988,7 @@ function randfrom($lst) {
 	if (!is_array($lst)) {
 		$lst = explode(",",$lst);
 	}
-	return $lst[rand(0,count($lst)-1)];
+	return $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 }
 
 
@@ -998,7 +998,7 @@ function randsfrom($lst,$n) {
 		$lst = explode(",",$lst);
 	}
 	for ($i=0; $i<$n;$i++) {
-		$r[$i] = $lst[rand(0,count($lst)-1)];
+		$r[$i] = $lst[$GLOBALS['RND']->rand(0,count($lst)-1)];
 	}
 	return $r;
 }
@@ -1012,7 +1012,7 @@ function jointrandfrom($lst1,$lst2) {
 	if (!is_array($lst2)) {
 		$lst2 = explode(",",$lst2);
 	}
-	$l = rand(0,min(count($lst1)-1,count($lst2)-1));
+	$l = $GLOBALS['RND']->rand(0,min(count($lst1)-1,count($lst2)-1));
 	return array($lst1[$l],$lst2[$l]);
 }
 
@@ -1022,7 +1022,7 @@ function diffrandsfrom($lst,$n) {
 	if (!is_array($lst)) {
 		$lst = explode(",",$lst);
 	}
-	shuffle($lst);
+	$GLOBALS['RND']->shuffle($lst);
 	return array_slice($lst,0,$n);
 }
 
@@ -1036,7 +1036,7 @@ function nonzerorand($min,$max) {
 		echo "min=0, max=0 bad."; return 0;
 	}
 	do {
-		$ret = rand($min,$max);
+		$ret = $GLOBALS['RND']->rand($min,$max);
 	} while ($ret == 0);
 	return $ret;
 }
@@ -1054,7 +1054,7 @@ function nonzerorrand($min,$max,$p) {
 	if (($q = strpos((string) $min,'.'))!==false) { $rn = max($rn, strlen((string) $min) - $q - 1); }
 
 	do {
-		$ret = round($min + $p*rand(0,($max-$min)/$p), $rn);
+		$ret = round($min + $p*$GLOBALS['RND']->rand(0,($max-$min)/$p), $rn);
 	} while (abs($ret)< 1e-14);
 	return $ret;
 }
@@ -1070,7 +1070,7 @@ function nonzerorands($min,$max,$n) {
 	}
 	for ($i = 0; $i < $n; $i++) {
 		do {
-			$r[$i] = rand($min,$max);
+			$r[$i] = $GLOBALS['RND']->rand($min,$max);
 		} while ($r[$i] == 0);
 	}
 	return $r;
@@ -1090,7 +1090,7 @@ function nonzerorrands($min,$max,$p,$n) {
 
 	for ($i = 0; $i < $n; $i++) {
 		do {
-			$r[$i] = round($min + $p*rand(0,($max-$min)/$p), $rn);
+			$r[$i] = round($min + $p*$GLOBALS['RND']->rand(0,($max-$min)/$p), $rn);
 		} while (abs($r[$i]) <1e-14);
 	}
 	return $r;
@@ -1103,7 +1103,7 @@ function diffrands($min,$max,$n) {
 	if ($n<.1*($max-$min)) {
 		$out = array();
 		while (count($out)<$n) {
-			$x = rand($min,$max);
+			$x = $GLOBALS['RND']->rand($min,$max);
 			if (!in_array($x,$out)) {
 				$out[] = $x;
 			}
@@ -1114,7 +1114,7 @@ function diffrands($min,$max,$n) {
 		while ($n>count($r)) {
 			$r = array_merge($r,$r);
 		}
-		shuffle($r);
+		$GLOBALS['RND']->shuffle($r);
 		return array_slice($r,0,$n);
 	}
 }
@@ -1138,7 +1138,7 @@ function diffrrands($min,$max,$p,$n, $nonzero=false) {
 		$out = array();
 
 		while (count($out)<$n) {
-			$x = round($min + $p*rand(0,$maxi), $rn);
+			$x = round($min + $p*$GLOBALS['RND']->rand(0,$maxi), $rn);
 			if (!in_array($x,$out) && (!$nonzero || abs($x)>1e-14)) {
 				$out[] = $x;
 			}
@@ -1154,7 +1154,7 @@ function diffrrands($min,$max,$p,$n, $nonzero=false) {
 				array_splice($r,-1*$min/$p,1);
 			}
 		}
-		shuffle($r);
+		$GLOBALS['RND']->shuffle($r);
 		$r = array_slice($r,0,$n);
 		for ($i=0;$i<$n;$i++) {
 			$r[$i] = round($min+$p*$r[$i], $rn);
@@ -1175,7 +1175,7 @@ function nonzerodiffrands($min,$max,$n) {
 	if ($n<.1*($max-$min)) {
 		$out = array();
 		while (count($out)<$n) {
-			$x = rand($min,$max);
+			$x = $GLOBALS['RND']->rand($min,$max);
 			if ($x!=0 && !in_array($x,$out)) {
 				$out[] = $x;
 			}
@@ -1186,7 +1186,7 @@ function nonzerodiffrands($min,$max,$n) {
 		if ($min <= 0 && $max >= 0) {
 			array_splice($r,-1*$min,1);
 		}
-		shuffle($r);
+		$GLOBALS['RND']->shuffle($r);
 		return array_slice($r,0,$n);
 	}
 }
@@ -1201,7 +1201,7 @@ function singleshuffle($a) {
 	if (!is_array($a)) {
 		$a = explode(",",$a);
 	}
-	shuffle($a);
+	$GLOBALS['RND']->shuffle($a);
 	if (func_num_args()>1) {
 		$n = func_get_arg(1);
 		return array_slice($a,0,$n);
@@ -1218,8 +1218,8 @@ function jointshuffle($a1,$a2) {  //optional third & fourth params $n1 and $n2
 	if (!is_array($a2)) {
 		$a2 = explode(",",$a2);
 	}
-	$r = array_rand($a1,count($a1));
-	shuffle($r);
+	$r = $GLOBALS['RND']->array_rand($a1,count($a1));
+	$GLOBALS['RND']->shuffle($r);
 	for ($j=0;$j<count($r);$j++) {
 		$ra1[$j] = $a1[$r[$j]];
 		$ra2[$j] = $a2[$r[$j]];
@@ -1773,10 +1773,10 @@ function randcities($n=1) {
 	global $cityarray;
 	$c = count($cityarray);
 	if ($n==1) {
-		return $cityarray[rand(0,$c-1)];
+		return $cityarray[$GLOBALS['RND']->rand(0,$c-1)];
 	} else {
 		$out = $cityarray;
-		shuffle($out);
+		$GLOBALS['RND']->shuffle($out);
 		return array_slice($out,0,$n);
 	}
 }
@@ -1786,9 +1786,9 @@ function randstates($n=1) {
 
 	$c = count($states);
 	if ($n==1) {
-		return $states[rand(0,$c-1)];
+		return $states[$GLOBALS['RND']->rand(0,$c-1)];
 	} else {
-		shuffle($states);
+		$GLOBALS['RND']->shuffle($states);
 		return array_slice($states,0,$n);
 	}
 }
@@ -1803,15 +1803,15 @@ function randnames($n=1,$gender=2) {
 	global $namearray;
 	if ($n==1) {
 		if ($gender==2) {
-			$gender = rand(0,1);
+			$gender = $GLOBALS['RND']->rand(0,1);
 		}
-		return $namearray[$gender][rand(0,137)];
+		return $namearray[$gender][$GLOBALS['RND']->rand(0,137)];
 	} else {
 		$out = array();
 		$locs = diffrands(0,137,$n);
 		for ($i=0; $i<$n;$i++) {
 			if ($gender==2) {
-				$gender = rand(0,1);
+				$gender = $GLOBALS['RND']->rand(0,1);
 			}
 			$out[] = $namearray[$gender][$locs[$i]];
 		}
@@ -1823,7 +1823,7 @@ function randmalenames($n=1) {
 	return randnames($n,0);
 }
 function randfemalenames($n=1) {
-        return randnames($n,1);
+  return randnames($n,1);
 }
 function randname() {
 	return randnames(1,2);
@@ -2664,11 +2664,11 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 	for ($i = 0; $i < 20; $i++) {
 		for($j=0; $j < count($variables); $j++) {
 			if (isset($fromto[2]) && $fromto[2]=="integers") {
-				$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+				$tps[$i][$j] = $GLOBALS['RND']->rand($fromto[0],$fromto[1]);
 			} else if (isset($fromto[2*$j+1])) {
-				$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
+				$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
 			} else {
-				$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
+				$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
 			}
 		}
 	}
@@ -3000,11 +3000,11 @@ function getfeedbacktxtnumfunc($stu, $partial, $fbtxt, $deffb='Incorrect', $vars
 		for ($i = 0; $i < $numpts; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+					$tps[$i][$j] = $GLOBALS['RND']->rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
 				} else {
-					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
+					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$GLOBALS['RND']->rand(0,499)/500.0 + 0.001;
 				}
 			}
 		}
@@ -3405,4 +3405,91 @@ function lensort($a,$b) {
 	return strlen($b)-strlen($a);
 }
 
+class Rand {
+	private $seed;
+	private $randmax;
+
+	function __construct() {
+		$this->seed = rand();
+		$this->randmax = getrandmax();
+	}
+
+	public function srand($n=0) {
+		if ($n==0) {
+			srand();
+			if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
+				$this->seed = rand();
+			}
+		} else {
+			if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
+				$this->seed = $n;
+			} else {
+				srand($n);
+			}
+		}
+	}
+
+	public function rand($min=0,$max=null) {  //simple xorshift
+		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
+			if ($max===null) {
+				$max = $this->randmax;
+			}
+			if ($min < $max) {
+				$this->seed ^= ($this->seed << 13);
+				$this->seed ^= ($this->seed >> 17);
+				$this->seed ^= ($this->seed << 5);
+				$this->seed &= 0x7fffffff;
+				return ($this->seed % ($max + 1 - $min)) + $min;
+			} else if($min > $max){
+				return $this->rand($max,$min);
+			} else if ($min == $max) {
+				return $min;
+			}
+		} else {
+			if ($max===null) {
+				return rand();
+			} else {
+				return rand($min,$max);
+			}
+		}
+	}
+
+	public function shuffle(&$arr) {
+		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
+			for ($i=count($arr)-1;$i>0;$i--) {
+				$this->seed ^= ($this->seed << 13);
+				$this->seed ^= ($this->seed >> 17);
+				$this->seed ^= ($this->seed << 5);
+				$this->seed &= 0x7fffffff;
+				$j = $this->seed % ($i+1); //$this->rand(0,$i);
+				if ($i!=$j) {
+					$tmp = $arr[$j];
+					$arr[$j] = $arr[$i];
+					$arr[$i] = $tmp;
+				}
+			}
+		} else {
+			shuffle($arr);
+		}
+	}
+
+	public function array_rand($arr, $n=1) {
+		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
+			$keys = array_keys($arr);
+			if ($n==1) {
+				$n = $this->rand(0,count($keys)-1);
+				return $keys[$n];
+			} else if ($n==count($arr)) { //no point in shuffling since php's internal function doesn't shuffle
+				return $keys;
+			} else {
+				$this->shuffle($keys);
+				return array_slice($keys,0,$n);
+			}
+		} else {
+			return array_rand($arr,$n);
+		}
+	}
+
+}
+$RND = new Rand();
 ?>

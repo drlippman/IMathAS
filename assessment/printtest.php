@@ -50,6 +50,7 @@
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	$GLOBALS['assessver'] = $line['ver'];
 	if (strpos($line['questions'],';')===false) {
 		$questions = explode(",",$line['questions']);
 		$bestquestions = $questions;

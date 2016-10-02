@@ -95,9 +95,10 @@
 			$stm->execute(array(':assessmentid'=>$aid));
 		}
 		$cnt = 0;
-		echo $stm->rowCount();
+
 		//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 		while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+			$GLOBALS['assessver'] = $line['ver'];
 			if ((!$onepergroup && isset($allscores[$line['id']])) || ($onepergroup && isset($grpscores[$line['agroupid']]))) {//if (isset($locs[$line['id']])) {
 				$sp = explode(';',$line['bestscores']);
 				$scores = explode(",",$sp[0]);
@@ -401,6 +402,7 @@
 
 	//DB while($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while($line=$stm->fetch(PDO::FETCH_ASSOC)) {
+		$GLOBALS['assessver'] = $line['ver'];
 		if ($page != -1) {
 			echo '<input type="hidden" name="userid" value="'.$line['userid'].'"/>';
 		}
@@ -635,7 +637,7 @@
 			//echo " &nbsp; <a href=\"gradebook.php?stu=$stu&gbmode=$gbmode&cid=$cid&asid={$line['id']}&clearq=$i\">Clear Score</a>";
 			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
 			echo '<br/>Question #'.($loc+1);
-			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid&to={$line['userid']}\">Use in Msg</a>";
+			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid-{$line['ver']}&to={$line['userid']}\">Use in Msg</a>";
 			echo "</div>\n";
 			if ($groupdup) {
 				echo '</div>';

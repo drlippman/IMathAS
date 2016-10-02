@@ -362,6 +362,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			} else if (isset($_GET['quoteq'])) {
 				require("../assessment/displayq2.php");
 				$parts = explode('-',$_GET['quoteq']);
+				$GLOBALS['assessver'] = $parts[4];
 				$message = displayq($parts[0],$parts[1],$parts[2],false,false,0,true);
 				$message = printfilter(forcefiltergraph($message));
 				if (isset($CFG['GEN']['AWSforcoursefiles']) && $CFG['GEN']['AWSforcoursefiles'] == true) {

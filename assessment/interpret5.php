@@ -393,6 +393,8 @@ function tokenize($str,$anstype,$countcnt) {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
+					} else if ($out=='rand') {
+						$out = '$RND->rand';
 					} else {
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
@@ -641,18 +643,19 @@ function loadlibrary($str) {
 
 //sets question seed
 function setseed($ns,$ref=0) {
+	global $RND;
 	if ($ns=="userid") {
 		if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
-			srand($GLOBALS['teacherreview']);
+			$RND->srand($GLOBALS['teacherreview']);
 		} else { //in assessment
-			srand($GLOBALS['userid']);
+			$RND->srand($GLOBALS['userid']);
 		}
 	} else if ($ns=="from") {
 		if (isset($GLOBALS['seeds']) && isset($GLOBALS['seeds'][$ref-1])) {
-			srand($GLOBALS['seeds'][$ref-1]);
+			$RND->srand($GLOBALS['seeds'][$ref-1]);
 		}
 	} else {
-		srand($ns);
+		$RND->srand($ns);
 	}
 }
 

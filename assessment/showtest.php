@@ -214,7 +214,7 @@
 		//DB $query = "SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='{$_GET['id']}' ORDER BY id DESC LIMIT 1";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-		$stm = $DBH->prepare("SELECT id,agroupid,lastanswers,bestlastanswers,starttime FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id DESC LIMIT 1");
+		$stm = $DBH->prepare("SELECT id,agroupid,lastanswers,bestlastanswers,starttime,ver FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid ORDER BY id DESC LIMIT 1");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 
@@ -293,8 +293,8 @@
 			//DB $query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid) ";
 			//DB $query .= "VALUES ('$userid','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext','$ltisourcedid');";
 			//DB $result = mysql_query($query);
-			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid) ";
-			$query .= "VALUES (:userid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, :agroupid, :feedback, :lti_sourcedid);";
+			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid,ver) ";
+			$query .= "VALUES (:userid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, :agroupid, :feedback, :lti_sourcedid,1);";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id'], ':questions'=>$qlist, ':seeds'=>$seedlist, ':scores'=>$scorelist,
 				':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':starttime'=>$starttime, ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist,
@@ -314,7 +314,7 @@
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid AND userid<>:userid");
 				$stm->execute(array(':stugroupid'=>$stugroupid, ':userid'=>$userid));
-				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback) VALUES ";
+				$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,ver) VALUES ";
 				$cnt = 0;
 				$insval = array();
 				//DB if (mysql_num_rows($result)>0) {
@@ -323,7 +323,7 @@
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 						if ($cnt>0) {$query .= ',';}
 						//DB $query .= "('{$row[0]}','{$_GET['id']}','$qlist','$seedlist','$scorelist','$attemptslist','$lalist',$starttime,'$bestscorelist','$bestattemptslist','$bestseedslist','$bestlalist','$scorelist','$attemptslist','$reviewseedlist','$lalist',$stugroupid,'$deffeedbacktext')";
-						$query .= "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+						$query .= "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)";
 						array_push($insval, $row[0], $_GET['id'], $qlist, $seedlist, $scorelist, $attemptslist, $lalist, $starttime, $bestscorelist, $bestattemptslist, $bestseedslist, $bestlalist, $scorelist, $attemptslist, $reviewseedlist, $lalist, $stugroupid, $deffeedbacktext);
 						$cnt++;
 					}
@@ -433,8 +433,8 @@
 
 				//DB $query = "UPDATE imas_assessment_sessions SET agroupid=$stugroupid WHERE id={$line['id']}";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET agroupid=:agroupid WHERE id=:id");
-				$stm->execute(array(':agroupid'=>$stugroupid, ':id'=>$line['id']));
+				$stm = $DBH->prepare("UPDATE imas_assessment_sessions SET agroupid=:agroupid,ver=:ver WHERE id=:id");
+				$stm->execute(array(':agroupid'=>$stugroupid, ':id'=>$line['id'], ':ver'=>$line['ver']));
 			}
 
 			//DB $query = "SELECT name,theme,topbar,msgset,toolset FROM imas_courses WHERE id='{$_GET['cid']}'";
@@ -497,6 +497,7 @@
 	$stm = $DBH->prepare("SELECT * FROM imas_assessment_sessions WHERE id=:id");
 	$stm->execute(array(':id'=>$testid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
+	$GLOBALS['assessver'] = $line['ver'];
 	if (strpos($line['questions'],';')===false) {
 		$questions = explode(",",$line['questions']);
 		$bestquestions = $questions;
@@ -1140,7 +1141,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if ($sessiondata['groupid']==0) {
 				echo '<p>', _('Group error - lost group info'), '</p>';
 			}
-			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting';
+			$fieldstocopy = 'assessmentid,agroupid,questions,seeds,scores,attempts,lastanswers,starttime,endtime,bestseeds,bestattempts,bestscores,bestlastanswers,feedback,reviewseeds,reviewattempts,reviewscores,reviewlastanswers,reattempting,reviewreattempting,ver';
 
 			//DB $query = "SELECT $fieldstocopy FROM imas_assessment_sessions WHERE id='$testid'";
 			//DB $result = mysql_query($query) or die("Query failed : $query:" . mysql_error());

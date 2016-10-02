@@ -13,12 +13,12 @@ require("macros.php");
 
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $DBH, $imasroot, $myrights, $showtips, $urlmode, $CFG;
+	global $DBH, $RND, $imasroot, $myrights, $showtips, $urlmode, $CFG;
 
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
 
-	srand($seed);
+	$RND->srand($seed);
 	if (is_int($doshowans) && $doshowans==2) {
 		$doshowans = true;
 		$nosabutton = true;
@@ -147,10 +147,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	//$toevalqtxt = str_replace('"','\\"',$toevalqtxt);
 	//echo "toeval: $toevalqtxt";
 	if ($doshowans) {
-		srand($seed+1);
+		$RND->srand($seed+1);
 		eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
 	}
-	srand($seed+2);
+	$RND->srand($seed+2);
 	$laarr = explode('##',$GLOBALS['lastanswers'][$qnidx]);
 	$la = $laarr[count($laarr)-1];
 	if ($la=="ReGen") {$la = '';}
@@ -555,9 +555,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 //inputs: Question number, Question id, rand seed, given answer
 function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
-	global $DBH;
+	global $DBH, $RND;
 	unset($abstolerance);
-	srand($seed);
+	$RND->srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;
 	//DB $query = "SELECT qtype,control,answer FROM imas_questionset WHERE id='$qidx'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -755,7 +755,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	}
 
 	eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	srand($seed+1);
+	$RND->srand($seed+1);
 	eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
 
 	if (isset($choices) && !isset($questions)) {
@@ -791,7 +791,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 	}
 
-	srand($seed+2);
+	$RND->srand($seed+2);
 	//pack options from eval
 	if (isset($answer)) {$options['answer'] = $answer;}
 	if (isset($reltolerance)) {$options['reltolerance'] = $reltolerance;}
@@ -910,7 +910,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 
 
 function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
-	global $myrights, $useeqnhelper, $showtips, $imasroot;
+	global $RND,$myrights, $useeqnhelper, $showtips, $imasroot;
 	$out = '';
 	$tip = '';
 	$sa = '';
@@ -1039,14 +1039,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if ($noshuffle == "last") {
-			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
-			shuffle($randkeys);
+			$randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			$RND->shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
 		} else {
-			$randkeys = array_rand($questions,count($questions));
-			shuffle($randkeys);
+			$randkeys = $RND->array_rand($questions,count($questions));
+			$RND->shuffle($randkeys);
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
 		if (isset($GLOBALS['capturechoices'])) {
@@ -1195,14 +1195,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$la = $la[0];
 
 		if ($noshuffle == "last") {
-			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
-			shuffle($randkeys);
+			$randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			$RND->shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all" || count($questions)==1) {
 			$randkeys = array_keys($questions);
 		} else {
-			$randkeys = array_rand($questions,count($questions));
-			shuffle($randkeys);
+			$randkeys = $RND->array_rand($questions,count($questions));
+			$RND->shuffle($randkeys);
 		}
 		$_SESSION['choicemap'][$qn] = $randkeys;
 		if (isset($GLOBALS['capturechoices'])) {
@@ -1314,14 +1314,14 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($noshuffle=="questions" || $noshuffle=='all') {
 			$randqkeys = array_keys($questions);
 		} else {
-			$randqkeys = array_rand($questions,count($questions));
-			shuffle($randqkeys);
+			$randqkeys = $RND->array_rand($questions,count($questions));
+			$RND->shuffle($randqkeys);
 		}
 		if ($noshuffle=="answers" || $noshuffle=='all') {
 			$randakeys = array_keys($answers);
 		} else {
-			$randakeys = array_rand($answers,count($answers));
-			shuffle($randakeys);
+			$randakeys = $RND->array_rand($answers,count($answers));
+			$RND->shuffle($randakeys);
 		}
 
 		if (isset($GLOBALS['capturechoices'])) {
@@ -1722,11 +1722,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tp[$j] = rand($fromto[0],$fromto[1]);
+					$tp[$j] = $RND->rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
+					$tp[$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
 				} else {
-					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
+					$tp[$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
 				}
 			}
 			$pts[$i] = implode("~",$tp);
@@ -2955,7 +2955,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	$defaultreltol = .0015;
-	global $mathfuncs;
+	global $RND,$mathfuncs;
 	if ($anstype == "number") {
 		if (is_array($options['answer'])) {$answer = $options['answer'][$qn];} else {$answer = $options['answer'];}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
@@ -3253,14 +3253,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
 		if ($noshuffle == "last") {
-			$randkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
-			shuffle($randkeys);
+			$randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			$RND->shuffle($randkeys);
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
 		} else {
-			$randkeys = array_rand($questions,count($questions));
-			shuffle($randkeys);
+			$randkeys = $RND->array_rand($questions,count($questions));
+			$RND->shuffle($randkeys);
 		}
 		if ($givenans==='NA' || $givenans === null) {
 			$GLOBALS['partlastanswer'] = $givenans;
@@ -3297,14 +3297,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$score = 1.0;
 		if ($noshuffle == "last") {
-			$randqkeys = array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
-			shuffle($randqkeys);
+			$randqkeys = $RND->array_rand(array_slice($questions,0,count($questions)-1),count($questions)-1);
+			$RND->shuffle($randqkeys);
 			array_push($randqkeys,count($questions)-1);
 		} else if ($noshuffle == "all" || count($questions)==1) {
 			$randqkeys = array_keys($questions);
 		} else {
-			$randqkeys = array_rand($questions,count($questions));
-			shuffle($randqkeys);
+			$randqkeys = $RND->array_rand($questions,count($questions));
+			$RND->shuffle($randqkeys);
 		}
 		if (trim($answers)=='') {
 			$akeys = array();
@@ -3357,14 +3357,14 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($noshuffle=="questions" || $noshuffle=='all') {
 			$randqkeys = array_keys($questions);
 		} else {
-			$randqkeys = array_rand($questions,count($questions));
-			shuffle($randqkeys);
+			$randqkeys = $RND->array_rand($questions,count($questions));
+			$RND->shuffle($randqkeys);
 		}
 		if ($noshuffle=="answers" || $noshuffle=='all') {
 			$randakeys = array_keys($answers);
 		} else {
-			$randakeys = array_rand($answers,count($answers));
-			shuffle($randakeys);
+			$randakeys = $RND->array_rand($answers,count($answers));
+			$RND->shuffle($randakeys);
 		}
 		if (isset($matchlist)) {$matchlist = array_map('trim',explode(',',$matchlist));}
 
@@ -4061,11 +4061,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		for ($i = 0; $i < 20; $i++) {
 			for($j=0; $j < count($variables); $j++) {
 				if (isset($fromto[2]) && $fromto[2]=="integers") {
-					$tps[$i][$j] = rand($fromto[0],$fromto[1]);
+					$tps[$i][$j] = $RND->rand($fromto[0],$fromto[1]);
 				} else if (isset($fromto[2*$j+1])) {
-					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*rand(0,499)/500.0 + 0.001;
+					$tps[$i][$j] = $fromto[2*$j] + ($fromto[2*$j+1]-$fromto[2*$j])*$RND->rand(0,499)/500.0 + 0.001;
 				} else {
-					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*rand(0,499)/500.0 + 0.001;
+					$tps[$i][$j] = $fromto[0] + ($fromto[1]-$fromto[0])*$RND->rand(0,499)/500.0 + 0.001;
 				}
 			}
 		}
@@ -5963,8 +5963,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (isset($GLOBALS['asid'])) { //going to use assessmentid/random
 				$randstr = '';
 				/*using rand was messing up the disp/score regen sequence of multipart
-				  for ($i=0; $i<6; $i++) {
-					$n = rand(0,61);
+				for ($i=0; $i<6; $i++) {
+					$n = $RND->rand(0,61);
 					if ($n<10) { $randstr .= chr(48+$n);}
 					else if ($n<36) { $randstr .= chr(65 + $n-10);}
 					else { $randstr .= chr(97 + $n-36);}
