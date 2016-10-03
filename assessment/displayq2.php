@@ -2234,7 +2234,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (isset($ansprompt)) {$out .= "<label for=\"qn$qn\">$ansprompt</label>";}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 
-		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+		$ansformats = array_map('trim',explode(',',$answerformat));
+
+		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
 			$top = _('Enter your answer by selecting the shade type, and by clicking and dragging the sliders on the normal curve');
 			$shorttip = _('Adjust the sliders');
 		} else {
@@ -2247,7 +2249,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			}
 			$shorttip = _('Enter an interval using interval notation');
 		}
-		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
 			$out .=  '<div style="background:#fff;padding:10px;">';
 			$out .=  '<p style="margin:0px";>Shade: <select id="shaderegions'.$qn.'" onchange="imathasDraw.chgnormtype(this.id.substring(12));"><option value="1L">' . _('Left of a value') . '</option><option value="1R">' . _('Right of a value') . '</option>';
 			$out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag and arrows to adjust the values.');
@@ -2266,11 +2268,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid2txt'.$qn.'"></div>';
 			$out .=  '</div></div>';
 			$out .=  '<script type="text/javascript">imathasDraw.addnormslider('.$qn.');</script>';
-		} else if ($answerformat=='normalcurve') {
+		} else if (in_array('normalcurve',$ansformats)) {
 			$out .= _('Enter an interval corresponding to the region to be shaded');
 		}
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\"  ";
-		if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+		if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
 			$out .= 'style="position:absolute;visibility:hidden;" ';
 		}
 		/*if ($showtips==2) { //eqntips: work in progress
@@ -2297,8 +2299,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 		$out .= '/>';
 		$out .= getcolormark($colorbox);
+		if (in_array('nosoln',$ansformats))  {
+			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, 'interval');
+			$answer = str_replace('"','',$answer);
+		}
 		if (isset($answer)) {
-			if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
+			if (in_array('normalcurve',$ansformats) && $GLOBALS['sessiondata']['graphdisp']!=0) {
 				$sa .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;background:#fff;">';
 				if (preg_match('/\(-oo,([\-\d\.]+)\)U\(([\-\d\.]+),oo\)/',$answer,$matches)) {
 					$sa .=  '<div style="position: absolute; left:0; top:0; height:200px; width:'.(250+60*$matches[1]+1).'px; background:#00f;">&nbsp;</div>';
@@ -2382,8 +2388,12 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$preview .= "<span id=p$qn></span> ";
 		$out .= "<script type=\"text/javascript\">intcalctoproc[$qn] = 1 ; calcformat[$qn] = '$answerformat';</script>\n";
 
+		if (in_array('nosoln',$ansformats)) {
+			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox, in_array('inequality',$ansformats)?'inequality':'interval');
+		}
+
 		if (isset($answer)) {
-			if (in_array('inequality',$ansformats)) {
+			if (in_array('inequality',$ansformats) && strpos($answer,'"')===false) {
 				$sa = '`'.intervaltoineq($answer,$variables).'`';
 			} else {
 				$sa = '`'.str_replace('U','uu',$answer).'`';
@@ -4420,6 +4430,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		$givenans = normalizemathunicode($givenans);
 		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
 
+		if (in_array('nosoln',$ansformats)) {
+			list($givenans, $_POST["tc$qn"], $answer) = scorenosolninf($qn, $givenans, $answer, $ansprompt, in_array('inequality',$ansformats)?'inequality':'interval');
+		}
+
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
 			$givenans = str_replace('u', 'U', $givenans);
@@ -4436,7 +4450,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				foreach ($matches[0] as $var) {
 					$var = str_replace(' ','',$var);
 					if (in_array($var,$mathfuncs)) { continue;}
-					if ($var!= 'or' && $var!='and' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
+					if ($var!= 'or' && $var!='and' && $var!='DNE' && $var != $variables && $_POST["qn$qn"]!="(-oo,oo)") {
 						return 0;
 					}
 				}
@@ -6557,12 +6571,16 @@ function getcolormark($c,$wrongformat=false) {
 	}
 }
 
-function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, $colorbox) {
+function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, $colorbox, $format="number") {
 	$answerbox = preg_replace('/<label.*?<\/label>/','',$answerbox);  //remove existing ansprompt
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
 	if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
 		$specsoln = _('One or more solutions: ');
+	} else if ($format=='interval') {
+		$specsoln = _('Interval notation solution: ');
+	} else if ($format=='inequality') {
+		$specsoln = _('Inequality notation solution: ');
 	} else {
 		$specsoln = _('One solution: ');
 	}
@@ -6610,7 +6628,7 @@ function setupnosolninf($qn, $answerbox, $answer, $ansformats, $la, $ansprompt, 
 	return array($out,$answer);
 }
 
-function scorenosolninf($qn, $givenans, $answer, $ansprompt) {
+function scorenosolninf($qn, $givenans, $answer, $ansprompt, $format="number") {
 	$nosoln = _('No solution');
 	$infsoln = _('Infinite number of solutions');
 	if (isset($ansprompt)) {
