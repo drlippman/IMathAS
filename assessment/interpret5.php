@@ -394,7 +394,7 @@ function tokenize($str,$anstype,$countcnt) {
 					} else if ($out=='ln') {
 						$out = 'log';
 					} else if ($out=='rand') {
-						$out = '$RND->rand';
+						$out = '$GLOBALS[\'RND\']->rand';
 					} else {
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
