@@ -1261,53 +1261,16 @@ function doonsubmit(form,type2,skipconfirm) {
 		str = document.getElementById("tc"+qn).value;
 		str = str.replace(/,/g,"");
 		str = normalizemathunicode(str);
+		var strprocess = AMnumfuncPrepVar(qn, str);
+		str = strprocess[0];
+		varlist = strprocess[2];
+
 		if (iseqn[qn]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
 		} else {
 			if (str.match("=")) {continue;}
 		}
 		fl = flist[qn];
-		varlist = vlist[qn];
-
-		vars = varlist.split("|");
-		for (var i=0; i<vars.length; i++) {
-			foundaltcap = false;
-			for (var j=0; j<vars.length; j++) {
-				if (i!=j && vars[j].toLowerCase()==vars[i].toLowerCase() && vars[j]!=vars[i]) {
-					foundaltcap = true;
-					break;
-				}
-			}
-			if (!foundaltcap) {
-				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
-				regmod = "gi";
-			} else {
-				regmod = "g";
-			}
-
-			if (vars[i].length>2 && vars[i].match(/^\w+_\w+$/)) {
-				var varpts = vars[i].match(/^(\w+)_(\w+)$/);
-				str = str.replace(new RegExp(varpts[1]+'_\\('+varpts[2]+'\\)', regmod), vars[i]);
-				str = str.replace(new RegExp(varpts[0],"g"), "repvars"+i);
-				vars[i] = "repvars"+i;
-			} else if (vars[i] == "varE") {
-				str = str.replace("E","varE");
-			}
-
-			/*else if (vars[i].charCodeAt(0)>96) { //lowercase
-			  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
-				//vars[i] = vars[i].toLowerCase();
-				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
-			  }
-			} else {
-			  if (arraysearch(vars[i].toLowerCase(),vars)==-1) {
-				//vars[i] = vars[i].toLowerCase();
-				str = str.replace(new RegExp(vars[i],"gi"),vars[i]);
-			  }
-			}
-			*/
-		}
-		varlist = vars.join("|");
 
 		if (fl!='') {
 			reg = new RegExp("("+fl+")\\(","g");
