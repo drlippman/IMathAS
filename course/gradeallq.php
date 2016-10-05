@@ -162,6 +162,7 @@
 
 	if ($isgroup>0) {
 		$groupnames = array();
+		$groupmembers = array();
 		//DB $query = "SELECT id,name FROM imas_stugroups WHERE groupsetid=$groupsetid";
 		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -170,15 +171,18 @@
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$groupnames[$row[0]] = $row[1];
 		}
-		$grplist = implode(',',array_keys($groupnames));
-		$groupmembers = array();
-		//DB $query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB while ($row = mysql_fetch_row($result)) {
-		$stm = $DBH->query("SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName");
-		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
-			$groupmembers[$row[0]][] = $row[2].' '.$row[1];
+		if (count($groupnames)>0) {
+			$grplist = implode(',',array_keys($groupnames));
+			//DB $query = "SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->query("SELECT isg.stugroupid,iu.LastName,iu.FirstName FROM imas_stugroupmembers AS isg JOIN imas_users as iu ON isg.userid=iu.id WHERE isg.stugroupid IN ($grplist) ORDER BY iu.LastName,iu.FirstName");
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				if (!isset($groupmembers[$row[0]])) {  $groupmembers[$row[0]] = array();}
+				$groupmembers[$row[0]][] = $row[2].' '.$row[1];
+			}
+		} else {
+			$isgroup = 0;  //disregard isgroup if no groups exist
 		}
 
 	}
