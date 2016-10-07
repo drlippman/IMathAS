@@ -4714,8 +4714,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
 			if ($lines=='') {
 				$line = array();
+				$extrapolys = 0;
 			} else {
 				$lines = explode(';',$lines);
+				$extrapolys = count($lines)-1;
 				$line = $lines[0]; //only use first line
 				$line = explode('),(',substr($line,1,strlen($line)-2));
 				foreach ($line as $j=>$pt) {
@@ -4771,6 +4773,9 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$adjv = $correctadj/$totaladj;
 
 			$totscore = ($vals+$adjv)/2;
+			if ($extrapolys>0) {
+				$totscore = $totscore/(1+$extrapolys);
+			}
 			//echo "Vals score: $vals, adj score: $adjv. </p>";
 
 			if (isset($abstolerance)) {
