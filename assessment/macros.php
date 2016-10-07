@@ -3421,6 +3421,7 @@ class Rand {
 				$this->seed = rand();
 			}
 		} else {
+			$n = (int)$n;
 			if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
 				$this->seed = $n;
 			} else {
@@ -3434,6 +3435,8 @@ class Rand {
 			if ($max===null) {
 				$max = $this->randmax;
 			}
+			$min = (int)$min;
+			$max = (int)$max;
 			if ($min < $max) {
 				$this->seed ^= ($this->seed << 13);
 				$this->seed ^= ($this->seed >> 17);
@@ -3482,6 +3485,7 @@ class Rand {
 			} else if ($n==count($arr)) { //no point in shuffling since php's internal function doesn't shuffle
 				return $keys;
 			} else {
+				$n = (int)$n;
 				$this->shuffle($keys);
 				return array_slice($keys,0,$n);
 			}
