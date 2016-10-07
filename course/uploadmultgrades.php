@@ -197,16 +197,18 @@ if (!(isset($teacherid))) {
 					//DB $names[$k] = addslashes($n);
 				//DB }
 				//DB $namelist = "'".implode("','",$names)."'";
-				$in  = str_repeat('?,', count($names) - 1) . '?';
-				//DB $query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
-				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-				//DB while ($row = mysql_fetch_row($result)) {
-				$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($in) AND courseid=?");
-				$stm->execute(array_merge($names, array($cid)));
-				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-					$loc = array_search($row[1],$names);
-					if ($loc===false) {continue; } //shouldn't happen
-					$columndata[$loc][3] = $row[0];  //store existing gbitems.id
+				if (count($names)>0) {
+					$in  = str_repeat('?,', count($names) - 1) . '?';
+					//DB $query = "SELECT id,name FROM imas_gbitems WHERE name IN ($namelist) AND courseid='$cid'";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB while ($row = mysql_fetch_row($result)) {
+					$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE name IN ($in) AND courseid=?");
+					$stm->execute(array_merge($names, array($cid)));
+					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+						$loc = array_search($row[1],$names);
+						if ($loc===false) {continue; } //shouldn't happen
+						$columndata[$loc][3] = $row[0];  //store existing gbitems.id
+					}
 				}
 				if (!isset($usernamecol)) {
 					$usernamecol = 1;
