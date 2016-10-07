@@ -470,10 +470,11 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 	return $out;
 }
 
-//normrand(mu,sigma,n)
+//normrand(mu,sigma,n, [rnd])
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
-function normrand($mu,$sig,$n) {
+//specify rnd to round to that many digits
+function normrand($mu,$sig,$n,$rnd=null) {
 	global $RND;
 	for ($i=0;$i<ceil($n/2);$i++) {
 		do {
@@ -483,8 +484,13 @@ function normrand($mu,$sig,$n) {
 			$count++;
 		} while ($r==0||$r>1);
 		$r = sqrt(-2*log($r)/$r);
-		$z[] = $sig*$a*$r + $mu;
-		$z[] = $sig*$b*$r + $mu;
+		if ($rnd!==null) {
+			$z[] = round($sig*$a*$r + $mu, $rnd);
+			$z[] = round($sig*$b*$r + $mu, $rnd);
+		} else {
+			$z[] = $sig*$a*$r + $mu;
+			$z[] = $sig*$b*$r + $mu;
+		}
 	}
 	if ($n%2==0) {
 		return $z;
