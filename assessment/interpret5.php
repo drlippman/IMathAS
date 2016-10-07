@@ -16,6 +16,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
+		$str = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$str);  //block function eval or backticks as way of generating variable name
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -24,6 +25,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
 		$r =  interpretline($str.';',$anstype,$countcnt).';';
+		$r = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$r);
 		return $r;
 	}
 }
@@ -527,17 +529,23 @@ function tokenize($str,$anstype,$countcnt) {
 			} else {
 				$c = $str{$i};
 			}
-		} else if ($c=='"' || $c=="'") { //string
+		} else if ($c=='"' || $c=="'" || $c=='`') { //string, or unquoted math
 			$intype = 6;
 			$qtype = $c;
+			$strtext = '';
 			do {
-				$out .= $c;
+				$strtext .= $c;
 				$i++;
 				if ($i==$len) {break;}
 				$lastc = $c;
 				$c = $str{$i};
 			} while (!($c==$qtype && $lastc!='\\'));
-			$out .= $c;
+			$strtext .= $c;
+			if ($c=='`') {
+				$out = _('"invalid - unquoted backticks"');
+			} else {
+				$out .= $strtext;
+			}
 			$i++;
 			$c = $str{$i};
 		} else if ($c=="\n") {
