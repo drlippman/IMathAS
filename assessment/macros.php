@@ -3476,6 +3476,16 @@ class Rand {
 		}
 	}
 
+	public function str_shuffle($str) {
+		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
+			$arr = str_split($str);
+			$this->shuffle($arr);
+			return implode('', $arr);
+		} else {
+			return str_shuffle($str);
+		}
+	}
+
 	public function array_rand($arr, $n=1) {
 		if (isset($GLOBALS['assessver']) && $GLOBALS['assessver']>0) {
 			$keys = array_keys($arr);

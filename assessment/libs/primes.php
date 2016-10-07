@@ -14,10 +14,10 @@ $primes[6] = array(804847, 929459, 280811, 802027, 614527, 774313, 929623, 26804
 
 
 //getprime([digits])
-//returns a prime number. 
+//returns a prime number.
 //if digits is specified, returns a prime with that many digits.  1 to 6 is supported
 function getprime($digits = 0) {
-	global $primes;
+	global $primes, $RND;
 	//global $primes;
 	if ($digits == 0) {
 		$c1 = count($primes[1]);
@@ -26,7 +26,7 @@ function getprime($digits = 0) {
 		$c4 = count($primes[4]);
 		$c5 = count($primes[5]);
 		$c6 = count($primes[6]);
-		$r = rand(0,$c1+$c2+$c3+$c4+$c5+$c6);
+		$r = $RND->rand(0,$c1+$c2+$c3+$c4+$c5+$c6);
 		if ($r<$c1) {
 			return $primes[1][$r];
 		} else if ($r < $c1+$c2) {
@@ -44,18 +44,18 @@ function getprime($digits = 0) {
 		if ($digits<0 || $digits>6) {
 			echo "$digits digit primes not supported.";
 		} else {
-			return $primes[$digits][rand(0,count($primes[$digits])-1)];
+			return $primes[$digits][$RND->rand(0,count($primes[$digits])-1)];
 		}
 	}
 }
 
 //getprimes(n,[digits])
-//returns n different prime numbers. 
+//returns n different prime numbers.
 //if digits is specified, returns primes with that many digits.  1 to 6 is supported
 function getprimes($n,$digits=0) {
 	global $primes;
 	$out = array();
-	
+
 	if ($digits == 0) {
 		$c1 = count($primes[1]);
 		$c2 = count($primes[2]);
@@ -89,11 +89,10 @@ function getprimes($n,$digits=0) {
 			}
 		} else {
 			$out[] =  $primes[$digits][$r];
-			
-		}	
+
+		}
 	}
 	return $out;
 }
 
 ?>
-
