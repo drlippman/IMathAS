@@ -100,10 +100,13 @@ function handleClickTextSegmentButton(e) {
 
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
-	 if (usingASCIIMath) {
-	      rendermathnode(document.getElementById("curqtbl"));
-         }
-         updateqgrpcookie();
+	if (usingASCIIMath) {
+		$("#curqtbl tr:not(.textsegmentrow)").each(function(i,el) {
+			rendermathnode(el);
+		});
+
+  }
+  updateqgrpcookie();
 	initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
 	tinymce.init({
 		selector: "h4.textsegment",

@@ -20,6 +20,9 @@
 	padding: 0px 5px;
 	margin: 0; /* h4 typically has a large margin which isn't needed */
 }
+.textsegment span.AMedit {
+	border: 1px solid #ff0000;
+}
 h4.textsegment {
 	padding: 3px 5px 5px;
 }
