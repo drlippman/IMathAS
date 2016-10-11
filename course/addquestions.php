@@ -472,7 +472,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($text_segments[$qncnt])) {
 			foreach ($text_segments[$qncnt] as $text_seg) {
 				//stupid hack: putting a couple extra unused entries in array so length>=5
-				$jsarr .= '["text", "'.str_replace('"','\\"',trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
+				$jsarr .= '["text", "'.str_replace(array("\\",'"'),array("\\\\",'\\"'),trim($text_seg['text'])).'",'.($text_seg['displayUntil']-$text_seg['displayBefore']+1).','.$text_seg['ispage'].',"'.str_replace('"','\\"',trim($text_seg['pagetitle'])).'",1],';
 			}
 		}
 		if (strpos($items[$i],'~')!==false) {
