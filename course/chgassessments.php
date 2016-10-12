@@ -297,15 +297,6 @@ if (!(isset($teacherid))) {
 			}
 		}
 
-		if (isset($_POST['chgintro'])) {
-			//DB $query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['intro']));
-			//DB $sets[] = "intro='".addslashes(mysql_result($result,0,0))."'";
-			$sets[] = "intro=:intro";
-			$qarr[':intro'] = $stm->fetchColumn(0);
-		}
 		if (isset($_POST['chgsummary'])) {
 			//DB $query = "SELECT summary FROM imas_assessments WHERE id='{$_POST['summary']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -345,6 +336,29 @@ if (!(isset($teacherid))) {
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)");
 			$stm->execute($qarr);
+		}
+		if (isset($_POST['chgintro'])) {
+			//DB $query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT intro FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$_POST['intro']));
+			$cpintro = $stm->fetchColumn(0);
+			if (($introjson=json_decode($cpintro))!==null) { //is json intro
+				$newintro = $introjson[0];
+			} else {
+				$newintro = $cpintro;
+			}
+			$stm = $DBH->query("SELECT id,intro FROM imas_assessments WHERE id IN ($checkedlist)");
+			$stmupd = $DBH->prepare("UPDATE imas_assessments SET intro=:intro WHERE id=:id");
+			while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+				if (($introjson=json_decode($row['intro']))!==null) { //is json intro
+					$introjson[0] = $newintro;
+					$outintro = json_encode($introjson);
+				} else {
+					$outintro = $newintro;
+				}
+				$stmupd->execute(array(':id'=>$row['id'], ':intro'=>$outintro));
+			}
 		}
 
 		if (isset($_POST['removeperq'])) {

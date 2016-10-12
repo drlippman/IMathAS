@@ -181,7 +181,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':id'=>$_POST['copyfrom']));
 			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = $stm->fetch(PDO::FETCH_NUM);
 			if (isset($_POST['copyinstr'])) {
-				$_POST['intro'] = $cpintro;
+				if (($introjson=json_decode($cpintro))!==null) { //is json intro
+					$_POST['intro'] = $introjson[0];
+				} else {
+					$_POST['intro'] = $cpintro;
+				}
 			}
 			if (isset($_POST['copysummary'])) {
 				$_POST['summary'] = $cpsummary;
