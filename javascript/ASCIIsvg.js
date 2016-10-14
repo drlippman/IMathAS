@@ -26,6 +26,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 General Public License (at http://www.gnu.org/copyleft/gpl.html)
 for more details.*/
 
+//reserved:
+//minify using something that will preserve these variables:
+//like uglify on http://refresh-sf.com/
+//origin,border,strokewidth,strokedasharray,stroke,fill,fontstyle,fontfamily,fontsize,fontweight,fontstroke,fontfill,fontbackground,fillopacity,markerstrokewidth,markerstroke,markerfill,marker,arrowfill,dotradius,ticklength,axesstroke,gridstroke,xmin,xmax,ymin,ymax,xscl,yscl,xgrid,ygrid,xtick,ytick,width,height
+
+(function() {
 var ASnoSVG = false;
 var checkIfSVGavailable = true;
 var notifyIfNoSVG = false;
@@ -320,10 +326,16 @@ function initPicture(x_min,x_max,y_min,y_max) {
       qnode.setAttribute("width",picture.getAttribute("width"));
       qnode.setAttribute("height",picture.getAttribute("height"));
       qnode.setAttribute("alt",picture.getAttribute("alt"));
-      if (picture.parentNode!=null)
-        picture.parentNode.replaceChild(qnode,picture);
-      else
+      if (picture.parentNode!=null) {
+        //picture.parentNode.replaceChild(qnode,picture);
+	picture.parentNode.insertBefore(qnode,picture);
+	picture.style.display="none";
+	picture.removeAttribute("sscr");
+	picture.removeAttribute("script");
+      } else {
         svgpicture.parentNode.replaceChild(qnode,svgpicture);
+      }
+
       svgpicture = qnode;
       doc = document;
       pointerpos = doc.getElementById("pointerpos");
@@ -1087,9 +1099,11 @@ function parseShortScript(sscript,gw,gh) {
 		picture.setAttribute("alt",eqnlist);
 
 		try {
+			console.log(commands);
 			eval(commands);
 		} catch (e) {
 			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
+			//console.log("Graph not ready");
 			//alert("Graph not ready");
 		}
 
@@ -1140,7 +1154,7 @@ function drawPics() {
 				  parseShortScript(sscr);
 			  } catch (e) {}
 		  } else {
-			  src = picture.getAttribute("script"); //script from showplot
+			  src = picture.hasAttribute("data-script")?picture.getAttribute("data-script"):picture.getAttribute("script"); //script from showplot
 			  if ((src!=null) && (src != "")) {
 				  try {
 					  with (Math) eval(src);
@@ -1148,14 +1162,14 @@ function drawPics() {
 			  }
 		  }
 	  } else {
-			sscr = picture.hasAttribute("data-sscr")?picture.getAttribute("data-sscr"):picture.getAttribute("sscr");
-		  if ((sscr != null) && (sscr != "")) {
+		sscr = picture.hasAttribute("data-sscr")?picture.getAttribute("data-sscr"):picture.getAttribute("sscr");
+		if ((sscr != null) && (sscr != "")) {
 			  n = document.createElement('img');
 			  n.setAttribute("style",picture.getAttribute("style"));
 			  n.setAttribute("src",AScgiloc+'?sscr='+encodeURIComponent(sscr));
 			  pn = picture.parentNode;
 			  pn.replaceChild(n,picture);
-		  }
+		}
 	  }
 	}
 }
@@ -1269,3 +1283,7 @@ if (checkIfSVGavailable) {
   nd = isSVGavailable();
   ASnoSVG = nd!=null;
 }
+
+window.drawPictures = drawPictures;
+window.drawPics = drawPics;
+})();
