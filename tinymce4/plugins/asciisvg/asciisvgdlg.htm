@@ -1,10 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<!--[if lt IE 9]> 
+<!--[if lt IE 9]>
 <meta http-equiv="X-UA-Compatible" content="IE=7" />
 <![endif]-->
 	<title>Graph Editor</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="../../../javascript/mathjs.js?v=071316"></script>
 	<script type="text/javascript" src="../../../javascript/ASCIIsvg_min.js?v=071316"></script>
 	<script type="text/javascript" src="js/asciisvgdlg.js"></script>
@@ -38,20 +39,20 @@ Color: <Select id="gcolor">
 	<option value="green">Green</option>
 	<option value="blue">Blue</option>
 	<option value="purple">Purple</option>
-</select> 
+</select>
 Width: <Select id="strokewidth">
 	<option value="1">1</option>
 	<option value="2">2</option>
 	<option value="3">3</option>
 	<option value="4">4</option>
-</select> 
+</select>
 Line: <Select id="strokedash">
 	<option value="none">Solid</option>
 	<option value="2">Dotted</option>
 	<option value="5">Dashed</option>
 	<option value="5 2">Tight Dash</option>
 	<option value="7 3 2 3">Dash-Dot</option>
-</select> 
+</select>
 
 Start with: <Select id="gstart">
 	<option value="none">Nothing</option>
@@ -64,7 +65,7 @@ End with: <Select id="gend">
 	<option value="arrow">Arrow</option>
 	<option value="opendot">Open Dot</option>
 	<option value="dot">Dot</option>
-</select> 
+</select>
 </div>
 <HR>
 
@@ -99,7 +100,7 @@ Graphs: <select id="graphs" onchange="AsciisvgDialog.loadeqn()"></select>
 <hr/>
 <div id="preview"><embed id="previewsvg" type="image/svg+xml" style="width: 300px; height: 200px; vertical-align: middle; float: none;" sscr="-7.5,7.5,-5,5,1,1,1,1,1,300,200" /></div>
 
-	
+
 	<div class="mceActionPanel">
 		<div style="float: left">
 			<button class="mce-btn mce-primary" id="insert" name="insert" value="" onclick="AsciisvgDialog.insert();">Insert</button>
