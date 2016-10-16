@@ -749,6 +749,12 @@ echo "</p>";
 					} else {
 						echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
 					}
+				} else if ($isteacher) {
+					if ($line['posttype']==2) {
+						echo "<img src=\"$imasroot/img/lock.png\" alt=\"Lock\" title=\"Locked (no replies)\" /> ";
+					} else if ($line['posttype']==3) {
+						echo "<img src=\"$imasroot/img/noview.png\" alt=\"No View\" title=\"Students can only see their own replies\" /> ";
+					}
 				}
 				if ($isteacher) {
 					echo "<a href=\"thread.php?page=$page&cid=$cid&forum={$line['forumid']}&move={$line['id']}\">Move</a> ";
