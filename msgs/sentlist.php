@@ -56,7 +56,7 @@ isread is bitwise:
 1      2         4                   8
 Read   Deleted   Deleted by Sender   Tagged
 	*/
-	if (isset($_POST['remove'])) {
+	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
 		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&2)=2";
@@ -66,7 +66,7 @@ Read   Deleted   Deleted by Sender   Tagged
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
-	if (isset($_POST['unsend'])) {
+	if (isset($_POST['unsend']) && count($_POST['checked'])>0) {
 		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist)";
