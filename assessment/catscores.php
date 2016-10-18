@@ -107,7 +107,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $assessmentname = mysql_result($result, 0, 0);
 			$assess_name_stm->execute(array(':id'=>$categoryaid, ':courseid'=>$cid));
-			$assessmentname = $stm->fetchColumn(0);
+			$assessmentname = $assess_name_stm->fetchColumn(0);
 			//link to the other assessment
 			$catname="<a href='../assessment/showtest.php?cid=$cid&aid=$categoryaid' >$assessmentname</a>";
 		} else {
