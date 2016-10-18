@@ -5,13 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>JSXG</title>
+
+  <style media="screen">
+    pre {
+      font-family: monospace;
+      border: 2px solid rgb(210,210,210);
+      background-color: rgb(240,240,240);
+      border-radius: 8px;
+      padding: 10px;
+      margin: 0px 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>JSXG Macro Library</h1>
-  <p>JSXGraph Integration functions, Version 1.0, July 30, 2016. Written by Grant Sander.</p>
+  <p>JSXGraph Integration functions, Version 1.0, September 2, 2016. Written by Grant Sander.</p>
   <hr>
   <p>
-    This library provides functions to integrate <a href="http://jsxgraph.uni-bayreuth.de/wp/index.html">JSXGraph</a> into MathAS/MOM. To use the library in a question, make sure to call <pre>loadlibrary("JSXG");</pre> before calling the functions.
+    This library provides functions to integrate <a href="http://jsxgraph.uni-bayreuth.de/wp/index.html">JSXGraph</a> into MathAS/MOM. To use the library in a question, make sure to call
+  </p>
+  <pre>loadlibrary("JSXG");</pre>
+  <p>
+    before calling the functions.
   </p>
   <ul>
     <li><a href="#loadJSX">loadJSX</a></li>
@@ -20,12 +35,27 @@
     <li><a href="#JSXG_addFunction">JSXG_addFunction</a></li>
     <li><a href="#JSXG_addFunction">JSXG_addParametric</a></li>
     <li><a href="#JSXG_addText">JSXG_addText</a></li>
-    <li><a href="#JSXG_addArrow">JSXG_addArrow</a></li>
-    <li><a href="#JSXG_addPoint">JSXG_addPoint</a></li>
-    <li><a href="#JSXG_addPoint">JSXG_addSegment</a></li>
+
     <li><a href="#JSXG_createPolarAxes">JSXG_addcreatePolarAxes</a></li>
     <li><a href="#JSXG_addPolar">JSXG_addPolar</a></li>
+
+    <li><a href="#JSXG_createBlankBoard">JSXG_createBlankBoard</a></li>
+    <li><a href="#JSXG_addPoint">JSXG_addPoint</a></li>
+    <li><a href="#JSXG_addPoint">JSXG_addSegment</a></li>
+    <li><a href="#JSXG_addArrow">JSXG_addArrow</a></li>
+    <li><a href="#JSXG_addLine">JSXG_addLine</a></li>
+    <li><a href="#JSXG_addRay">JSXG_addRay</a></li>
+    <li><a href="#JSXG_addAngle">JSXG_addAngle</a></li>
+    <li><a href="#JSXG_addCircle">JSXG_addCircle</a></li>
+    <li><a href="#JSXG_addPolygon">JSXG_addPolygon</a></li>
+    <li><a href="#JSXG_addGlider">JSXG_addGlider</a></li>
+
   </ul>
+
+  <h2>Some Notes</h2>
+  <p>
+    In all of the construction functions, and argument of 'attributes' can be passed to the options array, which will manually override the default attributes of an object. Use the <a href="http://jsxgraph.uni-bayreuth.de/docs/">JSXGraph API Reference</a> to view key-value pairs for attributes of certain objects. The $ops['attributes'] value should be a JSON string representing an attributes object that JSXGraph will understand, such as $ops['attributes']="{fixed:true, strokeColor:'purple'}";
+  </p>
 
   <h2><a name="loadJSX">loadJSX()</a></h2>
   <p>This function merely loads the JSXGraph script into the page, used to load the script for custom constructions.</p>
@@ -46,9 +76,9 @@
   <p>The created board with have a JS-name of board_$label. </p>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-3,7,-5,5]; $ops['axisLabel']=["`x`","`y=x^2`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-3,7,-5,5]; $ops['axisLabel']=["`x`","`y=x^2`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
   </pre>
   <p>Add the $board variable to your Question Text where you want the graph to display.</p>
 
@@ -65,12 +95,12 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
   </pre>
 
   <!-- addFunction -->
@@ -88,15 +118,15 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[400, 400]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['rule']="sin(%a*x)"; $ops['bounds']=[0, "%a"]; $ops['strokeColor']="green";
-    $board = JSXG_addFunction($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule']="sin(%a*x)"; $ops['bounds']=[0, "%a"]; $ops['attributes']="{strokeColor:'green'}";
+$board = JSXG_addFunction($board, $ops);
   </pre>
 
   <!-- addParametric -->
@@ -114,15 +144,15 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['rule']=["t*cos(%a/5*t)", "sin(t)"]; $ops['bounds']=[-1, "%a"];
-    $board = JSXG_addParametric($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule']=["t*cos(%a/5*t)", "sin(t)"]; $ops['bounds']=[-1, "%a"];
+$board = JSXG_addParametric($board, $ops);
   </pre>
 
   <!-- addText -->
@@ -140,91 +170,18 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['position']=["3*cos(%a)", "3*sin(%a)"]; $ops['text']="math: `x^2/pi`"; $ops['anchor']=["left","bottom"];
-    $board = JSXG_addText($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['position']=["3*cos(%a)", "3*sin(%a)"]; $ops['text']="math: `x^2/pi`"; $ops['attributes']="{anchorX:'left', anchorY:'middle', color:'red'}";
+$board = JSXG_addText($board, $ops);
   </pre>
 
-  <!-- addArrow -->
-  <h2><a name="JSXG_addArrow">JSXG_addArrow($board, $ops)</a></h2>
-  <p>Adds an arrow to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes().</p>
-  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
-  <ul>
-    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
-    <li>$ops['position']=[(float|string) x1, (float|string) y1, (float|string) x2, (float|string)y2] sets the starting and ending point of an arrow. Slider values can be used.</li>
-    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
-    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
-    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
-  </ul>
-  <h4>Example</h4>
-  <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
-
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
-
-    $ops=array(); $ops['slider-names']=["a"]; $ops['position']=[0,0,"4*cos(%a)","abs(cos(%a))*sin(%a)"]; $ops['dash']=3; $ops['strokeColor']="red";
-    $board = JSXG_addArrow($board, $ops);
-  </pre>
-
-  <!-- addPoint -->
-  <h2><a name="JSXG_addPoint">JSXG_addPoint($board, $ops)</a></h2>
-  <p>Adds a point to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes(). The position of the point can be linked to an answer box.</p>
-  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
-  <ul>
-    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
-    <li>$ops['position']=[(float|string) x, (float|string) y] sets the position of the point. Slider values can be used.</li>
-    <li>$ops['draggable']=true will make the point draggable. By default, points are fixed unless they are linked to answerbox.</li>
-    <li>$ops['color']=(string) sets the color of the point</li>
-    <li>$ops['size']=(int) sets the size of the point. Defaults to 2.</li>
-    <li>$ops['face']=(string) sets the face of the point. Defaults to "circle".</li>
-    <li>$ops['name']=(string) sets the label of the point. ASCIIMath can be used.</li>
-    <li>$ops['answerbox']=[$thisq, (optional) partNumber], if specified, this will like the point's coordinates to an answer box. If the question is not multipart/conditional, use $ops['answerbox']=[$thisq]. If multipart, use $ops['answerbox']=[$thisq, 0] to link to first box, etc..</li>
-  </ul>
-  <h4>Example</h4>
-  <p>Set question type to N-Tuple.</p>
-  <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
-
-    $ops=array(); $ops['position']=[1,1]; $ops['answerbox']=[$thisq]; $ops['name']="`x/pi`";
-    $board = JSXG_addPoint($board, $ops);
-  </pre>
-
-  <!-- addSegment -->
-  <h2><a name="JSXG_addSegment">JSXG_addSegment($board, $ops)</a></h2>
-  <p>Adds a segment to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes().</p>
-  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
-  <ul>
-    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
-    <li>$ops['position']=[(float|string) x1, (float|string) y1, (float|string) x2, (float|string) y2] sets the starting and ending point of the segment. Slider values can be used.</li>
-    <li>$ops['strokeColor']=(string) sets the color of the segment</li>
-    <li>$ops['strokeWidth']=(int) sets the width of the segment. Defaults to 2.</li>
-    <li>$ops['dash']=(int) will make the segment dashed. Not dashed by default. Set to 2-9 for dashing.</li>
-  </ul>
-  <h4>Example</h4>
-  <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
-    $board = JSXG_createAxes("plot{$thisq}", $ops);
-
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
-
-    $ops=array(); $ops['slider-names']=["a"]; $ops['position']=["2*cos(%a)", "2*sin(%a)", "2*cos(%a)+1", "2*sin(%a)"]; $ops['strokeWidth']=4;
-    $board = JSXG_addSegment($board, $ops);
-  </pre>
-
-  <!-- addSegment -->
+  <!--  Polar Axes -->
   <h2><a name="JSXG_createPolarAxes">JSXG_createPolarAxes($label, $ops)</a></h2>
   <p>Creates a set of polar axes. $label is the name of the board, and should be unique if there are more than one JSXGraph boards in a question/page.</p>
   <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
@@ -248,9 +205,9 @@
   <p>The created board with have a JS-name of board_$label. </p>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
-    $board = JSXG_createPolarAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
+$board = JSXG_createPolarAxes("plot{$thisq}", $ops);
   </pre>
   <p>Add the $board variable to your Question Text where you want the graph to display.</p>
 
@@ -268,15 +225,314 @@
   </ul>
   <h4>Example</h4>
   <pre>
-    loadlibrary("JSXG");
-    $ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
-    $board = JSXG_createPolarAxes("plot{$thisq}", $ops);
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=400; $ops['pad-top']=true; $ops['r']=[7,1]; $ops['theta']=['pi',6]; $ops['controls']=['no-pan'];
+$board = JSXG_createPolarAxes("plot{$thisq}", $ops);
 
-    $ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[0.1,8,1]; $ops['name']="<i>a</i>";
-    $board = JSXG_addSlider($board, "a", $ops);
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[0.1,8,1]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
 
-    $ops=array(); $ops['slider-names']=["a"]; $ops['rule'] = "t/3*cos(t)"; $ops['bounds']=[0, "%a*pi"];
-    $board = JSXG_addPolar($board, $ops);
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule'] = "t/3*cos(t)"; $ops['bounds']=[0, "%a*pi"];
+$board = JSXG_addPolar($board, $ops);
+  </pre>
+
+  <!-- createBlankBoard -->
+  <h2><a name="JSXG_createBlankBoard">JSXG_createBlankBoard($label, $ops)</a></h2>
+  <p>Creates a blank canvas. Similar to JSXG_createAxes(), but doesn't draw axes. $label is the name of the board, and should be unique if there are more than one JSXGraph boards in a question/page.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['size']=[(float) width, (float) height], size of board. Provide width and height (in pixels).</li>
+    <li>$ops['bounds']=[(float) xmin, (float) xmax, (float) ymin, (float) ymax] sets the cartesian bounds of the board.</li>
+    <li>$ops['controls']=['nav-bar', 'zoom', 'no-pan'] adds some navigation options. Include 'nav-bar' to include navigation buttons, 'zoom' for zooming, 'no-pan' to disable panning.</li>
+    <li>$ops['centered']=false will make the board left-justified, otherwise it will be centered.</li>
+  </ul>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[0.1,8,1]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
+
+$ops=array(); $ops['slider-names']=["a"]; $ops['rule'] = "t/3*cos(t)"; $ops['bounds']=[0, "%a*pi"];
+$board = JSXG_addPolar($board, $ops);
+  </pre>
+
+  <!-- addPoint -->
+  <h2><a name="JSXG_addPoint">JSXG_addPoint($board, $ops, $ref)</a></h2>
+  <p>Adds a point to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes(). The position of the point can be linked to an answer box.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[(float|string) x, (float|string) y] sets the position of the point. Slider values can be used.</li>
+    <li>$ops['fixed']=true will make the point fixed. By default, points are moveable.</li>
+    <li>$ops['color']=(string) sets the color of the point</li>
+    <li>$ops['size']=(int) sets the size of the point. Defaults to 2.</li>
+    <li>$ops['face']=(string) sets the face of the point. Defaults to "circle".</li>
+    <li>$ops['name']=(string) sets the label of the point. ASCIIMath can be used.</li>
+    <li>$ops['answerbox']=[$thisq, (optional) partNumber], if specified, this will like the point's coordinates to an answer box. If the question is not multipart/conditional, use $ops['answerbox']=[$thisq]. If multipart, use $ops['answerbox']=[$thisq, 0] to link to first box, etc..</li>
+  </ul>
+  <p>
+    $ref is an optional variable. It will give the point a name for reference, so that you can use it when constructing other elements. If a reference is provided, the point can be reference using the variable "p_$label_$ref" where $label is the label of the board the point lives in, and $ref is the reference you gave the point.
+  </p>
+  <h4>Example</h4>
+  <p>Set question type to N-Tuple.</p>
+  <pre>
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position']=[1,1]; $ops['answerbox']=[$thisq]; $ops['name']="`x/pi`";
+$board = JSXG_addPoint($board, $ops, "A");
+  </pre>
+
+  <!-- addSegment -->
+  <h2><a name="JSXG_addSegment">JSXG_addSegment($board, $ops, $ref)</a></h2>
+  <p>Adds a segment to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes().</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[[(float|string) x1, (float|string) y1], [(float|string) x2, (float|string) y2]] sets the starting and ending point of the segment. Slider values can be used. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", [0,3]];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the segment</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the segment. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the segment dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable. It will give the segment a name for reference, so that you can use it when constructing other elements. If a reference is provided, the point can be reference using the variable "seg_$label_$ref" where $label is the label of the board the point lives in, and $ref is the reference you gave the point.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position']=[1,1];
+$board = JSXG_addPoint($board, $ops, "a");
+
+$ops=array(); $ops['slider-names']=["a"]; $ops['position']=[[0,0], "p_plot{$thisq}_a"]; $ops['strokeWidth']=4;
+$board = JSXG_addSegment($board, $ops);
+  </pre>
+
+  <!-- addArrow -->
+  <h2><a name="JSXG_addArrow">JSXG_addArrow($board, $ops, $ref)</a></h2>
+  <p>Adds an arrow to an existing set of axes. $board should be a variable returned from JSXG_createAxes() or JSXG_createPolarAxes().</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[[(float|string) x1, (float|string) y1], [(float|string) x2, (float|string) y2]] sets the starting and ending point of an arrow. Slider values can be used. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", [0,3]];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via vec_$label_$ref where $label is the label of the board that the arrow/vector lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+$ops=array(); $ops['size']=[300, 300]; $ops['bounds']=[-5,5,-5,5]; $ops['axisLabel']=["`x`","`y`"];
+$board = JSXG_createAxes("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position']=[0.05,0.1,0.25,0.1]; $ops['range']=[1,10,3]; $ops['name']="<i>a</i>";
+$board = JSXG_addSlider($board, "a", $ops);
+
+$ops=array(); $ops['slider-names']=["a"]; $ops['position']=[[0,0],["4*cos(%a)","abs(cos(%a))*sin(%a)"]]; $ops['dash']=3; $ops['strokeColor']="red";
+$board = JSXG_addArrow($board, $ops);
+  </pre>
+
+  <!-- Line -->
+  <h2><a name="JSXG_addLine">JSXG_addLine($board, $ops, $ref)</a></h2>
+  <p>Adds a line to an existing set of axes or board. $board should be a variable returned from a board or axes construction function.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[[(float|string) x1, (float|string) y1], [(float|string) x2, (float|string)y2]] sets the starting and ending point of an arrow. Slider values can be used. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", [0,3]];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via line_$label_$ref where $label is the label of the board that the line lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5]; $ops['controls'] = ['no-pan'];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position'] = [-1,1]; $ops['name']='A';
+$board = JSXG_addPoint($board, $ops, "a");
+
+$ops=array(); $ops['position'] = [1,2]; $ops['name']='B';
+$board = JSXG_addPoint($board, $ops, "b");
+
+$ops=array(); $ops['position'] = ["p_plot{$thisq}_a", "p_plot{$thisq}_b"];
+$ops['attributes']="{strokeColor:'rgb(200,0,230)'}";
+$board = JSXG_addLine($board, $ops);
+  </pre>
+
+  <!-- Ray -->
+  <h2><a name="JSXG_addRay">JSXG_addRay($board, $ops, $ref)</a></h2>
+  <p>Adds a ray to an existing set of axes or board. $board should be a variable returned from a board or axes construction function.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[[(float|string) x1, (float|string) y1], [(float|string) x2, (float|string)y2]] sets the starting point and point to pass through of the ray. Slider values can be used. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", [0,3]];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via ray_$label_$ref where $label is the label of the board that the ray lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5]; $ops['controls'] = ['no-pan'];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position'] = [-1,1]; $ops['name']='A';
+$board = JSXG_addPoint($board, $ops, "a");
+
+$ops=array(); $ops['position'] = [[0,0], "p_plot{$thisq}_a"];
+$ops['attributes']="{strokeColor:'rgb(200,0,230)'}";
+$board = JSXG_addRay($board, $ops);
+  </pre>
+
+  <!-- Angle -->
+  <h2><a name="JSXG_addAngle">JSXG_addAngle($board, $ops, $ref)</a></h2>
+  <p>Adds an angle to an existing set of axes or board. $board should be a variable returned from a board or axes construction function.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[(point) p1, (point) p2, (point) p3] defines the angle as &angle;p1, p2, p3. Slider values can be used. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", [0,0], ["%a", 0]];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript objects can be referenced via angle_$label_$ref_i (initial ray) and angle_$label_$ref_t (terminal ray) where $label is the label of the board that the angle lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5]; $ops['controls'] = ['no-pan'];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['position'] = [-1,1]; $ops['name']='A';
+$board = JSXG_addPoint($board, $ops, "a");
+
+$ops=array(); $ops['position'] = [1,2]; $ops['name']='B';
+$board = JSXG_addPoint($board, $ops, "b");
+
+$ops=array(); $ops['position'] = ["p_plot{$thisq}_a", [0,0], "p_plot{$thisq}_b"];
+$board = JSXG_addAngle($board, $ops);
+  </pre>
+
+  <!-- Circle -->
+  <h2><a name="JSXG_addCircle">JSXG_addCircle($board, $ops, $ref)</a></h2>
+  <p>Adds a circle to an existing set of axes or board. $board should be a variable returned from a board or axes construction function.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']=[(point) center, (float) radius] sets the center and radius of the circle, The second argument can also be a point, and the circle will pass through that point. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", 2];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via circ_$label_$ref where $label is the label of the board that the circle lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5]; $ops['controls'] = ['no-pan'];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['range'] = [0,4,1]; $ops['name']='a';
+$board = JSXG_addSlider($board, "a", $ops);
+
+$ops=array(); $ops['position'] = [1,2]; $ops['name']='C';
+$board = JSXG_addPoint($board, $ops, "c");
+
+$ops=array(); $ops['position'] = ["p_plot{$thisq}_c", "%a"]; $ops['slider-names']=["a"];
+$board = JSXG_addCircle($board, $ops);
+  </pre>
+
+  <!-- Polygon -->
+  <h2><a name="JSXG_addPolygon">JSXG_addPolygon($board, $ops, $ref)</a></h2>
+  <p>Adds a polygon to an existing set of axes or board. $board should be a variable returned from a board or axes construction function.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['slider-names']=[(string)], array of slider names, tells PHP that you're going to be using those slider values. If you're not using a slider, don't set this option.</li>
+    <li>$ops['position']= [array of points] sets the vertices of the polygon. If you want to reference a point, use the point name for a position of the segment: $ops['position']=["p_plot{$thisq}_a", "p_plot{$thisq}_a", [0,0]];</li>
+    <li>$ops['strokeColor']=(string) sets the color of the arrow</li>
+    <li>$ops['strokeWidth']=(int) sets the width of the arrow. Defaults to 2.</li>
+    <li>$ops['dash']=(int) will make the arrow dashed. Not dashed by default. Set to 2-9 for dashing.</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via poly_$label_$ref where $label is the label of the board that the polygon lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5]; $ops['controls'] = ['no-pan'];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['range'] = [-2*pi,2*pi,0]; $ops['name']='a';
+$board = JSXG_addSlider($board, "a", $ops);
+
+$ops=array(); $ops['position'] = [-1,1];
+$board = JSXG_addPoint($board, $ops, "a");
+
+$ops=array(); $ops['position'] = [1,2];
+$board = JSXG_addPoint($board, $ops, "b");
+
+$ops=array(); $ops['position'] = ["p_plot{$thisq}_a", "p_plot{$thisq}_b", ["2*cos(%a)", "2*sin(%a)"]]; $ops['slider-names']=["a"];
+$ops['attributes'] ="{fillColor:'green', fillOpacity:0.7}";
+$board = JSXG_addPolygon($board, $ops);
+  </pre>
+
+  <!-- Glider -->
+  <h2><a name="JSXG_addGlider">JSXG_addGlider($board, $ops, $ref)</a></h2>
+  <p>Adds a glider (or point on an object) to an existing set of axes or board. $board should be a variable returned from a board or axes construction function.</p>
+  <p>$ops is an associative array containing name/value pairs for the options. The options are:</p>
+  <ul>
+    <li>$ops['position']= [(float) x, (float) y, (object) home] sets the starting location of the point, and the object the point/glider lives on. If you want to reference a point, use the point name for a position of the segment: $ops['position']=[0,0, "circ_plot{$thisq}_a"];</li>
+    <li>$ops['color']=(string) sets the color of the point</li>
+    <li>$ops['size']=(int) sets the size of the point. Defaults to 2.</li>
+    <li>$ops['face']=(string) sets the face of the point. Defaults to "circle".</li>
+    <li>$ops['name']=(string) sets the label of the point. ASCIIMath can be used.</li>
+    <li>$ops['answerbox']=[$thisq, (optional) partNumber], if specified, this will like the point's coordinates to an answer box. If the question is not multipart/conditional, use $ops['answerbox']=[$thisq]. If multipart, use $ops['answerbox']=[$thisq, 0] to link to first box, etc..</li>
+  </ul>
+  <p>
+    $ref is an optional variable that will give a reference to this object, so the JavaScript object can be referenced via glider_$label_$ref where $label is the label of the board that the glider lives in.
+  </p>
+  <h4>Example</h4>
+  <pre>
+loadlibrary("JSXG");
+
+$ops=array(); $ops['size']=[400,400]; $ops['bounds']=[-5,5,-5,5]; $ops['controls'] = ['no-pan'];
+$board = JSXG_createBlankBoard("plot{$thisq}", $ops);
+
+$ops=array(); $ops['range'] = [1,3,1]; $ops['name']='a';
+$board = JSXG_addSlider($board, "a", $ops);
+
+$ops=array(); $ops['position'] = [[0,0], "%a"]; $ops['slider-names']=["a"];
+$board = JSXG_addCircle($board, $ops, "1");
+
+$ops=array(); $ops['position'] = [1,0, "circ_plot{$thisq}_1"];
+$board = JSXG_addGlider($board, $ops, "1");
+
+$ops=array(); $ops['position'] = [[0,0], "glider_plot{$thisq}_1"];
+$board = JSXG_addLine($board, $ops);
   </pre>
 
 

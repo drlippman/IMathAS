@@ -1,5 +1,6 @@
 <?php
-// JSXGraph Integration functions, Version 1.0, Spring 2016
+// JSXGraph Integration functions, Version 1.0, Fall 2016
+// Grant Sander
 
 
 global $allowedmacros;
@@ -14,9 +15,18 @@ $allowedmacros[] = "JSXG_addFunction";
 $allowedmacros[] = "JSXG_addParametric";
 $allowedmacros[] = "JSXG_addText";
 $allowedmacros[] = "JSXG_addSlider";
+
+// Geometry macros
+$allowedmacros[] = "JSXG_createBlankBoard";
 $allowedmacros[] = "JSXG_addArrow";
 $allowedmacros[] = "JSXG_addPoint";
 $allowedmacros[] = "JSXG_addSegment";
+$allowedmacros[] = "JSXG_addLine";
+$allowedmacros[] = "JSXG_addRay";
+$allowedmacros[] = "JSXG_addAngle";
+$allowedmacros[] = "JSXG_addCircle";
+$allowedmacros[] = "JSXG_addPolygon";
+$allowedmacros[] = "JSXG_addGlider";
 
 ####### BASIC FUNCTION THAT JUST LOADS THE JSXGRAPH SCRIPT
 function loadJSX() {
@@ -31,6 +41,34 @@ function getJSXscript () {
 			JXGscriptloaded = true;
 		}</script>';
 }
+
+####################################
+#### JSXG_setUpBoard ###############
+# Set up a board. Auxillary functions
+function JSXG_setUpBoard($label, $width=350, $height=350, $centered=true){
+  $cntrd = $centered===true ? "margin:auto;" : "";
+  // Start output string by getting script
+  $out = getJSXscript();
+  // make board
+  $out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:{$width}px; height:{$height}px; {$cntrd}'></div>";
+  // Start script
+  $out .= "<script type='text/javascript'>";
+  // We build construction function inline, push function to initstack to load async
+  $out .= "function makeBoard{$label}(){
+           try{";
+  $out .= "JXG.Options.text.fontSize = 16;";
+   // This is where new content gets inserted
+   $out .= "/*INSERTHERE*/";
+   // End of construction function. Push it to initstack
+   $out .= "} catch(err){console.log(err);}
+          }
+					initstack.push(makeBoard{$label});
+          </script>"; // End of script
+
+   return $out;
+
+}
+
 #####################################
 ######### JSXG_createBoard ##########
 # creates a set of axes, and a board to construct on.
@@ -52,27 +90,13 @@ function JSXG_createAxes($label, $ops=array()){
    $navBar = ($ops['controls']!==null && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
    $zoom = ($ops['controls']!==null && in_array('zoom', $ops['controls'])) ? "true" : "false";
    $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
+   $centered = $ops['centered']!==null ? false : true;
 
    $useMathJax = ($ops['axisLabel']!==null && (strpos($ops['axisLabel'][0], "`")>-1 || strpos($ops['axisLabel'][1], "`")>-1)) ? "true" : "false";
 
-
-   // Add JSXGraph Script
-   $out .= getJSXscript();
-
-   // Create a home for the board
-   $cntrd = $ops['centered']!==null ? "" : "margin:auto;";
-   // BE CAREFUL - THE ID OF THE DIV BELOW IS BEING USED IN LATER CODE
-   $out .= "<div id='jxgboard_{$label}' style='background-color:#FFF; width:{$width}px; height:{$height}px; {$cntrd}'></div>";
-   // Start construction
-   $out .= "<script type='text/javascript'>";
-   // We build construction function inline, but call it after div.question loads.
-   $out .= "function makeBoard{$label}(){
-            try{";
-   // ID LIKE TO LOAD SCRIPT AFTER PAGE LOAD - BUT THIS FAILS IN EMBEDDED ASSESSMENTS
-   // Layering options. Push the axis in front of ticks
-   $out .= "JXG.Options.layer = {numlayers: 20, text: 9, point: 9, glider: 9, arc: 8, line: 7, circle: 6,
+    // Start output
+   $out = "JXG.Options.layer = {numlayers: 20, text: 9, point: 9, glider: 9, arc: 8, line: 7, circle: 6,
              curve: 5, turtle: 5, polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, grid: 1, image: 0, trace: 0};";
-   $out .= "JXG.Options.text.fontSize = 16;";
    //$out .= "JXG.Options.text.useMathJax = true;";
    // Create the board
    $defaultAxis = $ops['tickDistance'] ? "false" : "true";
@@ -165,15 +189,9 @@ function JSXG_createAxes($label, $ops=array()){
         board_{$label}.on('boundingbox', function(){setTicks{$label}();});
         board_{$label}.fullUpdate();";
     }
-   // Close up shop.
-   $out .= "/*INSERTHERE*/";
-   // End of construction function;
-   // Create DOM script element, make it call the construction function af end of div.question
-   $out .= "} catch(err){console.log(err);}
-          }
-					initstack.push(makeBoard{$label});
-          </script>"; // End of script
-   return $out;
+    $boardinit = JSXG_setUpBoard($label, $width, $height, $centered);
+    return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"),0);
+
 }
 
 #####################################
@@ -225,6 +243,9 @@ function JSXG_addSlider($board, $sname, $ops=array()){
             strokeColor: '{$color}',
             label: {color:'{$color}'}
           })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']})";
+    }
 
     // If answerbox option provided, link the point to the answerbox
     if($ops['answerbox']!==null ){
@@ -357,7 +378,12 @@ function JSXG_addFunction($board, $ops=array()){
             fixed: true,
             highlight: false,
             name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
-          });";
+          })";
+  if ($ops['attributes']!==null){
+    $out .= ".setAttribute({$ops['attributes']});";
+  } else {
+    $out .= ";";
+  }
 
   // Append new output string to the board string
   return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
@@ -443,8 +469,12 @@ function JSXG_addParametric($board, $ops=array()){
             strokeWidth: {$width},
             highlight:false,
             name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
-          });";
-
+          })";
+  if ($ops['attributes']!==null){
+    $out .= ".setAttribute({$ops['attributes']})";
+  } else {
+    $out .= ";";
+  }
   // Append new output string to the board string
   return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 }
@@ -528,301 +558,20 @@ function JSXG_addText($board, $ops=array()){
             rotate: {$rotate},
             color: '{$color}',
             name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
-          });";
-
+          })";
+  if ($ops['attributes']!==null){
+    $out .= ".setAttribute({$ops['attributes']});";
+  } else {
+    $out .= ";";
+  }
     // Append new output string to the board string
     return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 }
 
-#####################################
-######### JSXG_addArrow ##########
-function JSXG_addArrow($board, $ops=array()){
-  // Get Label string -- so we know how to link elements
-  $labStart = strpos($board, "jxgboard_") + 9;
-  $labEnd = strpos($board, "'", $labStart);
-  $label = substr($board, $labStart, $labEnd - $labStart);
-
-  // Make some default values
-  $x1 = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-  $y1 = $ops['position'][1]!==null ? $ops['position'][1] : 0;
-  $x2 = $ops['position'][2]!==null ? $ops['position'][2] : 3;
-  $y2 = $ops['position'][3]!==null ? $ops['position'][3] : 3;
-  // attributes
-  $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-  $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-  $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-  $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-  $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
-
-  $out .= "board_{$label}.create('arrow', [[";
-  // x1 value
-  if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
-    $out .= "function(){
-      var x1s = '{$x1}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($x1, "%{$sn}")>-1){
-        $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
-  } else {
-    $out .= "{$x1},";
-  }
-  // y1 value
-  if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
-    $out .= "function(){
-      var y1s = '{$y1}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($y1, "%{$sn}")>-1){
-        $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
-  } else {
-    $out .= "{$y1}],[";
-  }
-  // x2 value
-  if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
-    $out .= "function(){
-      var x2s = '{$x2}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($x2, "%{$sn}")>-1){
-        $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
-  } else {
-    $out .= "{$x2},";
-  }
-  // y2 value
-  if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
-    $out .= "function(){
-      var y2s = '{$y2}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($y2, "%{$sn}")>-1){
-        $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
-  } else {
-    $out .= "{$y2}]],";
-  }
-
-  // Set attributes and close up shop.
-  $out .= "{
-            highlight: {$highlight},
-            fixed: {$fixed},
-            strokeColor: '{$color}',
-            strokeWidth: {$strokeWidth},
-            dash: {$dash},
-            name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
-          });";
-
-    // Append new output string to the board string{
-    return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
-}
-
-#####################################
-######### JSXG_addPoint ##########
-function JSXG_addPoint($board, $ops=array()){
-  // Get Label string -- so we know how to link elements
-  $labStart = strpos($board, "jxgboard_") + 9;
-  $labEnd = strpos($board, "'", $labStart);
-  $label = substr($board, $labStart, $labEnd - $labStart);
-
-  // Make some default values
-  $x = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-  $y = $ops['position'][1]!==null ? $ops['position'][1] : 0;
-
-  // attributes
-  $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-  $draggable = ($ops['draggable']!==null || $ops['answerbox']!==null) ? "true" : "false";
-  $fixed = $draggable=="false" ? "true" : "false";
-  $color = $ops['color']!==null ? $ops['color'] : 'black';
-  $size = $ops['size']!==null ? $ops['size'] : 2;
-  $face = $ops['face']!==null ? $ops['face'] : 'circle';
-
-  // If answerbox option provided, set up box number
-  if($ops['answerbox']!==null ){
-    if (count($ops['answerbox'])==1){
-      $box = $ops['answerbox'][0] - 1;
-    } else {
-      $box = $ops['answerbox'][0]*1000 + $ops['answerbox'][1];
-    }
-    // Then name the point for use in persistence
-    $out .= "
-      p{$label}_{$box} = ";
-  }
 
 
-  $out .= "board_{$label}.create('point', [";
-  // x value
-  if ($ops['slider-names']!=null && strpos($x, "%")>-1){
-    $out .= "function(){
-      var xs = '{$x}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($x, "%{$sn}")>-1){
-        $out .= "xs = xs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var x = eval(mathjs(xs)); return x;},";
-  } else {
-    $out .= "{$x},";
-  }
-  // y value
-  if ($ops['slider-names']!=null && strpos($y, "%")>-1){
-    $out .= "function(){
-      var ys = '{$y}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($y, "%{$sn}")>-1){
-        $out .= "ys = ys.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var y = eval(mathjs(ys)); return y;}],";
-  } else {
-    $out .= "{$y}],";
-  }
 
-  // Set attributes
-  $out .= "{
-            highlight: {$highlight},
-            showInfobox: false,
-            fixed: {$fixed},
-            color: '{$color}',
-            size: {$size},
-            face: '{$face}',
-            label: {color:'{$color}', useMathJax:true},
-            name: '" . ($ops['name']!==null ? $ops['name'] : "") . "'
-          })";
-  // If answerbox option provided, link the point to the answerbox
-  if($ops['answerbox']!==null ){
-    $out .= ".on('up',function(){
-      $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')');
-    });";
-    // Change border color of JSXG board based off of answerbox color
-    // (Green if correct, red if wrong, etc.)
-    // Have to do this on an interval, since the answerbox might not be loaded when script called
-    $out .= "
-      var colorInterval{$label}_{$box} = setInterval(function(){
-        if ($('#qn{$box}')[0] || $('#qn{$box}')[0]){
-          if ($('#qn{$box}, #tc{$box}').is('.ansgrn')){
-            $('#jxgboard_{$label}').css('border', '1px solid #0f0');
-          } else if ($('#qn{$box}, #tc{$box}').is('.ansred') || $('#qn{$box}, #tc{$box}').is('.ansyel')){
-            $('#jxgboard_{$label}').css('border','1px solid #f00');
-          }
-          /* Pull in answer from answerbox is possible */
-          if ($('#qn{$box}')[0] && $('#qn{$box}').val() !== ''){
-            var coords = $('#qn{$box}').val();
-            coords = coords.substring(1, coords.length - 2);
-            coords = coords.split(',');
-            p{$label}_{$box}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
-            board_{$label}.fullUpdate();
-          } else if ($('#tc{$box}')[0] && $('#tc{$box}').val() !== ''){
-            var coords = $('#tc{$box}').val();
-            coords = coords.substring(1, coords.length - 2);
-            coords = coords.split(',');
-            p{$label}_{$box}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
-            board_{$label}.fullUpdate();
-          }
-          clearInterval(colorInterval{$label}_{$box});
-        }
-      }, 300);
-    ";
-  } else {
-    $out .= ";";
-  }
 
-  // Append new output string to the board string
-  return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
-}
-
-#####################################
-######### JSXG_addSegment ##########
-function JSXG_addSegment($board, $ops=array()){
-  // Get Label string -- so we know how to link elements
-  $labStart = strpos($board, "jxgboard_") + 9;
-  $labEnd = strpos($board, "'", $labStart);
-  $label = substr($board, $labStart, $labEnd - $labStart);
-
-  // Make some default values
-  $x1 = $ops['position'][0]!==null ? $ops['position'][0] : 0;
-  $y1 = $ops['position'][1]!==null ? $ops['position'][1] : 0;
-  $x2 = $ops['position'][2]!==null ? $ops['position'][2] : 3;
-  $y2 = $ops['position'][3]!==null ? $ops['position'][3] : 3;
-  // attributes
-  $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
-  $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
-  $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
-  $dash = $ops['dash']!==null ? $ops['dash'] : 0;
-  $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
-
-  $out .= "board_{$label}.create('segment', [[";
-  // x1 value
-  if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
-    $out .= "function(){
-      var x1s = '{$x1}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($x1, "%{$sn}")>-1){
-        $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
-  } else {
-    $out .= "{$x1},";
-  }
-  // y1 value
-  if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
-    $out .= "function(){
-      var y1s = '{$y1}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($y1, "%{$sn}")>-1){
-        $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
-  } else {
-    $out .= "{$y1}],[";
-  }
-  // x2 value
-  if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
-    $out .= "function(){
-      var x2s = '{$x2}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($x2, "%{$sn}")>-1){
-        $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
-  } else {
-    $out .= "{$x2},";
-  }
-  // y2 value
-  if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
-    $out .= "function(){
-      var y2s = '{$y2}';";
-    foreach($ops['slider-names'] as $sn){
-      if (strpos($y2, "%{$sn}")>-1){
-        $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
-      }
-    }
-    $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
-  } else {
-    $out .= "{$y2}]],";
-  }
-
-  // Set attributes and close up shop.
-  $out .= "{
-            highlight: {$highlight},
-            fixed: {$fixed},
-            strokeColor: '{$color}',
-            dash: {$dash},
-            strokeWidth: {$strokeWidth},
-            name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
-          });";
-
-    // Append new output string to the board string{
-    return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
-}
 
 #############################################
 #############################################
@@ -851,26 +600,11 @@ function JSXG_createPolarAxes($label, $ops=array()){
    $navBar = ($ops['controls']!==null && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
    $zoom = ($ops['controls']!==null && in_array('zoom', $ops['controls'])) ? "true" : "false";
    $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
+   $centered = $ops['centered']!==null ? false : true;
 
-   // Add JSXGraph Script
-   $out .= getJSXscript();
 
-   // Create a home for the board
-   $cntrd = $ops['centered']!==null ? "" : "margin:auto;";
-   // BE CAREFUL - THE ID OF THE DIV BELOW IS BEING USED IN LATER CODE
-   $out .= "
-   <div id='jxgboard_{$label}' style='background-color:#FFF; width:{$size}px; height:{$boardHeight}px; {$cntrd}'></div>
-   ";
-   // Start construction
-   $out .= "<script type='text/javascript'>";
-   // We build construction function inline, but call it after div.question loads.
-   $out .= "
-   function makeBoard{$label}(){
-     try{
-   ";
-   // ID LIKE TO LOAD SCRIPT AFTER PAGE LOAD - BUT THIS FAILS IN EMBEDDED ASSESSMENTS
    // Layering options. Push the axis in front of ticks
-   $out .= "
+   $out = "
    JXG.Options.layer = {numlayers: 20, text: 9, point: 9, glider: 9, arc: 8, line: 7, circle: 6,curve: 8, turtle: 5, polygon: 3, sector: 3, angle: 3, integral: 3, axis: 3, ticks: 2, grid: 1, image: 0, trace: 0};
    ";
    $out .= "
@@ -1036,18 +770,9 @@ function JSXG_createPolarAxes($label, $ops=array()){
         }
         ";
     }
-
-   // Close up shop.
-   $out .= "/*INSERTHERE*/";
-   // End of construction function;
-   // Create DOM script element, make it call the construction function af end of div.question
-   $out .= "
-    } catch(err){console.log(err);}
-   }
-	 initstack.push(makeBoard{$label});
-   </script>
-   "; // End of script
-   return $out;
+    // Get initial board, add this output string to it.
+    $boardinit = JSXG_setUpBoard($label, $size, $boardHeight, $centered);
+    return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"),0);
 }
 
 #####################################
@@ -1140,12 +865,1146 @@ function JSXG_addPolar($board, $ops=array()){
       strokeColor: '{$color}',
       strokeWidth: {$width}
     }
-  );
+  )
   ";
+  if ($ops['attributes']!==null){
+    $out .= ".setAttribute({$ops['attributes']});";
+  } else {
+    $out .= ";";
+  }
 
   // Append new output string to the board string
   return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
 }
+
+
+
+
+#############################################
+#############################################
+####### Geometry Functionality #################
+
+#####################################
+######### JSXG_createBlankBoard ##########
+# creates a board with no axes
+function JSXG_createBlankBoard($label, $ops){
+  // Add some default values
+  $width = $ops['size'][0]!==null ? $ops['size'][0] : 350; // board width
+  $height = $ops['size'][1]!==null ? $ops['size'][1] : 350; // board height
+  //set the min and max x-values if provided, else default to [-5, 5]
+  $xmin = $ops['bounds'][0]!==null ? $ops['bounds'][0] : -5;
+  $xmax = $ops['bounds'][1]!==null ? $ops['bounds'][1] : 5;
+  $ymin = $ops['bounds'][2]!==null ? $ops['bounds'][2] : -5;
+  $ymax = $ops['bounds'][3]!==null ? $ops['bounds'][3] : 5;
+
+  $navBar = ($ops['controls']!==null && in_array('nav-bar', $ops['controls'])) ? "true" : "false";
+  $zoom = ($ops['controls']!==null && in_array('zoom', $ops['controls'])) ? "true" : "false";
+  $pan = ($ops['controls']!==null && in_array('no-pan', $ops['controls'])) ? "false" : "true";
+  $centered = $ops['centered']!==null ? false : true;
+
+  // Create the board
+  $out .= "var board_{$label} = JXG.JSXGraph.initBoard('jxgboard_{$label}', {
+           boundingbox: [{$xmin}, {$ymax}, {$xmax}, {$ymin}],
+           axis: false,
+           showCopyright: false,
+           showNavigation: {$navBar},
+           zoom: {
+            enabled: {$zoom},
+            factorX: 1.25,
+            factorY: 1.25,
+            wheel: {$zoom},
+            needshift: false,
+            eps: 0.1
+          },
+          pan: {
+            enabled: {$pan},
+            needshift: false
+          }
+         });";
+
+
+  // CLOSE UP shop
+  $boardinit = JSXG_setUpBoard($label, $width, $height, $centered);
+  return substr_replace($boardinit, $out, strpos($boardinit, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addPoint ##########
+  function JSXG_addPoint($board, $ops=array(), $ref = null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    // Make some default values
+    $x = $ops['position'][0]!==null ? $ops['position'][0] : 0;
+    $y = $ops['position'][1]!==null ? $ops['position'][1] : 0;
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "true";
+    $draggable = ($ops['draggable']!==null || $ops['answerbox']!==null) ? "true" : "false";
+    $fixed = $ops['fixed']!==null ? "true" : "false";
+
+    $color = $ops['color']!==null ? $ops['color'] : 'purple';
+    $size = $ops['size']!==null ? $ops['size'] : 2;
+    $face = $ops['face']!==null ? $ops['face'] : 'circle';
+
+    // If answerbox option provided, set up box number
+    if($ops['answerbox']!==null ){
+      if (count($ops['answerbox'])==1){
+        $box = $ops['answerbox'][0] - 1;
+      } else {
+        $box = $ops['answerbox'][0]*1000 + $ops['answerbox'][1];
+      }
+      $ref = ($ref!==null ? $ref : $box);
+    }
+
+    if ($ref!==null){
+      // name point, which is used in persistence
+      $out .= "
+        var p_{$label}_{$ref} = ";
+    }
+
+    $out .= "board_{$label}.create('point', [";
+    // x value
+    if ($ops['slider-names']!=null && strpos($x, "%")>-1){
+      $out .= "function(){
+        var xs = '{$x}';";
+      foreach($ops['slider-names'] as $sn){
+        if (strpos($x, "%{$sn}")>-1){
+          $out .= "xs = xs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        }
+      }
+      $out .= "with (Math) var x = eval(mathjs(xs)); return x;},";
+    } else {
+      $out .= "{$x},";
+    }
+    // y value
+    if ($ops['slider-names']!=null && strpos($y, "%")>-1){
+      $out .= "function(){
+        var ys = '{$y}';";
+      foreach($ops['slider-names'] as $sn){
+        if (strpos($y, "%{$sn}")>-1){
+          $out .= "ys = ys.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+        }
+      }
+      $out .= "with (Math) var y = eval(mathjs(ys)); return y;}],";
+    } else {
+      $out .= "{$y}],";
+    }
+
+    // Set attributes
+    $out .= "{
+              highlight: {$highlight},
+              showInfobox: false,
+              fixed: {$fixed},
+              color: '{$color}',
+              size: {$size},
+              face: '{$face}',
+              label: {color:'{$color}', useMathJax:true},
+              name: '" . ($ops['name']!==null ? $ops['name'] : "") . "'
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']})";
+    }
+    // If answerbox option provided, link the point to the answerbox
+    if($ops['answerbox']!==null ){
+      $out .= ".on('up',function(){
+        $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')');
+      });";
+      // Change border color of JSXG board based off of answerbox color
+      // (Green if correct, red if wrong, etc.)
+      // Have to do this on an interval, since the answerbox might not be loaded when script called
+      $out .= "
+        var colorInterval{$label}_{$box} = setInterval(function(){
+          if ($('#qn{$box}')[0] || $('#qn{$box}')[0]){
+            if ($('#qn{$box}, #tc{$box}').is('.ansgrn')){
+              $('#jxgboard_{$label}').css('border', '1px solid #0f0');
+            } else if ($('#qn{$box}, #tc{$box}').is('.ansred') || $('#qn{$box}, #tc{$box}').is('.ansyel')){
+              $('#jxgboard_{$label}').css('border','1px solid #f00');
+            }
+            /* Pull in answer from answerbox is possible */
+            if ($('#qn{$box}')[0] && $('#qn{$box}').val() !== ''){
+              var coords = $('#qn{$box}').val();
+              coords = coords.substring(1, coords.length - 2);
+              coords = coords.split(',');
+              p_{$label}_{$ref}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
+              board_{$label}.fullUpdate();
+            } else if ($('#tc{$box}')[0] && $('#tc{$box}').val() !== ''){
+              var coords = $('#tc{$box}').val();
+              coords = coords.substring(1, coords.length - 2);
+              coords = coords.split(',');
+              p_{$label}_{$ref}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
+              board_{$label}.fullUpdate();
+            }
+            clearInterval(colorInterval{$label}_{$box});
+          }
+        }, 300);
+      ";
+    } else {
+      $out .= ";";
+    }
+
+    // Append new output string to the board string
+    return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addSegment ##########
+  function JSXG_addSegment($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [0,0];
+    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [3,3];
+
+    // Make some default values
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    // If reference provided...
+    if ($ref!==null){
+      $out .= "
+      var seg_{$label}_{$ref} = ";
+    }
+    $out .= "board_{$label}.create('segment', [";
+    if (!is_array($p1)){
+      $out .= $p1 . ",";
+    } else {
+      $x1 = $p1[0]; $y1 = $p1[1];
+      $out .= "[";
+      // x1 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
+      } else {
+        $out .= "{$y1}],";
+      }
+    }
+    if (!is_array($p2)){
+      $out .= $p2 . "],";
+    } else{
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
+      } else {
+        $out .= "{$y2}]],";
+      }
+    }
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              dash: {$dash},
+              strokeWidth: {$strokeWidth},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addArrow ##########
+  function JSXG_addArrow($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    // Make some default values
+    $p1 = $ops['position'][0]!==null ? $ops['position'][0] : 0;
+    $p2 = $ops['position'][1]!==null ? $ops['position'][1] : 1;
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    if ($ref!==null){
+      $out .= "
+      var vec_{$label}_{$ref} = ";
+    }
+
+    $out .= "board_{$label}.create('arrow', [";
+
+    if (!is_array($p1)){
+      $out .= $p1 . ",";
+    } else {
+       $x1 = $p1[0]; $y1 = $p1[1];
+       $out .= "[";
+      // x1 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
+      } else {
+        $out .= "{$y1}],";
+      }
+    }
+    if (!is_array($p2)){
+      $out .= $p2 . "],";
+    } else {
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
+      } else {
+        $out .= "{$y2}]],";
+      }
+    }
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              strokeWidth: {$strokeWidth},
+              dash: {$dash},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out.=";";
+    }
+
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addLine ##########
+  function JSXG_addLine($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [0,0];
+    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [3,3];
+
+    // Make some default values
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    // If reference provided...
+    if ($ref!==null){
+      $out .= "
+      var line_{$label}_{$ref} = ";
+    }
+    $out .= "board_{$label}.create('line', [";
+    if (!is_array($p1)){
+      $out .= $p1 . ",";
+    } else {
+      $x1 = $p1[0]; $y1 = $p1[1];
+      $out .= "[";
+      // x1 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
+      } else {
+        $out .= "{$y1}],";
+      }
+    }
+    if (!is_array($p2)){
+      $out .= $p2 . "],";
+    } else{
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
+      } else {
+        $out .= "{$y2}]],";
+      }
+    }
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              dash: {$dash},
+              strokeWidth: {$strokeWidth},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addRay ##########
+  function JSXG_addRay($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [0,0];
+    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [3,3];
+
+    // Make some default values
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    // If reference provided...
+    if ($ref!==null){
+      $out .= "
+      var ray_{$label}_{$ref} = ";
+    }
+    $out .= "board_{$label}.create('line', [";
+    if (!is_array($p1)){
+      $out .= $p1 . ",";
+    } else {
+      $x1 = $p1[0]; $y1 = $p1[1];
+      $out .= "[";
+      // x1 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
+      } else {
+        $out .= "{$y1}],";
+      }
+    }
+    if (!is_array($p2)){
+      $out .= $p2 . "],";
+    } else{
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
+      } else {
+        $out .= "{$y2}]],";
+      }
+    }
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              dash: {$dash},
+              strokeWidth: {$strokeWidth},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . ",
+              lastArrow: true,
+              straightFirst: false
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addAngle ##########
+  function JSXG_addAngle($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [3,0];
+    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [0,0];
+    $p3 = $ops['position'][2] !== null ? $ops['position'][2] : [0,3];
+
+    // Make some default values
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    // initial ray
+    // If reference provided...
+    if ($ref!==null){
+      $out .= "
+      var angle_{$label}_{$ref}_i = ";
+    }
+    $out .= "board_{$label}.create('line', [";
+    if (!is_array($p2)){
+      $out .= $p2 . ",";
+    } else {
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y1s)); return y2;}],[";
+      } else {
+        $out .= "{$y2}],";
+      }
+    }
+    if (!is_array($p1)){
+      $out .= $p1 . "],";
+    } else{
+      $x1 = $p1[0]; $y1 = $p1[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}]],";
+      } else {
+        $out .= "{$y1}]],";
+      }
+    }
+    // Set attributes
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              dash: {$dash},
+              strokeWidth: {$strokeWidth},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . ",
+              lastArrow: true,
+              straightFirst: false
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+
+    // Terminal ray...
+    // If reference provided...
+    if ($ref!==null){
+      $out .= "
+      var angle_{$label}_{$ref}_t = ";
+    }
+    $out .= "board_{$label}.create('line', [";
+    if (!is_array($p2)){
+      $out .= $p2 . ",";
+    } else {
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y1s)); return y2;}],[";
+      } else {
+        $out .= "{$y2}],";
+      }
+    }
+    if (!is_array($p3)){
+      $out .= $p3 . "],";
+    } else{
+      $x3 = $p3[0]; $y3 = $p3[1];
+      $out .= "[";
+      // x3 value
+      if ($ops['slider-names']!=null && strpos($x3, "%")>-1){
+        $out .= "function(){
+          var x3s = '{$x3}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x3, "%{$sn}")>-1){
+            $out .= "x3s = x3s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x3 = eval(mathjs(x3s)); return x3;},";
+      } else {
+        $out .= "{$x3},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y3s = '{$y3}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y3, "%{$sn}")>-1){
+            $out .= "y3s = y3s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y3 = eval(mathjs(y3s)); return y3;}]],";
+      } else {
+        $out .= "{$y3}]],";
+      }
+    }
+    // Set attributes
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              dash: {$dash},
+              strokeWidth: {$strokeWidth},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . ",
+              lastArrow: true,
+              straightFirst: false
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addCircle ##########
+  function JSXG_addCircle($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $p1 = $ops['position'][0] !== null ? $ops['position'][0] : [3,0];
+    $p2 = $ops['position'][1] !== null ? $ops['position'][1] : [0,0];
+
+    // Make some default values
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    if ($ref!==null){
+      $out = "
+      var circ_{$label}_{$ref} = ";
+    }
+    $out .= "board_{$label}.create('circle', [";
+    if (!is_array($p1)){
+      $out .= $p1 . ",";
+    } else {
+      $x1 = $p1[0]; $y1 = $p1[1];
+      $out .= "[";
+      // x1 value
+      if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+        $out .= "function(){
+          var x1s = '{$x1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x1, "%{$sn}")>-1){
+            $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+      } else {
+        $out .= "{$x1},";
+      }
+      // y1 value
+      if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+        $out .= "function(){
+          var y1s = '{$y1}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y1, "%{$sn}")>-1){
+            $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}],[";
+      } else {
+        $out .= "{$y1}],";
+      }
+    }
+    // Radius or second point
+    if (!is_array($p2)){ // If radius provided...
+      if (is_float($p2)){ // raw radius provided
+        $out .= $p2 . "],";
+      } elseif (strpos($p2, "%")>-1){ // Slider value provided
+        $out .= "function(){
+          var rs = '{$p2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($p2, "%{$sn}")>-1){
+            $out .= "rs = rs.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var r = eval(mathjs(rs)); return r;}],";
+      } else { // Anything else... like function(){return P.X();}, etc.
+        $out .= $p2 . "],";
+      }
+    } else{ // If point provided
+      $x2 = $p2[0]; $y2 = $p2[1];
+      $out .= "[";
+      // x2 value
+      if ($ops['slider-names']!=null && strpos($x2, "%")>-1){
+        $out .= "function(){
+          var x2s = '{$x2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($x2, "%{$sn}")>-1){
+            $out .= "x2s = x2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var x2 = eval(mathjs(x2s)); return x2;},";
+      } else {
+        $out .= "{$x2},";
+      }
+      // y2 value
+      if ($ops['slider-names']!=null && strpos($y2, "%")>-1){
+        $out .= "function(){
+          var y2s = '{$y2}';";
+        foreach($ops['slider-names'] as $sn){
+          if (strpos($y2, "%{$sn}")>-1){
+            $out .= "y2s = y2s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+          }
+        }
+        $out .= "with (Math) var y2 = eval(mathjs(y2s)); return y2;}]],";
+      } else {
+        $out .= "{$y2}]],";
+      }
+    }
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              strokeColor: '{$color}',
+              dash: {$dash},
+              strokeWidth: {$strokeWidth},
+              name: " . ($ops['name']!==null ? $ops['name'] : "''") . "
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addPolygon ##########
+  function JSXG_addPolygon($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $points = $ops['position'] !== null ? $ops['position'] : [[-1,-1],[1,-1],[1,1],[-1,1]];
+
+    // Make some default values
+
+    // attributes
+    $highlight = $ops['highlight']!==null ? $ops['highlight'] : "false";
+    $fixed = $ops['fixed']!==null ? $ops['fixed'] : "true";
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'black';
+    $fillColor = $ops['fillColor']!==null ? $ops['fillColor'] : 'white';
+    $fillOpacity = $ops['fillOpacity']!==null ? $ops['fillOpacity'] : 0;
+
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    if ($ref!==null){
+      $out = "
+      var poly_{$label}_{$ref} = ";
+    }
+    $out .= "board_{$label}.create('polygon', [";
+    $numPoints = count($points);
+    for ($i=0; $i<$numPoints; $i++){
+      $point = $points[$i];
+      if (!is_array($point)){ // draggable point provided
+        $out .= $point;
+      } else {  // point with coordinates specified
+        $x1 = $point[0]; $y1 = $point[1];
+        $out .= "[";
+        // x1 value
+        if ($ops['slider-names']!=null && strpos($x1, "%")>-1){
+          $out .= "function(){
+            var x1s = '{$x1}';";
+          foreach($ops['slider-names'] as $sn){
+            if (strpos($x1, "%{$sn}")>-1){
+              $out .= "x1s = x1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            }
+          }
+          $out .= "with (Math) var x1 = eval(mathjs(x1s)); return x1;},";
+        } else {
+          $out .= "{$x1},";
+        }
+        // y1 value
+        if ($ops['slider-names']!=null && strpos($y1, "%")>-1){
+          $out .= "function(){
+            var y1s = '{$y1}';";
+          foreach($ops['slider-names'] as $sn){
+            if (strpos($y1, "%{$sn}")>-1){
+              $out .= "y1s = y1s.replace(/%{$sn}/g, param{$label}_{$sn}.Value());";
+            }
+          }
+          $out .= "with (Math) var y1 = eval(mathjs(y1s)); return y1;}]";
+        } else {
+          $out .= "{$y1}]";
+        }
+      }
+      // trailing comma except for last point
+      if ($i != $numPoints){ $out .= ",";}
+    }
+    $out .= "],";
+
+    // Set attributes and close up shop.
+    $out .= "{
+              highlight: {$highlight},
+              fixed: {$fixed},
+              fillColor: '{$fillColor}',
+              fillOpacity: {$fillOpacity},
+              vertices: {
+                showInfobox: false,
+                fixed:true,
+                highlight:false,
+                color: 'black',
+                size: 2
+              },
+              borders: {
+                fixed: {$fixed},
+                highlight: {$highlight},
+                showInfobox: false,
+                strokeColor: '{$color}',
+                strokeWidth: {$strokeWidth},
+                dash: {$dash}
+              }
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']});";
+    } else {
+      $out .= ";";
+    }
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
+
+  #####################################
+  ######### JSXG_addGlider ##########
+  function JSXG_addGlider($board, $ops=array(), $ref=null){
+    // Get Label string -- so we know how to link elements
+    $labStart = strpos($board, "jxgboard_") + 9;
+    $labEnd = strpos($board, "'", $labStart);
+    $label = substr($board, $labStart, $labEnd - $labStart);
+
+    $x = $ops['position'][0]!==null ? $ops['position'][0] : 0;
+    $y = $ops['position'][1]!==null ? $ops['position'][1] : 0;
+    $obj = $ops['position'][2]!==null ? $ops['position'][2] : '';
+
+    // Make some default values
+
+    // attributes
+    $color = $ops['strokeColor']!==null ? $ops['strokeColor'] : 'purple';
+    $size = $ops['size']!==null ? $ops['size'] : 2;
+    $face = $ops['face']!==null ? $ops['face'] : 'circle';
+
+    $dash = $ops['dash']!==null ? $ops['dash'] : 0;
+    $strokeWidth = $ops['strokeWidth']!==null ? $ops['strokeWidth'] : 2;
+
+    // If answerbox option provided, set up box number
+    if($ops['answerbox']!==null ){
+      if (count($ops['answerbox'])==1){
+        $box = $ops['answerbox'][0] - 1;
+      } else {
+        $box = $ops['answerbox'][0]*1000 + $ops['answerbox'][1];
+      }
+      $ref = ($ref!==null ? $ref : $box);
+    }
+
+    if ($ref!==null){
+      $out = "
+      var glider_{$label}_{$ref} = ";
+    }
+    $out .= "board_{$label}.create('glider', [";
+    $out .= "{$x}, {$y}, {$obj}],";
+
+    // Set attributes
+    $out .= "{
+              highlight: true,
+              showInfobox: false,
+              fixed: false,
+              color: '{$color}',
+              size: {$size},
+              face: '{$face}',
+              label: {color:'{$color}', useMathJax:true},
+              name: '" . ($ops['name']!==null ? $ops['name'] : "") . "'
+            })";
+    if ($ops['attributes']!==null){
+      $out .= ".setAttribute({$ops['attributes']})";
+    }
+
+      // // If answerbox option provided, link the point to the answerbox
+      if($ops['answerbox']!==null ){
+        $out .= ".on('up',function(){
+          $('#qn{$box}, #tc{$box}').val('('+this.X().toFixed(4)+','+this.Y().toFixed(4)+')');
+        });";
+        // Change border color of JSXG board based off of answerbox color
+        // (Green if correct, red if wrong, etc.)
+        // Have to do this on an interval, since the answerbox might not be loaded when script called
+        $out .= "
+          var colorInterval{$label}_{$box} = setInterval(function(){
+            if ($('#qn{$box}')[0] || $('#qn{$box}')[0]){
+              if ($('#qn{$box}, #tc{$box}').is('.ansgrn')){
+                $('#jxgboard_{$label}').css('border', '1px solid #0f0');
+              } else if ($('#qn{$box}, #tc{$box}').is('.ansred') || $('#qn{$box}, #tc{$box}').is('.ansyel')){
+                $('#jxgboard_{$label}').css('border','1px solid #f00');
+              }
+              /* Pull in answer from answerbox is possible */
+              if ($('#qn{$box}')[0] && $('#qn{$box}').val() !== ''){
+                var coords = $('#qn{$box}').val();
+                coords = coords.substring(1, coords.length - 2);
+                coords = coords.split(',');
+                glider_{$label}_{$ref}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
+                board_{$label}.fullUpdate();
+              } else if ($('#tc{$box}')[0] && $('#tc{$box}').val() !== ''){
+                var coords = $('#tc{$box}').val();
+                coords = coords.substring(1, coords.length - 2);
+                coords = coords.split(',');
+                glider_{$label}_{$ref}.setPosition(JXG.COORDS_BY_USER, [parseFloat(coords[0]),parseFloat(coords[1])]);
+                board_{$label}.fullUpdate();
+              }
+              clearInterval(colorInterval{$label}_{$box});
+            }
+          }, 300);
+        ";
+      } else {
+        $out .= ";";
+      }
+
+      // Append new output string to the board string{
+      return substr_replace($board, $out, strpos($board, "/*INSERTHERE*/"),0);
+  }
 
 
 ?>
