@@ -147,6 +147,11 @@
 	 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	 //$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE time<:old");
 	 //$stm->execute(array(':old'=>$old));
+	 if (rand(1,100)==1) { //1% of the time clear out really old sessions
+		 $reallyold = $now-30*24*60*60;
+		 $stm = $DBH->prepare("DELETE FROM imas_sessions WHERE time<:time");
+		 $stm->execute(array(':time'=>$reallyold));
+	 }
 
 	 if (isset($CFG['GEN']['guesttempaccts']) && $_POST['username']=='guest') { // create a temp account when someone logs in w/ username: guest
 	 	//DB $query = 'SELECT ver FROM imas_dbschema WHERE id=2';

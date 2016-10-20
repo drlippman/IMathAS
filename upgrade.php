@@ -1,7 +1,7 @@
 <?php
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 113;
+$latest = 114;
 
 
 @set_time_limit(0);
@@ -1877,6 +1877,13 @@ unset($dbpassword);
 				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			}
 			echo '<p>Added assessment sessions ver</p>';
+		}
+		if ($last<114) {
+			$query = "ALTER TABLE  `imas_sessions` ADD INDEX ( `userid` )";
+			$res = $DBH->query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			}
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {

@@ -392,7 +392,7 @@ $sql = 'CREATE TABLE `imas_sessions` ('
 	. ' `tzoffset` SMALLINT(4) NOT NULL DEFAULT \'0\', '
 	. ' `tzname` VARCHAR(254) NOT NULL DEFAULT \'\', '
 	. ' `sessiondata` TEXT NOT NULL, '
-        . ' PRIMARY KEY (`sessionid`), INDEX(`time`) '
+        . ' PRIMARY KEY (`sessionid`), INDEX(`time`), INDEX(`userid`) '
         . ' )'
         . ' ENGINE = InnoDB'
         . ' COMMENT = \'Session data\';';
