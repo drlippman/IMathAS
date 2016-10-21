@@ -71,27 +71,39 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 	echo "<h4>", _('Categorized Score Breakdown'), "</h4>\n";
 	echo "<table cellpadding=5 class=gb><thead><tr><th>", _('Category'), "</th><th>", _('Points Earned / Possible (Percent)'), "</th></tr></thead><tbody>\n";
 	$alt = 0;
-	function printoutcomes($arr,$ind,&$outcomenames, &$catscore, &$catposs) {
+	function printoutcomes($arr,$ind, $outcomenames, $catscore, $catposs) {
 		$out = '';
+		$totpts = 0;  $totposs = 0;
 		foreach ($arr as $oi) {
 			if (is_array($oi)) {
-				$outc = printoutcomes($oi['outcomes'],$ind+1,$outcomenames,$catscore, $catposs);
+				list($outc, $subpts, $subposs) = printoutcomes($oi['outcomes'],$ind+1,$outcomenames,$catscore, $catposs);
 				if ($outc!='') {
-					$out .= '<tr><td colspan="2"><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+					$out .= '<tr><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td>';
+					if ($subposs>0) {
+						$out .= '<td><div>'.$subpts.' / '.$subposs.'('.round(100*$subpts/$subposs,1).'%)</div></td>';
+					} else {
+						$out .= '<td><div>-</div></td>';
+					}
+					$out .= '</tr>';
 					$out .= $outc;
 				}
+				$totpts += $subpts;
+				$totposs += $subposs;
 			} else {
 				if (isset($catscore[$oi])) {
 					$out .= '<tr><td><span class="ind'.$ind.'">'.$outcomenames[$oi].'</span></td>';
 					$pc = round(100*$catscore[$oi]/$catposs[$oi],1);
 					$out .= "<td>{$catscore[$oi]} / {$catposs[$oi]} ($pc %)</td></tr>\n";
+					$totpts += $catscore[$oi];
+					$totposs += $catposs[$oi];
 				}
 			}
 		}
-		return $out;
+		return array($out, $totpts, $totposs);
 	}
 	if (count($tolookup)>0) {
-		$outc = preg_split('/<tr/',printoutcomes($outcomes, 0, $outcomenames, $catscore, $catposs));
+		list($outc, $totpts, $totposs) = printoutcomes($outcomes, 0, $outcomenames, $catscore, $catposs);
+		$outc = preg_split('/<tr/',$outc);
 		for ($i=1;$i<count($outc);$i++) {
 			if ($alt==0) {echo '<tr class="even"'; $alt=1;} else {echo '<tr class="odd"'; $alt=0;}
 			echo $outc[$i];

@@ -153,7 +153,7 @@ if ($report=='overview') {
 
 				} else {
 					list($subhtml,$subtots) = printOutcomeRow($oi['outcomes'],$isheader,$level.'-'.$k,$stu);
-					$tots = $tots + $subtots;
+					$tots = array_merge($tots, $subtots);
 					if (count($subtots)>0) {
 						$html .= '<td><div>'.round(array_sum($subtots)/count($subtots),1).'%</div></td>';
 					} else {
