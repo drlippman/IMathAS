@@ -298,7 +298,7 @@ switch($_GET['action']) {
 			if (isset($_POST['msgmonitor'])) {
 				$msgset += 5;
 			}
-			if (isset($_POST['msgqtoinstr'])) {
+			if (isset($_POST['msgonenroll'])) {
 				$msgset += 5*2;
 			}
 		}

@@ -180,7 +180,7 @@ switch($_GET['action']) {
 			$copyrights = $line['copyrights'];
 			$msgset = $line['msgset']%5;
 			$msgmonitor = (floor($line['msgset']/5))&1;
-			$msgQtoInstr = (floor($line['msgset']/5))&2;
+			$msgOnEnroll = (floor($line['msgset']/5))&2;
 			$toolset = $line['toolset'];
 			$cploc = $line['cploc'];
 			$theme = $line['theme'];
@@ -210,7 +210,7 @@ switch($_GET['action']) {
 			$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 			$toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
 			$msgmonitor = (floor($msgset/5))&1;
-			$msgQtoInstr = (floor($msgset/5))&2;
+			$msgOnEnroll = (floor($msgset/5))&2;
 			$msgset = $msgset%5;
 
 			$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
@@ -406,9 +406,6 @@ switch($_GET['action']) {
 			echo '/> Off <br/> <input type=checkbox name="msgmonitor" value="1" ';
 			if ($msgmonitor==1) { echo "checked=1";}
 			echo '/> Enable monitoring of student-to-student messages ';
-			//<br/><input type=checkbox name="msgqtoinstr" value="1" ';
-			//if ($msgQtoInstr==2) { echo "checked=1";}
-			//echo '/> Enable &quot;Message instructor about this question&quot; links
 			echo '</span><br class=form />';
 		}
 		if (!isset($CFG['CPS']['toolset']) || $CFG['CPS']['toolset'][1]==1) {
@@ -433,6 +430,14 @@ switch($_GET['action']) {
 			echo '<span class="form">Auto-assign LatePasses on course enroll:</span><span class="formright">';
 			echo '<input type="text" size="3" name="deflatepass" value="'.$deflatepass.'"/> LatePasses</span><br class="form" />';
 		}
+		if (!isset($CFG['CPS']['msgonenroll']) || $CFG['CPS']['msgonenroll'][1]==1) {
+			echo '<span class="form">'._('Send teachers a message when students enroll').':</span><span class="formright">';
+			echo '<input type="checkbox" name="msgonenroll" value="10" ';
+			if ($msgOnEnroll>0) { echo 'checked="checked"';}
+			echo '/> '._('Send').'</span><br class="form" />';
+		}
+
+
 		if (!isset($CFG['CPS']['showlatepass']) || $CFG['CPS']['showlatepass'][1]==1) {
 			echo '<span class="form">Show remaining LatePasses on student gradebook page:</span><span class="formright">';
 			echo '<input type=checkbox name="showlatepass" value="1" ';

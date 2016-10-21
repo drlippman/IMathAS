@@ -834,7 +834,6 @@ if ($stm->rowCount()==0) {
 				$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 				$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 				$msgmonitor = (floor($msgset/5))&1;
-				$msgQtoInstr = (floor($msgset/5))&2;
 				$msgset = $msgset%5;
 				$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
 				$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
@@ -2227,7 +2226,6 @@ if (((count($keyparts)==1 || $_SESSION['lti_keytype']=='gc') && $_SESSION['ltiro
 						$copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
 						$msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
 						$msgmonitor = (floor($msgset/5))&1;
-						$msgQtoInstr = (floor($msgset/5))&2;
 						$msgset = $msgset%5;
 						$cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
 						$topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);

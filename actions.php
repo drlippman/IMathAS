@@ -171,7 +171,7 @@ ini_set("post_max_size", "10485760");
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 
-					$query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
+					$query = "SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
 					$stm = $DBH->prepare($query);
 					$stm->execute(array(':cid'=>$_POST['courseid']));
 					$line = $stm->fetch(PDO::FETCH_ASSOC);
@@ -201,6 +201,18 @@ ini_set("post_max_size", "10485760");
 							$stm->execute($array);
 							//DB mysql_query($query) or die("Query failed : " . mysql_error());
 							echo '<p>You have been enrolled in course ID '.$_POST['courseid'].'</p>';
+
+							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
+							if ($msgOnEnroll) {
+								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+								$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
+								$stm->execute(array(':cid'=>$_POST['courseid']));
+								while ($tuid = $stm->fetchColumn(0)) {
+									$stm_nmsg->execute(array(':cid'=>$_POST['courseid'],':title'=>_('Automated new enrollment notice'),
+										':message'=>_('This is an automated system message letting you know this student just enrolled in your course'),
+										':msgto'=>$tuid, ':msgfrom'=>$newuserid, ':senddate'=>time()));
+								}
+							}
 						}
 					}
 				}
@@ -466,9 +478,10 @@ ini_set("post_max_size", "10485760");
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 
-		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = :cid AND (available=0 OR available=2)");
+		$stm = $DBH->prepare("SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id = :cid AND (available=0 OR available=2)");
 		$stm->execute(array(':cid'=>$_POST['cid']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
+
 		if ($line === false) {
 			require("header.php");
 			echo $pagetopper;
@@ -546,6 +559,19 @@ ini_set("post_max_size", "10485760");
 					}
 					$stm = $DBH->prepare($query);
 					$stm->execute($array);
+
+					$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
+					if ($msgOnEnroll) {
+						$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
+						$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
+						$stm->execute(array(':cid'=>$_POST['cid']));
+						while ($tuid = $stm->fetchColumn(0)) {
+							$stm_nmsg->execute(array(':cid'=>$_POST['cid'],':title'=>_('Automated new enrollment notice'),
+								':message'=>_('This is an automated system message letting you know this student just enrolled in your course'),
+								':msgto'=>$tuid, ':msgfrom'=>$userid, ':senddate'=>time()));
+						}
+					}
+
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					require("header.php");
 					echo $pagetopper;

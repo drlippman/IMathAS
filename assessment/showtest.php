@@ -368,7 +368,6 @@
 			//DB $sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
 			//DB $sessiondata['coursetoolset'] = mysql_result($result,0,4);
 			$sessiondata['coursetopbar'] =  $courseinfo['topbar'];
-			$sessiondata['msgqtoinstr'] = (floor($courseinfo['msgset']/5))&2;
 			$sessiondata['coursetoolset'] = $courseinfo['toolset'];
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
@@ -451,7 +450,6 @@
 			//DB $sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
 			//DB $sessiondata['coursetoolset'] = mysql_result($result,0,4);
 			$sessiondata['coursetopbar'] =  $courseinfo['topbar'];
-			$sessiondata['msgqtoinstr'] = (floor($courseinfo['msgset']/5))&2;
 			$sessiondata['coursetoolset'] = $courseinfo['toolset'];
 			if (isset($studentinfo['timelimitmult'])) {
 				$sessiondata['timelimitmult'] = $studentinfo['timelimitmult'];
