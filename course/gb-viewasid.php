@@ -274,7 +274,7 @@
 			//DB $query .= "FROM imas_assessment_sessions WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}' ORDER BY id";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			$query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid ";
+			$query = "SELECT attempts,lastanswers,reattempting,scores,seeds,bestscores,bestattempts,bestlastanswers,bestseeds,lti_sourcedid ";
 			$query .= "FROM imas_assessment_sessions WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid ORDER BY id";
 			$stm = $DBH->prepare($query);
 			$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1]));
@@ -296,10 +296,12 @@
 			}
 
 			$attempts = explode(",",$line['attempts']);
+			$seeds = explode(",",$line['seeds']);
 			$lastanswers = explode("~",$line['lastanswers']);
 			$reattempting = explode(',',$line['reattempting']);
 			$bestattempts = explode(",",$line['bestattempts']);
 			$bestlastanswers = explode("~",$line['bestlastanswers']);
+			$bestseeds = explode(",",$line['bestseeds']);
 
 			$clearid = $_GET['clearq'];
 			if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
@@ -315,6 +317,10 @@
 					$bestrawscores[$clearid] = -1;
 					$firstscores[$clearid] = -1;
 				}
+				if (isset($_GET['regen']) && $_GET['regen']==1) {
+					$seeds[$clearid] = rand(1,9999);
+					$bestseeds[$clearid] = $seeds[$clearid];
+				}
 
 				$loc = array_search($clearid,$reattempting);
 				if ($loc!==false) {
@@ -329,6 +335,8 @@
 					$bestscorelist = implode(',',$bestscores);
 				}
 				$attemptslist = implode(",",$attempts);
+				$seedlist = implode(",",$seeds);
+				$bestseedlist = implode(",",$bestseeds);
 				//DB $lalist = addslashes(implode("~",$lastanswers));
 				$lalist = implode("~",$lastanswers);
 
@@ -341,12 +349,12 @@
 				//DB $query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
 				//DB $query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,";
-				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,reattempting=:reattempting ";
+				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,lastanswers=:lastanswers,seeds=:seeds,";
+				$query .= "bestscores=:bestscores,bestattempts=:bestattempts,bestlastanswers=:bestlastanswers,bestseeds=:bestseeds,reattempting=:reattempting ";
 				$query .= "WHERE {$qp[0]}=:qval AND assessmentid=:assessmentid ";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist,
-					':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':reattempting'=>$reattemptinglist));
+				$stm->execute(array(':assessmentid'=>$qp[2], ':qval'=>$qp[1], ':scores'=>$scorelist, ':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':seeds'=>$seedlist,
+					':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist, ':bestlastanswers'=>$bestlalist, ':bestseeds'=>$bestseedlist, ':reattempting'=>$reattemptinglist));
 				if (strlen($line['lti_sourcedid'])>1) {
 					require_once("../includes/ltioutcomes.php");
 					calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
@@ -371,7 +379,8 @@
 				echo getconfirmheader();
 			}
 			echo "<p>Are you sure you want to clear this $pers's scores for this question?</p>";
-			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\">\n";
+			echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&confirmed=true'\" value=\"Really Clear\"> \n";
+			echo "<input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&clearq={$_GET['clearq']}&uid={$_GET['uid']}&regen=1&confirmed=true'\" value=\"Really Clear and Regen\"> \n";
 			echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gb-viewasid.php?stu=$stu&from=$from&gbmode=$gbmode&cid=$cid&asid={$_GET['asid']}&uid={$_GET['uid']}'\"></p>\n";
 			exit;
 		}
