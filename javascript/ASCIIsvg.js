@@ -259,8 +259,44 @@ function setBorder(l,b,r,t) {
 	}
 }
 
-
 function initPicture(x_min,x_max,y_min,y_max) {
+ if (x_min!=null) xmin = x_min;
+ if (x_max!=null) xmax = x_max;
+ if (y_min!=null) ymin = y_min;
+ if (y_max!=null) ymax = y_max;
+ if (xmin==null) xmin = -5;
+ if (xmax==null) xmax = 5;
+ if (typeof xmin != "number" || typeof xmax != "number" || xmin >= xmax)
+   alert("Picture requires at least two numbers: xmin < xmax");
+ else if (y_max != null && (typeof y_min != "number" ||
+  				typeof y_max != "number" || y_min >= y_max))
+   alert("initPicture(xmin,xmax,ymin,ymax) requires numbers ymin < ymax");
+ else {
+  //if (width==null)
+  width = picture.getAttribute("width");
+  //else picture.setAttribute("width",width);
+  if (width==null || width=="") width=defaultwidth;
+  //if (height==null)
+  height = picture.getAttribute("height");
+  //else picture.setAttribute("height",height);
+  if (height==null || height=="") height=defaultheight;
+  xunitlength = (width-border[0]-border[2])/(xmax-xmin);
+  yunitlength = xunitlength;
+  //alert(xmin+" "+xmax+" "+ymin+" "+ymax)
+  if (ymin==null) {
+  	origin = [-xmin*xunitlength+border[0],height/2];
+  	ymin = -(height-border[1]-border[3])/(2*yunitlength);
+  	ymax = -ymin;
+  } else {
+  	if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
+  	else ymax = (height-border[1]-border[3])/yunitlength + ymin;
+  	origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
+  }
+  winxmin = Math.max(border[0]-5,0);
+  winxmax = Math.min(width-border[2]+5,width);
+  winymin = Math.max(border[3]-5,0);
+  winymax = Math.min(height-border[1]+5,height);
+ }
  if (!initialized) {
   strokewidth = "1"; // pixel
   strokedasharray = null;
@@ -275,42 +311,6 @@ function initPicture(x_min,x_max,y_min,y_max) {
   fontbackground = "none";
   marker = "none";
   initialized = true;
-  if (x_min!=null) xmin = x_min;
-  if (x_max!=null) xmax = x_max;
-  if (y_min!=null) ymin = y_min;
-  if (y_max!=null) ymax = y_max;
-  if (xmin==null) xmin = -5;
-  if (xmax==null) xmax = 5;
- if (typeof xmin != "number" || typeof xmax != "number" || xmin >= xmax)
-   alert("Picture requires at least two numbers: xmin < xmax");
- else if (y_max != null && (typeof y_min != "number" ||
-          typeof y_max != "number" || y_min >= y_max))
-   alert("initPicture(xmin,xmax,ymin,ymax) requires numbers ymin < ymax");
- else {
-  //if (width==null)
-  width = picture.getAttribute("width");
-  //else picture.setAttribute("width",width);
-  if (width==null || width=="") width=defaultwidth;
-  //if (height==null)
-  height = picture.getAttribute("height");
-  //else picture.setAttribute("height",height);
-  if (height==null || height=="") height=defaultheight;
-  xunitlength = (width-border[0]-border[2])/(xmax-xmin);
-  yunitlength = xunitlength;
-//alert(xmin+" "+xmax+" "+ymin+" "+ymax)
-  if (ymin==null) {
-    origin = [-xmin*xunitlength+border[0],height/2];
-    ymin = -(height-border[1]-border[3])/(2*yunitlength);
-    ymax = -ymin;
-  } else {
-    if (ymax!=null) yunitlength = (height-border[1]-border[3])/(ymax-ymin);
-    else ymax = (height-border[1]-border[3])/yunitlength + ymin;
-    origin = [-xmin*xunitlength+border[0],-ymin*yunitlength+border[1]];
-  }
-  winxmin = Math.max(border[0]-5,0);
-  winxmax = Math.min(width-border[2]+5,width);
-  winymin = Math.max(border[3]-5,0);
-  winymax = Math.min(height-border[1]+5,height);
 //  if (true ||picture.nodeName == "EMBED" || picture.nodeName == "embed") {
     if (isOldIE) {
       svgpicture = picture.getSVGDocument().getElementById("root");
@@ -321,17 +321,19 @@ function initPicture(x_min,x_max,y_min,y_max) {
       doc = picture.getSVGDocument();
     } else {
       var qnode = document.createElementNS("http://www.w3.org/2000/svg","svg");
-      qnode.setAttribute("id",picture.getAttribute("id"));
+	var picid = picture.getAttribute("id");
+	picture.setAttribute("id",picid+'-embed');
+      qnode.setAttribute("id", picid);
       qnode.setAttribute("style","display:inline; "+picture.getAttribute("style"));
       qnode.setAttribute("width",picture.getAttribute("width"));
       qnode.setAttribute("height",picture.getAttribute("height"));
       qnode.setAttribute("alt",picture.getAttribute("alt"));
       if (picture.parentNode!=null) {
         //picture.parentNode.replaceChild(qnode,picture);
-	picture.parentNode.insertBefore(qnode,picture);
-	picture.style.display="none";
-	picture.removeAttribute("sscr");
-	picture.removeAttribute("script");
+				picture.parentNode.insertBefore(qnode,picture);
+				picture.style.display="none";
+				picture.removeAttribute("sscr");
+				picture.removeAttribute("script");
       } else {
         svgpicture.parentNode.replaceChild(qnode,svgpicture);
       }
@@ -353,21 +355,7 @@ function initPicture(x_min,x_max,y_min,y_max) {
 //    svgpicture = picture;
 //    doc = document;
 //  }
-  svgpicture.setAttribute("xunitlength",xunitlength);
-  svgpicture.setAttribute("yunitlength",yunitlength);
-  svgpicture.setAttribute("xmin",xmin);
-  svgpicture.setAttribute("xmax",xmax);
-  svgpicture.setAttribute("ymin",ymin);
-  svgpicture.setAttribute("ymax",ymax);
-  svgpicture.setAttribute("ox",origin[0]);
-  svgpicture.setAttribute("oy",origin[1]);
-  var node = myCreateElementSVG("rect");
-  node.setAttribute("x","0");
-  node.setAttribute("y","0");
-  node.setAttribute("width",width);
-  node.setAttribute("height",height);
-  node.setAttribute("style","stroke-width:1;fill:white");
-  svgpicture.appendChild(node);
+
   if (!isOldIE && picture.getAttribute("onmousemove")!=null) {
     svgpicture.addEventListener("mousemove", mousemove_listener, true);
     var st = picture.getAttribute("onmousemove");
@@ -394,13 +382,31 @@ function initPicture(x_min,x_max,y_min,y_max) {
     svgpicture.appendChild(node);
   }
   border = defaultborder;
- }
  } else {
  	 //clear out svg
 	 while (svgpicture.lastChild) {
 		 svgpicture.removeChild(svgpicture.lastChild);
 	 }
  }
+ svgpicture.setAttribute("height", height);
+ svgpicture.style.height = height+"px";
+ svgpicture.setAttribute("width", width);
+ svgpicture.style.width = width+"px";
+ svgpicture.setAttribute("xunitlength",xunitlength);
+ svgpicture.setAttribute("yunitlength",yunitlength);
+ svgpicture.setAttribute("xmin",xmin);
+ svgpicture.setAttribute("xmax",xmax);
+ svgpicture.setAttribute("ymin",ymin);
+ svgpicture.setAttribute("ymax",ymax);
+ svgpicture.setAttribute("ox",origin[0]);
+ svgpicture.setAttribute("oy",origin[1]);
+ var node = myCreateElementSVG("rect");
+ node.setAttribute("x","0");
+ node.setAttribute("y","0");
+ node.setAttribute("width",width);
+ node.setAttribute("height",height);
+ node.setAttribute("style","stroke-width:1;fill:white");
+ svgpicture.appendChild(node);
 }
 
 
@@ -1006,9 +1012,9 @@ function drawPictures() {
 //xmin,xmax,ymin,ymax,xscl,yscl,labels,xgscl,ygscl,width,height plotcommands(see blow)
 //plotcommands: type,eq1,eq2,startmaker,endmarker,xmin,xmax,color,strokewidth,strokedash
 function parseShortScript(sscript,gw,gh) {
-	if (sscript == null) {
-		initialized = false;
+	if (sscript==null) {
 		sscript = picture.sscr;
+		initialized = false;
 	}
 
 	var sa= sscript.split(",");
