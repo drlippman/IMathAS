@@ -395,6 +395,11 @@ function initPicture(x_min,x_max,y_min,y_max) {
   }
   border = defaultborder;
  }
+ } else {
+ 	 //clear out svg
+	 while (svgpicture.lastChild) {
+		 svgpicture.removeChild(svgpicture.lastChild);
+	 }
  }
 }
 
@@ -1099,7 +1104,6 @@ function parseShortScript(sscript,gw,gh) {
 		picture.setAttribute("alt",eqnlist);
 
 		try {
-			console.log(commands);
 			eval(commands);
 		} catch (e) {
 			setTimeout(function() {parseShortScript(sscript,gw,gh)},100);
@@ -1286,4 +1290,6 @@ if (checkIfSVGavailable) {
 
 window.drawPictures = drawPictures;
 window.drawPics = drawPics;
+window.ASnoSVG = ASnoSVG;
+window.parseShortScript = parseShortScript;
 })();
