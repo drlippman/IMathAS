@@ -431,7 +431,7 @@ var livepoll = new function() {
 				var parsed = preProcess(data.html);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
-				$(".sabtn").hide();
+				//$(".sabtn").hide();
 				$("#livepollqcontent").append('<p><a href="#" onclick="livepoll.forceRegen('+qn+');return false;">' + _("Clear results and generate a new version of this question")+'</a></p>');
 				$("#LPstartq").show();
 
