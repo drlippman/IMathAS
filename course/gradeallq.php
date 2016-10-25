@@ -216,7 +216,7 @@
 	require("../includes/rubric.php");
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("../assessment/header.php");
-	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;}</style>\n";
+	echo "<style type=\"text/css\">p.tips {	display: none;}\n .hideongradeall { display: none;} .pseudohidden {visibility:hidden;position:absolute;}</style>\n";
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 	echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
 	echo "&gt; <a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&aid=$aid\">Item Analysis</a> ";
@@ -242,7 +242,7 @@
 			butn.html("'._('Hide Questions with Perfect Scores').'");
 			butn.removeClass("hchidden");
 		}
-		$(".iscorrect").toggle();
+		$(".iscorrect").toggleClass("pseudohidden");
 	}
 	function hidenonzero() {
 		var butn = $("#nztoggle");
@@ -255,7 +255,7 @@
 			butn.html("'._('Hide Nonzero Score Questions').'");
 			butn.removeClass("nzhidden");
 		}
-		$(".isnonzero").toggle();
+		$(".isnonzero").toggleClass("pseudohidden");
 	}
 	function hideNA() {
 		var butn = $("#hnatoggle");
@@ -266,7 +266,7 @@
 			butn.html("'._('Hide Unanswered Questions').'");
 			butn.removeClass("hnahidden");
 		}
-		$(".notanswered").toggle();
+		$(".notanswered").toggleClass("pseudohidden");
 	}';
 ?>
 	function preprint() {
@@ -451,6 +451,18 @@
 			if ($groupdup) {
 				echo '<div class="groupdup">';
 			}
+			echo "<div ";
+			if (getpts($scores[$loc])==$points) {
+				echo 'class="iscorrect"';
+			} else if (getpts($scores[$loc])>0) {
+				echo 'class="isnonzero"';
+			} else if ($scores[$loc]==-1) {
+				echo 'class="notanswered"';
+			} else {
+				echo 'class="iswrong"';
+			}
+			echo '>';
+			
 			echo "<p><span class=\"person\"><b>".$line['LastName'].', '.$line['FirstName'].'</b></span>';
 			if ($page != -1) {
 				echo '.  Jump to <select id="stusel" onchange="jumptostu()">';
@@ -470,17 +482,7 @@
 					echo ' (empty)</h4>';
 				}
 			}
-			echo "<div ";
-			if (getpts($scores[$loc])==$points) {
-				echo 'class="iscorrect"';
-			} else if (getpts($scores[$loc])>0) {
-				echo 'class="isnonzero"';
-			} else if ($scores[$loc]==-1) {
-				echo 'class="notanswered"';
-			} else {
-				echo 'class="iswrong"';
-			}
-			echo '>';
+
 			$lastanswers[$cnt] = $la[$loc];
 			$teacherreview = $line['userid'];
 
@@ -514,7 +516,7 @@
 				$GLOBALS['questionscoreref'] = array("ud-{$line['id']}-$loc",$points);
 			}
 			$qtypes = displayq($cnt,$qsetid,$seeds[$loc],true,false,$attempts[$loc]);
-			echo '</div>';
+
 
 			echo "<div class=review>";
 			echo '<span class="person">'.$line['LastName'].', '.$line['FirstName'].': </span>';
@@ -642,7 +644,8 @@
 			echo "<br/>Feedback: <textarea cols=50 rows=".($page==-1?1:3)." id=\"feedback-{$line['id']}\" name=\"feedback-{$line['id']}\">{$line['feedback']}</textarea>";
 			echo '<br/>Question #'.($loc+1);
 			echo ". <a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$loc-$qsetid-{$seeds[$loc]}-$aid-{$line['ver']}&to={$line['userid']}\">Use in Msg</a>";
-			echo "</div>\n";
+			echo "</div>\n"; //end review div
+			echo '</div>'; //end wrapper div
 			if ($groupdup) {
 				echo '</div>';
 			}
