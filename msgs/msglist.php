@@ -465,8 +465,13 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						$query .= "imas_teachers.courseid=:courseid ORDER BY imas_users.LastName";
 						$stm = $DBH->prepare($query);
 						$stm->execute(array(':courseid'=>$courseid));
+						$cnt = $stm->rowCount();
 						while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-							echo "<option value=\"{$row[0]}\">{$row[2]}, {$row[1]}</option>";
+							echo "<option value=\"{$row[0]}\"";
+							if ($cnt==1 && $msgset==1 && !$isteacher) {
+								echo ' selected="selected"';
+							}
+							echo ">{$row[2]}, {$row[1]}</option>";
 						}
             //DB $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM ";
       			//DB $query .= "imas_users,imas_tutors WHERE imas_users.id=imas_tutors.userid AND ";

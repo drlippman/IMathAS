@@ -940,6 +940,7 @@
 			} else {
 				echo 'class="iswrong"';
 			}
+			echo ' id="qwrap'.($i+1).'"';
 			$totalpossible += $pts[$questions[$i]];
 			echo '>';
 			list($qsetid,$cat) = getqsetid($questions[$i]);

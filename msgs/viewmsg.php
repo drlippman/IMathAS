@@ -134,6 +134,7 @@
 		echo " <a href=\"$imasroot/course/gradebook.php?cid={$line['courseid']}&stu={$line['msgfrom']}\" target=\"_popoutgradebook\">gradebook</a>";
 		if (preg_match('/Question\s+about\s+#(\d+)\s+in\s+(.*)\s*$/',$line['title'],$matches)) {
 			//DB $aname = addslashes($matches[2]);
+			$qn = $matches[1];
 			$aname = $matches[2];
 			//DB $query = "SELECT id,enddate FROM imas_assessments WHERE name='$aname' AND courseid='{$line['courseid']}'";
 			//DB $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -162,7 +163,7 @@
 				$stm->execute(array(':assessmentid'=>$aid, ':userid'=>$line['msgfrom']));
 				if ($stm->rowCount()>0) {
 					$asid = $stm->fetchColumn(0);
-					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid\" target=\"_popoutgradebook\">assignment</a>";
+					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid#qwrap$qn\" target=\"_popoutgradebook\">assignment</a>";
 					if ($due<2000000000) {
 						echo ' <span class="small">Due '.$duedate.'</span>';
 					}

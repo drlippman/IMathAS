@@ -626,8 +626,9 @@ function printchildren($base,$restricttoowner=false) {
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':courseid'=>$cid, ':name'=>$matches[2], ':ownerid'=>intval($ownerid[$child])));
 				if ($stm->rowCount()>0) {
+					$qn = $matches[1];
 					$r = $stm->fetch(PDO::FETCH_NUM);
-					echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r[0]}\" target=\"_popoutgradebook\">[assignment]</a>";
+					echo " <a class=\"small\" href=\"$imasroot/course/gb-viewasid.php?cid=$cid&uid={$ownerid[$child]}&asid={$r[0]}#qwrap$qn\" target=\"_popoutgradebook\">[assignment]</a>";
 				}
 			}
 		}
