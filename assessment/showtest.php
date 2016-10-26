@@ -3124,9 +3124,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 				//}
 				echo '<span style="margin-left:8px">';
 				if ($showeachscore) {
-					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." point".(($pgpts==1) ? "":"s")."</span> out of $pgposs";
+					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." " .(($pgpts==1) ? _("point") : _("points"))."</span> " . _("out of") . " $pgposs";
 				} else {
-					echo " <span id=\"embednavunans$i\">$cntunans</span> unattempted";
+					echo " <span id=\"embednavunans$i\">$cntunans</span> " . _("unattempted");
 				}
 				echo '</span>';
 				$totposs += $pgposs;
