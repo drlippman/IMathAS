@@ -3923,11 +3923,6 @@ msgstr "von"
 msgid "unattempted"
 msgstr "nicht versucht"
 
-#: assessment/showtest.php:3440
-#, php-format
-msgid "Total Points in Gradebook: %d out of~ %d possible: "
-msgstr "Gesamte Punkte in Punkteübersicht: %d von %d möglichen: "
-
 #: assessment/macros.php:2847
 msgid "No answer selected. Try again."
 msgstr "Keine Antwort ausgewählt. Bitte erneut versuchen."

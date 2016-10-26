@@ -3437,7 +3437,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if (($testsettings['minscore']<10000 && $total<$testsettings['minscore']) || ($testsettings['minscore']>10000 && $total<($testsettings['minscore']-10000)/100*$totpossible)) {
 				echo "<p><b>", sprintf(_('Total Points Earned:  %d out of %d possible: '), $total, $totpossible);
 			} else {
-				echo "<p><b>", sprintf(_('Total Points in Gradebook: %d out of~ %d possible: '), $total, $totpossible);
+				echo "<p><b>", sprintf(_('Total Points in Gradebook: %d out of %d possible: '), $total, $totpossible);
 			}
 
 			echo "$average % </b></p>\n";
