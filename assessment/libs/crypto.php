@@ -19,8 +19,9 @@ function chunktext($m, $s=4) {
 //randfiveletterword()
 //returns a random five-letter word
 function randfiveletterword() {
+	global $RND;
 	$fiveletterwords = explode(',','first,thing,those,woman,child,there,after,world,still,three,state,never,leave,while,great,group,begin,where,every,start,might,about,place,again,where,right,small,night,point,today,bring,large,under,water,write,money,story,young,month,right,study,issue,black,house,after,since,until,power,often,among,stand,later,white,least,learn,right,watch,speak,level,allow,spend,party,early,force,offer,maybe,music,human,serve,sense,build,death,reach,local,class,raise,field,major,along,heart,light,voice,whole,price,carry,drive,break,thank,value,model,early,agree,paper,space,event,whose,table,court,teach,image,phone,cover,quite,clear,piece,movie,north,third,catch,cause,point,plant,short,place,south,floor,close,wrong,sport,board,fight,throw,order,focus,blood,color,store,sound,enter,share,other,shoot,seven,scene,stock,eight,happy,occur,media,ready,argue,staff,trade,glass,skill,crime,stage,state,force,truth,check,laugh,guess,study,prove,since,claim,close,sound,enjoy,legal,final,green,above,trial,radio,visit,avoid,close,peace,apply,shake,chair,treat,style,adult,worry,range,dream,stuff,hotel,heavy,cause,tough,exist,agent,owner,ahead,coach,total,civil,mouth,smile,score,break,front,admit,alone,fresh,video,judge');
-	return $fiveletterwords[rand(0,count($fiveletterwords)-1)];
+	return $fiveletterwords[$RND->rand(0,count($fiveletterwords)-1)];
 }
 
 //randmilphrase([removespaces],[pad])
@@ -29,17 +30,18 @@ function randfiveletterword() {
 //if pad is set to a number N, then the phrase will be padded with random characters
 //for a transposition cipher with N columns.
 function randmilphrase($removespaces=false,$pad=false) {
+	global $RND;
 	$milphrase1 = explode(',','at noon,at one,at two,at three,at four,at five,at six,at seven,at eight,at nine,at ten,at eleven,at midnight,tomorrow,in two days');
 	$milphrase2 = explode(',','air strike on,attack,march towards,surveillance on,regroup at,spy on,head east to,head west to,head north to,head south to');
 	$milphrase3 = explode(',','headquarters,base camp,enemy camp,front lines,trenches,target');
-	$phrase = $milphrase1[rand(0,count($milphrase1)-1)] .' '. $milphrase2[rand(0,count($milphrase2)-1)] .' '. $milphrase3[rand(0,count($milphrase3)-1)];
+	$phrase = $milphrase1[$RND->rand(0,count($milphrase1)-1)] .' '. $milphrase2[$RND->rand(0,count($milphrase2)-1)] .' '. $milphrase3[$RND->rand(0,count($milphrase3)-1)];
 	$n = strlen(str_replace(' ','',$phrase));
 	$charset = 'BCDFGHJKLMNPQRSTVWXYZ';
 	if ($pad!==false) {
 		if ($n%$pad != 0) {
 			$phrase .= ' ';
 			for ($i=$n%$pad;$i<$pad;$i++) {
-				$phrase .= $charset{rand(0,25)};
+				$phrase .= $charset{$RND->rand(0,25)};
 			}
 		}
 	}
@@ -47,7 +49,7 @@ function randmilphrase($removespaces=false,$pad=false) {
 	return strtoupper($phrase);
 }
 
-//shiftcipher(message, shift, [alpha] [rotate]) 
+//shiftcipher(message, shift, [alpha] [rotate])
 //encrypts the message using a basic Caesar shift substitution cipher.
 //shift can be numeric value (e.g., 3 means A encrypts as D), or can be a letter
 //  indicating what A encrypts as
@@ -79,8 +81,8 @@ function shiftcipher($m, $s, $alpha='alpha', $rotate=false) {
 	} else if ($rotate===true) {
 		$rotate = 1;
 	}
-	
-	
+
+
 	$output = '';
 	for ($i=0; $i<strlen($m);$i++) {
 		$c = ord($m{$i});
@@ -90,7 +92,7 @@ function shiftcipher($m, $s, $alpha='alpha', $rotate=false) {
 			$output .= $charset{($c-48+26+$s)%$L};
 		} else {
 		        $output .= $m{$i};  // Copy
-		} 	
+		}
 		$s += $rotate;
 	}
 	return $output;
@@ -100,17 +102,18 @@ function shiftcipher($m, $s, $alpha='alpha', $rotate=false) {
 //generates a random substitution mapping
 //by default uses A-Z.  Set charset="alphanum" or A-Z0-9
 function randsubmap($alpha = "alpha") {
+	global $RND;
 	if ($alpha=='alphanum') {
 		$charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 	} else {
 		$charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	}
-	return str_shuffle($charset);
+	return $RND->str_shuffle($charset);
 }
 
-//subcipher(message, submap, [alpha] [rotate]) 
+//subcipher(message, submap, [alpha] [rotate])
 //encrypts the message using a general substitution cipher.
-//submap is a string consisting of all characters of the character set in 
+//submap is a string consisting of all characters of the character set in
 // desired mapping order
 //alpha should be "alpha" for A-Z or "alphanum" for A-Z0-9.  Defaults to "alpha"
 //if rotate is set to true, then the shift will be increased after each letter
@@ -125,13 +128,13 @@ function subcipher($m, $map, $alpha='alpha', $rotate=false) {
 		$m = preg_replace('/[^A-Z]/','',$m);
 	}
 	$L = strlen($map);
-	
+
 	if ($rotate===false) {
 		$rotate = 0;
 	} else if ($rotate===true) {
 		$rotate = 1;
 	}
-	
+
 	$s = 0;
 	$output = '';
 	for ($i=0; $i<strlen($m);$i++) {
@@ -142,7 +145,7 @@ function subcipher($m, $map, $alpha='alpha', $rotate=false) {
 			$output .= $map{($c-48+26+$s)%$L};
 		} else {
 		        $output .= $m{$i};  // Copy
-		}  	
+		}
 		$s += $rotate;
 	}
 	return $output;
@@ -170,7 +173,7 @@ function transcipher($m, $cols, $order=false) {
 		}
 	}
 	$n = strlen($m);
-	
+
 	$mat = array();
 	$output = '';
 	if ($order===false) {
@@ -195,7 +198,7 @@ function transcipher($m, $cols, $order=false) {
 //modularexponent(base, exponent, modulus)
 //calculates base^exponent mod modulus
 function modularexponent($base,$exponent,$modulus) {
-	$result = 1;  
+	$result = 1;
 	while ($exponent > 0 ) {
     	    if ($exponent % 2 == 1) {
     	    	   $result = ($result * $base) % $modulus;
@@ -206,7 +209,7 @@ function modularexponent($base,$exponent,$modulus) {
         return $result;
 }
 
-//cryptorsakeys(p, q) 
+//cryptorsakeys(p, q)
 //given two primes, p and q, returns array(n, e, d)
 //where n and e form the public key, and d is the private key
 function cryptorsakeys($p,$q) {
@@ -215,12 +218,12 @@ function cryptorsakeys($p,$q) {
 	$e = 3;  //this is obviously an insecure value for e, but makes the numbers more reasonable for learning
 	while (gcd($e,$phi)!=1 && $e<$phi) {$e++;}
 	if ($e>=$phi) {echo 'e bigger than phi - fail'; return;}
-	
+
 	list($d,$j,$k) = extended_gcd($e,$phi);
 	if ($d<0) {
 		$d += $phi;
 	}
-	
+
 	return array($n, $e, $d);
 }
 

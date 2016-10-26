@@ -3,7 +3,7 @@
 //(c) 2006 David Lippman
 	require("../validate.php");
 	$cid = $_GET['cid'];
-		
+
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($guestid)) {
 		require("../header.php");
 		echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
@@ -14,7 +14,7 @@
 		echo "<html><body>No item specified. <a href=\"course.php?cid={$_GET['cid']}\">Try again</a></body></html>\n";
 		exit;
 	}
-	if (strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
+	if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'],'treereader')!==false) {
 		$shownav = false;
 		$flexwidth = true;
 		$nologo = true;
@@ -23,16 +23,19 @@
 	}
 	$isteacher = isset($teacherid);
 	$istutor = isset($tutorid);
-	$query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$text = mysql_result($result, 0,0);
-	$title = mysql_result($result,0,1);
-	$target = mysql_result($result,0,2);
+	//DB $query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT text,title,target FROM imas_linkedtext WHERE id=:id");
+	$stm->execute(array(':id'=>$_GET['id']));
+	//DB $text = mysql_result($result, 0,0);
+	//DB $title = mysql_result($result,0,1);
+	//DB $target = mysql_result($result,0,2);
+	list($text,$title,$target) = $stm->fetch(PDO::FETCH_NUM);
 	$titlesimp = strip_tags($title);
-	
+
 	if (substr($text,0,8)=='exttool:') {
 		$param = "linkid={$_GET['id']}&cid=$cid";
-		
+
 		if ($target==0) {
 			$height = '500px';
 			$width = '95%';
@@ -40,7 +43,7 @@
 			$text = '<iframe id="exttoolframe" src="'.$imasroot.'/filter/basiclti/post.php?'.$param.'" height="'.$height.'" width="'.$width.'" ';
 			$text .= 'scrolling="auto" frameborder="1" transparency>   <p>Error</p> </iframe>';
 			$text .= '<script type="text/javascript">$(function() {$("#exttoolframe").css("height",$(window).height() - $(".midwrapper").position().top - ($(".midwrapper").height()-500) - ($("body").outerHeight(true) - $("body").innerHeight()));});</script>';
-			
+
 		} else {
 			//redirect to post page
 			$param .= '&target=new';
@@ -55,7 +58,7 @@
 		$alink = getcoursefileurl($filename);//$imasroot . "/course/files/".$filename;
 		$text = '<p>Download file: <a href="'.$alink.'">'.$title.'</a></p>';
 	}
-						   	   
+
 	$placeinhead = '';
 	if (isset($studentid)) {
 		$rec = "data-base=\"linkedintext-{$_GET['id']}\" ";
@@ -76,7 +79,7 @@
 		 </script>';
 	}
 	$placeinhead .= '<script type="text/javascript"> $(function() {
-	$(".im_glossterm").addClass("hoverdef").each(function(i,el) { 
+	$(".im_glossterm").addClass("hoverdef").each(function(i,el) {
 		$(el).attr("title",$(el).next(".im_glossdef").text());
 	   });
 	});
@@ -102,21 +105,27 @@
 	$navbuttons = '';
 	if ((isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) || isset($sessiondata['readernavon'])) {
 		$now = time();
-		$query = "SELECT il.id,il.title,il.avail,il.startdate,il.enddate,ii.id AS itemid 
-			  FROM imas_linkedtext as il JOIN imas_items AS ii ON il.id=ii.typeid AND ii.itemtype='LinkedText'
-			  WHERE ii.courseid='$cid' ";
-		if (!$isteacher && !$istutor) {	 
-			  $query .= "AND (il.avail=2 OR (il.avail=1 AND $now>il.startdate AND $now<il.enddate))";
+		//DB $query = "SELECT il.id,il.title,il.avail,il.startdate,il.enddate,ii.id AS itemid ";
+		//DB $query .= "FROM imas_linkedtext as il JOIN imas_items AS ii ON il.id=ii.typeid AND ii.itemtype='LinkedText' ";
+		//DB $query .= "WHERE ii.courseid='$cid' ";
+		$query = "SELECT il.id,il.title,il.avail,il.startdate,il.enddate,ii.id AS itemid ";
+		$query .= "FROM imas_linkedtext as il JOIN imas_items AS ii ON il.id=ii.typeid AND ii.itemtype='LinkedText' ";
+		$query .= "WHERE ii.courseid=:courseid ";
+		if (!$isteacher && !$istutor) {
+			  $query .= "AND (il.avail=2 OR (il.avail=1 AND $now>il.startdate AND $now<il.enddate))";  //$now is safe INT
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid));
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$itemdata = array();
-		while ($row = mysql_fetch_assoc($result)) {
+		//DB while ($row = mysql_fetch_assoc($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$itemdata[$row['itemid']] = $row;
 			if ($row['id']==$_GET['id']) {
 				$thisitemid = $row['itemid'];
 			}
 		}
-		
+
 		$flatlist = array();
 		$thisitemloc = -1;
 		function getflatlinkeditemlist($items) {
@@ -136,11 +145,14 @@
 				}
 			}
 		}
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		getflatlinkeditemlist(unserialize($row[0]));
-		
+
 		$navbuttons .= '<p>&nbsp;</p>';
 		if ($thisitemloc>0) {
 			$p = $itemdata[$flatlist[$thisitemloc-1]];
@@ -182,6 +194,6 @@
 			echo "<div class=right><a href=\"course.php?cid={$_GET['cid']}\">Return to Course Page</a></div>\n";
 		}
 	}
-	require("../footer.php");	
+	require("../footer.php");
 
 ?>

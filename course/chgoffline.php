@@ -20,14 +20,17 @@ if (isset($_POST['checked'])) { //form submitted
 			foreach ($checked as $k=>$gbi) {
 				$gbi = intval($gbi);
 				$checked[$k] = $gbi;
-				$query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='$gbi'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='$gbi'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
+				$stm->execute(array(':gradetypeid'=>$gbi));
 			}
-			$checkedlist = "'".implode("','",$checked)."'";
-			$query = "DELETE FROM imas_gbitems WHERE id IN ($checkedlist)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			$checkedlist = implode(',', array_map('intval',$checked));
+			//DB $query = "DELETE FROM imas_gbitems WHERE id IN ($checkedlist)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->query("DELETE FROM imas_gbitems WHERE id IN ($checkedlist)");
 		} else {
-			$checkedlist = implode(',',$checked);
+			$checkedlist = implode(',', array_map('intval',$checked));
 			require("../header.php");
 			echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
 			echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
@@ -37,10 +40,12 @@ if (isset($_POST['checked'])) { //form submitted
 			echo '<input type="hidden" name="checked" value="'.$checkedlist.'"/>';
 			echo '<p>Are you <b>SURE</b> you want to delete these offline grade items ';
 			echo 'and the associated student grades?<br/>If you haven\'t already, you might want to back up the gradebook first.</p><p>';
-			$checkedlist = "'".implode("','",$checked)."'";
-			$query = "SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			//DB $checkedlist = "'".implode("','",$checked)."'";
+			//DB $query = "SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->query("SELECT name FROM imas_gbitems WHERE id IN ($checkedlist)");
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				echo $row[0].'<br/>';
 			}
 			echo '<p><p><input type="submit" value="Yes, Delete"/>';
@@ -48,51 +53,66 @@ if (isset($_POST['checked'])) { //form submitted
 			echo '</form>';
 			require("../footer.php");
 			exit;
-		}		
+		}
 	} else {
 		require_once("../includes/parsedatetime.php");
-		$checkedlist = "'".implode("','",$checked)."'";
+		$checkedlist = implode(',', array_map('intval',$checked));
 		$sets = array();
+		$qarr = array();
 		if (isset($_POST['chgshowafter'])) {
 			if ($_POST['sdatetype']=='0') {
 				$showdate = 0;
 			} else {
 				$showdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 			}
-			$sets[] = "showdate='$showdate'";
+			//DB $sets[] = "showdate='$showdate'";
+			$sets[] = "showdate=:showdate";
+			$qarr[':showdate'] = $showdate;
 		}
 		if (isset($_POST['chgcount'])) {
-			$sets[] = "cntingb='{$_POST['cntingb']}'";	
+			//DB $sets[] = "cntingb='{$_POST['cntingb']}'";
+			$sets[] = "cntingb=:cntingb";
+			$qarr[':cntingb'] = $_POST['cntingb'];
 		}
 		if (isset($_POST['chgtutoredit'])) {
-			$sets[] = "tutoredit='{$_POST['tutoredit']}'";
+			//DB $sets[] = "tutoredit='{$_POST['tutoredit']}'";
+			$sets[] = "tutoredit=:tutoredit";
+			$qarr[':tutoredit'] = $_POST['tutoredit'];
 		}
 		if (isset($_POST['chggbcat'])) {
-			$sets[] = "gbcategory='{$_POST['gbcat']}'";	
+			//DB $sets[] = "gbcategory='{$_POST['gbcat']}'";
+			$sets[] = "gbcategory=:gbcategory";
+			$qarr[':gbcategory'] = $_POST['gbcat'];
 		}
 		if (count($sets)>0) {
 			$setslist = implode(',',$sets);
-			$query = "UPDATE imas_gbitems SET $setslist WHERE id IN ($checkedlist)";
-			mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_gbitems SET $setslist WHERE id IN ($checkedlist)";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_gbitems SET $setslist WHERE id IN ($checkedlist)");
+			$stm->execute($qarr);
 		}
 	}
-	
+
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?cid=$cid");
-	exit;	
+	exit;
 }
 
 //Prep for output
-$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
 $i=0;
 $page_gbcatSelect = array();
-if (mysql_num_rows($result)>0) {
-	while ($row = mysql_fetch_row($result)) {
+//DB if (mysql_num_rows($result)>0) {
+	//DB while ($row = mysql_fetch_row($result)) {
+if ($stm->rowCount()>0) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$page_gbcatSelect['val'][$i] = $row[0];
 		$page_gbcatSelect['label'][$i] = $row[1];
 		$i++;
 	}
-}	
+}
 
 $sdate = tzdate("m/d/Y",time());
 $stime = tzdate("g:i a",time());
@@ -110,9 +130,12 @@ echo '<div id="headerchgoffline" class="pagetitle"><h2>Manage Offline Grades</h2
 echo "<form id=\"mainform\" method=post action=\"chgoffline.php?cid=$cid\">";
 
 $gbitems = array();
-$query = "SELECT id,name FROM imas_gbitems WHERE courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,name FROM imas_gbitems WHERE courseid='$cid' ORDER BY name";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,name FROM imas_gbitems WHERE courseid=:courseid ORDER BY name");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$gbitems[$row[0]] = $row[1];
 }
 if (count($gbitems)==0) {
@@ -125,13 +148,13 @@ if (count($gbitems)==0) {
 }
 ?>
 Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('mainform','checked[]',false)">None</a>
-		
+
 <ul class=nomark>
 
 <?php
 
 foreach($gbitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';		
+	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';
 }
 ?>
 </ul>
@@ -146,18 +169,18 @@ foreach($gbitems as $id=>$name) {
 <tr>
 	<td><input type="checkbox" name="chgshowafter" /></td>
 	<td class="r">Show after:</td>
-	<td>  
+	<td>
 <input type=radio name="sdatetype" value="0" /> Always<br/>
-<input type=radio name="sdatetype" value="sdate" checked="checked"/><input type=text size=10 name=sdate value="<?php echo $sdate;?>"> 
+<input type=radio name="sdatetype" value="sdate" checked="checked"/><input type=text size=10 name=sdate value="<?php echo $sdate;?>">
 <a href="#" onClick="displayDatePicker('sdate', this); return false">
 <img src="../img/cal.gif" alt="Calendar"/></a>
-at <input type=text size=10 name=stime value="<?php echo $stime;?>">	
+at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 	</td>
 </tr>
 <tr>
 	<td><input type="checkbox" name="chgcount" /></td>
 	<td class="r">Count:</td>
-	<td> 
+	<td>
 	<input type="radio" name="cntingb" value="1" checked="checked" />Count in Gradebook<br/>
 	<input type="radio" name="cntingb" value="0" />Don't count in grade total and hide from students<br/>
 	<input type="radio" name="cntingb" value="3" />Don't count in grade total<br/>
@@ -168,7 +191,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>">
 	<td><input type="checkbox" name="chggbcat" /></td>
 	<td class="r">Gradebook category: </td>
 	<td>
-<?php 
+<?php
 writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0," id=gbcat");
 ?>
 
@@ -182,7 +205,7 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 $page_tutorSelect['label'] = array("No access","View Scores","View and Edit Scores");
 $page_tutorSelect['val'] = array(2,0,1);
 writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
-			
+
 ?>
 	</td>
 </tr>

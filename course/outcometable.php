@@ -17,7 +17,7 @@ row[0][1][#][1] = category color number
 row[0][1][#][2] = 0 past, 1 current
 row[0][1][#][3] = 1 count, 2 EC
 row[0][1][#][4] = 0 online, 1 offline, 2 discussion
-row[0][1][#][5] = assessmentid, gbitems.id, forumid 
+row[0][1][#][5] = assessmentid, gbitems.id, forumid
 
 row[0][2] category totals
 row[0][2][#][0] = "Category Name"
@@ -51,7 +51,7 @@ row[1][3][1][outc#] = % attempted on outcome
 
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		if ($sc>0) { 
+		if ($sc>0) {
 			return $sc;
 		} else {
 			return 0;
@@ -60,7 +60,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
@@ -69,7 +69,7 @@ function getpts($sc) {
 }
 
 function outcometable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
+	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -77,45 +77,58 @@ function outcometable() {
 	} else {
 		$limuser = 0;
 	}
-	
+
 	$category = array();
 	$outc = array();
 	$gb = array();
 	$ln = 0;
-	
+
 	//Pull Gradebook Scheme info
-	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	//DB $query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	list($useweights,$orderby,$defaultcat,$usersort) = $stm->fetch(PDO::FETCH_NUM);
 	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
-	
+
 	if (isset($GLOBALS['setorderby'])) {
 		$orderby = $GLOBALS['setorderby'];
 	}
-	
-	//Build user ID headers 
+
+	//Build user ID headers
 	$gb[0][0][0] = "Name";
-	
-	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_result($result,0,0)>0) {
+
+	//DB $query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_result($result,0,0)>0) {
+	$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL");
+	$stm->execute(array(':courseid'=>$cid));
+	if ($stm->fetchColumn(0)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
 	}
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
+	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
+	//DB $query .= "AND cntingb>0 AND cntingb<3 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 	$query .= "AND cntingb>0 AND cntingb<3 ";
-	
+	$qarr = array(':courseid'=>$cid);
 	if ($istutor) {
 		$query .= "AND tutoredit<2 ";
 	}
 	if ($catfilter>-1) {
-		$query .= "AND gbcategory='$catfilter' ";
+		//DB $query .= "AND gbcategory='$catfilter' ";
+		$query .= "AND gbcategory=:gbcategory ";
+		$qarr[':gbcategory']=$catfilter;
 	}
 	$query .= "ORDER BY enddate,name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+
 	$overallpts = 0;
 	$now = time();
 	$kcnt = 0;
@@ -124,6 +137,7 @@ function outcometable() {
 	$discuss = array();
 	$startdate = array();
 	$enddate = array();
+	$timelimits = array();
 	$avail = array();
 	$category = array();
 	$name = array();
@@ -132,7 +146,8 @@ function outcometable() {
 	$qposs = array();
 	$qoutcome = array();
 	$itemoutcome = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (substr($line['deffeedback'],0,8)=='Practice') { continue;}
 		if ($line['avail']==2) {
 			$line['startdate'] = 0;
@@ -147,14 +162,15 @@ function outcometable() {
 		}
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
-		
+		$timelimits[$kcnt] = $line['timelimit'];
+
 		$assessments[$kcnt] = $line['id'];
-		
+
 		$category[$kcnt] = $line['gbcategory'];
 		$name[$kcnt] = $line['name'];
 		$cntingb[$kcnt] = $line['cntingb']; //1: count, 2: extra credit
 		$assessoutcomes[$kcnt] = array();
-		
+
 		$aitems = explode(',',$line['itemorder']);
 		foreach ($aitems as $k=>$v) {
 			if (strpos($v,'~')!==FALSE) {
@@ -162,7 +178,7 @@ function outcometable() {
 				if (strpos($sub[0],'|')===false) { //backwards compat
 					$aitems[$k] = $sub[0];
 					$aitemcnt[$k] = 1;
-					
+
 				} else {
 					$grpparts = explode('|',$sub[0]);
 					$aitems[$k] = $sub[1];
@@ -172,11 +188,14 @@ function outcometable() {
 				$aitemcnt[$k] = 1;
 			}
 		}
-		
-		$query = "SELECT points,id,category FROM imas_questions WHERE assessmentid='{$line['id']}'";
-		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+
+		//DB $query = "SELECT points,id,category FROM imas_questions WHERE assessmentid='{$line['id']}'";
+		//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$stm2 = $DBH->prepare("SELECT points,id,category FROM imas_questions WHERE assessmentid=:assessmentid");
+		$stm2->execute(array(':assessmentid'=>$line['id']));
 		$totalpossible = 0;
-		while ($r = mysql_fetch_row($result2)) {
+		//DB while ($r = mysql_fetch_row($result2)) {
+		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 			if ($r[0]==9999) {
 				$qposs[$r[1]] = $line['defpoints'];
 			} else {
@@ -198,24 +217,32 @@ function outcometable() {
 		}
 		$kcnt++;
 	}
-	
+
 	//Pull Offline Grade item info
-	$query = "SELECT * from imas_gbitems WHERE courseid='$cid' AND outcomes<>'' ";
-	$query .= "AND showdate<$now ";
-	
+	//DB $query = "SELECT * from imas_gbitems WHERE courseid='$cid' AND outcomes<>'' ";
+	//DB $query .= "AND showdate<$now ";
+	//DB $query .= "AND cntingb>0 AND cntingb<3 ";
+	$query = "SELECT * from imas_gbitems WHERE courseid=:courseid AND outcomes<>'' ";
+	$query .= "AND showdate<:now ";
 	$query .= "AND cntingb>0 AND cntingb<3 ";
-	
+	$qarr = array(':courseid'=>$cid, ':now'=>$now);
+
 	if ($istutor) {
 		$query .= "AND tutoredit<2 ";
 	}
 	if ($catfilter>-1) {
-		$query .= "AND gbcategory='$catfilter' ";
+		//DB $query .= "AND gbcategory='$catfilter' ";
+		$query .= "AND gbcategory=:gbcategory ";
+		$qarr[':gbcategory']=$catfilter;
 	}
 	$query .= "ORDER BY showdate";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$avail[$kcnt] = 0;
-		
+
 		$grades[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
@@ -227,17 +254,25 @@ function outcometable() {
 		$itemoutcome[$kcnt] = explode(',',$line['outcomes']);
 		$kcnt++;
 	}
-	
+
 		//Pull Discussion Grade info
-	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
-	$query .= "AND startdate<$now AND outcomes<>'' ";
-	
+	//DB $query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	//DB $query .= "AND startdate<$now AND outcomes<>'' ";
+	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid=:courseid AND points>0 AND avail>0 ";
+	$query .= "AND startdate<:now AND outcomes<>'' ";
+	$qarr = array(':courseid'=>$cid, ':now'=>$now);
+
 	if ($catfilter>-1) {
-		$query .= "AND gbcategory='$catfilter' ";
+		//DB $query .= "AND gbcategory='$catfilter' ";
+		$query .= "AND gbcategory=:gbcategory ";
+		$qarr[':gbcategory']=$catfilter;
 	}
 	$query .= "ORDER BY enddate,postby,replyby,startdate";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -273,22 +308,27 @@ function outcometable() {
 		$itemoutcome[$kcnt] = explode(',',$line['outcomes']);
 		$kcnt++;
 	}
-	
+
 	$cats = array();
 	$catcolcnt = 0;
 	//Pull Categories:  Name, scale, scaletype, chop, drop, weight
 	if (in_array(0,$category)) {  //define default category, if used
-		$cats[0] = explode(',',$defaultcat); 
+		$cats[0] = explode(',',$defaultcat);
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);
 		$catcolcnt++;
-		
+
 	}
-	
-	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid' ";
+
+	//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid='$cid' ";
+	//DB $query .= "ORDER BY name";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden FROM imas_gbcats WHERE courseid=:courseid ";
 	$query .= "ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (in_array($row[0],$category)) { //define category if used
 			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
 				$row[1] = substr($row[1],1);
@@ -298,7 +338,7 @@ function outcometable() {
 			$catcolcnt++;
 		}
 	}
-	
+
 	//create item headers
 	$pos = 0;
 	$itemorder = array();
@@ -340,7 +380,7 @@ function outcometable() {
 			$newcategory[$k] = $category[$k];
 		}
 		$category = $newcategory;
-	} 
+	}
 	foreach(array_keys($cats) as $cat) {//foreach category
 		$catkeys = array_keys($category,$cat); //pull items in that category
 		if (($orderby&1)==1) { //order by category
@@ -348,16 +388,16 @@ function outcometable() {
 		}
 		foreach ($catkeys as $k) {
 			if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
-				$cntingb[$k] = 0;	
+				$cntingb[$k] = 0;
 			}
-					
+
 			if (($orderby&1)==1) {  //display item header if displaying by category
 				//$cathdr[$pos] = $cats[$cat][6];
 				$gb[0][1][$pos][0] = $name[$k]; //item name
 				$gb[0][1][$pos][1] = $cats[$cat][7]; //item category number
 				$gb[0][1][$pos][2] = $avail[$k]; //0 past, 1 current, 2 future
 				$gb[0][1][$pos][3] = $cntingb[$k]; //0 no count and hide, 1 count, 2 EC, 3 no count
-  
+
 				if (isset($assessments[$k])) {
 					$gb[0][1][$pos][4] = 0; //0 online, 1 offline
 					$gb[0][1][$pos][5] = $assessments[$k];
@@ -393,7 +433,7 @@ function outcometable() {
 			arsort($startdate,SORT_NUMERIC);
 			$itemorder = array_keys($startdate);
 		}
-		
+
 		foreach ($itemorder as $k) {
 			$gb[0][1][$pos][0] = $name[$k]; //item name
 			$gb[0][1][$pos][1] = $cats[$category[$k]][7]; //item category name
@@ -415,7 +455,7 @@ function outcometable() {
 			$pos++;
 		}
 	}
-	
+
 	//create category headers
 	$pos = 0;
 	$catorder = array_keys($cats);
@@ -424,26 +464,37 @@ function outcometable() {
 		$gb[0][2][$pos][1] = $cats[$cat][7];
 		$pos++;
 	}
-	
+
 	//Pull student data
 	$ln = 1;
+	//DB $query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
+	//DB $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg ";
-	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
+	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid ";
+	$qarr = array(':courseid'=>$cid);
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
-	if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
-	if ($secfilter!=-1) {
-		$query .= "AND imas_students.section='$secfilter' ";
+	//DB if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
+	if ($limuser>0) {
+		$query .= "AND imas_users.id=:userid ";
+		$qarr[':userid'] = $limuser;
 	}
-	if ($hidelocked) {
+	if ($secfilter!=-1 && $limuser<=0) {
+		//DB $query .= "AND imas_students.section='$secfilter' ";
+		$query .= "AND imas_students.section=:section ";
+		$qarr[':section'] = $secfilter;
+	}
+	if ($hidelocked && $limuser==0) {
 		$query .= "AND imas_students.locked=0 ";
 	}
 	if (isset($timefilter)) {
 		$tf = time() - 60*60*$timefilter;
-		$query .= "AND imas_users.lastaccess>$tf ";
+		$query .= "AND imas_users.lastaccess>:tf ";
+		$qarr[':tf'] = $tf;
 	}
 	if (isset($lnfilter) && $lnfilter!='') {
-		$query .= "AND imas_users.LastName LIKE '$lnfilter%' ";
+		$query .= "AND imas_users.LastName LIKE :lnfilter ";
+		$qarr['lnfilter'] = "$lnfilter%";
 	}
 	if ($isdiag) {
 		$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
@@ -452,11 +503,13 @@ function outcometable() {
 	} else {
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	}
-	
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$alt = 0;
 	$sturow = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) { //foreach student
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
 		$cattotpastec[$ln] = array();
@@ -469,39 +522,58 @@ function outcometable() {
 		$gb[$ln][0][0] = "{$line['LastName']},&nbsp;{$line['FirstName']}";
 		$gb[$ln][0][1] = $line['id'];
 		$gb[$ln][0][2] = $line['locked'];
-		
+
 
 		$sturow[$line['id']] = $ln;
 		$ln++;
-	}	
-		
+	}
+
 	//pull exceptions
 	$exceptions = array();
+	//DB $query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
+	//DB $query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($r = mysql_fetch_row($result2)) {
 	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
-	$query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($r = mysql_fetch_row($result2)) {
+	$query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid";
+	$stm2 = $DBH->prepare($query);
+	$stm2->execute(array(':courseid'=>$cid));
+	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 		if (!isset($sturow[$r[1]])) { continue;}
-		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);	
+		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);
 		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][2] = 10; //will get overwritten later if assessment session exists
-	}	
-	
+	}
+
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
-	$query = "SELECT ias.id,ias.assessmentid,ias.questions,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid,ia.timelimit FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
-	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
-	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+	//DB $query = "SELECT ias.id,ias.assessmentid,ias.questions,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid,ia.timelimit FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	//DB $query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid'";
+	//DB if ($limuser>0) {
+		//DB $query .= " AND ias.userid='$limuser' ";
+	//DB }
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+	$query = "SELECT ias.id,ias.assessmentid,ias.questions,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid=:courseid ";
+	if ($limuser>0) {
+		$query .= " AND ias.userid=:userid ";
+	}
+	$stm2 = $DBH->prepare($query);
+	if ($limuser>0) {
+		$stm2->execute(array(':courseid'=>$cid, ':userid'=>$limuser));
+	} else {
+		$stm2->execute(array(':courseid'=>$cid));
+	}
+	while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($assessidx[$l['assessmentid']]) || !isset($sturow[$l['userid']]) || !isset($assesscol[$l['assessmentid']])) {
 			continue;
 		}
 		$i = $assessidx[$l['assessmentid']];
 		$row = $sturow[$l['userid']];
 		$col = $assesscol[$l['assessmentid']];
-		
+
 		$gb[$row][1][$col][3] = $l['id'];; //assessment session id
-		
+
 		if (strpos($l['questions'],';')===false) {
 			$questions = explode(",",$l['questions']);
 		} else {
@@ -513,7 +585,7 @@ function outcometable() {
 		$pts = array();
 		$ptsposs = array();
 		for ($j=0;$j<count($scores);$j++) {
-			if (!isset($qoutcome[$questions[$j]])) { continue; } //no outcome set - skip it
+			if (!isset($qoutcome[$questions[$j]])) {continue; } //no outcome set - skip it
 			if (!isset($pts[$qoutcome[$questions[$j]]])) {
 				$pts[$qoutcome[$questions[$j]]] = 0;
 			}
@@ -523,13 +595,13 @@ function outcometable() {
 			$pts[$qoutcome[$questions[$j]]] += getpts($scores[$j]);
 			$ptsposs[$qoutcome[$questions[$j]]] += $qposs[$questions[$j]];
 		}
-		
-		if (in_array(-1,$scores)) { 
-			$IP=1; 
+
+		if (in_array(-1,$scores)) {
+			$IP=1;
 		} else {
 			$IP=0;
 		}
-		
+
 		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
 			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
@@ -549,11 +621,11 @@ function outcometable() {
 			$thised = $enddate[$i];
 			$inexception = false;
 		}
-		
-		
+
+
 		$countthisone = false;
 		$gb[$row][1][$col][1] = $ptsposs;
-		
+
 		if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$thised && !$canviewall) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
 			$gb[$row][1][$col][2] = 0;  //no other info
@@ -590,16 +662,16 @@ function outcometable() {
 					if ($gb[0][1][$col][2]<1) { //past
 						$cattotpast[$row][$category[$i]][$oc][$col] = $pv;
 						$catposspast[$row][$category[$i]][$oc][$col] = $ptsposs[$oc];
-					} 
+					}
 					if ($gb[0][1][$col][2]<2) { //past or cur
 						$cattotcur[$row][$category[$i]][$oc][$col] = $pv;
 						$catposscur[$row][$category[$i]][$oc][$col] = $ptsposs[$oc];
 					}
-				
+
 				} else if ($cntingb[$i] == 2) {
 					if ($gb[0][1][$col][2]<1) { //past
 						$cattotpastec[$row][$category[$i]][$oc][$col] = $pv;
-					} 
+					}
 					if ($gb[0][1][$col][2]<2) { //past or cur
 						$cattotcurec[$row][$category[$i]][$oc][$col] = $pv;
 					}
@@ -607,7 +679,7 @@ function outcometable() {
 			}
 		}
 	}
-	
+
 	//Get other grades
 	$gradeidx = array_flip($grades);
 	unset($gradeid); unset($opts);
@@ -624,10 +696,19 @@ function outcometable() {
 	}
 	if (count($gradetypeselects)>0) {
 		$sel = implode(' OR ',$gradetypeselects);
-		$query = "SELECT * FROM imas_grades WHERE ($sel)";
-		if ($limuser>0) { $query .= " AND userid='$limuser' ";}
-		$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+		//$query = "SELECT imas_grades.gradetypeid,imas_grades.gradetype,imas_grades.refid,imas_grades.id,imas_grades.score,imas_grades.feedback,imas_grades.userid FROM imas_grades,imas_gbitems WHERE ";
+		//$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
+		if ($limuser>0) {
+			//DB $query = "SELECT * FROM imas_grades WHERE ($sel) AND userid='$limuser' ";
+			$stm2 = $DBH->prepare("SELECT * FROM imas_grades WHERE ($sel) AND userid=:userid ");
+			$stm2->execute(array(':userid'=>$limuser));
+		} else {
+			//DB $query = "SELECT * FROM imas_grades WHERE ($sel)";
+			$stm2 = $DBH->query("SELECT * FROM imas_grades WHERE ($sel)");
+		}
+		//DB $result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+		while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 			if ($l['gradetype']=='offline') {
 				if (!isset($gradeidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gradetypeid']])) {
 					continue;
@@ -636,18 +717,18 @@ function outcometable() {
 				$row = $sturow[$l['userid']];
 				$col = $gradecol[$l['gradetypeid']];
 				foreach ($itemoutcome[$i] as $oc) {
-					
+
 					$gb[$row][1][$col][3] = $l['id'];
 					if ($l['score']!=null) {
 						$gb[$row][1][$col][0][$oc] = 1*$l['score'];
-						$gb[$row][1][$col][1][$oc] = $possible[$i];           
+						$gb[$row][1][$col][1][$oc] = $possible[$i];
 					}
-					
+
 					if ($cntingb[$i] == 1) {
 						if ($gb[0][1][$col][2]<1) { //past
 							$cattotpast[$row][$category[$i]][$oc][$col] = 1*$l['score'];
 							$catposspast[$row][$category[$i]][$oc][$col] = $possible[$i];
-						} 
+						}
 						if ($gb[0][1][$col][2]<2) { //past or cur
 							$cattotcur[$row][$category[$i]][$oc][$col] = 1*$l['score'];
 							$catposscur[$row][$category[$i]][$oc][$col] = $possible[$i];
@@ -655,7 +736,7 @@ function outcometable() {
 					} else if ($cntingb[$i]==2) {
 						if ($gb[0][1][$col][2]<1) { //past
 							$cattotpastec[$row][$category[$i]][$oc][$col] = 1*$l['score'];
-						} 
+						}
 						if ($gb[0][1][$col][2]<2) { //past or cur
 							$cattotcurec[$row][$category[$i]][$oc][$col] = 1*$l['score'];
 						}
@@ -669,7 +750,7 @@ function outcometable() {
 				$row = $sturow[$l['userid']];
 				$col = $discusscol[$l['gradetypeid']];
 				foreach ($itemoutcome[$i] as $oc) {
-				
+
 					if ($l['score']!=null) {
 						if (isset($gb[$row][1][$col][0])) {
 							$gb[$row][1][$col][0][$oc] += 1*$l['score']; //adding up all forum scores
@@ -677,11 +758,11 @@ function outcometable() {
 							$gb[$row][1][$col][0][$oc] = 1*$l['score'];
 						}
 					}
-			
+
 					if ($gb[0][1][$col][2]<1) { //past
 						$cattotpast[$row][$category[$i]][$oc][$col] = $gb[$row][1][$col][0];
 						$catposspast[$row][$category[$i]][$oc][$col] = $possible[$i];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$row][$category[$i]][$oc][$col] = $gb[$row][1][$col][0];
 						$catposscur[$row][$category[$i]][$oc][$col] = $possible[$i];
@@ -690,15 +771,15 @@ function outcometable() {
 			}
 		}
 	}
-	
+
 	//create category totals
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
-		
+
 		//zero out past due items
 		foreach($gb[0][1] as $col=>$inf) {
 			if ($gb[0][1][$col][2]>0 || count($gb[$ln][1][$col][1])>0) {continue;} //skip if current, or if already set
 			if ($inf[4]==0 && count($possible[$assessidx[$inf[5]]])==0) {continue;} //assess has no outcomes
-			
+
 			$gb[$ln][1][$col] = array();
 			$gb[$ln][1][$col][0] = array();
 			$gb[$ln][1][$col][1] = array();
@@ -706,7 +787,7 @@ function outcometable() {
 				$i = $assessidx[$inf[5]];
 				foreach ($possible[$i] as $oc=>$p) {
 					$gb[$ln][1][$col][0][$oc] = 0;
-					$gb[$ln][1][$col][1][$oc] = $p;	
+					$gb[$ln][1][$col][1][$oc] = $p;
 					$cattotpast[$ln][$category[$i]][$oc][$col] = 0;
 					$catposspast[$ln][$category[$i]][$oc][$col] = $p;
 					$cattotcur[$ln][$category[$i]][$oc][$col] = 0;
@@ -722,7 +803,7 @@ function outcometable() {
 				}
 				foreach ($itemoutcome[$i] as $oc) {
 					$gb[$ln][1][$col][0][$oc] = 0;
-					$gb[$ln][1][$col][1][$oc] = $possible[$i];	
+					$gb[$ln][1][$col][1][$oc] = $possible[$i];
 					$cattotpast[$ln][$category[$i]][$oc][$col] = 0;
 					$catposspast[$ln][$category[$i]][$oc][$col] = $possible[$i];
 					$cattotcur[$ln][$category[$i]][$oc][$col] = 0;
@@ -730,7 +811,7 @@ function outcometable() {
 				}
 			}
 		}
-		
+
 		$totpast = array();
 		$totposspast = array();
 		$totcur = array();
@@ -739,17 +820,17 @@ function outcometable() {
 
 		foreach($catorder as $cat) {//foreach category
 			//add up scores for each outcome
-			if (isset($cattotpast[$ln][$cat])) { 
+			if (isset($cattotpast[$ln][$cat])) {
 				foreach ($cattotpast[$ln][$cat] as $oc=>$scs) {
 					$cattotpast[$ln][$cat][$oc] = array_sum($scs);
 					if (isset($cattotpastec[$ln][$cat][$oc])) {
 						$cattotpast[$ln][$cat][$oc] += array_sum($cattotpastec[$ln][$cat][$oc]);
 					}
 					$catposspast[$ln][$cat][$oc] = array_sum($catposspast[$ln][$cat][$oc]);
-					
+
 					$gb[$ln][2][$pos][0][$oc] = $cattotpast[$ln][$cat][$oc];
 					$gb[$ln][2][$pos][1][$oc] = $catposspast[$ln][$cat][$oc];
-					
+
 					if (!isset($totpast[$oc])) {
 						$totpast[$oc] = 0;
 						$totposspast[$oc] = 0;
@@ -763,18 +844,18 @@ function outcometable() {
 					}
 				}
 			}
-			if (isset($cattotcur[$ln][$cat])) { 
+			if (isset($cattotcur[$ln][$cat])) {
 				foreach ($cattotcur[$ln][$cat] as $oc=>$scs) {
 					$cattotcur[$ln][$cat][$oc] = array_sum($scs);
 					if (isset($cattotcurec[$ln][$cat][$oc])) {
 						$cattotcur[$ln][$cat][$oc] += array_sum($cattotcurec[$ln][$cat][$oc]);
 					}
-					
+
 					$catposscur[$ln][$cat][$oc] = array_sum($catposscur[$ln][$cat][$oc]);
-					
+
 					$gb[$ln][2][$pos][2][$oc] = $cattotcur[$ln][$cat][$oc];
 					$gb[$ln][2][$pos][3][$oc] = $catposscur[$ln][$cat][$oc];
-					
+
 					if (!isset($totcur[$oc])) {
 						$totcur[$oc] = 0;
 						$totposscur[$oc] = 0;
@@ -794,12 +875,12 @@ function outcometable() {
 		foreach ($totpast as $oc=>$v) {
 			if ($totposspast[$oc]>0) {
 				$gb[$ln][3][0][$oc] = $totpast[$oc]/$totposspast[$oc];
-			} 
+			}
 		}
 		foreach ($totcur as $oc=>$v) {
 			if ($totposscur[$oc]>0) {
 				$gb[$ln][3][1][$oc] = $totcur[$oc]/$totposscur[$oc];
-			} 
+			}
 		}
 	}
 	if ($limuser<1) {

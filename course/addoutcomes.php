@@ -6,20 +6,23 @@ require("../validate.php");
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 if (isset($_POST['order'])) {
-	//store order and outcome groups as serialized array 
+	//store order and outcome groups as serialized array
 	//array(name=>name, items=>array(outcome ids))
 	//get list of existing outcomes
 	$curoutcomes = array();
-	$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$curoutcomes[$row[0]] = $row[1];
 	}
-	
+
 	//read in from order
 	$seenoutcomes = array();
 	function additems($list) {
-		 global $curoutcomes, $seenoutcomes, $cid;
+		 global $DBH,$curoutcomes, $seenoutcomes, $cid;
 		 $outarr = array();
 		 $list = substr($list,1,-1);
 		 $i = 0; $nd = 0; $last = 0;
@@ -53,68 +56,80 @@ if (isset($_POST['order'])) {
 					 $block = array("outcomes"=>$subarr);
 				 }
 				 if (substr($pts[0],0,3)=='new') {
-				 	 $name = stripslashes($_POST['newg'.substr($pts[0],6)]);
+				 	 $name = $_POST['newg'.substr($pts[0],6)];
 				 } else {
-				 	 $name = stripslashes($_POST['g'.substr($pts[0],3)]);
+				 	 $name = $_POST['g'.substr($pts[0],3)];
 				 }
 				 $block['name'] = $name;
 				 $outarr[] = $block;
 			 } else { //is an outcome
 			 	 if (substr($it,0,3)=='new') {
 			 	 	$ocnt = substr($it,3);
-			 	 	$query = "INSERT INTO imas_outcomes (courseid, name) VALUES ";
-			 	 	$query .= "('$cid','{$_POST['newo'.$ocnt]}')";
-			 	 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			 	 	$newid = mysql_insert_id();
+			 	 	//DB $query = "INSERT INTO imas_outcomes (courseid, name) VALUES ";
+			 	 	//DB $query .= "('$cid','{$_POST['newo'.$ocnt]}')";
+			 	 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			 	 	//DB $newid = mysql_insert_id();
+			 	 	$stm = $DBH->prepare("INSERT INTO imas_outcomes (courseid, name) VALUES (:cid,:name)");
+			 	 	$stm->execute(array(':cid'=>$cid, ':name'=>$_POST['newo'.$ocnt]));
+			 	 	$newid = $DBH->lastInsertId();
 			 	 	$seenoutcomes[] = $newid;
 			 	 	$outarr[] = $newid;
 			 	 } else if (isset($curoutcomes[$it])) {
-			 	 	if (stripslashes($_POST['o'.$it])!=$curoutcomes[$it]) {
-						 $query = "UPDATE imas_outcomes SET name='{$_POST['o'.$it]}' WHERE id='$it' AND courseid='$cid'";
-						 $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			 	 	if ($_POST['o'.$it]!=$curoutcomes[$it]) {
+						 //DB $query = "UPDATE imas_outcomes SET name='{$_POST['o'.$it]}' WHERE id='$it' AND courseid='$cid'";
+						 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						 $stm = $DBH->prepare("UPDATE imas_outcomes SET name=:name WHERE id=:id AND courseid=:courseid");
+						 $stm->execute(array(':name'=>$_POST['o'.$it], ':id'=>$it, ':courseid'=>$cid));
 			 	 	}
 			 	 	$outarr[] = $it;
 			 	 	$seenoutcomes[] = $it;
 			 	 }
 			 }
-			 
+
 		 }
 		 return $outarr;
 	 }
-	
+
 	 //this call parses the item array, adds any new outcomes, and updates names of any existing ones
 	 $itemarray = additems($_POST['order']);
-	 
-	 $outcomeorder = addslashes(serialize($itemarray));
-	 $query = "UPDATE imas_courses SET outcomes='$outcomeorder' WHERE id='$cid'";
-	 mysql_query($query) or die("Query failed : " . mysql_error());
-	 
-	
+
+	 //DB $outcomeorder = addslashes(serialize($itemarray));
+	 $outcomeorder = serialize($itemarray);
+	 //DB $query = "UPDATE imas_courses SET outcomes='$outcomeorder' WHERE id='$cid'";
+	 //DB mysql_query($query) or die("Query failed : " . mysql_error());
+	 $stm = $DBH->prepare("UPDATE imas_courses SET outcomes=:outcomes WHERE id=:id");
+	 $stm->execute(array(':outcomes'=>$outcomeorder, ':id'=>$cid));
+
+
 	//remove unused outcomes
 	$unused = array_diff(array_keys($curoutcomes), $seenoutcomes);
-	
+
 	if (count($unused)>0) {
 		//these aren't horribly efficient, but shouldn't be called that often, so oh well.
-		
-		$unusedlist = implode(',',$unused);
-		$query = "DELETE FROM imas_outcomes WHERE id IN ($unusedlist)";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+
+		$unusedlist = implode(',',array_map('intval',$unused));
+		//DB $query = "DELETE FROM imas_outcomes WHERE id IN ($unusedlist)";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$DBH->query("DELETE FROM imas_outcomes WHERE id IN ($unusedlist)");
+
 		//detach unused outcomes from questions/content items
-		$query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$cid' AND defoutcome IN ($unusedlist)";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+		//DB $query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$cid' AND defoutcome IN ($unusedlist)";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_assessments SET defoutcome=0 WHERE courseid=:courseid AND defoutcome IN ($unusedlist)");
+		$stm->execute(array(':courseid'=>$cid));
+
 		/*$query = "UPDATE imas_linkedtext SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+
 		$query = "UPDATE imas_forums SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+
 		$query = "UPDATE imas_gbitems SET outcome=0 WHERE courseid='$cid' AND outcomes IN ($unusedlist)";
 		mysql_query($query) or die("Query failed : " . mysql_error());
 		*/
-		$query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$DBH->query("UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)");
 	}
 	echo 'OK';
 }
@@ -122,9 +137,12 @@ if (isset($_POST['order'])) {
 
 
 //load existing outcomes
-$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+$stm->execute(array(':id'=>$cid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 if ($row[0]=='') {
 	$outcomes = array();
 } else {
@@ -135,9 +153,12 @@ if ($row[0]=='') {
 }
 
 $outcomeinfo = array();
-$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
@@ -178,7 +199,7 @@ $placeinhead .=  "<script>var AHAHsaveurl = '$imasroot/course/addoutcomes.php?ci
 $placeinhead .= "<script src=\"$imasroot/javascript/mootools.js\"></script>";
 $placeinhead .= "<script src=\"$imasroot/javascript/nested1.js?v=0122102\"></script>";
 $placeinhead .= '<script type="text/javascript">
- 	var noblockcookie=true; 
+ 	var noblockcookie=true;
 	var ocnt = 0;
 	var unsavedmsg = "'._("You have unrecorded changes.  Are you sure you want to abandon your changes?").'";
 	function txtchg() {
@@ -238,7 +259,7 @@ $placeinhead .= '<script type="text/javascript">
 			}
 		}
 	}
-	
+
 	</script>';
 require("../header.php");
 

@@ -5,24 +5,27 @@ if (!isset($teacherid) || !isset($cid)) {
 	echo "You are not authorized to view this page";
 	exit;
 }
+$cid = intval($cid);
 if (isset($_POST['aidorder'])) {
 	$aidorder = explode(',',$_POST['aidorder']);
-	foreach ($aidorder as $k=>$v) {
-		$aidorder[$k] = intval($v);
-	}
+	$aidorder = array_map('intval', $aidorder);
 	$aidlist = implode(',', $aidorder);
-	
-	$query = "SELECT id,points FROM imas_questions WHERE assessmentid IN ($aidlist) AND points<9999";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	//DB $query = "SELECT id,points FROM imas_questions WHERE assessmentid IN ($aidlist) AND points<9999";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->query("SELECT id,points FROM imas_questions WHERE assessmentid IN ($aidlist) AND points<9999");
 	$qpoints = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$qpoints[$row[0]] = $row[1];
 	}
-	
-	$query = "SELECT id,defpoints,itemorder FROM imas_assessments WHERE id IN ($aidlist) AND courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	//DB $query = "SELECT id,defpoints,itemorder FROM imas_assessments WHERE id IN ($aidlist) AND courseid='$cid'";
+	$stm = $DBH->query("SELECT id,defpoints,itemorder FROM imas_assessments WHERE id IN ($aidlist) AND courseid=$cid"); //presanitized
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$possible = array();
-	while ($line = mysql_fetch_assoc($result)) {
+	//DB while ($line = mysql_fetch_assoc($result)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$pos = 0;
 		$aitems = explode(',',$line['itemorder']);
 		$defpoints = $line['defpoints'];
@@ -43,28 +46,32 @@ if (isset($_POST['aidorder'])) {
 	}
 
 	$aidpos = array_flip($aidorder);
-	
+
+	$stm = $DBH->prepare("UPDATE imas_assessments SET reqscoreaid=:reqscoreaid,reqscore=:reqscore WHERE id=:id AND courseid=:courseid");
 	foreach ($_POST['checked'] as $tochgaid) {
 		if (!isset($possible[$tochgaid])) { continue;}
 		$reqval = intval($_POST['req'.$tochgaid]);
 		$pos = $aidpos[$tochgaid];
 		if ($pos<1) {continue;}  //can't set prereq on first item
 		$prereq = $aidorder[$pos-1]; //identify prereq assignment
-		
+
 		$score = ceil($reqval/100*$possible[$prereq] - .000000000001);
-		$query = "UPDATE imas_assessments SET reqscoreaid='$prereq',reqscore=$score WHERE id='$tochgaid' AND courseid='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "UPDATE imas_assessments SET reqscoreaid='$prereq',reqscore=$score WHERE id='$tochgaid' AND courseid='$cid'";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm->execute(array(':reqscoreaid'=>$prereq, ':reqscore'=>$score, ':id'=>$tochgaid, ':courseid'=>$cid));
 	}
-	
+
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
-	exit;	
-	
+	exit;
+
 } else {
 	require("../includes/copyiteminc.php");
-	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->query("SELECT itemorder FROM imas_courses WHERE id=$cid");
 
-	$items = unserialize(mysql_result($result,0,0));
+	//DB $items = unserialize(mysql_result($result,0,0));
+	$items = unserialize($stm->fetchColumn(0));
 	$gitypeids = array();
 	$ids = array();
 	$types = array();
@@ -73,13 +80,13 @@ if (isset($_POST['aidorder'])) {
 	$parents = array();
 	$agbcats = array();
 	getsubinfo($items,'0','','Assessment');
-	
+
 	require("../header.php");
 
 	echo '<h2>Quick-setup conditional release</h2>';
-	
+
 	echo '<p>If an item is checked, the item prior in the course order will be set as the prereq assignment</p>';
-	
+
 	echo '<form method="post" action="makeconditional.php?cid='.$cid.'">';
 	echo '<p>Req <input id="reqdef" value=""/> % <input type="button" onclick="$(\'.req\').val($(\'#reqdef\').val())" value="Copy to all"/></p>';
 	echo '<table><tbody>';
@@ -98,7 +105,7 @@ if (isset($_POST['aidorder'])) {
 	echo '<input type="hidden" name="aidorder" value="'.implode(',',$aids).'"/>';
 	echo '<input type="submit"/>';
 	echo '</form>';
-	
+
 	require("../footer.php");
 }
 

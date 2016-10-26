@@ -14,43 +14,53 @@ if (isset($teacherid)) {
 		echo 'Only students can claim a badge';
 	} else {
 		$userid = $_GET['userid'];
-		$query = "SELECT SID FROM imas_users WHERE id='$userid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$username = mysql_result($result,0,0);
+		//DB $query = "SELECT SID FROM imas_users WHERE id='$userid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $username = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT SID FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$userid));
+		$username = $stm->fetchColumn(0);
 	}
 } else if (!isset($studentid) && !isset($teacherid)) {
 	echo 'Must be a student in this class to claim a badge';
-	
+
 } else if (!isset($_GET['badgeid'])) {
 	echo 'No badge id provided';
 //} else if (isset($teacherid) || isset($tutorid))  {
 //	echo 'This page is only relevant to student.';
 //} else if (!isset($studentid)) {
-//	echo 'You are not authorized to view this page.';	
+//	echo 'You are not authorized to view this page.';
 } else {
 	$badgeid = intval($_GET['badgeid']);
-	$query = "SELECT name, requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	//DB $query = "SELECT name, requirements FROM imas_badgesettings WHERE id=$badgeid AND courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare("SELECT name, requirements FROM imas_badgesettings WHERE id=:id AND courseid=:courseid");
+	$stm->execute(array(':id'=>$badgeid, ':courseid'=>$cid));
+	if ($stm->rowCount()==0) {
 		echo 'Invalid badge ID for this course';
 	} else {
-		list($name,$req) = mysql_fetch_row($result);
+		//DB list($name,$req) = mysql_fetch_row($result);
+		list($name,$req) = $stm->fetch(PDO::FETCH_NUM);
 		$req = unserialize($req);
-		
+
 		//get student's scores
 		require("gbtable2.php");
 		$secfilter = -1;
 		$gbt = gbtable($userid);
-		
-		
-		$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items'); 
-		
-		while ($row=mysql_fetch_row($result)) {
+
+
+		//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid' ORDER BY name";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid ORDER BY name");
+		$stm->execute(array(':courseid'=>$cid));
+		$gtypes = array('0'=>'Past Due', '3'=>'Past and Attempted', '1'=>'Past and Available', '2'=>'All Items');
+
+		//DB while ($row=mysql_fetch_row($result)) {
+		while ($row=$stm->fetch(PDO::FETCH_NUM)) {
 			$gbcats[$row[0]] = $row[1];
 		}
-		
+
 		$reqmet = true;
 		echo '<h2>Badge: '.$name.'</h2>';
 		echo '<p>Badge requirements:</p>';
@@ -72,7 +82,7 @@ if (isset($teacherid)) {
 						if ($r[1]==3) {
 							$mypercent = round(100*$gbt[1][2][$i][3]/$gbt[1][2][$i][4],1);
 						} else {
-							if ($catinfo[$r[1]+3]==0) { 
+							if ($catinfo[$r[1]+3]==0) {
 								$mypercent= 0;
 							} else {
 								$mypercent = round(100*$gbt[1][2][$i][$r[1]]/$catinfo[$r[1]+3],1);
@@ -113,16 +123,16 @@ if (isset($teacherid)) {
 			echo '</td></tr>';
 		}
 		echo '</tbody></table>';
-		
+
 		if ($reqmet) {
 			echo '<h3>Badge Requirements have been met!</h3>';
 			$verify = urlencode(hash('sha256', $username . $userid));
 			$url = $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . '/course/verifybadge.php?format=json&userid='.$userid.'&badgeid='.$badgeid.'&v='.$verify;
-			
+
 			echo '<p><input type="button" value="Claim Badge" onclick="OpenBadges.issue([\''.$url.'\'], function(errors,successes) { })"/><br/>FireFox, Chrome, Safari, or IE 9+ is needed to claim badge.</p>';
 		}
 	}
-	
+
 }
 require("../footer.php");
 

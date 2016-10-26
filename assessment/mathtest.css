@@ -9,8 +9,8 @@ a:hover {
 }
 
 html {
-	
-}                                
+
+}
 body {
 	margin: 10px;
 	padding: 0px;
@@ -36,7 +36,7 @@ div.toppad {
 }
 div.breadcrumb {
 	border: 1px solid #000;
-	background-color: #ddf;	
+	background-color: #ddf;
 	margin-bottom: 10px;
 	padding: 5px;
 }
@@ -56,8 +56,8 @@ div.question {
 	/*position: relative;*/
 	font-family: "Times New Roman", Times, serif;
 	font-size: medium;
-	background-color: #ddf; 
-	border: 1px solid #00f; 
+	background-color: #ddf;
+	border: 1px solid #00f;
 	margin-top: 0px;
 	margin-bottom: 5px;
 	padding: 10px;
@@ -67,7 +67,7 @@ div.inactive {
 	/*position: relative;*/
 	margin-bottom: 5px;
 	padding: 10px;
-	border: 1px solid #00f; 
+	border: 1px solid #00f;
 }
 div.prequestion {
 	padding-left: 10px;
@@ -87,8 +87,8 @@ div.todoquestion div.inactive {
 	margin: 0; padding: 0;
 }
 div.todoquestion {
-	background-color: #ffffcc; 
-	border: 1px solid #999966; 
+	background-color: #ffffcc;
+	border: 1px solid #999966;
 	margin-top: 0px;
 	margin-bottom: 5px;
 	padding: 10px;
@@ -105,7 +105,7 @@ div.review {
 }
 
 div.intro {
-	border: 1px solid #00f; 
+	border: 1px solid #00f;
 	padding: 5px;
 	margin-bottom: 10px;
 }
@@ -123,7 +123,7 @@ div.float {
 div.match {
 	float:left;
 	padding: 5px;
-	padding-right: 30px;	
+	padding-right: 30px;
 }
 
 div.spacer {
@@ -169,7 +169,7 @@ div.inset {
 
 div.right {
 	padding: 0px;
-	text-align: right;	
+	text-align: right;
 }
 
 ul.qlist {list-style-type: none; margin: 0px; padding: 0px;}
@@ -190,6 +190,18 @@ input.unind {
 }
 p.centered {
 	text-align: center;
+}
+.ind1 {
+	margin-left: .75em;
+}
+.ind2 {
+	margin-left: 1.5em;
+}
+.ind3 {
+	margin-left: 2.25em;
+}
+.ind4 {
+	margin-left: 3em;
 }
 
 table thead th {
@@ -241,7 +253,7 @@ img.skipnav {
 }
 .hidden {
 	display: none;
-} 
+}
 span.shown {
 	display: inline;
 }
@@ -290,12 +302,12 @@ span.spanbutton:active {
 }
 span.spanbutton:hover {
 	background: #fcf;
-}	
+}
 
 
 table.longdiv {
   border-collapse: collapse;
-  border: 0px; 
+  border: 0px;
 }
 table.longdiv td {
   padding: 3px;
@@ -311,12 +323,12 @@ span.withdrawn {
 	color: red;
 	text-decoration: line-through;
 }
-td.matrixleft { 
+td.matrixleft {
 	border: 1px solid #000;
 	border-width: 1px 0px 1px 1px;
 	margin: 0px;
 	padding: 0px;
-} 
+}
 td.matrixright {
 	border: 1px solid #000;
 	border-width: 1px 1px 1px 0px;
@@ -365,7 +377,7 @@ div.tips {
 	background: #fff;
 	vertical-align: middle;
 }
-.eetab { 
+.eetab {
 	cursor: pointer;
 	height: 35px;
 	padding: 0px 1em;
@@ -378,11 +390,11 @@ div.tips {
 .eedd {
 	cursor: pointer;
 	font-family: sans-serif;
-	position: absolute; 
-	height: 8px; 
+	position: absolute;
+	height: 8px;
 	background: #ff0 url('../img/tinyarrow.gif') no-repeat center;
-	display:none; 
-	text-align:center; 
+	display:none;
+	text-align:center;
 	color: #fa0;
 	font-size: 6px;
 	border: 1px solid #fa0;
@@ -392,8 +404,8 @@ div.tips {
 	font-size:1px;
 	display:-moz-inline-box;
 	display:inline-block;
-	vertical-align:middle; 
-	width:30px; 
+	vertical-align:middle;
+	width:30px;
 	height: 10px;
 	border: 1px solid #000;
 }
@@ -405,14 +417,14 @@ div.tips {
 	position:relative;
 	left:0px;
 	top:0px;
-	
+
 }
 .miniscorebarholder {
 	font-size:1px;
 	display:-moz-inline-box;
 	display:inline-block;
-	vertical-align:bottom; 
-	width:5px; 
+	vertical-align:bottom;
+	width:5px;
 	height: 14px;
 	border: 1px solid #000;
 }
@@ -426,9 +438,9 @@ div.tips {
 }
 /*for eqn tips*/
 .ehdd {
-	position: absolute; 
+	position: absolute;
 	background: #669;
-	display:none; 
+	display:none;
 	color: #fff;
 	font-size: 75%;
 	padding: 0px 4px;
@@ -475,7 +487,7 @@ color: #fff;
 background-color: #036;
 }
 
-ul#navlist li { 
+ul#navlist li {
 display: inline;
 }
 
@@ -631,7 +643,7 @@ table.gridded tbody th {
 	padding: 2px 5px 2px 5px;
 }
 span.boxed {
-	border: 1px solid #000; 
+	border: 1px solid #000;
 	padding: 2px 5px;
 	line-height: 1em;
 	display: inline-block;
@@ -641,7 +653,7 @@ div.question>div:first-child>p:first-child, div.inactive>p:first-child {
 }
 td>p:first-child, td>p:first-child {
 	margin-top: 0;
-}      
+}
 td>p:last-child, td>p:last-child {
 	margin-bottom: 0;
 }
@@ -667,7 +679,7 @@ div.question td img, div.question th img {
 
 span.inlinebtn {
 	cursor: pointer;
-	border: 1px solid #000; 
+	border: 1px solid #000;
 	padding: 5px 10px;
 	line-height: 1em;
 	display: inline-block;
@@ -722,13 +734,13 @@ span.inlinebtn:hover {
  tr#quickadd td {
 	 border-bottom: 1px solid #000;
  }
- 
+
 
  #autosuggest
  {
  display: none;
  }
- 
+
  input.iscredit {
  	 padding-left: 2em;
  }

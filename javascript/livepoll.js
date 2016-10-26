@@ -183,8 +183,8 @@ var livepoll = new function() {
 	}
 
 	function updateResults() {
-		var datatots = [];
-		var scoredat = [];
+		var datatots = {};
+		var scoredat = {};
 		if (qdata[curquestion].choices.length>0) {
 			for (i=0;i<qdata[curquestion].choices.length;i++) {
 				datatots[i] = 0;
@@ -250,7 +250,10 @@ var livepoll = new function() {
 			}
 		}
 		var out = '';
-		var maxfreq = Math.max.apply(null,datatots);
+		var maxfreq = 1;
+		for (i in datatots) {
+			if (datatots[i]>maxfreq) {maxfreq = datatots[i];}
+		}
 		if (qdata[curquestion].choices.length>0) {
 			if (qdata[curquestion].initrdisp) {
 				for (i=0;i<qdata[curquestion].randkeys.length;i++) {
@@ -428,7 +431,7 @@ var livepoll = new function() {
 				var parsed = preProcess(data.html);
 				$("#livepollqcontent").html(parsed.html);
 				postProcess('livepollqcontent',parsed.code);
-				$(".sabtn").hide();
+				//$(".sabtn").hide();
 				$("#livepollqcontent").append('<p><a href="#" onclick="livepoll.forceRegen('+qn+');return false;">' + _("Clear results and generate a new version of this question")+'</a></p>');
 				$("#LPstartq").show();
 

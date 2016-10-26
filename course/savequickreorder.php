@@ -2,7 +2,7 @@
  //IMathAS:  Save page reordering from Quick View
  //(c) 2008 David Lippman
  require("../validate.php");
- 
+
  if (!isset($teacherid)) {
 	 echo "Must be a teacher to access this page";
 	 exit;
@@ -13,27 +13,42 @@
  }
  $cid = $_GET['cid'];
  $order = $_POST['order'];
- 
+
   foreach ($_POST as $id=>$val) {
 	 if ($id=="order") { continue;}
 	 $type = $id{0};
 	 $typeid = substr($id,1);
 	 if ($type=="I") {
-		 $query = "UPDATE imas_inlinetext SET title='$val' WHERE id='$typeid'";
+		 //DB $query = "UPDATE imas_inlinetext SET title='$val' WHERE id='$typeid'";
+		 $stm = $DBH->prepare("UPDATE imas_inlinetext SET title=:title WHERE id=:id");
+		 $stm->execute(array(':title'=>$val, ':id'=>$typeid));
 	 } else if ($type=="L") {
-		 $query = "UPDATE imas_linkedtext SET title='$val' WHERE id='$typeid'";
+		 //DB $query = "UPDATE imas_linkedtext SET title='$val' WHERE id='$typeid'";
+		 $stm = $DBH->prepare("UPDATE imas_linkedtext SET title=:title WHERE id=:id");
+		 $stm->execute(array(':title'=>$val, ':id'=>$typeid));
 	 } else if ($type=="A") {
-		 $query = "UPDATE imas_assessments SET name='$val' WHERE id='$typeid'";
+		 //DB $query = "UPDATE imas_assessments SET name='$val' WHERE id='$typeid'";
+		 $stm = $DBH->prepare("UPDATE imas_assessments SET name=:name WHERE id=:id");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="F") {
-		 $query = "UPDATE imas_forums SET name='$val' WHERE id='$typeid'";
+		 //DB $query = "UPDATE imas_forums SET name='$val' WHERE id='$typeid'";
+		 $stm = $DBH->prepare("UPDATE imas_forums SET name=:name WHERE id=:id");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="W") {
-		 $query = "UPDATE imas_wikis SET name='$val' WHERE id='$typeid'";
+		 //DB $query = "UPDATE imas_wikis SET name='$val' WHERE id='$typeid'";
+		 $stm = $DBH->prepare("UPDATE imas_wikis SET name=:name WHERE id=:id");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="D") {
-		 $query = "UPDATE imas_drillassess SET name='$val' WHERE id='$typeid'";
+		 //DB $query = "UPDATE imas_drillassess SET name='$val' WHERE id='$typeid'";
+		 $stm = $DBH->prepare("UPDATE imas_drillassess SET name=:name WHERE id=:id");
+		 $stm->execute(array(':name'=>$val, ':id'=>$typeid));
 	 } else if ($type=="B") {
-		 $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		 $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		 $itemsforblock = unserialize(mysql_result($result,0,0));
+		 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		 //DB $itemsforblock = unserialize(mysql_result($result,0,0));
+		 $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		 $stm->execute(array(':id'=>$cid));
+		 $itemsforblock = unserialize($stm->fetchColumn(0));
 		$blocktree = explode('-',$typeid);
 		$existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
 		$sub =& $itemsforblock;
@@ -42,27 +57,36 @@
 				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 			}
 		}
-		$sub[$existingid]['name'] = stripslashes($val);
-		$itemorder = addslashes(serialize($itemsforblock));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+		//DB $sub[$existingid]['name'] = stripslashes($val);
+		$sub[$existingid]['name'] = $val;
+		//DB $itemorder = addslashes(serialize($itemsforblock));
+		$itemorder = serialize($itemsforblock);
+		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 	 }
-	 mysql_query($query) or die("Query failed : " . mysql_error());
+	 //DB mysql_query($query) or die("Query failed : " . mysql_error());
  }
- 
- $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
- $result = mysql_query($query) or die("Query failed : " . mysql_error());
- $items = unserialize(mysql_result($result,0,0));
- 
+
+ //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+ //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+ //DB $items = unserialize(mysql_result($result,0,0));
+ $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+ $stm->execute(array(':id'=>$cid));
+ $items = unserialize($stm->fetchColumn(0));
+
  $newitems = array();
 
  $newitems = additems($order);
- $itemlist = addslashes(serialize($newitems));
- $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
- mysql_query($query) or die("Query failed : " . mysql_error());
- 
+ //DB $itemlist = addslashes(serialize($newitems));
+ //DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
+ //DB mysql_query($query) or die("Query failed : " . mysql_error());
+ $itemlist = serialize($newitems);
+ $stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+ $stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 
- 
- 
+
+
  function additems($list) {
 	 global $items;
 	 $outarr = array();
@@ -96,7 +120,7 @@
 				 $sub = $sub[$blocktree[$i]-1]['items'];
 			 }
 			 $block = $sub[$blocktree[count($blocktree)-1]-1];
-			 
+
 			 if ($pos===false) {
 				 $block['items'] = array();
 			 } else {
@@ -107,11 +131,11 @@
 		 } else { //regular item
 			 $outarr[] = $it;
 		 }
-		 
+
 	 }
 	 return $outarr;
  }
- echo "OK"; 
+ echo "OK";
  require("courseshowitems.php");
  $openblocks = Array(0);
  $prevloadedblocks = array(0);
@@ -119,6 +143,6 @@
  if (isset($_COOKIE['prevloadedblocks-'.$cid]) && $_COOKIE['prevloadedblocks-'.$cid]!='') {$prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$cid]);}
  $plblist = implode(',',$prevloadedblocks);
  $oblist = implode(',',$openblocks);
-	
+
  quickview($newitems,0);
 ?>

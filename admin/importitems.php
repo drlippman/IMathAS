@@ -20,7 +20,8 @@ function getsubinfo($items,$parent,$pre) {
 		if (is_array($anitem)) {
 			$ids[] = $parent.'-'.($k+1);
 			$types[] = $pre."Block";
-			$names[] = stripslashes($anitem['name']);
+			//DB $names[] = stripslashes($anitem['name']);
+			$names[] = $anitem['name'];
 			$parents[] = $parent;
 			getsubinfo($anitem['items'],$parent.'-'.($k+1),$pre.'--');
 		} else {
@@ -39,8 +40,8 @@ function getsubinfo($items,$parent,$pre) {
 $newqcnt = 0;
 $updateqcnt = 0;
 function additem($itemtoadd,$item,$questions,$qset) {
-	
-	global $newlibs;
+
+	global $DBH,$newlibs;
 	global $userid, $userights, $cid, $missingfiles, $newqcnt, $updateqcnt;
 	$mt = microtime();
 	if ($item[$itemtoadd]['type'] == "Assessment") {
@@ -51,23 +52,30 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			$item[$itemtoadd][$pair[0]] = $pair[1];
 		}
 		$setstoadd = explode(',','name,summary,intro,avail,startdate,enddate,reviewdate,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,shuffle,password,cntingb,minscore,showcat,showhints,isgroup,allowlate,exceptionpenalty,noprint,groupmax,endmsg,eqnhelper,caltag,calrtag,showtips,deffeedbacktext,istutorial,viddata');
-		$valsets = "'$cid'";
+		$qarr = array();
+		$valsets = ":courseid";
 		$tosets = 'courseid';
+		$qarr[':courseid'] = $cid;
 		foreach ($setstoadd as $set) {
 			if (isset($item[$itemtoadd][$set])) {
 				$tosets .= ','.$set;
-				$valsets .= ',\''.$item[$itemtoadd][$set].'\'';
+				//DB $valsets .= ',\''.$item[$itemtoadd][$set].'\'';
+				$valsets .= ',:'.$set;
+				$qarr[':'.$set] = $item[$itemtoadd][$set];
 			}
 		}
 		$query = "INSERT INTO imas_assessments ($tosets) VALUES ($valsets)";
+		$stm = $DBH->prepare($query);
+		$stm->execute($qarr);
 		/*'{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['intro']}',";
 		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['reviewdate']}','{$item[$itemtoadd]['timelimit']}',";
 		$query .= "'{$item[$itemtoadd]['displaymethod']}','{$item[$itemtoadd]['defpoints']}','{$item[$itemtoadd]['defattempts']}',";
 		$query .= "'{$item[$itemtoadd]['deffeedback']}','{$item[$itemtoadd]['defpenalty']}','{$item[$itemtoadd]['shuffle']}','{$item[$itemtoadd]['password']}','{$item[$itemtoadd]['cntingb']}',";
 		*/
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
-					
+		//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+		//DB $typeid = mysql_insert_id();
+		$typeid = $DBH->lastInsertId();
+
 		//determine question to be added
 		//$qtoadd = explode(',',$item[$itemtoadd]['questions']);  //FIX!!! can be ~ separated as well
 		//FIX!!: check on format issues for grouped assessments.
@@ -78,53 +86,78 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		}
 		$allqids = array();
 		foreach ($qtoadd as $qid) {
-			//add question or get system id. 
-			$query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
-			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
-			$questionexists = (mysql_num_rows($result)>0);
-			
+			//add question or get system id.
+			//DB $query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
+			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			//DB $questionexists = (mysql_num_rows($result)>0);
+			$stm = $DBH->prepare("SELECT id,adddate FROM imas_questionset WHERE uniqueid=:uniqueid AND deleted=0");
+			$stm->execute(array(':uniqueid'=>$questions[$qid]['uqid']));
+			$questionexists = ($stm->rowCount()>0);
+			if ($questionexists) {
+				list($thisqsetid, $qadddate) = $stm->fetch(PDO::FETCH_NUM);
+			}
 			if ($questionexists && ($_POST['merge']==1 || $_POST['merge']==2)) {
-				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
+				//DB $questions[$qid]['qsetid'] = mysql_result($result,0,0);
+				$questions[$qid]['qsetid'] = $thisqsetid;
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
-				if ($qset['lastmod'][$n]>mysql_result($result,0,1) || $_POST['merge']==2) { //if old question
+				//DB if ($qset['lastmod'][$n]>mysql_result($result,0,1) || $_POST['merge']==2) {
+				if ($qset['lastmod'][$n]>$qadddate || $_POST['merge']==2) {
 					$now = time();
 					if (!empty($qset['qimgs'][$n])) {
 						$hasimg = 1;
 					} else {
 						$hasimg = 0;
 					}
-					$query = "UPDATE imas_questionset SET description='{$qset['description'][$n]}',";
-					$query .= "author='{$qset['author'][$n]}',qtype='{$qset['qtype'][$n]}',";
-					$query .= "control='{$qset['control'][$n]}',qcontrol='{$qset['qcontrol'][$n]}',";
-					$query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
-					$query .= "solution='{$qset['solution'][$n]}',solutionopts='{$qset['solutionopts'][$n]}',";
-					$query .= "license='{$qset['license'][$n]}',ancestorauthors='{$qset['ancestorauthors'][$n]}',otherattribution='{$qset['otherattribution'][$n]}',";
-					$query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
-					$query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
-					mysql_query($query) or die("error on: $query: " . mysql_error());
-					if (mysql_affected_rows()>0 && $hasimg==1) {
+					//DB $query = "UPDATE imas_questionset SET description='{$qset['description'][$n]}',";
+					//DB $query .= "author='{$qset['author'][$n]}',qtype='{$qset['qtype'][$n]}',";
+					//DB $query .= "control='{$qset['control'][$n]}',qcontrol='{$qset['qcontrol'][$n]}',";
+					//DB $query .= "qtext='{$qset['qtext'][$n]}',answer='{$qset['answer'][$n]}',";
+					//DB $query .= "solution='{$qset['solution'][$n]}',solutionopts='{$qset['solutionopts'][$n]}',";
+					//DB $query .= "license='{$qset['license'][$n]}',ancestorauthors='{$qset['ancestorauthors'][$n]}',otherattribution='{$qset['otherattribution'][$n]}',";
+					//DB $query .= "extref='{$qset['extref'][$n]}',lastmoddate=$now,adddate=$now,hasimg=$hasimg ";
+					//DB $query .= " WHERE id='{$questions[$qid]['qsetid']}' AND (ownerid='$userid' OR userights>3)";
+					//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+					//DB if (mysql_affected_rows()>0 && $hasimg==1) {
+					$query = "UPDATE imas_questionset SET description=:description,";
+					$query .= "author=:author,qtype=:qtype,";
+					$query .= "control=:control,qcontrol=:qcontrol,";
+					$query .= "qtext=:qtext,answer=:answer,";
+					$query .= "solution=:solution,solutionopts=:solutionopts,";
+					$query .= "license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
+					$query .= "extref=:extref,lastmoddate=:lastmoddate,adddate=:adddate,hasimg=:hasimg ";
+					$query .= " WHERE id=:id AND (ownerid=:ownerid OR userights>3)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':description'=>$qset['description'][$n], ':author'=>$qset['author'][$n], ':qtype'=>$qset['qtype'][$n],
+						':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
+						':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':license'=>$qset['license'][$n],
+						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>$qset['extref'][$n],
+						':lastmoddate'=>$now, ':adddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$questions[$qid]['qsetid'], ':ownerid'=>$userid));
+					if ($stm->rowCount()>0 && $hasimg==1) {
 						//not efficient, but sufficient :)
-						$query = "DELETE FROM imas_qimages WHERE qsetid='{$questions[$qid]['qsetid']}'";
-						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						//DB $query = "DELETE FROM imas_qimages WHERE qsetid='{$questions[$qid]['qsetid']}'";
+						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						$stm = $DBH->prepare("DELETE FROM imas_qimages WHERE qsetid=:qsetid");
+						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid']));
 						$qimgs = explode("\n",trim($qset['qimgs'][$n]));
 						foreach($qimgs as $qimg) {
 							$p = explode(',',$qimg);
 							if (count($p)<2) {continue;}
-							$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ('{$questions[$qid]['qsetid']}','{$p[0]}','{$p[1]}')";
-							mysql_query($query) or die("Import failed on $query: " . mysql_error());
+							//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ('{$questions[$qid]['qsetid']}','{$p[0]}','{$p[1]}')";
+							//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
+							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
+							$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1]));
 						}
 					}
 					$updateqcnt++;
 				}
 			} else if ($questionexists && $_POST['merge']==-1) {
-				$questions[$qid]['qsetid'] = mysql_result($result,0,0);
+				//DB $questions[$qid]['qsetid'] = mysql_result($result,0,0);
+				$questions[$qid]['qsetid'] = $thisqsetid;
 			} else { //add question, and assign to default library
 				$n = array_search($questions[$qid]['uqid'],$qset['uniqueid']);
-				$importuidstr = '';
-				$importuidval = '';
+				$importuid = '';
 				if ($questionexists && $_POST['merge']==0) {
-					$importuidstr = ',importuid';
-					$importuidval = ','.$questions[$qid]['uqid'];
+					$importuid = $questions[$qid]['uqid'];
 					$questions[$qid]['uqid'] = substr($mt,11).substr($mt,2,2).$qid;
 					$qset['uniqueid'][$n] = $questions[$qid]['uqid'];
 				}
@@ -134,48 +167,63 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				} else {
 					$hasimg = 0;
 				}
-				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,";
-				$query .= "author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg$importuidstr) ";
-				$query .= "VALUES ($now,'{$qset['lastmod'][$n]}','{$qset['uniqueid'][$n]}',";
-				$query .= "'$userid','{$qset['author'][$n]}','$userights',";
-				$query .= "'{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}',";
-				$query .= "'{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['solution'][$n]}','{$qset['solutionopts'][$n]}','{$qset['extref'][$n]}',";
-				$query .= "'{$qset['license'][$n]}','{$qset['ancestorauthors'][$n]}','{$qset['otherattribution'][$n]}',$hasimg$importuidval)";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-				$questions[$qid]['qsetid'] = mysql_insert_id();
+				//DB $query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuidstr) ";
+				//DB $query .= "VALUES ($now,'{$qset['lastmod'][$n]}','{$qset['uniqueid'][$n]}','$userid','{$qset['author'][$n]}','$userights','{$qset['description'][$n]}','{$qset['qtype'][$n]}','{$qset['control'][$n]}','{$qset['qcontrol'][$n]}','{$qset['qtext'][$n]}','{$qset['answer'][$n]}','{$qset['solution'][$n]}','{$qset['solutionopts'][$n]}','{$qset['extref'][$n]}','{$qset['license'][$n]}','{$qset['ancestorauthors'][$n]}','{$qset['otherattribution'][$n]}',$hasimg,$importuid)";
+				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+				//DB $questions[$qid]['qsetid'] = mysql_insert_id();
+				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) ";
+				$query .= "VALUES (:adddate, :lastmoddate, :uniqueid, :ownerid, :author, :userights, :description, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>$qset['lastmod'][$n], ':uniqueid'=>$qset['uniqueid'][$n], ':ownerid'=>$userid,
+					':author'=>$qset['author'][$n], ':userights'=>$userights, ':description'=>$qset['description'][$n], ':qtype'=>$qset['qtype'][$n],
+					':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
+					':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':extref'=>$qset['extref'][$n], ':license'=>$qset['license'][$n],
+					':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
+				$questions[$qid]['qsetid'] = $DBH->lastInsertId();
 				if ($hasimg==1) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);
 					foreach($qimgs as $qimg) {
 						$p = explode(',',$qimg);
-						$query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
-							
-						mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
+						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
+						$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
+						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1]));
 					}
 				}
 				foreach ($newlibs as $lib) {
-					$query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','{$questions[$qid]['qsetid']}','$userid')";
-					mysql_query($query) or die("error on: $query: " . mysql_error());
+					//DB $query = "INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES ('$lib','{$questions[$qid]['qsetid']}','$userid')";
+					//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_library_items (libid,qsetid,ownerid) VALUES (:libid, :qsetid, :ownerid)");
+					$stm->execute(array(':libid'=>$lib, ':qsetid'=>$questions[$qid]['qsetid'], ':ownerid'=>$userid));
 				}
 				$newqcnt++;
 			}
 			$allqids[] = $questions[$qid]['qsetid'];
-			
+
 			//add question $questions[$qid].  assessmentid is $typeid
-			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans)";
-			$query .= "VALUES ($typeid,'{$questions[$qid]['qsetid']}','{$questions[$qid]['points']}',";
-			$query .= "'{$questions[$qid]['attempts']}','{$questions[$qid]['penalty']}','{$questions[$qid]['category']}','{$questions[$qid]['regen']}','{$questions[$qid]['showans']}')";
-			mysql_query($query) or die("error on: $query: " . mysql_error());
-			$questions[$qid]['systemid'] = mysql_insert_id();
+			//DB $query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans)";
+			//DB $query .= "VALUES ($typeid,'{$questions[$qid]['qsetid']}','{$questions[$qid]['points']}','{$questions[$qid]['attempts']}','{$questions[$qid]['penalty']}','{$questions[$qid]['category']}','{$questions[$qid]['regen']}','{$questions[$qid]['showans']}')";
+			//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+			//DB $questions[$qid]['systemid'] = mysql_insert_id();
+			$query = "INSERT INTO imas_questions (assessmentid,questionsetid,points,attempts,penalty,category,regen,showans) ";
+			$query .= "VALUES (:assessmentid, :questionsetid, :points, :attempts, :penalty, :category, :regen, :showans)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':assessmentid'=>$typeid, ':questionsetid'=>$questions[$qid]['qsetid'], ':points'=>$questions[$qid]['points'],
+				':attempts'=>$questions[$qid]['attempts'], ':penalty'=>$questions[$qid]['penalty'], ':category'=>$questions[$qid]['category'],
+				':regen'=>$questions[$qid]['regen'], ':showans'=>$questions[$qid]['showans']));
+			$questions[$qid]['systemid'] = $DBH->lastInsertId();
 		}
-		
+
 		//resolve any includecodefrom links
 		$qidstoupdate = array();
-		$qidstocheck = implode(',',$allqids);
+		$qidstocheck = implode(',', array_map('intval', $allqids));
 		//look up any refs to UIDs
-		$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
-		$result = mysql_query($query) or die("error on: $query: " . mysql_error());
+		//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
+		//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+		$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 		$includedqs = array();
-		while ($row = mysql_fetch_row($result)) {
+		//DB while ($row = mysql_fetch_row($result)) {
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$qidstoupdate[] = $row[0];
 			if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row[1],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
@@ -188,25 +236,37 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//lookup backrefs
 			$includedbackref = array();
 			if (count($includedqs)>0) {
-				$includedlist = implode(',',$includedqs);
-				$query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
-				$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$includedbackref[$row[1]] = $row[0];		
+				$includedlist = implode(',', array_map('intval', $includedqs));
+				//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
+				//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+				//DB while ($row = mysql_fetch_row($result)) {
+				$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)");
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+					$includedbackref[$row[1]] = $row[0];
 				}
 			}
-			$updatelist = implode(',',$qidstoupdate);
-			$query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
-			$result = mysql_query($query) or die("error on: $query: " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
-				$qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
-				$query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
+			$updatelist = implode(',', array_map('intval', $qidstoupdate));
+			//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)";
+			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($updatelist)");
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				//DB $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
+				//DB $qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
+				$control = preg_replace_callback('/includecodefrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
+						return "includecodefrom(".$includedbackref[$matches[1]].")";
+					}, $row[1]);
+				$qtext = preg_replace_callback('/includeqtextfrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
+						return "includeqtextfrom(".$includedbackref[$matches[1]].")";
+					}, $row[2]);
+				//DB $query = "UPDATE imas_questionset SET control='$control',qtext='$qtext' WHERE id={$row[0]}";
+				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+				$stm2 = $DBH->prepare("UPDATE imas_questionset SET control=:control,qtext=:qtext WHERE id=:id");
+				$stm2->execute(array(':control'=>$control, ':qtext'=>$qtext, ':id'=>$row[0]));
 			}
 		}
-		
-		//recreate itemorder 
+
+		//recreate itemorder
 		//$item[$itemtoadd]['questions'] = preg_replace("/(\d+)/e",'$questions[\\1]["systemid"]',$item[$itemtoadd]['questions']);
 		$qs = explode(',',$item[$itemtoadd]['questions']);
 		$newqorder = array();
@@ -224,30 +284,45 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$newsub[] = $questions[$subq]["systemid"];
 				}
 				$newqorder[] = implode('~',$newsub);
-			}	
+			}
 		}
-		$itemorder = addslashes(implode(',',$newqorder));
+		//DB $itemorder = addslashes(implode(',',$newqorder));
+		$itemorder = implode(',',$newqorder);
 		//write itemorder to db
-		$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id=$typeid";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
+		//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id=$typeid";
+		//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
+		$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$typeid));
 	} else if ($item[$itemtoadd]['type'] == "Forum") {
 		$settings = explode("\n",$item[$itemtoadd]['settings']);
 		foreach ($settings as $set) {
 			$pair = explode('=',$set);
 			$item[$itemtoadd][$pair[0]] = $pair[1];
 		}
-		$query = "INSERT INTO imas_forums (name,description,courseid,avail,startdate,enddate,postby,replyby,defdisplay,points,cntingb,settings)";
-		$query .= "VALUES ('{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','$cid',";
-		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['postby']}','{$item[$itemtoadd]['replyby']}',";
-		$query .= "'{$item[$itemtoadd]['defdisplay']}','{$item[$itemtoadd]['points']}','{$item[$itemtoadd]['cntingb']}','{$item[$itemtoadd]['settings']}')";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		//DB $query = "INSERT INTO imas_forums (name,description,courseid,avail,startdate,enddate,postby,replyby,defdisplay,points,cntingb,settings)";
+		//DB $query .= "VALUES ('{$item[$itemtoadd]['name']}','{$item[$itemtoadd]['summary']}','$cid','{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['postby']}','{$item[$itemtoadd]['replyby']}','{$item[$itemtoadd]['defdisplay']}','{$item[$itemtoadd]['points']}','{$item[$itemtoadd]['cntingb']}','{$item[$itemtoadd]['settings']}')";
+		//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+		//DB $typeid = mysql_insert_id();
+		$query = "INSERT INTO imas_forums (name,description,courseid,avail,startdate,enddate,postby,replyby,defdisplay,points,cntingb,settings) ";
+		$query .= "VALUES (:name, :description, :courseid, :avail, :startdate, :enddate, :postby, :replyby, :defdisplay, :points, :cntingb, :settings)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':name'=>$item[$itemtoadd]['name'], ':description'=>$item[$itemtoadd]['summary'], ':courseid'=>$cid,
+			':avail'=>$item[$itemtoadd]['avail'], ':startdate'=>$item[$itemtoadd]['startdate'], ':enddate'=>$item[$itemtoadd]['enddate'],
+			':postby'=>$item[$itemtoadd]['postby'], ':replyby'=>$item[$itemtoadd]['replyby'], ':defdisplay'=>$item[$itemtoadd]['defdisplay'],
+			':points'=>$item[$itemtoadd]['points'], ':cntingb'=>$item[$itemtoadd]['cntingb'], ':settings'=>$item[$itemtoadd]['settings']));
+		$typeid = $DBH->lastInsertId();
 	} else if ($item[$itemtoadd]['type'] == "InlineText") {
-		$query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
-		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['text']}',";
-		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}')";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		//DB $query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag)";
+		//DB $query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['text']}','{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}')";
+		//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+		//DB $typeid = mysql_insert_id();
+		$query = "INSERT INTO imas_inlinetext (courseid,title,text,avail,startdate,enddate,oncal,caltag) ";
+		$query .= "VALUES (:courseid, :title, :text, :avail, :startdate, :enddate, :oncal, :caltag)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid, ':title'=>$item[$itemtoadd]['title'], ':text'=>$item[$itemtoadd]['text'],
+			':avail'=>$item[$itemtoadd]['avail'], ':startdate'=>$item[$itemtoadd]['startdate'], ':enddate'=>$item[$itemtoadd]['enddate'],
+			':oncal'=>$item[$itemtoadd]['oncal'], ':caltag'=>$item[$itemtoadd]['caltag']));
+		$typeid = $DBH->lastInsertId();
 		if (isset($item[$itemtoadd]['instrfiles'])) {
 			$item[$itemtoadd]['instrfiles'] = explode("\n",$item[$itemtoadd]['instrfiles']);
 			$fileorder = array();
@@ -255,32 +330,52 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				if (!file_exists("../course/files/$filename")) {
 					$missingfiles[] = $filename;
 				}
-				list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
+				//DB list($filename,$filedescr) = explode(':::',addslashes($fileinfo));
+				list($filename,$filedescr) = explode(':::',$fileinfo);
+				//DB $query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
+				//DB $query .= "('$filedescr','$filename',$typeid)";
+				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+				//DB $fileorder[] = mysql_insert_id();
 				$query = "INSERT INTO imas_instr_files (description,filename,itemid) VALUES ";
-				$query .= "('$filedescr','$filename',$typeid)";
-				mysql_query($query) or die("error on: $query: " . mysql_error());
-				$fileorder[] = mysql_insert_id();
+				$query .= "(:description, :filename, :itemid)";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':description'=>$filedescr, ':filename'=>$filename, ':itemid'=>$typeid));
+				$fileorder[] = $DBH->lastInsertId();
 			}
-			$query = "UPDATE imas_inlinetext SET fileorder='".implode(',',$fileorder)."' WHERE id=$typeid";
-			mysql_query($query) or die("error on: $query: " . mysql_error());
+			//DB $query = "UPDATE imas_inlinetext SET fileorder='".implode(',',$fileorder)."' WHERE id=$typeid";
+			//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_inlinetext SET fileorder=:fileorder WHERE id=:id");
+			$stm->execute(array(':id'=>$typeid, ':fileorder'=>implode(',',$fileorder)));
 		}
 	} else if ($item[$itemtoadd]['type'] == "LinkedText") {
-		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target)";
-		$query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['text']}',";
-		$query .= "'{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}','{$item[$itemtoadd]['target']}')";
-		mysql_query($query) or die("error on: $query: " . mysql_error());
-		$typeid = mysql_insert_id();
+		//DB $query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target)";
+		//DB $query .= "VALUES ('$cid','{$item[$itemtoadd]['title']}','{$item[$itemtoadd]['summary']}','{$item[$itemtoadd]['text']}','{$item[$itemtoadd]['avail']}','{$item[$itemtoadd]['startdate']}','{$item[$itemtoadd]['enddate']}','{$item[$itemtoadd]['oncal']}','{$item[$itemtoadd]['caltag']}','{$item[$itemtoadd]['target']}')";
+		//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+		//DB $typeid = mysql_insert_id();
+		$query = "INSERT INTO imas_linkedtext (courseid,title,summary,text,avail,startdate,enddate,oncal,caltag,target) ";
+		$query .= "VALUES (:courseid, :title, :summary, :text, :avail, :startdate, :enddate, :oncal, :caltag, :target)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':courseid'=>$cid, ':title'=>$item[$itemtoadd]['title'], ':summary'=>$item[$itemtoadd]['summary'],
+			':text'=>$item[$itemtoadd]['text'], ':avail'=>$item[$itemtoadd]['avail'], ':startdate'=>$item[$itemtoadd]['startdate'],
+			':enddate'=>$item[$itemtoadd]['enddate'], ':oncal'=>$item[$itemtoadd]['oncal'], ':caltag'=>$item[$itemtoadd]['caltag'],
+			':target'=>$item[$itemtoadd]['target']));
+		$typeid = $DBH->lastInsertId();
 	} else {
 		return false;
 	}
-	
-	//add item, set 
+
+	//add item, set
+	//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
+	//DB $query .= "VALUES ('$cid','{$item[$itemtoadd]['type']}',$typeid)";
+	//DB mysql_query($query) or die("error on: $query: " . mysql_error());
+	//DB $item[$itemtoadd]['systemid'] = mysql_insert_id();
 	$query = "INSERT INTO imas_items (courseid,itemtype,typeid) ";
-	$query .= "VALUES ('$cid','{$item[$itemtoadd]['type']}',$typeid)";
-	mysql_query($query) or die("error on: $query: " . mysql_error());
-	$item[$itemtoadd]['systemid'] = mysql_insert_id();
-	
-	return ($item[$itemtoadd]['systemid']);		
+	$query .= "VALUES (:courseid, :itemtype, :typeid)";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid, ':itemtype'=>$item[$itemtoadd]['type'], ':typeid'=>$typeid));
+	$item[$itemtoadd]['systemid'] = $DBH->lastInsertId();
+
+	return ($item[$itemtoadd]['systemid']);
 }
 
 function parsefile($file) {
@@ -298,7 +393,7 @@ function parsefile($file) {
 	$item = array();
 	$questions = array();
 	$qset = array();
-	
+
 	while (!feof($handle)) {
 		$line = rtrim(fgets($handle, 4096));
 		switch ((string)$line) {
@@ -307,7 +402,7 @@ function parsefile($file) {
 				break;
 			case  "ITEM LIST":
 				$itemlist = rtrim(fgets($handle, 44096));
-				break;	
+				break;
 			case  "BEGIN ITEM":
 				$itemcnt++;
 				$initem = true;
@@ -421,7 +516,7 @@ function parsefile($file) {
 				break;
 		}
 	}
-	
+
 	return array($desc,$itemlist,$item,$questions,$qset);
 }
 
@@ -462,52 +557,62 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = $installname . " Import Course Items";
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Import Course Items</div>\n";
- 
+
 //data manipulation here
 
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
-	$body = "You need to log in as a teacher to access this page";	
+	$body = "You need to log in as a teacher to access this page";
 } elseif (!(isset($_GET['cid']))) {
  	$overwriteBody = 1;
-	$body = "You need to access this page from a menu link";	
+	$body = "You need to access this page from a menu link";
 } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-	
-	
 
-	
+
+
+
 	//FORM HAS BEEN POSTED, STEP 3 DATA MANIPULATION
 	if (isset($_POST['process'])) {
 		$filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $_POST['filename'];
 		list ($desc,$itemlist,$item,$questions,$qset) = parsefile($filename);
-		
+
 		$userights = $_POST['userights'];
 		$newlibs = explode(",",$_POST['libs']);
-		$item = array_map('addslashes_deep', $item);
-		$questions = array_map('addslashes_deep', $questions);
-		$qset = array_map('addslashes_deep', $qset);
-		
+		//DB $item = array_map('addslashes_deep', $item);
+		//DB $questions = array_map('addslashes_deep', $questions);
+		//DB $qset = array_map('addslashes_deep', $qset);
+
 		$checked = $_POST['checked'];
-		$query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$blockcnt = mysql_result($result,0,0);
-		$ciditemorder = unserialize(mysql_result($result,0,1));
+		//DB $query = "SELECT blockcnt,itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB $blockcnt = mysql_result($result,0,0);
+		//DB $ciditemorder = unserialize(mysql_result($result,0,1));
+		$stm = $DBH->prepare("SELECT blockcnt,itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+
+		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+		$ciditemorder = unserialize($itemorder);
 		$items = unserialize($itemlist);
 		$newitems = array();
 		$missingfiles = array();
-		
-		mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
-				
+
+		//DB mysql_query("START TRANSACTION") or die("Query failed :$query " . mysql_error());
+		$DBH->beginTransaction();
+
 		copysub($items,'0',$newitems);
-		
+
 		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
-		$itemorder = addslashes(serialize($ciditemorder));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : $query" . mysql_error());
-		
-		mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-			
+		//DB $itemorder = addslashes(serialize($ciditemorder));
+		$itemorder = serialize($ciditemorder);
+		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
+		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
+		$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
+
+		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
+		$DBH->commit();
+
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {
@@ -520,7 +625,7 @@ if (!(isset($teacherid))) {
 		} else {
 			header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid=$cid");
 		}
-		exit;	
+		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
 		$page_fileErrorMsg = "";
 		$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/import/';
@@ -544,10 +649,10 @@ if (!(isset($teacherid))) {
 		$names = array();
 		$parents = array();
 		getsubinfo($items,'0','');
-		
+
 	}
-}	
-	
+}
+
 /******* begin html output ********/
 require("../header.php");
 
@@ -589,12 +694,12 @@ function chkgrp(frm, arr, mark) {
 	<div id="headerimportitems" class="pagetitle"><h2>Import Course Items</h2></div>
 	<form id="qform" enctype="multipart/form-data" method=post action="importitems.php?cid=<?php echo $cid ?>">
 
-<?php	
+<?php
 	if ($_FILES['userfile']['name']=='') {
-?>	
+?>
 		<p>This page will allow you to import course items previously exported from
 		this site or another site running this software.</p>
-		
+
 		<input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
 		<span class=form>Import file: </span>
 		<span class=formright><input name="userfile" type="file" /></span><br class=form>
@@ -602,27 +707,27 @@ function chkgrp(frm, arr, mark) {
 
 <?php
 	} else {
-	
+
 		if (strlen($page_fileErrorMsg)>1) {
 			echo $page_fileErrorMsg;
-		} else { 
+		} else {
 			echo $page_fileHiddenInput;
 ?>
 		<h3>Package Description</h3>
 		<?php echo $desc; ?>
-			
-			
-		<p>Some questions (possibly older or different versions) may already exist on the system.  
+
+
+		<p>Some questions (possibly older or different versions) may already exist on the system.
 		With these questions, do you want to:<br/>
-			<input type=radio name=merge value="1" CHECKED>Update existing questions, 
-			<input type=radio name=merge value="0">Add as new question, 
+			<input type=radio name=merge value="1" CHECKED>Update existing questions,
+			<input type=radio name=merge value="0">Add as new question,
 			<input type=radio name=merge value="-1">Keep existing questions
 			<?php if ($myrights==100) {
 				echo '<input type=radio name=merge value="2">Force update';
 			}?>
 		</p>
 		<p>
-			For Added Questions, Set Question Use Rights to 
+			For Added Questions, Set Question Use Rights to
 			<select name=userights>
 				<option value="0">Private</option>
 				<option value="2" SELECTED>Allow use, use as template, no modifications</option>
@@ -631,16 +736,16 @@ function chkgrp(frm, arr, mark) {
 			</select>
 		</p>
 		<p>
-			
-		Assign Added Questions to library: 
+
+		Assign Added Questions to library:
 		<span id="libnames">Unassigned</span>
 		<input type=hidden name="libs" id="libs"  value="0">
-		<input type=button value="Select Libraries" onClick="libselect()"><br> 
-			
-		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-			
+		<input type=button value="Select Libraries" onClick="libselect()"><br>
 
-<?php		
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+
+
+<?php
 			if (count($ids)>0) {
 ?>
 		<table cellpadding=5 class=gb>
@@ -648,12 +753,12 @@ function chkgrp(frm, arr, mark) {
 			<tr><th></th><th>Type</th><th>Title</th></tr>
 		</thead>
 		<tbody>
-<?php			
+<?php
 				$alt=0;
 				for ($i = 0 ; $i<(count($ids)); $i++) {
 					if ($alt==0) {echo "		<tr class=even>"; $alt=1;} else {echo "		<tr class=odd>"; $alt=0;}
 			echo '<td>';
-			if (strpos($types[$i],'Block')!==false) {		
+			if (strpos($types[$i],'Block')!==false) {
 				echo "<input type=checkbox name='checked[]' value='{$ids[$i]}' id='{$parents[$i]}' checked=checked ";
 				echo "onClick=\"chkgrp(this.form, '{$ids[$i]}', this.checked);\" ";
 				echo '/>';
@@ -669,7 +774,7 @@ function chkgrp(frm, arr, mark) {
 
 <?php
 				}
-?>			
+?>
 		</tbody>
 		</table>
 		<p><input type=submit name="process" value="Import Items"></p>
@@ -683,5 +788,5 @@ function chkgrp(frm, arr, mark) {
 	echo "</form>\n";
 }
 require("../footer.php");
-	
+
 ?>

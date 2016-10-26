@@ -13,7 +13,7 @@ table.forum td {
 	border:	1px solid #000;
 }
 table.forum tr.sticky {
-	background-color: #dfd;	
+	background-color: #dfd;
 }
 table.forum thead td {
 	border-bottom: 2px solid #00f;
@@ -49,10 +49,12 @@ span.leftbtns img {
 	height: 0;
 	padding: 0;
 	margin: 0;
+	position: absolute;
+	visibility: hidden;
 }
 .forumcattag {
 	color: #090;
-}	
+}
 .likeicon {
 	vertical-align: middle;
 	border-radius: 8px;
@@ -70,5 +72,3 @@ span.leftbtns img {
 .likedt {
 	background-color: #0f0;
 }
-
-	

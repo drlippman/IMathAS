@@ -50,15 +50,21 @@ if (isset($_GET['delete'])) {
 
 	$linktype = $_POST['type'];
 	$iteminfo = array();
-	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
-	$r = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($r)) {
+	//DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
+	//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($r)) {
+	$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$iteminfo[$row[0]] = array($row[1],$row[2]);
 	}
 
-	$query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
-	$r = mysql_query($query) or die("Query failed : " . mysql_error());
-	$items = unserialize(mysql_result($r,0,0));
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id=$cid";
+	//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $items = unserialize(mysql_result($r,0,0));
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$items = unserialize($stm->fetchColumn(0));
 
 	$newdir = $path . '/CCEXPORT'.$cid;
 	mkdir($newdir);
@@ -113,7 +119,7 @@ if (isset($_GET['delete'])) {
 	$inmodule = false;
 
 	function getorg($it,$parent,&$res,$ind) {
-		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
+		global $DBH,$iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
 		global $usechecked,$checked;
 
 		$out = '';
@@ -151,15 +157,21 @@ if (isset($_GET['delete'])) {
 					continue;
 				}
 				if ($iteminfo[$item][0]=='InlineText') {
-					$query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
-					$row = mysql_fetch_row($r);
+					//DB $query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
+					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $row = mysql_fetch_row($r);
+					$stm = $DBH->prepare("SELECT title,text,fileorder FROM imas_inlinetext WHERE id=:id");
+					$stm->execute(array(':id'=>$iteminfo[$item][1]));
+					$row = $stm->fetch(PDO::FETCH_NUM);
 					if ($row[2]!='') {
 						$files = explode(',',$row[2]);
-						$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$iteminfo[$item][1]}'";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$iteminfo[$item][1]}'";
+						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						$stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
+						$stm->execute(array(':itemid'=>$iteminfo[$item][1]));
 						$filesout = array();
-						while ($r = mysql_fetch_row($result)) {
+						//DB while ($r = mysql_fetch_row($result)) {
+						while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 							//if s3 filehandler, do files as weblinks rather than including the file itself
 							if ($GLOBALS['filehandertypecfiles'] == 's3') {
 								$r[2] = getcoursefileurl($r[2]);
@@ -211,9 +223,12 @@ if (isset($_GET['delete'])) {
 					$resitem .= '</resource>';
 					$res[] = $resitem;
 				} else if ($iteminfo[$item][0]=='LinkedText') {
-					$query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
-					$row = mysql_fetch_row($r);
+					//DB $query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
+					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $row = mysql_fetch_row($r);
+					$stm = $DBH->prepare("SELECT title,text,summary FROM imas_linkedtext WHERE id=:id");
+					$stm->execute(array(':id'=>$iteminfo[$item][1]));
+					$row = $stm->fetch(PDO::FETCH_NUM);
 
 					//if s3 filehandler, do files as weblinks rather than including the file itself
 					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
@@ -287,9 +302,12 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					}
 				} else if ($iteminfo[$item][0]=='Forum') {
-					$query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
-					$row = mysql_fetch_row($r);
+					//DB $query = "SELECT name,description FROM imas_forums WHERE id='{$iteminfo[$item][1]}'";
+					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $row = mysql_fetch_row($r);
+					$stm = $DBH->prepare("SELECT name,description FROM imas_forums WHERE id=:id");
+					$stm->execute(array(':id'=>$iteminfo[$item][1]));
+					$row = $stm->fetch(PDO::FETCH_NUM);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
@@ -331,9 +349,12 @@ if (isset($_GET['delete'])) {
 					$res[] = $resitem;
 
 				} else if ($iteminfo[$item][0]=='Assessment') {
-					$query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
-					$row = mysql_fetch_row($r);
+					//DB $query = "SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id='{$iteminfo[$item][1]}'";
+					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $row = mysql_fetch_row($r);
+					$stm = $DBH->prepare("SELECT name,summary,defpoints,itemorder FROM imas_assessments WHERE id=:id");
+					$stm->execute(array(':id'=>$iteminfo[$item][1]));
+					$row = $stm->fetch(PDO::FETCH_NUM);
 					//echo "encoding {$row[0]} as ".htmlentities($row[0],ENT_XML1,'UTF-8',false).'<br/>';
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
@@ -362,10 +383,13 @@ if (isset($_GET['delete'])) {
 								$aitemcnt[$k] = 1;
 							}
 						}
-						$query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$iteminfo[$item][1]}'";
-						$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+						//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$iteminfo[$item][1]}'";
+						//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+						$stm2 = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
+						$stm2->execute(array(':assessmentid'=>$iteminfo[$item][1]));
 						$totalpossible = 0;
-						while ($r = mysql_fetch_row($result2)) {
+						//DB while ($r = mysql_fetch_row($result2)) {
+						while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 							if (($k = array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 								if ($r[0]==9999) {
 									$totalpossible += $aitemcnt[$k]*$row[2]; //use defpoints
@@ -415,9 +439,12 @@ if (isset($_GET['delete'])) {
 						$res[] = $resitem;
 					}
 				} else if ($iteminfo[$item][0]=='Wiki') {
-					$query = "SELECT name FROM imas_wikis WHERE id='{$iteminfo[$item][1]}'";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
-					$row = mysql_fetch_row($r);
+					//DB $query = "SELECT name FROM imas_wikis WHERE id='{$iteminfo[$item][1]}'";
+					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $row = mysql_fetch_row($r);
+					$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id");
+					$stm->execute(array(':id'=>$iteminfo[$item][1]));
+					$row = $stm->fetch(PDO::FETCH_NUM);
 					$out .= $ind.'<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'" identifierref="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$out .= $ind.'  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 					$out .= $ind.'</item>'."\n";
@@ -437,10 +464,14 @@ if (isset($_GET['delete'])) {
 					}
 					fwrite($fp,"</head><body>");
 
-					$query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='{$iteminfo[$item][1]}' AND stugroupid=0 ORDER BY id DESC LIMIT 1";
-					$r = mysql_query($query) or die("Query failed : " . mysql_error());
-					if (mysql_num_rows($r)>0) {
-						$row = mysql_fetch_row($r);
+					//DB $query = "SELECT revision FROM imas_wiki_revisions WHERE wikiid='{$iteminfo[$item][1]}' AND stugroupid=0 ORDER BY id DESC LIMIT 1";
+					//DB $r = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB if (mysql_num_rows($r)>0) {
+						//DB $row = mysql_fetch_row($r);
+					$stm = $DBH->prepare("SELECT revision FROM imas_wiki_revisions WHERE wikiid=:wikiid AND stugroupid=0 ORDER BY id DESC LIMIT 1");
+					$stm->execute(array(':wikiid'=>$iteminfo[$item][1]));
+					if ($stm->rowCount()>0) {
+						$row = $stm->fetch(PDO::FETCH_NUM);
 						$text = $row[0];
 						if (strlen($text)>6 && substr($text,0,6)=='**wver') {
 							$wikiver = substr($text,6,strpos($text,'**',6)-6);
@@ -644,7 +675,8 @@ if (isset($_GET['delete'])) {
 			if (is_array($item)) {
 				$ids[] = $parent.'-'.($k+1);
 				$types[] = $pre."Block";
-				$names[] = stripslashes($item['name']);
+				//DB $names[] = stripslashes($item['name']);
+				$names[] = $item['name'];
 				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
 			} else {
 				$ids[] = $item;
@@ -655,33 +687,45 @@ if (isset($_GET['delete'])) {
 		}
 	}
 	function getiteminfo($itemid) {
-		$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
-		$itemtype = mysql_result($result,0,0);
-		$typeid = mysql_result($result,0,1);
+		global $DBH;
+		//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
+		$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+		$stm->execute(array(':id'=>$itemid));
+		//DB $itemtype = mysql_result($result,0,0);
+		//DB $typeid = mysql_result($result,0,1);
+		list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
 		switch($itemtype) {
 			case ($itemtype==="InlineText"):
-				$query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
+				//DB $query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
+				$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
 				break;
 			case ($itemtype==="LinkedText"):
-				$query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
+				//DB $query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
+				$stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
 				break;
 			case ($itemtype==="Forum"):
-				$query = "SELECT name FROM imas_forums WHERE id=$typeid";
+				//DB $query = "SELECT name FROM imas_forums WHERE id=$typeid";
+				$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
 				break;
 			case ($itemtype==="Assessment"):
-				$query = "SELECT name FROM imas_assessments WHERE id=$typeid";
+				//DB $query = "SELECT name FROM imas_assessments WHERE id=$typeid";
+				$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 				break;
 		}
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$name = mysql_result($result,0,0);
+		$stm->execute(array(':id'=>$typeid));
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $name = mysql_result($result,0,0);
+		$name = $stm->fetchColumn(0);
 		return array($itemtype,$name);
 	}
 
-	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-
-	$items = unserialize(mysql_result($result,0,0));
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $items = unserialize(mysql_result($result,0,0));
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$items = unserialize($stm->fetchColumn(0));
 	$ids = array();
 	$types = array();
 	$names = array();

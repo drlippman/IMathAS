@@ -36,12 +36,12 @@ if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
 		$curBreadcrumb .= "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
 	} else if ($_GET['from']=="isolate") {
 		$curBreadcrumb .= " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> &gt; ";	
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid=$aid\">View Scores</a> &gt; ";
 	} else if ($_GET['from']=="gisolate") {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> &gt; ";	
+		$curBreadcrumb .= "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid=$aid\">View Group Scores</a> &gt; ";
 	}else if ($_GET['from']=='stugrp') {
-		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=$aid\">Student Groups</a> &gt; ";	
+		$curBreadcrumb .= "<a href=\"managestugrps.php?cid=$cid&aid=$aid\">Student Groups</a> &gt; ";
 	} else {
 		$curBreadcrumb .= "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
 	}
@@ -58,43 +58,62 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$cid = $_GET['cid'];
 	$waivereqscore = (isset($_POST['waivereqscore']))?1:0;
 	$epenalty = (isset($_POST['overridepenalty']))?intval($_POST['newpenalty']):'NULL';
-	
+
 	if (isset($_POST['sdate'])) {
 		$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 		$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-		
+
 		//check if exception already exists
-		$query = "SELECT id FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT id FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT id FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$_GET['aid']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		if ($row != null) {
-			$query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore,exceptionpenalty=$epenalty WHERE id='{$row[0]}'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			//DB $query = "UPDATE imas_exceptions SET startdate=$startdate,enddate=$enddate,islatepass=0,waivereqscore=$waivereqscore,exceptionpenalty=$epenalty WHERE id='{$row[0]}'";
+			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_exceptions SET startdate=:startdate,enddate=:enddate,islatepass=0,waivereqscore=:waivereqscore,exceptionpenalty=:exceptionpenalty WHERE id=:id");
+			$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty, ':id'=>$row[0]));
 		} else {
+			//DB $query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty) VALUES ";
+			//DB $query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate,$waivereqscore,$epenalty)";
+			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			$query = "INSERT INTO imas_exceptions (userid,assessmentid,startdate,enddate,waivereqscore,exceptionpenalty) VALUES ";
-			$query .= "('{$_GET['uid']}','{$_GET['aid']}',$startdate,$enddate,$waivereqscore,$epenalty)";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$query .= "(:userid, :assessmentid, :startdate, :enddate, :waivereqscore, :exceptionpenalty)";
+			$stm = $DBH->prepare($query);
+			$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$_GET['aid'], ':startdate'=>$startdate, ':enddate'=>$enddate,
+				':waivereqscore'=>$waivereqscore, ':exceptionpenalty'=>$epenalty));
 		}
 		if (isset($_POST['eatlatepass'])) {
 			$n = intval($_POST['latepassn']);
-			$query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-			mysql_query($query) or die("Query failed :$query " . mysql_error());
+			//DB $query = "UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+			//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_students SET latepass = CASE WHEN latepass>$n THEN latepass-$n ELSE 0 END WHERE userid=:userid AND courseid=:courseid");
+			$stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
 		}
-		
+
 		//force regen?
 		if (isset($_POST['forceregen'])) {
 			//this is not group-safe
 			$stu = $_GET['uid'];
 			$aid = $_GET['aid'];
-			$query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			list($shuffle) = mysql_fetch_row($result);
+			//DB $query = "SELECT shuffle FROM imas_assessments WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			//DB list($shuffle) = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT shuffle FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			list($shuffle) = $stm->fetch(PDO::FETCH_NUM);
 			$allqsameseed = (($shuffle&2)==2);
-			
-			$query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
-			$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			if (mysql_num_rows($result)>0) {
-				$row = mysql_fetch_row($result);
+
+			//DB $query = "SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid='$stu' AND assessmentid='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+			//DB if (mysql_num_rows($result)>0) {
+				//DB $row = mysql_fetch_row($result);
+			$stm = $DBH->prepare("SELECT id,questions,lastanswers,scores FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
+			$stm->execute(array(':userid'=>$stu, ':assessmentid'=>$aid));
+			if ($stm->rowCount()>0) {
+				$row = $stm->fetch(PDO::FETCH_NUM);
 				if (strpos($row[1],';')===false) {
 					$questions = explode(",",$row[1]);
 					$bestquestions = $questions;
@@ -106,7 +125,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$curscorelist = $row[3];
 				$scores = array(); $attempts = array(); $seeds = array(); $reattempting = array();
 				for ($i=0; $i<count($questions); $i++) {
-					$scores[$i] = -1;  
+					$scores[$i] = -1;
 					$attempts[$i] = 0;
 					if ($allqsameseed && $i>0) {
 						$seeds[$i] = $seeds[0];
@@ -115,7 +134,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 					$newla = array();
 					$laarr = explode('##',$lastanswers[$i]);
-					//may be some files not accounted for here... 
+					//may be some files not accounted for here...
 					//need to fix
 					foreach ($laarr as $lael) {
 						if ($lael=="ReGen") {
@@ -133,38 +152,54 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$seedslist = implode(',',$seeds);
 				$lastanswers = str_replace('~','',$lastanswers);
 				$lalist = implode('~',$lastanswers);
-				$lalist = addslashes(stripslashes($lalist));
+				//DB $lalist = addslashes(stripslashes($lalist));
 				$reattemptinglist = implode(',',$reattempting);
-				$query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
-				$query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
-				mysql_query($query) or die("Query failed :$query " . mysql_error());
+				//DB $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',seeds='$seedslist',lastanswers='$lalist',";
+				//DB $query .= "reattempting='$reattemptinglist' WHERE id='{$row[0]}'";
+				//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+				$query = "UPDATE imas_assessment_sessions SET scores=:scores,attempts=:attempts,seeds=:seeds,lastanswers=:lastanswers,";
+				$query .= "reattempting=:reattempting WHERE id=:id";
+				$stm = $DBH->prepare($query);
+				$stm->execute(array(':scores'=>$scorelist, ':attempts'=>$attemptslist, ':seeds'=>$seedslist, ':lastanswers'=>$lalist,
+					':reattempting'=>$reattemptinglist, ':id'=>$row[0]));
 			}
-			
+
 		}
-		
+
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid&stu=$stu&from=$from");
-		
+
 	} else if (isset($_GET['clear'])) {
-		$query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
-		mysql_query($query) or die("Query failed :$query " . mysql_error());
+		//DB $query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
+		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
+		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['clear']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-viewasid.php?cid=$cid&asid=$asid&uid=$uid&stu=$stu&from=$from");
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
-		$query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$stuname = implode(', ', mysql_fetch_row($result));
-		
-		$query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $stuname = implode(', ', mysql_fetch_row($result));
+		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['uid']));
+		$stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
+
+		//DB $query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_assessments WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['aid']));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		$sdate = tzdate("m/d/Y",$row[0]);
 		$edate = tzdate("m/d/Y",$row[1]);
 		$stime = tzdate("g:i a",$row[0]);
 		$etime = tzdate("g:i a",$row[1]);
 
 		//check if exception already exists
-		$query = "SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$erow = mysql_fetch_row($result);
+		//DB $query = "SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$_GET['aid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $erow = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT id,startdate,enddate,waivereqscore,exceptionpenalty FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid");
+		$stm->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$_GET['aid']));
+		$erow = $stm->fetch(PDO::FETCH_NUM);
 		$page_isExceptionMsg = "";
 		$savetitle = _('Create Exception');
 		if ($erow != null) {
@@ -176,26 +211,32 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$etime = tzdate("g:i a",$erow[2]);
 			$curwaive = $erow[3];
 			$curepenalty = $erow[4];
-		}	
-	} 
+		}
+	}
 	//DEFAULT LOAD DATA MANIPULATION
 	$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/exception.php?cid={$_GET['cid']}&uid={$_GET['uid']}&asid=$asid&stu=$stu&from=$from";
 
-	$query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $query = "SELECT id,name from imas_assessments WHERE courseid='$cid' ORDER BY name";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT id,name from imas_assessments WHERE courseid=:courseid ORDER BY name");
+	$stm->execute(array(':courseid'=>$cid));
 	$page_courseSelect = array();
 	$i=0;
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$page_courseSelect['val'][$i] = $line['id'];
 		$page_courseSelect['label'][$i] = $line['name'];
 		$i++;
 	}
-	
+
 }
 
-$query = "SELECT latepass FROM imas_students WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$latepasses = mysql_result($result,0,0);
+//DB $query = "SELECT latepass FROM imas_students WHERE userid='{$_GET['uid']}' AND courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $latepasses = mysql_result($result,0,0);
+$stm = $DBH->prepare("SELECT latepass FROM imas_students WHERE userid=:userid AND courseid=:courseid");
+$stm->execute(array(':userid'=>$_GET['uid'], ':courseid'=>$cid));
+$latepasses = $stm->fetchColumn(0);
 
 /******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
@@ -212,12 +253,12 @@ if ($overwriteBody==1) {
 	   window.location = togo;
 	}
 	</script>
-	
 
-	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>	
+
+	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerexception" class="pagetitle"><h2>Make Start/Due Date Exception</h2></div>
 
-<?php 
+<?php
 	echo '<h3>'.$stuname.'</h3>';
 	echo $page_isExceptionMsg;
 	echo '<p><span class="form">Assessment:</span><span class="formright">';
@@ -225,27 +266,27 @@ if ($overwriteBody==1) {
 	echo '</span><br class="form"/></p>';
 
 	if (isset($_GET['aid']) && $_GET['aid']!='') {
-?>		
+?>
 	<form method=post action="exception.php?cid=<?php echo $cid ?>&aid=<?php echo $_GET['aid'] ?>&uid=<?php echo $_GET['uid'] ?>&asid=<?php echo $asid;?>&from=<?php echo $from;?>">
 		<span class=form>Available After:</span>
 		<span class=formright>
-			<input type=text size=10 name=sdate value="<?php echo $sdate ?>"> 
+			<input type=text size=10 name=sdate value="<?php echo $sdate ?>">
 			<a href="#" onClick="displayDatePicker('sdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=stime value="<?php echo $stime ?>">
 		</span><BR class=form>
 		<span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=text size=10 name=edate value="<?php echo $edate ?>"> 
+			<input type=text size=10 name=edate value="<?php echo $edate ?>">
 			<a href="#" onClick="displayDatePicker('edate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></A>
 			at <input type=text size=10 name=etime value="<?php echo $etime ?>">
 		</span><BR class=form>
 		<span class="form"><input type="checkbox" name="forceregen"/></span>
-		<span class="formright">Force student to work on new versions of all questions?  Students 
+		<span class="formright">Force student to work on new versions of all questions?  Students
 		   will keep any scores earned, but must work new versions of questions to improve score. <i>Do not use with group assessments</i>.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="eatlatepass"/></span>
-		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).  
+		<span class="formright">Deduct <input type="input" name="latepassn" size="1" value="1"/> LatePass(es).
 		   Student currently has <?php echo $latepasses;?> latepasses.</span><br class="form"/>
 		<span class="form"><input type="checkbox" name="waivereqscore" <?php if ($curwaive==1) echo 'checked="checked"';?>/></span>
 		<span class="formright">Waive "show based on an another assessment" requirements, if applicable.</span><br class="form"/>
@@ -256,6 +297,6 @@ if ($overwriteBody==1) {
 
 <?php
 	}
-}	
+}
 require("../footer.php");
 ?>

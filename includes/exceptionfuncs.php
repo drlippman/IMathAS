@@ -2,7 +2,42 @@
 
 //Exception Handling functions
 
-//$exception should be from imas_exceptions, and be null, or 
+//$exception should be from imas_exceptions, and be null, or
+//   array(startdate,enddate,islatepass,waivereqscore,itemtype)
+//$adata should be associative array from imas_assessments including
+//   startdate, enddate, reviewdate, allowlate
+//returns array(useexception, canundolatepass, canuselatepass)
+function getCanUseAssessException($exception, $adata) {
+	global $latepasshrs, $latepasses, $sessiondata, $viewedassess, $actas;
+	if (!isset($actas)) {$actas = false;}
+	$now = time();
+	$canuselatepass = false;
+	$canundolatepass = false;
+	$useexception = ($exception!==null); //use by default
+	if ($exception[2]>0 && $adata['enddate']>$exception[1]) {
+		//if latepass and assessment enddate is later than exception enddate, skip exception
+		$useexception = false;
+	} else if ($exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
+		//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
+		//presumption: exception was made to extend due date, not start assignment early
+		$useexception = false;
+	}
+	if ($useexception && $exception[2]>0 && ($now < $adata['enddate'] || $exception[1] > $now + $latepasshrs*60*60)) {
+			$canundolatepass = true;
+	}
+	if ($exception[2]>0) {
+			$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($latepasshrs*3600)));
+	}
+	if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && isset($viewedassess) && !in_array($typeid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
+		$canuselatepass = true;
+	} else if ($now<$adata['enddate'] && ($line['allowlate']%10==1 || $line['allowlate']%10-1>$latepasscnt) && $latepasses>0 && !$actas) {
+		$canuselatepass = true;
+	}
+	return array($useexception, $canundolatepass, $canuselatepass);
+
+}
+
+//$exception should be from imas_exceptions, and be null, or
 //   array(startdate,enddate,islatepass,waivereqscore,itemtype)
 //$line should be from imas_forums, and be assoc array including keys
 //   replyby, postby, enddate, allowlate
@@ -48,8 +83,8 @@ function getCanUseLatePassForums($exception, $line) {
 	   if ($exception[4]=='F' && $exception[0]>0 && $exception[1]>0) {
 		  $canundolatepass = $canundolatepassP && $canundolatepassR;
 	   } else {
-		  $canundolatepass = $canundolatepassP || $canundolatepassR; 
-	   
+		  $canundolatepass = $canundolatepassP || $canundolatepassR;
+
 	   }
 	}
 	$canuselatepassP = false;
@@ -72,5 +107,5 @@ function getCanUseLatePassForums($exception, $line) {
 		   }
 	   }
 	}
-	return array($canundolatepassP && $canundolatepass, $canundolatepassR && $canundolatepass, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']); 
+	return array($canundolatepassP && $canundolatepass, $canundolatepassR && $canundolatepass, $canundolatepass, $canuselatepassP, $canuselatepassR, $line['postby'], $line['replyby'], $line['enddate']);
 }

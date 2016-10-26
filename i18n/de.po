@@ -18,6 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.6\n"
 
+
 #: course/courseshowitems.php:321 course/courseshowitems.php:322
 msgid " Collapsed. "
 msgstr ". eingeklappt. "
@@ -210,7 +211,7 @@ msgstr ""
 "<a href=\"showtest.php?regenall=all\">Ähnliche Probleme versuchen</a> (alle "
 "erlaubten Fragen)"
 
-#: assessment/testutil.php:823 assessment/showtest.php:2559 
+#: assessment/testutil.php:823 assessment/showtest.php:2559
 #: assessment/showtest.php:3202
 msgid ""
 "<a href=\"showtest.php?regenall=missed\">Try similar problems</a> for all "
@@ -397,9 +398,8 @@ msgstr ""
 
 #: course/courseshowitems.php:1373 course/courseshowitems.php:1374
 #: assessment/showtest.php:107 assessment/showtest.php:746
-#: assessment/showtest.php:750
-#: assessment/showtest.php:158 assessment/showtest.php:940
-#: assessment/showtest.php:944
+#: assessment/showtest.php:750 assessment/showtest.php:158
+#: assessment/showtest.php:940 assessment/showtest.php:944
 msgid "Assessment"
 msgstr "Test"
 
@@ -408,9 +408,8 @@ msgid "Assessment has no questions!"
 msgstr "Test hat keine Fragen!"
 
 #: assessment/showtest.php:404 assessment/showtest.php:418
-#: assessment/showtest.php:435 
-#: assessment/showtest.php:530 assessment/showtest.php:544
-#: assessment/showtest.php:565
+#: assessment/showtest.php:435 assessment/showtest.php:530
+#: assessment/showtest.php:544 assessment/showtest.php:565
 msgid "Assessment is closed"
 msgstr "Test ist geschlossen"
 
@@ -575,9 +574,8 @@ msgid "Continue"
 msgstr "Fortfahren"
 
 #: assessment/showtest.php:1549 assessment/showtest.php:1556
-#: assessment/showtest.php:1559 
-#: assessment/showtest.php:1855 assessment/showtest.php:1862
-#: assessment/showtest.php:1865
+#: assessment/showtest.php:1559 assessment/showtest.php:1855
+#: assessment/showtest.php:1862 assessment/showtest.php:1865
 #, php-format
 msgid "Continue video to %s"
 msgstr "Im Video zu %s fortfahren"
@@ -1422,8 +1420,8 @@ msgid "Hide Locked"
 msgstr "Gesperrte verbergen"
 
 #: assessment/showtest.php:1318 assessment/showtest.php:1805
-#: assessment/showtest.php:1563
-#: assessment/showtest.php:1604 assessment/showtest.php:2317
+#: assessment/showtest.php:1563 assessment/showtest.php:1604
+#: assessment/showtest.php:2317
 msgid "Hide Question Information"
 msgstr "Fragenhinweise verstecken"
 
@@ -1468,8 +1466,9 @@ msgstr ""
 "Wenn Sie es nicht jetzt erneut versuchen, werden Sie eine neue Gelegenheit "
 "haben, sobald die den Test abschließen."
 
-#: assessment/showtest.php:1337 assessment/showtest.php:1820 assessment/showtest.php:1582
-#: assessment/showtest.php:1623 assessment/showtest.php:2332
+#: assessment/showtest.php:1337 assessment/showtest.php:1820
+#: assessment/showtest.php:1582 assessment/showtest.php:1623
+#: assessment/showtest.php:2332
 msgid ""
 "If you jump to the answer, you must generate a new version to earn credit"
 msgstr ""
@@ -1532,9 +1531,9 @@ msgstr "isolieren"
 msgid "Item"
 msgstr "Teil"
 
-#: assessment/showtest.php:1337 assessment/showtest.php:1820 
-#: assessment/showtest.php:1582
-#: assessment/showtest.php:1623 assessment/showtest.php:2332
+#: assessment/showtest.php:1337 assessment/showtest.php:1820
+#: assessment/showtest.php:1582 assessment/showtest.php:1623
+#: assessment/showtest.php:2332
 msgid "Jump to Answer"
 msgstr "Zur Antwort springen"
 
@@ -1993,8 +1992,8 @@ msgstr "Vorherige Frage"
 msgid "Print Report"
 msgstr "Zeugnis drucken"
 
-#: assessment/showtest.php:2406 
-#: assessment/showtest.php:2910 assessment/showtest.php:3047
+#: assessment/showtest.php:2406 assessment/showtest.php:2910
+#: assessment/showtest.php:3047
 msgid "Print Version"
 msgstr "Druckversion"
 
@@ -2004,8 +2003,7 @@ msgstr "Probleme mit dem Speicher für die Sitzungsverwaltung"
 
 #: assessment/testutil.php:679 assessment/testutil.php:681
 #: assessment/showtest.php:2469 assessment/showtest.php:2480
-#: assessment/showtest.php:2585
-#: assessment/showtest.php:2558
+#: assessment/showtest.php:2585 assessment/showtest.php:2558
 #: assessment/showtest.php:3112 assessment/showtest.php:3123
 #: assessment/showtest.php:3237
 msgid "Question"
@@ -2048,8 +2046,8 @@ msgstr "Frage mit letztem Versuch wird nur zur Überprüfung angezeigt"
 #: course/courseshowitems.php:1735 course/courseshowitems.php:645
 #: course/courseshowitems.php:682 course/courseshowitems.php:719
 #: course/courseshowitems.php:1736 course/course.php:439
-#: assessment/showtest.php:2282 
-#: assessment/showtest.php:2601 assessment/showtest.php:2923
+#: assessment/showtest.php:2282 assessment/showtest.php:2601
+#: assessment/showtest.php:2923
 msgid "Questions"
 msgstr "Fragen"
 
@@ -2067,8 +2065,7 @@ msgid "Quick View."
 msgstr "Schnellansicht"
 
 #: assessment/showtest.php:1179 assessment/showtest.php:1266
-#: assessment/showtest.php:1424
-#: assessment/showtest.php:1394
+#: assessment/showtest.php:1424 assessment/showtest.php:1394
 #: assessment/showtest.php:1502 assessment/showtest.php:1512
 #: assessment/showtest.php:1726
 msgid "Reattempt last question"
@@ -2086,8 +2083,8 @@ msgstr "Änderungen speichern"
 msgid "Record Group and Continue"
 msgstr "Gruppe speichern und fortfahren"
 
-#: assessment/showtest.php:766
-#: assessment/showtest.php:967 assessment/showtest.php:980
+#: assessment/showtest.php:766 assessment/showtest.php:967
+#: assessment/showtest.php:980
 msgid "Redeem LatePass"
 msgstr "Verspätet einreichen"
 
@@ -2144,9 +2141,8 @@ msgid "Score before penalty on last attempt: "
 msgstr "Punktzahl vor Strafe beim letzten Versuch:"
 
 #: assessment/showtest.php:2474 assessment/showtest.php:2485
-#: assessment/showtest.php:2588
-#: assessment/showtest.php:3117 assessment/showtest.php:3128
-#: assessment/showtest.php:3240
+#: assessment/showtest.php:2588 assessment/showtest.php:3117
+#: assessment/showtest.php:3128 assessment/showtest.php:3240
 msgid "Score in Gradebook: "
 msgstr "Punktzahl in Punkteübersicht: "
 
@@ -2251,8 +2247,8 @@ msgstr "Anweisungen anzeigen"
 msgid "Show Locked"
 msgstr "Gesperrte anzeigen"
 
-#: assessment/showtest.php:1321
-#: assessment/showtest.php:1566 assessment/showtest.php:1607
+#: assessment/showtest.php:1321 assessment/showtest.php:1566
+#: assessment/showtest.php:1607
 msgid "Show Question Information"
 msgstr "Fragenhinweise anzeigen"
 
@@ -2315,9 +2311,8 @@ msgid "Showing until:"
 msgstr "Zeige bis:"
 
 #: assessment/showtest.php:2124 assessment/showtest.php:2151
-#: assessment/showtest.php:2280
-#: assessment/showtest.php:2758 assessment/showtest.php:2785
-#: assessment/showtest.php:2921
+#: assessment/showtest.php:2280 assessment/showtest.php:2758
+#: assessment/showtest.php:2785 assessment/showtest.php:2921
 msgid "Skip Navigation"
 msgstr "Navigation überspringen"
 
@@ -2353,10 +2348,9 @@ msgstr "Studentenansicht"
 
 #: assessment/showtest.php:114 assessment/showtest.php:1621
 #: assessment/showtest.php:1752 assessment/showtest.php:1818
-#: assessment/showtest.php:168
-#: assessment/showtest.php:1580 assessment/showtest.php:1937
-#: assessment/showtest.php:2264 assessment/showtest.php:2330
-#: assessment/showtest.php:2509
+#: assessment/showtest.php:168 assessment/showtest.php:1580
+#: assessment/showtest.php:1937 assessment/showtest.php:2264
+#: assessment/showtest.php:2330 assessment/showtest.php:2509
 msgid "Submit"
 msgstr "Absenden"
 
@@ -2457,8 +2451,8 @@ msgstr ""
 "automatische Auswertung direkt Rückmeldung bekommen."
 
 #: assessment/showtest.php:759 assessment/showtest.php:766
-#: assessment/showtest.php:953
-#: assessment/showtest.php:967 assessment/showtest.php:980
+#: assessment/showtest.php:953 assessment/showtest.php:967
+#: assessment/showtest.php:980
 msgid "This will discard any unsaved work."
 msgstr "Dies wird alle nicht gespeicherte Arbeit verwerfen."
 
@@ -2663,8 +2657,8 @@ msgstr "Zeige diagnostische Punkteübersicht"
 msgid "View your assessment"
 msgstr "Ihren Test anzeigen"
 
-#: assessment/showtest.php:772 
-#: assessment/showtest.php:135 assessment/showtest.php:991
+#: assessment/showtest.php:772 assessment/showtest.php:135
+#: assessment/showtest.php:991
 msgid "View your scored assessment"
 msgstr "Ihre bepunkteten Tests anzeigen"
 
@@ -2877,14 +2871,14 @@ msgstr "Zeile vom Typ $a=b if $c==0 where $d==0 ist ungültig "
 #: course/courseshowitems.php:613 course/courseshowitems.php:620
 #: course/courseshowitems.php:614 course/courseshowitems.php:621
 #: assessment/showtest.php:996 assessment/showtest.php:1003
-#: drillassess.php:224
-#: assessment/showtest.php:1245 assessment/showtest.php:1252
+#: drillassess.php:224 assessment/showtest.php:1245
+#: assessment/showtest.php:1252
 msgid "minute"
 msgstr "Minute"
 
 #: assessment/showtest.php:970 assessment/showtest.php:2538
-#: drillassess.php:224 
-#: assessment/showtest.php:1209 assessment/showtest.php:3181
+#: drillassess.php:224 assessment/showtest.php:1209
+#: assessment/showtest.php:3181
 msgid "minutes"
 msgstr "Minuten"
 
@@ -2921,8 +2915,8 @@ msgstr "verbleibend"
 #: course/courseshowitems.php:615 course/courseshowitems.php:622
 #: course/courseshowitems.php:616 course/courseshowitems.php:623
 #: assessment/showtest.php:998 assessment/showtest.php:1005
-#: drillassess.php:227
-#: assessment/showtest.php:1247 assessment/showtest.php:1254
+#: drillassess.php:227 assessment/showtest.php:1247
+#: assessment/showtest.php:1254
 msgid "second"
 msgstr "Sekunde"
 
@@ -2930,7 +2924,7 @@ msgstr "Sekunde"
 msgid "second(s)"
 msgstr "Sekunde(n)"
 
-#: assessment/showtest.php:2541 drillassess.php:227 
+#: assessment/showtest.php:2541 drillassess.php:227
 #: assessment/showtest.php:3184
 msgid "seconds"
 msgstr "Sekunden"
@@ -3088,8 +3082,7 @@ msgstr "Trainings-Test"
 
 #: drillassess.php:23 drillassess.php:52 drillassess.php:60 drillassess.php:95
 #: drillassess.php:119 drillassess.php:200 drillassess.php:204
-#: drillassess.php:469 
-#: assessment/showtest.php:48 assessment/showtest.php:61
+#: drillassess.php:469 assessment/showtest.php:48 assessment/showtest.php:61
 #: assessment/showtest.php:65 assessment/showtest.php:102
 #: assessment/showtest.php:110 assessment/showtest.php:114
 #: assessment/showtest.php:129 assessment/showtest.php:179
@@ -3288,8 +3281,7 @@ msgstr ""
 "erneut auf einen Test zuzugreifen, den Sie bereits gestartet haben, greifen "
 "Sie über die Kursseite darauf zu"
 
-#: assessment/showtest.php:133
-#: assessment/showtest.php:989
+#: assessment/showtest.php:133 assessment/showtest.php:989
 msgid ""
 "If you view this scored assignment, you will not be able to use a LatePass "
 "on it"
@@ -3325,8 +3317,7 @@ msgstr ""
 msgid "Hide"
 msgstr "Verstecken"
 
-#: assessment/showtest.php:1316
-#: assessment/showtest.php:1418
+#: assessment/showtest.php:1316 assessment/showtest.php:1418
 msgid "Show Intro/Instructions"
 msgstr "Zeige Einführung/Anweisungen"
 
@@ -3350,8 +3341,7 @@ msgstr ""
 "Wenn Sie es jetzt nicht noch einmal versuchen, bekommen Sie eine weitere "
 "Möglichleit, wenn Sie den Test abgeben."
 
-#: assessment/showtest.php:1486
-#: assessment/showtest.php:1905
+#: assessment/showtest.php:1486 assessment/showtest.php:1905
 msgid ""
 "This question contains parts that can not be auto-graded.  Those parts will "
 "count as a score of 0 until they are graded by your instructor"
@@ -3369,8 +3359,7 @@ msgid ", reattempt last question below, or select another question."
 msgstr ""
 ", versuchen Sie die letzte Frage erneut, oder wählen Sie eine andere Frage."
 
-#: assessment/showtest.php:1508
-#: assessment/showtest.php:1514
+#: assessment/showtest.php:1508 assessment/showtest.php:1514
 msgid ", or select another question"
 msgstr ", oder wählen Sie eine andere Frage."
 
@@ -3597,10 +3586,9 @@ msgstr "Verstecke Einstellungen"
 #: assessment/displayq2.php:383
 msgid "This solution is for a similar problem, not your specific version"
 msgstr ""
-"Diese Lösung ist für ein ähnliches Problem, nicht für diese "
-"spezielle Version"
+"Diese Lösung ist für ein ähnliches Problem, nicht für diese spezielle Version"
 
-#: assessment/displayq2.php:484
+#: assessment/displayq2.php:484 assessment/showsoln.php:19
 msgid "Written Example"
 msgstr "Musterlösung"
 
@@ -3644,9 +3632,7 @@ msgstr ""
 
 #: assessment/displayq2.php:1768 assessment/displayq2.php:1827
 msgid "Enter your answer as a set of numbers.  Example: {1,2,3}"
-msgstr ""
-"Geben Sie Ihre ANtwort als Menge von Zahlen ein, "
-"Beispiel: {1,2,3}"
+msgstr "Geben Sie Ihre ANtwort als Menge von Zahlen ein, Beispiel: {1,2,3}"
 
 #: assessment/displayq2.php:1769 assessment/displayq2.php:1828
 msgid "Enter a set"
@@ -3666,8 +3652,8 @@ msgstr ""
 #: assessment/displayq2.php:2309
 #, php-format
 msgid "Use or to combine intervals.  Example: %s &lt; 2 or %s &gt;= 3"
-msgstr "Benutzen Sie or um Intervalle zu vereinen. Beispiel: "
-" %s &lt; 2 or %s &gt;= 3"
+msgstr ""
+"Benutzen Sie or um Intervalle zu vereinen. Beispiel:  %s &lt; 2 or %s &gt;= 3"
 
 #: assessment/displayq2.php:2315
 msgid "Separate intervals by a comma.  Example: (-oo,2],[4,oo)"
@@ -3675,8 +3661,7 @@ msgstr "Trennen Sie Intervalle mit Kommata. Beispiel: (-oo,2],84,oo)"
 
 #: assessment/displayq2.php:2316
 msgid "Enter a list of intervals using interval notation"
-msgstr "Geben Sie eine Liste von Intervallen in "
-"Intervallnotation ein"
+msgstr "Geben Sie eine Liste von Intervallen in Intervallnotation ein"
 
 #: assessment/displayq2.php:2658
 msgid "Freehand Draw"
@@ -3705,8 +3690,8 @@ msgid ""
 "Enter %s as a reduced fraction (like 5/3, not 10/6), as a whole number (like "
 "4 or -2), or as an exact decimal (like 0.5 or 1.25)"
 msgstr ""
-"Geben Sie %s als einen gekürzten Bruch (wie 5/3 anstatt 10/6), als ganze Zahl "
-"(wie 4 oder -2), oder als Dezimalzahl (wie 0.5 oder 1.25) ein"
+"Geben Sie %s als einen gekürzten Bruch (wie 5/3 anstatt 10/6), als ganze "
+"Zahl (wie 4 oder -2), oder als Dezimalzahl (wie 0.5 oder 1.25) ein"
 
 #: assessment/displayq2.php:6424
 #, php-format
@@ -3735,7 +3720,6 @@ msgid ""
 msgstr ""
 "Geben Sie %s als echten, unechten oder als gemischten Bruch oder als ganze "
 "Zahl ein. Kürzen Sie soweit wie möglich. Beispiel: 2 1/2 = 2 &frac12;"
-
 
 #: assessment/displayq2.php:6434
 msgid ""
@@ -3774,3 +3758,7 @@ msgstr "Eine oder mehrere Lösungen: "
 #: assessment/displayq2.php:6492
 msgid "One solution: "
 msgstr "Eine Lösung: "
+
+#: assessment/showsoln.php:19
+msgid "of a similar problem"
+msgstr "eines ähnlichen Problems"

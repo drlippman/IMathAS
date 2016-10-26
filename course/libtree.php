@@ -1,6 +1,6 @@
 <?php
 	require_once("../validate.php");
-		
+
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		$isadmin = false;
 		$isgrpadmin = false;
@@ -23,7 +23,7 @@
 <title>IMathAS Library Selection</title>
 END;
 	}
-	if (isset($coursetheme)) { 
+	if (isset($coursetheme)) {
 		$coursetheme = str_replace('_fw','',$coursetheme);
 		echo '<link rel="stylesheet" href="'."$imasroot/themes/$coursetheme?v=012810\" type=\"text/css\" />";
 	}
@@ -37,12 +37,15 @@ END;
 <body>
 <form>
 END;
-	} 
+	}
+	//DB $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
+	//DB $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
 	$query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
+	$stm = $DBH->query($query);
 	//$query = "SELECT id,name,parent FROM imas_libraries ORDER BY parent";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	
+
 	if (isset($_GET['select'])) {
 		$select = $_GET['select'];
 	} else if (!isset($select)) {
@@ -61,10 +64,11 @@ END;
 		}
 	}
 	$allsrights = 2+3*$selectrights;
-	
+
 	$rights = array();
 	$sortorder = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$id = $line['id'];
 		$name = $line['name'];
 		$parent = $line['parent'];
@@ -79,13 +83,13 @@ END;
 		$ownerids[$id] = $line['ownerid'];
 		$groupids[$id] = $line['groupid'];
 	}
-	//if parent has lower userights, up them to match child library	
+	//if parent has lower userights, up them to match child library
 	function setparentrights($alibid) {
 		global $rights,$parents;
 		if ($parents[$alibid]>0) {
 			if ($rights[$parents[$alibid]] < $rights[$alibid]) {
 			//if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
-				
+
 				$rights[$parents[$alibid]] = $rights[$alibid];
 			}
 			setparentrights($parents[$alibid]);
@@ -94,7 +98,7 @@ END;
 	foreach ($rights as $k=>$n) {
 		setparentrights($k);
 	}
-	
+
 	if (isset($_GET['libs']) && $_GET['libs']!='') {
 		$checked = explode(",",$_GET['libs']);
 	} else if (!isset($checked)) {
@@ -107,7 +111,7 @@ END;
 	}
 	$checked = array_merge($checked,$locked);
 	$toopen = array();
-	
+
 	if (isset($_GET['base'])) {
 		$base = $_GET['base'];
 	}
@@ -123,7 +127,7 @@ END;
 		}
 	}
 	echo "<ul class=base>";
-	
+
 	if ($select == "child") {
 		if ($_GET['type']=="radio") {
 			echo "<li><span class=dd>-</span><input type=radio name=\"libs\" value=0 ";
@@ -137,7 +141,7 @@ END;
 	} else {
 		echo "<li><span class=dd>---</span><span class=\"r8\">Unassigned</span></li>\n";
 	}
-	
+
 	if (isset($ltlibs[0])) {
 		if (isset($base)) {
 			printlist($base);
@@ -153,7 +157,7 @@ END;
 	$colorcode .= "<span class=r2>Open to group, private to others</span><br/>\n";
 	$colorcode .= "<span class=r1>Closed to group, private to others</span><br/>\n";
 	$colorcode .= "<span class=r0>Private</span></p>\n";
-	
+
 	function printlist($parent) {
 		global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin;
 		$arr = array();
@@ -172,8 +176,8 @@ END;
 			$arr = array_keys($orderarr);
 		}
 		foreach ($arr as $child) {
-			
-			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {	
+
+			if ($rights[$child]>$allsrights || (($rights[$child]%3)>$selectrights && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
 			//if ($rights[$child]>$selectrights || $ownerids[$child]==$userid || $isadmin) {
 				if (!$isadmin) {
 					if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
@@ -184,8 +188,8 @@ END;
 					//echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
 					echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
 					if ($select == "parent" || $select=="all") {
-						if ($_GET['type']=="radio") {				
-							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
+						if ($_GET['type']=="radio") {
+							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
 								echo "</span><input type=radio disabled=\"disabled\" ";
 							} else {
 								echo "</span><input type=radio name=\"libs\" value=$child ";
@@ -193,12 +197,12 @@ END;
 							if (in_array($child,$checked)) { echo "CHECKED";	}
 							echo "><span class=hdr onClick=\"toggle($child)\">";
 						} else {
-							if (in_array($child,$locked)) { 
+							if (in_array($child,$locked)) {
 								echo "</span><input type=checkbox disabled=\"disabled\" ";
 							} else {
 								echo "</span><input type=checkbox name=\"libs[]\" value=$child ";
 							}
-							
+
 							if (in_array($child,$checked)) { echo "CHECKED";	}
 							echo "><span class=hdr onClick=\"toggle($child)\">";
 						}
@@ -207,11 +211,11 @@ END;
 					echo "<ul class=hide id=$child>\n";
 					printlist($child);
 					echo "</ul></li>\n";
-					
+
 				} else {  //no children
 					if ($select == "child" || $select=="all" || $isempty[$child]==true) {
 						if ($_GET['type']=="radio") {
-							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) { 
+							if (in_array($child,$locked) || ($select=="parent" && $rights[$child]>2 && !$allownongrouplibs && !$isadmin && !$isgrpadmin)) {
 								echo "<li><span class=dd>---</span> <input type=radio disabled=\"disabled\" ";
 							} else {
 								if ($select=="parent") {
@@ -220,13 +224,13 @@ END;
 									echo "<li><span class=dd>-</span> <input type=radio name=\"libs\" value=$child ";
 								}
 							}
-							
+
 							if (in_array($child,$checked)) { echo "CHECKED";	}
 							echo "> <span id=\"n$child\" class=\"r{$rights[$child]}\">{$names[$child]}</span></li>\n";
 						} else {
-							if (in_array($child,$locked)) { 
+							if (in_array($child,$locked)) {
 								echo "<li><span class=dd>-</span><input type=checkbox disabled=\"disabled\" ";
-	
+
 							} else {
 								echo "<li><span class=dd>-</span><input type=checkbox name=\"libs[]\" value=$child ";
 							}
@@ -236,7 +240,7 @@ END;
 					} else {
 						echo "<li><span class=dd>---</span> <span id=\"n$child\" class=\"r{$rights[$child]}\">{$names[$child]}</span></li>\n";
 					}
-					
+
 				}
 			}
 		}
@@ -268,7 +272,7 @@ END;
 		}
 	}
 	echo "</script>\n";
-	
+
 	if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
 		echo <<<END
 <input type=button value="Use Libraries" onClick="setlib(this.form)">

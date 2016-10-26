@@ -12,7 +12,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Wiki";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; Delete Wiki";
-	
+
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";
@@ -25,46 +25,68 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 
 	if ($_GET['remove']=="really") {
 		$wikiid = $_GET['id'];
-		
-		$query = "SELECT id FROM imas_items WHERE typeid='$wikiid' AND itemtype='Wiki'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$itemid = mysql_result($result,0,0);
-		
-		$query = "DELETE FROM imas_items WHERE id='$itemid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "DELETE FROM imas_wikis WHERE id='$wikiid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$wikiid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
-		$query = "DELETE FROM imas_wiki_views WHERE wikiid='$wikiid'";
-		mysql_query($query) or die("Query failed : $query " . mysql_error());
-		
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		
-		$blocktree = explode('-',$block);
-		$sub =& $items;
-		for ($i=1;$i<count($blocktree);$i++) {
-			$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+		$DBH->beginTransaction();
+		//DB $query = "SELECT id FROM imas_items WHERE typeid='$wikiid' AND itemtype='Wiki' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $itemid = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT id FROM imas_items WHERE typeid=:typeid AND itemtype='Wiki' AND courseid=:courseid");
+		$stm->execute(array(':typeid'=>$wikiid, ':courseid'=>$cid));
+		if ($stm->rowCount()>0) {
+			$itemid = $stm->fetchColumn(0);
+
+			//DB $query = "DELETE FROM imas_items WHERE id='$itemid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_items WHERE id=:id");
+			$stm->execute(array(':id'=>$itemid));
+
+			//DB $query = "DELETE FROM imas_wikis WHERE id='$wikiid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_wikis WHERE id=:id");
+			$stm->execute(array(':id'=>$wikiid));
+
+			//DB $query = "DELETE FROM imas_wiki_revisions WHERE wikiid='$wikiid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
+			$stm->execute(array(':wikiid'=>$wikiid));
+
+			//DB $query = "DELETE FROM imas_wiki_views WHERE wikiid='$wikiid'";
+			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_wiki_views WHERE wikiid=:wikiid");
+			$stm->execute(array(':wikiid'=>$wikiid));
+
+			//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $items = unserialize(mysql_result($result,0,0));
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+			$stm->execute(array(':id'=>$cid));
+			$items = unserialize($stm->fetchColumn(0));
+
+			$blocktree = explode('-',$block);
+			$sub =& $items;
+			for ($i=1;$i<count($blocktree);$i++) {
+				$sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+			}
+			$key = array_search($itemid,$sub);
+			array_splice($sub,$key,1);
+			//DB $itemorder = addslashes(serialize($items));
+			$itemorder = serialize($items);
+			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
-		$key = array_search($itemid,$sub);
-		array_splice($sub,$key,1);
-		$itemorder = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error());
-		
+		$DBH->commit();
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
-		
+
 		exit;
 	} else {
-		$query = "SELECT name FROM imas_wikis WHERE id='{$_GET['id']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$itemname = mysql_result($result,0,0);
-	}	
+		//DB $query = "SELECT name FROM imas_wikis WHERE id='{$_GET['id']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $itemname = mysql_result($result,0,0);
+		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['id']));
+		$itemname = $stm->fetchColumn(0);
+	}
 }
 
 /******* begin html output ********/

@@ -5,14 +5,17 @@
 		echo "This page cannot be accessed directly";
 		exit;
 	}
-	
+
 	if ($_GET['process']== true) {
 		if (isset($_POST['add'])) { //adding new questions
-			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = mysql_result($result,0,0);
-			$viddata = mysql_result($result,0,1);
-			
+			//DB $query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $itemorder = mysql_result($result,0,0);
+			//DB $viddata = mysql_result($result,0,1);
+			$stm = $DBH->prepare("SELECT itemorder,viddata FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			list($itemorder, $viddata) = $stm->fetch(PDO::FETCH_NUM);
+
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
 				$newitemorder = '1|0';
@@ -27,10 +30,15 @@
 					if ($points==9999 && isset($_POST['pointsforparts']) && $_POST['qparts'.$qsetid]>1) {
 						$points = intval($_POST['qparts'.$qsetid]);
 					}
+					//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
+					//DB $query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
+					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $qid = mysql_insert_id();
 					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
-					$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$qid = mysql_insert_id();
+					$query .= "VALUES (:assessmentid, :points, :attempts, :showhints, :penalty, :regen, :showans, :questionsetid)";
+					$stm = $DBH->prepare($query);
+					$stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':penalty'=>9999, ':regen'=>0, ':showans'=>0, ':questionsetid'=>$qsetid));
+					$qid = $DBH->lastInsertId();
 					if ($newitemorder=='') {
 						$newitemorder = $qid;
 					} else {
@@ -42,7 +50,7 @@
 					}
 				}
 			}
-			
+
 			if ($viddata != '') {
 				if ($itemorder=='') {
 					$nextnum = 0;
@@ -62,25 +70,29 @@
 				if ($finalseg != '') {
 					$viddata[] = $finalseg;
 				}
-				$viddata = addslashes(serialize($viddata));
+				//DB $viddata = addslashes(serialize($viddata));
+				$viddata = serialize($viddata);
 			}
-			
+
 			if ($itemorder == '') {
 				$itemorder = $newitemorder;
 			} else {
 				$itemorder .= ','.$newitemorder;
 			}
-			
-			
-			
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+			//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder,viddata=:viddata WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':viddata'=>$viddata, ':id'=>$aid));
 		} else if (isset($_POST['mod'])) { //modifying existing
-			
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = mysql_result($result,0,0);
-			
+
+			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $itemorder = mysql_result($result,0,0);
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			$itemorder = $stm->fetchColumn(0);
+
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
 			foreach(explode(',',$_POST['qids']) as $qid) {
@@ -91,29 +103,38 @@
 			//lookup qsetids
 			$qidtoqsetid = array();
 			if (count($lookupid)>0) {
-				$query = "SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
+				//DB $query = "SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while ($row = mysql_fetch_row($result)) {
+				$stm = $DBH->query("SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")"); //sanitized above
+				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					$qidtoqsetid[$row[0]] = $row[1];
 				}
 			}
-			
+
 			foreach(explode(',',$_POST['qids']) as $qid) {
 				$points = trim($_POST['points'.$qid]);
 				$attempts = trim($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
-				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm = $DBH->prepare("UPDATE imas_questions SET points=:points,attempts=:attempts,showhints=:showhints WHERE id=:id");
+				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid));
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
 					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
 						$qsetid = $qidtoqsetid[$qid];
+						//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
+						//DB $query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
+						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+						//DB $newqid = mysql_insert_id();
 						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
-						$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						$newqid = mysql_insert_id();
-						
+						$query .= "VALUES (:assessmentid, :points, :attempts, :showhints, :penalty, :regen, :showans, :questionsetid)";
+						$stm = $DBH->prepare($query);
+						$stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':penalty'=>9999, ':regen'=>0, ':showans'=>0, ':questionsetid'=>$qsetid));
+						$newqid = $DBH->lastInsertId();
+
 						$itemarr = explode(',',$itemorder);
 						$key = array_search($qid,$itemarr);
 						if ($key===false) {
@@ -125,18 +146,20 @@
 					}
 				}
 			}
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("UPDATE imas_assessments SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$aid));
 		}
-		
+
 	} else {
 		$pagetitle = "Question Settings";
 		require("../header.php");
 		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
-		
+
 		echo "Question Settings</div>\n";
-	
+
 ?>
 <div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
 <p>For more advanced settings, modify the settings for individual questions after adding.
@@ -152,25 +175,31 @@ Leave items blank to use the assessment's default values<br/>
 <thead><tr>
 <?php
 		if (isset($_POST['checked'])) { //modifying existing questions
-			
+
 			$qids = array();
 			foreach ($_POST['checked'] as $k=>$v) {
 				$v = explode(':',$v);
 				$qids[] = $v[1];
 			}
 			$qrows = array();
+			//DB $query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
+			//DB $query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
+			//DB $query .= "imas_questions.id IN ('".implode("','",$qids)."')";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$qidlist = implode(',', array_map('intval', $qids));
 			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
 			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
-			$query .= "imas_questions.id IN ('".implode("','",$qids)."')";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+			$query .= "imas_questions.id IN ($qidlist)";
+			$stm = $DBH->query($query);
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[2]==9999) {
 					$row[2] = '';
-				} 
+				}
 				if ($row[3]==9999) {
 					$row[3] = '';
 				}
-				
+
 				$qrows[$row[0]] = '<tr><td>'.$row[1].'</td>';
 				$qrows[$row[0]] .= '<td>';
 				if ($row[5]!='') {
@@ -190,7 +219,7 @@ Leave items blank to use the assessment's default values<br/>
 					if ($hasother) {
 						$qrows[$row[0]] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
 					}
-				} 
+				}
 				$qrows[$row[0]] .= '</td>';
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
@@ -200,13 +229,16 @@ Leave items blank to use the assessment's default values<br/>
 				$qrows[$row[0]] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
 				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
 				$qrows[$row[0]] .= '</tr>';
-			} 
+			}
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = explode(',', mysql_result($result,0,0));
+			//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $itemorder = explode(',', mysql_result($result,0,0));
+			$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
+			$stm->execute(array(':id'=>$aid));
+			$itemorder = explode(',', $stm->fetchColumn(0));
 			foreach ($itemorder as $item) {
 				if (strpos($item,'~')!==false) {
 					$subs = explode('~',$item);
@@ -220,22 +252,25 @@ Leave items blank to use the assessment's default values<br/>
 					}
 				} else if (isset($qrows[$item])) {
 					echo $qrows[$item];
-				}	
+				}
 			}
-			
+
 			echo '</tbody></table>';
 			echo '<input type=hidden name="qids" value="'.implode(',',$qids).'" />';
 			echo '<input type=hidden name="mod" value="true" />';
-			
+
 			echo '<div class="submit"><input type="submit" value="'._('Save Settings').'"></div>';
-			
+
 		} else { //adding new questions
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
-			
-			$query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
+
+			//DB $query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
+			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$checked = implode(',', array_map('intval', $_POST['nchecked']));
+			$stm = $DBH->query("SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ($checked)");
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]=='multipart') {
 					preg_match('/anstypes\s*=(.*)/',$row[4],$match);
 					$n = substr_count($match[1],',')+1;
@@ -276,7 +311,7 @@ Leave items blank to use the assessment's default values<br/>
 			echo '</tbody></table>';
 			echo '<input type=hidden name="qsetids" value="'.implode(',',$_POST['nchecked']).'" />';
 			echo '<input type=hidden name="add" value="true" />';
-			
+
 			echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';
 			echo '<p><input type=checkbox name="pointsforparts" value="1" /> Set the points equal to the number of parts for multipart?</p>';
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';

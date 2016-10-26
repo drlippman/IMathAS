@@ -9,7 +9,7 @@ ini_set("max_execution_time", "900");
 ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
-                                        
+
 /*** master php includes *******/
 require("../validate.php");
 include("../includes/filehandler.php");
@@ -52,7 +52,8 @@ function getsubinfo($items,$parent,$pre) {
 		if (is_array($item)) {
 			$ids[] = $parent.'-'.($k+1);
 			$types[] = $pre."Block";
-			$names[] = stripslashes($item['name']);
+			//DB $names[] = stripslashes($item['name']);
+			$names[] = $item['name'];
 			getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
 		} else {
 			$ids[] = $item;
@@ -64,29 +65,39 @@ function getsubinfo($items,$parent,$pre) {
 }
 
 function getiteminfo($itemid) {
-	$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
-	$itemtype = mysql_result($result,0,0);
-	$typeid = mysql_result($result,0,1);
-	switch($itemtype) {
-		case ($itemtype==="InlineText"):
-			$query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
-			break;
-		case ($itemtype==="LinkedText"):
-			$query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
-			break;
-		case ($itemtype==="Forum"):
-			$query = "SELECT name FROM imas_forums WHERE id=$typeid";
-			break;
-		case ($itemtype==="Assessment"):
-			$query = "SELECT name FROM imas_assessments WHERE id=$typeid";
-			break;
-	}
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$name = mysql_result($result,0,0);
+  global $DBH;
+	//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
+	$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+	$stm->execute(array(':id'=>$itemid));
+  //DB $itemtype = mysql_result($result,0,0);
+  //DB $typeid = mysql_result($result,0,1);
+  list($itemtype, $typeid) = $stm->fetch(PDO::FETCH_NUM);
+  switch($itemtype) {
+    case ($itemtype==="InlineText"):
+      //DB $query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
+      $stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
+      break;
+    case ($itemtype==="LinkedText"):
+      //DB $query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
+      $stm = $DBH->prepare("SELECT title FROM imas_linkedtext WHERE id=:id");
+      break;
+    case ($itemtype==="Forum"):
+      //DB $query = "SELECT name FROM imas_forums WHERE id=$typeid";
+      $stm = $DBH->prepare("SELECT name FROM imas_forums WHERE id=:id");
+      break;
+    case ($itemtype==="Assessment"):
+      //DB $query = "SELECT name FROM imas_assessments WHERE id=$typeid";
+      $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+      break;
+  }
+  $stm->execute(array(':id'=>$typeid));
+  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+  //DB $name = mysql_result($result,0,0);
+  $name = $stm->fetchColumn(0);
 	return array($itemtype,$name);
 }
-		
+
  //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
@@ -101,20 +112,23 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 } elseif (isset($_POST['export'])) { //STEP 2 DATA PROCESSING, OUTPUT FILE HERE
 	header('Content-type: text/imas');
 	header("Content-Disposition: attachment; filename=\"imasitemexport.imas\"");
-	
+
 	$checked = $_POST['checked'];
-	
-	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
 
 	$itemcnt = 0;
 	$toexport = array();
 	$qcnt = 0;
-	$items = unserialize(mysql_result($result,0,0));
+	//DB $items = unserialize(mysql_result($result,0,0));
+	$items = unserialize($stm->fetchColumn(0));
 	$newitems = array();
 	$qtoexport = array();
 	$qsettoexport = array();
-	
+
 	copysub($items,'0',$newitems);
 	//print_r($newitems);
 	echo "EXPORT DESCRIPTION\n";
@@ -126,19 +140,26 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		echo "BEGIN ITEM\n";
 		echo "ID\n";
 		echo $exportid."\n";
-		$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$row = mysql_fetch_row($result);
+		//DB $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $row = mysql_fetch_row($result);
+		$stm = $DBH->prepare("SELECT itemtype,typeid FROM imas_items WHERE id=:id");
+		$stm->execute(array(':id'=>$itemid));
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		echo "TYPE\n";
 		echo $row[0] . "\n";
 		switch ($row[0]) {
 			case ($row[0]==="InlineText"):
-				$query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$row[1]}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				$stm2 = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
+				$stm2->execute(array(':itemid'=>$row[1]));
 				$filenames = array();
 				$filedescr = array();
-				if (mysql_num_rows($r2)>0) {
-					   while ($frow = mysql_fetch_row($r2)) {
+				//DB if (mysql_num_rows($r2)>0) {
+				if ($stm2->rowCount()>0) {
+					   //DB while ($frow = mysql_fetch_row($r2)) {
+					   while ($frow = $stm2->fetch(PDO::FETCH_NUM)) {
 						   $filedescr[$frow[0]] = $frow[1];
 						   if ($GLOBALS['filehandertypecfiles'] == 's3') {
 						   	   $filenames[$frow[0]] = getcoursefileurl($frow[2]);
@@ -148,9 +169,12 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 						   }
 					   }
 				}
-				$query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				//DB $query = "SELECT * FROM imas_inlinetext WHERE id='{$row[1]}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$stm2 = $DBH->prepare("SELECT * FROM imas_inlinetext WHERE id=:id");
+				$stm2->execute(array(':id'=>$row[1]));
+				$line = $stm2->fetch(PDO::FETCH_ASSOC);
 				echo "TITLE\n";
 				echo $line['title'] . "\n";
 				echo "TEXT\n";
@@ -178,13 +202,16 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 						  echo $filenames[$fid]. ':::'.$filedescr[$fid]."\n";
 					   }
 				}
-				
+
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="LinkedText"):
-				$query = "SELECT * FROM imas_linkedtext WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				//DB $query = "SELECT * FROM imas_linkedtext WHERE id='{$row[1]}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$stm2 = $DBH->prepare("SELECT * FROM imas_linkedtext WHERE id=:id");
+				$stm2->execute(array(':id'=>$row[1]));
+				$line = $stm2->fetch(PDO::FETCH_ASSOC);
 				if (substr($line['text'],0,5)=='file:') {
 					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($line['text']),0,5)=="file:") {
 						$line['text'] = getcoursefileurl(trim(substr(strip_tags($line['text']),5)));
@@ -212,12 +239,15 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "TARGET\n";
 				echo $line['target'] . "\n";
 				echo "END ITEM\n";
-				
+
 				break;
 			case ($row[0]==="Forum"):
-				$query = "SELECT * FROM imas_forums WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				//DB $query = "SELECT * FROM imas_forums WHERE id='{$row[1]}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$stm2 = $DBH->prepare("SELECT * FROM imas_forums WHERE id=:id");
+				$stm2->execute(array(':id'=>$row[1]));
+				$line = $stm2->fetch(PDO::FETCH_ASSOC);
 				echo "NAME\n";
 				echo $line['name'] . "\n";
 				echo "SUMMARY\n";
@@ -239,9 +269,12 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				echo "END ITEM\n";
 				break;
 			case ($row[0]==="Assessment"):
-				$query = "SELECT * FROM imas_assessments WHERE id='{$row[1]}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				$line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				//DB $query = "SELECT * FROM imas_assessments WHERE id='{$row[1]}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $line = mysql_fetch_array($r2, MYSQL_ASSOC);
+				$stm2 = $DBH->prepare("SELECT * FROM imas_assessments WHERE id=:id");
+				$stm2->execute(array(':id'=>$row[1]));
+				$line = $stm2->fetch(PDO::FETCH_ASSOC);
 				echo "NAME\n";
 				echo $line['name'] . "\n";
 				echo "SUMMARY\n";
@@ -288,17 +321,22 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 				break;
 		} //end item switch
 	} // end item export
-	
+
 	foreach ($qtoexport as $exportid=>$qid) { //export questions
 		echo "BEGIN QUESTION\n";
 		echo "QID\n";
 		echo $exportid . "\n";
-		
+
+		//DB $query = "SELECT imas_questions.*,imas_questionset.uniqueid from imas_questions,imas_questionset ";
+		//DB $query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
+		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $line = mysql_fetch_array($r2, MYSQL_ASSOC);
 		$query = "SELECT imas_questions.*,imas_questionset.uniqueid from imas_questions,imas_questionset ";
-		$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id='$qid'";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		$line = mysql_fetch_array($r2, MYSQL_ASSOC);
-		
+		$query .= "WHERE imas_questions.questionsetid=imas_questionset.id AND imas_questions.id=:id";
+		$stm2 = $DBH->prepare($query);
+		$stm2->execute(array(':id'=>$qid));
+		$line = $stm2->fetch(PDO::FETCH_ASSOC);
+
 		if (!empty($line['uniqueid'])) {
 			echo "UQID\n";
 			echo $line['uniqueid'] . "\n";
@@ -315,14 +353,14 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			echo "SHOWANS\n";
 			echo $line['showans'] . "\n";
 			echo "END QUESTION\n";
-			
+
 			$qsettoexport[] = $line['questionsetid'];
 		}
 	}
 	/*
 	foreach ($qsettoexport as $qsetid) { //export questionset
 		echo "BEGIN QSET\n";
-		
+
 		$query = "SELECT * from imas_questionset WHERE id='$qsetid'";
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		$line = mysql_fetch_array($r2, MYSQL_ASSOC);
@@ -348,13 +386,17 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	}
 	*/
 	if (count($qsettoexport)>0) {
-		$qstoexportlist = implode(',',$qsettoexport);
+		$qstoexportlist = implode(',', array_map('intval', $qsettoexport));
 		//first, lets pull any questions that have include__from so we can lookup backrefs
+		//DB $query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
+		//DB $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
 		$query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		$stm = $DBH->query($query);
 		$includedqs = array();
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0) {
 				$includedqs = array_merge($includedqs,$matches[1]);
 			}
@@ -364,20 +406,30 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		}
 		$includedbackref = array();
 		if (count($includedqs)>0) {
-			$includedlist = implode(',',$includedqs);
-			$query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
-			$result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				$includedbackref[$row[0]] = $row[1];		
+			$includedlist = implode(',', array_map('intval', $includedqs));
+			//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)";
+			//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->query("SELECT id,uniqueid FROM imas_questionset WHERE id IN ($includedlist)");
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$includedbackref[$row[0]] = $row[1];
 			}
 		}
 		$imgfiles = array();
-		$query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->query("SELECT * FROM imas_questionset WHERE id IN ($qstoexportlist)");
 		$qcnt = 0;
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			$line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
-			$line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+			//DB $line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
+			//DB $line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+      $line['control'] = preg_replace_callback('/includecodefrom\((\d+)\)/', function($matches) use ($includedbackref) {
+          return "includecodefrom(UID".$includedbackref[$matches[1]].")";
+        }, $line['control']);
+      $line['qtext'] = preg_replace_callback('/includeqtextfrom\((\d+)\)/', function($matches) use ($includedbackref) {
+          return "includeqtextfrom(UID".$includedbackref[$matches[1]].")";
+        }, $line['qtext']);
 			echo "BEGIN QSET\n";
 			echo "\nUNIQUEID\n";
 			echo rtrim($line['uniqueid']) . "\n";
@@ -412,21 +464,26 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			//no static file handling happening here yet just export the info
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
-				$query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
-				$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($r2)) {
+				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
+				//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB while ($row = mysql_fetch_row($r2)) {
+				$stm2 = $DBH->prepare("SELECT var,filename FROM imas_qimages WHERE qsetid=:qsetid");
+				$stm2->execute(array(':qsetid'=>$line['id']));
+				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 					echo $row[0].','.$row[1]. "\n";
-					
+
 				}
 			}
 			echo "END QSET\n";
 		}
-		
-		
-		
-		$query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
-		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($r2)) {
+
+
+
+		//DB $query = "SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)";
+		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($r2)) {
+		$stm2 = $DBH->query("SELECT DISTINCT filename FROM imas_qimages WHERE qsetid IN ($qstoexportlist)");
+		while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 			if ($GLOBALS['filehandertypecfiles'] == 's3') {
 				if (!file_exists("../assessment/qimages".DIRECTORY_SEPARATOR.trim($row[0]))) {
 					copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
@@ -450,10 +507,10 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 			foreach ($imgfiles as $file) {
 				$zip->addFile($file,basename($file));
 			}
-		} 
+		}
 		$zip->close();
 	}
-	
+
 	if (class_exists('ZipArchive')) {
 		$zip = new ZipArchive();
 		if ($zip->open("../course/files/coursefilepack$cid.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
@@ -465,47 +522,49 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					$zip->addFile("../course/files/$file",basename($file));
 				}
 			}
-		} 
+		}
 		$zip->close();
 	}
-		
-	
+
+
 	exit;
 
 } else { //STEP 1 DATA PROCESSING, INITIAL LOAD
-	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-
-	$items = unserialize(mysql_result($result,0,0));
+	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $items = unserialize(mysql_result($result,0,0));
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$items = unserialize($stm->fetchColumn(0));
 	$ids = array();
 	$types = array();
 	$names = array();
 
 	getsubinfo($items,'0','');
 }
-	
+
 require("../header.php");
 
 if ($overwriteBody==1) {
  echo $body;
-} else {	
+} else {
 ?>
 
 	<?php echo $curBreadcrumb; ?>
 	<div class="cpmid"><a href="ccexport.php?cid=<?php echo $cid ?>">Export for another Learning Management System</a></div>
-	
+
 	<h2>Export Course Items</h2>
-	
+
 	<p>This page will let you export your course items for backup or transfer to
 	another server running this software.</p>
-	
+
 	<form id="qform" method=post action="exportitems.php?cid=<?php echo $cid ?>">
 		<p>Export description<br/>
 		<textarea rows=5 cols=50 name=description>Course Item Export</textarea></p>
 		<p>Select items to export</p>
-	
+
 		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
-	
+
 		<table cellpadding=5 class=gb>
 		<thead>
 			<tr><th></th><th>Type</th><th>Title</th></tr>
@@ -515,7 +574,7 @@ if ($overwriteBody==1) {
 	$alt=0;
 	for ($i = 0 ; $i<(count($ids)); $i++) {
 		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
-?>		
+?>
 				<td>
 				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>' checked=checked>
 				</td>
@@ -538,7 +597,7 @@ if ($overwriteBody==1) {
 	<p>If you were wanting to export this course to a different Learning Management System, you can try the <a href="ccexport.php?cid=<?php echo $cid;?>">
 	Common Cartridge export</a></p>
 <?php
-}	
+}
 
 require("../footer.php");
 ?>

@@ -5,7 +5,7 @@
 //used by gbtable
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
-		if ($sc>0) { 
+		if ($sc>0) {
 			return $sc;
 		} else {
 			return 0;
@@ -14,7 +14,7 @@ function getpts($sc) {
 		$sc = explode('~',$sc);
 		$tot = 0;
 		foreach ($sc as $s) {
-			if ($s>0) { 
+			if ($s>0) {
 				$tot+=$s;
 			}
 		}
@@ -25,17 +25,21 @@ function getpts($sc) {
 //determine if diagnostic - used in gradebook too
 $isdiag = false;
 if ($canviewall) {
-	$query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)>0) {
+	//DB $query = "SELECT sel1name,sel2name FROM imas_diags WHERE cid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)>0) {
+	$stm = $DBH->prepare("SELECT sel1name,sel2name FROM imas_diags WHERE cid=:cid");
+	$stm->execute(array(':cid'=>$cid));
+	if ($stm->rowCount()>0) {
 		$isdiag = true;
-		$sel1name = mysql_result($result,0,0);
-		$sel2name = mysql_result($result,0,1);
+		//DB $sel1name = mysql_result($result,0,0);
+		//DB $sel2name = mysql_result($result,0,1);
+		list($sel1name, $sel2name) = $stm->fetch(PDO::FETCH_NUM);
 	}
 }
 
 /****
-The super-nasty gradebook function!  
+The super-nasty gradebook function!
 gbtable([userid])
 Student: automatically limits to their userid
 Teacher: gives all students unless userid is provided
@@ -54,7 +58,7 @@ row[0][1][0][1] = category color #
 row[0][1][0][2] = points possible
 row[0][1][0][3] = 0 past, 1 current, 2 future
 row[0][1][0][4] = 0 no count and hide, 1 count, 2 EC, 3 no count
-row[0][1][0][5] = 0 regular, 1 practice test  
+row[0][1][0][5] = 0 regular, 1 practice test
 row[0][1][0][6] = 0 online, 1 offline, 2 discussion, 3 exttool
 row[0][1][0][7] = assessmentid, gbitems.id, forumid, linkedtext.id
 row[0][1][0][8] = tutoredit: 0 no, 1 yes
@@ -98,7 +102,7 @@ row[1][1][0][6] = 1 if had exception, = 2 if was latepass
 row[1][1][0][7] = time spent (minutes)
 row[1][1][0][8] = time on task (time displayed)
 row[1][1][0][9] = last change time (if $includelastchange is set)
-row[1][1][0][10] = allow latepass use on this item 
+row[1][1][0][10] = allow latepass use on this item
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -136,7 +140,8 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 ****/
 
 function gbtable() {
-	global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs;
+	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
+	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -150,23 +155,26 @@ function gbtable() {
 	if (!isset($logincnt)) {
 		$logincnt = 0;
 	}
-	
+
 	$category = array();
 	$gb = array();
-	
+
 	$ln = 0;
-	
+
 	//Pull Gradebook Scheme info
-	$query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	//DB $query = "SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB list($useweights,$orderby,$defaultcat,$usersort) = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT useweights,orderby,defaultcat,usersort FROM imas_gbscheme WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	list($useweights,$orderby,$defaultcat,$usersort) = $stm->fetch(PDO::FETCH_NUM);
 	if ($useweights==2) {$useweights = 0;} //use 0 mode for calculation of totals
-	
+
 	if (isset($GLOBALS['setorderby'])) {
 		$orderby = $GLOBALS['setorderby'];
 	}
-	
-	//Build user ID headers 
+
+	//Build user ID headers
 	$gb[0][0][0] = "Name";
 	if ($isdiag) {
 		$gb[0][0][1] = "ID";
@@ -176,16 +184,22 @@ function gbtable() {
 	} else {
 		$gb[0][0][1] = "Username";
 	}
-	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_result($result,0,0)>0) {
+	//DB $query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_result($result,0,0)>0) {
+	$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.section IS NOT NULL");
+	$stm->execute(array(':courseid'=>$cid));
+	if ($stm->fetchColumn(0)>0) {
 		$hassection = true;
 	} else {
 		$hassection = false;
 	}
-	$query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_result($result,0,0)>0) {
+	//DB $query = "SELECT count(id) FROM imas_students WHERE imas_students.courseid='$cid' AND imas_students.code IS NOT NULL";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_result($result,0,0)>0) {
+	$stm = $DBH->prepare("SELECT count(id) FROM imas_students WHERE imas_students.courseid=:courseid AND imas_students.code IS NOT NULL");
+	$stm->execute(array(':courseid'=>$cid));
+	if ($stm->fetchColumn(0)>0) {
 		$hascode = true;
 	} else {
 		$hascode = false;
@@ -202,12 +216,15 @@ function gbtable() {
 	if ($logincnt) {
 		$gb[0][0][] = "Login Count";
 	}
-	
+
 	//orderby 10: course order (11 cat first), 12: course order rev (13 cat first)
 	if ($orderby>=10 && $orderby <=13) {
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$courseitemorder = unserialize(mysql_result($result,0,0));
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB $courseitemorder = unserialize(mysql_result($result,0,0));
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$courseitemorder = unserialize($stm->fetchColumn(0));
 		$courseitemsimporder = array();
 		function flattenitems($items,&$addto) {
 			foreach ($items as $item) {
@@ -221,21 +238,26 @@ function gbtable() {
 		flattenitems($courseitemorder,$courseitemsimporder);
 		$courseitemsimporder = array_flip($courseitemsimporder);
 		$courseitemsassoc = array();
-		$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,itemtype,typeid FROM imas_items WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if (!isset($courseitemsimporder[$row[0]])) { //error catch items not in course.itemorder
 				$courseitemsassoc[$row[1].$row[2]] = 999+count($courseitemsassoc);
 			} else {
 				$courseitemsassoc[$row[1].$row[2]] = $courseitemsimporder[$row[0]];
 			}
 		}
-		
+
 	}
 
 	//Pull Assessment Info
 	$now = time();
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
+	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
+
 	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
 	}
@@ -245,11 +267,21 @@ function gbtable() {
 	if (!$isteacher) {
 		//$query .= "AND startdate<$now ";
 	}
+	//DB if ($catfilter>-1) {
+		//DB $query .= "AND gbcategory='$catfilter' ";
+	//DB }
+	//DB $query .= "ORDER BY enddate,name";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if ($catfilter>-1) {
-		$query .= "AND gbcategory='$catfilter' ";
+		$query .= "AND gbcategory=:gbcategory ";
 	}
 	$query .= "ORDER BY enddate,name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	if ($catfilter>-1) {
+		$stm->execute(array(':courseid'=>$cid, ':gbcategory'=>$catfilter));
+	} else {
+		$stm->execute(array(':courseid'=>$cid));
+	}
 	$overallpts = 0;
 	$now = time();
 	$kcnt = 0;
@@ -271,7 +303,8 @@ function gbtable() {
 	$possible = array();
 	$courseorder = array();
 	$allowlate = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$assessments[$kcnt] = $line['id'];
 		if (isset($courseitemsassoc)) {
 			$courseorder[$kcnt] = $courseitemsassoc['Assessment'.$line['id']];
@@ -334,12 +367,15 @@ function gbtable() {
 				$k++;
 			}
 		}
-		
-		$query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$line['id']}'";
-		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+
+		//DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='{$line['id']}'";
+		//DB $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$stm2 = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
+		$stm2->execute(array(':assessmentid'=>$line['id']));
 		$totalpossible = 0;
-		while ($r = mysql_fetch_row($result2)) {
-			if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts	
+		//DB while ($r = mysql_fetch_row($result2)) {
+		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
+			if (($k = array_search($r[1],$atofind))!==false) { //only use first item from grouped questions for total pts
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$line['defpoints']; //use defpoints
 				} else {
@@ -350,9 +386,16 @@ function gbtable() {
 		$possible[$kcnt] = $totalpossible;
 		$kcnt++;
 	}
-	
+
 	//Pull Offline Grade item info
-	$query = "SELECT * from imas_gbitems WHERE courseid='$cid' ";
+	//DB $query = "SELECT * from imas_gbitems WHERE courseid='$cid' ";
+	//DB if ($catfilter>-1) {
+		//DB $query .= "AND gbcategory='$catfilter' ";
+	//DB }
+	$query = "SELECT * from imas_gbitems WHERE courseid=:courseid ";
+	if ($catfilter>-1) {
+		$query .= "AND gbcategory=:gbcategory ";
+	}
 	if (!$canviewall) {
 		$query .= "AND showdate<$now ";
 	}
@@ -362,12 +405,16 @@ function gbtable() {
 	if ($istutor) {
 		$query .= "AND tutoredit<2 ";
 	}
-	if ($catfilter>-1) {
-		$query .= "AND gbcategory='$catfilter' ";
-	}
 	$query .= "ORDER BY showdate,name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	if ($catfilter>-1) {
+		$stm->execute(array(':courseid'=>$cid, ':gbcategory'=>$catfilter));
+	} else {
+		$stm->execute(array(':courseid'=>$cid));
+	}
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$grades[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Offline";
 		$category[$kcnt] = $line['gbcategory'];
@@ -387,21 +434,32 @@ function gbtable() {
 		}
 		$kcnt++;
 	}
-	
+
 	//Pull Discussion Grade info
-	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	//DB $query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	//DB if ($catfilter>-1) {
+		//DB $query .= "AND gbcategory='$catfilter' ";
+	//DB }
+	$query = "SELECT id,name,gbcategory,startdate,enddate,replyby,postby,points,cntingb,avail FROM imas_forums WHERE courseid=:courseid AND points>0 AND avail>0 ";
+	if ($catfilter>-1) {
+		$query .= "AND gbcategory=:gbcategory ";
+	}
 	if (!$canviewall) {
 		$query .= "AND startdate<$now ";
 	}
 	if ($istutor) {
 		$query .= "AND tutoredit<2 ";
 	}
-	if ($catfilter>-1) {
-		$query .= "AND gbcategory='$catfilter' ";
-	}
 	$query .= "ORDER BY enddate,postby,replyby,startdate";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$stm = $DBH->prepare($query);
+	if ($catfilter>-1) {
+		$stm->execute(array(':courseid'=>$cid, ':gbcategory'=>$catfilter));
+	} else {
+		$stm->execute(array(':courseid'=>$cid));
+	}
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$discuss[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "Discussion";
 		$category[$kcnt] = $line['gbcategory'];
@@ -444,9 +502,10 @@ function gbtable() {
 		}
 		$kcnt++;
 	}
-	
+
 	//Pull External Tools info
-	$query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	//DB $query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid='$cid' AND points>0 AND avail>0 ";
+	$query = "SELECT id,title,text,startdate,enddate,points,avail FROM imas_linkedtext WHERE courseid=:courseid AND points>0 AND avail>0 ";
 	if (!$canviewall) {
 		$query .= "AND startdate<$now ";
 	}
@@ -457,8 +516,11 @@ function gbtable() {
 		$query .= "AND gbcategory='$catfilter' ";
 	}*/
 	$query .= "ORDER BY enddate,startdate";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		if (substr($line['text'],0,8)!='exttool:') {
 			continue;
 		}
@@ -472,7 +534,7 @@ function gbtable() {
 		}
 		if ($istutor && $thistutoredit==2) { continue;}
 		if ($catfilter>-1 && $thisgbcat != $catfilter) {continue;}
-		
+
 		$exttools[$kcnt] = $line['id'];
 		$assessmenttype[$kcnt] = "External Tool";
 		$category[$kcnt] = $thisgbcat;
@@ -497,8 +559,8 @@ function gbtable() {
 		}
 		$kcnt++;
 	}
-	
-	
+
+
 	$cats = array();
 	$catcolcnt = 0;
 	//Pull Categories:  Name, scale, scaletype, chop, drop, weight, calctype
@@ -510,13 +572,18 @@ function gbtable() {
 		array_unshift($cats[0],"Default");
 		array_push($cats[0],$catcolcnt);
 		$catcolcnt++;
-		
+
 	}
-	
-	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='$cid' ";
+
+	//DB $query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid='$cid' ";
+	//DB $query .= "ORDER BY name";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$query = "SELECT id,name,scale,scaletype,chop,dropn,weight,hidden,calctype FROM imas_gbcats WHERE courseid=:courseid ";
 	$query .= "ORDER BY name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (in_array($row[0],$category)) { //define category if used
 			if ($row[1]{0}>='1' && $row[1]{0}<='9') {
 				$row[1] = substr($row[1],1);
@@ -553,7 +620,7 @@ function gbtable() {
 				return ($name[$a]>$name[$b]?1:-1);
 			} else {
 				return ($enddate[$a]>$enddate[$b]?1:-1);
-			}		
+			}
 		  });
 		$newcategory = array();
 		foreach ($enddate as $k=>$v) {
@@ -567,7 +634,7 @@ function gbtable() {
 				return ($name[$a]>$name[$b]?1:-1);
 			} else {
 				return ($enddate[$a]>$enddate[$b]?-1:1);
-			}		
+			}
 		  });
 		$newcategory = array();
 		foreach ($enddate as $k=>$v) {
@@ -609,7 +676,7 @@ function gbtable() {
 			$newcategory[$k] = $category[$k];
 		}
 		$category = $newcategory;
-	} 
+	}
 	foreach(array_keys($cats) as $cat) {//foreach category
 		$catposspast[$cat] = array();
 		$catposscur[$cat] =array();
@@ -620,7 +687,7 @@ function gbtable() {
 		}
 		foreach ($catkeys as $k) {
 			if (isset($cats[$cat][6]) && $cats[$cat][6]==1) {//hidden
-				$cntingb[$k] = 0;	
+				$cntingb[$k] = 0;
 			}
 			if ($avail[$k]<1) { //is past
 				if ($assessmenttype[$k]!="Practice" && $cntingb[$k]==1) {
@@ -642,7 +709,7 @@ function gbtable() {
 			} else if ($cntingb[$k]==2) {
 				$catpossfutureec[$cat][] = 0;
 			}
-			
+
 			if (($orderby&1)==1) {  //display item header if displaying by category
 				//$cathdr[$pos] = $cats[$cat][6];
 				$gb[0][1][$pos][0] = $name[$k]; //item name
@@ -654,7 +721,7 @@ function gbtable() {
 					$gb[0][1][$pos][5] = 1;  //0 regular, 1 practice test
 				} else {
 					$gb[0][1][$pos][5] = 0;
-				}  
+				}
 				if (isset($assessments[$k])) {
 					$gb[0][1][$pos][6] = 0; //0 online, 1 offline
 					$gb[0][1][$pos][7] = $assessments[$k];
@@ -680,7 +747,7 @@ function gbtable() {
 				if (isset($allowlate[$k])) {
 					$gb[0][1][$pos][12] = $allowlate[$k];
 				}
-				
+
 				$pos++;
 			}
 		}
@@ -692,7 +759,7 @@ function gbtable() {
 					return ($name[$a]>$name[$b]?1:-1);
 				} else {
 					return ($enddate[$a]>$enddate[$b]?1:-1);
-				}		
+				}
 			  });
 			//asort($enddate,SORT_NUMERIC);
 			$itemorder = array_keys($enddate);
@@ -706,7 +773,7 @@ function gbtable() {
 					return ($name[$a]>$name[$b]?1:-1);
 				} else {
 					return ($enddate[$a]>$enddate[$b]?-1:1);
-				}		
+				}
 			  });
 			$itemorder = array_keys($enddate);
 		} else if ($orderby==6) { //startdate
@@ -722,7 +789,7 @@ function gbtable() {
 			arsort($courseorder,SORT_NUMERIC);
 			$itemorder = array_keys($courseorder);
 		}
-		
+
 		foreach ($itemorder as $k) {
 			$gb[0][1][$pos][0] = $name[$k]; //item name
 			$gb[0][1][$pos][1] = $cats[$category[$k]][8]; //item category name
@@ -757,10 +824,10 @@ function gbtable() {
 			}
 			$pos++;
 		}
-	} 
+	}
 	$totalspos = $pos;
 	//create category headers
-	
+
 	$catorder = array_keys($cats);
 	$overallptspast = 0;
 	$overallptscur = 0;
@@ -773,14 +840,14 @@ function gbtable() {
 	$catpossattempted = array();
 	$catpossattemptedec = array();
 	foreach($catorder as $cat) {//foreach category
-		
+
 		//cats: name,scale,scaletype,chop,drop,weight
 		$catitemcntpast[$cat] = count($catposspast[$cat]);// + count($catposspastec[$cat]);
 		$catitemcntcur[$cat] = count($catposscur[$cat]);// + count($catposscurec[$cat]);
 		$catitemcntfuture[$cat] = count($catpossfuture[$cat]);// + count($catpossfutureec[$cat]);
 		$catpossattempted[$cat] = $catposscur[$cat];  //a copy of the current for later use with attempted
 		$catpossattemptedec[$cat] = $catposscurec[$cat];
-		
+
 		if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catposspast[$cat])) { //if drop is set and have enough items
 			asort($catposspast[$cat],SORT_NUMERIC);
 			$catposspast[$cat] = array_slice($catposspast[$cat],$cats[$cat][4]);
@@ -796,8 +863,8 @@ function gbtable() {
 		$catposspast[$cat] = array_sum($catposspast[$cat]);
 		$catposscur[$cat] = array_sum($catposscur[$cat]);
 		$catpossfuture[$cat] = array_sum($catpossfuture[$cat]);
-		
-		
+
+
 		$gb[0][2][$pos][0] = $cats[$cat][0];
 		$gb[0][2][$pos][1] = $cats[$cat][8];
 		$gb[0][2][$pos][10] = $cat;
@@ -809,7 +876,7 @@ function gbtable() {
 			$cattotweightcur += $cats[$cat][5];
 			$cattotweightfuture += $cats[$cat][5];
 		} else if ($catposscur[$cat]>0 || count($catposscurec[$cat])>0) {
-			$gb[0][2][$pos][2] = 1; //scores in cur 
+			$gb[0][2][$pos][2] = 1; //scores in cur
 			$cattotweightcur += $cats[$cat][5];
 			$cattotweightfuture += $cats[$cat][5];
 		} else if ($catpossfuture[$cat]>0 || count($catpossfutureec[$cat])>0) {
@@ -842,41 +909,52 @@ function gbtable() {
 		if ($useweights==1) {
 			$gb[0][2][$pos][11] = $cats[$cat][5];
 		}
-			
-		
+
+
 		$overallptspast += $gb[0][2][$pos][3];
 		$overallptscur += $gb[0][2][$pos][4];
 		$overallptsfuture += $gb[0][2][$pos][5];
 		$pos++;
 	}
-	
+
 	//find total possible points
 	if ($useweights==0) { //use points grading method
 		$gb[0][3][0] = $overallptspast;
 		$gb[0][3][1] = $overallptscur;
 		$gb[0][3][2] = $overallptsfuture;
-	} 
-	
-	
+	}
+
+
 	//Pull student data
 	$ln = 1;
+	//DB $query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
+	//DB $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
 	$query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
-	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' ";
+	$query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=:courseid ";
+	$qarr = array(':courseid'=>$cid);
 	//$query .= "FROM imas_users,imas_teachers WHERE imas_users.id=imas_teachers.userid AND imas_teachers.courseid='$cid' ";
 	//if (!$isteacher && !isset($tutorid)) {$query .= "AND imas_users.id='$userid' ";}
-	if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
+	//DB if ($limuser>0) { $query .= "AND imas_users.id='$limuser' ";}
+	if ($limuser>0) {
+		$query .= "AND imas_users.id=:userid ";
+		$qarr[':userid'] = $limuser;
+	}
 	if ($secfilter!=-1 && $limuser<=0) {
-		$query .= "AND imas_students.section='$secfilter' ";
+		//DB $query .= "AND imas_students.section='$secfilter' ";
+		$query .= "AND imas_students.section=:section ";
+		$qarr[':section'] = $secfilter;
 	}
 	if ($hidelocked && $limuser==0) {
 		$query .= "AND imas_students.locked=0 ";
 	}
 	if (isset($timefilter)) {
 		$tf = time() - 60*60*$timefilter;
-		$query .= "AND imas_users.lastaccess>$tf ";
+		$query .= "AND imas_users.lastaccess>:tf ";
+		$qarr[':tf'] = $tf;
 	}
 	if (isset($lnfilter) && $lnfilter!='') {
-		$query .= "AND imas_users.LastName LIKE '$lnfilter%' ";
+		$query .= "AND imas_users.LastName LIKE :lnfilter ";
+		$qarr['lnfilter'] = "$lnfilter%";
 	}
 	if ($isdiag) {
 		$query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
@@ -885,12 +963,14 @@ function gbtable() {
 	} else {
 		$query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
 	}
-	
-	$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute($qarr);
+	//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 	$alt = 0;
 	$sturow = array();
 	$timelimitmult = array();
-	while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) { //foreach student
+	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		unset($asid); unset($pts); unset($IP); unset($timeused);
 		$cattotpast[$ln] = array();
 		$cattotpastec[$ln] = array();
@@ -904,7 +984,7 @@ function gbtable() {
 		$gb[$ln][4][1] = $line['locked'];
 		$gb[$ln][4][2] = $line['hasuserimg'];
 		$gb[$ln][4][3] = !empty($line['gbcomment']);
-		
+
 		if ($isdiag) {
 			$selparts = explode('~',$line['SID']);
 			$gb[$ln][0][1] = $selparts[0];
@@ -924,61 +1004,86 @@ function gbtable() {
 		if ($lastlogin) {
 			$gb[$ln][0][] = date("n/j/y",$line['lastaccess']);
 		}
-		
+
 		$sturow[$line['id']] = $ln;
 		$timelimitmult[$line['id']] = $line['timelimitmult'];
 		$ln++;
 	}
-	
+
 	//pull logincnt if needed
 	if ($logincnt==1) {
-		$query = "SELECT userid,count(*) FROM imas_login_log WHERE courseid='$cid' GROUP BY userid";
-		$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($r = mysql_fetch_row($result2)) {
+		//DB $query = "SELECT userid,count(*) FROM imas_login_log WHERE courseid='$cid' GROUP BY userid";
+		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($r = mysql_fetch_row($result2)) {
+		$stm2 = $DBH->prepare("SELECT userid,count(*) FROM imas_login_log WHERE courseid=:courseid GROUP BY userid");
+		$stm2->execute(array(':courseid'=>$cid));
+		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 			$gb[$sturow[$r[0]]][0][] = $r[1];
 		}
 	}
-	
+
 	//pull exceptions
 	$exceptions = array();
 	$forumexceptions = array();
+	//DB $query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
+	//DB $query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	//DB $query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
+	//DB $query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_assessments.enddate as itemenddate FROM imas_exceptions AS ie,imas_assessments WHERE ";
-	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
+	$query .= "ie.itemtype='A' AND ie.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid ";
 	$query .= "UNION SELECT ie.assessmentid as typeid,ie.userid,ie.startdate,ie.enddate,ie.islatepass,ie.itemtype,imas_forums.enddate as itemenddate FROM imas_exceptions AS ie,imas_forums WHERE ";
-	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid='$cid'";
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($r = mysql_fetch_assoc($result2)) {
+	$query .= "(ie.itemtype='F' OR ie.itemtype='R' OR ie.itemtype='P') AND ie.assessmentid=imas_forums.id AND imas_forums.courseid=:courseid2";
+	$stm2 = $DBH->prepare($query);
+	$stm2->execute(array(':courseid'=>$cid, ':courseid2'=>$cid));
+	//DB while ($r = mysql_fetch_assoc($result2)) {
+	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($sturow[$r['userid']])) { continue;}
 		if ($r['itemtype']=='A') {
-			$exceptions[$r['typeid']][$r['userid']] = array($r['enddate'],$r['islatepass']);	
+			$exceptions[$r['typeid']][$r['userid']] = array($r['enddate'],$r['islatepass']);
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		} else if ($r['itemtype']=='F' || $r['itemtype']=='P' || $r['itemtype']=='R') {
-			$forumexceptions[$r['typeid']][$r['userid']] = array($r['startdate'],$r['enddate'],$r['islatepass']);	
+			$forumexceptions[$r['typeid']][$r['userid']] = array($r['startdate'],$r['enddate'],$r['islatepass']);
 			$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			//$gb[$sturow[$r['userid']]][1][$discusscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		}
 	}
-	
+
 	//Get assessment scores
 	$assessidx = array_flip($assessments);
+	//DB $query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
+	//DB $query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid' ";
+	//DB if ($limuser>0) {
+		//DB $query .= " AND ias.userid='$limuser' ";
+	//DB }
+	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 	$query = "SELECT ias.id,ias.assessmentid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,ias.userid FROM imas_assessment_sessions AS ias,imas_assessments AS ia ";
-	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid='$cid' ";
-	if ($limuser>0) { $query .= " AND ias.userid='$limuser' ";}
-	$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+	$query .= "WHERE ia.id=ias.assessmentid AND ia.courseid=:courseid ";
+	if ($limuser>0) {
+		$query .= " AND ias.userid=:userid ";
+	}
+	$stm2 = $DBH->prepare($query);
+	if ($limuser>0) {
+		$stm2->execute(array(':courseid'=>$cid, ':userid'=>$limuser));
+	} else {
+		$stm2->execute(array(':courseid'=>$cid));
+	}
+
+	while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($assessidx[$l['assessmentid']]) || !isset($sturow[$l['userid']]) || !isset($assesscol[$l['assessmentid']])) {
 			continue;
 		}
 		$i = $assessidx[$l['assessmentid']];
 		$row = $sturow[$l['userid']];
 		$col = $assesscol[$l['assessmentid']];
-		
+
 		//if two asids for same stu/assess, skip or overright one with higher ID. Shouldn't happen
-		if (isset($gb[$row][1][$col][4]) && $gb[$row][1][$col][4]<$l['id']) { continue;} 
-		
+		if (isset($gb[$row][1][$col][4]) && $gb[$row][1][$col][4]<$l['id']) { continue;}
+
 		$gb[$row][1][$col][4] = $l['id'];; //assessment session id
-		
+
 		$sp = explode(';',$l['bestscores']);
 		$scores = explode(',',$sp[0]);
 		$pts = 0;
@@ -992,7 +1097,7 @@ function gbtable() {
 		} else {
 			$gb[$row][1][$col][7] = round($timeused/60);
 		}
-		
+
 		$timeontask = array_sum(explode(',',str_replace('~',',',$l['timeontask'])));
 		if ($timeontask==0) {
 			$gb[$row][1][$col][8] = "N/A";
@@ -1002,8 +1107,8 @@ function gbtable() {
 		if (isset($GLOBALS['includelastchange']) && $GLOBALS['includelastchange']==true) {
 			$gb[$row][1][$col][9] =	$l['endtime'];
 		}
-		if (in_array(-1,$scores)) { 
-			$IP=1; 
+		if (in_array(-1,$scores)) {
+			$IP=1;
 		} else {
 			$IP=0;
 		}
@@ -1042,19 +1147,19 @@ function gbtable() {
 				$allowlatethis = true;
 			} else if ($allowlate[$i]>10 && ($now - $thised)<$latepasshrs*3600) {
 				$allowlatethis = true;
-			} 
+			}
 		}
 		$gb[$row][1][$col][10] = $allowlatethis;
-		
-		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice" 
+
+		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
 			$gb[$row][1][$col][2] = 1; //show link
-		} /*else if ($l['timelimit']<0 && (($now - $l['starttime'])>abs($l['timelimit'])) && $sa[$i]!='N' && ($assessmenttype[$k]=='EachAtEnd' || $assessmenttype[$k]=='EndReview' || $assessmenttype[$k]=='AsGo' || $assessmenttype[$k]=='Homework'))  ) { 
+		} /*else if ($l['timelimit']<0 && (($now - $l['starttime'])>abs($l['timelimit'])) && $sa[$i]!='N' && ($assessmenttype[$k]=='EachAtEnd' || $assessmenttype[$k]=='EndReview' || $assessmenttype[$k]=='AsGo' || $assessmenttype[$k]=='Homework'))  ) {
 			//has "kickout after time limit" set, time limit has passed, and is set for showing each score
 			$gb[$row][1][$col][2] = 1; //show link
 		} */else {
 			$gb[$row][1][$col][2] = 0; //don't show link
 		}
-		
+
 		$countthisone = false;
 		if ($assessmenttype[$i]=="NoScores" && $sa[$i]!="I" && $now<$thised && !$canviewall) {
 			$gb[$row][1][$col][0] = 'N/A'; //score is not available
@@ -1090,7 +1195,7 @@ function gbtable() {
 			if ($cntingb[$i] == 1) {
 				if ($gb[0][1][$col][3]<1) { //past
 					$cattotpast[$row][$category[$i]][$col] = $pts;
-				} 
+				}
 				if ($gb[0][1][$col][3]<2) { //past or cur
 					$cattotcur[$row][$category[$i]][$col] = $pts;
 				}
@@ -1098,7 +1203,7 @@ function gbtable() {
 			} else if ($cntingb[$i] == 2) {
 				if ($gb[0][1][$col][3]<1) { //past
 					$cattotpastec[$row][$category[$i]][$col] = $pts;
-				} 
+				}
 				if ($gb[0][1][$col][3]<2) { //past or cur
 					$cattotcurec[$row][$category[$i]][$col] = $pts;
 				}
@@ -1113,7 +1218,7 @@ function gbtable() {
 			$gb[$row][1][$col][1] = 0; //no comment
 		}
 	}
-	
+
 	//Get other grades
 	$gradeidx = array_flip($grades);
 	unset($gradeid); unset($opts);
@@ -1122,25 +1227,32 @@ function gbtable() {
 	$exttoolidx = array_flip($exttools);
 	$gradetypeselects = array();
 	if (count($grades)>0) {
-		$gradeidlist = implode(',',$grades);
+		$gradeidlist = implode(',',$grades); //values from DB
 		$gradetypeselects[] = "(gradetype='offline' AND gradetypeid IN ($gradeidlist))";
 	}
 	if (count($discuss)>0) {
-		$forumidlist = implode(',',$discuss);
+		$forumidlist = implode(',',$discuss); //values from DB
 		$gradetypeselects[] = "(gradetype='forum' AND gradetypeid IN ($forumidlist))";
 	}
 	if (count($exttools)>0) {
-		$linkedlist = implode(',',$exttools);
+		$linkedlist = implode(',',$exttools); //values from DB
 		$gradetypeselects[] = "(gradetype='exttool' AND gradetypeid IN ($linkedlist))";
 	}
 	if (count($gradetypeselects)>0) {
 		$sel = implode(' OR ',$gradetypeselects);
-		$query = "SELECT * FROM imas_grades WHERE ($sel)";
 		//$query = "SELECT imas_grades.gradetypeid,imas_grades.gradetype,imas_grades.refid,imas_grades.id,imas_grades.score,imas_grades.feedback,imas_grades.userid FROM imas_grades,imas_gbitems WHERE ";
 		//$query .= "imas_grades.gradetypeid=imas_gbitems.id AND imas_gbitems.courseid='$cid'";
-		if ($limuser>0) { $query .= " AND userid='$limuser' ";}
-		$result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+		if ($limuser>0) {
+			//DB $query = "SELECT * FROM imas_grades WHERE ($sel) AND userid='$limuser' ";
+			$stm2 = $DBH->prepare("SELECT * FROM imas_grades WHERE ($sel) AND userid=:userid ");
+			$stm2->execute(array(':userid'=>$limuser));
+		} else {
+			//DB $query = "SELECT * FROM imas_grades WHERE ($sel)";
+			$stm2 = $DBH->query("SELECT * FROM imas_grades WHERE ($sel)");
+		}
+		//DB $result2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB while ($l = mysql_fetch_array($result2, MYSQL_ASSOC)) {
+		while ($l = $stm2->fetch(PDO::FETCH_ASSOC)) {
 			if ($l['gradetype']=='offline') {
 				if (!isset($gradeidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($gradecol[$l['gradetypeid']])) {
 					continue;
@@ -1148,7 +1260,7 @@ function gbtable() {
 				$i = $gradeidx[$l['gradetypeid']];
 				$row = $sturow[$l['userid']];
 				$col = $gradecol[$l['gradetypeid']];
-				
+
 				$gb[$row][1][$col][2] = $l['id'];
 				if ($l['score']!=null) {
 					$gb[$row][1][$col][0] = 1*$l['score'];
@@ -1160,23 +1272,23 @@ function gbtable() {
 				} else {
 					$gb[$row][1][$col][1] = 0; //no feedback
 				}
-				
+
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$row][$category[$i]][$col] = 1*$l['score'];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$row][$category[$i]][$col] = 1*$l['score'];
 					}
-					$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];		
+					$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];
 				} else if ($cntingb[$i]==2) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$row][$category[$i]][$col] = 1*$l['score'];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$row][$category[$i]][$col] = 1*$l['score'];
 					}
-					$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];	
+					$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];
 				}
 			} else if ($l['gradetype']=='forum') {
 				if (!isset($discussidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($discusscol[$l['gradetypeid']])) {
@@ -1185,7 +1297,7 @@ function gbtable() {
 				$i = $discussidx[$l['gradetypeid']];
 				$row = $sturow[$l['userid']];
 				$col = $discusscol[$l['gradetypeid']];
-				
+
 				if (isset($forumexceptions[$l['gradetypeid']][$l['userid']])) {
 					$thised = max($forumexceptions[$l['gradetypeid']][$l['userid']][0], $forumexceptions[$l['gradetypeid']][$l['userid']][1]);
 					if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
@@ -1197,7 +1309,7 @@ function gbtable() {
 					}
 					//TODO:  show latepass link in gradebook?
 				}
-				
+
 				if ($l['score']!=null) {
 					if (isset($gb[$row][1][$col][0])) {
 						$gb[$row][1][$col][0] += 1*$l['score']; //adding up all forum scores
@@ -1218,29 +1330,29 @@ function gbtable() {
 						//the feedback (for students)
 					} else if ($limuser==0) { //feedback
 						$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
-					} 
+					}
 				}
 				$gb[$row][1][$col][2] = 1; //show link
 				$gb[$row][1][$col][3] = 0; //is counted
-								
+
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 					}
-					$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];		
+					$cattotfuture[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 				} else if ($cntingb[$i]==2) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 					}
-					$cattotfutureec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];	
+					$cattotfutureec[$row][$category[$i]][$col] = $gb[$row][1][$col][0];
 				}
-				
+
 			} else if ($l['gradetype']=='exttool') {
 				if (!isset($exttoolidx[$l['gradetypeid']]) || !isset($sturow[$l['userid']]) || !isset($exttoolcol[$l['gradetypeid']])) {
 					continue;
@@ -1248,7 +1360,7 @@ function gbtable() {
 				$i = $exttoolidx[$l['gradetypeid']];
 				$row = $sturow[$l['userid']];
 				$col = $exttoolcol[$l['gradetypeid']];
-				
+
 				$gb[$row][1][$col][2] = $l['id'];
 				if ($l['score']!=null) {
 					$gb[$row][1][$col][0] = 1*$l['score'];
@@ -1260,23 +1372,23 @@ function gbtable() {
 				} else {
 					$gb[$row][1][$col][1] = 0; //no feedback
 				}
-				
+
 				if ($cntingb[$i] == 1) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$row][$category[$i]][$col] = 1*$l['score'];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$row][$category[$i]][$col] = 1*$l['score'];
 					}
-					$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];		
+					$cattotfuture[$row][$category[$i]][$col] = 1*$l['score'];
 				} else if ($cntingb[$i]==2) {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$row][$category[$i]][$col] = 1*$l['score'];
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$row][$category[$i]][$col] = 1*$l['score'];
 					}
-					$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];	
+					$cattotfutureec[$row][$category[$i]][$col] = 1*$l['score'];
 				}
 			}
 		}
@@ -1284,7 +1396,7 @@ function gbtable() {
 
 	//fill out cattot's with zeros
 	for ($ln=1; $ln<count($sturow)+1; $ln++) {
-		
+
 		$cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
 		$cattotattemptedec[$ln] = $cattotcurec[$ln];
 		foreach($assessidx as $aid=>$i) {
@@ -1294,7 +1406,7 @@ function gbtable() {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
 						$cattotattempted[$ln][$category[$i]][$col] = 0;
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
 					}
@@ -1303,13 +1415,13 @@ function gbtable() {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
 						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
 					}
 					$cattotfutureec[$ln][$category[$i]][$col] = 0;
 				}
-			} 
+			}
 		}
 		foreach($gradeidx as $aid=>$i) {
 			$col = $gradecol[$aid];
@@ -1318,7 +1430,7 @@ function gbtable() {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
 						$cattotattempted[$ln][$category[$i]][$col] = 0;
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
 					}
@@ -1327,7 +1439,7 @@ function gbtable() {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
 						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
 					}
@@ -1342,7 +1454,7 @@ function gbtable() {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpast[$ln][$category[$i]][$col] = 0;
 						$cattotattempted[$ln][$category[$i]][$col] = 0;
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcur[$ln][$category[$i]][$col] = 0;
 					}
@@ -1351,7 +1463,7 @@ function gbtable() {
 					if ($gb[0][1][$col][3]<1) { //past
 						$cattotpastec[$ln][$category[$i]][$col] = 0;
 						$cattotattemptedec[$ln][$category[$i]][$col] = 0;
-					} 
+					}
 					if ($gb[0][1][$col][3]<2) { //past or cur
 						$cattotcurec[$ln][$category[$i]][$col] = 0;
 					}
@@ -1360,17 +1472,17 @@ function gbtable() {
 			}
 		}
 	}
-	
+
 	//create category totals
 	for ($ln = 1; $ln<count($sturow)+1;$ln++) { //foreach student calculate category totals and total totals
-						
+
 		$totpast = 0;
 		$totcur = 0;
 		$totfuture = 0;
 		$totattempted = 0;
 		$cattotweightattempted = 0;
 		$pos = 0; //reset position for category totals
-		
+
 		//update attempted for this student
 		unset($catpossattemptedstu);
 		unset($catpossattemptedecstu);
@@ -1394,7 +1506,7 @@ function gbtable() {
 				}
 			}
 		}
-		
+
 		foreach($catorder as $cat) {//foreach category
 			if (isset($cattotpast[$ln][$cat])) {  //past items
 				//cats: name,scale,scaletype,chop,drop,weight,hidden,calctype
@@ -1414,7 +1526,7 @@ function gbtable() {
 						} else {  //doing drop n
 							$ntodrop = $cats[$cat][4] - ($catitemcntpast[$cat]-count($cattotpast[$ln][$cat]));
 						}
-						
+
 						if ($ntodrop>0) {
 							$ndropcnt = 0;
 							foreach ($cattotpast[$ln][$cat] as $col=>$v) {
@@ -1423,7 +1535,7 @@ function gbtable() {
 								if ($ndropcnt==$ntodrop) { break;}
 							}
 						}
-						
+
 						while (count($cattotpast[$ln][$cat])<$catitemcntpast[$cat]) {
 							array_unshift($cattotpast[$ln][$cat],0);
 						}
@@ -1436,7 +1548,7 @@ function gbtable() {
 				} else {
 					$cattotpast[$ln][$cat] = array_sum($cattotpast[$ln][$cat]);
 				}
-				
+
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotpast[$ln][$cat] = round($catposspast[$cat]*($cattotpast[$ln][$cat]/$cats[$cat][1]),1);
@@ -1450,7 +1562,7 @@ function gbtable() {
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catposspast[$cat]>0) {//use fixed pt value for cat
 					$cattotpast[$ln][$cat] = ($catposspast[$cat]==0)?0:round($cats[$cat][5]*($cattotpast[$ln][$cat]/$catposspast[$cat]),1);
 				}
-				
+
 				if ($cats[$cat][3]>0) { //chop score - no over 100%
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotpast[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotpast[$ln][$cat]);
@@ -1458,9 +1570,9 @@ function gbtable() {
 						$cattotpast[$ln][$cat] = min($catposspast[$cat]*$cats[$cat][3],$cattotpast[$ln][$cat]);
 					}
 				}
-				
+
 				$gb[$ln][2][$pos][0] = $cattotpast[$ln][$cat];
-				
+
 				if ($useweights==1) {
 					if ($cattotpast[$ln][$cat]>0 && $catposspast[$cat]>0) {
 						$totpast += ($cattotpast[$ln][$cat]*$cats[$cat][5])/(100*$catposspast[$cat]); //weight total
@@ -1469,12 +1581,12 @@ function gbtable() {
 			} else if (isset($cattotpastec[$ln][$cat])) {
 				$cattotpast[$ln][$cat] = array_sum($cattotpastec[$ln][$cat]);
 				$gb[$ln][2][$pos][0] = $cattotpast[$ln][$cat];
-				
+
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][0] = 0;
 			}
 			if (isset($cattotcur[$ln][$cat])) {  //cur items
-				
+
 				//cats: name,scale,scaletype,chop,drop,weight,calctype
 				//if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) { //if drop is set and have enough items
 				if ($cats[$cat][7]==1) {
@@ -1487,13 +1599,13 @@ function gbtable() {
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotcur[$ln][$cat])) {
 						asort($cattotcur[$ln][$cat],SORT_NUMERIC);
-						
+
 						if ($cats[$cat][4]<0) {  //doing keep n
 							$ntodrop = count($cattotcur[$ln][$cat])+$cats[$cat][4];
 						} else {  //doing drop n
 							$ntodrop = $cats[$cat][4] - ($catitemcntcur[$cat]-count($cattotcur[$ln][$cat]));
 						}
-						
+
 						if ($ntodrop>0) {
 							$ndropcnt = 0;
 							foreach ($cattotcur[$ln][$cat] as $col=>$v) {
@@ -1502,11 +1614,11 @@ function gbtable() {
 								if ($ndropcnt==$ntodrop) { break;}
 							}
 						}
-						
+
 						while (count($cattotcur[$ln][$cat])<$catitemcntcur[$cat]) {
 							array_unshift($cattotcur[$ln][$cat],0);
 						}
-						
+
 						$cattotcur[$ln][$cat] = array_slice($cattotcur[$ln][$cat],$cats[$cat][4]);
 						$tokeep = ($cats[$cat][4]<0)? abs($cats[$cat][4]) : ($catitemcntcur[$cat] - $cats[$cat][4]);
 						$cattotcur[$ln][$cat] = round($catposscur[$cat]*array_sum($cattotcur[$ln][$cat])/($tokeep),1);
@@ -1516,7 +1628,7 @@ function gbtable() {
 				} else {
 					$cattotcur[$ln][$cat] = array_sum($cattotcur[$ln][$cat]);
 				}
-				
+
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotcur[$ln][$cat] = round($catposscur[$cat]*($cattotcur[$ln][$cat]/$cats[$cat][1]),1);
@@ -1530,7 +1642,7 @@ function gbtable() {
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catposscur[$cat]>0) {//use fixed pt value for cat
 					$cattotcur[$ln][$cat] = ($catposscur[$cat]==0)?0:round($cats[$cat][5]*($cattotcur[$ln][$cat]/$catposscur[$cat]),1);
 				}
-				
+
 				if ($cats[$cat][3]>0) {
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotcur[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotcur[$ln][$cat]);
@@ -1538,9 +1650,9 @@ function gbtable() {
 						$cattotcur[$ln][$cat] = min($catposscur[$cat]*$cats[$cat][3],$cattotcur[$ln][$cat]);
 					}
 				}
-				
+
 				$gb[$ln][2][$pos][1] = $cattotcur[$ln][$cat];
-				
+
 				if ($useweights==1) {
 					if ($cattotcur[$ln][$cat]>0 && $catposscur[$cat]>0) {
 						$totcur += ($cattotcur[$ln][$cat]*$cats[$cat][5])/(100*$catposscur[$cat]); //weight total
@@ -1549,12 +1661,12 @@ function gbtable() {
 			} else if (isset($cattotcurec[$ln][$cat])) {
 				$cattotcur[$ln][$cat] = array_sum($cattotcurec[$ln][$cat]);
 				$gb[$ln][2][$pos][1] = $cattotcur[$ln][$cat];
-				
+
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][1] = 0;
 			}
-			
-			
+
+
 			if (isset($cattotfuture[$ln][$cat])) {  //future items
 				//cats: name,scale,scaletype,chop,drop,weight,calctype
 				//if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) { //if drop is set and have enough items
@@ -1568,13 +1680,13 @@ function gbtable() {
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotfuture[$ln][$cat])) {
 						asort($cattotfuture[$ln][$cat],SORT_NUMERIC);
-						
+
 						if ($cats[$cat][4]<0) {  //doing keep n
 							$ntodrop = count($cattotfuture[$ln][$cat])+$cats[$cat][4];
 						} else {  //doing drop n
 							$ntodrop = $cats[$cat][4] - ($catitemcntfuture[$cat]-count($cattotfuture[$ln][$cat]));
 						}
-						
+
 						if ($ntodrop>0) {
 							$ndropcnt = 0;
 							foreach ($cattotfuture[$ln][$cat] as $col=>$v) {
@@ -1583,7 +1695,7 @@ function gbtable() {
 								if ($ndropcnt==$ntodrop) { break;}
 							}
 						}
-						
+
 						while (count($cattotfuture[$ln][$cat])<$catitemcntfuture[$cat]) {
 							array_unshift($cattotfuture[$ln][$cat],0);
 						}
@@ -1596,7 +1708,7 @@ function gbtable() {
 				} else {
 					$cattotfuture[$ln][$cat] = array_sum($cattotfuture[$ln][$cat]);
 				}
-				
+
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotfuture[$ln][$cat] = round($catpossfuture[$cat]*($cattotfuture[$ln][$cat]/$cats[$cat][1]),1);
@@ -1610,7 +1722,7 @@ function gbtable() {
 				if ($useweights==0 && $cats[$cat][5]>-1 && $catpossfuture[$cat]>0) {//use fixed pt value for cat
 					$cattotfuture[$ln][$cat] = round($cats[$cat][5]*($cattotfuture[$ln][$cat]/$catpossfuture[$cat]),1);
 				}
-				
+
 				if ($cats[$cat][3]>0) {
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotfuture[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotfuture[$ln][$cat]);
@@ -1618,9 +1730,9 @@ function gbtable() {
 						$cattotfuture[$ln][$cat] = min($catpossfuture[$cat]*$cats[$cat][3],$cattotfuture[$ln][$cat]);
 					}
 				}
-				
+
 				$gb[$ln][2][$pos][2] = $cattotfuture[$ln][$cat];
-				
+
 				if ($useweights==1) {
 					if ($cattotfuture[$ln][$cat]>0 && $catpossfuture[$cat]>0) {
 						$totfuture += ($cattotfuture[$ln][$cat]*$cats[$cat][5])/(100*$catpossfuture[$cat]); //weight total
@@ -1629,18 +1741,18 @@ function gbtable() {
 			} else if (isset($cattotfutureec[$ln][$cat])) {
 				$cattotfuture[$ln][$cat] = array_sum($cattotfutureec[$ln][$cat]);
 				$gb[$ln][2][$pos][2] = $cattotfuture[$ln][$cat];
-				
+
 			} else { //no items in category yet?
 				$gb[$ln][2][$pos][2] = 0;
 			}
-			
-			
+
+
 			//update attempted for this student; adjust for drops
 			if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($catpossattemptedstu[$cat])) { //same for past&current
 				asort($catpossattemptedstu[$cat],SORT_NUMERIC);
-				$catpossattemptedstu[$cat] = array_slice($catpossattemptedstu[$cat],$cats[$cat][4]);	
+				$catpossattemptedstu[$cat] = array_slice($catpossattemptedstu[$cat],$cats[$cat][4]);
 			}
-			
+
 			if (isset($cattotattempted[$ln][$cat])) {  //past and attempted items
 				$catitemcntattempted[$cat] = count($catpossattemptedstu[$cat]);
 				$catpossattemptedstu[$cat] = array_sum($catpossattemptedstu[$cat]);
@@ -1656,13 +1768,13 @@ function gbtable() {
 					}
 					if ($cats[$cat][4]!=0 && abs($cats[$cat][4])<count($cattotattempted[$ln][$cat])) { //if drop is set and have enough items
 						asort($cattotattempted[$ln][$cat],SORT_NUMERIC);
-					
+
 						if ($cats[$cat][4]<0) {  //doing keep n
 							$ntodrop = count($cattotattempted[$ln][$cat])+$cats[$cat][4];
 						} else {  //doing drop n
 							$ntodrop = $cats[$cat][4];// - ($catitemcntattempted[$cat]-count($cattotattempted[$ln][$cat]));
 						}
-						
+
 						if ($ntodrop>0) {
 							$ndropcnt = 0;
 							foreach ($cattotattempted[$ln][$cat] as $col=>$v) {
@@ -1671,7 +1783,7 @@ function gbtable() {
 								if ($ndropcnt==$ntodrop) { break;}
 							}
 						}
-						
+
 						while (count($cattotattempted[$ln][$cat])<$catitemcntattempted[$cat]) {
 							array_unshift($cattotattempted[$ln][$cat],0);
 						}
@@ -1685,7 +1797,7 @@ function gbtable() {
 				} else {
 					$cattotattempted[$ln][$cat] = array_sum($cattotattempted[$ln][$cat]);
 				}
-				
+
 				if ($cats[$cat][1]!=0) { //scale is set
 					if ($cats[$cat][2]==0) { //pts scale
 						$cattotattempted[$ln][$cat] = round($catpossattemptedstu[$cat]*($cattotattempted[$ln][$cat]/$cats[$cat][1]),1);
@@ -1700,7 +1812,7 @@ function gbtable() {
 					$cattotattempted[$ln][$cat] = ($catpossattemptedstu[$cat]==0)?0:round($cats[$cat][5]*($cattotattempted[$ln][$cat]/$catpossattemptedstu[$cat]),1);
 					$catpossattemptedstu[$cat] = ($catpossattemptedstu[$cat]==0)?0:$cats[$cat][5];
 				}
-				
+
 				if ($cats[$cat][3]>0) { //chop score - no over 100%
 					if ($useweights==0  && $cats[$cat][5]>-1) { //set cat pts
 						$cattotattempted[$ln][$cat] = min($cats[$cat][5]*$cats[$cat][3],$cattotattempted[$ln][$cat]);
@@ -1708,9 +1820,9 @@ function gbtable() {
 						$cattotattempted[$ln][$cat] = min($catpossattemptedstu[$cat]*$cats[$cat][3],$cattotattempted[$ln][$cat]);
 					}
 				}
-				
+
 				$gb[$ln][2][$pos][3] = $cattotattempted[$ln][$cat];
-				
+
 				if ($useweights==1) {
 					if ($cattotattempted[$ln][$cat]>0 && $catpossattemptedstu[$cat]>0) {
 						$totattempted += ($cattotattempted[$ln][$cat]*$cats[$cat][5])/(100*$catpossattemptedstu[$cat]); //weight total
@@ -1730,12 +1842,12 @@ function gbtable() {
 			if ($catpossattemptedstu[$cat]>0 || count($catpossattemptedecstu[$cat])>0) {
 				$cattotweightattempted += $cats[$cat][5];
 			}
-			
+
 			$pos++;
-			
+
 		}
 		$overallptsattempted = array_sum($catpossattemptedstu);
-		
+
 		if ($useweights==0) { //use points grading method
 			if (!isset($cattotpast)) {
 				$totpast = 0;
@@ -1795,7 +1907,7 @@ function gbtable() {
 				$gb[$ln][3][0] = sprintf("%01.1f", 10000*$totpast/$cattotweightpast);
 			}
 			$gb[$ln][3][3] = null;
-			
+
 			//if ($overallptscur>0) {
 			//	$totcur = 100*($totcur/$overallptscur);
 			//} else {
@@ -1807,7 +1919,7 @@ function gbtable() {
 				$gb[$ln][3][1] = sprintf("%01.1f", 10000*$totcur/$cattotweightcur);
 			}
 			$gb[$ln][3][4] = null;
-			
+
 			//if ($overallptsfuture>0) {
 			//	$totfuture = 100*($totfuture/$overallptsfuture);
 			//} else {
@@ -1819,7 +1931,7 @@ function gbtable() {
 				$gb[$ln][3][2] = sprintf("%01.1f", 10000*$totfuture/$cattotweightfuture);
 			}
 			$gb[$ln][3][5] = null;
-			
+
 			if ($cattotweightattempted==0) {
 				$gb[$ln][3][6] = '0.0';
 			} else {
@@ -1828,11 +1940,11 @@ function gbtable() {
 			}
 			$gb[$ln][3][7] = null;
 			$gb[$ln][3][8] = null;
-			
-			
-			
+
+
+
 		}
-		
+
 	}
 	if ($limuser<1) {
 		//create averages
@@ -1842,7 +1954,7 @@ function gbtable() {
 			$avgs = array();
 			$avgtime = array();
 			$avgtimedisp = array();
-			
+
 			for ($i=1;$i<$ln;$i++) { //foreach student
 				if (isset($gb[$i][1][$j][0]) && $gb[$i][4][1]==0) { //score exists and student is not locked
 					if ($gb[$i][1][$j][3]%10==0 && is_numeric($gb[$i][1][$j][0])) {
@@ -1854,7 +1966,7 @@ function gbtable() {
 					}
 				}
 			}
-			
+
 			if (count($avgs)>0) {
 				sort($avgs, SORT_NUMERIC);
 				$fivenum = array();
@@ -1878,11 +1990,11 @@ function gbtable() {
 			} else {
 				$fivenumsum = '';
 			}
-			$gb[0][1][$j][9] = $fivenumsum;	
+			$gb[0][1][$j][9] = $fivenumsum;
 			//$gb[0][1][$j][9] = gbpercentile($avgs[$j],0).',&nbsp;'.gbpercentile($avgs[$j],25).',&nbsp;'.gbpercentile($avgs[$j],50).',&nbsp;'.gbpercentile($avgs[$j],75).',&nbsp;'.gbpercentile($avgs[$j],100);
-			
+
 		}
-	
+
 		//cat avgs
 		$catavgs = array();
 		for ($j=0;$j<count($gb[0][2]);$j++) { //category headers
@@ -1923,7 +2035,7 @@ function gbtable() {
 				} else {
 					$fivenumsum = '';
 				}
-				$gb[0][2][$j][6+$i] = $fivenumsum;	
+				$gb[0][2][$j][6+$i] = $fivenumsum;
 			}
 		}
 		//tot avgs
@@ -1937,7 +2049,7 @@ function gbtable() {
 				}
 			}
 		}
-		
+
 		foreach ($catavgs as $j=>$avg) {
 			for ($m=0;$m<4;$m++) {
 				if (count($avg[$m])>0) {
