@@ -375,7 +375,7 @@ function printscore($sc,$qn) {
 			$hasmanual = true;
 			$sc = '*';
 		}
-		$out =  "$sc out of $poss";
+		$out =  "$sc " . _("out of") . " $poss";
 		$pts = $sc;
 		if (!is_numeric($pts)) { $pts = 0;}
 	} else {
@@ -439,7 +439,7 @@ function printscore($sc,$qn) {
 		}
 		$sc = implode(', ',$scarr);
 		//$ptposs = implode(', ',$ptposs);
-		$out =  "$pts out of $poss (parts: $sc)";
+		$out =  "$pts " . _("out of") . " $poss (parts: $sc)";
 	}
 	if ($hasmanual) {
 		$out .= _(' (* not auto-graded)');
@@ -812,7 +812,7 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 		}
 		if ($attempts[$qn]>0 && $showeachscore) {
 			if (strpos($scores[$qn],'~')===false) {
-				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0?'N/A':$scores[$qn]).". ". _('Score in gradebook:'), " ".($bestscores[$qn]<0?'N/A':$bestscores[$qn]);
+				echo "<br/>", _('Score on last attempt:'). " ".($scores[$qn]<0? 'N/A':$scores[$qn]).". ". _('Score in gradebook:'), " ".($bestscores[$qn]<0? 'N/A':$bestscores[$qn]);
 			} else {
 				echo "<br/>", _('Score on last attempt:'), " (" . str_replace('~', ', ',$scores[$qn]) . '), ';
 				echo _('Score in gradebook:'), " (" . str_replace('~', ', ',$bestscores[$qn]) . '), ';

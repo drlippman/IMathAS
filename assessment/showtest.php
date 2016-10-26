@@ -3124,9 +3124,9 @@ if (!isset($_REQUEST['embedpostback'])) {
 				//}
 				echo '<span style="margin-left:8px">';
 				if ($showeachscore) {
-					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." point".(($pgpts==1) ? "":"s")."</span> out of $pgposs";
+					echo " <span id=\"embednavscore$i\">".round($pgpts,1)." " .(($pgpts==1) ? _("point") : _("points"))."</span> " . _("out of") . " $pgposs";
 				} else {
-					echo " <span id=\"embednavunans$i\">$cntunans</span> unattempted";
+					echo " <span id=\"embednavunans$i\">$cntunans</span> " . _("unattempted");
 				}
 				echo '</span>';
 				$totposs += $pgposs;
@@ -3437,7 +3437,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			if (($testsettings['minscore']<10000 && $total<$testsettings['minscore']) || ($testsettings['minscore']>10000 && $total<($testsettings['minscore']-10000)/100*$totpossible)) {
 				echo "<p><b>", sprintf(_('Total Points Earned:  %d out of %d possible: '), $total, $totpossible);
 			} else {
-				echo "<p><b>", sprintf(_('Total Points in Gradebook: %d out of %d possible: '), $total, $totpossible);
+				echo "<p><b>", sprintf(_('Total Points in Gradebook: %d out of~ %d possible: '), $total, $totpossible);
 			}
 
 			echo "$average % </b></p>\n";
