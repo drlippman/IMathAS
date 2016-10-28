@@ -2844,7 +2844,7 @@ function getfeedbacktxt($stu,$fbtxt,$ans) {
 	if ($stu===null) {
 		return " ";
 	} else if ($stu==='NA') {
-		return '<div class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/> No answer selected. Try again.</div>';
+		return '<div class="feedbackwrap"><img src="'.$imasroot.'/img/redx.gif"/> ' . _("No answer selected. Try again.") . '</div>';
 	} else if (isset($fbtxt[$stu])) {
 		if ($stu==$ans) {
 			return '<div class="feedbackwrap correct"><img src="'.$imasroot.'/img/gchk.gif"/> '.$fbtxt[$stu].'</div>';
@@ -2873,7 +2873,7 @@ function getfeedbacktxtnumber($stu, $partial, $fbtxt, $deffb='Incorrect', $tol=.
 	if ($stu===null) {
 		return " ";
 	} else if (!is_numeric($stu)) {
-		return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> This answer does not appear to be a valid number.</div>';
+		return '<div class="feedbackwrap incorrect"><img src="'.$imasroot.'/img/redx.gif"/> ' . _("This answer does not appear to be a valid number.") . '</div>';
 	} else {
 		if ($tol{0}=='|') {
 			$abstol = true;
