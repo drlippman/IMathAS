@@ -766,10 +766,11 @@ span.inlinebtn:hover {
 	cursor: pointer;
 }
 
-.clearfix:before,
 .clearfix:after {
     content: " ";
-    display: table;
+    display: block;
+		font-size: 0;
+		height: 0;
 }
 .clearfix:after {
     clear: both;
