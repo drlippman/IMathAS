@@ -1478,7 +1478,7 @@ for ($n=0;$n<10;$n++) {
 		echo '<tr id="qc'.$n.'-'.$i.'" ';
 		if ($i>=$qparts[$n]) {echo ' style="display:none;"';};
 		echo '><td><input type="radio" name="ans'.$n.'" value="'.$i.'" ';
-		if ($i==$answer[$n]) {echo 'checked="checked"';}
+		if (($qtype[$n]=='choices' && $i==$answer[$n]) || ($qtype[$n]!='choices' && isset($partial[$n][$i]) && $partial[$n][$i]==1)) {echo 'checked="checked"';}
 		echo '/></td>';
 		echo '<td><input autocomplete="off" id="txt'.$n.'-'.$i.'" name="txt'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($questions[$n][$i])?prepd($questions[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'txt'.$n.'-'.$i.'\')"/></td>';
 		echo '<td><input autocomplete="off" id="fb'.$n.'-'.$i.'" name="fb'.$n.'-'.$i.'" type="text" size="60" value="'.(isset($feedbacktxt[$n][$i])?prepd($feedbacktxt[$n][$i]):"").'"/><input type="button" class="txted" value="E" onclick="popupeditor(\'fb'.$n.'-'.$i.'\')"/></td>';
