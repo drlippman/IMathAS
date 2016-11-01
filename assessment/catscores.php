@@ -121,7 +121,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 			$assess_name_stm->execute(array(':id'=>$categoryaid, ':courseid'=>$cid));
 			$assessmentname = $assess_name_stm->fetchColumn(0);
 			//link to the other assessment
-			$catname="<a href='../assessment/showtest.php?cid=$cid&aid=$categoryaid' >$assessmentname</a>";
+			$catname="<a href='../assessment/showtest.php?cid=$cid&id=$categoryaid' >$assessmentname</a>";
 		} else {
 			$catname = $category;
 		}
