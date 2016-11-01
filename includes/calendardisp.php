@@ -661,6 +661,9 @@ function flattenitems($items,&$addto,&$folderholder,&$hiddenholder,$folder,$avai
 	$now = time();
 	foreach ($items as $k=>$item) {
 		if (is_array($item)) {
+			if (!isset($item['avail'])) { //backwards compat
+				$item['avail'] = 1;
+			}
 			$thisavail = ($avail && ($item['avail']==2 || ($item['avail']==1 && ($item['SH'][0]=='S' || ($item['startdate']<$now && $item['enddate']>$now)))));
 			//set as hidden if explicitly hidden or opens in future.  We won't count past folders that aren't showing as hidden
 			//  to allow students with latepasses to access old assignments even if the folder is gone.

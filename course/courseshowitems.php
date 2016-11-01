@@ -122,7 +122,7 @@ function enditem($canedit) {
 					if ($canedit) {
 						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 					}
-					echo "<div class=block ";
+					echo '<div class="block folder" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
@@ -177,7 +177,7 @@ function enditem($canedit) {
 					if ($canedit) {
 						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 					}
-					echo "<div class=block ";
+					echo '<div class="block folder treereader" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
@@ -329,7 +329,7 @@ function enditem($canedit) {
 					if ($canedit) {
 						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 					}
-					echo "<div class=block ";
+					echo '<div class="block folder" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
@@ -376,7 +376,7 @@ function enditem($canedit) {
 					if ($canedit) {
 						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 					}
-					echo "<div class=block ";
+					echo '<div class="block folder treereader" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
 						$astyle = "style=\"color:$titletxt;\"";
