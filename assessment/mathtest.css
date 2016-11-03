@@ -185,6 +185,15 @@ ol.lalpha li { margin-top: .7em;}
 ul.nomark {
 	padding-left: 40px;
 }
+ul.likelines {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+ul.likelines li {
+	margin-bottom: .4em;
+}
+
 input.unind {
 	margin-left: -15px;
 }
