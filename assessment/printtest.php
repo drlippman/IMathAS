@@ -26,7 +26,7 @@
 	}
 	$sessiondata['coursetheme'] = $coursetheme;
 	require("header.php");
-	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;} .question, .review {background-color:#fff;}</style>\n";
+	echo "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn, button.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;} .question, .review {background-color:#fff;}</style>\n";
 	echo "<style type=\"text/css\">p.tips {	display: none;}\n </style>\n";
 	echo '<script type="text/javascript">function rendersa() { ';
 	echo '  el = document.getElementsByTagName("span"); ';
@@ -36,7 +36,20 @@
 	//echo '		 AMprocessNode(el)';
 	echo '     }';
 	echo '    }';
-	echo '} </script>';
+	echo '}';
+	echo '
+			var introshowing = true;
+			function toggleintros() {
+				if (introshowing) {
+					$(".intro").slideUp();
+					$("#introtoggle").text("'._('Show Intro and Between-Question Text').'");
+				} else {
+					$(".intro").slideDown();
+					$("#introtoggle").text("'._('Hide Intro and Between-Question Text').'");
+				}
+				introshowing = !introshowing;
+			}
+			</script>';
 
 	if ($isteacher && isset($_GET['asid'])) {
 		$testid = $_GET['asid'];
@@ -150,7 +163,10 @@
 	$showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
 	$showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
 	$GLOBALS['useeditor']='reviewifneeded';
-	echo "<div class=breadcrumb>Print Ready Version</div>";
+	echo "<div class=breadcrumb>"._('Print Ready Version').' ';
+	echo '<button type="button" onclick="window.print()">'._('Print').'</button>';
+	echo '</div>';
+	echo '<p><button id="introtoggle" type="button" class="btn" onclick="toggleintros()">'._('Hide Intro and Between-Question Text').'</button></p>';
 
 	if (($introjson=json_decode($testsettings['intro'],true))!==null) { //is json intro
 		$testsettings['intro'] = $introjson[0];
@@ -211,12 +227,12 @@
 
 	echo '<div class=intro>'.$testsettings['intro'].'</div>';
 	if ($isteacher && !$scoredview) {
-		echo '<p>'._('Showing Current Versions').'<br/><button type="button" class="btn" onclick="rendersa()">'._("Show Answers").'</button> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+		echo '<p class="hideonprint">'._('Showing Current Versions').'<br/><button type="button" class="btn" onclick="rendersa()">'._("Show Answers").'</button> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a> <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
 	} else if ($isteacher) {
 		if ($scoredtype=='last') {
-			echo '<p>'._('Showing Last Attempts').' <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a></p>';
+			echo '<p class="hideonprint">'._('Showing Last Attempts').' <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a></p>';
 		} else {
-			echo '<p>'._('Showing Scored View').' <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+			echo '<p class="hideonprint">'._('Showing Scored View').' <a href="printtest.php?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
 		}
 
 	}
