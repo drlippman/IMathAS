@@ -675,9 +675,9 @@
 			if (isset($exped) && $exped!=$line['enddate']) {
 				echo "<p>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
 				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
-				echo "<br/>Original Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
+				echo "<br/>Original Due Date: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
 			} else {
-				echo "<p>Due Date: ". tzdate("F j, Y, g:i a",$line['enddate']);
+				echo "<p>Due Date: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
 				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Make Exception</button>";
 			}
 			echo "</p>";
