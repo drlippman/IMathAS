@@ -375,7 +375,7 @@
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		$query .= ',listperpage,hasuserimg,theme,specialrights';
+		$query .= ',listperpage,hasuserimg,theme,specialrights,FCMtoken';
 	}
 	//DB $query .= " FROM imas_users WHERE id='$userid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -392,6 +392,7 @@
 	$listperpage = $line['listperpage'];
 	$selfhasuserimg = $line['hasuserimg'];
 	$usertheme = $line['theme'];
+	$FCMtoken = $line['FCMtoken'];
 	if (isset($usertheme) && $usertheme!='') {
 		$coursetheme = $usertheme;
 	}

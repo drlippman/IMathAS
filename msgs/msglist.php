@@ -193,31 +193,36 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 
 			//DB $query = "SELECT msgnotify,email FROM imas_users WHERE id='{$_POST['to']}'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$stm = $DBH->prepare("SELECT msgnotify,email FROM imas_users WHERE id=:id");
+			$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$_POST['to']));
-      list($msgnotify, $email) = $stm->fetch(PDO::FETCH_NUM);
+      list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
 			//DB if (mysql_result($result,0,0)==1) {
       if ($msgnotify==1) {
 				//DB $email = mysql_result($result,0,1);
 				//DB $query = "SELECT FirstName,LastName FROM imas_users WHERE id='$userid'";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $from = mysql_result($result,0,0).' '.mysql_result($result,0,1);
-				$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
+				/*$stm = $DBH->prepare("SELECT FirstName,LastName FROM imas_users WHERE id=:id");
 				$stm->execute(array(':id'=>$userid));
-				$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));
+				$from = implode(' ', $stm->fetch(PDO::FETCH_NUM));*/
 				$headers  = 'MIME-Version: 1.0' . "\r\n";
 				$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 				$headers .= "From: $sendfrom\r\n";
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
-				$message .= "<p>You've received a new message</p><p>From: $from<br />Course: $cname.</p>\r\n";
+				$message .= "<p>You've received a new message</p><p>From: $userfullname<br />Course: $cname.</p>\r\n";
 				//DB $message .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
         $message .= "<p>Subject: ".$_POST['subject']."</p>";
-				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid=$cid&msgid=$msgid\">";
+				$message .= "<a href=\"$urlmode" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid={$_POST['courseid']}&msgid=$msgid\">";
 				$message .= "View Message</a></p>\r\n";
 				$message .= "<p>If you do not wish to receive email notification of new messages, please ";
-				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
+				$message .= "<a href=\"$urlmode" . $_SERVER['HTTP_HOST'] . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
 				$message .= "user preferences</a></p>\r\n";
 				mail($email,'New message notification',$message,$headers);
+			}
+			if ($FCMtokenTo != '') {
+				require_once("../includes/FCM.php");
+				$url = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid={$_POST['courseid']}&msgid=$msgid";
+				sendFCM($FCMtokenTo,"Msg from: $userfullname",$_POST['subject'],$url);
 			}
 			if ($type=='new') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/newmsglist.php?cid=$cid");

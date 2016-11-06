@@ -1,7 +1,7 @@
 <?php
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 114;
+$latest = 115;
 
 
 @set_time_limit(0);
@@ -1884,6 +1884,14 @@ unset($dbpassword);
 			if ($res===false) {
 				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			}
+		}
+		if ($last<115) {
+			$query = "ALTER TABLE  `imas_users` ADD `FCMtoken` VARCHAR(512) NOT NULL DEFAULT '';";
+			$res = $DBH->query($query);
+			if ($res===false) {
+				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
+			}
+			echo '<p>Added FCMtoken column</p>';
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
