@@ -20,9 +20,6 @@ $placeinhead = '<script src="https://www.gstatic.com/firebasejs/3.5.3/firebase-a
   // Initialize Firebase
   var FCMconfig = {
     apiKey: "'.$CFG['FCM']['webApiKey'].'",
-    authDomain: "myopenmathnotifications.firebaseapp.com",
-    databaseURL: "https://myopenmathnotifications.firebaseio.com",
-    storageBucket: "myopenmathnotifications.appspot.com",
     messagingSenderId: "'.$CFG['FCM']['SenderId'].'"
   };
   firebase.initializeApp(FCMconfig);
