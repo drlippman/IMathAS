@@ -29,9 +29,7 @@ function sendFCM($token,$title,$body,$url='') {
 				'icon'=>$CFG['FCM']['icon']
 			)
 		);
-		if (isset($CFG['FCM']['badge'])) {
-			$fields['notification']['badge'] = $CFG['FCM']['badge'];
-		}
+		
 		$headers = array(
     	'Authorization:key=' . $apiKey,
     	'Content-Type:application/json'
