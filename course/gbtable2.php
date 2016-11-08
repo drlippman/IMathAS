@@ -103,6 +103,7 @@ row[1][1][0][7] = time spent (minutes)
 row[1][1][0][8] = time on task (time displayed)
 row[1][1][0][9] = last change time (if $includelastchange is set)
 row[1][1][0][10] = allow latepass use on this item
+row[1][1][0][11] = endmsg if requested through $includeendmsg
 
 row[1][1][1] = offline
 row[1][1][1][0] = score
@@ -141,7 +142,7 @@ cats[i]:  0: name, 1: scale, 2: scaletype, 3: chop, 4: dropn, 5: weight, 6: hidd
 
 function gbtable() {
 	global $DBH,$cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag;
-	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs;
+	global $sel1name,$sel2name,$canviewall,$lastlogin,$logincnt,$hidelocked,$latepasshrs,$includeendmsg;
 	if ($canviewall && func_num_args()>0) {
 		$limuser = func_get_arg(0);
 	} else if (!$canviewall) {
@@ -256,7 +257,11 @@ function gbtable() {
 	//Pull Assessment Info
 	$now = time();
 	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
+	if (isset($includeendmsg) && $includeendmsg) {
+		$query .= ',endmsg';
+	}
+	$query .= " FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 
 	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
@@ -303,6 +308,7 @@ function gbtable() {
 	$possible = array();
 	$courseorder = array();
 	$allowlate = array();
+	$endmsgs = array();
 	//DB while ($line=mysql_fetch_array($result, MYSQL_ASSOC)) {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$assessments[$kcnt] = $line['id'];
@@ -337,6 +343,9 @@ function gbtable() {
 		$aitems = explode(',',$line['itemorder']);
 		if ($line['allowlate']>0) {
 			$allowlate[$kcnt] = $line['allowlate'];
+		}
+		if (isset($line['endmsg']) && $line['endmsg']!='') {
+			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
 		$k = 0;
 		$atofind = array();
@@ -947,7 +956,7 @@ function gbtable() {
 	if ($hidelocked && $limuser==0) {
 		$query .= "AND imas_students.locked=0 ";
 	}
-	if (isset($timefilter)) {
+	if (isset($timefilter) && $timefilter>0) {
 		$tf = time() - 60*60*$timefilter;
 		$query .= "AND imas_users.lastaccess>:tf ";
 		$qarr[':tf'] = $tf;
@@ -1172,6 +1181,7 @@ function gbtable() {
 			} else {
 				$gb[$row][1][$col][0] = 'NC'; //score is No credit
 				$gb[$row][1][$col][3] = 1;  //no credit
+				$pts = 0;
 			}
 		} else 	if ($IP==1 && $thised>$now && (($timelimits[$i]==0) || ($timeused < $timelimits[$i]*$timelimitmult[$l['userid']]))) {
 			$gb[$row][1][$col][0] = $pts; //the score
@@ -1187,6 +1197,23 @@ function gbtable() {
 			$gb[$row][1][$col][0] = $pts; //the score
 			$gb[$row][1][$col][3] = 0;  //no other info
 			$countthisone =true;
+		}
+		//do endmsg if appropriate
+		if (isset($endmsgs[$i])) {
+			$outmsg = '';
+			foreach ($endmsgs[$i]['msgs'] as $sc=>$msg) { //array must be reverse sorted
+				if (($endmsgs[$i]['type']==0 && $pts>=$sc) || ($endmsgs[$i]['type']==1 && 100*$gb[$row][1][$col][0]/$pts>=$sc)) {
+					$outmsg = $msg;
+					break;
+				}
+			}
+			if ($outmsg=='') {
+				$outmsg = $endmsgs[$i]['def'];
+			}
+			if (strpos($outmsg,'redirectto:')!==false) {
+				$outmsg = '';
+			}
+			$gb[$row][1][$col][11] = $outmsg;
 		}
 		if ($now < $thised) { //still active
 			$gb[$row][1][$col][3] += 10;

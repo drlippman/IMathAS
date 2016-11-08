@@ -91,6 +91,14 @@ $address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']
 $placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
 $placeinhead .= "  	window.location = toopen; \n";
 $placeinhead .= "}\n";
+$placeinhead .= 'function showendmsgs() {
+	$(".endmsg").each(function() {
+		var short = $(this).find(".short").text();
+		if (short!="") {
+			$(this).html("<br/>"+short);
+		}
+	});
+	$(".endmsg").show();}';
 $placeinhead .= "</script>";
 
 
@@ -108,7 +116,7 @@ $placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; docum
 $placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
 $placeinhead .= "} ";
 $placeinhead .= "</script>\n";
-$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
+$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } .endmsg {display:none;}</style>";
 
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -127,11 +135,12 @@ echo "<option value=24 "; writeHtmlSelected($timefilter,24); echo ">last day</op
 echo "<option value=168 "; writeHtmlSelected($timefilter,168); echo ">last week</option>";
 echo "<option value=720 "; writeHtmlSelected($timefilter,720); echo ">last month</option>";
 echo "<option value=8760 "; writeHtmlSelected($timefilter,8760); echo ">last year</option>";
+echo "<option value=0 "; writeHtmlSelected($timefilter,0); echo ">all time</option>";
 echo "</select>";
 
 echo " Last name: <input type=text id=\"lnfilter\" value=\"$lnfilter\" />";
 echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
-
+echo ' <button type="button" id="endmsgbtn" onclick="showendmsgs()" style="display:none;">Show End Messages</button>';
 echo "</div>";
 
 $gbt = gbinstrdisp();
@@ -153,8 +162,10 @@ echo "Meanings:   NC-no credit";
 
 
 function gbinstrdisp() {
-	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
+	global $DBH,$isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection,$includeendmsg;
 	$hidenc = 1;
+	$includeendmsg = true;
+	$hasendmsg = false;
 	$gbt = gbtable();
 	//print_r($gbt);
 	echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
@@ -292,6 +303,10 @@ function gbinstrdisp() {
 					if ($gbt[$i][1][$j][1]==1) {
 						echo '<sup>*</sup>';
 					}
+					if (isset($gbt[$i][1][$j][11])) {
+						echo '<span class="endmsg"><br/>'.$gbt[$i][1][$j][11].'</span>';
+						$hasendmsg = true;
+					}
 				} else { //no score
 					if ($gbt[$i][0][0]=='Averages') {
 						echo '-';
@@ -346,6 +361,9 @@ function gbinstrdisp() {
 	$sarr = implode(",",$sarr);
 	if (count($gbt)<500) {
 		echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+	}
+	if ($hasendmsg) {
+		echo '<script type="text/javascript">$(function(){ $("#endmsgbtn").show(); });</script>';
 	}
 
 
