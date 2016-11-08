@@ -9,7 +9,7 @@ array_push($allowedmacros, "normalcurve", "normalcurve2", "normalcurve3");
 //This function is good for a basic normal curve, vertically scaled to fit
 //with axis labels at multiples of sigma
 //
-//draws on bounds a<x<b, with axis markings at mu+k*sigma
+//draws on bounds a&lt;x&lt;b, with axis markings at mu+k*sigma
 //axis label gives an axis label
 //optionally can shade a region based on one or two values x and y
 //indiciate shade direction using dirx and diry, which can be "left" or "right"
@@ -104,7 +104,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
 //This function allows for axis spacing other than multiples of sigma, and does
 //not scale the graph vertically to fit.
 //
-//draws on bounds a<x<b
+//draws on bounds a&lt;x&lt;b
 //specify axisspacing, or defaults to sigma
 //set ymax to set max of vertical axis; graph is NOT scaled vertically to fit
 //axis label gives an axis label
@@ -212,7 +212,7 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
 //with axis labels at multiples of sigma.  This versions allows for the shading
 //of TWO regions with different colors
 //
-//draws on bounds a<x<b, with axis markings at mu+k*sigma
+//draws on bounds a&lt;x&lt;b, with axis markings at mu+k*sigma
 //axis label gives an axis label
 //optionally can shade a region based on one or two values x and y
 //indiciate shade direction using dirx and diry, which can be "left" or "right"
