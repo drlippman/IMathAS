@@ -1202,7 +1202,7 @@ function gbtable() {
 		if (isset($endmsgs[$i])) {
 			$outmsg = '';
 			foreach ($endmsgs[$i]['msgs'] as $sc=>$msg) { //array must be reverse sorted
-				if (($endmsgs[$i]['type']==0 && $pts>=$sc) || ($endmsgs[$i]['type']==1 && 100*$gb[$row][1][$col][0]/$pts>=$sc)) {
+				if (($endmsgs[$i]['type']==0 && $pts>=$sc) || ($endmsgs[$i]['type']==1 && 100*$pts/$possible[$i]>=$sc)) {
 					$outmsg = $msg;
 					break;
 				}
