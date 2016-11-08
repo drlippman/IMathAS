@@ -155,6 +155,8 @@
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
+			} else if ($from=='gbtesting') {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
 			} else {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
 			}
@@ -472,6 +474,8 @@
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
 			} else if ($from=='stugrp') {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
+			} else if ($from=='gbtesting') {
+				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
 			} else {
 				header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
 			}
@@ -560,6 +564,9 @@
 			} else if ($_GET['from']=='stugrp') {
 				echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
 				$backurl = "managestugrps.php?cid=$cid&aid={$line['assessmentid']}";
+			} else if ($_GET['from']=='gbtesting') {
+				echo "<a href=\"gb-testing.php?stu=0&cid=$cid\">Diagnostic Gradebook</a> &gt; ";
+				$backurl = "gb-testing.php?stu=0&cid=$cid";
 			} else {
 				echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
 				$backurl = "gradebook.php?stu=0&cid=$cid";

@@ -286,7 +286,7 @@ function gbinstrdisp() {
 					if ($gbt[$i][1][$j][4]=='average') {
 						echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
 					} else {
-						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
+						echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}&from=gbtesting\">";
 					}
 					echo $gbt[$i][1][$j][0];
 					if ($gbt[$i][1][$j][3]==1) {
