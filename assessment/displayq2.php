@@ -945,19 +945,21 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$rightb = '';
 		}
 		if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) ||  in_array('orderedlist',$ansformats)) {
-			$tip = _('Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5') . "<br/>";
+			$tip = _('Enter your answer as a list of whole or decimal numbers separated with commas: Examples: -4, 3, 2.5234') . "<br/>";
 			$shorttip = _('Enter a list of whole or decimal numbers');
 		} else if (in_array('set',$ansformats) || in_array('exactset',$ansformats)) {
-			$tip = _('Enter your answer as a set of whole or decimal numbers separated with commas: Example: {-4, 3, 2.5}') . "<br/>";
+			$tip = _('Enter your answer as a set of whole or decimal numbers separated with commas: Example: {-4, 3, 2.5234}') . "<br/>";
 			$shorttip = _('Enter a set of whole or decimal numbers');
 		} else {
-			$tip = _('Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5') . "<br/>";
+			$tip = _('Enter your answer as a whole or decimal number.  Examples: 3, -4, 5.5432') . "<br/>";
 			$shorttip = _('Enter a whole or decimal number');
 		}
 		$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
 			$shorttip .= sprintf(_(", accurate to %d decimal places"), $reqdecimals);
+		} else {
+			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to at least 4 decimal places.'), $reqdecimals);
 		}
 		if (isset($reqsigfigs)) {
 			if ($reqsigfigs{0}=='=') {
@@ -1563,7 +1565,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .= "</table>\n";
 			$out .= getcolormark($colorbox);
 			$out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
+			$tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2543)');
 		} else {
 			if (!isset($sz)) { $sz = 20;}
 			$out .= "<input class=\"text $colorbox\" type=\"text\" size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
@@ -6533,7 +6535,7 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= sprintf(_('Enter %s as in scientific notation.  Example: 3*10^2 = 3 &middot; 10<sup>2</sup>'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of numbers using scientific notation'), $listtype):_('Enter a number using scientific notation');
 	} else {
-		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)'), $eword);
+		$tip .= sprintf(_('Enter %s as a number (like 5, -3, 2.2543) or as a calculation (like 5/3, 2^3, 5+4).  For decimal numbers, include at least 4 significant digits.'), $eword);
 		$shorttip = $islist?sprintf(_('Enter a %s of mathematical expressions'), $listtype):_('Enter a mathematical expression');
 	}
 	if ($calledfrom != 'calcmatrix') {
