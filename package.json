@@ -1,0 +1,30 @@
+{
+  "name": "imathas",
+  "version": "1.0.0",
+  "description": "Internet Math Assessment System",
+  "main": "Gruntfile.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drlippman/IMathAS.git"
+  },
+  "keywords": [
+    "math",
+    "homework"
+  ],
+  "author": "David Lippman",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/drlippman/IMathAS/issues"
+  },
+  "homepage": "https://github.com/drlippman/IMathAS#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-less": "^1.4.0"
+  }
+}
