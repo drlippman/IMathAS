@@ -885,7 +885,7 @@ function generateTable() {
 			if (beentaken) {
 				if (curisgroup) {
 					if (j==0) {
-						html += "<td>"+(i+1)+"</td><td><b>Group</b>, choosing "+itemarray[i][0];
+						html += "<td>Q"+(i-text_segment_count+1)+"</td><td><b>Group</b>, choosing "+itemarray[i][0];
 						if (itemarray[i][1]==0) {
 							html += " without";
 						} else if (itemarray[i][1]==1) {
@@ -893,9 +893,12 @@ function generateTable() {
 						}
 						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
 					}
-					html += "<td>&nbsp;"+(i+1)+'-'+(j+1);
+					html += "<td>&nbsp;Q"+(i-text_segment_count+1)+'-'+(j+1);
+				} else if (curistext) {
+					//html += "<td>Text"+(text_segment_count+1);
+					html += "<td>"+ms;
 				} else {
-					html += "<td>"+(i+1);
+					html += "<td>Q"+(i-text_segment_count+1);
 				}
 				html += "<input type=hidden id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/>";
 				html += "</td>";
@@ -970,11 +973,11 @@ function generateTable() {
 					html += "<div class=\"text-segment-icon\"><button id=\"edit-button"+i+"\" type=\"button\" title=\"Expand and Edit\" class=\"text-segment-button\"><span id=\"edit-button-span"+i+"\" class=\"icon-pencil text-segment-icon\"></span></button></div></div></div></td>";
 					html += "<td>"+generateShowforSelect(i)+"</td>";
 				}
-				if (beentaken) {
-					html += "<td></td>";
-				} else {
+				//if (beentaken) {
+				//	html += "<td></td>";
+				//} else {
 					html += "<td class=c><a href=\"#\" onclick=\"return removeitem('"+i+"');\">Remove</a></td>";
-				}
+				//}
 			} else {
 				html += "<td><input type=hidden name=\"curq[]\" id=\"oqc"+ln+"\" value=\""+curitems[j][1]+"\"/>"+curitems[j][2]+"</td>"; //description
 				html += "<td class=\"nowrap\"><div";
@@ -1037,15 +1040,19 @@ function generateTable() {
 		}
 		alt = 1-alt;
 	}
-	if (!beentaken) {
-		html += '<tr><td></td><td></td><td colspan=8><button type=\"button\" onclick="addtextsegment()" title="Insert Instructions or Video for Question" id="add-text-button"><span class="icon-plus" style="font-size:0.8em"></span> Text</button>';
-		if (text_segment_count > 1) {
-			html += " <div class=\"text-segment-icon text-segment-iconglobal\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button text-segment-button-global\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2\"></span></button></div>";
-			html += " <div class=\"text-segment-icon text-segment-iconglobal\"><button id=\"collapse-buttonglobal\" type=\"button\" title=\"Collapse All\" class=\"text-segment-button text-segment-button-global\"><span id=\"collapse-button-spanglobal\" class=\"icon-shrink2\"></span></button></div>";
-		}
-		html += '<div class="text-segment-iconglobal"><img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/></div>';
-		html += '</td><td></td><td></td></tr>';
+	if (beentaken) {
+		html += '<tr><td></td>';
+	} else {
+		html += '<tr><td></td><td></td>';
 	}
+	html += '<td colspan=8><button type=\"button\" onclick="addtextsegment()" title="Insert Instructions or Video for Question" id="add-text-button"><span class="icon-plus" style="font-size:0.8em"></span> Text</button>';
+	if (text_segment_count > 1) {
+		html += " <div class=\"text-segment-icon text-segment-iconglobal\"><button id=\"edit-buttonglobal\" type=\"button\" title=\"Expand All\" class=\"text-segment-button text-segment-button-global\"><span id=\"edit-button-spanglobal\" class=\"icon-enlarge2\"></span></button></div>";
+		html += " <div class=\"text-segment-icon text-segment-iconglobal\"><button id=\"collapse-buttonglobal\" type=\"button\" title=\"Collapse All\" class=\"text-segment-button text-segment-button-global\"><span id=\"collapse-button-spanglobal\" class=\"icon-shrink2\"></span></button></div>";
+	}
+	html += '<div class="text-segment-iconglobal"><img src="'+imasroot+'/img/help.gif" alt="Help" onClick="window.open(\''+imasroot+'/help.php?section=questionintrotext\',\'help\',\'top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420)+'\')"/></div>';
+	html += '</td><td></td><td></td></tr>';
+
 	html += "</tbody></table>";
 	document.getElementById("pttotal").innerHTML = pttotal;
 	return html;
