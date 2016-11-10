@@ -6268,7 +6268,6 @@ function checkreqtimes($tocheck,$rtimes) {
 				$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
 			} else if (strlen($list[$i])>6 && substr($list[$i],0,6)=='regex:') {
 				$regex = str_replace('/','\\/',substr($list[$i],6));
-				echo '/'.$regex.'/'.($ignore_case?'i':'');
 				$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
 			} else {
 				if ($ignore_case || in_array($list[$i], $mathfuncs)) {
