@@ -21,7 +21,7 @@
 		require("../header.php");
 		$pagetitle = "Diagnostics";
 		require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
-		echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\"/>
+		echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\" alt=\"Picture of a ruler\"/>
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h2>", _('Available Diagnostics'), "</h2></div>
 		<ul class=\"nomark\">";

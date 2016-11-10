@@ -509,7 +509,7 @@ function hideall() {
 function savelike(el) {
 	var like = (el.src.match(/gray/))?1:0;
 	var postid = el.id.substring(8);
-	$(el).parent().append('<img style="vertical-align: middle" src="../img/updating.gif" id="updating"/>');
+	$(el).parent().append('<img style="vertical-align: middle" src="../img/updating.gif" id="updating" alt="Updating"/>');
 	$.ajax({
 		url: "recordlikes.php",
 		data: {cid:<?php echo $cid;?>, postid: postid, like: like},
@@ -562,13 +562,13 @@ function printchildren($base,$restricttoowner=false) {
 				$lbl = '-';
 				$img = "collapse";
 			}
-			echo "<img class=\"pointer expcol\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow(this)\"/> ";
+			echo "<img class=\"pointer expcol\" src=\"$imasroot/img/$img.gif\" onClick=\"toggleshow(this)\" alt=\"Expand/Collapse\"/> ";
 		}
 		if ($hasuserimg[$child]==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
 			} else {
-				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" />";
+				echo "<img src=\"$imasroot/course/files/userimg_sm{$ownerid[$child]}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/>";
 			}
 		}
 		echo '</span>';
@@ -677,7 +677,7 @@ function printchildren($base,$restricttoowner=false) {
 			}
 
 			echo '<div class="likewrap">';
-			echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\">";
+			echo "<img id=\"likeicon$child\" class=\"likeicon$likeclass\" src=\"$imasroot/img/$icon.png\" title=\"$likemsg\" onclick=\"savelike(this)\" alt=\"Like\">";
 			echo " <span class=\"pointer\" id=\"likecnt$child\" onclick=\"GB_show('"._('Post Likes')."','listlikes.php?cid=$cid&amp;post=$child',500,500);\">".($likecnt>0?$likecnt:'').' </span> ';
 			echo '</div>';
 		}
@@ -764,8 +764,8 @@ if ($caneditscore && $haspoints) {
 	}
 	echo "</form>";
 }
-echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" />";
-echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" />";
+echo "<img src=\"$imasroot/img/expand.gif\" style=\"visibility:hidden\" alt=\"Expand\" />";
+echo "<img src=\"$imasroot/img/collapse.gif\" style=\"visibility:hidden\" alt=\"Collapse\" />";
 
 }
 echo "<div class=right><a href=\"thread.php?cid=$cid&forum=$forumid&page=$page\">Back to Forum Topics</a></div>\n";

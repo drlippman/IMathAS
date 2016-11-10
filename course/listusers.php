@@ -652,11 +652,11 @@ if ($overwriteBody==1) {
 			<?php
 		if ($lineStudent['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_{$_GET['uid']}.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
-				echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"$imasroot/course/files/userimg_{$_GET['uid']}.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
 			}
 		} else {
 			echo "No Pic ";
@@ -808,9 +808,9 @@ if ($overwriteBody==1) {
 
 	if ($line['hasuserimg']==1) {
 		if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-			echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+			echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		} else {
-			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\"  />";
+			echo "<img src=\"$imasroot/course/files/userimg_sm{$line['userid']}.jpg\" style=\"display:none;\" alt=\"User picture\" />";
 		}
 	}
 ?>
@@ -838,7 +838,7 @@ if ($overwriteBody==1) {
 				</td>
 				<?php
 				if ($line['locked']>0) {
-					echo '<td><img src="../img/lock.png"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
+					echo '<td><img src="../img/lock.png" alt="Locked"/> <a href="listusers.php?cid='.$cid.'&action=unlockone&uid='.$line['userid'].'" class="ull">Unlock</a></td>';
 				} else {
 					echo '<td><a href="listusers.php?cid='.$cid.'&action=lockone&uid='.$line['userid'].'" onclick="return confirm(\'Are you SURE you want to lock this student ('.str_replace("'","\\'",$line['LastName'].', '.$line['FirstName']).') out of the course?\');" class="ll">Lock</a></td>';
 				}

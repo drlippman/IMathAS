@@ -2160,11 +2160,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
 				}
 				$out .= '<span style="float:right;">';
-				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" ';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" alt="Set score full credit" ';
 				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
-				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" ';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" alt="Set score half credit" ';
 				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
-				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" ';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 
 				$la = preg_replace_callback('/<a[^>]*href="(.*)?"[^>]*>(.*?)<\/a>/', function ($m) {
@@ -2182,7 +2182,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$extension = substr($url,strrpos($url,'.')+1,3);
 					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
 						$ret .= " <span class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayimg$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
-						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" src=\"$url\" />";
+						$ret .= " <br/><img id=\"essayimg$gradededessayexpandocnt\" style=\"display:none;max-width:80%;\" src=\"$url\" alt=\"Student uploaded image\" />";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$ret .= " <span class=\"clickable\" id=\"essaytog$gradededessayexpandocnt\" onclick=\"toggleinlinebtn('essayfileprev$gradededessayexpandocnt','essaytog$gradededessayexpandocnt');\">[+]</span>";
 						$ret .= " <br/><iframe id=\"essayfileprev$gradededessayexpandocnt\" style=\"display:none;\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
@@ -2261,9 +2261,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			//}
 			$out .=  '<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f;" id="normleft'.$qn.'">&nbsp;</div>';
 			$out .=  '<div style="position: absolute; right:0; top:0; height:200px; width:0px; background:#00f;" id="normright'.$qn.'">&nbsp;</div>';
-			$out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif"/>';
-			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
-			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
+			$out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif" alt="Normal curve" />';
+			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
+			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif" alt="Interval pointer"/>';
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid1txt'.$qn.'"></div>';
 			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid2txt'.$qn.'"></div>';
 			$out .=  '</div></div>';
@@ -2316,7 +2316,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				} else if (preg_match('/\(([\-\d\.]+),([\-\d\.]+)\)/',$answer,$matches)) {
 					$sa .=  '<div style="position: absolute; left:'.(250+60*$matches[1]).'px; top:0; height:200px; width:'.(60*($matches[2]-$matches[1])+1).'px; background:#00f;">&nbsp;</div>';
 				}
-				$sa .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif"/>';
+				$sa .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif" alt="Normal Curve"/>';
 				$sa .=  '</div>';
 			} else {
 				$sa = $answer;
@@ -2605,92 +2605,92 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$out .= "<span onclick=\"imathasDraw.clearcanvas($qn)\">" . _('Clear All') . "</span> " . _('Draw:') . " ";
 				if ($answerformat[0]=='inequality') {
 					if (in_array('both',$answerformat)) {
-						$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"imathasDraw.settool(this,$qn,10)\" class=\"sel\"/>";
-						$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.2)\"/>";
-						$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"imathasDraw.settool(this,$qn,10.3)\"/>";
-						$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.4)\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"imathasDraw.settool(this,$qn,10)\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.2)\" alt=\"Linear inequality, dashed line\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"imathasDraw.settool(this,$qn,10.3)\" alt=\"Quadratic inequality, solid line\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.4)\" alt=\"Quadratic inequality, dashed line\"/>";
 						$def = 10;
 					}
 					else if (in_array('parab',$answerformat)) {
-						$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"imathasDraw.settool(this,$qn,10.3)\" class=\"sel\"/>";
-						$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.4)\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineqparab.gif\" onclick=\"imathasDraw.settool(this,$qn,10.3)\" class=\"sel\" alt=\"Quadratic inequality, solid line\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineqparabdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.4)\" alt=\"Quadratic inequality, dashed line\"/>";
 						$def = 10.3;
 					}
 					else {
-						$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"imathasDraw.settool(this,$qn,10)\" class=\"sel\"/>";
-						$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.2)\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineq.gif\" onclick=\"imathasDraw.settool(this,$qn,10)\" class=\"sel\" alt=\"Linear inequality, solid line\"/>";
+						$out .= "<img src=\"$imasroot/img/tpineqdash.gif\" onclick=\"imathasDraw.settool(this,$qn,10.2)\" alt=\"Linear inequality, dashed line\"/>";
 						$def = 10;
 					}
 				} else if ($answerformat[0]=='twopoint') {
 					if (count($answerformat)==1 || in_array('line',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpline.gif\" onclick=\"imathasDraw.settool(this,$qn,5)\" ";
 						if (count($answerformat)==1 || $answerformat[1]=='line') { $out .= 'class="sel" '; $def = 5;}
-						$out .= '/>';
+						$out .= ' alt="Line"/>';
 					}
 					//$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"settool(this,$qn,5.2)\"/>";
 					if (in_array('lineseg',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpline3.gif\" onclick=\"imathasDraw.settool(this,$qn,5.3)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='lineseg') { $out .= 'class="sel" '; $def = 5.3;}
-						$out .= "/>";
+						$out .= ' alt="Line segment"/>';
 					}
 					if (in_array('ray',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpline2.gif\" onclick=\"imathasDraw.settool(this,$qn,5.2)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='ray') { $out .= 'class="sel" '; $def = 5.2;}
-						$out .= "/>";
+						$out .= ' alt="Ray"/>';
 					}
 					if (count($answerformat)==1 || in_array('parab',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpparab.png\" onclick=\"imathasDraw.settool(this,$qn,6)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
-						$out .= '/>';
+						$out .= ' alt="Parabola"/>';
 					}
 					if (in_array('sqrt',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpsqrt.png\" onclick=\"imathasDraw.settool(this,$qn,6.5)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='sqrt') { $out .= 'class="sel" '; $def = 6.5;}
-						$out .= '/>';
+						$out .= ' alt="Square root"/>';
 					}
 					if (count($answerformat)==1 || in_array('abs',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpabs.gif\" onclick=\"imathasDraw.settool(this,$qn,8)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='abs') { $out .= 'class="sel" '; $def = 8;}
-						$out .= '/>';
+						$out .= ' alt="Absolute value"/>';
 					}
 					if (in_array('rational',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tprat.png\" onclick=\"imathasDraw.settool(this,$qn,8.2)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='rational') { $out .= 'class="sel" '; $def = 8.2;}
-						$out .= '/>';
+						$out .= ' alt="Rational"/>';
 					}
 					if (in_array('exp',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpexp.png\" onclick=\"imathasDraw.settool(this,$qn,8.3)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='exp') { $out .= 'class="sel" '; $def = 8.3;}
-						$out .= '/>';
+						$out .= ' alt="Exponential"/>';
 					}
 					if ($settings[6]*($settings[3]-$settings[2]) == $settings[7]*($settings[1]-$settings[0])) {
 						//only circles if equal spacing in x and y
 						if (count($answerformat)==1 || in_array('circle',$answerformat)) {
 							$out .= "<img src=\"$imasroot/img/tpcirc.png\" onclick=\"imathasDraw.settool(this,$qn,7)\" ";
 							if (count($answerformat)>1 && $answerformat[1]=='circle') { $out .= 'class="sel" '; $def = 7;}
-							$out .= '/>';
+							$out .= ' alt="Circle"/>';
 						}
 					}
 					if (count($answerformat)==1 || in_array('dot',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"imathasDraw.settool(this,$qn,1)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
-						$out .= '/>';
+						$out .= ' alt="Dot"/>';
 					}
 					if (in_array('opendot',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpodot.gif\" onclick=\"imathasDraw.settool(this,$qn,2)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
-						$out .= '/>';
+						$out .= ' alt="Open dot"/>';
 					}
 					if (in_array('trig',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpcos.png\" onclick=\"imathasDraw.settool(this,$qn,9)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='trig') { $out .= 'class="sel" '; $def = 9;}
-						$out .= '/>';
-						$out .= "<img src=\"$imasroot/img/tpsin.png\" onclick=\"imathasDraw.settool(this,$qn,9.1)\"/>";
+						$out .= ' alt="Cosine"/>';
+						$out .= "<img src=\"$imasroot/img/tpsin.png\" onclick=\"imathasDraw.settool(this,$qn,9.1)\" alt=\"Sine\"/>";
 					}
 					if (in_array('vector',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpvec.gif\" onclick=\"imathasDraw.settool(this,$qn,5.4)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='vector') { $out .= 'class="sel" '; $def = 5.4;}
-						$out .= '/>';
+						$out .= ' alt="Vector"/>';
 					}
 				} else {
 					if ($answerformat[0]=='numberline') {
@@ -2921,11 +2921,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$sc = $GLOBALS['questionscoreref'][1][$qn%1000];
 				}
 				$out .= '<span style="float:right;">';
-				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" ';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_fullbox.gif" alt="Set score full credit" ';
 				$out .= "onclick=\"quicksetscore('$el',$sc)\" />";
-				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" ';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_halfbox.gif" alt="Set score half credit" ';
 				$out .= "onclick=\"quicksetscore('$el',.5*$sc)\" />";
-				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" ';
+				$out .= '<img class="scoreicon" src="'.$imasroot.'/img/q_emptybox.gif" alt="Set score no credit" ';
 				$out .= "onclick=\"quicksetscore('$el',0)\" /></span>";
 			}
 			if (!empty($s3asid)) {
@@ -2942,7 +2942,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 					$out .= "<input type=\"hidden\" name=\"lf$qn\" value=\"$file\"/>";
 					if (in_array(strtolower($extension),array('jpg','gif','png','bmp','jpe'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('img$qn','filetog$qn');\">[+]</span>";
-						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" onclick=\"rotateimg(this)\" src=\"$url\" /></div>";
+						$out .= " <br/><div><img id=\"img$qn\" style=\"display:none;max-width:80%;\" onclick=\"rotateimg(this)\" src=\"$url\" alt=\"Student uploaded image\"/></div>";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
 						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
@@ -6563,13 +6563,13 @@ function getcolormark($c,$wrongformat=false) {
 	if (isset($GLOBALS['nocolormark'])) { return '';}
 
 	if ($c=='ansred') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/redx.gif" width="6" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/redx.gif" width="6" height="6" alt="'._('Incorrect').'"/>';
 	} else if ($c=='ansgrn') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/gchk.gif" width="8" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/gchk.gif" width="8" height="6" alt="'._('Correct').'"/>';
 	} else if ($c=='ansorg') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/orgx.gif" width="6" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/orgx.gif" width="6" height="6" alt="'._('Correct answer, but wrong format').'"/>';
 	} else if ($c=='ansyel') {
-		return '<img class="scoreboxicon" src="'.$imasroot.'/img/ychk.gif" width="8" height="6"/>';
+		return '<img class="scoreboxicon" src="'.$imasroot.'/img/ychk.gif" width="8" height="6" alt="'._('Partially correct').'"/>';
 	} else {
 		return '';
 	}

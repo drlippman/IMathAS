@@ -642,7 +642,7 @@ jQuery(document).ready(function($) {
 	$('body').fitVids();
 	$('a[target="_blank"]').each(function() {
 		if (!this.href.match(/youtu/) && !this.href.match(/vimeo/)) {
-		   $(this).append(' <img src="'+imasroot+'/img/extlink.png"/>')
+		   $(this).append(' <img src="'+imasroot+'/img/extlink.png" alt="External link"/>')
 		}
 	});
 });

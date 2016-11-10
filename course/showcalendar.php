@@ -91,7 +91,7 @@
 					var droppedOn = $(this);
 					$(dropped).detach().css({top: 0,left: 0}).appendTo(droppedOn.find("div.center"));
 					if (droppedOn.attr("id") != $(dropped).data("originalParent")) {
-						$(".calupdatenotice").html('<img src="../img/updating.gif"/> '+_("Saving..."));
+						$(".calupdatenotice").html('<img src="../img/updating.gif" alt="Saving"/> '+_("Saving..."));
 						$.ajax({
 							"url": "savecalendardrag.php",
 							data: {
