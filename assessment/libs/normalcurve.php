@@ -128,8 +128,6 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
 	 }
    if ($ymax<=0) { echo 'invalid ymax'; return;}
    if ($axisspacing<=0) { echo 'invalid axis spacing'; return;}
-   $za = ($a-$mu)/$sigma;
-   $zb = ($b-$mu)/$sigma;
    if ($x!==null) {
    	   $zx = ($x-$mu)/$sigma;
    }
@@ -143,14 +141,17 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
 	 $tick = .04*$ymax;
    $plot = "setBorder(10,30,10,5);initPicture($a,$b,-$ymin,$ymax);line([$zab,0],[$zbb,0]);";
    if ($axisspacing==$sigma) {
+		 $za = ($a-$mu)/$sigma;
+	   $zb = ($b-$mu)/$sigma;
+		 $dz = ($zb-$za)/80;
 	   for ($i=ceil($za);$i<$zb+$dz;$i++) {
-		$label = $mu + $i*$sigma;
-		$plot .= "line([$label,.$tick],[$label,-$tick]);text([$i,-$tick],\"$label\",\"below\");";
+			 $label = $mu + $i*$sigma;
+			 $plot .= "line([$label,$tick],[$label,-$tick]);text([$label,-$tick],\"$label\",\"below\");";
 	   }
    } else {
-   	   for ($i=$a;$i<$b+$dx;$i+=$axisspacing) {
-		$plot .= "line([$i,$tick],[$i,-$tick]);text([$i,-$tick],\"$i\",\"below\");";
-	   }
+   	  for ($i=$a;$i<$b+$dx;$i+=$axisspacing) {
+				 $plot .= "line([$i,$tick],[$i,-$tick]);text([$i,-$tick],\"$i\",\"below\");";
+	   	}
    }
    $midx = $w/2;
    $plot .= "textabs([$midx,0],'$axislabel','above');";
