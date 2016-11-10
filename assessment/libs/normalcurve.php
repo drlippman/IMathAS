@@ -13,6 +13,7 @@ array_push($allowedmacros, "normalcurve", "normalcurve2", "normalcurve3");
 //axis label gives an axis label
 //optionally can shade a region based on one or two values x and y
 //indiciate shade direction using dirx and diry, which can be "left" or "right"
+//you set use null for y to set later values
 //color indicates color of the shaded regions
 //width and height are pixels for the displayed graph.  defaults to 400 by 150
 function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $y=null, $diry='right', $color='blue', $w=400,$h=150) {
@@ -20,7 +21,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
    if ($y!==null && $y<$x) { echo 'Second value should be bigger than the first'; return; }
    if ($a>=$b) { echo 'xmin should be smaller than xmax'; return; }
    if ($y!==null && $dirx==$diry) { echo 'directions should not be equal'; return;}
-   
+
    $za = ($a-$mu)/$sigma;
    $zb = ($b-$mu)/$sigma;
    if ($x!==null) {
@@ -37,7 +38,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
 	$label = $mu + $i*$sigma;
 	$plot .= "line([$i,.02],[$i,-.02]);text([$i,-.01],\"$label\",\"below\");";
    }
-   
+
    $midx = $w/2;
    $plot .= "textabs([$midx,0],'$axislabel','above');";
    $pts = array();
@@ -56,13 +57,13 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
       $ypts[] = "[$zy,$py]";
    }
 
-  
+
    for ($z=$za;$z<=$zb+.00001;$z+=$dz) {
 	$py = $coef*exp(-$z*$z/2);
         $pts[] = "[$z,$py]";
         if ($x !== null && (($dirx == 'left' && $z<$zx) || ($dirx == 'right' && $z>$zx && ($y===null || $z<$zy )))) {
            $xpts[] = "[$z,$py]";
-        } 
+        }
         if ($y !== null && $diry=='right' && $z>$zy) {
            $ypts[] = "[$z,$py]";
         }
@@ -81,7 +82,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
       $xpts[] = "[$zy,$py]";
       $xpts[] = "[$zy,0]";
       $xpts[] = "[$zx,0]";
-   }    
+   }
    if ($y !== null && $diry=='right') {
       $ypts[] = "[$zb,0]";
       $ypts[] = "[$zy,0]";
@@ -94,7 +95,7 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
    if ($y !== null && $diry=='right') {
        $plot .= 'fill="'.$color.'";path([' . implode(',',$ypts) . ']);';
    }
-   
+
    return showasciisvg($plot,$w,$h);
 }
 
@@ -106,10 +107,11 @@ function normalcurve($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $
 //
 //draws on bounds a&lt;x&lt;b
 //specify axisspacing, or defaults to sigma
-//set ymax to set max of vertical axis; graph is NOT scaled vertically to fit
+//set ymax to set max of vertical axis, or "auto" for ymax to autoscale
 //axis label gives an axis label
 //optionally can shade a region based on one or two values x and y
 //indiciate shade direction using dirx and diry, which can be "left" or "right"
+//you set use null for y to set later values
 //color indicates color of the shaded regions
 //width and height are pixels for the displayed graph.  defaults to 400 by 150
 function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel='',$x=null, $dirx='left', $y=null, $diry='right', $color='blue', $w=400,$h=150) {
@@ -120,6 +122,10 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
    if ($axisspacing==null) {
    	   $axisspacing = $sigma;
    }
+	 $coef = 1/($sigma*sqrt(2*3.1415926));
+	 if ($ymax=="auto") {
+		 $ymax = $coef*1.1;
+	 }
    if ($ymax<=0) { echo 'invalid ymax'; return;}
    if ($axisspacing<=0) { echo 'invalid axis spacing'; return;}
    $za = ($a-$mu)/$sigma;
@@ -133,16 +139,18 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
    $dx = ($b-$a)/80;
    $zab=$a-$sigma;
    $zbb=$b+$sigma;
-   $plot = "setBorder(10,30,10,5);initPicture($a,$b,-.1,$ymax);line([$zab,0],[$zbb,0]);";
+	 $ymin = .24*$ymax;
+	 $tick = .04*$ymax;
+   $plot = "setBorder(10,30,10,5);initPicture($a,$b,-$ymin,$ymax);line([$zab,0],[$zbb,0]);";
    if ($axisspacing==$sigma) {
 	   for ($i=ceil($za);$i<$zb+$dz;$i++) {
 		$label = $mu + $i*$sigma;
-		$plot .= "line([$label,.02],[$label,-.02]);text([$i,-.01],\"$label\",\"below\");";
+		$plot .= "line([$label,.$tick],[$label,-$tick]);text([$i,-$tick],\"$label\",\"below\");";
 	   }
    } else {
    	   for ($i=$a;$i<$b+$dx;$i+=$axisspacing) {
-		$plot .= "line([$i,.02],[$i,-.02]);text([$i,-.01],\"$i\",\"below\");";
-	   } 
+		$plot .= "line([$i,$tick],[$i,-$tick]);text([$i,-$tick],\"$i\",\"below\");";
+	   }
    }
    $midx = $w/2;
    $plot .= "textabs([$midx,0],'$axislabel','above');";
@@ -150,7 +158,6 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
    $xpts = array();
    $ypts = array();
 
-   $coef = 1/($sigma*sqrt(2*3.1415926));
    $ss = $sigma*$sigma;
 
    if ($x !== null && $dirx=='right') {
@@ -163,13 +170,13 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
       $ypts[] = "[$y,$py]";
    }
 
-  
-   for ($xv=$a;$xv<=$zb+.00001;$xv+=$dx) {
+
+   for ($xv=$a;$xv<=$b+.00001;$xv+=$dx) {
 	$py = $coef*exp(-0.5*($xv-$mu)*($xv-$mu)/$ss);
         $pts[] = "[$xv,$py]";
         if ($x !== null && (($dirx == 'left' && $xv<$x) || ($dirx == 'right' && $xv>$x && ($y===null || $xv<$y )))) {
            $xpts[] = "[$xv,$py]";
-        } 
+        }
         if ($y !== null && $diry=='right' && $xv>$y) {
            $ypts[] = "[$xv,$py]";
         }
@@ -188,7 +195,7 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
       $xpts[] = "[$y,$py]";
       $xpts[] = "[$y,0]";
       $xpts[] = "[$x,0]";
-   }    
+   }
    if ($y !== null && $diry=='right') {
       $ypts[] = "[$b,0]";
       $ypts[] = "[$y,0]";
@@ -201,7 +208,7 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
    if ($y !== null && $diry=='right') {
        $plot .= 'fill="'.$color.'";path([' . implode(',',$ypts) . ']);';
    }
-   
+
    return showasciisvg($plot,$w,$h);
 }
 
@@ -218,6 +225,7 @@ function normalcurve2($mu, $sigma, $a, $b, $axisspacing=null,$ymax=1, $axislabel
 //indiciate shade direction using dirx and diry, which can be "left" or "right"
 //optionally can shade a second region based on one or two values q and r
 //indiciate shade direction using dirq and dirr, which can be "left" or "right"
+//you set use null for y, q, and/or r to set later values
 //color indicates color of the shaded regions
 //width and height are pixels for the displayed graph.  defaults to 400 by 150
 function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', $y=null, $diry='right', $color='blue', $q=null, $dirq='left', $r=null, $dirr='right', $color2='red', $w=400,$h=150) {
@@ -225,7 +233,7 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
    if ($y!==null && $y<$x) { echo 'Second value should be bigger than the first'; return; }
    if ($a>=$b) { echo 'xmin should be smaller than xmax'; return; }
    if ($y!==null && $dirx==$diry) { echo 'directions should not be equal'; return;}
-   
+
    $za = ($a-$mu)/$sigma;
    $zb = ($b-$mu)/$sigma;
    if ($x!==null) {
@@ -248,7 +256,7 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
 	$label = $mu + $i*$sigma;
 	$plot .= "line([$i,.02],[$i,-.02]);text([$i,-.01],\"$label\",\"below\");";
    }
-      
+
    $midx = $w/2;
    $plot .= "textabs([$midx,0],'$axislabel','above');";
    $pts = array();
@@ -256,7 +264,7 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
    $ypts = array();
    $qpts = array();
    $rpts = array();
-   
+
    $coef = 1/sqrt(2*3.1415926);
 
    if ($x !== null && $dirx=='right') {
@@ -277,19 +285,19 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
       $pr = $coef*exp(-$zr*$zr/2);
       $rpts[] = "[$zr,$pr]";
    }
-  
+
    for ($z=$za;$z<=$zb+.00001;$z+=$dz) {
 	$py = $coef*exp(-$z*$z/2);
         $pts[] = "[$z,$py]";
         if ($x !== null && (($dirx == 'left' && $z<$zx) || ($dirx == 'right' && $z>$zx && ($y===null || $z<$zy )))) {
            $xpts[] = "[$z,$py]";
-        } 
+        }
         if ($y !== null && $diry=='right' && $z>$zy) {
            $ypts[] = "[$z,$py]";
         }
         if ($q !== null && (($dirq == 'left' && $z<$zq) || ($dirq == 'right' && $z>$zq && ($r===null || $z<$zr )))) {
            $qpts[] = "[$z,$py]";
-        } 
+        }
         if ($r !== null && $dirr=='right' && $z>$zr) {
            $rpts[] = "[$z,$py]";
         }
@@ -308,12 +316,12 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
       $xpts[] = "[$zy,$py]";
       $xpts[] = "[$zy,0]";
       $xpts[] = "[$zx,0]";
-   }    
+   }
    if ($y !== null && $diry=='right') {
       $ypts[] = "[$zb,0]";
       $ypts[] = "[$zy,0]";
    }
-   
+
    if ($q !== null && $dirq=='left') {
       $py = $coef*exp(-$zq*$zq/2.0);
       $qpts[] = "[$zq,$py]";
@@ -328,10 +336,10 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
       $qpts[] = "[$zr,$py]";
       $qpts[] = "[$zy,0]";
       $qpts[] = "[$zx,0]";
-   }    
+   }
    if ($r !== null && $dirr=='right') {
       $rpts[] = "[$zb,0]";
-      $rpts[] = "[$zy,0]";
+      $rpts[] = "[$zr,0]";
    }
 
    $plot .= 'fill="none";path([' . implode(',',$pts) . ']);';
@@ -351,4 +359,3 @@ function normalcurve3($mu, $sigma, $a, $b, $axislabel='',$x=null, $dirx='left', 
 }
 
 ?>
-
