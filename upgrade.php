@@ -1,7 +1,7 @@
 <?php
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 115;
+$latest = 116;
 
 
 @set_time_limit(0);
@@ -1892,6 +1892,17 @@ unset($dbpassword);
 				echo "<p>Query failed: ($query) : ".$DBH->errorInfo()."</p>";
 			}
 			echo '<p>Added FCMtoken column</p>';
+		}
+		if ($last<116) {
+			echo '<p>Custom themes will need updating if they are currently using activewrapper to show/hide instructor controls.  Add this code to your theme:<br/>';
+			echo '<code>
+div.item:hover span.instronly, div.block:hover span.instronly {
+  visibility: visible;
+}
+span.instronly {
+  visibility: hidden;
+}
+			</code></p>';
 		}
 		/*$handle = fopen("upgradecounter.txt",'w');
 		if ($handle===false) {
