@@ -103,7 +103,7 @@ if (!isset($imasroot)) {
 	echo '<table class="gb"><thead><tr><th>If score is at least</th><th>Display this message</th></tr></thead><tbody>';
 	$i=1;
 	foreach($endmsg['msgs'] as $sc=>$msg) {
-		$msg = str_replace('"','&quot;',$msg);
+		$msg = htmlspecialchars($msg);
 		echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"$sc\"/></td>";
 		echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
 		$i++;
@@ -114,6 +114,7 @@ if (!isset($imasroot)) {
 		$i++;
 	}
 	echo "<tr><td>Otherwise, show:</td>";
+	$endmsg['def'] = htmlspecialchars($endmsg['def']);
 	echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
 	echo '</tbody></table>';
 	echo '<p>After the score-specific message, display this text to everyone:</p>';
