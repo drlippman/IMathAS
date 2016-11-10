@@ -3,9 +3,9 @@
 //(c) 2007 David Lippman
 
 function beginitem($canedit,$aname=0) {
-	if ($canedit) {
-		echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-	 }
+	//if ($canedit) {
+	//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+	// }
 	 echo "<div class=item>\n";
 	 if ($aname != 0) {
 		 echo "<a name=\"$aname\"></a>";
@@ -14,9 +14,9 @@ function beginitem($canedit,$aname=0) {
 function enditem($canedit) {
 	echo '<div class="clear"></div>';
 	echo "</div>\n";
-	if ($canedit) {
-		echo '</div>'; //itemwrapper
-	}
+	//if ($canedit) {
+	//	echo '</div>'; //itemwrapper
+	//}
 
 }
 
@@ -119,9 +119,9 @@ function enditem($canedit) {
 					$show = sprintf(_('Showing %1$s %2$s until %3$s'), $availbeh, $startdate, $enddate);
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
-					if ($canedit) {
-						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-					}
+					//if ($canedit) {
+					//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					//}
 					echo '<div class="block folder" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -169,14 +169,14 @@ function enditem($canedit) {
 					}
 					echo '<div class="clear"></div>';
 					echo "</div>";
-					if ($canedit) {
-						echo '</div>'; //itemwrapper
-					}
+					//if ($canedit) {
+					//	echo '</div>'; //itemwrapper
+					//}
 				} else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') { //show as tree reader
 					if ($ispublic) {continue;} //public treereader not supported yet.
-					if ($canedit) {
-						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-					}
+					//if ($canedit) {
+					//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					//}
 					echo '<div class="block folder treereader" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -222,13 +222,14 @@ function enditem($canedit) {
 					}
 					echo '<div class="clear"></div>';
 					echo "</div>";
-					if ($canedit) {
-						echo '</div>'; //itemwrapper
-					}
+					//if ($canedit) {
+					//	echo '</div>'; //itemwrapper
+					//}
 				} else {
-					if ($canedit) {
-						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-					}
+					//if ($canedit) {
+					//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					//}
+					echo '<div class="blockwrap">';
 					echo "<div class=block ";
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -275,9 +276,9 @@ function enditem($canedit) {
 						echo "</div>";
 					}
 					echo "</div>\n";
-					if ($canedit) {
-						echo '</div>'; //itemwrapper
-					}
+					//if ($canedit) {
+					//	echo '</div>'; //itemwrapper
+					//}
 					if ($isopen) {
 						echo "<div class=blockitems ";
 					} else {
@@ -307,6 +308,7 @@ function enditem($canedit) {
 					}
 
 					echo "</div>";
+					echo '</div>'; //end blockwrap
 				}
 			} else if ($viewall || ($items[$i]['SH'][0]=='S' && $items[$i]['avail']>0)) { //if "unavailable"
 				if ($items[$i]['avail']==0) {
@@ -326,9 +328,9 @@ function enditem($canedit) {
 					$show .= sprintf(_('Showing %1$s %2$s to %3$s'), $availbeh, $startdate, $enddate);
 				}
 				if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='F') { //show as folder
-					if ($canedit) {
-						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-					}
+					//if ($canedit) {
+					//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					//}
 					echo '<div class="block folder" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -369,13 +371,13 @@ function enditem($canedit) {
 					}
 					echo '<div class="clear"></div>';
 					echo "</div>";
-					if ($canedit) {
-						echo '</div>'; //itemwrapper
-					}
+					//if ($canedit) {
+					//	echo '</div>'; //itemwrapper
+					//}
 				} else if (strlen($items[$i]['SH'])>1 && $items[$i]['SH'][1]=='T') { //show as tree reader
-					if ($canedit) {
-						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-					}
+					//if ($canedit) {
+					//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					//}
 					echo '<div class="block folder treereader" ';
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -416,13 +418,14 @@ function enditem($canedit) {
 					}
 					echo '<div class="clear"></div>';
 					echo "</div>";
-					if ($canedit) {
-						echo '</div>'; //itemwrapper
-					}
+					//if ($canedit) {
+					//	echo '</div>'; //itemwrapper
+					//}
 				} else {
-					if ($canedit) {
-						echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
-					}
+					//if ($canedit) {
+					//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
+					//}
+					echo '<div class="blockwrap">';
 					echo "<div class=block ";
 					if ($titlebg!='') {
 						echo "style=\"background-color:$titlebg;color:$titletxt;\"";
@@ -475,9 +478,9 @@ function enditem($canedit) {
 						echo "</div>";
 					}
 					echo "</div>\n";
-					if ($canedit) {
-						echo '</div>'; //itemwrapper
-					}
+					//if ($canedit) {
+					//	echo '</div>'; //itemwrapper
+					//}
 					if ($isopen) {
 						echo "<div class=blockitems ";
 					} else {
@@ -510,6 +513,7 @@ function enditem($canedit) {
 						echo _('Loading content...');
 					}
 					echo "</div>";
+					echo '</div>'; //end blockwrap
 				}
 			}
 			continue;
@@ -798,7 +802,7 @@ function enditem($canedit) {
 
 					   echo '<span class="instronly">';
 					   if ($line['allowlate']>0) {
-						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> |';
+						echo ' <span onmouseover="tipshow(this,\'', _('LatePasses Allowed'), '\')" onmouseout="tipout()">', _('LP'), '</span> | ';
 					   }
 					   echo "<a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
 					   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";

@@ -388,9 +388,12 @@ div.ddmenu {
 	padding: 0px;
 	}
 
-div.inactivewrapper, div.activewrapper {
+/*div.inactivewrapper, div.activewrapper {
 	margin: 0px;
 	padding: 0px;
+}*/
+div.blockwrapper {
+	margin: 0; padding:0;
 }
 
 div.tips {

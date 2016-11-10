@@ -47,7 +47,7 @@ div#leftcontent.needed * {
 
 div#leftcontent.needed p {
 	display:inline;
-}	
+}
 div#leftcontent.needed *.essen {
 	display: inline;
 	padding-right: 1em;
@@ -104,10 +104,10 @@ div#headercontent {
 div#navlistcont {
 	height: auto !important;
 }
-div.headerwrapper {	
+div.headerwrapper {
 	height: auto !important;
 }
-div.inactivewrapper span.instronly {
+span.instronly {
 	visibility: visible !important;
 }
 div.breadcrumb {
