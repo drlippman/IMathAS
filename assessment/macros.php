@@ -290,14 +290,18 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		} else {$xmax = $settings[1];}
 
 		if ($GLOBALS['sessiondata']['graphdisp']==0) {
-			if ($xmax-$xmin>2) {
+			if ($xmax-$xmin>2 || $xmax==$xmin) {
 				$dx = 1;
 				$stopat = ($xmax-$xmin)+1;
 			} else {
 				$dx = ($xmax-$xmin)/10;
 				$stopat = ($domainlimited?10:11);
 			}
-			$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+			if ($xmax != $xmin) {
+				$alt .= "<table class=stats><thead><tr><th>x</th><th>y</th></thead></tr><tbody>";
+			} else {
+				$alt .= '. ';
+			}
 		} else {
 			$dx = ($xmax - $xmin + ($domainlimited?0:10*($xmax-$xmin)/$settings[6]) )/100;
 			$stopat = ($domainlimited?101:102);
@@ -326,14 +330,18 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				if (in_array($t,$avoid)) { continue;}
 				$x = round($evalxfunc($t),$xrnd);//round(eval("return ($xfunc);"),3);
 				$y = round($evalyfunc($t),$yrnd);//round(eval("return ($yfunc);"),3);
-				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
+				if ($xmax != $xmin) {
+					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
+				}
 			} else {
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - (($domainlimited || $GLOBALS['sessiondata']['graphdisp']==0)?0:5*abs($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = round($evalfunc($x),$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
-				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
+				if ($xmax != $xmin) {
+					$alt .= "<tr><td>$x</td><td>$y</td></tr>";
+				}
 			}
 
 			if ($i<2 || $i==$stopat-2) {
@@ -410,7 +418,9 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 
 		if ($lastl > 0) {$pathstr .= "]);";}
 		$path .= $pathstr;
-		$alt .= "</tbody></table>\n";
+		if ($xmax != $xmin) {
+			$alt .= "</tbody></table>\n";
+		}
 
 		if ($isineq) {
 
@@ -446,23 +456,23 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		}
 		if (isset($function[5]) && $function[5]=='open') {
 			$path .= "dot([$x,$y],\"open\");";
-			$alt .= "Open dot at $x,$y";
+			$alt .= "Open dot at ($x,$y). ";
 		} else if (isset($function[5]) && $function[5]=='closed') {
 			$path .= "dot([$x,$y],\"closed\");";
-			$alt .= "Closed dot at $x,$y";
+			$alt .= "Closed dot at ($x,$y).). ";
 		} else if (isset($function[5]) && $function[5]=='arrow') {
 			$path .= "arrowhead([{$fx[$stopat-2]},{$fy[$stopat-2]}],[$x,$y]);";
-			$alt .= "Arrow at $x,$y";
+			$alt .= "Arrow at ($x,$y). ";
 		}
 		if (isset($function[4]) && $function[4]=='open') {
 			$path .= "dot([{$fx[0]},{$fy[0]}],\"open\");";
-			$alt .= "Open dot at {$fx[0]},{$fy[0]}";
+			$alt .= "Open dot at ({$fx[0]},{$fy[0]}). ";
 		} else if (isset($function[4]) && $function[4]=='closed') {
 			$path .= "dot([{$fx[0]},{$fy[0]}],\"closed\");";
-			$alt .= "Closed dot at {$fx[0]},{$fy[0]}";
+			$alt .= "Closed dot at ({$fx[0]},{$fy[0]}). ";
 		} else if (isset($function[4]) && $function[4]=='arrow') {
 			$path .= "arrowhead([{$fx[1]},{$fy[1]}],[{$fx[0]},{$fy[0]}]);";
-			$alt .= "Arrow at {$fx[0]},{$fy[0]}";
+			$alt .= "Arrow at ({$fx[0]},{$fy[0]}). ";
 		}
 
 		$commands .= $path;
@@ -474,7 +484,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 		$settings[3] = min($absymax,$ymax);
 	}
 	$commands = "setBorder(5); initPicture({$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]});".$commands;
-	$alt = "Graph, window x {$settings[0]} to {$settings[1]}, y {$settings[2]} to {$settings[3]}.".$alt;
+	$alt = "Graphs with window x: {$settings[0]} to {$settings[1]}, y: {$settings[2]} to {$settings[3]}. ".$alt;
 
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
@@ -495,7 +505,7 @@ function addlabel($plot,$x,$y,$lbl) {
 		$color = "black";
 	}
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
-		return $plot .= "Label &quot;$lbl&quot; at ($x,$y).";
+		return $plot .= "Label &quot;$lbl&quot; at ($x,$y). ";
 	}
 	if (func_num_args()>6) {
 		$loc = func_get_arg(5);
