@@ -887,13 +887,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									$hasvid = true;
 									if (strpos($v,'!!1')!==false) {
 										$page_questionTable[$i]['cap'] = 1;
+										$altcap = "Captioned ";
+									} else {
+										$altcap = "";
 									}
 								} else {
 									$hasother = true;
 								}
 							}
 							if ($hasvid) {
-								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
+								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"{$altcap}Video\"/>";
 							}
 							if ($hasother) {
 								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
@@ -1059,13 +1062,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								$hasvid = true;
 								if (strpos($v,'!!1')!==false) {
 									$page_assessmentQuestions[$x]['cap'][$y] = 1;
+									$altcap = "Captioned ";
+								} else {
+									$altcap = '';
 								}
 							} else {
 								$hasother = true;
 							}
 						}
 						if ($hasvid) {
-							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
+							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"{$altcap}Video\"/>";
 						}
 						if ($hasother) {
 							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";

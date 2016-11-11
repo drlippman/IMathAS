@@ -983,6 +983,9 @@ function generateTable() {
 				html += "<td class=\"nowrap\"><div";
 				if ((curitems[j][7]&16) == 16) {
 					html += " class=\"ccvid\"";
+					var altbase = "Captioned video";
+				} else {
+					var altbase = "Video";
 				}
 				html += ">";
 				if ((curitems[j][7]&1) == 1) {
@@ -993,7 +996,7 @@ function generateTable() {
 					var altadd = " disabled";
 				}
 				if ((curitems[j][7]&4) == 4) {
-					html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png" alt="Video'+altadd+'"/>';
+					html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png" alt="'+altbase+altadd+'"/>';
 				}
 				if ((curitems[j][7]&2) == 2) {
 					html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png" alt="Help Resource'+altadd+'"/>';
