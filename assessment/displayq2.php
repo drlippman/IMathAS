@@ -2243,11 +2243,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$shorttip = _('Adjust the sliders');
 		} else {
 
-			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
+			$tip = _('Enter your answer using interval notation.  Example: [2.1234,5.6789)') . " <br/>";
 			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
 			$tip .= _('Enter DNE for an empty set, oo for Infinity');
 			if (isset($reqdecimals)) {
 				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
+			} else {
+				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to 4 decimal places.'), $reqdecimals);
 			}
 			$shorttip = _('Enter an interval using interval notation');
 		}
@@ -2346,7 +2348,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip .= _('Enter <i>all real numbers</i> for solutions of that type') . "<br/>";
 			$shorttip = _('Enter an interval using inequalities');
 		} else {
-			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6)') . " <br/>";
+			$tip = _('Enter your answer using interval notation.  Example: [2.1234,5.6789)') . " <br/>";
 			if (in_array('list',$ansformats)) {
 				$tip .= _('Separate intervals by a comma.  Example: (-oo,2],[4,oo)') . "<br/>";
 				$shorttip = _('Enter a list of intervals using interval notation');
@@ -2361,6 +2363,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		$tip .= formathint(_('each value'),$ansformats,'calcinterval');
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
+		} else {
+			$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to 4 decimal places.'), $reqdecimals);
 		}
 
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
