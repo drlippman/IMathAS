@@ -53,7 +53,7 @@
 	//DB $query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	//DB if (mysql_result($result,0,0)>0) {
-	$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
+	/*$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 	$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':courseid'=>$cid));
@@ -62,6 +62,12 @@
 	} else {
 		$hassection = false;
 	}
+	*/
+	$stm = $DBH->prepare("SELECT COUNT(DISTINCT section), COUNT(DISTINCT code) FROM imas_students WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
+	$seccodecnt = $stm->fetch(PDO::FETCH_NUM);
+	$hassection = ($seccodecnt[0]>0);
+	$hascodes = ($seccodecnt[1]>0);
 
 	if ($hassection) {
 		//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
@@ -148,7 +154,7 @@
 	//DB if ($secfilter != -1) {
 		//DB $query .= " AND istu.section='$secfilter' ";
 	//DB }
-	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
+	$query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.code,istu.timelimitmult,";
 	$query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid=:courseid ";
 	$query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid=:assessmentid WHERE istu.courseid=:courseid2 ";
 	if ($secfilter != -1) {
@@ -177,6 +183,9 @@
 	if ($hassection) {
 		echo '<th>Section</th>';
 	}
+	if ($hascodes) {
+		echo '<th>Code</th>';
+	}
 	echo "<th>Grade</th><th>%</th><th>Last Change</th><th>Time Spent (In Questions)</th><th>Feedback</th></tr></thead><tbody>";
 	$now = time();
 	$lc = 1;
@@ -201,6 +210,10 @@
 		}
 		if ($hassection) {
 			echo "<td>{$line['section']}</td>";
+		}
+		if ($hascodes) {
+			if ($line['code']==null) {$line['code']='';}
+			echo "<td>{$line['code']}</td>";
 		}
 		$total = 0;
 		$sp = explode(';',$line['bestscores']);
@@ -306,7 +319,9 @@
 	}
 	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
-	if ($hassection) {
+	if ($hassection && $hascodes) {
+		echo "<script> initSortTable('myTable',Array('S','S','S','N'),true);</script>";
+	} else if ($hassection) {
 		echo "<script> initSortTable('myTable',Array('S','S','N'),true);</script>";
 	} else {
 		echo "<script> initSortTable('myTable',Array('S','N'),true);</script>";

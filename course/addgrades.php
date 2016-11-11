@@ -516,7 +516,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		//DB $query .= "AND imas_students.courseid='$cid' AND imas_students.section IS NOT NULL";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_result($result,0,0)>0) {
-		$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
+		/*$query = "SELECT COUNT(imas_users.id) FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid ";
 		$query .= "AND imas_students.courseid=:courseid AND imas_students.section IS NOT NULL";
 		$stm = $DBH->prepare($query);
 		$stm->execute(array(':courseid'=>$cid));
@@ -525,6 +525,12 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		} else {
 			$hassection = false;
 		}
+		*/
+		$stm = $DBH->prepare("SELECT COUNT(DISTINCT section), COUNT(DISTINCT code) FROM imas_students WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		$seccodecnt = $stm->fetch(PDO::FETCH_NUM);
+		$hassection = ($seccodecnt[0]>0);
+		$hascodes = ($seccodecnt[1]>0);
 
 		if ($hassection) {
 			//DB $query = "SELECT usersort FROM imas_gbscheme WHERE courseid='$cid'";
@@ -572,9 +578,15 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 		if ($hassection) {
 			echo '<th>Section</th>';
 		}
+		if ($hascodes) {
+			echo '<th>Code</th>';
+		}
 		echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
 		echo '<tr id="quickadd" style="display:none;"><td><input type="text" id="qaname" /></td>';
 		if ($hassection) {
+			echo '<td></td>';
+		}
+		if ($hascodes) {
 			echo '<td></td>';
 		}
 		echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
@@ -584,7 +596,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			//DB $query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked ";
 			//DB $query .= "FROM imas_users,imas_students WHERE ";
 			//DB $query .= "imas_users.id=imas_students.userid AND imas_students.courseid='$cid'";
-			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked ";
+			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked,imas_students.code ";
 			$query .= "FROM imas_users,imas_students WHERE ";
 			$query .= "imas_users.id=imas_students.userid AND imas_students.courseid=:cid";
 			$qarr = array(':cid'=>$cid);
@@ -614,7 +626,7 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 				}
 				$feedback[$row[0]] = $row[2];
 			}
-			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked FROM imas_users,imas_students ";
+			$query = "SELECT imas_users.id,imas_users.LastName,imas_users.FirstName,imas_students.section,imas_students.locked,imas_students.code FROM imas_users,imas_students ";
 			if ($_GET['grades']!='all') {
 				//DB $query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id='{$_GET['grades']}' AND imas_students.courseid='$cid'";
 				$query .= "WHERE imas_users.id=imas_students.userid AND imas_users.id=:userid AND imas_students.courseid=:cid";
@@ -654,6 +666,10 @@ at <input type=text size=10 name=stime value="<?php echo $stime;?>"></span><BR c
 			echo '</td>';
 			if ($hassection) {
 				echo "<td>{$row[3]}</td>";
+			}
+			if ($hascodes) {
+				if ($row[5]==null) {$row[5] = '';}
+				echo "<td>{$row[5]}</td>";
 			}
 			if (isset($score[$row[0]])) {
 				echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$row[0]}]\" id=\"score{$row[0]}\" value=\"";
