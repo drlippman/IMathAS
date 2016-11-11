@@ -86,6 +86,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 		}
 		$allqids = array();
 		foreach ($qtoadd as $qid) {
+			if (strpos($qid,'|')!==FALSE) {continue;}
 			//add question or get system id.
 			//DB $query = "SELECT id,adddate FROM imas_questionset WHERE uniqueid='{$questions[$qid]['uqid']}' AND deleted=0";
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
