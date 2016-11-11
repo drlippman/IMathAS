@@ -296,7 +296,7 @@
 			$query = "INSERT INTO imas_assessment_sessions (userid,assessmentid,questions,seeds,scores,attempts,lastanswers,starttime,bestscores,bestattempts,bestseeds,bestlastanswers,reviewscores,reviewattempts,reviewseeds,reviewlastanswers,agroupid,feedback,lti_sourcedid,ver) ";
 			$query .= "VALUES (:userid, :assessmentid, :questions, :seeds, :scores, :attempts, :lastanswers, :starttime, :bestscores, :bestattempts, :bestseeds, :bestlastanswers, :reviewscores, :reviewattempts, :reviewseeds, :reviewlastanswers, :agroupid, :feedback, :lti_sourcedid,1);";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id'], ':questions'=>$qlist, ':seeds'=>$seedlist, ':scores'=>$scorelist,
+			$result = $stm->execute(array(':userid'=>$userid, ':assessmentid'=>$_GET['id'], ':questions'=>$qlist, ':seeds'=>$seedlist, ':scores'=>$scorelist,
 				':attempts'=>$attemptslist, ':lastanswers'=>$lalist, ':starttime'=>$starttime, ':bestscores'=>$bestscorelist, ':bestattempts'=>$bestattemptslist,
 				':bestseeds'=>$bestseedslist, ':bestlastanswers'=>$bestlalist, ':reviewscores'=>$scorelist, ':reviewattempts'=>$attemptslist,
 				':reviewseeds'=>$reviewseedlist, ':reviewlastanswers'=>$lalist, ':agroupid'=>$stugroupid, ':feedback'=>$deffeedbacktext, ':lti_sourcedid'=>$ltisourcedid));
