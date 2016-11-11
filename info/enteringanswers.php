@@ -19,7 +19,7 @@ img {
 	require("../infoheader.php");
 ?>
 
-<img class="floatleft" src="<?php echo $imasroot;?>/img/typing.jpg"/>
+<img class="floatleft" src="<?php echo $imasroot;?>/img/typing.jpg" alt="Picture of typing"/>
 
 <div class="content">
 <h4>Answer Types</h4>

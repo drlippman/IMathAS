@@ -214,10 +214,10 @@ Leave items blank to use the assessment's default values<br/>
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						$qrows[$row[0]] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+						$qrows[$row[0]] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/>";
 					}
 					if ($hasother) {
-						$qrows[$row[0]] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+						$qrows[$row[0]] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 					}
 				}
 				$qrows[$row[0]] .= '</td>';
@@ -290,10 +290,10 @@ Leave items blank to use the assessment's default values<br/>
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						echo "<td><img src=\"$imasroot/img/video_tiny.png\"/></td>";
+						echo "<td><img src=\"$imasroot/img/video_tiny.png\" alt=\"Video\"/></td>";
 					}
 					if ($hasother) {
-						echo "<td><img src=\"$imasroot/img/html_tiny.png\"/></td>";
+						echo "<td><img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/></td>";
 					}
 				} else {
 					echo '<td></td>';

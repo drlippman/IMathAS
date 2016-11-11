@@ -510,15 +510,15 @@ function printscore($sc,$qsetid,$seed) {
 		foreach ($scarr as $k=>$v) {
 			$v = round($v * $poss, 2);
 			if ($ptposs[$k]==0) {
-				$pm = 'gchk';
+				$pm = 'gchk'; $alt=_('Correct');
 			} else if (!is_numeric($v) || $v==0) {
-				$pm = 'redx';
+				$pm = 'redx'; $alt=_('Incorrect');
 			} else if (abs($v-$ptposs[$k])<.011) {
-				$pm = 'gchk';
+				$pm = 'gchk'; $alt=_('Correct');
 			} else {
-				$pm = 'ychk';
+				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" />";
+			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

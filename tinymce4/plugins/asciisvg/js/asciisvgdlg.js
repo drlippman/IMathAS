@@ -17,7 +17,7 @@ var AsciisvgDialog = {
 		this.AScgiloc = top.tinymce.activeEditor.windowManager.getParams().AScgiloc;
 		this.alignm = top.tinymce.activeEditor.windowManager.getParams().alignm;
 		if (ASnoSVG) {
-			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " />';
+			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " alt="Graph"/>';
 		} else {
 			document.getElementById("previewsvg").setAttribute("sscr",this.sscr);
 		}
@@ -35,7 +35,7 @@ var AsciisvgDialog = {
 			} else {
 				aligntxt = "vertical-align: "+this.alignm+"; float: none;";
 			}
-			top.tinymce.activeEditor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" data-sscr="'+this.sscr+'" data-asciisvg="1" data-mce-placeholder="1" script=" " />');
+			top.tinymce.activeEditor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" data-sscr="'+this.sscr+'" data-asciisvg="1" data-mce-placeholder="1" script=" " alt="Graph" />');
 		} else {
 			el = top.tinymce.activeEditor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);

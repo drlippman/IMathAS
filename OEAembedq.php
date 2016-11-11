@@ -176,7 +176,7 @@ if (isset($QS['showscored'])) {
 
 		displayq(0, $qsetid, $seed, $showans?2:0, true, 0,false,false,false,$rawscores);
 	} else {
-		echo '<p>Saving score... <img src="img/updating.gif"/></p>';
+		echo '<p>Saving score... <img src="img/updating.gif" alt="Saving"/></p>';
 	}
 
 } else {
@@ -346,15 +346,15 @@ function printscore($sc,$qsetid,$seed) {
 		$scarr = explode('~',$sc);
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
-				$pm = 'gchk';
+				$pm = 'gchk'; $alt=_('Correct');
 			} else if (!is_numeric($v) || $v==0) {
-				$pm = 'redx';
+				$pm = 'redx'; $alt=_('Incorrect');
 			} else if (abs($v-$ptposs[$k])<.011) {
-				$pm = 'gchk';
+				$pm = 'gchk'; $alt=_('Correct');
 			} else {
-				$pm = 'ychk';
+				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" />";
+			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

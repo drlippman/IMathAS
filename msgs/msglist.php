@@ -247,7 +247,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					var newcid = $(el).val();
 					$("#to").hide();
 					if (newcid>0) {
-						$(el).after($("<img>", {src: imasroot+"/img/updating.gif"}));
+						$(el).after($("<img>", {src: imasroot+"/img/updating.gif", alt: "Loading recipients..."}));
 						$.ajax({
 							url: "msglist.php?cid=0&getstulist="+newcid,
 							dataType: "json"
@@ -449,9 +449,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				if (isset($_GET['to']) && $row[4]==1) {
 					if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+						echo " <img style=\"vertical-align: middle;\" src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					} else {
-						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" /><br/>";
+						echo " <img style=\"vertical-align: middle;\" src=\"$imasroot/course/files/userimg_sm{$_GET['to']}.jpg\"  onclick=\"togglepic(this)\" alt=\"User picture\"/><br/>";
 					}
 				}
 				echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
@@ -926,17 +926,17 @@ function chgfilter() {
 
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  />";
+				echo " <img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\"  class=\"userpic\"  alt=\"User picture\"/>";
 			} else {
-				echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  />";
+				echo " <img src=\"$imasroot/course/files/userimg_sm{$line['msgfrom']}.jpg\" style=\"display:none;\" class=\"userpic\"  alt=\"User picture\"/>";
 			}
 		}
 
 		echo "</td><td>";
 		if (($line['isread']&8)==8) {
-			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Flagged\"/>";
 		} else {
-			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" />";
+			echo "<img class=\"pointer\" id=\"tag{$line['id']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggletagged({$line['id']});return false;\" alt=\"Not flagged\"/>";
 		}
 		echo '</td>';
 		echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";

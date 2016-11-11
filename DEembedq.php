@@ -135,7 +135,7 @@ if (isset($_GET['showscored'])) {
 	});
 	</script>';
 
-	echo '<p>Saving score... <img src="img/updating.gif"/></p>';
+	echo '<p>Saving score... <img src="img/updating.gif" alt="Updating"/></p>';
 
 } else {
 	$lastanswers = array();
@@ -251,15 +251,15 @@ function printscore($sc,$qsetid,$seed) {
 		$scarr = explode('~',$sc);
 		foreach ($scarr as $k=>$v) {
 			if ($ptposs[$k]==0) {
-				$pm = 'gchk';
+				$pm = 'gchk'; $alt=_('Correct');
 			} else if (!is_numeric($v) || $v==0) {
-				$pm = 'redx';
+				$pm = 'redx'; $alt=_('Incorrect');
 			} else if (abs($v-$ptposs[$k])<.011) {
-				$pm = 'gchk';
+				$pm = 'gchk'; $alt=_('Correct');
 			} else {
-				$pm = 'ychk';
+				$pm = 'ychk'; $alt=_('Partially correct');
 			}
-			$bar = "<img src=\"$imasroot/img/$pm.gif\" />";
+			$bar = "<img src=\"$imasroot/img/$pm.gif\" alt=\"$alt\"/>";
 			$scarr[$k] = "$bar $v/{$ptposs[$k]}";
 		}
 		$sc = implode(', ',$scarr);

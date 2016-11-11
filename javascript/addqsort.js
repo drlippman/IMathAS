@@ -909,9 +909,9 @@ function generateTable() {
 						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
 					} else {
 						if (itemarray[i][3]==1) {
-							html += "<img src=\""+imasroot+"/img/collapse.gif\" onclick=\"collapseqgrp("+i+")\"/>";
+							html += "<img src=\""+imasroot+"/img/collapse.gif\" onclick=\"collapseqgrp("+i+")\" alt=\"Collapse\"/>";
 						} else {
-							html += "<img src=\""+imasroot+"/img/expand.gif\" onclick=\"expandqgrp("+i+")\"/>";
+							html += "<img src=\""+imasroot+"/img/expand.gif\" onclick=\"expandqgrp("+i+")\" alt=\"Expand\"/>";
 						}
 						html += '</td><td>';
 					}
@@ -983,21 +983,26 @@ function generateTable() {
 				html += "<td class=\"nowrap\"><div";
 				if ((curitems[j][7]&16) == 16) {
 					html += " class=\"ccvid\"";
+					var altbase = "Captioned video";
+				} else {
+					var altbase = "Video";
 				}
 				html += ">";
 				if ((curitems[j][7]&1) == 1) {
 					var showicons = "";
+					var altadd = "";
 				} else {
 					var showicons = "_no";
+					var altadd = " disabled";
 				}
 				if ((curitems[j][7]&4) == 4) {
-					html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png"/>';
+					html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png" alt="'+altbase+altadd+'"/>';
 				}
 				if ((curitems[j][7]&2) == 2) {
-					html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png"/>';
+					html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png" alt="Help Resource'+altadd+'"/>';
 				}
 				if ((curitems[j][7]&8) == 8) {
-					html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png"/>';
+					html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png" alt="Detailed solution'+altadd+'"/>';
 				}
 				html += "</div></td>";
 				html += "<td>"+curitems[j][1]+"</td>";

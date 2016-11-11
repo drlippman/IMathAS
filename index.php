@@ -430,7 +430,7 @@ function printCourses($data,$title,$type=null) {
 		if ($type=='take') {
 			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
 		} /*else if ($type=='teach') {
-			echo '<div class="floatright clear dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$imasroot.'/img/gears.png"/></a>';
+			echo '<div class="floatright clear dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$imasroot.'/img/gears.png" alt="Settings"/></a>';
 			echo '<ul class="dropdown-menu dropdown-menu-right">';
 			echo '<li><a>Do something one</a></li>';
 			echo '<li><a>Add/Remove Teachers</a></li>';
@@ -514,7 +514,7 @@ function printPostsGadget() {
 
 	echo '<div class="block">';
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
-	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
+	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"Settings\"/></a></span>";
 
 	echo '<h3>', _('New forum posts'), '</h3></div>';
 	echo '<div class="blockitems">';

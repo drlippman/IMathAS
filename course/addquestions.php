@@ -887,20 +887,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 									$hasvid = true;
 									if (strpos($v,'!!1')!==false) {
 										$page_questionTable[$i]['cap'] = 1;
+										$altcap = "Captioned ";
+									} else {
+										$altcap = "";
 									}
 								} else {
 									$hasother = true;
 								}
 							}
 							if ($hasvid) {
-								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"{$altcap}Video\"/>";
 							}
 							if ($hasother) {
-								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+								$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 							}
 						}
 						if ($line['solution']!='' && ($line['solutionopts']&2)==2) {
-							$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/assess_tiny.png\"/>";
+							$page_questionTable[$i]['extref'] .= "<img src=\"$imasroot/img/assess_tiny.png\" alt=\"Detailed Solution\"/>";
 						}
 						/*$query = "SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$line['id']}'";
 						$result2 = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -1059,16 +1062,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 								$hasvid = true;
 								if (strpos($v,'!!1')!==false) {
 									$page_assessmentQuestions[$x]['cap'][$y] = 1;
+									$altcap = "Captioned ";
+								} else {
+									$altcap = '';
 								}
 							} else {
 								$hasother = true;
 							}
 						}
 						if ($hasvid) {
-							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/video_tiny.png\" alt=\"{$altcap}Video\"/>";
 						}
 						if ($hasother) {
-							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+							$page_assessmentQuestions[$x]['extref'][$y] .= "<img src=\"$imasroot/img/html_tiny.png\" alt=\"Help Resource\"/>";
 						}
 					}
 
@@ -1170,7 +1176,7 @@ if ($overwriteBody==1) {
 		echo "<p>No Questions currently in assessment</p>\n";
 
 		echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-		echo "<img src=\"$imasroot/img/help.gif\" /> ";
+		echo "<img src=\"$imasroot/img/help.gif\" alt=\"Help\"/> ";
 		echo 'How do I find questions to add?</a>';
 		echo '<div id="helpwithadding" style="display:none">';
 		if ($sessiondata['selfrom'.$aid]=='lib') {
@@ -1366,9 +1372,9 @@ if ($overwriteBody==1) {
 					<td class=c><?php echo $page_questionTable[$qid]['templ'] ?></td>
 					<?php if ($searchall==0) {
 						if ($page_questionTable[$qid]['junkflag']==1) {
-							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Flagged\" /></td>";
 						} else {
-							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+							echo "<td class=c><img class=\"pointer\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" alt=\"Not flagged\" /></td>";
 						}
 					} ?>
 				</tr>

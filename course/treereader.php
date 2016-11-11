@@ -246,11 +246,11 @@ function printlist($items) {
 					$isopen = true;
 				}
 				if ($bisopen) {
-					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\"> ";
+					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
 					$out .=  "{$item['name']}</span>\n";
 					$out .=  '<ul class="show nomark" id="'.$item['id'].'">';
 				} else {
-					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\"> ";
+					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
 					$out .=  "{$item['name']}</span>\n";
 					$out .=  '<ul class="hide nomark" id="'.$item['id'].'">';
 				}
@@ -295,14 +295,14 @@ function printlist($items) {
 					 }
 					 $out .= '<li>';
 					 if ($line['displaymethod']!='Embed') {
-						 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png"> ';
+						 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png" alt="Assessment"> ';
 					 } else {
 						 if (!isset($astatus[$typeid]) || $astatus[$typeid]==0) {
-							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_fullbox.gif" /> ';
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_fullbox.gif" alt="'._('Unattempted').'"/> ';
 						 } else if ($astatus[$typeid]==1) {
-							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_halfbox.gif" /> ';
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_halfbox.gif" alt="'._('Started').'"/> ';
 						 } else {
-							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_emptybox.gif" /> ';
+							 $out .= '<img id="aimg'.$typeid.'" src="'.$imasroot.'/img/q_emptybox.gif" alt="'._('Attempted').'"/> ';
 						 }
 					 }
 					 if (isset($studentinfo['timelimitmult'])) {
@@ -356,7 +356,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 					 }
-					 $out .=  '<li><img src="'.$imasroot.'/img/html_tiny.png"> <a href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
+					 $out .=  '<li><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
 				 }
 			} /*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.
@@ -369,7 +369,7 @@ function printlist($items) {
 				 if ($itemtype.$typeid===$openitem) {
 				 	 $foundopenitem = '/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid; $isopen = true;
 				 }
-				 $out .=  '<li><img src="'.$imasroot.'/img/forum_tiny.png"> <a href="'.$imasroot.'/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid.'" onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+				 $out .=  '<li><img src="'.$imasroot.'/img/forum_tiny.png" alt="Forum"> <a href="'.$imasroot.'/forums/thread.php?cid='.$cid.'&amp;forum='.$typeid.'" onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 			} */else if ($line['itemtype']=='Wiki') {
 				//TODO check availability, etc.
 				 //DB $query = "SELECT id,name,description,startdate,enddate,editbydate,avail,settings,groupsetid FROM imas_wikis WHERE id='$typeid'";
@@ -385,7 +385,7 @@ function printlist($items) {
 					 if ($itemtype.$typeid===$openitem) {
 						 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
 					 }
-					 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+					 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png" alt="Wiki"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 				 }
 			}
 
@@ -438,7 +438,7 @@ function upsendexceptions(&$items) {
 </div>
 
 <div id="leftcontent" style="width: 250px;">
-<img id="navtoggle" src="<?php echo $imasroot;?>/img/collapse.gif"  onclick="toggletreereadernav()"/>
+<img id="navtoggle" src="<?php echo $imasroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse"/>
 <ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
 <?php
 $ul = printlist($items);

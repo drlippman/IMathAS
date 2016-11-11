@@ -307,7 +307,7 @@ if ($overwriteBody==1) {
 	echo "<p>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
 	echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
 	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
-	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
+	echo "Click the <img src=\"$imasroot/img/swap.gif\" alt=\"Swap\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
 	echo "<form id=\"qform\">";
 
@@ -574,9 +574,9 @@ if ($overwriteBody==1) {
 			echo "</td>";
 		}
 
-		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
+		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" alt="Swap" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
 
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('s',$cnt)\"/>";
 		if ($startdates[$i]==0) {
 			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
 		} else {
@@ -609,7 +609,7 @@ if ($overwriteBody==1) {
 		echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 		echo '</span></td>';
 
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('e',$cnt)\"/>";
 		if ($enddates[$i]==2000000000) {
 			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
 		} else {
@@ -645,7 +645,7 @@ if ($overwriteBody==1) {
 
 		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
 		if ($types[$i]=='Assessment') {
-			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('r',$cnt)\"/>";
 			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
 				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
 			} else {
@@ -690,7 +690,7 @@ if ($overwriteBody==1) {
 		echo '</td>';
 		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
 		if ($types[$i]=='Forum') {
-			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fp',$cnt)\"/>";
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('fp',$cnt)\"/>";
 			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
 				echo "<input type=hidden id=\"fpdatetype$cnt\" name=\"fpdatetype$cnt\" value=\"0\"/>";
 			} else {
@@ -735,7 +735,7 @@ if ($overwriteBody==1) {
 		echo '</td>';
 		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
 		if ($types[$i]=='Forum') {
-			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fr',$cnt)\"/>";
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('fr',$cnt)\"/>";
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
 				echo "<input type=hidden id=\"frdatetype$cnt\" name=\"frdatetype$cnt\" value=\"0\"/>";
 			} else {
