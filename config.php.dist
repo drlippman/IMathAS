@@ -103,6 +103,9 @@
   //$AWSsecret = "";
   //$AWSbucket = "";
 
+	//use secure password hashing
+	$CFG['GEN']['newpasswords'] = 'only';
+
 
   //Special Config tags for customizing
   //$loginpage = 'custom-login-page.php';

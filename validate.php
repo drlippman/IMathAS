@@ -428,6 +428,10 @@
 		$sessiondata['useflash'] = true;
 		writesessiondata();
 	}
+	if (isset($_GET['graphdisp'])) {
+		$sessiondata['graphdisp'] = $_GET['graphdisp'];
+		writesessiondata();
+	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
 	}
