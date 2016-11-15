@@ -17,7 +17,15 @@ require("./assessment/displayq2.php");
 $GLOBALS['assessver'] = 1;
 
 $sessiondata = array();
-$sessiondata['graphdisp'] = 1;
+if (isset($_GET['graphdisp'])) {
+	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
+	setcookie("OEAembed-graphdisp", $sessiondata['graphdisp']);
+} else if (isset($_COOKIE['OEAembed-graphdisp'])) {
+	$sessiondata['graphdisp'] = intval($_COOKIE['OEAembed-graphdisp']);
+} else {
+	$sessiondata['graphdisp'] = 1;
+}
+
 $sessiondata['mathdisp'] = 6;
 $sessiondata['secsalt'] = "12345";
 $cid = "embedq";
@@ -76,6 +84,10 @@ $flexwidth = true; //tells header to use non _fw stylesheet
 $placeinhead .= '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
 $useeditor = 1;
 require("./assessment/header.php");
+
+if ($sessiondata['graphdisp'] == 1) {
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="OEAembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';  
+}
 
 //seeds 1-4999 are for summative requests that are signed
 //seeds 5000-9999 are for formative requests (unsigned)

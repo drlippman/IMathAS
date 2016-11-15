@@ -24,7 +24,14 @@ require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $sessiondata = array();
-$sessiondata['graphdisp'] = 1;
+if (isset($_GET['graphdisp'])) {
+	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
+	setcookie("multiembedq-graphdisp", $sessiondata['graphdisp']);
+} else if (isset($_COOKIE['multiembedq-graphdisp'])) {
+	$sessiondata['graphdisp'] = intval($_COOKIE['multiembedq-graphdisp']);
+} else {
+	$sessiondata['graphdisp'] = 1;
+}
 $sessiondata['mathdisp'] = 3;
 $showtips = 2;
 $useeqnhelper = 4;
@@ -154,7 +161,9 @@ if ($theme != '') {
 	$sessiondata['coursetheme'] = $theme.'.css';
 }
 require("./assessment/header.php");
-
+if ($sessiondata['graphdisp'] == 1) {
+	echo '<div style="position:absolute;width:1px;height:1px;left:0px:top:-1px;overflow:hidden;"><a href="multiembedq.php?'.$_SERVER['QUERY_STRING'].'&graphdisp=0">Enable text based alternatives for graph display and drawing entry</a></div>';  
+}
 echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. $_SERVER['HTTP_HOST'] . $imasroot . '/multiembedq.php?embedpostback=true&action=scoreembed";</script>';
 
 echo '<input type="hidden" id="asidverify" value="'.$jwtstring.'"/>';

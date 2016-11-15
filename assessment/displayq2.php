@@ -1007,6 +1007,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper && !(isset($scoremethod) && $scoremethod=='acct') ) {
 			$out .= "onfocus=\"showeebasicdd('qn$qn',0)\" onblur=\"hideebasice();hideebasicedd();\" ";
 		}
@@ -1489,6 +1490,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
@@ -1676,6 +1678,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
@@ -1812,6 +1815,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		}
 		$out .= '/>';
 		$out .= getcolormark($colorbox);
@@ -1875,6 +1879,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
@@ -1927,6 +1932,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$qnref = ($multi-1).'-'.($qn%1000);
 			}
 			$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		}
 		$out .= '/>';
 		$out .= getcolormark($colorbox);
@@ -1973,6 +1979,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 		}
@@ -2075,6 +2082,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				} else {
 					$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
 				}
+				$out .= 'aria-describedby="tips'.$qnref.'" ';
 			} else if ($useeqnhelper && $displayformat == 'usepreview') {
 				$out .= "onfocus=\"showeedd('qn$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
 			}
@@ -2294,6 +2302,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('qn$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeebasicdd('qn$qn',1)\" onblur=\"hideebasice();hideebasicedd();\" ";
 		}
@@ -2373,6 +2382,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			} else {
 				$out .= "onfocus=\"showehdd('tc$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" onclick=\"reshrinkeh('tc$qn')\" ";
 			}
+			$out .= 'aria-describedby="tips'.$qnref.'" ';
 		} else if ($useeqnhelper) {
 			$out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper,". (in_array('inequality',$ansformats)?"'ineq'":"'int'") .")\" onblur=\"hideee();hideeedd();\" ";
 		}
