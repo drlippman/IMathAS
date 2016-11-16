@@ -320,11 +320,11 @@
 	echo "</a></td><td>$pct</td><td></td><td>$timeavg</td><td></td></tr>";
 	echo "</tbody></table>";
 	if ($hassection && $hascodes) {
-		echo "<script> initSortTable('myTable',Array('S','S','S','N'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','S','N','P','D'),true);</script>";
 	} else if ($hassection) {
-		echo "<script> initSortTable('myTable',Array('S','S','N'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','S','N','P','D'),true);</script>";
 	} else {
-		echo "<script> initSortTable('myTable',Array('S','N'),true);</script>";
+		echo "<script> initSortTable('myTable',Array('S','N','P','D'),true);</script>";
 	}
 	echo "<p>Meanings:  <i>italics</i>-available to student, IP-In Progress (some questions unattempted), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/>";
 	echo "<sup>e</sup> Has exception <sup>LP</sup> Used latepass  </p>\n";
