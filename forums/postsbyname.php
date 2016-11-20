@@ -253,6 +253,18 @@
 			$limthreads = implode(',',$limthreads); //INT from DB - safe
 		}
 	}
+	$blockreplythreads = array();
+	if (!$canviewall) { //this should probably be refactored in a more elegant way
+		$query = "SELECT threadid FROM imas_forum_posts WHERE forumid=:forumid AND parent=0 AND posttype=3 ";
+		if ($dofilter) {
+			$query .= "AND threadid IN ($limthreads) ";
+		}
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':forumid'=>$forumid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$blockreplythreads[] = $row[0];
+		}
+	}
 
 	//DB $query = "SELECT imas_forum_posts.*,imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.hasuserimg,ifv.lastview from imas_forum_posts JOIN imas_users ";
 	//DB $query .= "ON imas_forum_posts.userid=imas_users.id LEFT JOIN (SELECT DISTINCT threadid,lastview FROM imas_forum_views WHERE userid='$userid') AS ifv ON ";
@@ -305,6 +317,7 @@
 		}
 
 		if ($line['parent']!=0) {
+			if ($line['userid']!=$userid && in_array($line['threadid'], $blockreplythreads)) { continue;}
 			$content .= '<div class="reply"><div class="block">';
 			$content .= '<span style="color:green;">';
 			$replycnt++;
@@ -315,7 +328,7 @@
 
 		$content .= '<span class="right">';
 		if ($haspoints) {
-			if ($caneditscore) {
+			if ($caneditscore && $line['userid']!=$userid) {
 				$content .= "<input type=text size=2 name=\"score[{$line['id']}]\" id=\"score{$line['id']}\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" value=\"";
 				if (isset($scores[$line['id']])) {
 					$content .= $scores[$line['id']];
@@ -325,15 +338,15 @@
 				if ($rubric != 0) {
 					$content .= printrubriclink($rubric,$pointspos,"score{$line['id']}", "feedback{$line['id']}").' ';
 				}
-			} else if (($line['ownerid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
+			} else if (($line['userid']==$userid || $canviewscore) && isset($scores[$line['id']])) {
 				$content .= "<span class=red>{$scores[$line['id']]} pts</span> ";
 			}
 		}
 		$content .= "<a href=\"posts.php?cid=$cid&forum=$forumid&thread={$line['threadid']}\">Thread</a> ";
-		if ($isteacher || ($line['ownerid']==$userid && $allowmod)) {
+		if ($isteacher || ($line['userid']==$userid && $allowmod)) {
 			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&modify={$line['id']}\">Modify</a> \n";
 		}
-		if ($isteacher || ($allowdel && $line['ownerid']==$userid)) {
+		if ($isteacher || ($allowdel && $line['userid']==$userid)) {
 			$content .= "<a href=\"postsbyname.php?cid=$cid&forum=$forumid&thread={$line['threadid']}&remove={$line['id']}\">Remove</a> \n";
 		}
 		if ($line['posttype']!=2 && $myrights > 5 && $allowreply) {
@@ -353,14 +366,14 @@
 		$content .= '</div>';
 		$content .= "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);
 		if ($haspoints) {
-			if ($caneditscore && $ownerid[$child]!=$userid) {
+			if ($caneditscore && $line['userid']!=$userid) {
 				$content .= '<hr/>';
 				$content .= "Private Feedback: <textarea cols=\"50\" rows=\"2\" name=\"feedback[{$line['id']}]\" id=\"feedback{$line['id']}\">";
 				if ($feedback[$line['id']]!==null) {
 					$content .= $feedback[$line['id']];
 				}
 				$content .= "</textarea>";
-			} else if (($ownerid[$child]==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
+			} else if (($line['userid']==$userid || $canviewscore) && $feedback[$line['id']]!=null) {
 				$content .= '<div class="signup">Private Feedback: ';
 				$content .= $feedback[$line['id']];
 				$content .= '</div>';
