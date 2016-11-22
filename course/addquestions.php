@@ -484,13 +484,17 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (count($subs)>1) {
 			if (strpos($subs[0],'|')===false) { //for backwards compat
 				$jsarr .= '[1,0,[';
+				$qncnt++;
 			} else {
 				$grpparts = explode('|',$subs[0]);
 				$jsarr .= '['.$grpparts[0].','.$grpparts[1].',[';
 				array_shift($subs);
+				$qncnt += $grpparts[0];
 			}
+		} else {
+			$qncnt++;
 		}
-		$qncnt += count($subs);
+		
 		for ($j=0;$j<count($subs);$j++) {
 			//DB $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users ";
 			//DB $query .= "WHERE imas_questions.id='{$subs[$j]}' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
