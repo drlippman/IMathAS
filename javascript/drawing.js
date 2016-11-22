@@ -72,6 +72,9 @@ var hasTouchTimer = null;
 	6: parabola
 	6.5: square root
 	7: circle (only works on square grids)
+	7.2: ellipse
+	7.4: vertical hyperbola
+	7.5: horizontal hyperbola
 	8: abs value
 	8.2: linear/linear rational
 	8.3: exponential (unshifted)
@@ -159,6 +162,11 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"rational": [{"mode":8.2, "descr":_("Rational"), inN: 2, "input":_("Enter the point where the vertical and horizontal asymptote cross, then a point on the graph")}],
 			"exp": [{"mode":8.3, "descr":_("Exponential"), inN: 2, "input":_("Enter two points on the graph")}],
 			"circle": [{"mode":7, "descr":_("Circle"), inN: 2, "input":_("Enter the center point of the circle, then a point on the graph")}],
+			"ellipse": [{"mode":7.2, "descr":_("Ellipse"), inN: 2, "input":_("Enter the center point of the ellipse, then a point offset from the center by the horizontal radius and vertical radius")}],
+			"hyperbola": [
+				{"mode":7.4, "descr":_("Vertical hyperbola"), inN: 2, "input":_("Enter the center point of the hyperbola, then a point (x,y) where x is the x-coordinate of the co-vertex and y is the y-coordinate of the vertex")},
+				{"mode":7.5, "descr":_("Horizontal hyperbola"), inN: 2, "input":_("Enter the center point of the hyperbola, then a point (x,y) where x is the x-coordinate of the vertex and y is the y-coordinate of the co-vertex")},
+			],
 			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
 			"trig": [
@@ -703,7 +711,9 @@ function drawTarget(x,y) {
 					} while (curx > 0 && curx < targets[curTarget].imgwidth && cury > 0 && cury < targets[curTarget].imgheight);
 				}
 			}
-		} else if (tptypes[curTarget][i]==7) {//if a tp circle
+		} else if (tptypes[curTarget][i]>=7 && tptypes[curTarget][i]<8) {//if a tp circle
+			var y2 = null;
+			var x2 = null;
 			if (tplines[curTarget][i].length==2) {
 				x2 = tplines[curTarget][i][1][0];
 				y2 = tplines[curTarget][i][1][1];
@@ -712,8 +722,113 @@ function drawTarget(x,y) {
 				y2 = y;
 			}
 			if (x2 != null && (x2!=tplines[curTarget][i][0][0] || y2!=tplines[curTarget][i][0][1])) {
-				var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
-				ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
+				if (tptypes[curTarget][i]==7) { //is a tp circle
+					var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
+					ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
+				} else if (tptypes[curTarget][i]==7.2) { //if a tp ellipse
+					var rx = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var ry = Math.abs(y2-tplines[curTarget][i][0][1]);
+					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
+						ctx.strokeStyle = "rgb(0,255,255)";
+						ctx.lineWidth = 1;
+						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
+						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2,y2-2*(y2-tplines[curTarget][i][0][1]),x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2-2*(x2-tplines[curTarget][i][0][0]),y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.lineWidth = 2;
+					}
+					ctx.strokeStyle = "rgb(0,0,255)";
+					ctx.save(); // save state
+					ctx.beginPath();
+					ctx.translate(tplines[curTarget][i][0][0]-rx, tplines[curTarget][i][0][1]-ry);
+					ctx.scale(rx, ry);
+					ctx.arc(1, 1, 1, 0, 2 * Math.PI, false);
+					ctx.restore(); // restore to original state
+				} else if (tptypes[curTarget][i]==7.4) { //if a tp vert hyperbola
+					var b = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var a = Math.abs(y2-tplines[curTarget][i][0][1]);
+					var m = Math.abs(a/b);
+					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]+m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]-m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
+					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
+						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.lineWidth = 1;
+						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
+						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2,y2-2*(y2-tplines[curTarget][i][0][1]),x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2-2*(x2-tplines[curTarget][i][0][0]),y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.lineWidth = 2;
+					}
+					ctx.beginPath();
+					ctx.strokeStyle = "rgb(0,0,255)";
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+						cury = tplines[curTarget][i][0][1] + Math.sqrt((Math.pow(curx-tplines[curTarget][i][0][0], 2)/(b*b) + 1)*a*a);
+						if (cury<-100) { cury = -100;}
+						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+						if (curx==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+					ctx.stroke();
+					ctx.beginPath();
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+						cury = tplines[curTarget][i][0][1] - Math.sqrt((Math.pow(curx-tplines[curTarget][i][0][0], 2)/(b*b) + 1)*a*a);
+						if (cury<-100) { cury = -100;}
+						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+						if (curx==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				} else if (tptypes[curTarget][i]==7.5) { //if a tp horiz hyperbola
+					var a = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var b = Math.abs(y2-tplines[curTarget][i][0][1]);
+					var m = Math.abs(b/a);
+					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]+m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]-m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
+					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
+						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.lineWidth = 1;
+						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
+						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2,y2-2*(y2-tplines[curTarget][i][0][1]),x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2-2*(x2-tplines[curTarget][i][0][0]),y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.lineWidth = 2;
+					}
+					ctx.beginPath();
+					ctx.strokeStyle = "rgb(0,0,255)";
+					for (var cury=0;cury < targets[curTarget].imgwidth+4;cury += 3) {
+						curx = tplines[curTarget][i][0][0] + Math.sqrt((Math.pow(cury-tplines[curTarget][i][0][1], 2)/(b*b) + 1)*a*a);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+					ctx.stroke();
+					ctx.beginPath();
+					for (var cury=0;cury < targets[curTarget].imgwidth+4;cury += 3) {
+						curx = tplines[curTarget][i][0][0] - Math.sqrt((Math.pow(cury-tplines[curTarget][i][0][1], 2)/(b*b) + 1)*a*a);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				}
 			}
 		} else if (tptypes[curTarget][i]==8) {//if a tp absolute value
 			var slope = null;
@@ -1695,7 +1810,7 @@ function initCanvases(k) {
 		    var dashes = Math.sqrt(dX * dX + dY * dY) / dashLen;
 		    var dashX = dX / dashes;
 		    var dashY = dY / dashes;
-		    dashes = Math.round(dashes);
+		    dashes = Math.floor(dashes);
 
 		    var q = 0;
 		    while (q++ < dashes && y1>-1 && y1<targets[curTarget].imgheight+1 && x1>-1 && x1<targets[curTarget].imgwidth+1) {

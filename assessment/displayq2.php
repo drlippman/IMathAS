@@ -2648,6 +2648,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='ray') { $out .= 'class="sel" '; $def = 5.2;}
 						$out .= ' alt="Ray"/>';
 					}
+					if (in_array('vector',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpvec.gif\" onclick=\"imathasDraw.settool(this,$qn,5.4)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='vector') { $out .= 'class="sel" '; $def = 5.4;}
+						$out .= ' alt="Vector"/>';
+					}
 					if (count($answerformat)==1 || in_array('parab',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpparab.png\" onclick=\"imathasDraw.settool(this,$qn,6)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
@@ -2681,6 +2686,24 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 							$out .= ' alt="Circle"/>';
 						}
 					}
+					if (in_array('ellipse',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpellipse.png\" onclick=\"imathasDraw.settool(this,$qn,7.2)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='ellipse') { $out .= 'class="sel" '; $def = 7.2;}
+						$out .= ' alt="Ellipse"/>';
+					}
+					if (in_array('hyperbola',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpverthyper.png\" onclick=\"imathasDraw.settool(this,$qn,7.4)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='hyperbola') { $out .= 'class="sel" '; $def = 7.4;}
+						$out .= ' alt="Vertical hyperbola"/>';
+						$out .= "<img src=\"$imasroot/img/tphorizhyper.png\" onclick=\"imathasDraw.settool(this,$qn,7.5)\" ";
+						$out .= ' alt="Horizontal hyperbola"/>';
+					}
+					if (in_array('trig',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tpcos.png\" onclick=\"imathasDraw.settool(this,$qn,9)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='trig') { $out .= 'class="sel" '; $def = 9;}
+						$out .= ' alt="Cosine"/>';
+						$out .= "<img src=\"$imasroot/img/tpsin.png\" onclick=\"imathasDraw.settool(this,$qn,9.1)\" alt=\"Sine\"/>";
+					}
 					if (count($answerformat)==1 || in_array('dot',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpdot.gif\" onclick=\"imathasDraw.settool(this,$qn,1)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='dot') { $out .= 'class="sel" '; $def = 1;}
@@ -2691,17 +2714,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='opendot') { $out .= 'class="sel" '; $def = 2;}
 						$out .= ' alt="Open dot"/>';
 					}
-					if (in_array('trig',$answerformat)) {
-						$out .= "<img src=\"$imasroot/img/tpcos.png\" onclick=\"imathasDraw.settool(this,$qn,9)\" ";
-						if (count($answerformat)>1 && $answerformat[1]=='trig') { $out .= 'class="sel" '; $def = 9;}
-						$out .= ' alt="Cosine"/>';
-						$out .= "<img src=\"$imasroot/img/tpsin.png\" onclick=\"imathasDraw.settool(this,$qn,9.1)\" alt=\"Sine\"/>";
-					}
-					if (in_array('vector',$answerformat)) {
-						$out .= "<img src=\"$imasroot/img/tpvec.gif\" onclick=\"imathasDraw.settool(this,$qn,5.4)\" ";
-						if (count($answerformat)>1 && $answerformat[1]=='vector') { $out .= 'class="sel" '; $def = 5.4;}
-						$out .= ' alt="Vector"/>';
-					}
+					
+					
 				} else {
 					if ($answerformat[0]=='numberline') {
 						array_shift($answerformat);
@@ -2818,6 +2832,26 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$saarr[$k] = "[$xs + ($dx)*t, $ys + ($dy)*t],blue,0,1,,arrow";
 					} else if ($function[0]=='circle') { //is circle
 						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[3]}*sin(t)+{$function[2]}],blue,0,6.31";
+					} else if ($function[0]=='ellipse') { 
+						$saarr[$k] = "[{$function[3]}*cos(t)+{$function[1]},{$function[4]}*sin(t)+{$function[2]}],blue,0,6.31";
+					} else if ($function[0]=='verthyperbola') { 
+						//(y-yc)^2/a^2 -  (x-xc)^2/b^2 = 1
+						$saarr[$k] = "sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
+						$k++;
+						$saarr[$k] = "-sqrt($function[3]^2*(1+(x-$function[1])^2/($function[4])^2))+$function[2]";
+						$k++;
+						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]+$function[3]*t],green,,,,,,dash";
+						$k++;
+						$saarr[$k] = "[$function[1]+$function[4]*t,$function[2]-$function[3]*t],green,,,,,,dash";
+					} else if ($function[0]=='horizhyperbola') { 
+						//(x-xc)^2/a^2 - (y-yc)^2/b^2 = 1
+						$saarr[$k] = "[sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
+						$k++;
+						$saarr[$k] = "[-sqrt($function[3]^2*(1+(t-$function[2])^2/($function[4])^2))+{$function[1]},t],blue,$settings[2],$settings[3]";
+						$k++;
+						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]+$function[4]*t],green,,,,,,dash";
+						$k++;
+						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]-$function[4]*t],green,,,,,,dash";
 					} else if (substr($function[0],0,2)=='x=') {
 						$saarr[$k] = '['.substr($function[0],2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
 					} else { //is function
@@ -4807,6 +4841,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$anscoss = array();
 			$ansvecs = array();
 			$ansrats = array();
+			$ansellipses = array();
+			$anshyperbolas = array();
 			$x0 = $settings[0];
 			$x1 = 1/4*$settings[1] + 3/4*$settings[0];
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0];
@@ -4844,6 +4880,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				} else if ($function[0]=='circle') {  // form "circle,x_center,y_center,radius"
 					$anscircs[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,$function[3]*$pixelsperx);
+				} else if ($function[0]=='ellipse') {  //form ellipse,x_center,y_center,x_radius,y_radius
+					$ansellipses[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,abs($function[3]*$pixelsperx),abs($function[4]*$pixelspery));
+				} else if ($function[0]=='verthyperbola') {  //form verthyperbola,x_center,y_center,horiz "radius",vert "radius"
+					$anshyperbolas[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,abs($function[4]*$pixelspery),abs($function[3]*$pixelsperx),'vert');
+				} else if ($function[0]=='horizhyperbola') {  //form verthyperbola,x_center,y_center,horiz "radius",vert "radius"
+					$anshyperbolas[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,abs($function[3]*$pixelsperx),abs($function[4]*$pixelspery),'horiz');
 				} else if (substr($function[0],0,2)=='x=') {
 					$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
 				} else if (count($function)==3) { //line segment or ray
@@ -5028,6 +5070,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$exps = array();
 			$vecs = array();
 			$rats = array();
+			$ellipses = array();
+			$hyperbolas = array();
 			if ($tplines=='') {
 				$tplines = array();
 			} else {
@@ -5077,6 +5121,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else if ($pts[0]==7) {
 						//circle
 						$circs[] = array($pts[1],$pts[2],sqrt(($pts[3]-$pts[1])*($pts[3]-$pts[1]) + ($pts[4]-$pts[2])*($pts[4]-$pts[2])));
+					} else if ($pts[0]==7.2) {
+						//ellipse
+						$ellipses[] = array($pts[1],$pts[2],abs($pts[3]-$pts[1]),abs($pts[4]-$pts[2]));
+					} else if ($pts[0]==7.4) {
+						//vert hyperbola
+						$hyperbolas[] = array($pts[1],$pts[2],abs($pts[3]-$pts[1]),abs($pts[4]-$pts[2]),'vert');
+					} else if ($pts[0]==7.5) {
+						//horiz hyperbola
+						$hyperbolas[] = array($pts[1],$pts[2],abs($pts[3]-$pts[1]),abs($pts[4]-$pts[2]),'horiz');
 					} else if ($pts[0]==8) {
 						//abs
 						if ($pts[1]==$pts[3]) {
@@ -5200,6 +5253,45 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						continue;
 					}
 					if (abs($anscirc[2]-$circs[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			foreach ($ansellipses as $key=>$ansellipse) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($ellipses); $i++) {
+					if (abs($ansellipse[0]-$ellipses[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansellipse[1]-$ellipses[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansellipse[2]-$ellipses[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansellipse[3]-$ellipses[$i][3])>$defpttol*$reltolerance) {
+						continue;
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+			foreach ($anshyperbolas as $key=>$anshyperbola) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($hyperbolas); $i++) {
+					if ($anshyperbola[4]!=$hyperbolas[$i][4]) {continue;}
+					if (abs($anshyperbola[0]-$hyperbolas[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anshyperbola[1]-$hyperbolas[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anshyperbola[2]-$hyperbolas[$i][2])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($anshyperbola[3]-$hyperbolas[$i][3])>$defpttol*$reltolerance) {
 						continue;
 					}
 					$scores[$key] = 1;

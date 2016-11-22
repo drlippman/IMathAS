@@ -2570,8 +2570,21 @@ drawn line from the correct line.
 <p><b>Optional Variables</b><BR>
 <dl>
 <dt>$answerformat = "line,lineseg,dot,opendot" or "polygon" or "twopoint" or "inequality" or "numberline" (In Common Control)</dt>
-	<dd>Limits the drawing tools available to students.  Defaults to "line,dot,opendot".  Define to limit the options.
-	    Example: $answerformat = "line", or $answerformat = "line,dot"<br/>
+	<dd>Limits the drawing tools available to students.  Defaults to the older drawing tools "line,dot,opendot".  <br/>
+	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
+	    control points to define the shape. 
+	      <ul>
+	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
+	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp,ellipse,hyperbola</li>
+	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials, give $answers in the normal way (as a function of x)</li>
+	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
+	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3"</li>
+	        <li>For ellipses, give $answers as "ellipse,x,y,x_radius,y_radius", like "ellipse,1,2,4,2"</li>
+	        <li>For hyperbolas of form (x-h)^2/a^2-(y-k)^2/b^2=1, give $answers as "horizhyperbola,h,k,a,b"</li>
+	        <li>For hyperbolas of form (y-k)^2/a^2-(x-h)^2/b^2=1, give $answers as "verthyperbola,h,k,a,b"</li>
+	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
+	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
+	      </ul><br/>
 	    $answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.<br/>
 	    $answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
 	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.<br/>
@@ -2579,16 +2592,7 @@ drawn line from the correct line.
 	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.<br/>
 	    $answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
 	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.<br/>
-	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
-	    control points to define the shape. 
-	      <ul>
-	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
-	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp</li>
-	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials and dots, give $answers in the normal way (as a function of x)</li>
-	        <li>For circles, use "circle,x,y,radius", like "circle,2,-1,3"</li>
-	        <li>For vertical lines use "x=number", like "x=3".</li>
-	        <li>For vectors, use "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
-	      </ul>
+	    Can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"<br/>
 	     </dd>
 <dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
 	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
