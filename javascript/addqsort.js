@@ -432,7 +432,7 @@ function generateMoveSelect2(num) {
 
 		if (!curistxt) {
 			if (itemarray[i-1].length<5) { //is group
-				qcnt += itemarray[i-1][2].length;
+				qcnt += itemarray[i-1][0];//itemarray[i-1][2].length;
 			} else {
 				qcnt++;
 			}
@@ -796,8 +796,8 @@ function generateOutput() {
 			out += itemarray[i][0]+'|'+itemarray[i][1];
 			for (var j=0; j<itemarray[i][2].length; j++) {
 				out += '~'+itemarray[i][2][j][0];
-				qcnt++;
 			}
+			qcnt += itemarray[i][0];
 		} else {
 			if (out.length>0) {
 				out += ',';
@@ -854,7 +854,7 @@ function generateTable() {
 		html += "<th>Template</th><th>Remove</th>";
 	}
 	html += "</thead><tbody>";
-	var text_segment_count = 0;
+	var text_segment_count = 0; var curqnum = 0;
 	for (var i=0; i<itemcount; i++) {
 		curistext = 0;
 		curisgroup = 0;
@@ -869,7 +869,7 @@ function generateTable() {
 			var curitems = new Array();
 			curitems[0] = itemarray[i];
 		}
-
+		curqnum = i-text_segment_count;
 		//var ms = generateMoveSelect(i,itemcount);
 		var ms = generateMoveSelect2(i);
 		for (var j=0; j<curitems.length; j++) {
@@ -885,7 +885,7 @@ function generateTable() {
 			if (beentaken) {
 				if (curisgroup) {
 					if (j==0) {
-						html += "<td>Q"+(i-text_segment_count+1)+"</td><td><b>Group</b>, choosing "+itemarray[i][0];
+						html += "<td>Q"+(curqnum+1)+"</td><td><b>Group</b>, choosing "+itemarray[i][0];
 						if (itemarray[i][1]==0) {
 							html += " without";
 						} else if (itemarray[i][1]==1) {
@@ -893,12 +893,12 @@ function generateTable() {
 						}
 						html += " replacement</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr class="+curclass+">";
 					}
-					html += "<td>&nbsp;Q"+(i-text_segment_count+1)+'-'+(j+1);
+					html += "<td>&nbsp;Q"+(curqnum+1)+'-'+(j+1);
 				} else if (curistext) {
 					//html += "<td>Text"+(text_segment_count+1);
 					html += "<td>"+ms;
 				} else {
-					html += "<td>Q"+(i-text_segment_count+1);
+					html += "<td>Q"+(curqnum+1);
 				}
 				html += "<input type=hidden id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/>";
 				html += "</td>";
@@ -1030,7 +1030,7 @@ function generateTable() {
 					if (curitems[j][6]==1) {
 						html += "<td><span class='red'>Withdrawn</span></td>";
 					} else {
-						html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
+						html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?curqnum+'-'+j:curqnum)+"\">Withdraw</a></td>";
 					}
 				} else {
 					html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
