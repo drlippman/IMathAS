@@ -70,6 +70,7 @@ var hasTouchTimer = null;
 	5.3:  line segment
 	5.4:  vector
 	6: parabola
+	6.1: horiz parabola
 	6.5: square root
 	7: circle (only works on square grids)
 	7.2: ellipse
@@ -157,6 +158,7 @@ function addA11yTarget(canvdata, thisdrawla) {
 			"lineseg": [{"mode":5.3, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
 			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
 			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
+			"horizparab": [{"mode":6.1, "descr":_("Parabola opening right or left"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
 			"sqrt": [{"mode":6.5, "descr":_("Square root"), inN: 2, "input":_("Enter the starting point of the square root, then another point on the graph")}],
 			"abs": [{"mode":8, "descr":_("Absolute value"), inN: 2, "input":_("Enter the corner point of the absolute value, then another point on the graph")}],
 			"rational": [{"mode":8.2, "descr":_("Rational"), inN: 2, "input":_("Enter the point where the vertical and horizontal asymptote cross, then a point on the graph")}],
@@ -644,7 +646,7 @@ function drawTarget(x,y) {
 					}
 				}
 			}
-		} else if (tptypes[curTarget][i]==6) {//if a tp parabola
+		} else if (tptypes[curTarget][i]==6 || tptypes[curTarget][i]==6.1) {//if a tp parabola
 			var y2 = null;
 			var x2 = null;
 			if (tplines[curTarget][i].length==2) {
@@ -654,30 +656,71 @@ function drawTarget(x,y) {
 				x2 = x;
 				y2 = y;
 			}
-			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
-				if (y2==tplines[curTarget][i][0][1]) {
-					ctx.moveTo(0,y2);
-					ctx.lineTo(targets[curTarget].imgwidth,y2);
-				} else {
-					var stretch = (y2 - tplines[curTarget][i][0][1])/((x2 - tplines[curTarget][i][0][0])*(x2 - tplines[curTarget][i][0][0]));
-					if (y2>tplines[curTarget][i][0][1]) {
-						//crosses at y=imgheight
-						var inta = Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var intb = -1*Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var cnty = tplines[curTarget][i][0][1] - (targets[curTarget].imgheight - tplines[curTarget][i][0][1]);
-						var qy = targets[curTarget].imgheight;
+			if (x2 != null) {
+				if (tptypes[curTarget][i]==6) {
+					if (y2==tplines[curTarget][i][0][1]) {
+						ctx.moveTo(0,y2);
+						ctx.lineTo(targets[curTarget].imgwidth,y2);
+					} else if (x2 == tplines[curTarget][i][0][0]) {
+						ctx.moveTo(x2,tplines[curTarget][i][0][1]);
+						if (y2>tplines[curTarget][i][0][1]) {
+							ctx.lineTo(x2,targets[curTarget].imgheight);
+						} else {
+							ctx.lineTo(x2,0);
+						}
 					} else {
-						var inta = Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var intb = -1*Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var cnty = 2*tplines[curTarget][i][0][1];
-						var qy = 0;
+						var stretch = (y2 - tplines[curTarget][i][0][1])/((x2 - tplines[curTarget][i][0][0])*(x2 - tplines[curTarget][i][0][0]));
+						if (y2>tplines[curTarget][i][0][1]) {
+							//crosses at y=imgheight
+							var inta = Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var intb = -1*Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var cnty = tplines[curTarget][i][0][1] - (targets[curTarget].imgheight - tplines[curTarget][i][0][1]);
+							var qy = targets[curTarget].imgheight;
+						} else {
+							var inta = Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var intb = -1*Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var cnty = 2*tplines[curTarget][i][0][1];
+							var qy = 0;
+						}
+						var cp1x = inta + 2.0/3.0*(tplines[curTarget][i][0][0] - inta);
+						var cp1y = qy + 2.0/3.0*(cnty - qy);
+						var cp2x = cp1x + (intb - inta)/3.0;
+						var cp2y = cp1y;
+						ctx.moveTo(inta,qy);
+						ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,intb,qy);
 					}
-					var cp1x = inta + 2.0/3.0*(tplines[curTarget][i][0][0] - inta);
-					var cp1y = qy + 2.0/3.0*(cnty - qy);
-					var cp2x = cp1x + (intb - inta)/3.0;
-					var cp2y = cp1y;
-					ctx.moveTo(inta,qy);
-					ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,intb,qy);
+				} else if (tptypes[curTarget][i]==6.1) {
+					if (x2==tplines[curTarget][i][0][0]) {
+						ctx.moveTo(x2,0);
+						ctx.lineTo(x2,targets[curTarget].imgheight);
+					} else if (y2 == tplines[curTarget][i][0][1]) {
+						ctx.moveTo(tplines[curTarget][i][0][0],y2);
+						if (x2>tplines[curTarget][i][0][0]) {
+							ctx.lineTo(targets[curTarget].imgwidth,y2);
+						} else {
+							ctx.lineTo(0,y2);
+						}
+					} else {
+						var stretch = (x2 - tplines[curTarget][i][0][0])/((y2 - tplines[curTarget][i][0][1])*(y2 - tplines[curTarget][i][0][1]));
+						if (x2>tplines[curTarget][i][0][0]) {
+							//crosses at x=imgwidth
+							var inta = Math.sqrt((targets[curTarget].imgwidth - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var intb = -1*Math.sqrt((targets[curTarget].imgwidth - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var cntx = tplines[curTarget][i][0][0] - (targets[curTarget].imgwidth - tplines[curTarget][i][0][0]);
+							var qx = targets[curTarget].imgwidth;
+						} else {
+							var inta = Math.sqrt((0 - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var intb = -1*Math.sqrt((0 - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var cntx = 2*tplines[curTarget][i][0][0];
+							var qx = 0;
+						}
+						var cp1y = inta + 2.0/3.0*(tplines[curTarget][i][0][1] - inta);
+						var cp1x = qx + 2.0/3.0*(cntx - qx);
+						var cp2y = cp1y + (intb - inta)/3.0;
+						var cp2x = cp1x;
+						ctx.moveTo(qx,inta);
+						ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,qx,intb);
+					}
 				}
 
 			}

@@ -2658,6 +2658,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						if (count($answerformat)>1 && $answerformat[1]=='parab') { $out .= 'class="sel" '; $def = 6;}
 						$out .= ' alt="Parabola"/>';
 					}
+					if (in_array('horizparab',$answerformat)) {
+						$out .= "<img src=\"$imasroot/img/tphorizparab.png\" onclick=\"imathasDraw.settool(this,$qn,6.1)\" ";
+						if (count($answerformat)>1 && $answerformat[1]=='horizparab') { $out .= 'class="sel" '; $def = 6.1;}
+						$out .= ' alt="Horizontal parabola"/>';
+					}
 					if (in_array('sqrt',$answerformat)) {
 						$out .= "<img src=\"$imasroot/img/tpsqrt.png\" onclick=\"imathasDraw.settool(this,$qn,6.5)\" ";
 						if (count($answerformat)>1 && $answerformat[1]=='sqrt') { $out .= 'class="sel" '; $def = 6.5;}
@@ -2853,7 +2858,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$k++;
 						$saarr[$k] = "[$function[1]+$function[3]*t,$function[2]-$function[4]*t],green,,,,,,dash";
 					} else if (substr($function[0],0,2)=='x=') {
-						$saarr[$k] = '['.substr($function[0],2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
+						$saarr[$k] = '['.substr(str_replace('y','t',$function[0]),2).',t],blue,'.($settings[2]-1).','.($settings[3]+1);
 					} else { //is function
 						$saarr[$k] = $function[0].',blue';
 						if (count($function)>2) {
@@ -4835,6 +4840,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		} else if ($answerformat[0]=="twopoint") {
 			$anscircs = array();
 			$ansparabs = array();
+			$anshparabs = array();
 			$ansabs = array();
 			$anssqrts = array();
 			$ansexps = array();
@@ -4887,7 +4893,41 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				} else if ($function[0]=='horizhyperbola') {  //form verthyperbola,x_center,y_center,horiz "radius",vert "radius"
 					$anshyperbolas[$key] = array(($function[1] - $settings[0])*$pixelsperx + $imgborder,$settings[7] - ($function[2]-$settings[2])*$pixelspery - $imgborder,abs($function[3]*$pixelsperx),abs($function[4]*$pixelspery),'horiz');
 				} else if (substr($function[0],0,2)=='x=') {
-					$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+					if (strpos($function[0],'y')!==false && strpos($function[0],'^2')!==false) { //horiz parab
+						$y1 = 1/4*$settings[3] + 3/4*$settings[2];
+						$y2 = 1/2*$settings[3] + 1/2*$settings[2];
+						$y3 = 3/4*$settings[3] + 1/4*$settings[2];
+						$y1p = $ytopix($y1);
+						$y2p = $ytopix($y2);
+						$y3p = $ytopix($y3);
+						$func = makepretty(substr($function[0],2));
+						$func = mathphp($func,'y');
+						$func = str_replace("(y)",'($y)',$func);
+						$func = create_function('$y', 'return ('.$func.');');
+						$x1p = $xtopix(@$func($y1));
+						$x2p = $xtopix(@$func($y2));
+						$x3p = $xtopix(@$func($y3));
+						$denom = ($y1p - $y2p)*($y1p - $y3p)*($y2p - $y3p);
+						$A = ($y3p * ($x2p - $x1p) + $y2p * ($x1p - $x3p) + $y1p * ($x3p - $x2p)) / $denom;
+						$B = ($y3p*$y3p * ($x1p - $x2p) + $y2p*$y2p * ($x3p - $x1p) + $y1p*$y1p * ($x2p - $x3p)) / $denom;
+						$C = ($y2p * $y3p * ($y2p - $y3p) * $x1p + $y3p * $y1p * ($y3p - $y1p) * $x2p + $y1p * $y2p * ($y1p - $y2p) * $x3p) / $denom;
+						
+						$yv = -$B/(2*$A);
+						$xv = $C-$B*$B/(4*$A);
+						//TODO:  adjust 20px to be based on drawing window and grid
+						//   maybe ~1 grid units?
+						$yt = -$B/(2*$A)+20;
+						$xatyt = $A*$yt*$yt+$B*$yt+$C;
+						if (abs($xatyt - $xv)<20) {
+							$yatxt = sign($A)*sqrt(abs(20/$A))+$yv;
+							$anshparabs[$key] = array('y', $xv, $yv, $yatxt);
+						} else {
+							//use vertex and x value at y of vertex + 20 pixels
+							$anshparabs[$key] = array('x', $xv, $yv, $xatyt);
+						}
+					} else {
+						$anslines[$key] = array('x',10000,(substr($function[0],2)- $settings[0])*$pixelsperx + $imgborder );
+					}
 				} else if (count($function)==3) { //line segment or ray
 					$func = makepretty($function[0]);
 					$func = mathphp($func,'x');
@@ -5063,6 +5103,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			list($lines,$dots,$odots,$tplines,$ineqlines) = array_slice(explode(';;',$givenans),0,5);
 			$lines = array();
 			$parabs = array();
+			$hparabs = array();
 			$circs = array();
 			$abs = array();
 			$sqrts = array();
@@ -5110,6 +5151,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							$y = $pts[2]+$a*400;
 							$x = $pts[1]+sign($a)*sqrt(abs(20/$a));
 							$parabs[] = array($pts[1],$pts[2],$y,$x);
+						}
+					} else if ($pts[0]==6.1) {
+						//same as above, but swap x and y
+						if ($pts[3]==$pts[1]) {
+							$lines[] = array('x',0,$pts[3]);
+						} else if ($pts[4]!=$pts[2]) {
+							$a = ($pts[3]-$pts[1])/(($pts[4]-$pts[2])*($pts[4]-$pts[2]));
+							$x = $pts[1]+$a*400;
+							$y = $pts[2]+sign($a)*sqrt(abs(20/$a));
+							$hparabs[] = array($pts[1],$pts[2],$y,$x);
 						}
 					} else if ($pts[0]==6.5) {//sqrt
 						$flip = ($pts[3] < $pts[1])?-1:1;
@@ -5420,6 +5471,29 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}
 					} else { //compare y at xv+20
 						if (abs($ansparab[3]-$parabs[$i][2])>$defpttol*$reltolerance) {
+							continue;
+						}
+					}
+					$scores[$key] = 1;
+					break;
+				}
+			}
+
+			foreach ($anshparabs as $key=>$ansparab) {
+				$scores[$key] = 0;
+				for ($i=0; $i<count($hparabs); $i++) {
+					if (abs($ansparab[1]-$hparabs[$i][0])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if (abs($ansparab[2]-$hparabs[$i][1])>$defpttol*$reltolerance) {
+						continue;
+					}
+					if ($ansparab[0]=='x') { //compare x at yv+-20
+						if (abs($ansparab[3]-$hparabs[$i][3])>$defpttol*$reltolerance) {
+							continue;
+						}
+					} else { //compare y at xv+20
+						if (abs($ansparab[3]-$hparabs[$i][2])>$defpttol*$reltolerance) {
 							continue;
 						}
 					}
