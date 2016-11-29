@@ -4,8 +4,8 @@
 
 //boost operation time
 @set_time_limit(0);
-ini_set("max_input_time", "900");
-ini_set("max_execution_time", "900");
+ini_set("max_input_time", "3600");
+ini_set("max_execution_time", "3600");
 ini_set("memory_limit", "104857600");
 ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
@@ -93,17 +93,17 @@ function parseqs($file,$touse,$rights) {
 					$query .= "qtype=:qtype,control=:control,qcontrol=:qcontrol,qtext=:qtext,";
 					$query .= "answer=:answer,extref=:extref,license=:license,ancestorauthors=:ancestorauthors,otherattribution=:otherattribution,";
 					$query .= "solution=:solution,solutionopts=:solutionopts,adddate=:adddate,lastmoddate=:lastmoddate,hasimg=:hasimg WHERE id=:id";
-					$qarry = array(':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'],
-            ':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'], ':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'],
-            ':extref'=>$qd['extref'], ':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'],
-            ':otherattribution'=>$qd['otherattribution'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'],
-            ':adddate'=>$now, ':lastmoddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$qsetid);
+					$qarr = array(':description'=>$qd['description'], ':author'=>$qd['author'], ':qtype'=>$qd['qtype'],
+						':control'=>$qd['control'], ':qcontrol'=>$qd['qcontrol'], ':qtext'=>$qd['qtext'], ':answer'=>$qd['answer'],
+						':extref'=>$qd['extref'], ':license'=>$qd['license'], ':ancestorauthors'=>$qd['ancestorauthors'],
+						':otherattribution'=>$qd['otherattribution'], ':solution'=>$qd['solution'], ':solutionopts'=>$qd['solutionopts'],
+						':adddate'=>$now, ':lastmoddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$qsetid);
 					if (!$isadmin) {
 						//DB $query .= " AND ownerid=$userid";
-            $query .= " AND ownerid=:ownerid";
-            $qarr[':ownerid'] = $userid;
+						$query .= " AND ownerid=:ownerid";
+						$qarr[':ownerid'] = $userid;
 					}
-          $stm = $DBH->prepare($query);
+					$stm = $DBH->prepare($query);
 					$stm->execute($qarr);
 				}
 				//DB mysql_query($query) or die("error on: $query: " . mysql_error());
