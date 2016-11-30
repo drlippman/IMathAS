@@ -392,7 +392,13 @@ if (!(isset($teacherid)) && $myrights<75) {
 		$qrights = $_POST['qrights'];
 		$touse = '';
 		//write libraries
-		$lookup = implode(',', array_map('intval', $unique));
+		foreach ($unique as $k=>$v) {
+			$unique[$k] = preg_replace('/[^0-9\.]/','',$v);
+		}
+		$lookup = implode(',', $unique);
+		// intval doesn't work on uniqueid since they're bigint 
+		// $lookup = implode(',', array_map('intval', $unique));
+		
 		//DB $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ($lookup)";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -425,10 +431,10 @@ if (!(isset($teacherid)) && $myrights<75) {
 			if (isset($exists[$unique[$libid]]) && $_POST['merge']==1) {
 				if ($lastmoddate[$libid]>$adddate[$exists[$unique[$libid]]]) { //if library has changed
 					if ($isadmin) {
-            //DB $query = "UPDATE imas_libraries SET name='{$names[$libid]}',adddate=$now,lastmoddate=$now WHERE id={$exists[$unique[$libid]]}";
-            $stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
-            $stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]]));
-          } else if ($isgrpadmin) {
+						//DB $query = "UPDATE imas_libraries SET name='{$names[$libid]}',adddate=$now,lastmoddate=$now WHERE id={$exists[$unique[$libid]]}";
+						$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id");
+						$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]]));
+					} else if ($isgrpadmin) {
 						//DB $query .= "UPDATE imas_libraries SET name='{$names[$libid]}',adddate=$now,lastmoddate=$now WHERE id={$exists[$unique[$libid]]} AND groupid='$groupid'";
 						$stm = $DBH->prepare("UPDATE imas_libraries SET name=:name,adddate=:adddate,lastmoddate=:lastmoddate WHERE id=:id AND groupid=:groupid");
 						$stm->execute(array(':name'=>$names[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':id'=>$exists[$unique[$libid]], ':groupid'=>$groupid));
@@ -458,7 +464,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :parent, :groupid)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':uniqueid'=>$unique[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$names[$libid], ':ownerid'=>$userid,
-          ':userights'=>$librights, ':parent'=>$parent, ':groupid'=>$groupid));
+					':userights'=>$librights, ':parent'=>$parent, ':groupid'=>$groupid));
 				$libs[$libid] = $DBH->lastInsertId();
 				$newl++;
 			}
@@ -492,7 +498,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				//lookup backrefs
 				$includedbackref = array();
 				if (count($includedqs)>0) {
-					$includedlist = implode(',', array_map('intval', $includedqs));
+					$includedlist = implode(',', $includedqs);  //known decimal values from above
 					//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 					//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
