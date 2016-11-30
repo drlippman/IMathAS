@@ -515,7 +515,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					//DB $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row[1]));
 					//DB $qtext = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row[2]));
-          $control = preg_replace_callback('/includecodefrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
+					$control = preg_replace_callback('/includecodefrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
   						return "includecodefrom(".$includedbackref[$matches[1]].")";
   					}, $row[1]);
   				$qtext = preg_replace_callback('/includeqtextfrom\(UID(\d+)\)/', function($matches) use ($includedbackref) {
@@ -553,10 +553,12 @@ if (!(isset($teacherid)) && $myrights<75) {
 				}
 				unset($existingli);
 			}
+			//clean up any unassigned library items that are now assigned
+			$DBH->query("DELETE A FROM imas_library_items AS A JOIN imas_library_items as B on A.qsetid=B.qsetid WHERE A.libid=0 AND B.libid>0");
 		}
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
-    $DBH->commit();
+		$DBH->commit();
 
 		unlink($filename);
 		$page_uploadSuccessMsg = "Import Successful.<br>\n";

@@ -51,7 +51,7 @@ if ($myrights<20) {
 		if (isset($_GET['confirmed'])) {
 			if ($_POST['remove']!='') {
 				//DB $remlist = "'".implode("','",explode(',',$_POST['remove']))."'";
-        $remlist = implode(',' , array_map('intval', explode(',',$_POST['remove'])));
+				$remlist = implode(',' , array_map('intval', explode(',',$_POST['remove'])));
 
 				//DB $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist)";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -71,28 +71,28 @@ if ($myrights<20) {
 					//DB while ($row = mysql_fetch_row($result)) {
 					$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND groupid=:groupid");
 					$stm->execute(array(':groupid'=>$groupid));
-          $todel = array();
+					$todel = array();
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-            $todel[] = $row[0];
+						$todel[] = $row[0];
 						//DB $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					}
-          $todellist = implode(',', $todel);
-          $stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($todellist)");
+					$todellist = implode(',', $todel);
+					$stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($todellist)");
 				} else {
 					//DB $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid='$userid'";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {
 					$stm = $DBH->prepare("SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
 					$stm->execute(array(':ownerid'=>$userid));
-          $todel = array();
+					$todel = array();
 					while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-            $todel[] = $row[0];
+						$todel[] = $row[0];
 						//DB $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
 						//DB mysql_query($query) or die("Query failed : " . mysql_error());
 					}
-          $todellist = implode(',', $todel);
-          $stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($todellist)");
+					$todellist = implode(',', $todel);
+					$stm = $DBH->query("DELETE FROM imas_library_items WHERE libid IN ($todellist)");
 				}
 
 				if (isset($qidstocheck)) {
@@ -116,7 +116,7 @@ if ($myrights<20) {
 							delqimgs($qid);
 						}*/
 					} else {
-            $stm = $DBH->prepare("INSERT INTO imas_library_items (qsetid,libid) VALUES (:qsetid, :libid)");
+						$stm = $DBH->prepare("INSERT INTO imas_library_items (qsetid,libid) VALUES (:qsetid, :libid)");
 						foreach($qidstofix as $qid) {
 							//DB $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
 							//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -124,17 +124,19 @@ if ($myrights<20) {
 						}
 					}
 				}
-				if (!$isadmin) {
-          //DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
+				
+				if (!$isadmin && !$isgrpadmin) {
+					//DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
+					//DB $query .= " AND ownerid='$userid'";
+					$stm = $DBH->prepare("DELETE FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
+					$stm->execute(array(':ownerid'=>$userid));
+				} else if (!$isadmin) {
+					//DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
 					//DB $query .= " AND groupid='$groupid'";
 					$stm = $DBH->prepare("DELETE FROM imas_libraries WHERE id IN ($remlist) AND groupid=:groupid");
 					$stm->execute(array(':groupid'=>$groupid));
-				}
-				if (!$isadmin && !$isgrpadmin) {
-          //DB $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
-					//DB $query .= " AND ownerid='$userid'";
-          $stm = $DBH->prepare("DELETE FROM imas_libraries WHERE id IN ($remlist) AND ownerid=:ownerid");
-					$stm->execute(array(':ownerid'=>$userid));
+				} else if ($isadmin) {
+					$stm = $DBH->query("DELETE FROM imas_libraries WHERE id IN ($remlist)");
 				}
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			}
