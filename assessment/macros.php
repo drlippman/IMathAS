@@ -2294,7 +2294,7 @@ function cleanbytoken($str,$funcs = array()) {
 		}
 		$primeoff = $p+1;
 	}
-	$parts = preg_split('/(<=|>=|=|,|<|>)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
+	$parts = preg_split('/(<=|>=|=|,|<|>|\blt\b|\bgt\b|\ble\b|\bge\b)/',$str,-1,PREG_SPLIT_DELIM_CAPTURE);
 	$finalout = array();
 	for ($k=0;$k<count($parts);$k+=2) {
 		$finalout = array();

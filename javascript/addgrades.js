@@ -423,11 +423,22 @@ function addsuggest() {
 	var scorev = document.getElementById("qascore").value;
 	var feedbv = document.getElementById("qafeedback").value;
 	if (namev != '') {
+		var found = false;
 		for (var i=1;i<trs.length;i++) {
 			var tds = trs[i].getElementsByTagName("td");
-			if (tds[0].innerHTML.match(namev) || tds[0].innerHTML==namev) {
+			if (tds[0].innerHTML==namev) {
+				found = true;
 				tds[tds.length-2].getElementsByTagName("input")[0].value = scorev;
 				tds[tds.length-1].getElementsByTagName("textarea")[0].value = feedbv;
+			}
+		}
+		if (!found) {
+			for (var i=1;i<trs.length;i++) {
+				var tds = trs[i].getElementsByTagName("td");
+				if (tds[0].innerHTML.match(namev)) {
+					tds[tds.length-2].getElementsByTagName("input")[0].value = scorev;
+					tds[tds.length-1].getElementsByTagName("textarea")[0].value = feedbv;
+				}
 			}
 		}
 	}

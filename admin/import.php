@@ -166,7 +166,13 @@ if (!(isset($teacherid)) && $myrights<75) {
 			}
 		}
 		//DB $lookup = implode("','",$lookup);
-		$lookup = implode(',', array_map('intval', $lookup));
+		foreach ($lookup as $k=>$v) {
+			$lookup[$k] = preg_replace('/[^0-9\.]/','',$v);
+		}
+		$lookup = implode(',', $lookup);
+		//intval bad on bigints
+		//$lookup = implode(',', array_map('intval', $lookup));
+		
 		//DB $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_questionset WHERE uniqueid IN ('$lookup')";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
@@ -355,7 +361,7 @@ if (!(isset($teacherid)) && $myrights<75) {
 			//lookup backrefs
 			$includedbackref = array();
 			if (count($includedqs)>0) {
-				$includedlist = implode(',', array_map('intval', $includedqs));
+				$includedlist = implode(',', $includedqs);  //known decimal values from above
 				//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 				//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {

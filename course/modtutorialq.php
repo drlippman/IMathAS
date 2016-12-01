@@ -2,6 +2,13 @@
 require("../validate.php");
 require("../includes/htmlutil.php");
 
+if ($myrights<20) {
+	require("../header.php");
+	echo "You need to log in as a teacher to access this page";
+	require("../footer.php");
+	exit;
+}
+
 function stripsmartquotes($text) {
 		$text = str_replace(
 			array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),

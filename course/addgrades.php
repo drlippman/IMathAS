@@ -248,7 +248,7 @@
 	}
 
 	$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=121213\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addgrades.js?v=112016\"></script>";
 	$placeinhead .= '<style type="text/css">
 		 .suggestion_list
 		 {
@@ -286,7 +286,7 @@
 		 display: none;
 		 }
 		 </style>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	require("../includes/rubric.php");
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

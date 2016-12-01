@@ -204,7 +204,7 @@
 	}
 
 	$useeditor='review';
-	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=120311"></script>';
+	$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	$placeinhead .= "<script type=\"text/javascript\">";
 	$placeinhead .= 'function jumptostu() { ';
 	$placeinhead .= '       var stun = document.getElementById("stusel").value; ';

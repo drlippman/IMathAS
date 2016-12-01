@@ -622,7 +622,7 @@ function doaftercopy($sourcecid) {
 	//update any assessment ids in categories
 	if (count($categoryassessmenttrack)>0) {
 		$stmA = $DBH->prepare("UPDATE imas_questions SET category=:category WHERE id=:id");
-		$stmB = $DBH->prepare("UPDATE imas_assessments SET category=0 WHERE id=:id");
+		$stmB = $DBH->prepare("UPDATE imas_questions SET category=0 WHERE id=:id");
 		foreach ($categoryassessmenttrack as $newqid=>$oldcategoryaid) {
 			//is oldcategoryaid in copied list?
 			if (isset($assessnewid[$oldcategoryaid])) {
