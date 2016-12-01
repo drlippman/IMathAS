@@ -112,7 +112,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 //BEGIN DISPLAY BLOCK
 
 /******* begin html output ********/
-$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 require("../header.php");
 
 if ($overwriteBody==1) {
@@ -151,15 +151,28 @@ if (!isset($_GET['id'])) {//displaying "Manage Rubrics" page
 	echo '<p>Rubric Type: ';
 	writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');
 	echo '</p>';
-
+	if ($rubtype==0 || $rubtype==1) {
+		echo '<p id="breakdowninstr">';
+	} else {
+		echo '<p style="display:none;" id="breakdowninstr">';
+	}
+	echo 'With this type of rubric, the total score is divided up between the rubric items. The "portion of score" column should
+		add to 100(%) or the expected point total for the question.';
+	echo '</p>';
+	if ($rubtype==3 || $rubtype==4) {
+		echo '<p id="scoretotalinstr">';
+	} else {
+		echo '<p style="display:none;" id="scoretotalinstr">';
+	}
+	echo 'With this type of rubric, one rubric item will be selected, and "portion of score" associated with that item will be the 
+		total final score for the question.  Make sure one item is 100(%) or the expected point total for the question.';
+	echo '</p>';
+	
 	echo '<p>Share with Group: <input type="checkbox" name="rubisgroup" '.getHtmlChecked($rubgrp,-1,1).' /></p>';
 	echo '<table><thead><tr><th>Rubric Item<br/>Shows in feedback</th><th>Instructor Note<br/>Not in feedback</th><th><span id="pointsheader" ';
 	if ($rubtype==2) {echo 'style="display:none;" ';}
-	if ($rubtype==3 || $rubtype==4) {
-		echo '>Percentage of score</span>';
-	} else {
-		echo '>Percentage of score<br/>Should add to 100</span>';
-	}
+	echo '>Portion of Score</span>';
+	
 	echo '</th></tr></thead><tbody>';
 	for ($i=0;$i<15; $i++) {
 		echo '<tr><td><input type="text" size="40" name="rubitem'.$i.'" value="';

@@ -286,7 +286,7 @@
 		 display: none;
 		 }
 		 </style>';
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js"></script>';
+	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 	require("../includes/rubric.php");
 	require("../header.php");
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";

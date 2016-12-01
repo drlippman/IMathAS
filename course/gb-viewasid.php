@@ -485,7 +485,7 @@
 		$sessiondata['coursetheme'] = $coursetheme;
 		$sessiondata['isteacher'] = $isteacher;
 		if ($isteacher || $istutor) {
-			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=070113"></script>';
+			$placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/rubric.js?v=113016"></script>';
 			require("../includes/rubric.php");
 		}
 		require("../assessment/header.php");
