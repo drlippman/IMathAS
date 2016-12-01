@@ -590,7 +590,7 @@ function addfractionaxislabels($plot,$step) {
 			$xd = $n;
 		}
 		if ($d!=1) {$xd .= "/$d";}
-		$outst .= "line([$x,$tm],[$x,$tx]); text([$x,$tx],\"$xd\",\"below\");";
+		$outst .= "line([$x,$tm],[$x,$tx]); text([$x,$tm],\"$xd\",\"below\");";
 		$step++;
 	}
 	return str_replace("' />","$outst' />",$plot);
