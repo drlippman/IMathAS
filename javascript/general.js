@@ -75,14 +75,21 @@ function arraysearch(needle,hay) {
       return -1;
    }
 
-var tipobj = 0;
+var tipobj = 0; var curtipel = null;
 function tipshow(el,tip) {
 	if (typeof tipobj!= 'object') {
 		tipobj = document.createElement("div");
 		tipobj.className = "tips";
+		tipobj.id = "hovertipsholder";
 		document.getElementsByTagName("body")[0].appendChild(tipobj);
 	}
-	tipobj.innerHTML = tip;
+	curtipel = el;
+	el.setAttribute("aria-describedby", "hovertipsholder");
+	if (el.hasAttribute("data-tip")) {
+		tipobj.innerHTML = el.getAttribute("data-tip");
+	} else {
+		tipobj.innerHTML = tip;
+	}
 	tipobj.style.left = "5px";
 	tipobj.style.display = "block";
 
@@ -146,6 +153,8 @@ function popupwindow(id,content,width,height,scroll) {
 }
 function tipout(el) {
 	tipobj.style.display = "none";
+	curtipel.removeAttribute("aria-describedby");
+	curtipel = null;
 }
 
 function findPos(obj) { //from quirksmode.org

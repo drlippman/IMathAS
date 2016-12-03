@@ -1286,13 +1286,13 @@ if ($overwriteBody==1) {
 		<br>
 		Search:
 		<input type=text size=15 name=search value="<?php echo $search ?>">
-		<span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
+		<span tabindex="0" data-tip="Search all libraries, not just selected ones" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
 		<input type=checkbox name="searchall" value="1" <?php writeHtmlChecked($searchall,1,0) ?> />
 		Search all libs</span>
-		<span onmouseover="tipshow(this,'List only questions I own')" onmouseout="tipout()">
+		<span tabindex="0" data-tip="List only questions I own" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
 		<input type=checkbox name="searchmine" value="1" <?php writeHtmlChecked($searchmine,1,0) ?> />
 		Mine only</span>
-		<span onmouseover="tipshow(this,'Exclude questions already in assessment')" onmouseout="tipout()">
+		<span tabindex="0" data-tip="Exclude questions already in assessment" onmouseover="tipshow(this)" onfocus="tipshow(this)" onmouseout="tipout()" onblur="tipout()">
 		<input type=checkbox name="newonly" value="1" <?php writeHtmlChecked($newonly,1,0) ?> />
 		Exclude added</span>
 		<input type=submit value=Search>
