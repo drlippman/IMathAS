@@ -2881,7 +2881,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			echo "<input type=\"hidden\" id=\"isreview\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 
 			if ($sessiondata['isteacher']) {
-				echo '<div class="navbar">';
+				echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 				echo '<p id="livepollactivestu" style="margin-top:0px">&nbsp;</p>';
 				echo "<h4>", _('Questions'), "</h4>\n";
 				echo "<ul class=qlist>\n";
@@ -3044,7 +3044,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		5: title for the part immediately following the Q]
 		*/
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
-		echo '<div class="navbar" style="width:175px">';
+		echo '<div class="navbar" style="width:175px" role="navigation" aria-label="'._("Video and question navigation").'">';
 		echo '<ul class="qlist" style="margin-left:-10px">';
 		$timetoshow = 0;
 		for ($i=1; $i<count($viddata); $i++) {
@@ -3072,7 +3072,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 		global $imasroot,$scores,$bestscores,$showeachscore,$qi,$questions,$testsettings;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
 
-		echo '<div class="navbar fixedonscroll">';
+		echo '<div class="navbar fixedonscroll" role="navigation" aria-label="'._("Page and question navigation").'">';
 		echo "<h4>", _('Pages'), "</h4>\n";
 		echo '<ul class="qlist" style="margin-left:-10px">';
 		$jsonbits = array();
@@ -3200,14 +3200,14 @@ if (!isset($_REQUEST['embedpostback'])) {
 
 		echo '</div>';
 	}
-
+                                                 
 	function shownavbar($questions,$scores,$current,$showcat) {
 		global $imasroot,$isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores,$CFG;
 		$todo = 0;
 		$earned = 0;
 		$poss = 0;
 		echo "<a href=\"#beginquestions\"><img class=skipnav src=\"$imasroot/img/blank.gif\" alt=\"", _('Skip Navigation'), "\" /></a>\n";
-		echo "<div class=navbar>";
+		echo '<div class="navbar" role="navigation" aria-label="'._("Question navigation").'">';
 		echo "<h4>", _('Questions'), "</h4>\n";
 		echo "<ul class=qlist>\n";
 		for ($i = 0; $i < count($questions); $i++) {

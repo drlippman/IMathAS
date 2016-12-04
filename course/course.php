@@ -494,7 +494,7 @@ if ($overwriteBody==1) {
 <?php
 	if ($useleftbar && isset($teacherid)) {
 ?>
-	<div id="leftcontent" class="hiddenmobile">
+	<div id="leftcontent" class="hiddenmobile" role="navigation" aria-label="<?php echo _('Instructor tool navigation');?>">
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
@@ -577,7 +577,7 @@ if ($overwriteBody==1) {
 		if (($toolset&1)==0) {$neededtools++;}
 
 ?>
-		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>>
+		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>  role="navigation" aria-label="<?php echo _('Tools navigation');?>">
 
 <?php
 		if ($msgset<4 || ($toolset&2)==0 || ($toolset&1)==0) {
@@ -798,7 +798,7 @@ function makeTopMenu() {
 	if ($useviewbuttons && (isset($teacherid) || $previewshift>-1)) {
 		echo '<div id="viewbuttoncont">';
 		if ($useleftbar && isset($teacherid)) {
-			echo '<span id="leftcontenttoggle"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
+			echo '<span id="leftcontenttoggle" aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
 		}
 		echo 'View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
