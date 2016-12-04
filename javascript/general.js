@@ -781,6 +781,7 @@ jQuery(document).ready(function($) {
 		e.preventDefault();
 	    }
 	});
+	$("div.breadcrumb").attr("role","navigation").attr("aria-label",_("Navigation breadcrumbs"));
 
 });
 

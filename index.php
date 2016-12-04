@@ -347,7 +347,7 @@ if ($myrights==100) {
 /*** done pulling stuff.  Time to display something ***/
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
-echo '<div class="floatright" id="homelinkbox">';
+echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
 if (!isset($CFG['GEN']['hidedefindexmenu'])) {
 	if ($myrights>5) {
 		echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
@@ -366,7 +366,7 @@ if ($myrights > 10) {
 }
 
 echo '</div>';
-echo '<div class="pagetitle" id="headerhome"><h2>';
+echo '<div class="pagetitle" id="headerhome" role="banner"><h2>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
@@ -423,6 +423,7 @@ function printCourses($data,$title,$type=null) {
 	global $shownewmsgnote, $shownewpostnote, $stuhashiddencourses,$imasroot;
 	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
+	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
 	echo '<div class="blockitems"><ul class="nomark courselist">';
 	for ($i=0; $i<count($data); $i++) {
@@ -468,10 +469,12 @@ function printCourses($data,$title,$type=null) {
 		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
 	}
 	echo '</div>';
+	echo '</div>';
 }
 
 function printMessagesGadget() {
 	global $page_newmessagelist, $page_coursenames;
+	echo '<div role="complementary" aria-label="'._('New messages').'">';
 	echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newmessagelist)==0) {
@@ -507,11 +510,12 @@ function printMessagesGadget() {
 	echo '</tbody></table>';
 	echo '<script type="text/javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
 	echo '</div>';
+	echo '</div>';
 
 }
 function printPostsGadget() {
 	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot;
-
+	echo '<div role="complementary" aria-label="'._('New forum posts').'">';
 	echo '<div class="block">';
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
 	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"Settings\"/></a></span>";
@@ -569,6 +573,7 @@ function printPostsGadget() {
 	echo '</tbody></table>';
 	echo '<script type="text/javascript">initSortTable("newpostlist",Array("S","S","S","D"),false);</script>';
 
+	echo '</div>';
 	echo '</div>';
 }
 
