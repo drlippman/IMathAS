@@ -636,7 +636,7 @@ function printchildren($base,$restricttoowner=false) {
 		echo tzdate("D, M j, Y, g:i a",$date[$child]);
 
 		if ($date[$child]>$lastview) {
-			echo " <span style=\"color:red;\">New</span>\n";
+			echo " <span class=noticetext>New</span>\n";
 		}
 		echo '</span>';
 

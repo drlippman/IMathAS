@@ -429,7 +429,7 @@ function upsendexceptions(&$items) {
 <div class="breadcrumb">
 	<span class="padright">
 	<?php if (isset($guestid)) {
-		echo '<span class="red">Instructor Preview</span> ';
+		echo '<span class="noticetext">Instructor Preview</span> ';
 	}?>
 	<?php echo $userfullname ?>
 	</span>

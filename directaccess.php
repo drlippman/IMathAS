@@ -324,7 +324,7 @@ function enablenewstu() {
 <p><b>New Student Enrollment</b></p>
 <?php
 if ($page_newaccounterror!='') {
-	echo '<p style="color:red;">'.$page_newaccounterror.'</p>';
+	echo '<p class=noticetext>'.$page_newaccounterror.'</p>';
 }
 ?>
 <script type="text/javascript" src="<?php echo $imasroot;?>/javascript/validateform.js"></script>

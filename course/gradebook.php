@@ -593,7 +593,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 	echo "&gt; ", _('Gradebook'), "</div>";
 	echo "<form id=\"qform\" method=post action=\"gradebook.php?cid=$cid\">";
 
-	echo '<div id="headergradebook" class="pagetitle"><h2>', _('Gradebook'), ' <span class="red" id="newflag" style="font-size: 70%" >';
+	echo '<div id="headergradebook" class="pagetitle"><h2>', _('Gradebook'), ' <span class="noticetext" id="newflag" style="font-size: 70%" >';
 	if (($coursenewflag&1)==1) {
 		echo _('New');
 	}

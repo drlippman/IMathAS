@@ -1096,12 +1096,12 @@ if ($editmsg != '' || $_GET['id']!='new') {
 	echo '</p>';
 }
 if ($line['deleted']==1) {
-	echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
+	echo '<p class=noticetext>This question has been marked for deletion.  This might indicate there is an error in the question. ';
 	echo 'It is recommended you discontinue use of this question when possible</p>';
 }
 
 if (isset($inusecnt) && $inusecnt>0) {
-	echo '<p style="color:red;">This question is currently being used in ';
+	echo '<p class=noticetext>This question is currently being used in ';
 	if ($inusecnt>1) {
 		echo $inusecnt.' assessments that are not yours.  ';
 	} else {

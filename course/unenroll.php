@@ -101,8 +101,8 @@ ini_set("max_execution_time", "600");
 				$stm = $DBH->prepare("SELECT COUNT(id) FROM imas_students WHERE courseid=:courseid");
 				$stm->execute(array(':courseid'=>$_GET['cid']));
 				if (count($_POST['checked']) > floor($stm->fetchColumn(0)/2)) {
-					$delForumMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
-					$delWikiMsg = "<p>Also delete <b style=\"color:red;\">ALL</b> wiki revisions: ";
+					$delForumMsg = "<p>Also delete <b class=noticetext>ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name=\"delforumposts\"/></p>";
+					$delWikiMsg = "<p>Also delete <b class=noticetext>ALL</b> wiki revisions: ";
 					$delWikiMsg .= '<input type="radio" name="delwikirev" value="0" checked="checked" />No,  ';
 					$delWikiMsg .= '<input type="radio" name="delwikirev" value="1" />Yes, from all wikis, ';
 					$delWikiMsg .= '<input type="radio" name="delwikirev" value="2" />Yes, from group wikis only</p>';
@@ -133,7 +133,7 @@ ini_set("max_execution_time", "600");
 
 			if ($_GET['uid']=="all") {
 ?>
-			<p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+			<p><b class=noticetext>Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
 			If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
 			<p>Are you SURE you want to unenroll ALL students?</p>
 			<ul>
@@ -173,7 +173,7 @@ ini_set("max_execution_time", "600");
 
 				} else {
 ?>
-		<p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+		<p><b class=noticetext>Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
 		If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
 		<p>Are you SURE you want to unenroll the selected students?</p>
 		<ul>

@@ -246,15 +246,15 @@ if ($overwriteBody==1) {
 	echo "<p>Description: {$line['description']}</p><p>Author: {$line['author']}</p>";
 	echo "<p>Last Modified: $lastmod</p>";
 	if ($line['deleted']==1) {
-		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
+		echo '<p class=noticetext>This question has been marked for deletion.  This might indicate there is an error in the question. ';
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
 	if ($line['replaceby']>0) {
-		echo '<p style="color:red;">This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
+		echo '<p class=noticetext>This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
 		echo 'by searching all libraries with the ID number as the search term</p>';
 	}
 
-	echo '<p id="brokenmsgbad" style="color:red;display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
+	echo '<p id="brokenmsgbad" class=noticetext style="display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
 	echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
 	echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
 

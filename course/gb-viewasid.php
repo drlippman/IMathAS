@@ -1283,7 +1283,7 @@
 			if ($i%2!=0) {$qbreakdown .= "<tr class=even>"; } else {$qbreakdown .= "<tr class=odd>";}
 			$qbreakdown .= '<td>';
 			if ($row[3]==1) {
-				$qbreakdown .= '<span class="red">Withdrawn</span> ';
+				$qbreakdown .= '<span class="noticetext">Withdrawn</span> ';
 			}
 			$qbreakdown .= $row[0];
 			$qbreakdown .= "</td><td>{$scores[$row[1]]} / ";
@@ -1330,7 +1330,7 @@
 		}
 
 		if ($outmsg!='') {
-			echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
+			echo "<p class=noticetext style=\"font-weight: bold;\">$outmsg</p>";
 			if ($endmsg['commonmsg']!='' && $endmsg['commonmsg']!='<p></p>') {
 				echo $endmsg['commonmsg'];
 			}

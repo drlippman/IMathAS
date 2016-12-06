@@ -514,7 +514,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 							// $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 							//DB if (mysql_num_rows($result)>0) {
 							if ($stm->rowCount()>0) {
-								$notice =  '<span style="color:red;font-weight:bold">This question has already been posted about.</span><br/>';
+								$notice =  '<span class=noticetext style="font-weight:bold">This question has already been posted about.</span><br/>';
 								$notice .= 'Please read and participate in the existing discussion.';
 								//DB while ($row = mysql_fetch_row($result)) {
 								while ($row = $stm->fetch(PDO::FETCH_NUM)) {

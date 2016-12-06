@@ -788,7 +788,7 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 			echo sprintf(_('Question %d of %d'), $qn+1, count($questions)).'<br/>';
 		}
 		if ($qi[$questions[$qn]]['withdrawn']==1) {
-			echo '<span class="red">', _('Question Withdrawn'), '</span> ';
+			echo '<span class="noticetext">', _('Question Withdrawn'), '</span> ';
 		}
 		if ($attempts[$qn]<$qi[$questions[$qn]]['attempts'] || $qi[$questions[$qn]]['attempts']==0) {
 			$pointsremaining = getremainingpossible($qn,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);

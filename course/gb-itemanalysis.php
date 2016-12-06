@@ -341,7 +341,7 @@
 
 			echo "<td>{$itemnum[$qid]}</td><td>";
 			if ($withdrawn[$qid]==1) {
-				echo '<span class="red">Withdrawn</span> ';
+				echo '<span class="noticetext">Withdrawn</span> ';
 			}
 			echo "{$descrips[$qid]}</td>";
 			echo "<td><a href=\"gradeallq.php?stu=$stu&cid=$cid&asid=average&aid=$aid&qid=$qid\" ";

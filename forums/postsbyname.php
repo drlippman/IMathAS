@@ -361,7 +361,7 @@
 		$dt = tzdate("F j, Y, g:i a",$line['postdate']);
 		$content .= ', Posted: '.$dt;
 		if ($line['lastview']==null || $line['postdate']>$line['lastview']) {
-			$content .= " <span style=\"color:red;\">New</span>\n";
+			$content .= " <span class=noticetext>New</span>\n";
 		}
 		$content .= '</div>';
 		$content .= "<div id=\"m$cnt\" class=\"hidden\">".filter($line['message']);

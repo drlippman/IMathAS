@@ -981,12 +981,12 @@
 	}
 
 	if ($line['deleted']==1) {
-		echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
+		echo '<p class=noticetext>This question has been marked for deletion.  This might indicate there is an error in the question. ';
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
 
 	if (isset($inusecnt) && $inusecnt>0) {
-		echo '<p style="color:red;">This question is currently being used in ';
+		echo '<p class=noticetext>This question is currently being used in ';
 		if ($inusecnt>1) {
 			echo $inusecnt.' assessments that are not yours.  ';
 		} else {
@@ -1054,7 +1054,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	echo '<option value="2" '.($line['license']==2?'selected':'').'>Public Domain</option>';
 	echo '<option value="3" '.($line['license']==3?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
 	echo '<option value="3" '.($line['license']==4?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
-	echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span>';
+	echo '</select><span id="licensewarn" class=noticetext style="font-size:80%;"></span>';
 	if ($line['otherattribution']=='') {
 		echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
 		echo '<span id="addattrspan" style="display:none;">';
@@ -1063,7 +1063,7 @@ if (!isset($line['ownerid']) || isset($_GET['template']) || $line['ownerid']==$u
 	}
 	echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>';
 	if ($line['otherattribution']!='') {
-		echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
+		echo '<br/><span class=noticetext style="font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
 	}
 	echo '</span>';
 

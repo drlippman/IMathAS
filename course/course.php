@@ -303,7 +303,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	   $stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
 	   $msgcnt = $stm->fetchColumn(0);
 	   if ($msgcnt>0) {
-		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
+		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" class=noticetext>" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
 	   } else {
 		   $newmsgs = '';
 	   }
@@ -367,7 +367,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$newpostcnts[$row[0]] = $row[1];
 	}
 	if (array_sum($newpostcnts)>0) {
-		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">" . sprintf(_('New (%d)'), array_sum($newpostcnts)) . "</a>";
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" class=noticetext>" . sprintf(_('New (%d)'), array_sum($newpostcnts)) . "</a>";
 	} else {
 		$newpostscnt = '';
 	}
@@ -411,7 +411,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	}
 }
 
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=071416\"></script>";
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=120516\"></script>";
 if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
@@ -480,7 +480,7 @@ if ($overwriteBody==1) {
 			echo '<span class="padright hideinmobile">';
 		}
 		if (isset($guestid)) {
-			echo '<span class="red">', _('Instructor Preview'), '</span> ';
+			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
 		if (!isset($usernameinheader)) {
 			echo $userfullname;
@@ -514,7 +514,7 @@ if ($overwriteBody==1) {
 	?>
 		<p><b><?php echo _('Tools'); ?></b><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
 	                <a href="coursereports.php?cid=<?php echo $cid ?>">Reports</a><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
 			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
@@ -598,7 +598,7 @@ if ($overwriteBody==1) {
 	?>
 
 			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?>
+			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?>
 			</p>
 	<?php
 		if (!isset($sessiondata['ltiitemtype'])) { //don't show in LTI embed
@@ -696,7 +696,7 @@ if ($overwriteBody==1) {
 		<span class=column>
 			<?php echo generateadditem($_GET['folder'], 'BB') ?>
 			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Show Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Show Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick View'); ?></a></span>
 			<span class=column>
@@ -741,7 +741,7 @@ if ($overwriteBody==1) {
 		}
 ?>
 	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/>
-	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
 	<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>
 	<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a><br/>
 <?php
@@ -844,13 +844,13 @@ function makeTopMenu() {
 		} else {
 			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 		}
-		 echo '<span id="submitnotice" style="color:red;"></span>';
+		 echo '<span id="submitnotice" class=noticetext></span>';
 		 echo '<div class="clear"></div>';
 		 echo '</div>';
 
 	}
 	if (($coursenewflag&1)==1) {
-		$gbnewflag = ' <span class="red">' . _('New') . '</span>';
+		$gbnewflag = ' <span class="noticetext">' . _('New') . '</span>';
 	} else {
 		$gbnewflag = '';
 	}

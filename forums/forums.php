@@ -542,7 +542,7 @@ if (!isset($teacherid)) {
 		}
 		echo "<b><a href=\"thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b> ";
 		if ($newcnt[$line['id']]>0) {
-			 echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">New Posts ({$newcnt[$line['id']]})</a>";
+			 echo "<a href=\"thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext >New Posts ({$newcnt[$line['id']]})</a>";
 		}
 		echo "</td>\n";
 		if (isset($threadcount[$line['id']])) {

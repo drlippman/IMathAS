@@ -47,6 +47,9 @@ div.cpmid {
 	margin-bottom: 10px;
 	border-radius: 4px;
 }
+.noticetext {
+	color: #db0000;
+}
 .mceContentBody {
 	font-family: "Times New Roman", Times, serif;
 	font-size: medium;
@@ -516,7 +519,7 @@ ul#navlist li a:hover
 background-color: #369;
 color: #fff;
 }
-div.pagetitle h2 {
+div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px;
 }
 .clear {

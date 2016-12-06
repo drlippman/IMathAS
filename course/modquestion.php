@@ -272,7 +272,7 @@ Leave items blank to use the assessment's default values<br/>
 		echo '<span class="form"><a href="#" onclick="$(this).hide();$(\'#advanced\').show();return false">Advanced</a></span><br class="form"/>';
 		echo '<div id="advanced" style="display:none;">';
 		echo '<span class="form">Replace this question with question ID: <br/>';
-		echo '<span style="color:red">WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
+		echo '<span class=noticetext>WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
 		echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
 		echo '</div>';
 	}

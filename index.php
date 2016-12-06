@@ -357,7 +357,7 @@ if (!isset($CFG['GEN']['hidedefindexmenu'])) {
 }
 echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
 if ($msgtotal>0) {
-	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">', sprintf(_('New (%d)'), $msgtotal), '</a>';
+	echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), $msgtotal), '</a>';
 }
 if ($myrights > 10) {
 	echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
@@ -374,7 +374,7 @@ if (isset($CFG['GEN']['hometitle'])) {
 }
 echo '</h2>';
 if ($myrights==100 && count($brokencnt)>0) {
-	echo '<span class="red">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
+	echo '<span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
 }
 echo '</div>';
 
@@ -447,10 +447,10 @@ function printCourses($data,$title,$type=null) {
 			echo ' <span style="color:green;">', _('Lockdown'), '</span>';
 		}
 		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
-			echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
+			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			echo ' <a class="newnote" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
+			echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
 
 		echo '</li>';

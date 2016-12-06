@@ -285,7 +285,7 @@
 			echo ', ';
 			echo tzdate("F j, Y, g:i a",$date[$child]);
 			if ($date[$child]>$lastview) {
-				echo " <span style=\"color:red;\">New</span>\n";
+				echo " <span class=noticetext>New</span>\n";
 			}
 
 			echo "</div>\n";

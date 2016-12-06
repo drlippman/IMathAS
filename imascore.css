@@ -17,7 +17,7 @@ p {
 br {
 	line-height: 1em;
 }
-div.pagetitle h2 {
+div.pagetitle h2, div.pagetitle h1 {
 	margin: 10px 0px 20px 0px;
 }
 div.item {
@@ -39,6 +39,9 @@ div.itemsum {
 }
 span.iteminfo {
 	margin-left: 30px;
+}
+.noticetext {
+	color: #db0000;
 }
 div.title {
 	/*display: inline;*/
@@ -506,7 +509,7 @@ div#viewbuttoncont a.buttonactive {
 	border-radius: 4px;
 }
 div#viewbuttoncont a.buttoninactive {
-	background-color: #69a;
+	background-color: #297bbb;
 	border-radius: 4px;
 }
 div#viewbuttoncont a.buttoninactive:hover {
@@ -651,7 +654,7 @@ div.multiselitem {
 }
 .delx {
 	font-family: sans-serif;
-	color: #999;
+	color: #6d6d6d;
 	float: right;
 	cursor: pointer;
 }

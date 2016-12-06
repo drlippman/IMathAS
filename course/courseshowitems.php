@@ -6,9 +6,10 @@ function beginitem($canedit,$aname=0) {
 	//if ($canedit) {
 	//	echo '<div class="inactivewrapper" onmouseover="this.className=\'activewrapper\'" onmouseout="this.className=\'inactivewrapper\'">';
 	// }
-	 echo "<div class=item>\n";
 	 if ($aname != 0) {
-		 echo "<a name=\"$aname\"></a>";
+		 echo "<div class=\"item\" id=\"$aname\">\n";
+	 } else {
+	 	 echo "<div class=\"item\">\n";
 	 }
 }
 function enditem($canedit) {
@@ -150,7 +151,7 @@ function enditem($canedit) {
 						echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">", _('New'), "</span>";
+						echo "<span class=noticetext>", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -203,7 +204,7 @@ function enditem($canedit) {
 						echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>{$items[$i]['name']}</b></a> ";
 					}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">", _('New'), "</span>";
+						echo "<span class=noticetext>", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -237,6 +238,7 @@ function enditem($canedit) {
 					} else {
 						$astyle = '';
 					}
+					echo ' id="blockhead'.$items[$i]['id'].'"';
 					echo ">";
 
 					//echo "<input class=\"floatright\" type=button id=\"but{$items[$i]['id']}\" value=\"";
@@ -247,7 +249,9 @@ function enditem($canedit) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo _('collapse');} else {echo _('expand');}
-						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" /></span>";
+						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
+						echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
+						echo "/></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
@@ -255,10 +259,11 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\">";
-					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></b></span> ";
+					echo "<b><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
+					echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
+					echo "$astyle>{$items[$i]['name']}</a></b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">", _('New'), "</span>";
+						echo "<span class=noticetext>", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -280,9 +285,9 @@ function enditem($canedit) {
 					//	echo '</div>'; //itemwrapper
 					//}
 					if ($isopen) {
-						echo "<div class=blockitems ";
+						echo "<div aria-expanded=true class=blockitems ";
 					} else {
-						echo "<div class=hidden ";
+						echo "<div aria-hidden=true class=hidden ";
 					}
 					$style = '';
 					if (isset($items[$i]['fixedheight']) && $items[$i]['fixedheight']>0) {
@@ -351,7 +356,7 @@ function enditem($canedit) {
 					echo "<a href=\"course.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo " <span style=\"color:red;\">", _('New'), "</span>";
+						echo " <span class=noticetext>", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -398,7 +403,7 @@ function enditem($canedit) {
 					echo "<a href=\"treereader.php?cid=$cid&folder=$parent-$bnum\" $astyle><b>";
 					if ($items[$i]['SH'][0]=='S') {echo "{$items[$i]['name']}</b></a> ";} else {echo "<i>{$items[$i]['name']}</i></b></a>";}
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo " <span style=\"color:red;\">", _('New'), "</span>";
+						echo " <span class=noticetext>", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -433,6 +438,7 @@ function enditem($canedit) {
 					} else {
 						$astyle = '';
 					}
+					echo ' id="blockhead'.$items[$i]['id'].'"';
 					echo ">";
 
 					//echo "<input class=\"floatright\" type=button id=\"but{$items[$i]['id']}\" value=\"";
@@ -442,7 +448,9 @@ function enditem($canedit) {
 						echo "<span class=left>";
 						echo "<img alt=\"expand/collapse\" style=\"cursor:pointer;\" id=\"img{$items[$i]['id']}\" src=\"$imasroot/img/";
 						if ($isopen) {echo _('collapse');} else {echo _('expand');}
-						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" /></span>";
+						echo ".gif\" onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\" ";
+						echo 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
+						echo "/></span>";
 						echo "<div class=title>";
 					}
 					if (!$canedit) {
@@ -450,16 +458,17 @@ function enditem($canedit) {
 						echo "<a href=\"".($ispublic?"public":"course").".php?cid=$cid&folder=$parent-$bnum\" $astyle>", _('Isolate'), "</a>";
 						echo '</span>';
 					}
-					echo "<span class=pointer onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum')\">";
 					echo "<b>";
+					$control = "onClick=\"toggleblock(event,'{$items[$i]['id']}','$parent-$bnum'); return false;\" ";
+					$control .= 'aria-controls="block'.$items[$i]['id'].'" aria-expanded="'.($isopen?"true":"false").'"';
 					if ($items[$i]['SH'][0]=='S') {
-						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a>";
+						echo "<a id=\"blockh{$items[$i]['id']}\" href=\"#\" $control $astyle>{$items[$i]['name']}</a>";
 					} else {
-						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" onclick=\"return false;\" $astyle>{$items[$i]['name']}</a></i>";
+						echo "<i><a id=\"blockh{$items[$i]['id']}\" href=\"#\" $control  $astyle>{$items[$i]['name']}</a></i>";
 					}
-					echo "</b></span> ";
+					echo "</b> ";
 					if (isset($items[$i]['newflag']) && $items[$i]['newflag']==1) {
-						echo "<span style=\"color:red;\">", _('New'), "</span>";
+						echo "<span class=noticetext>", _('New'), "</span>";
 					}
 					if ($viewall) {
 						echo '<span class="instrdates">';
@@ -482,9 +491,9 @@ function enditem($canedit) {
 					//	echo '</div>'; //itemwrapper
 					//}
 					if ($isopen) {
-						echo "<div class=blockitems ";
+						echo "<div aria-expanded=true class=blockitems ";
 					} else {
-						echo "<div class=hidden ";
+						echo "<div aria-hidden=true class=hidden ";
 					}
 					//if ($titlebg!='') {
 					//	echo "style=\"background-color:$bicolor;\"";
@@ -898,8 +907,7 @@ function enditem($canedit) {
 					   $show = _('Showing until:') . " $enddate";
 					   $color = makecolor2($line['startdate'],$line['enddate'],$now);
 				   }
-				   beginitem($canedit,$items[$i]);// echo "<div class=item>\n";
-				   echo '<a name="inline'.$typeid.'"></a>';
+				   beginitem($canedit,'inline'.$typeid);// echo "<div class=item>\n";
 				   if ($line['title']!='##hidden##') {
 					   if (($hideicons&2)==0) {
 						   if ($graphicalicons) {
@@ -1390,7 +1398,7 @@ function enditem($canedit) {
 				   echo "<div class=title> ";
 				   echo "<b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b>\n";
 				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext>", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
 				   }
 				   if ($viewall) {
 					   echo '<span class="instrdates">';
@@ -1439,7 +1447,7 @@ function enditem($canedit) {
 				   }
 				   echo "<div class=title><i> <b><a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}\">{$line['name']}</a></b></i> ";
 				   if (isset($newpostcnts[$line['id']]) && $newpostcnts[$line['id']]>0 ) {
-					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" style=\"color:red\">", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
+					   echo " <a href=\"../forums/thread.php?cid=$cid&forum={$line['id']}&page=-1\" class=noticetext>", sprintf(_('New Posts (%s)'), $newpostcnts[$line['id']]), "</a>";
 				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";
@@ -1570,7 +1578,7 @@ function enditem($canedit) {
 					   }
 				   	   echo "<b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\" $rec>{$line['name']}</a></b>\n";
 				   	   if ($hasnew) {
-				   	    	    echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
+				   	    	    echo " <span class=noticetext>", _('New Revisions'), "</span>";
 				   	   }
 				   }
 				   if ($viewall) {
@@ -1604,7 +1612,7 @@ function enditem($canedit) {
 				   }
 				   echo "<div class=title><i> <b><a href=\"../wikis/viewwiki.php?cid=$cid&id={$line['id']}\">{$line['name']}</a></b></i> ";
 				   if ($hasnew) {
-				   	   echo " <span style=\"color:red\">", _('New Revisions'), "</span>";
+				   	   echo " <span class=noticetext>", _('New Revisions'), "</span>";
 				   }
 				   echo '<span class="instrdates">';
 				   echo "<br/><i>$show </i>";

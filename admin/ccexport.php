@@ -748,7 +748,7 @@ if (isset($_GET['delete'])) {
 	echo 'If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
 	if ($enablebasiclti==false) {
-		echo '<p style="color:red">Note: Your system does not currenltly have LTI enabled.  Contact your system administrator</p>';
+		echo '<p class="noticetext">Note: Your system does not currenltly have LTI enabled.  Contact your system administrator</p>';
 	}
 	echo '<form id="qform" method="post" action="ccexport.php?cid='.$cid.'&create=true">';
 	?>

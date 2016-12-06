@@ -1083,7 +1083,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$msgcnt = $stm->fetchColumn(0);
 			echo "<a href=\"$imasroot/msgs/msglist.php?cid=$cid\" onclick=\"return confirm('", _('This will discard any unsaved work.'), "');\">", _('Messages'), " ";
 			if ($msgcnt>0) {
-				echo '<span style="color:red;">('.$msgcnt.' new)</span>';
+				echo '<span class="noticetext">('.$msgcnt.' new)</span>';
 			}
 			echo '</a> ';
 		}
@@ -2457,7 +2457,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			$testsettings['intro'] .= "<p>" . _('Total Points Possible: ') . totalpointspossible($qi) . "</p>";
 		}
 		if ($testsettings['isgroup']>0) {
-			$testsettings['intro'] .= "<p><span style=\"color:red;\">" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
+			$testsettings['intro'] .= "<p><span class=noticetext >" . _('This is a group assessment.  Any changes affect all group members.') . "</span><br/>";
 			if (!$isteacher || isset($sessiondata['actas'])) {
 				$testsettings['intro'] .= _('Group Members:') . " <ul>";
 
@@ -3443,7 +3443,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 			echo "$average % </b></p>\n";
 
 			if ($outmsg!='') {
-				echo "<p style=\"color:red;font-weight: bold;\">$outmsg</p>";
+				echo "<p class=noticetext style=\"font-weight: bold;\">$outmsg</p>";
 				if ($endmsg['commonmsg']!='' && $endmsg['commonmsg']!='<p></p>') {
 					echo $endmsg['commonmsg'];
 				}
@@ -3456,7 +3456,7 @@ if (!isset($_REQUEST['embedpostback'])) {
 				} else {
 					$reqscore = ($testsettings['minscore']-10000).'%';
 				}
-				echo "<p><span style=\"color:red;\"><b>", sprintf(_('A score of %s is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";
+				echo "<p><span class=noticetext><b>", sprintf(_('A score of %s is required to receive credit for this assessment'), $reqscore), "<br/>", _('Grade in Gradebook: No Credit (NC)'), "</span></p> ";
 			}
 		} else {
 			echo "<p><b>", _('Your scores have been recorded for this assessment.'), "</b></p>";

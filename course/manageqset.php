@@ -1049,9 +1049,9 @@ if ($myrights<20) {
 
 			$page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
 			if ($line['userights']==0) {
-				$page_questionTable[$i]['desc'] = '<span class="red">'.filter($line['description']).'</span>';
+				$page_questionTable[$i]['desc'] = '<span class="noticetext">'.filter($line['description']).'</span>';
 			} else if ($line['replaceby']>0 || $line['junkflag']>0) {
-				$page_questionTable[$i]['desc'] = '<span style="color:#ccc"><i>'.filter($line['description']).'</i></span>';
+				$page_questionTable[$i]['desc'] = '<span class="grey"><i>'.filter($line['description']).'</i></span>';
 			} else {
 				$page_questionTable[$i]['desc'] = filter($line['description']);
 			}
@@ -1344,7 +1344,7 @@ function getnextprev(formn,loc) {
 		 <li>If the question currently has additional attribution listed, you CAN NOT remove that attribution unless
 		     you have removed from the question all parts that require the attribution.</li>
 		</ul>
-		<p style="color:red;">
+		<p class=noticetext>
 		  In short, you should only be changing license if the questions are your original works, not built on top of existing
 		  community work.
 		<p>

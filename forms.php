@@ -70,7 +70,7 @@ switch($_GET['action']) {
 			echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
 			if ($doselfenroll) {
 				echo '</div>';
-				echo '<div id="selfenrollwarn" style="color:red;display:none;">Warning: You have selected a non-credit self-study course. ';
+				echo '<div id="selfenrollwarn" class=noticetext style="display:none;">Warning: You have selected a non-credit self-study course. ';
 				echo 'If you are using '.$installname.' with an instructor-led course, this is NOT what you want; nothing you do in the self-study ';
 				echo 'course will be viewable by your instructor or count towards your course.  For an instructor-led ';
 				echo 'course, you need to enter the course ID and key provided by your instructor.</div>';
@@ -306,7 +306,7 @@ switch($_GET['action']) {
 		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
 		if ($doselfenroll) {
 			echo '</div>';
-			echo '<div id="selfenrollwarn" style="color:red;display:none;">Warning: You have selected a non-credit self-study course. ';
+			echo '<div id="selfenrollwarn" class=noticetext style="display:none;">Warning: You have selected a non-credit self-study course. ';
 			echo 'If you are using '.$installname.' with an instructor-led course, this is NOT what you want; nothing you do in the self-study ';
 			echo 'course will be viewable by your instructor or count towards your course.  For an instructor-led ';
 			echo 'course, you need to enter the course ID and key provided by your instructor.</div>';

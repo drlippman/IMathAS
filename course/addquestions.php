@@ -1231,7 +1231,7 @@ if ($overwriteBody==1) {
 <?php
 		}
 ?>
-		<span id="submitnotice" style="color:red;"></span>
+		<span id="submitnotice" class=noticetext></span>
 		<div id="curqtbl"></div>
 
 	</form>

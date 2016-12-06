@@ -176,7 +176,7 @@ if (isset($_GET['launch'])) {
 	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
-		echo "<p style=\"color:red;\">This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
 	} else {
 		echo ">";
 	}
@@ -364,7 +364,7 @@ if (isset($_GET['launch'])) {
 		$nologo = true;
 		require("header.php");
 		if (isset($infoerr)) {
-			echo '<p style="color:red">'.$infoerr.'</p>';
+			echo '<p class=noticetext>'.$infoerr.'</p>';
 		}
 
 		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";
@@ -1615,7 +1615,7 @@ if (isset($_GET['launch'])) {
 	echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?launch=true\" ";
 	if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltitlwrds'] != '') {
 		echo "onsubmit='return confirm(\"This assessment has a time limit of {$sessiondata['ltitlwrds']}.  Click OK to start or continue working on the assessment.\")' >";
-		echo "<p style=\"color:red;\">This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
+		echo "<p class=noticetext>This assessment has a time limit of {$sessiondata['ltitlwrds']}.</p>";
 	} else {
 		echo ">";
 	}
@@ -1804,7 +1804,7 @@ if (isset($_GET['launch'])) {
 		$flexwidth = true;
 		require("header.php");
 		if (isset($infoerr)) {
-			echo '<p style="color:red">'.$infoerr.'</p>';
+			echo '<p class=noticetext>'.$infoerr.'</p>';
 		}
 
 		echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}?userinfo=set\" ";
