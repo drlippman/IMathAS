@@ -123,14 +123,18 @@ function recordlasttreeview(id) {
 }
 var treereadernavstate = 1;
 function toggletreereadernav() {
+	var lc = document.getElementById("leftcontent");
+	
 	if (treereadernavstate==1) {
-		document.getElementById("leftcontent").style.width = "20px";
-		document.getElementById("leftcontenttext").style.display = "none";
-		document.getElementById("centercontent").style.marginLeft = "30px";
+		$("#leftcontenttext").slideUp(200,function() {
+			$(this).attr("aria-expanded",false).attr("aria-hidden",true);
+			$("#leftcontent").width(20).attr("aria-expanded",false);
+			document.getElementById("centercontent").style.marginLeft = "30px";
+		});;
 		document.getElementById("navtoggle").src= document.getElementById("navtoggle").src.replace(/collapse/,"expand");
 	} else {
-		document.getElementById("leftcontent").style.width = "250px";
-		document.getElementById("leftcontenttext").style.display = "";
+		$("#leftcontent").width(250).attr("aria-expanded",true);
+		$("#leftcontenttext").slideDown(200).attr("aria-expanded",true).attr("aria-hidden",false);
 		document.getElementById("centercontent").style.marginLeft = "260px";
 		document.getElementById("navtoggle").src= document.getElementById("navtoggle").src.replace(/expand/,"collapse");
 	}
@@ -159,8 +163,46 @@ height: auto;
 #leftcontent {
 	margin-top: 0px;
 }
+
+ul[role="tree"]:focus {
+    outline:1px dotted #0000ff;
+} 
+ul[role="tree"] li[aria-selected="true"]  {
+      outline: none;
+}
+ul[role="tree"] li[aria-selected="true"] > span.hdr .blocklbl {
+	border:dotted 1px;
+}
+ul[role="tree"] li > span.hdr .blocklbl {
+	border: 1px transparent;
+	
+}
+ul[role="tree"] li[aria-selected="true"] > a {
+	border:dotted 1px;
+}
+ul[role="tree"] li[aria-expanded="false"] > ul {
+      display:none;
+}
+ul[role="tree"] li[aria-expanded="true"] > ul {
+      display:block;
+}
+
 </style>';
 $placeinhead .= "<style type=\"text/css\">\n<!--\n@import url(\"$imasroot/course/libtree.css\");\n-->\n</style>\n";
+$placeinhead .= '<script type="text/javascript" src="../javascript/a11ytree.js"></script>';
+$placeinhead .= '<script type="text/javascript">$(function() {
+  $("#leftcontenttext").a11yTree({
+	toggleSelector: "span.hdr",
+	toggleIconSelector: "span.btn",
+	treeItemLabelSelector: "span.blocklbl",
+	onCollapse:function($item) {
+		$item.children("span").children("span.btn").text("+");
+	},
+	onExpand:function($item) {
+		$item.children("span").children("span.btn").text("-");
+	}
+  });
+});</script>';
 require("../header.php");
 
 //DB $query = "SELECT value FROM imas_bookmarks WHERE userid='$userid' AND courseid='$cid' AND name='TR{$_GET['folder']}'";
@@ -238,6 +280,7 @@ function printlist($items) {
 	$out = '';
 	$isopen = false;
 	foreach ($items as $item) {
+		$opentxt = '';
 		if (is_array($item)) { //is block
 			//TODO check that it's available
 			if ($viewall || $item['avail']==2 || ($item['avail']==1 && $item['startdate']<$now && $item['enddate']>$now)) {
@@ -246,13 +289,13 @@ function printlist($items) {
 					$isopen = true;
 				}
 				if ($bisopen) {
-					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
-					$out .=  "{$item['name']}</span>\n";
-					$out .=  '<ul class="show nomark" id="'.$item['id'].'">';
+					$out .=  "<li class=lihdr aria-expanded=true ><span class=hdr><span class=btn id=\"b{$item['id']}\">-</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
+					$out .=  "<span class=blocklbl>{$item['name']}</span></span>\n";
+					$out .=  '<ul class="nomark" id="'.$item['id'].'">';
 				} else {
-					$out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
-					$out .=  "{$item['name']}</span>\n";
-					$out .=  '<ul class="hide nomark" id="'.$item['id'].'">';
+					$out .=  "<li class=lihdr aria-expanded=false><span class=hdr><span class=btn id=\"b{$item['id']}\">+</span> <img src=\"$imasroot/img/folder_tiny.png\" alt=\"Folder\"> ";
+					$out .=  "<span class=blocklbl>{$item['name']}</span></span>\n";
+					$out .=  '<ul class="nomark" id="'.$item['id'].'">';
 				}
 				$out .= $subcontent;
 				$out .=  '</ul></li>';
@@ -291,9 +334,9 @@ function printlist($items) {
 						 $foundfirstitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 					 }
 					 if ($itemtype.$typeid===$openitem) {
-						 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+						 $foundopenitem = '/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true; $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .= '<li>';
+					 $out .= '<li '.$opentxt.'>';
 					 if ($line['displaymethod']!='Embed') {
 						 $out .=  '<img src="'.$imasroot.'/img/assess_tiny.png" alt="Assessment"> ';
 					 } else {
@@ -339,7 +382,7 @@ function printlist($items) {
 					 } else {
 						 $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
 					 }
-					 $out .= '<a href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.$line['name'].'</a></li>';
+					 $out .= '<a tabindex="-1" href="'.$imasroot.'/assessment/showtest.php?cid='.$cid.'&amp;id='.$typeid.'" '.$onclick.' target="readerframe">'.$line['name'].'</a></li>';
 				 }
 			} else if ($line['itemtype']=='LinkedText') {
 				//TODO check availability, etc.
@@ -354,9 +397,9 @@ function printlist($items) {
 						 $foundfirstitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
 					 }
 					 if ($itemtype.$typeid===$openitem) {
-						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;
+						 $foundopenitem = '/course/showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid; $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/html_tiny.png" alt="Link"> <a tabindex="-1" href="showlinkedtext.php?cid='.$cid.'&amp;id='.$typeid.'"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
 				 }
 			} /*else if ($line['itemtype']=='Forum') {
 				//TODO check availability, etc.
@@ -383,9 +426,9 @@ function printlist($items) {
 						 $foundfirstitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
 					 }
 					 if ($itemtype.$typeid===$openitem) {
-						 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;
+						 $foundopenitem = '/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true'; $isopen = true;  $opentxt = ' aria-selected="true" ';
 					 }
-					 $out .=  '<li><img src="'.$imasroot.'/img/wiki_tiny.png" alt="Wiki"> <a href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+					 $out .=  '<li '.$opentxt.'><img src="'.$imasroot.'/img/wiki_tiny.png" alt="Wiki"> <a tabindex="-1" href="'.$imasroot.'/wikis/viewwiki.php?cid='.$cid.'&amp;id='.$typeid.'&framed=true"  onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
 				 }
 			}
 
@@ -437,8 +480,8 @@ function upsendexceptions(&$items) {
 	<div class="clear"></div>
 </div>
 
-<div id="leftcontent" style="width: 250px;">
-<img id="navtoggle" src="<?php echo $imasroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse"/>
+<div id="leftcontent" style="width: 250px;" role="navigation" aria-label="<?php echo _('Content navigation');?>">
+<img id="navtoggle" src="<?php echo $imasroot;?>/img/collapse.gif"  onclick="toggletreereadernav()" alt="Expand/Collapse" aria-expanded="true" aria-controls="leftcontenttext"/>
 <ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
 <?php
 $ul = printlist($items);
@@ -449,8 +492,7 @@ echo $ul[0];
 </ul>
 <div id="bmrecout" style="display:none;"></div>
 </div>
-<div id="centercontent" style="margin-left: 260px;">
-
+<div id="centercontent" style="margin-left: 260px;position:relative;" role="main">
 <iframe id="readerframe" name="readerframe" style="width:100%; border:1px solid #ccc;" src="<?php echo $imasroot . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
 </div>
 <?php

@@ -1970,8 +1970,8 @@ function assessmentTimer(duration, timelimitkickout) {
 			remaining = 0;
 			clearInterval(countdowntimer);
 			if (timelimitkickout) {
-				document.getElementById('timelimitholder').className = "";
-				document.getElementById('timelimitholder').style.color = "#f00";
+				document.getElementById('timelimitholder').className = "noticetext";
+				//document.getElementById('timelimitholder').style.color = "#f00";
 				document.getElementById('timelimitholder').innerHTML = _('Time limit expired - submitting now');
 				document.getElementById('timelimitholder').style.fontSize="300%";
 				if (document.getElementById("qform") == null) {
@@ -1991,7 +1991,7 @@ function assessmentTimer(duration, timelimitkickout) {
 		seconds = Math.floor((remaining)%60);
 		minutes = Math.floor((remaining/60)%60);
 		hours = Math.floor(remaining/3600);
-		if (hours==0 && minutes <= 5) {document.getElementById("timeremaining").style.color="#f00";}
+		if (hours==0 && minutes < 5) {document.getElementById("timeremaining").className="noticetext";}
 		if (hours==0 && minutes==0 && seconds <= 5) {document.getElementById("timeremaining").style.fontSize="150%";}
 		timestr = ((hours>0)?hours+":":"") + ((hours>0 && minutes<10)?"0":"") + minutes+":" + (seconds<10?"0":"")+seconds;
 		document.getElementById("timeremaining").innerHTML = timestr;
