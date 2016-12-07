@@ -41,7 +41,7 @@ function randmilphrase($removespaces=false,$pad=false) {
 		if ($n%$pad != 0) {
 			$phrase .= ' ';
 			for ($i=$n%$pad;$i<$pad;$i++) {
-				$phrase .= $charset{$RND->rand(0,25)};
+				$phrase .= $charset{$RND->rand(0,20)};
 			}
 		}
 	}
