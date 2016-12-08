@@ -537,7 +537,7 @@ echo "<input type=hidden name=cid value=\"$cid\"/>";
 echo "<input type=hidden name=forum value=\"$forumid\"/>";
 
 ?>
-Search: <input type=text name="search" /> <input type=checkbox name="allforums" />All forums in course? <input type="submit" value="Search"/>
+<label for="search">Search</label>: <input type=text name="search" id="search" /> <input type=checkbox name="allforums" id="allforums" /> <label for="allforums">All forums in course?</label> <input type="submit" value="Search"/>
 </form>
 <?php
 if ($isteacher && $groupsetid>0) {

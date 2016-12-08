@@ -525,12 +525,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 					echo "</select>";
 					echo "<input type=hidden name=courseid value=\"$courseid\"/>\n";
 				} else {
-					echo '<select name="courseid" onchange="updateTo(this)">';
+					echo '<select name="courseid" onchange="updateTo(this)" aria-label="Select a course">';
 					echo '<option value="0">Select a course...</option>';
 					echo $courseopts;
 					echo '</select><br/>';
-					echo '<select name="to" id="to" style="display:none;">';
-					echo '<option value="0">Select a course...</option></select>';
+					echo '<select name="to" id="to" style="display:none;" aria-label="Select an individual ">';
+					echo '<option value="0">Select an individual...</option></select>';
 				}
 
 			}
@@ -546,7 +546,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			echo htmlentities($message);
 			echo "</textarea></div></span><br class=form>\n";
 			if ($replyto>0) {
-				echo '<span class="form"></span><span class="formright"><label><input type="checkbox" name="sendunread" value="1"/> '._('Mark original message unread').'</label></span><br class="form"/>';
+				echo '<span class="form"></span><span class="formright"><input type="checkbox" name="sendunread" id="sendunread" value="1"/> <label for="sendunread">'._('Mark original message unread').'</label></span><br class="form"/>';
 			}
 			echo '<div class="submit"><button type="submit" name="submit" value="send">'._('Send Message').'</button></div>';
 

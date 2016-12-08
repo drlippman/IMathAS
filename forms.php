@@ -37,9 +37,9 @@ switch($_GET['action']) {
 		echo "<span class=\"form\"><label for=\"email\">Enter E-mail address:</label></span>  <input class=\"form\" type=\"text\" size=60 id=email name=email><BR class=\"form\">\n";
 		echo "<span class=form><label for=\"msgnot\">Notify me by email when I receive a new message:</label></span><span class=formright><input type=checkbox id=msgnot name=msgnot checked=\"checked\" /></span><BR class=form>\n";
 		if (isset($studentTOS)) {
-			echo "<span class=form><label for=\"agree\">I have read and agree to the Terms of Use (below)</label></span><span class=formright><input type=checkbox name=agree></span><br class=form />\n";
+			echo "<span class=form><label for=\"agree\">I have read and agree to the Terms of Use (below)</label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
 		} else if (isset($CFG['GEN']['TOSpage'])) {
-			echo "<span class=form><label for=\"agree\">I have read and agree to the <a href=\"#\" onclick=\"GB_show('Terms of Use','".$CFG['GEN']['TOSpage']."',700,500);return false;\">Terms of Use</a></label></span><span class=formright><input type=checkbox name=agree></span><br class=form />\n";
+			echo "<span class=form><label for=\"agree\">I have read and agree to the <a href=\"#\" onclick=\"GB_show('Terms of Use','".$CFG['GEN']['TOSpage']."',700,500);return false;\">Terms of Use</a></label></span><span class=formright><input type=checkbox name=agree id=agree></span><br class=form />\n";
 		}
 
 		if (!$emailconfirmation) {
@@ -50,7 +50,7 @@ switch($_GET['action']) {
 			$stm = $DBH->query("SELECT id,name FROM imas_courses WHERE (istemplate&4)=4 AND available<4 ORDER BY name");
 			if ($stm->rowCount()>0) {
 				$doselfenroll = true;
-				echo '<p>Select the course you\'d like to enroll in</p>';
+				echo '<p><label for="courseselect">Select the course you\'d like to enroll in</label></p>';
 				echo '<p><select id="courseselect" name="courseselect" onchange="courseselectupdate(this);">';
 				echo '<option value="0" selected="selected">My teacher gave me a course ID (enter below)</option>';
 				echo '<optgroup label="Self-study courses">';
@@ -133,11 +133,11 @@ switch($_GET['action']) {
 		echo "<span class=\"formright\">";
 		if ($line['hasuserimg']==1) {
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
-				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_$userid.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" id=removepic value=\"1\" /> <label for=removepic>Remove</label> ";
 			} else {
 				$curdir = rtrim(dirname(__FILE__), '/\\');
 				$galleryPath = "$curdir/course/files/";
-				echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" value=\"1\" /> Remove ";
+				echo "<img src=\"$imasroot/course/files/userimg_$userid.jpg\" alt=\"User picture\"/> <input type=\"checkbox\" name=\"removepic\" id=removepic value=\"1\" /> <label for=removepic>Remove</label> ";
 			}
 		} else {
 			echo "No Pic ";
@@ -162,23 +162,23 @@ switch($_GET['action']) {
 		}
 		$hpsets = '';
 		if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(2,$CFG['GEN']['fixedhomelayout'])) {
-			$hpsets .= '<input type="checkbox" name="homelayout10" ';
+			$hpsets .= '<input type="checkbox" name="homelayout10" id="homelayout10" ';
 			if (in_array(10,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
-			$hpsets .=  ' /> New messages widget<br/>';
+			$hpsets .=  ' /> <label for="homelayout10">New messages widget</label><br/>';
 
-			$hpsets .= '<input type="checkbox" name="homelayout11" ';
+			$hpsets .= '<input type="checkbox" name="homelayout11" id="homelayout11" ';
 			if (in_array(11,$pagelayout[2])) {$hpsets .= 'checked="checked"';}
-			$hpsets .= ' /> New forum posts widget<br/>';
+			$hpsets .= ' /> <label for="homelayout11">New forum posts widget</label><br/>';
 		}
 		if (!isset($CFG['GEN']['fixedhomelayout']) || !in_array(3,$CFG['GEN']['fixedhomelayout'])) {
 
-			$hpsets .= '<input type="checkbox" name="homelayout3-0" ';
+			$hpsets .= '<input type="checkbox" name="homelayout3-0" id="homelayout3-0" ';
 			if (in_array(0,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
-			$hpsets .= ' /> New messages notes on course list<br/>';
+			$hpsets .= ' /> <label for="homelayout3-0">New messages notes on course list</label><br/>';
 
-			$hpsets .= '<input type="checkbox" name="homelayout3-1" ';
+			$hpsets .= '<input type="checkbox" name="homelayout3-1" id="homelayout3-1" ';
 			if (in_array(1,$pagelayout[3])) {$hpsets .= 'checked="checked"';}
-			$hpsets .= ' /> New posts notes on course list<br/>';
+			$hpsets .= ' /> <label for="homelayout3-1">New posts notes on course list</label><br/>';
 		}
 		if ($hpsets != '') {
 			echo '<span class="form">Show on home page:</span><span class="formright">';
@@ -186,8 +186,8 @@ switch($_GET['action']) {
 			echo '</span><br class="form" />';
 
 		}
-		echo '<span class="form">'._('Overwrite default course theme on all pages:').'</span><span class="formright">';
-		echo '<select name="theme">';
+		echo '<span class="form"><label for="theme">'._('Overwrite default course theme on all pages:').'</label></span><span class="formright">';
+		echo '<select name="theme" id="theme">';
 		echo '<option value="" '.($line['theme']==''?'selected':'').'>'._('Use course default theme').'</option>';
 		if (isset($CFG['GEN']['stuthemes'])) {
 			foreach ($CFG['GEN']['stuthemes'] as $k=>$v) {
@@ -243,8 +243,8 @@ switch($_GET['action']) {
 			echo "<span class=form>Default question library:</span><span class=formright> <span id=\"libnames\">$lname</span><input type=hidden name=\"libs\" id=\"libs\"  value=\"{$line['deflib']}\">\n";
 			echo " <input type=button value=\"Select Library\" onClick=\"libselect()\"></span><br class=form> ";
 
-			echo "<span class=form>Use default question library for all templated questions?</span>";
-			echo "<span class=formright><input type=checkbox name=\"usedeflib\"";
+			echo "<span class=form><label for=usedeflib>Use default question library for all templated questions?</label></span>";
+			echo "<span class=formright><input type=checkbox name=\"usedeflib\" id=\"usedeflib\"";
 			if ($line['usedeflib']==1) {echo "checked=1";}
 			echo "> ";
 			echo "</span><br class=form>";
@@ -302,8 +302,8 @@ switch($_GET['action']) {
 		} else {
 			echo '<p>If you already know your course ID, you can enter it now.  Otherwise, leave this blank and you can enroll later.</p>';
 		}
-		echo '<span class="form"><label for="cid">Course ID:</label></span><input class="form" type="text" size="20" name="cid"/><br class="form"/>';
-		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey"/><br class="form"/>';
+		echo '<span class="form"><label for="cid">Course ID:</label></span><input class="form" type="text" size="20" name="cid" id="cid"/><br class="form"/>';
+		echo '<span class="form"><label for="ekey">Enrollment Key:</label></span><input class="form" type="text" size="20" name="ekey" id="ekey"/><br class="form"/>';
 		if ($doselfenroll) {
 			echo '</div>';
 			echo '<div id="selfenrollwarn" class=noticetext style="display:none;">Warning: You have selected a non-credit self-study course. ';
@@ -332,7 +332,7 @@ switch($_GET['action']) {
 		echo "<form method=post action=\"actions.php?action=resetpw$gb\">\n";
 		echo "<p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will ";
 		echo "reset your password.</p>";
-		echo "<p>User Name: <input type=text name=\"username\"/></p>";
+		echo "<p><label for=username>User Name</label>: <input type=text name=\"username\" id=username /></p>";
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "lookupusername":
@@ -342,7 +342,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Lookup Username</h2></div>';
 		echo "<form method=post action=\"actions.php?action=lookupusername$gb\">\n";
 		echo "If you can't remember your username, enter your email address below.  An email will be sent to your email address with your username. ";
-		echo "<p>Email: <input type=text name=\"email\"/></p>";
+		echo "<p><label for=email>Email</label>: <input type=text name=\"email\" id=email /></p>";
 		echo "<p><input type=submit value=\"Submit\" /></p></form>";
 		break;
 	case "forumwidgetsettings":
@@ -369,9 +369,9 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
-				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row[0].'" ';
+				echo '<br/><input type="checkbox" name="checked[]" class="teaching" value="'.$row[0].'" id="c'.$row[0].'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> '.$row[1];
+				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
 			}
 			echo '</p>';
 		}
@@ -385,9 +385,9 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
-				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.$row[0].'" ';
+				echo '<br/><input type="checkbox" name="checked[]" class="tutoring" value="'.$row[0].'" id="c'.$row[0].'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> '.$row[1];
+				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
 			}
 			echo '</p>';
 		}
@@ -401,9 +401,9 @@ switch($_GET['action']) {
 			//DB while ($row = mysql_fetch_row($result)) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				$allcourses[] = $row[0];
-				echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.$row[0].'" ';
+				echo '<br/><input type="checkbox" name="checked[]" class="taking" value="'.$row[0].'" id="c'.$row[0].'"';
 				if (!in_array($row[0],$hidelist)) {echo 'checked="checked"';}
-				echo '/> '.$row[1];
+				echo '/> <label for="c'.$row[0].'">'.$row[1].'</label>';
 			}
 			echo '</p>';
 		}

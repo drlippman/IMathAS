@@ -564,7 +564,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					var filecnt = 1;
 					function addnewfile(t) {
 						var s = document.createElement("span");
-						s.innerHTML = \'Description: <input type="text" name="newfiledesc-\'+filecnt+\'" /><br/>File: <input type="file" name="newfile-\'+filecnt+\'" /><br/>\';
+						s.innerHTML = \'<label for="newfiledesc-\'+filecnt+\'">Description</label>: <input type="text" name="newfiledesc-\'+filecnt+\' id="newfiledesc-\'+filecnt+\'" /><br/><label for="newfile-\'+filecnt+\'">File</label>: <input type="file" name="newfile-\'+filecnt+\'" id="newfile-\'+filecnt+\'" /><br/>\';
 						t.parentNode.insertBefore(s,t);
 						filecnt++;
 					}</script>';
@@ -574,20 +574,20 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					require_once('../includes/filehandler.php');
 					$files = explode('@@',$line['files']);
 					for ($i=0;$i<count($files)/2;$i++) {
-						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'"/>';
+						echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'" aria-label="'._('Description').'"/>';
 						echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
-						echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
+						echo '<label for="filedel['.$i.']">Delete?</label> <input type="checkbox" name="filedel['.$i.']" id="filedel['.$i.']" value="1"/><br/>';
 					}
 				}
-				echo 'Description: <input type="text" name="newfiledesc-0" /><br/>';
-				echo 'File: <input type="file" name="newfile-0" /><br/>';
+				echo '<label for="newfiledesc-0">Description</label>: <input type="text" name="newfiledesc-0" id="newfiledesc-0" /><br/>';
+				echo '<label for=>File</label>: <input type="file" name="newfile-0" id="newfile-0" /><br/>';
 				echo '<a href="#" onclick="addnewfile(this);return false;">Add another file</a>';
 				echo "</span><br class=form>\n";
 			}
 			if ($taglist!='' && ($_GET['modify']=='new' || $_GET['modify']==$threadid)) {
 				$p = strpos($taglist,':');
 				echo '<span class="form"><label for="tag">'.substr($taglist,0,$p).'</label></span>';
-				echo '<span class="formright"><select name="tag">';
+				echo '<span class="formright"><select name="tag" id="tag">';
 				echo '<option value="">Select...</option>';
 				$tags = explode(',',substr($taglist,$p+1));
 				foreach ($tags as $tag) {
@@ -610,40 +610,40 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 			if ($isteacher && ($_GET['modify']=='new' || $line['userid']==$userid) && ($_GET['modify']=='new' || $_GET['modify']==$_GET['thread'] || ($_GET['modify']!='reply' && $line['parent']==0))) {
 				echo "<span class=form>Post Type:</span><span class=formright>\n";
-				echo "<input type=radio name=type value=0 ";
+				echo "<input type=radio name=type id=type0 value=0 ";
 				if ($line['posttype']==0) { echo "checked=1 ";}
-				echo ">Regular<br>\n";
-				echo "<input type=radio name=type value=1 ";
+				echo "> <label for=type0>Regular</label><br>\n";
+				echo "<input type=radio name=type value=1 id=type1 ";
 				if ($line['posttype']==1) { echo "checked=1 ";}
-				echo ">Displayed at top of list<br>\n";
-				echo "<input type=radio name=type value=2 ";
+				echo "> <label for=type1>Displayed at top of list</label><br>\n";
+				echo "<input type=radio name=type value=2 id=type2 ";
 				if ($line['posttype']==2) { echo "checked=1 ";}
-				echo ">Displayed at top and locked (no replies)<br>\n";
-				echo "<input type=radio name=type value=3 ";
+				echo "> <label for=type2>Displayed at top and locked (no replies)</label><br>\n";
+				echo "<input type=radio name=type value=3 id=type3 ";
 				if ($line['posttype']==3) { echo "checked=1 ";}
-				echo ">Displayed at top and students can only see their own replies\n";
+				echo "> <label for=type3>Displayed at top and students can only see their own replies</label>\n";
 				echo "</span><br class=form>";
 				echo "<span class=form>Allow replies: </span><span class=formright>\n";
-				echo "<input type=radio name=replyby value=\"null\" ";
+				echo "<input type=radio name=replyby id=replyby0 value=\"null\" ";
 				if ($line['replyby']==null) { echo "checked=1 ";}
-				echo "/>Use default<br/>";
-				echo "<input type=radio name=replyby value=\"Always\" ";
+				echo "/> <label for=replyby0>Use default</label><br/>";
+				echo "<input type=radio name=replyby id=replyby1 value=\"Always\" ";
 				if ($line['replyby']==2000000000) { echo "checked=1 ";}
-				echo "/>Always<br/>";
-				echo "<input type=radio name=replyby value=\"Never\" ";
+				echo "/> <label for=replyby1>Always</label><br/>";
+				echo "<input type=radio name=replyby id=replyby2 value=\"Never\" ";
 				if ($line['replyby']==='0') { echo "checked=1 ";}
-				echo "/>Never<br/>";
-				echo "<input type=radio name=replyby value=\"Date\" ";
+				echo "/> <label for=replyby2>Never</label><br/>";
+				echo "<input type=radio name=replyby id=replyby3 value=\"Date\" ";
 				if ($line['replyby']!==null && $line['replyby']<2000000000 && $line['replyby']>0) { echo "checked=1 ";}
-				echo "/>Before: ";
-				echo "<input type=text size=10 name=replybydate value=\"$replybydate\"/>";
+				echo "/> <label for=replyby3>Before:</label> ";
+				echo "<input type=text size=10 name=replybydate value=\"$replybydate\" aria-label=\"reply by date\"/>";
 				echo '<a href="#" onClick="displayDatePicker(\'replybydate\', this); return false">';
 				//echo "<A HREF=\"#\" onClick=\"cal1.select(document.forms[0].replybydate,'anchor3','MM/dd/yyyy',(document.forms[0].replybydate.value==$replybydate')?(document.forms[0].replyby.value):(document.forms[0].replyby.value)); return false;\" NAME=\"anchor3\" ID=\"anchor3\">
 				echo "<img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>";
-				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\"></span><br class=\"form\" />";
+				echo "at <input type=text size=10 name=replybytime value=\"$replybytime\" aria-label=\"reply by time\"></span><br class=\"form\" />";
 				if ($groupsetid >0) {
-					echo '<span class="form">Set thread to group:</span><span class="formright">';
-					echo '<select name="stugroup">';
+					echo '<span class="form"><label for="stugroup">Set thread to group</label>:</span><span class="formright">';
+					echo '<select name="stugroup" id="stugroup">';
 					echo '<option value="0" ';
 					if ($curstugroupid==0) { echo 'selected="selected"';}
 					echo '>Non group-specific</option>';
@@ -667,8 +667,8 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 			}
 			if ($isteacher && $haspoints && $_GET['modify']=='reply') {
-				echo '<span class="form">Points for message you\'re replying to:</span><span class="formright">';
-				echo '<input type="text" size="4" name="points" value="'.$points.'" /></span><br class="form" />';
+				echo '<span class="form"><label for="points">Points for message you\'re replying to</label>:</span><span class="formright">';
+				echo '<input type="text" size="4" name="points" id="points" value="'.$points.'" /></span><br class="form" />';
 			}
 			if ($_GET['modify']=='reply') {
 				echo "<div class=submit><input type=submit value='Post Reply'></div>\n";
@@ -977,11 +977,11 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo '<input type="hidden" name="thread" value="'.$threadid.'"/>';
 		echo "<p>What do you want to do?<br/>";
 		if ($ishead) {
-			echo '<input type="radio" name="movetype" value="0" checked="checked" onclick="toggleforumselect(0)"/> Move thread to different forum<br/>';
-			echo '<input type="radio" name="movetype" value="1" onclick="toggleforumselect(1)"/> Move post to be a reply to a thread';
+			echo '<input type="radio" name="movetype" value="0" id=movetype0 checked="checked" onclick="toggleforumselect(0)"/> <label for="movetype0">Move thread to different forum</label><br/>';
+			echo '<input type="radio" name="movetype" value="1" id=movetype1 onclick="toggleforumselect(1)"/> <label for="movetype1">Move post to be a reply to a thread</label>';
 		} else {
-			echo '<input type="radio" name="movetype" value="0" onclick="toggleforumselect(0)"/> Move post to be a new thread in this or another forum<br/>';
-			echo '<input type="radio" name="movetype" value="1" checked="checked" onclick="toggleforumselect(1)"/> Move post to be a reply to a different thread';
+			echo '<input type="radio" name="movetype" value="0" id=movetype0 onclick="toggleforumselect(0)"/> <label for="movetype0">Move post to be a new thread in this or another forum</label><br/>';
+			echo '<input type="radio" name="movetype" value="1" id=movetype1 checked="checked" onclick="toggleforumselect(1)"/> <label for="movetype1">Move post to be a reply to a different thread</label>';
 		}
 		echo '</p>';
 		echo '<div id="fsel" ';
@@ -993,9 +993,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		echo "<input type=\"radio\" name=\"movetof\" value=\"{$row[0]}\" ";
+		echo "<input type=\"radio\" name=\"movetof\" value=\"{$row[0]}\" id=\"moveto{$row[0]}\" ";
 			if ($row[0]==$forumid) {echo 'checked="checked"';}
-			echo "/>{$row[1]}<br/>";
+			echo "/> <label for=\"moveto{$row[0]}\">{$row[1]}</label><br/>";
 		}
 		echo '</div>';
 
@@ -1009,9 +1009,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm->execute(array(':forumid'=>$forumid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if ($ishead && $row[0]==$threadid) {continue;}
-			echo "<input type=\"radio\" name=\"movetot\" value=\"{$row[0]}\" ";
+			echo "<input type=\"radio\" name=\"movetot\" value=\"{$row[0]}\" id=\"movetot{$row[0]}\" ";
 			if ($row[0]==$threadid) {echo 'checked="checked"';}
-			echo "/>{$row[1]}<br/>";
+			echo "/> <label for=\"movetot{$row[0]}\">{$row[1]}</label><br/>";
 		}
 		echo '</div>';
 
