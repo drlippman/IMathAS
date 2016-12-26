@@ -4628,7 +4628,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 				}
 			}
 			if (count($gaarr)>0) { //extraneous student intervals?
-				continue 2;
+				continue;
 			}
 			$correct = 1;
 			break;
