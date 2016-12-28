@@ -121,10 +121,14 @@
 		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
 		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result2);
-		$stm2 = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
+			require("../includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $testsettings, true);	
+		}
+		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 					$isreview = true;

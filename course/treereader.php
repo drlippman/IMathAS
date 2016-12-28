@@ -271,6 +271,7 @@ if (!$viewall) {
 	}
 	//update block start/end dates to show blocks containing items with exceptions
 	if (count($exceptions)>0) {
+		require_once("../includes/exceptionfuncs.php");
 		upsendexceptions($items);
 	}
 }
@@ -326,8 +327,11 @@ function printlist($items) {
 				 $stm->execute(array(':id'=>$typeid));
 				 $line = $stm->fetch(PDO::FETCH_ASSOC);
 				 if (isset($exceptions[$item])) {
-					$line['startdate'] = $exceptions[$item][0];
-					$line['enddate'] = $exceptions[$item][1];
+				 	 $useexception = getCanUseAssessException($exceptions[$item], $line, true); 
+				 	 if ($useexception) {
+				 	 	 $line['startdate'] = $exceptions[$item][0];
+				 	 	 $line['enddate'] = $exceptions[$item][1];
+				 	 }
 				 }
 				 if ($viewall || ($line['avail']==1 && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
 					 if ($openitem=='' && $foundfirstitem=='') {

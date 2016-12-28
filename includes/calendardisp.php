@@ -127,54 +127,67 @@ if (!isset($teacherid)) {
 
 $byid = array();
 $k = 0;
-
 $bestscores_stm = null;
 //DB $query = "SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid='$cid' AND enddate<2000000000 ORDER BY name";
 //DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 //DB while ($row = mysql_fetch_row($result)) {
 $stm = $DBH->prepare("SELECT id,name,startdate,enddate,reviewdate,gbcategory,reqscore,reqscoreaid,timelimit,allowlate,caltag,calrtag FROM imas_assessments WHERE avail=1 AND courseid=:courseid AND enddate<2000000000 ORDER BY name");
 $stm->execute(array(':courseid'=>$cid));
-while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-	$canundolatepass = false;
-	$latepasscnt = 0;
-	if (isset($exceptions[$row[0]])) {
-		if ($exceptions[$row[0]][2]>0 && ($now < $row[3] || $exceptions[$row[0]][1] > $now + $latepasshrs*60*60)) {
-			$canundolatepass = true;
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+	$canundolatepass = false; 
+	$canuselatepass = false;
+	if (!$havecalcedviewedassess && $row['allowlate']>0) {
+		$havecalcedviewedassess = true;
+		$viewedassess = array();
+		//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($r = mysql_fetch_row($r2)) {
+		$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+		$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+		while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
+			$viewedassess[] = $r[0];
 		}
-		$latepasscnt = round(($exceptions[$row[0]][1] - $row[3])/($latepasshrs*3600));
-		$row[2] = $exceptions[$row[0]][0];
-		$row[3] = $exceptions[$row[0]][1];
+	}
+	require_once("exceptionfuncs.php");
+	if (isset($exceptions[$row['id']])) {
+		list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$row['id']], $row); 
+		if ($useexception) {
+			$row['startdate'] = $exceptions[$row['id']][0];
+			$row['enddate'] = $exceptions[$row['id']][1];
+		}
+	} else {
+		$canuselatepass = getCanUseAssessLatePass($row);
 	}
 	//2: start, 3: end, 4: review
 	//if enddate past end of calendar
-	if (!$editingon && $row[3]>$uppertime && ($row[4]==0 || $row[4]>$uppertime || $row[4]<$row[3])) {
+	if (!$editingon && $row['enddate']>$uppertime && ($row['reviewdate']==0 || $row['reviewdate']>$uppertime || $row['reviewdate']<$row['enddate'])) {
 		continue;
 	}
 	//if enddate is past, and reviewdate is past end of calendar
-	if (!$editingon && $row[3]<$now && $row[4]>$uppertime) {
+	if (!$editingon && $row['enddate']<$now && $row['reviewdate']>$uppertime) {
 		//continue;
 	}
-	//echo "{$row[1]}, {$row[3]}, $uppertime, {$row[4]}<br/>";
+	//echo "{$row['name']}, {$row['enddate']}, $uppertime, {$row['reviewdate']}<br/>";
 	//if startdate is past now
-	if (!$editingon && ($row[2]>$now && !isset($teacherid))) {
+	if (!$editingon && ($row['startdate']>$now && !isset($teacherid))) {
 		continue;
 	}
 	//if past reviewdate
-	if (!$editingon && $row[4]>0 && $now>$row[4] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row[3] && $row[4]==0)
+	if (!$editingon && $row['reviewdate']>0 && $now>$row['reviewdate'] && !isset($teacherid)) { //if has reviewdate and we're past it   //|| ($now>$row['enddate'] && $row['reviewdate']==0)
 		//continue;
 	}
 
 	$showgrayedout = false;
-	if (!isset($teacherid) && abs($row[6])>0 && $row[7]>0 && (!isset($exceptions[$row[0]]) || $exceptions[$row[0]][3]==0)) {
-			 //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row[7]}' AND userid='$userid'";
+	if (!isset($teacherid) && abs($row['reqscore'])>0 && $row['reqscoreaid']>0 && (!isset($exceptions[$row['id']]) || $exceptions[$row['id']][3]==0)) {
+			 //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$row['reqscoreaid']}' AND userid='$userid'";
 		   //DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		   //DB if (mysql_num_rows($r2)==0) {
 			 if ($bestscores_stm===null) { //only prepare once
 			 	$bestscores_stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
 			 }
-			 $bestscores_stm->execute(array(':assessmentid'=>$row[7], ':userid'=>$userid));
+			 $bestscores_stm->execute(array(':assessmentid'=>$row['reqscoreaid'], ':userid'=>$userid));
 		   if ($bestscores_stm->rowCount()==0) {
-		   	   if ($row[6]<0) {
+		   	   if ($row['reqscore']<0) {
 		   	   	   $showgrayedout = true;
 		   	   } else {
 		   	   	   continue;
@@ -182,8 +195,8 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		   } else {
 			   //DB $scores = explode(';',mysql_result($r2,0,0));
 			   $scores = explode(';',$bestscores_stm->fetchColumn(0));
-			   if (round(getpts($scores[0]),1)+.02<abs($row[6])) {
-				   if ($row[6]<0) {
+			   if (round(getpts($scores[0]),1)+.02<abs($row['reqscore'])) {
+				   if ($row['reqscore']<0) {
 					   $showgrayedout = true;
 				   } else {
 					   continue;
@@ -191,40 +204,27 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			   }
 		   }
 	}
-	if ($row[4]<$uppertime && $row[4]>$exlowertime && (($row[4]>0 && $now>$row[3]) || $editingon)) { //has review, and we're past enddate
-		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[4]));
-		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-		$tag = htmlentities($row[11], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-		if ($editingon) {$colors='';} else {if ($now<$row[4]) { $colors = '#99f';} else {$colors = '#ccc';}}
-		$json = "{type:\"AR\", typeref:\"$row[0]\", time:\"$time\", tag:\"$tag\", ";
-		if ($now<$row[4] || isset($teacherid)) { $json .= "id:\"$row[0]\",";}
-		$json .=  "color:\"".$colors."\",name:\"$row[1]\"".((isset($teacherid))?", editlink:true":"")."}";
-		//if (($row[3]<$uppertime && $row[3]>$exlowertime) || $editingon) {  //if going to do a second tag, need to increment.
-			$byid['AR'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+	if ($row['reviewdate']<$uppertime && $row['reviewdate']>$exlowertime && (($row['reviewdate']>0 && $now>$row['enddate']) || $editingon)) { //has review, and we're past enddate
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['reviewdate']));
+		$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+		$tag = htmlentities($row['calrtag'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+		if ($editingon) {$colors='';} else {if ($now<$row['reviewdate']) { $colors = '#99f';} else {$colors = '#ccc';}}
+		$json = "{type:\"AR\", typeref:\"{$row['id']}\", time:\"$time\", tag:\"$tag\", ";
+		if ($now<$row['reviewdate'] || isset($teacherid)) { $json .= "id:\"{$row['id']}\",";}
+		$json .=  "color:\"".$colors."\",name:\"{$row['name']}\"".((isset($teacherid))?", editlink:true":"")."}";
+		//if (($row['enddate']<$uppertime && $row['enddate']>$exlowertime) || $editingon) {  //if going to do a second tag, need to increment.
+			$byid['AR'.$row['id']] = array($moday,$tag,$colors,$json,$row['name']);
 		//}
 	}
-	$tag = htmlentities($row[10], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
-	if ($row[3]<$uppertime && $row[3]>$exlowertime) {// taking out "hide if past due" && ($now<$row[3] || isset($teacherid))) {
-		/*if (isset($gbcats[$row[5]])) {
-			$tag = $gbcats[$row[5]];
+	$tag = htmlentities($row['caltag'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+	if ($row['enddate']<$uppertime && $row['enddate']>$exlowertime) {// taking out "hide if past due" && ($now<$row['enddate'] || isset($teacherid))) {
+		/*if (isset($gbcats[$row['gbcategory']])) {
+			$tag = $gbcats[$row['gbcategory']];
 		} else {
 			$tag = '?';
 		}*/
 
-		if (!$havecalcedviewedassess && $now>$row[3] && $row[9]>10) {
-			$havecalcedviewedassess = true;
-			$viewedassess = array();
-			//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
-			//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($r = mysql_fetch_row($r2)) {
-			$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
-			$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
-			while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-				$viewedassess[] = $r[0];
-			}
-		}
-		if (($row[9]%10==1 || $row[9]%10-1>$latepasscnt) && $latepasses>0 && !$showgrayedout &&
-		   ($now < $row[3] || ($row[9]>10 && $now-$row[3]<$latepasshrs*3600 && !in_array($row[0],$viewedassess)))) {
+		if ($canuselatepass && !$showgrayedout) {
 			$lp = 1;
 		} else {
 			$lp = 0;
@@ -236,23 +236,23 @@ while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		} else {
 			$ulp = 0;
 		}
-		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row[3]));
-		$row[1] = htmlentities($row[1], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
+		list($moday,$time) = explode('~',tzdate('Y-n-j~g:i a',$row['enddate']));
+		$row['name'] = htmlentities($row['name'], ENT_COMPAT | ENT_HTML401, "UTF-8", false);
 		if ($showgrayedout) {
 			$colors = '#ccc';
 		} else {
-			$colors = makecolor2($row[2],$row[3],$now);
+			$colors = makecolor2($row['startdate'],$row['enddate'],$now);
 		}
 		if ($editingon) {$colors='';}
-		$json = "{type:\"AE\", typeref:\"$row[0]\", time:\"$time\", ";
-		if ($now<$row[3] || $row[4]>$now || isset($teacherid) || $lp==1) { $json .= "id:\"$row[0]\",";}
-		if ((($now>$row[3] && $now>$row[4]) || $showgrayedout) && !isset($teacherid)) { $json .= 'inactive:true,';}
-		$json .= "name:\"$row[1]\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row[8]!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row[0]}&cid=$cid\">{$row[1]}</a> Due $time<br/>";
-		$byid['AE'.$row[0]] = array($moday,$tag,$colors,$json,$row[1]);
+		$json = "{type:\"AE\", typeref:\"{$row['id']}\", time:\"$time\", ";
+		if ($now<$row['enddate'] || $row['reviewdate']>$now || isset($teacherid) || $lp==1) { $json .= "id:\"{$row['id']}\",";}
+		if ((($now>$row['enddate'] && $now>$row['reviewdate']) || $showgrayedout) && !isset($teacherid)) { $json .= 'inactive:true,';}
+		$json .= "name:\"{$row['name']}\", color:\"".$colors."\", allowlate:\"$lp\", undolate:\"$ulp\", tag:\"$tag\"".(($row['timelimit']!=0)?", timelimit:true":"").((isset($teacherid))?", editlink:true":"")."}";//"<span class=icon style=\"background-color:#f66\">?</span> <a href=\"../assessment/showtest.php?id={$row['id']}&cid=$cid\">{$row['name']}</a> Due $time<br/>";
+		$byid['AE'.$row['id']] = array($moday,$tag,$colors,$json,$row['name']);
 	}
-	if ($editingon && $row[2]>$exlowertime && $row[2]<$uppertime) {
-		$json = "{type:\"AS\", typeref:\"$row[0]\", name:\"$row[1]\", tag:\"$tag\"}";
-		$byid['AS'.$row[0]] = array(tzdate('Y-n-j',$row[2]) ,$tag,'',$json,$row[1]);
+	if ($editingon && $row['startdate']>$exlowertime && $row['startdate']<$uppertime) {
+		$json = "{type:\"AS\", typeref:\"{$row['id']}\", name:\"{$row['name']}\", tag:\"$tag\"}";
+		$byid['AS'.$row['id']] = array(tzdate('Y-n-j',$row['startdate']) ,$tag,'',$json,$row['name']);
 	}
 }
 // 4/4/2011, changing tthis to code block below.  Not sure why change on 10/23 was made :/

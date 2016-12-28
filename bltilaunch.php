@@ -1198,7 +1198,7 @@ if ($linkparts[0]=='cid') {
 	//DB $query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	$cid = $line['courseid'];
@@ -1212,10 +1212,15 @@ if ($linkparts[0]=='cid') {
 		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid'";
 		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result2);
-		$stm = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
+		$useexception = false
 		if ($row!=null) {
+			require_once("./includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $line, true);	
+		}
+		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;
@@ -2383,7 +2388,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	//DB $query = "SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT courseid,startdate,enddate,reviewdate,avail,ltisecret,allowlate FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	$cid = $line['courseid'];
@@ -2400,7 +2405,12 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		$stm2 = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
+		$useexception = false;
 		if ($row!=null) {
+			require_once("./includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $line, true);	
+		}
+		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $line['startdate'] && $now < $line['reviewdate']) {
 					$isreview = true;

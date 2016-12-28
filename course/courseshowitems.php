@@ -557,7 +557,7 @@ function enditem($canedit) {
 			   //DB $query = "SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id='$typeid'";
 			   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			   //DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
-			   $stm = $DBH->prepare("SELECT name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id=:id");
+			   $stm = $DBH->prepare("SELECT id,name,summary,startdate,enddate,reviewdate,deffeedback,reqscore,reqscoreaid,avail,allowlate,timelimit FROM imas_assessments WHERE id=:id");
 			   $stm->execute(array(':id'=>$typeid));
 			   $line = $stm->fetch(PDO::FETCH_ASSOC);
 			   //do time limit mult
@@ -577,17 +577,28 @@ function enditem($canedit) {
 
 			   //check for exception
 			   $canundolatepass = false;
-			   $latepasscnt = 0;
+			   $canuselatepass = false;
+			   require_once("../includes/exceptionfuncs.php");
+			   if (!$havecalcedviewedassess && $line['avail']>0 && $line['allowlate']>0) {
+			   	   $havecalcedviewedassess = true;
+			   	   $viewedassess = array();
+			   	   //DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
+			   	   //DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
+			   	   //DB while ($r = mysql_fetch_row($r2)) {
+			   	   $stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+			   	   $stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+			   	   while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
+			   	   	   $viewedassess[] = $r[0];
+				   }
+			   }
 			   if (isset($exceptions[$items[$i]])) {
-			   	   //if latepass and it's before original due date or exception is for more than a latepass past now
-			   	   if ($exceptions[$items[$i]][2]>0 && ($now < $line['enddate'] || $exceptions[$items[$i]][1] > $now + $latepasshrs*60*60)) {
-			   	   	   $canundolatepass = true;
+			   	   list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$items[$i]], $line);
+			   	   if ($useexception) {
+			   	   	   $line['startdate'] = $exceptions[$items[$i]][0];
+			   	   	   $line['enddate'] = $exceptions[$items[$i]][1];
 			   	   }
-			   	   if ($exceptions[$items[$i]][2]>0) {
-			   	   	   $latepasscnt = max(0,round(($exceptions[$items[$i]][1] - $line['enddate'])/($latepasshrs*3600)));
-			   	   }
-				   $line['startdate'] = $exceptions[$items[$i]][0];
-				   $line['enddate'] = $exceptions[$items[$i]][1];
+			   } else {
+			   	   $canuselatepass = getCanUseAssessLatePass($line);
 			   }
 
 			   if ($line['startdate']==0) {
@@ -625,18 +636,6 @@ function enditem($canedit) {
 					   	   $nothidden = false;
 					   }
 				   }
-			   }
-			   if (!$havecalcedviewedassess && $line['avail']>0 && $line['enddate']<$now && $line['allowlate']>10) {
-						$havecalcedviewedassess = true;
-						$viewedassess = array();
-						//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$userid' AND type='gbviewasid'";
-						//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-						//DB while ($r = mysql_fetch_row($r2)) {
-						$stm2 = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
-						$stm2->execute(array(':courseid'=>$cid, ':userid'=>$userid));
-						while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
-							$viewedassess[] = $r[0];
-						}
 			   }
 
 			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
@@ -709,7 +708,7 @@ function enditem($canedit) {
 
 					echo '</span>';
 
-				   } else if (($line['allowlate']%10==1 || $line['allowlate']%10-1>$latepasscnt) && $latepasses>0) {
+				   } else if ($canuselatepass) {
 					echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 					if ($canundolatepass) {
 						 echo " | <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid&undo=true\">", _('Un-use LatePass'), "</a>";
@@ -740,7 +739,7 @@ function enditem($canedit) {
 				   if ($line['reviewdate']!=2000000000) {
 					   echo " ", _('until'), " $reviewdate \n";
 				   }
-				   if ($line['allowlate']>10 && ($now - $line['enddate'])<$latepasshrs*3600 && !in_array($typeid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview'])) {
+				   if ($canuselatepass) {
 				   	   echo " <a href=\"redeemlatepass.php?cid=$cid&aid=$typeid\">", _('Use LatePass'), "</a>";
 				   }
 				   if ($canedit) {

@@ -2,6 +2,8 @@
 //IMathAS:  Outcomes report array generator
 //(c) 2013 David Lippman for Lumen Learning
 
+require_once("../includes/exceptionfuncs.php");
+
 /***
 format of output
 
@@ -113,7 +115,7 @@ function outcometable() {
 	$now = time();
 	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
 	//DB $query .= "AND cntingb>0 AND cntingb<3 ";
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
+	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,defoutcome,allowlate FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
 	$query .= "AND cntingb>0 AND cntingb<3 ";
 	$qarr = array(':courseid'=>$cid);
 	if ($istutor) {
@@ -137,6 +139,7 @@ function outcometable() {
 	$discuss = array();
 	$startdate = array();
 	$enddate = array();
+	$allowlate = array();
 	$timelimits = array();
 	$avail = array();
 	$category = array();
@@ -162,6 +165,8 @@ function outcometable() {
 		}
 		$enddate[$kcnt] = $line['enddate'];
 		$startdate[$kcnt] = $line['startdate'];
+		$allowlate[$kcnt] = $line['allowlate'];
+		
 		$timelimits[$kcnt] = $line['timelimit'];
 
 		$assessments[$kcnt] = $line['id'];
@@ -534,13 +539,13 @@ function outcometable() {
 	//DB $query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid='$cid'";
 	//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB while ($r = mysql_fetch_row($result2)) {
-	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
+	$query = "SELECT imas_exceptions.assessmentid,imas_exceptions.userid,imas_exceptions.startdate,imas_exceptions.enddate,imas_exceptions.islatepass FROM imas_exceptions,imas_assessments WHERE ";
 	$query .= "imas_exceptions.itemtype='A' AND imas_exceptions.assessmentid=imas_assessments.id AND imas_assessments.courseid=:courseid";
 	$stm2 = $DBH->prepare($query);
 	$stm2->execute(array(':courseid'=>$cid));
 	while ($r = $stm2->fetch(PDO::FETCH_NUM)) {
 		if (!isset($sturow[$r[1]])) { continue;}
-		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3]);
+		$exceptions[$r[0]][$r[1]] = array($r[2],$r[3],$r[4]);
 		$gb[$sturow[$r[1]]][1][$assesscol[$r[0]]][2] = 10; //will get overwritten later if assessment session exists
 	}
 
@@ -601,13 +606,17 @@ function outcometable() {
 		} else {
 			$IP=0;
 		}
-
-		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {
+		$useexception = false; 
+		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
+			$useexception = getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i]), true);
+		}
+		
+		if ($useexception) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']][0];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
 				if ($limuser>0 && $gb[0][1][$col][2]==2) {  //change $avail past/cur/future
 					if ($now<$thised) {
 						$gb[0][1][$col][2] = 1;

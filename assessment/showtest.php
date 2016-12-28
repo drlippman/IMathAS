@@ -47,7 +47,7 @@
 		//DB $query = "SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod FROM imas_assessments WHERE id='$aid'";
 		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		//DB $adata = mysql_fetch_array($result, MYSQL_ASSOC);
-		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod FROM imas_assessments WHERE id=:id");
+		$stm = $DBH->prepare("SELECT deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate,displaymethod,id FROM imas_assessments WHERE id=:id");
 		$stm->execute(array(':id'=>$aid));
 		$adata = $stm->fetch(PDO::FETCH_ASSOC);
 		$now = time();
@@ -56,7 +56,7 @@
 		if ($adata['avail']==0 && !isset($teacherid) && !isset($tutorid)) {
 			$assessmentclosed = true;
 		}
-
+		$canuselatepass = false;
 		if (!$actas) {
 			if (isset($studentid)) {
 				//DB $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
@@ -71,11 +71,14 @@
 			//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='$aid' AND itemtype='A'";
 			//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result2);
-			$stm2 = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+			$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 			$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 			$row = $stm2->fetch(PDO::FETCH_NUM);
-
 			if ($row!=null) {
+				require_once("../includes/exceptionfuncs.php");
+				$useexception = getCanUseAssessException($row, $adata, true);	
+			}
+			if ($row!=null && $useexception) {
 				if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 					if ($now > $adata['startdate'] && $now<$adata['reviewdate']) {
 						$isreview = true;
@@ -136,8 +139,14 @@
 					$latepasses = 0;
 					$latepasshrs = 0;
 				}
-				if ($adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && !in_array($aid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas ) {
-					echo "<p><a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid=$aid\">", _('Use LatePass'), "</a></p>";
+				
+				if (!$actas && $latepasses>0) {
+					require_once("../includes/exceptionfuncs.php");
+					list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($row, $adata);
+					
+					if ($canuselatepass) {
+						echo "<p><a href=\"$imasroot/course/redeemlatepass.php?cid=$cid&aid=$aid\">", _('Use LatePass'), "</a></p>";
+					}
 				}
 
 				if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0 && $sessiondata['ltiitemid']==$aid) {
@@ -653,6 +662,10 @@
 		$stm2->execute(array(':userid'=>$userid, ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
+			require_once("../includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $testsettings, true);	
+		}
+		if ($row!=null && $useexception) {
 			if ($now<$row[0] || $row[1]<$now) { //outside exception dates
 				if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
 					$isreview = true;
@@ -690,11 +703,15 @@
 		//DB $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='{$sessiondata['actas']}' AND assessmentid='{$line['assessmentid']}' AND itemtype='A'";
 		//DB $result2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result2);
-		$stm2 = $DBH->prepare("SELECT startdate,enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$sessiondata['actas'], ':assessmentid'=>$line['assessmentid']));
 		$row = $stm2->fetch(PDO::FETCH_NUM);
 		if ($row!=null) {
-			$exceptionduedate = $row[1];
+			require_once("../includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($row, $testsettings, true);	
+			if ($useexception) {
+				$exceptionduedate = $row[1];
+			}
 		}
 	}
 

@@ -138,20 +138,29 @@
 			$aname = $matches[2];
 			//DB $query = "SELECT id,enddate FROM imas_assessments WHERE name='$aname' AND courseid='{$line['courseid']}'";
 			//DB $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			$stm = $DBH->prepare("SELECT id,enddate FROM imas_assessments WHERE name=:name AND courseid=:courseid");
+			$stm = $DBH->prepare("SELECT id,startdate,enddate,allowlate FROM imas_assessments WHERE name=:name AND courseid=:courseid");
 			$stm->execute(array(':name'=>$aname, ':courseid'=>$line['courseid']));
 			//DB if (mysql_num_rows($res)>0) {
 			if ($stm->rowCount()>0) {
+				
 				//DB list($aid,$due) = mysql_fetch_row($res);
-				list($aid,$due) = $stm->fetch(PDO::FETCH_NUM);
+				$adata = $stm->fetch(PDO::FETCH_ASSOC);
+				$due = $adata['enddate'];
+				
+				//list($aid,$due) = $stm->fetch(PDO::FETCH_NUM);
 				//DB $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$line['msgfrom']}' AND assessmentid='$aid' AND itemtype='A'";
 				//DB $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB if (mysql_num_rows($res)>0) {
 					//DB $due = mysql_result($res,0,0);
-				$stm = $DBH->prepare("SELECT enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
-				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$aid));
+				$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+				$stm->execute(array(':userid'=>$line['msgfrom'], ':assessmentid'=>$adata['id']));
 				if ($stm->rowCount()>0) {
-					$due = $stm->fetchColumn(0);
+					$exception = $stm->fetch(PDO::FETCH_NUM);
+					require_once("../includes/exceptionfuncs.php");
+					$useexception = getCanUseAssessException($exception, $adata, true);
+					if ($useexception) {
+						$due = $exception[1];
+					}
 				}
 				$duedate = tzdate('D m/d/Y g:i a',$due);
 
@@ -160,7 +169,7 @@
 				//DB if (mysql_num_rows($res)>0) {
 					//DB $asid = mysql_result($res,0,0);
 				$stm = $DBH->prepare("SELECT id FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-				$stm->execute(array(':assessmentid'=>$aid, ':userid'=>$line['msgfrom']));
+				$stm->execute(array(':assessmentid'=>$adata['id'], ':userid'=>$line['msgfrom']));
 				if ($stm->rowCount()>0) {
 					$asid = $stm->fetchColumn(0);
 					echo " | <a href=\"$imasroot/course/gb-viewasid.php?cid={$line['courseid']}&uid={$line['msgfrom']}&asid=$asid#qwrap$qn\" target=\"_popoutgradebook\">assignment</a>";

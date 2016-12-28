@@ -515,7 +515,7 @@
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_num_rows($result)==0) {
 		$query = "SELECT imas_assessments.name,imas_assessments.timelimit,imas_assessments.defpoints,imas_assessments.tutoredit,imas_assessments.defoutcome,";
-		$query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.enddate,imas_assessment_sessions.* ";
+		$query .= "imas_assessments.showhints,imas_assessments.deffeedback,imas_assessments.startdate,imas_assessments.enddate,imas_assessments.allowlate,imas_assessment_sessions.* ";
 		$query .= "FROM imas_assessments,imas_assessment_sessions ";
 		$query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id=:id AND imas_assessments.courseid=:courseid";
 		if (!$isteacher && !$istutor) {
@@ -669,20 +669,32 @@
 		//DB $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB if (mysql_num_rows($r2)>0) {
 			//DB $exped = mysql_result($r2,0,0);
-		$stm2 = $DBH->prepare("SELECT enddate FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
+		$stm2 = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm2->execute(array(':userid'=>$_GET['uid'], ':assessmentid'=>$line['assessmentid']));
+		$useexception = false;
 		if ($stm2->rowCount()>0) {
-			$exped = $stm2->fetchColumn(0);
+			$exception = $stm2->fetch(PDO::FETCH_NUM);
+			$exped = $exception[1];
 			if ($exped>$saenddate) {
 				$saenddate = $exped;
 			}
+			require("../includes/exceptionfuncs.php");
+			$useexception = getCanUseAssessException($exception, $line, true); 
 		}
 
 		if ($isteacher) {
 			if (isset($exped) && $exped!=$line['enddate']) {
-				echo "<p>Has exception, with due date: ".tzdate("F j, Y, g:i a",$exped);
-				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
-				echo "<br/>Original Due Date: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
+				$lpnote = ($exception[2]>0)?" (LatePass)":"";
+				if ($useexception) {
+					echo "<p>Has exception$lpnote, with due date: ".tzdate("F j, Y, g:i a",$exped);
+					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
+					echo "<br/>Original Due Date: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
+				} else {
+					echo "<p>Had exception$lpnote, with due date: ".tzdate("F j, Y, g:i a",$exped);
+					echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
+					echo "<br/>Assessment Due Date is being used instead: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
+
+				}
 			} else {
 				echo "<p>Due Date: ". ($line['enddate']==2000000000?"None":tzdate("F j, Y, g:i a",$line['enddate']));
 				echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Make Exception</button>";

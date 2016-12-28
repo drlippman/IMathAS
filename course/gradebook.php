@@ -728,7 +728,7 @@ if (isset($studentid) || $stu!=0) { //show student view
 }
 
 function gbstudisp($stu) {
-	global $DBH,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs;
+	global $DBH,$hidenc,$cid,$gbmode,$availshow,$isteacher,$istutor,$catfilter,$imasroot,$canviewall,$urlmode,$includeduedate, $includelastchange,$latepasshrs,$latepasses,$viewedassess;
 	if ($availshow==4) {
 		$availshow=1;
 		$hidepast = true;
@@ -740,6 +740,34 @@ function gbstudisp($stu) {
 		$stm = $DBH->prepare("SELECT showlatepass,latepasshrs FROM imas_courses WHERE id=:id");
 		$stm->execute(array(':id'=>$cid));
 		list($showlatepass,$latepasshrs) = $stm->fetch(PDO::FETCH_NUM);
+		
+		//DB $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
+		//DB $query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB if (mysql_num_rows($result)==0) {
+		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
+		$query .= "imas_students.userid=imas_users.id AND imas_users.id=:id AND imas_students.courseid=:courseid";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':id'=>$stu, ':courseid'=>$_GET['cid']));
+		if ($stm->rowCount()==0) { //shouldn't happen
+			echo 'Invalid student id';
+			require("../footer.php");
+			exit;
+		}
+		//DB list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
+		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
+		
+		$viewedassess = array();
+		if (!$isteacher && !$istutor) {
+			//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$stu' AND type='gbviewasid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB while ($row = mysql_fetch_row($result)) {
+			$stm = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
+			$stm->execute(array(':courseid'=>$cid, ':userid'=>$stu));
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$viewedassess[] = $row[0];
+			}
+		}
 	}
 	$curdir = rtrim(dirname(__FILE__), '/\\');
 	$gbt = gbtable($stu);
@@ -798,32 +826,9 @@ function gbstudisp($stu) {
 		} else {
 			echo strip_tags($gbt[1][0][0]) . ' <span class="small">('.$gbt[1][0][1].')</span>';
 
-			$viewedassess = array();
-			//DB $query = "SELECT typeid FROM imas_content_track WHERE courseid='$cid' AND userid='$stu' AND type='gbviewasid'";
-			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-			//DB while ($row = mysql_fetch_row($result)) {
-			$stm = $DBH->prepare("SELECT typeid FROM imas_content_track WHERE courseid=:courseid AND userid=:userid AND type='gbviewasid'");
-			$stm->execute(array(':courseid'=>$cid, ':userid'=>$stu));
-			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-				$viewedassess[] = $row[0];
-			}
 			$now = time();
 		}
-		//DB $query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
-		//DB $query .= "imas_students.userid=imas_users.id AND imas_users.id='$stu' AND imas_students.courseid='{$_GET['cid']}'";
-		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-		//DB if (mysql_num_rows($result)==0) {
-		$query = "SELECT imas_students.gbcomment,imas_users.email,imas_students.latepass,imas_students.section,imas_students.lastaccess FROM imas_students,imas_users WHERE ";
-		$query .= "imas_students.userid=imas_users.id AND imas_users.id=:id AND imas_students.courseid=:courseid";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$stu, ':courseid'=>$_GET['cid']));
-		if ($stm->rowCount()==0) { //shouldn't happen
-			echo 'Invalid student id';
-			require("../footer.php");
-			exit;
-		}
-		//DB list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = mysql_fetch_row($result);
-		list($gbcomment,$stuemail,$latepasses,$stusection,$lastaccess) = $stm->fetch(PDO::FETCH_NUM);
+		
 		if ($stusection!='') {
 			echo ' <span class="small">Section: '.$stusection.'.</span>';
 		}
@@ -935,11 +940,18 @@ function gbstudisp($stu) {
 
 			echo '<td class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0];
 			$afterduelatepass = false;
-			if (!$isteacher && !$istutor && $latepasses>0  &&	(
+			if (!$isteacher && !$istutor && $latepasses>0 && !isset($gbt[1][1][$i][10])) {
+				//not started, so no canuselatepass record
+				require_once("../includes/exceptionfuncs.php");
+				$gbt[1][1][$i][10] = getCanUseAssessLatePass(array('enddate'=>$gbt[0][1][$i][11], 'allowlate'=>$gbt[0][1][$i][12]));
+				
+			}
+			/*if (!$isteacher && !$istutor && $latepasses>0  &&	(
 				(isset($gbt[1][1][$i][10]) && $gbt[1][1][$i][10]>0 && !in_array($gbt[0][1][$i][7],$viewedassess)) ||  //started, and already figured it's ok
 				(!isset($gbt[1][1][$i][10]) && $now<$gbt[0][1][$i][11]) || //not started, before due date
 				(!isset($gbt[1][1][$i][10]) && $gbt[0][1][$i][12]>10 && $now-$gbt[0][1][$i][11]<$latepasshrs*3600 && !in_array($gbt[0][1][$i][7],$viewedassess)) //not started, within one latepass
-			    )) {
+			    )) {*/
+			if (!$isteacher && !$istutor && $latepasses>0 && $gbt[1][1][$i][10]==true) { //if canuselatepass
 				echo ' <span class="small"><a href="redeemlatepass.php?cid='.$cid.'&aid='.$gbt[0][1][$i][7].'">[';
 				echo _('Use LatePass').']</a></span>';
 				if ($now>$gbt[0][1][$i][11]) {
@@ -1031,16 +1043,18 @@ function gbstudisp($stu) {
 			if ($haslink) { //show link
 				echo '</a>';
 			}
+			$exceptionnote = '';
 			if (isset($gbt[1][1][$i][6]) ) {  //($isteacher || $istutor) &&
 				if ($gbt[1][1][$i][6]>1) {
 					if ($gbt[1][1][$i][6]>2) {
-						echo '<sup>LP ('.($gbt[1][1][$i][6]-1).')</sup>';
+						$exceptionnote = '<sup>LP ('.($gbt[1][1][$i][6]-1).')</sup>';
 					} else {
-						echo '<sup>LP</sup>';
+						$exceptionnote = '<sup>LP</sup>';
 					}
 				} else {
-					echo '<sup>e</sup>';
+					$exceptionnote = '<sup>e</sup>';
 				}
+				echo $exceptionnote;
 			}
 			if (isset($gbt[1][1][$i][5]) && ($gbt[1][1][$i][5]&(1<<$availshow)) && !$hidepast) {
 				echo '<sub>d</sub>';
@@ -1071,8 +1085,10 @@ function gbstudisp($stu) {
 					if ($gbt[0][1][$i][11]<2000000000) {
 						echo '<td>'.tzdate('n/j/y g:ia',$gbt[0][1][$i][11]);
 					} else {
-						echo '<td>-</td>';
+						echo '<td>-';
 					}
+					echo $exceptionnote;
+					echo '</td>';
 				}
 			} else if ($stu==-1) {
 				if (isset($gbt[1][1][$i][7]) && $gbt[1][1][$i][7]>-1) {

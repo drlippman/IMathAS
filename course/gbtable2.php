@@ -2,6 +2,8 @@
 //IMathAS: gradebook table generating function
 //(c) 2007 David Lippman
 
+require_once("../includes/exceptionfuncs.php");
+
 //used by gbtable
 function getpts($sc) {
 	if (strpos($sc,'~')===false) {
@@ -341,9 +343,8 @@ function gbtable() {
 			$cntingb[$kcnt] = 3;
 		}
 		$aitems = explode(',',$line['itemorder']);
-		if ($line['allowlate']>0) {
-			$allowlate[$kcnt] = $line['allowlate'];
-		}
+		$allowlate[$kcnt] = $line['allowlate'];
+		
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
@@ -750,10 +751,10 @@ function gbtable() {
 					$gb[0][1][$pos][7] = $exttools[$k];
 					$exttoolcol[$exttools[$k]] = $pos;
 				}
-				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || isset($allowlate[$k])) {
+				if ((isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true) || $allowlate[$k]>0) {
 					$gb[0][1][$pos][11] = $enddate[$k];
 				}
-				if (isset($allowlate[$k])) {
+				if ($allowlate[$k]>0) {
 					$gb[0][1][$pos][12] = $allowlate[$k];
 				}
 
@@ -825,10 +826,10 @@ function gbtable() {
 				$gb[0][1][$pos][7] = $exttools[$k];
 				$exttoolcol[$exttools[$k]] = $pos;
 			}
-			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true|| isset($allowlate[$k])) {
+			if (isset($GLOBALS['includeduedate']) && $GLOBALS['includeduedate']==true|| $allowlate[$k]>0) {
 				$gb[0][1][$pos][11] = $enddate[$k];
 			}
-			if (isset($allowlate[$k])) {
+			if ($allowlate[$k]>0) {
 				$gb[0][1][$pos][12] = $allowlate[$k];
 			}
 			$pos++;
@@ -1049,7 +1050,7 @@ function gbtable() {
 	while ($r = $stm2->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($sturow[$r['userid']])) { continue;}
 		if ($r['itemtype']=='A') {
-			$exceptions[$r['typeid']][$r['userid']] = array($r['enddate'],$r['islatepass']);
+			$exceptions[$r['typeid']][$r['userid']] = array($r['startdate'],$r['enddate'],$r['islatepass']);
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][6] = ($r['islatepass']>0)?(1+$r['islatepass']):1;
 			$gb[$sturow[$r['userid']]][1][$assesscol[$r['typeid']]][3] = 10; //will get overwritten later if assessment session exists
 		} else if ($r['itemtype']=='F' || $r['itemtype']=='P' || $r['itemtype']=='R') {
@@ -1127,13 +1128,20 @@ function gbtable() {
 			$gb[$row][1][$col][6] = ($exceptions[$l['assessmentid']][$l['userid']][1]>0)?2:1; //had exception
 		}
 		*/
-		$latepasscnt = 0;
-		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
-			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][0] && $assessmenttype[$i]=="NoScores") {
+		$useexception = false; $canuselatepass = false;
+		if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
+			list($useexception, $canundolatepass, $canuselatepass) = getCanUseAssessException($exceptions[$l['assessmentid']][$l['userid']], array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid']));
+		} else {
+			$canuselatepass = getCanUseAssessLatePass(array('startdate'=>$startdate[$i], 'enddate'=>$enddate[$i], 'allowlate'=>$allowlate[$i], 'id'=>$l['assessmentid']));
+		}
+		//if (isset($exceptions[$l['assessmentid']][$l['userid']])) {// && $now>$enddate[$i] && $now<$exceptions[$l['assessmentid']][$l['userid']]) {
+		if ($useexception) {
+			//TODO:  Does not change due date display in individual user gradebook view
+			if ($enddate[$i]>$exceptions[$l['assessmentid']][$l['userid']][1] && $assessmenttype[$i]=="NoScores") {
 				//if exception set for earlier, and NoScores is set, use later date to hide score until later
 				$thised = $enddate[$i];
 			} else {
-				$thised = $exceptions[$l['assessmentid']][$l['userid']][0];
+				$thised = $exceptions[$l['assessmentid']][$l['userid']][1];
 				if ($limuser>0 && $gb[0][1][$col][3]==2) {  //change $avail past/cur/future
 					if ($now<$thised) {
 						$gb[0][1][$col][3] = 1;
@@ -1142,23 +1150,15 @@ function gbtable() {
 					}
 				}
 			}
-			$inexception = true;
-			if ($enddate[$i]<$exceptions[$l['assessmentid']][$l['userid']][0] && $latepasshrs>0) {
-				$latepasscnt = round(($exceptions[$l['assessmentid']][$l['userid']][0] - $enddate[$i])/($latepasshrs*3600));
+			if ($limuser>0) { //override due date header if one stu display
+				$gb[0][1][$col][11] = $thised;
 			}
+			$inexception = true;
 		} else {
 			$thised = $enddate[$i];
 			$inexception = false;
 		}
-		$allowlatethis = false;
-		if (isset($allowlate[$i]) && ($allowlate[$i]%10==1 || $latepasscnt<$allowlate[$i]%10-1)) {
-			if ($now<$thised) {
-				$allowlatethis = true;
-			} else if ($allowlate[$i]>10 && ($now - $thised)<$latepasshrs*3600) {
-				$allowlatethis = true;
-			}
-		}
-		$gb[$row][1][$col][10] = $allowlatethis;
+		$gb[$row][1][$col][10] = $canuselatepass;
 
 		if ($canviewall || $sa[$i]=="I" || ($sa[$i]!="N" && $now>$thised)) { //|| $assessmenttype[$i]=="Practice"
 			$gb[$row][1][$col][2] = 1; //show link

@@ -87,9 +87,9 @@
 	//DB $query = "SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder FROM imas_assessments WHERE id='$aid'";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	//DB list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = mysql_fetch_row($result);
-	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,enddate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id");
+	$stm = $DBH->prepare("SELECT minscore,timelimit,deffeedback,startdate,enddate,allowlate,name,defpoints,itemorder FROM imas_assessments WHERE id=:id");
 	$stm->execute(array(':id'=>$aid));
-	list($minscore,$timelimit,$deffeedback,$enddate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
+	list($minscore,$timelimit,$deffeedback,$startdate,$enddate,$allowlate,$name,$defpoints,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
 	$deffeedback = explode('-',$deffeedback);
 	$assessmenttype = $deffeedback[0];
 
@@ -140,12 +140,15 @@
 	//get exceptions
 	//DB $query = "SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid='$aid' AND itemtype='A'";
 	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$stm = $DBH->prepare("SELECT userid,enddate,islatepass FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
+	$stm = $DBH->prepare("SELECT userid,startdate,enddate,islatepass FROM imas_exceptions WHERE assessmentid=:assessmentid AND itemtype='A'");
 	$stm->execute(array(':assessmentid'=>$aid));
 	$exceptions = array();
 	//DB while ($row = mysql_fetch_row($result)) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$exceptions[$row[0]] = array($row[1],$row[2]);
+		$exceptions[$row[0]] = array($row[1],$row[2],$row[3]);
+	}
+	if (count($exceptions)>0) {
+		require_once("../includes/exceptionfuncs.php");
 	}
 
 	//DB $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
@@ -224,15 +227,26 @@
 		}
 		$timeused = $line['endtime']-$line['starttime'];
 		$timeontask = round(array_sum(explode(',',str_replace('~',',',$line['timeontask'])))/60,1);
-
-		if ($line['id']==null) {
-			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td><td></td><td></td>";
-		} else {
-			if (isset($exceptions[$line['userid']])) {
-				$thisenddate = $exceptions[$line['userid']][0];
-			} else {
-				$thisenddate = $enddate;
+		$useexception = false; 
+		if (isset($exceptions[$line['userid']])) {
+			$useexception = getCanUseAssessException($exceptions[$line['userid']], array('startdate'=>$startdate, 'enddate'=>$enddate, 'allowlate'=>$allowlate), true);
+			if ($useexception) {
+				$thisenddate = $exceptions[$line['userid']][1];
 			}
+		} else {
+			$thisenddate = $enddate;
+		}
+		if ($line['id']==null) {
+			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a>";
+			if ($useexception) {
+				if ($exceptions[$line['userid']][2]>0) {
+					echo '<sup>LP</sup>';
+				} else {
+					echo '<sup>e</sup>';
+				}
+			}
+			echo "</td><td>-</td><td></td><td></td><td></td>";
+		} else {
 			echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
 			if ($thisenddate>$now) {
 				echo '<i>'.$total;
@@ -256,8 +270,8 @@
 				echo '</i>';
 			}
 			echo '</a>';
-			if (isset($exceptions[$line['userid']])) {
-				if ($exceptions[$line['userid']][1]>0) {
+			if ($useexception) {
+				if ($exceptions[$line['userid']][2]>0) {
 					echo '<sup>LP</sup>';
 				} else {
 					echo '<sup>e</sup>';
