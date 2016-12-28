@@ -1215,7 +1215,7 @@ if ($linkparts[0]=='cid') {
 		$stm = $DBH->prepare("SELECT startdate,enddate,islatepass FROM imas_exceptions WHERE userid=:userid AND assessmentid=:assessmentid AND itemtype='A'");
 		$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$aid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
-		$useexception = false
+		$useexception = false;
 		if ($row!=null) {
 			require_once("./includes/exceptionfuncs.php");
 			$useexception = getCanUseAssessException($row, $line, true);	
