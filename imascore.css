@@ -40,7 +40,7 @@ div.itemsum {
 span.iteminfo {
 	margin-left: 30px;
 }
-.noticetext {
+.noticetext, a.noticetext, a.noticetext:link, a.noticetext:visited {
 	color: #db0000;
 }
 div.title {
