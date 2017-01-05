@@ -19,7 +19,7 @@ var AsciisvgDialog = {
 		this.AScgiloc = tinyMCEPopup.getWindowArg('AScgiloc');
 		this.alignm = tinyMCEPopup.getWindowArg('alignm');
 		if (ASnoSVG) {
-			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " />';
+			document.getElementById("preview").innerHTML = '<img id="previewimg" style="width:'+this.width+'px; height: '+this.height+'px; vertical-align: middle; float: none;" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" script=" " alt="Graph"/>';
 		} else {
 			document.getElementById("previewsvg").setAttribute("sscr",this.sscr);
 			switchTo("previewsvg");
@@ -38,7 +38,7 @@ var AsciisvgDialog = {
 			} else {
 				aligntxt = "vertical-align: "+this.alignm+"; float: none;";
 			}
-			tinyMCEPopup.editor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" sscr="'+this.sscr+'" script=" " />');
+			tinyMCEPopup.editor.execCommand('mceInsertContent', false, '<img style="width:'+this.width+'px; height:'+this.height+'px; '+aligntxt+'" src="'+ this.AScgiloc + '?sscr='+encodeURIComponent(this.sscr)+'" sscr="'+this.sscr+'" script=" " alt="Graph"/>');
 		} else {
 			el = tinyMCEPopup.editor.selection.getNode();
 			ed.dom.setAttrib(el,"sscr",this.sscr);

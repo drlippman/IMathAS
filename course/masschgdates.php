@@ -20,20 +20,23 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$body = "You need to log in as a teacher to access this page";
 } else {
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_POST['chgcnt'])) {
 
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $items = unserialize(mysql_result($result,0,0));
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$items = unserialize($stm->fetchColumn(0));
+
 		$cnt = $_POST['chgcnt'];
 		$blockchg = 0;
 		for ($i=0; $i<$cnt; $i++) {
 			require_once("../includes/parsedatetime.php");
-			
+
 			$data = explode(',',$_POST['data'.$i]);
-			
+
 			if ($data[0] == '0') {
 				$startdate = 0;
 			} else {
@@ -47,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$startdate = parsedatetime($_POST['sdate'.$i],$_POST['stime'.$i]);
 			}
 			*/
-			
+
 			if ($data[1] == '2000000000') {
 				$enddate = 2000000000;
 			} else {
@@ -61,7 +64,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$enddate = parsedatetime($_POST['edate'.$i],$_POST['etime'.$i]);
 			}
 			*/
-			
+
 			if ($data[2] != 'NA') {
 				if ($data[2]=='A') {
 					$reviewdate = 2000000000;
@@ -101,38 +104,50 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			*/
-			
+
 			$type = $data[5]; // $_POST['type'.$i];
 			$id = $data[6]; // $_POST['id'.$i];
 			$avail = intval($data[7]);
 			if ($type=='Assessment') {
 				if ($id>0) {
-					$query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate',avail='$avail' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "UPDATE imas_assessments SET startdate='$startdate',enddate='$enddate',reviewdate='$reviewdate',avail='$avail' WHERE id='$id'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_assessments SET startdate=:startdate,enddate=:enddate,reviewdate=:reviewdate,avail=:avail WHERE id=:id");
+					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':avail'=>$avail, ':id'=>$id));
 				}
 			} else if ($type=='Forum') {
 				if ($id>0) {
 					if ($data[3] != 'NA' && $data[4] != 'NA') {
-						$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',postby='$fpdate',replyby='$frdate',avail='$avail' WHERE id='$id'";
+						//DB $query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',postby='$fpdate',replyby='$frdate',avail='$avail' WHERE id='$id'";
+						$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,postby=:postby,replyby=:replyby,avail=:avail WHERE id=:id");
+						$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':postby'=>$fpdate, ':replyby'=>$frdate, ':avail'=>$avail, ':id'=>$id));
 					} else {
-						$query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+						//DB $query = "UPDATE imas_forums SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+						$stm = $DBH->prepare("UPDATE imas_forums SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+						$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
 					}
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				}
 			} else if ($type=='Wiki') {
 				if ($id>0) {
-					$query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "UPDATE imas_wikis SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_wikis SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
 				}
 			} else if ($type=='InlineText') {
 				if ($id>0) {
-					$query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "UPDATE imas_inlinetext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_inlinetext SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
 				}
 			} else if ($type=='Link') {
 				if ($id>0) {
-					$query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "UPDATE imas_linkedtext SET startdate='$startdate',enddate='$enddate',avail='$avail' WHERE id='$id'";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("UPDATE imas_linkedtext SET startdate=:startdate,enddate=:enddate,avail=:avail WHERE id=:id");
+					$stm->execute(array(':startdate'=>$startdate, ':enddate'=>$enddate, ':avail'=>$avail, ':id'=>$id));
 				}
 			} else if ($type=='Block') {
 				$blocktree = explode('-',$id);
@@ -148,23 +163,26 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$sub['avail'] = $avail;
 				$blockchg++;
 			}
-			
+
 		}
 		if ($blockchg>0) {
-			$itemorder = addslashes(serialize($items));
-			$query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $itemorder = addslashes(serialize($items));
+			//DB $query = "UPDATE imas_courses SET itemorder='$itemorder' WHERE id='$cid';";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$itemorder = serialize($items);
+			$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+			$stm->execute(array(':itemorder'=>$itemorder, ':id'=>$cid));
 		}
 
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
-			
+
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 		$pagetitle = "Mass Change Dates";
 		$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/masschgdates.js?v=041316\"></script>";
 		$placeinhead .= "<style>.show {display:inline;} \n .hide {display:none;} td.dis {color:#ccc;opacity:0.5;}\n td.dis input {color: #ccc;}</style>";
 	}
-}	
+}
 
 
 /******* begin html output ********/
@@ -173,14 +191,14 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 if ($overwriteBody==1) {
 	require("../header.php");
 	echo $body;
-} else {		
-	
+} else {
+
 	$shortdays = array("Su","M","Tu","W","Th","F","Sa");
 	function getshortday($atime) {
 		global $shortdays;
 		return $shortdays[tzdate('w',$atime)];
 	}
-	
+
 	$availnames = array(_("Hidden"),_("By Dates"),_("Always"));
 
 	if (isset($_GET['orderby'])) {
@@ -213,7 +231,7 @@ if ($overwriteBody==1) {
 //	}
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 	//$placeinhead .= '<style type="text/css">.mcind1 {padding-left: .9em; text-indent:-.5em;} .mcind2 {padding-left: 1.4em; text-indent:-1em;}
-	//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;} 
+	//		.mcind3 {padding-left: 1.9em; text-indent:-1.5em; .mcind4 {padding-left: 2.4em; text-indent:-2em; .mcind5, mcind6 {padding-left: 2.9em; text-indent:-2.5em;}
 	//		td {padding: .1em .4em;}</style>';
 	$placeinhead .= '<style type="text/css">
 			td {padding: .1em 4px;}
@@ -229,15 +247,15 @@ if ($overwriteBody==1) {
 		$placeinhead .= '<script type="text/javascript">var includeforums = true;</script>';
 	}
 	require("../header.php");
-	
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";	
+
+	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; Mass Change Dates</div>\n";
 	echo '<div id="headermasschgdates" class="pagetitle"><h2>Mass Change Dates</h2></div>';
-	
+
 	echo "<script type=\"text/javascript\">var filteraddr = \"$imasroot/course/masschgdates.php?cid=$cid&orderby=$orderby\";";
-	
+
 	echo "var orderaddr = \"$imasroot/course/masschgdates.php?cid=$cid&filter=$filter\";</script>";
-	
+
 	echo '<p>Order by: <select id="orderby" onchange="chgorderby()">';
 	echo '<option value="0" ';
 	if ($orderby==0) {echo 'selected="selected"';}
@@ -252,7 +270,7 @@ if ($overwriteBody==1) {
 	if ($orderby==3) {echo 'selected="selected"';}
 	echo '>Course page</option>';
 	echo '</select> ';
-	
+
 	echo 'Filter by type: <select id="filter" onchange="filteritems()">';
 	echo '<option value="all" ';
 	if ($filter=='all') {echo 'selected="selected"';}
@@ -284,15 +302,15 @@ if ($overwriteBody==1) {
 	}
 	echo '</button>';
 	echo '</p>';
-	
+
 	echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
 	echo "<p>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
 	echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
 	echo "If you click the checkboxes on the left, you can limit the update to those items. ";
-	echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
+	echo "Click the <img src=\"$imasroot/img/swap.gif\" alt=\"Swap\"> icon in each cell to swap from ";
 	echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
 	echo "<form id=\"qform\">";
-	
+
 	echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a>. ';
 
 	//echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
@@ -300,7 +318,7 @@ if ($overwriteBody==1) {
 	echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
 	echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
 	echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
-	
+
 	if ($picicons) {
 		echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th class="mcf">Post By Date</th><th class="mcf">Reply By Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
 	} else {
@@ -309,17 +327,23 @@ if ($overwriteBody==1) {
 	$prefix = array();
 	if ($orderby==3) {  //course page order
 		$itemsassoc = array();
-		$query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT id,typeid,itemtype FROM imas_items WHERE courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,typeid,itemtype FROM imas_items WHERE courseid=:courseid");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$itemsassoc[$row[0]] = $row[2].$row[1];
 		}
-		
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$itemorder = unserialize(mysql_result($result,0,0));
+
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB $itemorder = unserialize(mysql_result($result,0,0));
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$itemorder = unserialize($stm->fetchColumn(0));
 		$itemsimporder = array();
-		
+
 		function flattenitems($items,&$addto,$parent,$pre) {
 			global $itemsimporder,$itemsassoc,$prefix,$imasroot;
 			foreach ($items as $k=>$item) {
@@ -336,8 +360,8 @@ if ($overwriteBody==1) {
 		flattenitems($itemorder,$itemscourseorder,'0','');
 		$itemscourseorder = array_flip($itemscourseorder);
 	}
-		
-		
+
+
 	$names = Array();
 	$startdates = Array();
 	$enddates = Array();
@@ -350,9 +374,12 @@ if ($overwriteBody==1) {
 	$courseorder = Array();
 	$pres = array();
 	if ($filter=='all' || $filter=='assessments') {
-		$query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid='$cid' ";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT name,startdate,enddate,reviewdate,id,avail FROM imas_assessments WHERE courseid=:courseid ");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$types[] = "Assessment";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -366,9 +393,12 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='inlinetext') {
-		$query = "SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid='$cid' ";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT title,startdate,enddate,id,avail FROM imas_inlinetext WHERE courseid=:courseid ");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$types[] = "InlineText";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -382,9 +412,12 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='linkedtext') {
-		$query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid='$cid' ";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT title,startdate,enddate,id,avail FROM imas_linkedtext WHERE courseid=:courseid ");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$types[] = "Link";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -398,15 +431,18 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='forums') {
-		$query = "SELECT name,startdate,enddate,id,avail,postby,replyby FROM imas_forums WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT name,startdate,enddate,id,avail,postby,replyby FROM imas_forums WHERE courseid='$cid' ";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT name,startdate,enddate,id,avail,postby,replyby FROM imas_forums WHERE courseid=:courseid ");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$types[] = "Forum";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
 			$enddates[] = $row[2];
 			$reviewdates[] = -1;
-			$fpdates[] = $row[5]; 
+			$fpdates[] = $row[5];
 			$frdates[] = $row[6];
 			$ids[] = $row[3];
 			$avails[] = $row[4];
@@ -415,9 +451,12 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='wikis') {
-		$query = "SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid='$cid' ";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+		//DB $query = "SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid='$cid' ";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT name,startdate,enddate,id,avail FROM imas_wikis WHERE courseid=:courseid ");
+		$stm->execute(array(':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$types[] = "Wiki";
 			$names[] = $row[0];
 			$startdates[] = $row[1];
@@ -431,10 +470,13 @@ if ($overwriteBody==1) {
 		}
 	}
 	if ($filter=='all' || $filter=='blocks') {
-		$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
-		
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $items = unserialize(mysql_result($result,0,0));
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$cid));
+		$items = unserialize($stm->fetchColumn(0));
+
 		function getblockinfo($items,$parent) {
 			global $ids,$types,$names,$startdates,$enddates,$reviewdates,$frdates,$fpdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
 			foreach($items as $k=>$item) {
@@ -442,7 +484,8 @@ if ($overwriteBody==1) {
 					$ids[] = $parent.'-'.($k+1);
 					$types[] = "Block";
 					if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
-					$names[] = stripslashes($item['name']);
+					//DB $names[] = stripslashes($item['name']);
+					$names[] = $item['name'];
 					$startdates[] = $item['startdate'];
 					$enddates[] = $item['enddate'];
 					$avails[] = $item['avail'];
@@ -452,12 +495,12 @@ if ($overwriteBody==1) {
 					if (count($item['items'])>0) {
 						getblockinfo($item['items'],$parent.'-'.($k+1));
 					}
-				} 
+				}
 			}
 		}
 		getblockinfo($items,'0');
 	}
-	
+
 	$cnt = 0;
 	$now = time();
 	$hr = floor($coursedeftime/60)%12;
@@ -468,7 +511,7 @@ if ($overwriteBody==1) {
 	$min = $coursedefstime%60;
 	$am = ($coursedefstime<12*60)?'am':'pm';
 	$defstime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-	
+
 	if ($orderby==0) {
 		asort($startdates);
 		$keys = array_keys($startdates);
@@ -482,7 +525,7 @@ if ($overwriteBody==1) {
 		asort($courseorder);
 		$keys = array_keys($courseorder);
 	}
-	
+
 	foreach ($keys as $i) {
 		echo '<tr class=grid>';
 		echo '<td>';
@@ -530,10 +573,10 @@ if ($overwriteBody==1) {
 			echo "{$types[$i]}<input type=hidden id=\"type$cnt\" value=\"{$types[$i]}\"/>";
 			echo "</td>";
 		}
-		
-		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
-		
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
+
+		echo '<td><span class="nowrap"><img src="'.$imasroot.'/img/swap.gif" alt="Swap" onclick="MCDtoggle(\'a\','.$cnt.')"/><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
+
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('s',$cnt)\"/>";
 		if ($startdates[$i]==0) {
 			echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
 		} else {
@@ -557,16 +600,16 @@ if ($overwriteBody==1) {
 			$sdate = tzdate("m/d/Y",$startdates[$i]);
 			$stime = tzdate("g:i a",$startdates[$i]);
 		}
-		
+
 		echo "<input type=text size=10 id=\"sdate$cnt\" name=\"sdate$cnt\" value=\"$sdate\" onblur=\"ob(this)\"/>(";
 		echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
 		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].sdate$cnt,'anchor$cnt','MM/dd/yyyy',document.forms[0].sdate$cnt.value); return false;\" NAME=\"anchor$cnt\" ID=\"anchor$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 		echo ") <a href=\"#\" onClick=\"displayDatePicker('sdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-		
+
 		echo " at <input type=text size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
 		echo '</span></td>';
-		
-		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
+
+		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('e',$cnt)\"/>";
 		if ($enddates[$i]==2000000000) {
 			echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
 		} else {
@@ -582,7 +625,7 @@ if ($overwriteBody==1) {
 		} else {
 			echo "<span id=\"espan1$cnt\" class=\"show\">";
 		}
-		
+
 		if ($enddates[$i]==2000000000) {
 			$enddates[$i]  = $startdates[$i] + 7*24*60*60;
 			$edate = tzdate("m/d/Y",$enddates[$i]);
@@ -591,18 +634,18 @@ if ($overwriteBody==1) {
 			$edate = tzdate("m/d/Y",$enddates[$i]);
 			$etime = tzdate("g:i a",$enddates[$i]);
 		}
-		
+
 		echo "<input type=text size=10 id=\"edate$cnt\" name=\"edate$cnt\" value=\"$edate\" onblur=\"ob(this)\"/>(";
 		echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
 		//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 		echo ") <a href=\"#\" onClick=\"displayDatePicker('edate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-		
+
 		echo " at <input type=text size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
 		echo '</span></td>';
-				
+
 		echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
 		if ($types[$i]=='Assessment') {
-			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('r',$cnt)\"/>";
 			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
 				echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
 			} else {
@@ -616,13 +659,13 @@ if ($overwriteBody==1) {
 			echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" id=\"rdateanN$cnt\" ";
 			if ($reviewdates[$i]!=2000000000) {
 				echo 'checked=1';
-			} 
+			}
 			echo " />Never <input type=radio name=\"rdatean$cnt\" value=\"2000000000\"  id=\"rdateanA$cnt\"  ";
 			if ($reviewdates[$i]==2000000000) {
 				echo 'checked=1';
-			} 
+			}
 			echo " />Always</span>";
-			
+
 			if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
 				echo "<span id=\"rspan1$cnt\" class=\"hide\">";
 			} else {
@@ -636,18 +679,18 @@ if ($overwriteBody==1) {
 				$rdate = tzdate("m/d/Y",$reviewdates[$i]);
 				$rtime = tzdate("g:i a",$reviewdates[$i]);
 			}
-		
+
 			echo "<input type=text size=10 id=\"rdate$cnt\" name=\"rdate$cnt\" value=\"$rdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].rdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].rdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('rdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-		
+
 			echo " at <input type=text size=8 id=\"rtime$cnt\" name=\"rtime$cnt\" value=\"$rtime\"></span>";
 		}
 		echo '</td>';
 		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
 		if ($types[$i]=='Forum') {
-			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fp',$cnt)\"/>";
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('fp',$cnt)\"/>";
 			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
 				echo "<input type=hidden id=\"fpdatetype$cnt\" name=\"fpdatetype$cnt\" value=\"0\"/>";
 			} else {
@@ -661,13 +704,13 @@ if ($overwriteBody==1) {
 			echo "<input type=radio name=\"fpdatean$cnt\" value=\"0\" id=\"fpdateanN$cnt\" ";
 			if ($fpdates[$i]==0) {
 				echo 'checked=1';
-			} 
+			}
 			echo " />Never <input type=radio name=\"fpdatean$cnt\" value=\"2000000000\"  id=\"fpdateanA$cnt\"  ";
 			if ($fpdates[$i]!=0) {
 				echo 'checked=1';
-			} 
+			}
 			echo " />Always</span>";
-			
+
 			if ($fpdates[$i]==0 || $fpdates[$i]==2000000000) {
 				echo "<span id=\"fpspan1$cnt\" class=\"hide\">";
 			} else {
@@ -681,18 +724,18 @@ if ($overwriteBody==1) {
 				$fpdate = tzdate("m/d/Y",$fpdates[$i]);
 				$fptime = tzdate("g:i a",$fpdates[$i]);
 			}
-		
+
 			echo "<input type=text size=10 id=\"fpdate$cnt\" name=\"fpdate$cnt\" value=\"$fpdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"fpd$cnt\">".getshortday($fpdates[$i]).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].fpdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].fpdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('fpdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-		
+
 			echo " at <input type=text size=8 id=\"fptime$cnt\" name=\"fptime$cnt\" value=\"$fptime\"></span>";
 		}
 		echo '</td>';
 		echo "<td class=\"mcf togdishid".($avails[$i]==0?' dis':'')."\">";
 		if ($types[$i]=='Forum') {
-			echo "<img src=\"$imasroot/img/swap.gif\"  onclick=\"MCDtoggle('fr',$cnt)\"/>";
+			echo "<img src=\"$imasroot/img/swap.gif\" alt=\"Swap\" onclick=\"MCDtoggle('fr',$cnt)\"/>";
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
 				echo "<input type=hidden id=\"frdatetype$cnt\" name=\"frdatetype$cnt\" value=\"0\"/>";
 			} else {
@@ -706,13 +749,13 @@ if ($overwriteBody==1) {
 			echo "<input type=radio name=\"frdatean$cnt\" value=\"0\" id=\"frdateanN$cnt\" ";
 			if ($frdates[$i]==0) {
 				echo 'checked=1';
-			} 
+			}
 			echo " />Never <input type=radio name=\"frdatean$cnt\" value=\"2000000000\"  id=\"frdateanA$cnt\"  ";
 			if ($frdates[$i]!=0) {
 				echo 'checked=1';
-			} 
+			}
 			echo " />Always</span>";
-			
+
 			if ($frdates[$i]==0 || $frdates[$i]==2000000000) {
 				echo "<span id=\"frspan1$cnt\" class=\"hide\">";
 			} else {
@@ -726,16 +769,16 @@ if ($overwriteBody==1) {
 				$frdate = tzdate("m/d/Y",$frdates[$i]);
 				$frtime = tzdate("g:i a",$frdates[$i]);
 			}
-		
+
 			echo "<input type=text size=10 id=\"frdate$cnt\" name=\"frdate$cnt\" value=\"$frdate\" onblur=\"ob(this)\"/>(";
 			echo "<span id=\"frd$cnt\">".getshortday($frdates[$i]).'</span>';
 			//echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].frdate$cnt,'anchor3$cnt','MM/dd/yyyy',document.forms[0].frdate$cnt.value); return false;\" NAME=\"anchor3$cnt\" ID=\"anchor3$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
 			echo ") <a href=\"#\" onClick=\"displayDatePicker('frdate$cnt', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-		
+
 			echo " at <input type=text size=8 id=\"frtime$cnt\" name=\"frtime$cnt\" value=\"$frtime\"></span>";
 		}
 		echo '</td>';
-		
+
 		//echo "<td>Send Down: <a href=\"#\" <input type=button value=\"Change\" onclick=\"senddown($cnt)\"/> <input type=button value=\"Copy\" onclick=\"copydown($cnt)\"/></td>";
 		echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
 		echo '<option value="1">Send down date &amp; time changes</option>';
@@ -756,7 +799,7 @@ if ($overwriteBody==1) {
 	echo '</form>';
 	//echo "<script>var acnt = $cnt;</script>";
 }
-	
+
 require("../footer.php");
 
 ?>

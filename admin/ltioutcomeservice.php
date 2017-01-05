@@ -41,7 +41,7 @@ try {
 } catch (Exception $e) {
 	echo 'Invalid credentials';
 	//fwrite($fp, "Invalid credentials\n");
-	exit;	
+	exit;
 }
 $store->mark_nonce_used($request);
 
@@ -66,11 +66,11 @@ if (strpos($xml,'replaceResultRequest')!==false) {
 		//fwrite($fp, "out of range $matches[2]\n");
 		failmessage('replaceResult');
 	}
-	
+
 } else {
 	preg_match('/<sourcedId>\s*(.*?)\s*<\/sourcedId>/is', $xml, $matches);
 	list($sig,$rlid,$userid) = explode('::', $matches[0]);
-} 
+}
 
 list($cid,$linkid) = explode('-',$rlid);
 $cid = intval($cid);
@@ -78,16 +78,22 @@ $linkid = intval($linkid);
 $userid = intval($userid);
 
 //check is a student
-$query = "SELECT id FROM imas_students WHERE courseid=$cid AND userid=$userid";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
+//DB $query = "SELECT id FROM imas_students WHERE courseid=$cid AND userid=$userid";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
+$stm = $DBH->prepare("SELECT id FROM imas_students WHERE courseid=:courseid AND userid=:userid");
+$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+if ($stm->rowCount()==0) {
 	//fwrite($fp, "not stu\n");
 	failmessage('replaceResult');
 }
 
-$query = "SELECT text,points FROM imas_linkedtext WHERE id='$linkid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT text,points FROM imas_linkedtext WHERE id='$linkid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT text,points FROM imas_linkedtext WHERE id=:id");
+$stm->execute(array(':id'=>$linkid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 
 $toolparts = explode('~~',substr($row[0],8));
 if (isset($toolparts[6])) {
@@ -108,25 +114,39 @@ if (strpos($xml,'replaceResultRequest')!==false) {
 	}
 	$points = round($score*$possible,1);
 	//fwrite($fp, "Writing score $score,$possible,$points for $gbitem user $userid\n");
-	$query = "SELECT id,score FROM imas_grades WHERE gradetypeid=$linkid AND gradetype='exttool' AND userid=$userid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)>0) {
-		$row = mysql_fetch_row($result);
-		$query = "UPDATE imas_grades SET score=$points WHERE id=".$row[0];
+	//DB $query = "SELECT id,score FROM imas_grades WHERE gradetypeid=$linkid AND gradetype='exttool' AND userid=$userid";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)>0) {
+		//DB $row = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT id,score FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool' AND userid=:userid");
+	$stm->execute(array(':gradetypeid'=>$linkid, ':userid'=>$userid));
+	if ($stm->rowCount()>0) {
+		$row = $stm->fetch(PDO::FETCH_NUM);
+		//DB $query = "UPDATE imas_grades SET score=$points WHERE id=".$row[0];
+		$stm = $DBH->prepare("UPDATE imas_grades SET score=:score WHERE id=:id");
+		$stm->execute(array(':score'=>$points, ':id'=>$row[0]));
 	} else {
+		//DB $query = "INSERT INTO imas_grades (gradetypeid,userid,score,gradetype) VALUES ";
+		//DB $query .= "($linkid,$userid,$points,'exttool')";
 		$query = "INSERT INTO imas_grades (gradetypeid,userid,score,gradetype) VALUES ";
-		$query .= "($linkid,$userid,$points,'exttool')";
+		$query .= "(:gradetypeid, :userid, :score, :gradetype)";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':gradetypeid'=>$linkid, ':userid'=>$userid, ':score'=>$points, ':gradetype'=>'exttool'));
 	}
-	mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB mysql_query($query) or die("Query failed : " . mysql_error());
 	successmessage('replaceResult',$msgid,$score);
 } else if (strpos($xml,'readResultRequest')!==false) {
 	if ($possible==0 || $sig2!=$sig) {
 		failmessage('readResult');
 	}
-	$query = "SELECT id,score FROM imas_grades WHERE gradetypeid=$linkid AND gradetype='exttool' AND userid=$userid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)>0) {
-		$row = mysql_fetch_row($result);
+	//DB $query = "SELECT id,score FROM imas_grades WHERE gradetypeid=$linkid AND gradetype='exttool' AND userid=$userid";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)>0) {
+		//DB $row = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT id,score FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool' AND userid=:userid");
+	$stm->execute(array(':gradetypeid'=>$linkid, ':userid'=>$userid));
+	if ($stm->rowCount()>0) {
+		$row = $stm->fetch(PDO::FETCH_NUM);
 		successmessage('readResult',$msgid,round($row[1]/$possible,3));
 	} else {
 		successmessage('readResult',$msgid,'');
@@ -135,8 +155,10 @@ if (strpos($xml,'replaceResultRequest')!==false) {
 	if ($possible==0 || $sig2!=$sig) {
 		failmessage('deleteResult');
 	}
-	$query = "DELETE FROM imas_grades WHERE gradetypeid=$linkid AND gradetype='exttool' AND userid=$userid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $query = "DELETE FROM imas_grades WHERE gradetypeid=$linkid AND gradetype='exttool' AND userid=$userid";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetypeid=:gradetypeid AND gradetype='exttool' AND userid=:userid");
+	$stm->execute(array(':gradetypeid'=>$linkid, ':userid'=>$userid));
 	successmessage('deleteResult',$msgid,'');
 }
 
@@ -187,7 +209,7 @@ function successmessage($type,$msgid,$score) {
           <textString>'.$score.'</textString>
         </resultScore>
       </result>
-    </readResultResponse>';  
+    </readResultResponse>';
   }
   $out .=  '
     <'.$type.'Response/>

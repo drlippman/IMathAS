@@ -130,9 +130,10 @@ piechart(percents, labels, {width, height})
 <BR>labels: array of labels for each pie piece
 <BR>uses Google Charts API
 <BR><h3><a name="normrand">normrand</a></h3>
-normrand(mu,sigma,n)
+normrand(mu,sigma,n,[rnd])
 <BR>returns an array of n random numbers that are normally distributed with given
 <BR>mean mu and standard deviation sigma.  Uses the Box-Muller transform.
+<BR>specify rnd to round to that many digits
 <BR><h3><a name="boxplot">boxplot</a></h3>
 boxplot(array,axislabel,[datalabel])
 <BR>draws a boxplot based on the data in array, with given axislabel
@@ -142,7 +143,7 @@ boxplot(array,axislabel,[datalabel])
 <BR><h3><a name="normalcdf">normalcdf</a></h3>
 normalcdf(z,[dec])
 <BR>calculates the area under the standard normal distribution to the left of the
-<BR>z-value z, to dec decimals (defaults to 4) 
+<BR>z-value z, to dec decimals (defaults to 4)
 <BR>based on someone else's code - can't remember whose!
 <BR><h3><a name="tcdf">tcdf</a></h3>
 tcdf(t,df,[dec])
@@ -156,7 +157,7 @@ invnormalcdf(p,[dec])
 <BR>&nbsp;from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
 <BR><h3><a name="invtcdf">invtcdf</a></h3>
 invtcdf(p,df,[dec])
-<BR>the inverse Student's t-distribution 
+<BR>the inverse Student's t-distribution
 <BR>computes the t-value with a left-tail probability of p, with df degrees of freedom
 <BR>to dec decimal places (default 4)
 <BR>&nbsp;from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
@@ -184,7 +185,7 @@ checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, gr
 <BR>intended for checking a student answer for drawing a line fit to data.  Determines
 <BR>if the student answer is within the confidence bounds for the regression equation.
 <BR>xarray, yarray:  list/array of data values
-<BR>student answer from draw:  the $stuanswers[$thisq] 
+<BR>student answer from draw:  the $stuanswers[$thisq]
 <BR>grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
 <BR>alpha: for confidence bound.  defaults to .05
 <BR>grid:  If you've modified the grid, include it here
@@ -198,7 +199,7 @@ binomialcdf(N,p,x)
 <BR>Computes the probably of &lt;=x successes out of N trials
 <BR>where each trial has probability p of success
 <BR><h3><a name="chi2teststat">chi2teststat</a></h3>
-chi2teststat(m) 
+chi2teststat(m)
 <BR>Computes the test stat sum((E-O)^2/E) given a matrix of values
 <BR><h3><a name="chi2cdf">chi2cdf</a></h3>
 chi2cdf(x,df)
@@ -206,7 +207,7 @@ chi2cdf(x,df)
 <BR>with df degrees of freedom
 <BR><h3><a name="invchi2cdf">invchi2cdf</a></h3>
 invchi2cdf(p,df)
-<BR>Compuates the x value with left-tail probability p under the 
+<BR>Compuates the x value with left-tail probability p under the
 <BR>chi-squared distribution with df degrees of freedom
 <BR><h3><a name="fcdf">fcdf</a></h3>
 fcdf(f,df1,df2)

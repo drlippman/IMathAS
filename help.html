@@ -25,7 +25,7 @@ h1,h2,h3 {
 h1 {
 	color: #00f;
 }
-h2,h3,h4 {
+h2,h3,h4,h5,h6 {
 	color: #00c;
 }
 div.h2 {
@@ -42,6 +42,8 @@ dd {
 }
 
 </style>
+<link rel="stylesheet" href="iconfonts/style.css?v=081316" type="text/css" />
+<link rel="stylesheet" href="tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
 </head>
 <body>
 <div class=h1>
@@ -97,6 +99,9 @@ dd {
 			<ul>
 			<li><a href="#assessmentsettings">Assessment Settings</a></li>
 			<li><a href="#addingquestionstoanassessment">Adding Questions to an Assessment</a></li>
+				<ul>
+				<li><a href="#questionintrotext">Adding an Introduction to a Question</a></li>
+				</ul>
 			<li><a href="#addingnewquestions">Adding New Questions</a></li>
 			<li><a href="#categorizequestions">Categorizing Questions</a></li>
 			<li><a href="#printcopies">Making Print Copies</a></li>
@@ -872,6 +877,16 @@ Once added to the assessment you can:
     delete the question from the Question Set.  You can also use the checkboxes and the "With selected, Remove"
     button to remove multiple questions at once.</li>
 </ul>
+
+<div class=h5>
+<h5><a name="questionintrotext">Adding an Introduction to a Question</a></h5>
+<p>In addition to the assignment Introduction, each question can have an individual introduction.  A common example is to display a video and then a related question as part of a video assignment.</p>
+<p>To add a question introduction, click on <span style="font-weight: bold">+ Text</span> below the last question.  An editable text box will appear where you can write instuctions or drag in a video link.  After you edit your text, click the <span class="mce-i-save" style="font-family: tinymce; font-weight: bold">&nbsp;Save All</span> icon in the editor toolbar.  You can expand/collapse each question intro by clicking the <span class="icon-pencil" style="font-weight: bold">&nbsp;Expand and Edit</span> or <span class="icon-shrink2" style="font-weight: bold">&nbsp;Collapse</span> icons in the lower right of the question intro.  Once you modify a question intro, you'll need to save it to collapse it.</p>
+<p>When you click <span class="mce-i-save" style="font-family: tinymce; font-weight: bold">&nbsp;Save All</span>, all changes you have made in any other question intros will also be saved.  If you leave a question intro with unsaved changes, the Save All button will be highlighted.</p>
+<p>A question intro can be displayed for multiple consecutive questions (except on Embedded assignments).  In the <span style="font-weight: bold">Show for</span> selector, select the number of questions that question intro should be used for.</p>
+<p>Embedded assignments can include page titles.  Check the <span style="font-weight: bold">New Page</span> checkbox to add a page title. Then add your title in the editor and save it.</p>
+<p>Below the last questions is an <span class="icon-enlarge2" style="font-weight: bold">&nbsp;Expand All</span> button which will expand all the question intros.  Click on any one to edit it.<p>
+</div>
 
 <p>If students have taken the assessment, you will not be allowed to make as many changes to the assessment, as it
 will mess up existing student attempts.  If you need to change the assessment a lot, you can clear all student attempts.
@@ -2555,8 +2570,22 @@ drawn line from the correct line.
 <p><b>Optional Variables</b><BR>
 <dl>
 <dt>$answerformat = "line,lineseg,dot,opendot" or "polygon" or "twopoint" or "inequality" or "numberline" (In Common Control)</dt>
-	<dd>Limits the drawing tools available to students.  Defaults to "line,dot,opendot".  Define to limit the options.
-	    Example: $answerformat = "line", or $answerformat = "line,dot"<br/>
+	<dd>Limits the drawing tools available to students.  Defaults to the older drawing tools "line,dot,opendot".  <br/>
+	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
+	    control points to define the shape. 
+	      <ul>
+	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
+	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp,ellipse,hyperbola,horizparab</li>
+	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials, give $answers in the normal way (as a function of x)</li>
+	        <li>For dots give $answers as "x,y", or "x,y,open" for open dots</li>
+	        <li>For circles, give $answers as "circle,x,y,radius", like "circle,2,-1,3"</li>
+	        <li>For ellipses, give $answers as "ellipse,x,y,x_radius,y_radius", like "ellipse,1,2,4,2"</li>
+	        <li>For hyperbolas of form (x-h)^2/a^2-(y-k)^2/b^2=1, give $answers as "horizhyperbola,h,k,a,b"</li>
+	        <li>For hyperbolas of form (y-k)^2/a^2-(x-h)^2/b^2=1, give $answers as "verthyperbola,h,k,a,b"</li>
+	        <li>For horizontal parabolas give $answers as "x=equation", like "x=2(y-1)^2-3".</li>
+	        <li>For vertical lines give $answers as "x=number", like "x=3".</li>
+	        <li>For vectors, give $answers as "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
+	      </ul><br/>
 	    $answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.<br/>
 	    $answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
 	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.<br/>
@@ -2564,16 +2593,7 @@ drawn line from the correct line.
 	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.<br/>
 	    $answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
 	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.<br/>
-	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
-	    control points to define the shape. 
-	      <ul>
-	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
-	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp</li>
-	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials and dots, give $answers in the normal way (as a function of x)</li>
-	        <li>For circles, use "circle,x,y,radius", like "circle,2,-1,3"</li>
-	        <li>For vertical lines use "x=number", like "x=3".</li>
-	        <li>For vectors, use "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
-	      </ul>
+	    Can also be used to limit the older tools: $answerformat = "line", or $answerformat = "line,dot"<br/>
 	     </dd>
 <dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
 	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the

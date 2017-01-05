@@ -19,7 +19,7 @@ if (isset($teacherid)) {
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> ";
 	}
 }
-$curBreadcrumb .= "&gt; View Login Log\n";	
+$curBreadcrumb .= "&gt; View Login Log\n";
 $pagetitle = "View Login Log";
 require("../header.php");
 echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
@@ -29,15 +29,21 @@ echo "<div class=\"breadcrumb\">$curBreadcrumb</div>";
 echo '<div id="headerloginlog" class="pagetitle"><h2>'.$pagetitle. '</h2></div>';
 echo '<div class="cpmid"><a href="viewactionlog.php?cid='.$cid.'&uid='.$uid.'">View Activity Log</a></div>';
 
-$query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='$uid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
+$stm->execute(array(':id'=>$uid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 echo '<h3>Login Log for '.$row[0].', '.$row[1].'</h3>';
 echo '<ul class="nomark">';
 
-$query = "SELECT logintime,lastaction FROM imas_login_log WHERE userid='$uid' AND courseid='$cid' ORDER BY logintime DESC";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT logintime,lastaction FROM imas_login_log WHERE userid='$uid' AND courseid='$cid' ORDER BY logintime DESC";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT logintime,lastaction FROM imas_login_log WHERE userid=:userid AND courseid=:courseid ORDER BY logintime DESC");
+$stm->execute(array(':userid'=>$uid, ':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	echo '<li>'.tzdate("l, F j, Y, g:i a",$row[0]);
 	if ($row[1]>0) {
 		echo '.  On for about '.round(($row[1]-$row[0])/60).' minutes.';

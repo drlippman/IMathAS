@@ -202,12 +202,16 @@ function sendXmlOverPost($url, $xml, $header) {
 $aidtotalpossible = array();
 //use this if we don't know the total possible
 function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
-	global $aidtotalpossible;
+	global $DBH, $aidtotalpossible;
 	if (!isset($aidtotalpossible[$aid])) {
-		$query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
-		$res= mysql_query($query) or die("Query failed : $query" . mysql_error());
-		$aitems = explode(',',mysql_result($res,0,0));
-		$defpoints = mysql_result($res,0,1);
+		//DB $query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
+		//DB $res= mysql_query($query) or die("Query failed : $query" . mysql_error());
+		//DB $aitems = explode(',',mysql_result($res,0,0));
+		//DB $defpoints = mysql_result($res,0,1);
+		$stm = $DBH->prepare("SELECT itemorder,defpoints FROM imas_assessments WHERE id=:id");
+		$stm->execute(array(':id'=>$aid));
+    list($aitems, $defpoints) = $stm->fetch(PDO::FETCH_NUM);
+		$aitems = explode(',',$aitems);
 		foreach ($aitems as $k=>$v) {
 			if (strpos($v,'~')!==FALSE) {
 				$sub = explode('~',$v);
@@ -224,10 +228,13 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 			}
 		}
 
-		$query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-		$result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 		$totalpossible = 0;
-		while ($r = mysql_fetch_row($result2)) {
+    //DB $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
+		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		//DB while ($r = mysql_fetch_row($result2)) {
+    $stm = $DBH->prepare("SELECT points,id FROM imas_questions WHERE assessmentid=:assessmentid");
+    $stm->execute(array(':assessmentid'=>$aid));
+		while ($r = $stm->fetch(PDO::FETCH_NUM)) {
 			if (($k=array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
 				if ($r[0]==9999) {
 					$totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
@@ -248,7 +255,7 @@ function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
 
 //use this if we know the grade, or want to delete
 function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
-	global $sessiondata,$testsettings,$cid;
+	global $DBH,$sessiondata,$testsettings,$cid;
 
 	list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
 
@@ -260,10 +267,14 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				if (isset($testsettings) && isset($testsettings['ltisecret'])) {
 					$secret = $testsettings['ltisecret'];
 				} else {
-					$qr = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
-					$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
-					if (mysql_num_rows($res)>0) {
-						$secret = mysql_result($res,0,0);
+					//DB $query = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
+					//DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
+					//DB if (mysql_num_rows($res)>0) {
+						//DB $secret = mysql_result($res,0,0);
+					$stm = $DBH->prepare("SELECT ltisecret FROM imas_assessments WHERE id=:id");
+					$stm->execute(array(':id'=>$aid));
+					if ($stm->rowCount()>0) {
+						$secret = $stm->fetchColumn(0);
 						$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
 						writesessiondata();
 					} else {
@@ -279,10 +290,14 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				//change to use launched key rather than key from course in case someone uses material
 				//from multiple imathas courses in one LMS course.
 				$keyparts = explode('_',$ltikey);
-				$qr = "SELECT ltisecret FROM imas_courses WHERE id=".intval($keyparts[1]);
-				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
-				if (mysql_num_rows($res)>0) {
-					$secret = mysql_result($res,0,0);
+				//DB $query = "SELECT ltisecret FROM imas_courses WHERE id=".intval($keyparts[1]);
+				//DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
+				//DB if (mysql_num_rows($res)>0) {
+					//DB $secret = mysql_result($res,0,0);
+				$stm = $DBH->prepare("SELECT ltisecret FROM imas_courses WHERE id=:id");
+				$stm->execute(array(':id'=>$keyparts[1]));
+				if ($stm->rowCount()>0) {
+					$secret = $stm->fetchColumn(0);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
 					writesessiondata();
 				} else {
@@ -290,13 +305,21 @@ function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
 				}
 			} else {
 				if (isset($sessiondata['lti_origkey'])) {
-					$qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76 OR rights=77)";
+					//DB $query = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76 OR rights=77)";
+          //DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
+					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
+					$stm->execute(array(':SID'=>$sessiondata['lti_origkey']));
 				} else {
-					$qr = "SELECT password FROM imas_users WHERE SID='".addslashes($ltikey)."' AND (rights=11 OR rights=76 OR rights=77)";
+					//DB $query = "SELECT password FROM imas_users WHERE SID='".addslashes($ltikey)."' AND (rights=11 OR rights=76 OR rights=77)";
+          //DB $res= mysql_query($query) or die("Query failed : $qr" . mysql_error());
+					$stm = $DBH->prepare("SELECT password FROM imas_users WHERE SID=:SID AND (rights=11 OR rights=76 OR rights=77)");
+					$stm->execute(array(':SID'=>$ltikey));
 				}
-				$res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
-				if (mysql_num_rows($res)>0) {
-					$secret = mysql_result($res,0,0);
+
+				//DB if (mysql_num_rows($res)>0) {
+					//DB $secret = mysql_result($res,0,0);
+				if ($stm->rowCount()>0) {
+					$secret = $stm->fetchColumn(0);
 					$sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
 					writesessiondata();
 				} else {

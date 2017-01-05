@@ -44,46 +44,54 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 	$endtime = tzdate("M j, Y, g:i a", $end);
 	$sdate = tzdate("m/d/Y",$start);
 	$edate = tzdate("m/d/Y",$end);
-	
+
 	$logins = array();
-	$query = "SELECT userid,logintime FROM imas_login_log WHERE courseid='$cid' AND logintime>=$start AND logintime<=$end";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT userid,logintime FROM imas_login_log WHERE courseid='$cid' AND logintime>=$start AND logintime<=$end";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT userid,logintime FROM imas_login_log WHERE courseid=:courseid AND logintime>=:start AND logintime<=:end");
+	$stm->execute(array(':courseid'=>$cid, ':start'=>$start, ':end'=>$end));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		if (!isset($logins[$row[0]])) { $logins[$row[0]] = array(); }
 		$day = floor(($row[1] - $start)/86400);
-		if (!isset($logins[$row[0]][$day])) { 
+		if (!isset($logins[$row[0]][$day])) {
 			$logins[$row[0]][$day] = 1;
 		} else {
 			$logins[$row[0]][$day]++;
 		}
 	}
-	
+
 	$dates = array();
 	for ($time=$start;$time<$end;$time+=86400) {
 		$dates[] = tzdate("n/d",$time);
 	}
-	
+
 	$stus = array();
+	//DB $query = "SELECT iu.LastName,iu.FirstName,iu.id FROM imas_users as iu JOIN imas_students ON iu.id=imas_students.userid ";
+	//DB $query .= "WHERE imas_students.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
 	$query = "SELECT iu.LastName,iu.FirstName,iu.id FROM imas_users as iu JOIN imas_students ON iu.id=imas_students.userid ";
-	$query .= "WHERE imas_students.courseid='$cid' ORDER BY iu.LastName,iu.FirstName";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$query .= "WHERE imas_students.courseid=:courseid ORDER BY iu.LastName,iu.FirstName";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':courseid'=>$cid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$stus[] = array($row[0].', '.$row[1], $row[2]);
 	}
-	
+
 } //END DATA MANIPULATION
-	
-/******* begin html output ********/	
+
+/******* begin html output ********/
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css"> table.logingrid td {text-align: center; border-right:1px solid #ccc;} table.logingrid td.left {text-align: left;}</style>';
 require("../header.php");
 if ($overwriteBody==1) {
 	echo $body;
-} else {	
+} else {
 ?>
 	<div class=breadcrumb><?php echo $curBreadcrumb ?></div>
 	<div id="headerlogingrid" class="pagetitle"><h2>Login Grid View</h2></div>
-	
+
 	<form method="post" action="logingrid.php?cid=<?php echo $cid;?>">
 	<p>Showing Number of Logins <?php echo "$starttime through $endtime";?></p>
 	<p>
@@ -93,15 +101,15 @@ if ($overwriteBody==1) {
 		echo '<a href="logingrid.php?cid='.$cid.'&start='.($start+7*24*60*60).'">Show following week</a>. ';
 	}
 ?>
-	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>"> 
+	Show <input type="text" size="10" name="sdate" value="<?php echo $sdate;?>">
 	<a href="#" onClick="displayDatePicker('sdate', this); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a> through 
-	<input type="text" size="10" name="edate" value="<?php echo $edate;?>"> 
+	<img src="../img/cal.gif" alt="Calendar"/></a> through
+	<input type="text" size="10" name="edate" value="<?php echo $edate;?>">
 	<a href="#" onClick="displayDatePicker('edate', this, 'sdate', 'start date'); return false">
-	<img src="../img/cal.gif" alt="Calendar"/></a> 
+	<img src="../img/cal.gif" alt="Calendar"/></a>
 	<input type="submit" name="daterange" value="Go"/></p>
 	</form>
-	
+
 	<table class="gb logingrid" id="myTable">
 	<thead>
 	<tr>

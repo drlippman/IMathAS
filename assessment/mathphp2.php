@@ -22,7 +22,7 @@ function mathphppre($st) {
   $st = preg_replace('/log_([a-zA-Z\d\.\/]+)\(/','nthlog($1,',$st);
   $st = preg_replace('/log_\(([a-zA-Z\/\d\.\/]+)\)\(/','nthlog($1,',$st);
   $st = preg_replace('/(sin|cos|tan|sec|csc|cot)\s*\^\s*(\d+)\(/','$1n($2,', $st);
-  
+
   return $st;
 }
 function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
@@ -32,13 +32,13 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
 	// (...)d --> (...)*d
 	// n! --> factorial(n)
 	// sin^-1 --> asin etc.
-	
+
 	//parenthesize variables with number endings, ie $c2^3 => ($c2)^3
 	//not needed since mathphp no longer used on php vars
-	
+
 	//skipfactorial:  legacy: not really used anymore.  Originally intended
 	//to handle !something type ifcond.  Might need to reexplore
-	
+
 	$vars = explode('|',$varlist);
 	//security check variables (we might evaling with them later)
 	global $disallowedvar;
@@ -51,7 +51,7 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
 			return "0;";
 		}
 	}
-	
+
 	//take care of sin^-1 notation first
 	$st = mathphppre($st);
 	$st = preg_replace('/(\+|\-)\s+(\+|\-)/',"$1$2",$st);
@@ -60,7 +60,7 @@ function mathphp($st,$varlist,$skipfactorial=false,$ignorestrings=true) {
 	$st = str_replace("-+","-",$st);
 	$st = str_replace("--","+",$st);
 	return mathphpinterpretline($st.' ',$vars,$ignorestrings);
-  
+
 }
 //interpreter some code text.  Returns a PHP code string.
 function mathphpinterpretline($str,$vars,$ignorestrings) {
@@ -77,7 +77,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 	$syms = mathphptokenize($str,$vars,$ignorestrings);
 	$k = 0;
 	$symlen = count($syms);
-	//$lines holds lines of code; $bits holds symbols for the current line. 
+	//$lines holds lines of code; $bits holds symbols for the current line.
 	while ($k<$symlen) {
 		list($sym,$type) = $syms[$k];
 		//first handle stuff that would use last symbol; add it if not needed
@@ -90,7 +90,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') { 
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -114,8 +114,8 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			}
 			//$closeparens = false;
 		}
-		
-		
+
+
 		if ($type==7) {//end of line
 			if ($lasttype=='7') {
 				//nothing exciting, so just continue
@@ -144,7 +144,7 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			if ($lasttype==3 || $lasttype == 1 || $lasttype==4 || $lasttype==2) {
 				$bits[] = '*';
 			}
-			
+
 		} else if ($type==4) { //is parens
 			//implicit 3(4) (5)(3)  $v(2)  sin(4)(3)
 			if ($lasttype==3 || $lasttype==4 || $lasttype==1 || $lasttype==2) {
@@ -159,8 +159,8 @@ function mathphpinterpretline($str,$vars,$ignorestrings) {
 			$bits[] = '(';
 			$closeparens++;
 		}
-			
-		
+
+
 		$lastsym = $sym;
 		$lasttype = $type;
 		$cnt++;
@@ -181,7 +181,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 	if (!isset($allowedmacros)) {
 		$allowedmacros = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count","nthlog","sinn","cosn","tann","secn","cscn","cotn");
 	}
-	
+
 	$lookfor = array_merge($vars, array("e","pi"));
 	$maxvarlen = 0;
 	foreach ($lookfor as $v) {
@@ -216,7 +216,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 			// nln(n)
 			// ppi   and pip
 			// pi
-			
+
 			$intype = 2; //string like function name
 			do {
 				$out .= $c;
@@ -237,7 +237,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					$i++;
 					$c = $str{$i};
 					$eatenwhite++;
-				}    
+				}
 				//if possible function at end, strip off function
 				//look for xsin(  or nsin(  or  nxsin(  or xy(1+x)
 				if ($c=='(' && !in_array($out,$allowedmacros) && !in_array($out,$vars)) {// moved to mathphppre-> || ($c=='^' && (substr($str,$i+1,2)=='-1' || substr($str,$i+1,4)=='(-1)'))) {
@@ -259,9 +259,9 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 							break;
 						}
 					}
-					
+
 				}
-				
+
 				//if there's a ( then it's a function or x(
 				if ($c=='(' && $out!='e' && $out!='pi' && !in_array($out,$vars)) {
 					//is a function
@@ -270,6 +270,8 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
+					} else if ($out=='rand') {
+						$out = '$GLOBALS[\'RND\']->rand';
 					} else {
 						//check it's an OK function
 						if (!in_array($out,$allowedmacros)) {
@@ -279,7 +281,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 					}
 					//rewrite arctrig into atrig for PHP
 					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$out);
-	  
+
 					//connect upcoming parens to function
 					$connecttolast = 2;
 				} else {
@@ -296,7 +298,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 						$outlen = strlen($out);
 						$outst = '';
 						for ($j=min($maxvarlen,$outlen-1); $j>0; $j--) {
-							$outst = substr($out,0,$j);			
+							$outst = substr($out,0,$j);
 							if (in_array($outst,$lookfor)) {
 								$i = $i - $outlen + $j - $eatenwhite;
 								$c = $str{$i};
@@ -314,26 +316,26 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 									}
 								}
 								break;
-								
+
 							}
-							
+
 						}
 						//quote it if not a variable
 						if ($intype == 6 && $ignorestrings) {
 							$out = "'$out'";
 						}
-							
+
 					}
-					
+
 					/*if (isset($GLOBALS['teacherid'])) {
-						//an unquoted string!  give a warning to instructor, 
+						//an unquoted string!  give a warning to instructor,
 						//but treat as a quoted string.
 						echo "Warning... unquoted string $out.. treating as string";
 						$out = "'$out'";
 						$intype = 6;
 					}
 					*/
-					
+
 				}
 			}
 		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
@@ -352,7 +354,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
 					//is still num
 				} else if ($c=='e' || $c=='E') {
-					//might be scientific notation:  5e6 or 3e-6 
+					//might be scientific notation:  5e6 or 3e-6
 					$d = $str{$i+1};
 					if ($d>='0' && $d<='9') {
 						$out .= $c;
@@ -366,10 +368,10 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 						$c= $str{$i};
 					} else {
 						$cont = false;
-					}	
+					}
 				} else {
 					$cont = false;
-				}	
+				}
 			} while ($cont);
 		} else if ($c=='(' || $c=='{' || $c=='[') { //parens or curlys
 			if ($c=='(') {
@@ -445,17 +447,17 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				if ($i==$len) {break;}
 				$lastc = $c;
 				$c = $str{$i};
-			} while (!($c==$qtype && $lastc!='\\'));	
+			} while (!($c==$qtype && $lastc!='\\'));
 			$out .= $c;
 			if (!$ignorestrings) {
 				$inside = mathphpinterpretline(substr($out,1,strlen($out)-2),$vars,$ignorestrings);
 				if ($inside{0}=='\'' && $inside{strlen($inside)-1}=='\'') {
 					$inside = substr($inside,1,strlen($inside)-2);
-				} 
+				}
 				$out= $qtype . $inside . $qtype;
-				
+
 			}
-							
+
 			$i++;
 			$c = $str{$i};
 		} else if ($c=="\n") {
@@ -490,13 +492,13 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 		}
 		//if parens or array index needs to be connected to func/var, do it
 		if ($connecttolast>0 && $intype!=$connecttolast) {
-			
+
 			$syms[count($syms)-1][0] .= $out;
 			$connecttolast = 0;
 			if ($c=='[') {// multidim array ref?
 				$connecttolast = 1;
 			}
-			
+
 		} else {
 			//add to symbol list, avoid repeat end-of-lines.
 			if ($intype!=7 || $lastsym[1]!=7) {
@@ -504,7 +506,7 @@ function mathphptokenize($str,$vars,$ignorestrings) {
 				$syms[] =  array($out,$intype);
 			}
 		}
-		
+
 	}
 	return $syms;
 }
@@ -546,7 +548,7 @@ function root($n,$x) {
 
 function factorial($x) {
 	for ($i=$x-1;$i>0;$i--) {
-		$x *= $i;	
+		$x *= $i;
 	}
 	return ($x<0?false:($x==0?1:$x));
 }
@@ -570,7 +572,7 @@ function coth($x) {
 	return (1/tanh($x));
 }
 function nthlog($n,$x) {
-	return (log($x)/log($n));	
+	return (log($x)/log($n));
 }
 function sinn($n,$x) { return safepow(sin($x), $n);}
 function cosn($n,$x) { return safepow(cos($x), $n);}

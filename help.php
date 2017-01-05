@@ -31,17 +31,19 @@ h1,h2,h3 {
 h1 {
 	color: #00f;
 }
-h2,h3,h4 {
+h2,h3,h4,h5,h6 {
 	color: #00c;
 }
 </style>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/iconfonts/style.css?v=081316" type="text/css" />
+<link rel="stylesheet" href="<?php echo $imasroot;?>/tinymce4/skins/lightgray/skin.min.css?v=061416" type="text/css" />
 <?php
 	}
 //IMathAS:  Reads sections of the help.html file
 //(c) 2006 David Lippman
 	if (!isset($_GET['section']) && !isset($_GET['bare'])) {
 		echo "<style type=\"text/css\">\n";
-		echo "div.h2 {margin-left: 10px;} \n div.h3 {margin-left: 20px;} \n div.h3 {margin-left: 30px;} \n";
+		echo "div.h2 {margin-left: 10px;} \n div.h3 {margin-left: 20px;} \n div.h4 {margin-left: 30px;} \n div.h5 {margin-left: 40px;} \n";
 		echo "</style>\n";
 	}
 	if (!isset($_GET['bare'])) {
@@ -98,7 +100,7 @@ h2,h3,h4 {
 					echo $next;
 				}
 			
-			} else if (preg_match('/.*<h(1|2|3|4)>\s*<a\s+name\="([^"]+)".*/',$buffer,$matches) && $matches[2]==$_GET['section']) {
+			} else if (preg_match('/.*<h([1-6])>\s*<a\s+name\="([^"]+)".*/',$buffer,$matches) && $matches[2]==$_GET['section']) {
 				if (!isset($_GET['bare'])) {
 					echo "<style type=\"text/css\">\n";
 					for ($i=$matches[1]+1;$i<5;$i++) {

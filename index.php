@@ -14,9 +14,12 @@ require("./validate.php");
 
 //pagelayout:  array of arrays.  pagelayout[0] = fullwidth header, [1] = left bar 25%, [2] = rigth bar 75%
 //[3]: 0 for newmsg note next to courses, 1 for newpost note next to courses
-$query = "SELECT homelayout,hideonpostswidget FROM imas_users WHERE id='$userid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-list($homelayout,$hideonpostswidget) = mysql_fetch_row($result);
+//DB $query = "SELECT homelayout,hideonpostswidget FROM imas_users WHERE id='$userid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB list($homelayout,$hideonpostswidget) = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT homelayout,hideonpostswidget FROM imas_users WHERE id=:id");
+$stm->execute(array(':id'=>$userid));
+list($homelayout,$hideonpostswidget) = $stm->fetch(PDO::FETCH_NUM);
 if ($hideonpostswidget!='') {
 	$hideonpostswidget = explode(',',$hideonpostswidget);
 } else {
@@ -41,14 +44,14 @@ $showpostsgadget = (in_array(11,$pagelayout[1]) || in_array(11,$pagelayout[0]) |
 
 $twocolumn = (count($pagelayout[1])>0 && count($pagelayout[2])>0);
 
-$placeinhead = ' 
+$placeinhead = '
   <style type="text/css">
    div.pagetitle h2 {
   	margin-top: 0px;
   	}
   </style>';
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-	
+
 $nologo = true;
 
 
@@ -62,12 +65,19 @@ $page_newpostlist = array();
 $newmsgcnt = array();
 if ($showmessagesgadget) {
 	$page_newmessagelist = array();
+	//DB $query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
+	//DB $query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
+	//DB $query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+	//DB $query .= "ORDER BY senddate DESC ";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.courseid ";
 	$query .= "FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom WHERE ";
-	$query .= "imas_msgs.msgto='$userid' AND (imas_msgs.isread=0 OR imas_msgs.isread=4)";
+	$query .= "imas_msgs.msgto=:msgto AND (imas_msgs.isread=0 OR imas_msgs.isread=4) ";
 	$query .= "ORDER BY senddate DESC ";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':msgto'=>$userid));
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newmsgcnt[$line['courseid']])) {
 			$newmsgcnt[$line['courseid']] = 1;
 		} else {
@@ -76,11 +86,14 @@ if ($showmessagesgadget) {
 		$page_newmessagelist[] = $line;
 	}
 } else {
-	//check for new messages    
-	
-	$query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	//check for new messages
+
+	//DB $query = "SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND (isread=0 OR isread=4) GROUP BY courseid";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT courseid,COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND (isread=0 OR isread=4) GROUP BY courseid");
+	$stm->execute(array(':msgto'=>$userid));
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$newmsgcnt[$row[0]] = $row[1];
 	}
 }
@@ -88,20 +101,27 @@ if ($showmessagesgadget) {
 $page_studentCourseData = array();
 
 // check to see if the user is enrolled as a student
+//DB $query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
+//DB $query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
+//DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 $query = "SELECT imas_courses.name,imas_courses.id,imas_students.hidefromcourselist FROM imas_students,imas_courses ";
-$query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid='$userid' ";
+$query .= "WHERE imas_students.courseid=imas_courses.id AND imas_students.userid=:userid ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=2) ORDER BY imas_courses.name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+$stm = $DBH->prepare($query);
+$stm->execute(array(':userid'=>$userid));
 $stuhashiddencourses = false;
-if (mysql_num_rows($result)==0) {
+//DB if (mysql_num_rows($result)==0) {
+if ($stm->rowCount()==0) {
 	$noclass = true;
 } else {
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if ($line['hidefromcourselist']==1) {
 			$stuhashiddencourses = true;
 		} else {
 			$noclass = false;
-			$page_studentCourseData[] = $line;	
+			$page_studentCourseData[] = $line;
 			$page_coursenames[$line['id']] = $line['name'];
 			if (!in_array($line['id'],$hideonpostswidget)) {
 				$postcheckstucids[] = $line['id'];
@@ -113,21 +133,28 @@ if (mysql_num_rows($result)==0) {
 $page_teacherCourseData = array();
 if ($myrights>10) {
 	// check to see if the user is enrolled as a teacher
+	//DB $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
+	//DB $query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
+	//DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
 	$query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_teachers,imas_courses ";
-	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid='$userid' ";
+	$query .= "WHERE imas_teachers.courseid=imas_courses.id AND imas_teachers.userid=:userid ";
 	$query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':userid'=>$userid));
+	if ($stm->rowCount()==0) {
 		$noclass = true;
 	} else {
 		$noclass = false;
 		$tchcids = array();
-		
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			$page_teacherCourseData[] = $line;	
+
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+			$page_teacherCourseData[] = $line;
 			$page_coursenames[$line['id']] = $line['name'];
 			if (!in_array($line['id'],$hideonpostswidget)) {
-				$postcheckstucids[] = $line['id'];
+				$postcheckcids[] = $line['id'];
 			}
 		}
 	}
@@ -135,17 +162,24 @@ if ($myrights>10) {
 
 $page_tutorCourseData = array();
 // check to see if the user is enrolled as a tutor
+//DB $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
+//DB $query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userid' ";
+//DB $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB if (mysql_num_rows($result)==0) {
 $query = "SELECT imas_courses.name,imas_courses.id,imas_courses.available,imas_courses.lockaid FROM imas_tutors,imas_courses ";
-$query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid='$userid' ";
+$query .= "WHERE imas_tutors.courseid=imas_courses.id AND imas_tutors.userid=:userid ";
 $query .= "AND (imas_courses.available=0 OR imas_courses.available=1) ORDER BY imas_courses.name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-if (mysql_num_rows($result)==0) {
+$stm = $DBH->prepare($query);
+$stm->execute(array(':userid'=>$userid));
+if ($stm->rowCount()==0) {
 	$noclass = true;
 } else {
 	$noclass = false;
 	$tchcids = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-		$page_tutorCourseData[] = $line;	
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
+		$page_tutorCourseData[] = $line;
 		$page_coursenames[$line['id']] = $line['name'];
 		if (!in_array($line['id'],$hideonpostswidget)) {
 			$postcheckstucids[] = $line['id'];
@@ -155,6 +189,9 @@ if (mysql_num_rows($result)==0) {
 
 //get new posts
 //check for new posts in courses being taught.
+//TODO:  changed since wasn't being hit before. Check it works right.
+//  is the cost of calling this more correct version more than the benefit of
+//  getting notified of group posts correctly?
 $postcidlist = implode(',',$postcheckcids);
 $postthreads = array();
 if ($showpostsgadget && count($postcheckcids)>0) {
@@ -162,22 +199,31 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";*/
-	
+
+	//DB $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
+	//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	//DB $query .= "AND imas_forums.courseid IN ($postcidlist) ";
+	//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//DB $query .= "ORDER BY imas_forum_threads.lastposttime DESC";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-	$query .= "AND imas_forums.courseid IN ($postcidlist) ";
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "AND imas_forums.courseid IN ($postcidlist) ";  //is int's from DB - safe
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':userid'=>$userid));
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
 		} else {
 			$newpostcnt[$line['courseid']]++;
 		}
 		if ($newpostcnt[$line['courseid']]<10) {
-			$page_newpostlist[] = $line;	
+			$page_newpostlist[] = $line;
 			$postthreads[] = $line['threadid'];
 		}
 	}
@@ -189,18 +235,28 @@ if ($showpostsgadget && count($postcheckcids)>0) {
 	$query .= "($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";*/
-	
+
 	$now = time();
+	//DB $query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	//DB $query .= "AND imas_forums.courseid IN ($postcidlist) ";
+	//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//DB $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	//DB $query .= "GROUP BY imas_forums.courseid";
+	//DB $r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB while ($row = mysql_fetch_row($r2)) {
 	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-	$query .= "AND imas_forums.courseid IN ($postcidlist) ";
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "AND imas_forums.courseid IN ($postcidlist) ";    //is int's from DB - safe
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	//this is not consistent with above...
+	//$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "GROUP BY imas_forums.courseid";
-	
-	$r2 = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($row = mysql_fetch_row($r2)) {
+	$stm2 = $DBH->prepare($query);
+	$stm2->execute(array(':userid'=>$userid));
+	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
 }
@@ -212,38 +268,39 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' WHERE imas_forums.courseid IN ($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ORDER BY imas_forum_threads.lastposttime DESC";*/
 	$now = time();
+	//DB $query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
+	//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+	//DB $query .= "AND imas_forums.courseid IN ($poststucidlist) ";
+	//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//DB $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	//DB $query .= "ORDER BY imas_forum_threads.lastposttime DESC";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT imas_forums.name,imas_forums.id,imas_forum_threads.id as threadid,imas_forum_threads.lastposttime,imas_forums.courseid FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
 	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
-	$query .= "AND imas_forums.courseid IN ($poststucidlist) ";
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //is int's from DB - safe
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
 	$query .= "ORDER BY imas_forum_threads.lastposttime DESC";
-	
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':userid'=>$userid, ':useridB'=>$userid));
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		if (!isset($newpostcnt[$line['courseid']])) {
 			$newpostcnt[$line['courseid']] = 1;
 		} else {
 			$newpostcnt[$line['courseid']]++;
 		}
 		if ($newpostcnt[$line['courseid']]<10) {
-			$page_newpostlist[] = $line;	
+			$page_newpostlist[] = $line;
 			$postthreads[] = $line['threadid'];
 		}
 	}
 } else if (count($postcheckstucids)>0) {
 	$now = time();
-	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
-	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
-	$query .= "AND imas_forums.courseid IN ($poststucidlist) ";
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
-	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
-	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
-	$query .= "GROUP BY imas_forums.courseid";
-	
 	/*
 	$query = "SELECT courseid,count(*) FROM ";
 	$query .= "(SELECT imas_forums.courseid,imas_forum_threads.id FROM imas_forum_threads ";
@@ -252,16 +309,37 @@ if ($showpostsgadget && count($postcheckstucids)>0) {
 	$query .= "($postcidlist) AND imas_forums.grpaid=0 ";
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	$query .= "GROUP BY courseid";*/
-	$r2 = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	while ($row = mysql_fetch_row($r2)) {
+	//DB $query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+	//DB $query .= "AND imas_forums.courseid IN ($poststucidlist) ";
+	//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//DB $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	//DB $query .= "GROUP BY imas_forums.courseid";
+	//DB $r2 = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB while ($row = mysql_fetch_row($r2)) {
+	$query = "SELECT imas_forums.courseid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id ";
+	$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+	$query .= "AND imas_forums.courseid IN ($poststucidlist) "; //int's from DB - safe
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
+	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:useridB)) ";
+	$query .= "GROUP BY imas_forums.courseid";
+	$stm2 = $DBH->prepare($query);
+	$stm2->execute(array(':userid'=>$userid, ':useridB'=>$userid));
+	while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
 		$newpostcnt[$row[0]] = $row[1];
 	}
 }
 if ($myrights==100) {
-	$query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights";
-	$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 	$brokencnt = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB $query = "SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights";
+	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->query("SELECT userights,COUNT(id) FROM imas_questionset WHERE broken=1 AND deleted=0 GROUP BY userights");
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$brokencnt[$row[0]] = $row[1];
 	}
 }
@@ -269,7 +347,7 @@ if ($myrights==100) {
 /*** done pulling stuff.  Time to display something ***/
 require("header.php");
 $msgtotal = array_sum($newmsgcnt);
-echo '<div class="floatright" id="homelinkbox">';
+echo '<div class="floatright" id="homelinkbox" role="navigation" aria-label="'._('Site tools').'">';
 if (!isset($CFG['GEN']['hidedefindexmenu'])) {
 	if ($myrights>5) {
 		echo "<a href=\"forms.php?action=chguserinfo\">", _('Change User Info'), "</a> | \n";
@@ -279,16 +357,16 @@ if (!isset($CFG['GEN']['hidedefindexmenu'])) {
 }
 echo '<a href="msgs/msglist.php?cid=0">', _('Messages'), '</a>';
 if ($msgtotal>0) {
-	echo ' <a href="msgs/newmsglist.php?cid=0" class="newnote">', sprintf(_('New (%d)'), $msgtotal), '</a>';
+	echo ' <a href="msgs/newmsglist.php?cid=0" class="noticetext">', sprintf(_('New (%d)'), $msgtotal), '</a>';
 }
 if ($myrights > 10) {
 	echo " | <a href=\"docs/docs.php\">", _('Documentation'), "</a>\n";
 } else if ($myrights > 9) {
 	echo " | <a href=\"help.php?section=usingimas\">", _('Help'), "</a>\n";
 }
-		
+
 echo '</div>';
-echo '<div class="pagetitle" id="headerhome"><h2>';
+echo '<div class="pagetitle" id="headerhome" role="banner"><h2>';
 if (isset($CFG['GEN']['hometitle'])) {
 	echo $CFG['GEN']['hometitle'];
 } else {
@@ -296,7 +374,7 @@ if (isset($CFG['GEN']['hometitle'])) {
 }
 echo '</h2>';
 if ($myrights==100 && count($brokencnt)>0) {
-	echo '<span class="red">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
+	echo '<span class="noticetext">'.array_sum($brokencnt).'</span> questions, '.(array_sum($brokencnt)-$brokencnt[0]).' public, reported broken systemwide';
 }
 echo '</div>';
 
@@ -314,7 +392,7 @@ for ($i=0; $i<3; $i++) {
 	}
 	for ($j=0; $j<count($pagelayout[$i]); $j++) {
 		switch ($pagelayout[$i][$j]) {
-			case 0: 
+			case 0:
 				if ($myrights>10) {
 					printCourses($page_teacherCourseData,_('Courses you\'re teaching'),'teach');
 				}
@@ -322,7 +400,7 @@ for ($i=0; $i<3; $i++) {
 			case 1:
 				printCourses($page_tutorCourseData,_('Courses you\'re tutoring'),'tutor');
 				break;
-			case 2: 
+			case 2:
 				printCourses($page_studentCourseData,_('Courses you\'re taking'),'take');
 				break;
 			case 10:
@@ -345,6 +423,7 @@ function printCourses($data,$title,$type=null) {
 	global $shownewmsgnote, $shownewpostnote, $stuhashiddencourses,$imasroot;
 	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
+	echo '<div role="navigation" aria-label="'.$title.'">';
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
 	echo '<div class="blockitems"><ul class="nomark courselist">';
 	for ($i=0; $i<count($data); $i++) {
@@ -352,7 +431,7 @@ function printCourses($data,$title,$type=null) {
 		if ($type=='take') {
 			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
 		} /*else if ($type=='teach') {
-			echo '<div class="floatright clear dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$imasroot.'/img/gears.png"/></a>';
+			echo '<div class="floatright clear dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$imasroot.'/img/gears.png" alt="Settings"/></a>';
 			echo '<ul class="dropdown-menu dropdown-menu-right">';
 			echo '<li><a>Do something one</a></li>';
 			echo '<li><a>Add/Remove Teachers</a></li>';
@@ -368,12 +447,12 @@ function printCourses($data,$title,$type=null) {
 			echo ' <span style="color:green;">', _('Lockdown'), '</span>';
 		}
 		if ($shownewmsgnote && isset($newmsgcnt[$data[$i]['id']]) && $newmsgcnt[$data[$i]['id']]>0) {
-			echo ' <a class="newnote" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
+			echo ' <a class="noticetext" href="msgs/msglist.php?cid='.$data[$i]['id'].'">', sprintf(_('Messages (%d)'), $newmsgcnt[$data[$i]['id']]), '</a>';
 		}
 		if ($shownewpostnote && isset($newpostcnt[$data[$i]['id']]) && $newpostcnt[$data[$i]['id']]>0) {
-			echo ' <a class="newnote" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
+			echo ' <a class="noticetext" href="forums/newthreads.php?from=home&cid='.$data[$i]['id'].'">', sprintf(_('Posts (%d)'), $newpostcnt[$data[$i]['id']]), '</a>';
 		}
-		
+
 		echo '</li>';
 	}
 	if ($type=='teach' && $myrights>39 && count($data)==0) {
@@ -390,10 +469,12 @@ function printCourses($data,$title,$type=null) {
 		echo '<div class="center"><a class="abutton" href="admin/admin.php">', _('Admin Page'), '</a></div>';
 	}
 	echo '</div>';
+	echo '</div>';
 }
 
 function printMessagesGadget() {
 	global $page_newmessagelist, $page_coursenames;
+	echo '<div role="complementary" aria-label="'._('New messages').'">';
 	echo '<div class="block"><h3>', _('New messages'), '</h3></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newmessagelist)==0) {
@@ -429,15 +510,16 @@ function printMessagesGadget() {
 	echo '</tbody></table>';
 	echo '<script type="text/javascript">initSortTable("newmsglist",Array("S","S","S","D"),false);</script>';
 	echo '</div>';
-	
+	echo '</div>';
+
 }
 function printPostsGadget() {
-	global $page_newpostlist, $page_coursenames, $postthreads,$imasroot;
-	
+	global $DBH,$page_newpostlist, $page_coursenames, $postthreads,$imasroot;
+	echo '<div role="complementary" aria-label="'._('New forum posts').'">';
 	echo '<div class="block">';
 	//echo "<span class=\"floatright\"><a href=\"#\" onclick=\"GB_show('Forum Widget Settings','$imasroot/forms.php?action=forumwidgetsettings&greybox=true',800,'auto')\" title=\"Forum Widget Settings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
-	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\"/></a></span>";
-	
+	echo "<span class=\"floatright\"><a href=\"forms.php?action=forumwidgetsettings\"><img style=\"vertical-align:top\" src=\"$imasroot/img/gears.png\" alt=\"Settings\"/></a></span>";
+
 	echo '<h3>', _('New forum posts'), '</h3></div>';
 	echo '<div class="blockitems">';
 	if (count($page_newpostlist)==0) {
@@ -447,13 +529,17 @@ function printPostsGadget() {
 	}
 	$threadlist = implode(',',$postthreads);
 	$threaddata = array();
+	//DB $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
+	//DB $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
+	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	//DB while ($tline = mysql_fetch_array($result, MYSQL_ASSOC)) {
 	$query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName FROM imas_forum_posts,imas_users ";
-	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	while ($tline = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	$query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.id IN ($threadlist)";  //int vals from DB - safe
+	$stm = $DBH->query($query);
+	while ($tline = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$threaddata[$tline['id']] = $tline;
 	}
-	
+
 	echo '<table class="gb" id="newpostlist"><thead><tr><th>', _('Thread'), '</th><th>', _('Started By'), '</th><th>', _('Course'), '</th><th>', _('Last Post'), '</th></tr></thead>';
 	echo '<tbody>';
 	foreach ($page_newpostlist as $line) {
@@ -486,7 +572,8 @@ function printPostsGadget() {
 	}
 	echo '</tbody></table>';
 	echo '<script type="text/javascript">initSortTable("newpostlist",Array("S","S","S","D"),false);</script>';
-	
+
+	echo '</div>';
 	echo '</div>';
 }
 

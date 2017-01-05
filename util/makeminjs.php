@@ -1,4 +1,9 @@
 <?php
+
+@set_time_limit(0);
+ini_set("max_input_time", "600");
+ini_set("max_execution_time", "600");
+
 require("../validate.php");
 if ($myrights<100) { exit; }
 error_reporting(E_ALL);
@@ -31,14 +36,14 @@ function httpPost($url, $data)
 }
 
 //build assessment javascript min file
-$c = file_get_contents("../javascript/general.js")."\n";
-$c .= file_get_contents("../javascript/mathjs.js")."\n";
-$c .= file_get_contents("../javascript/AMhelpers.js")."\n";
-$c .= file_get_contents("../javascript/confirmsubmit.js")."\n";
-$c .= file_get_contents("../javascript/drawing.js")."\n";
-$c .= file_get_contents("../javascript/eqntips.js")."\n";
+$c = minify(file_get_contents("../javascript/general.js"))."\n";
+$c .= minify(file_get_contents("../javascript/mathjs.js"))."\n";
+$c .= minify(file_get_contents("../javascript/AMhelpers.js"))."\n";
+$c .= minify(file_get_contents("../javascript/confirmsubmit.js"))."\n";
+$c .= minify(file_get_contents("../javascript/drawing.js"))."\n";
+$c .= minify(file_get_contents("../javascript/eqntips.js"))."\n";
 
-file_put_contents("../javascript/assessment_min.js", minify($c));
+file_put_contents("../javascript/assessment_min.js", $c);
 echo "Wrote assessment_min<br>";
 
 $c = file_get_contents("../javascript/mathquill.js")."\n";

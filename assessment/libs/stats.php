@@ -23,7 +23,7 @@ function nCr($n,$r){
 function nPr($n,$r){
    if ($r > $n)
      return false;
-   if ($r==0) 
+   if ($r==0)
      return 1;
    $return = 1;
    $i = $n-$r;
@@ -36,7 +36,7 @@ function nPr($n,$r){
 //mean(array)
 //Finds the mean of an array of numbers
 function mean($a) {
-	return (array_sum($a)/count($a));	
+	return (array_sum($a)/count($a));
 }
 
 //variance(array)
@@ -79,7 +79,7 @@ function percentile($a,$p) {
 //finds the 0 (min), 1st, 2nd (median), 3rd, or 4th (max) quartile of an
 //array of numbers.  Calculates using percentiles.
 function quartile($a,$q) {
-	return percentile($a,$q*25);	
+	return percentile($a,$q*25);
 }
 
 //TIquartile(array,quartile)
@@ -146,7 +146,7 @@ function Excelquartile($a,$q) {
 	} else {
 		$l = round((count($a)-1)*.25*$q ,3);
 		if (floor($l)==$l) {
-			return ($a[$l]);	
+			return ($a[$l]);
 		} else {
 			$d = $l - floor($l);
 			return ($d*$a[floor($l)+1] + (1-$d)*$a[floor($l)]);
@@ -157,7 +157,7 @@ function Excelquartile($a,$q) {
 //median(array)
 //returns the median of an array of numbers
 function median($a) {
-	return percentile($a,50);	
+	return percentile($a,50);
 }
 
 //freqdist(array,label,start,classwidth)
@@ -234,7 +234,7 @@ function countif($a,$ifcond) {
 	$ifcond = str_replace('#=','!=',$ifcond);
 	$ifcond = str_replace('(x)','($x)',$ifcond);
 	$iffunc = create_function('$x','return('.$ifcond.');');
-	
+
 	$cnt = 0;
 	foreach ($a as $v) {
 		if ($iffunc($v)) {
@@ -288,11 +288,11 @@ function histogram($a,$label,$start,$cw,$startlabel=false,$upper=false,$width=30
 		return $alt;
 	}
 	$outst = "setBorder(".(40+7*strlen($maxfreq)).",40,10,5);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
-	
+
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
-	
+
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else if ($maxfreq>9) { $step = 2; } else {$step=1;}
 	if ($startlabel===false) {
 		//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
@@ -384,7 +384,7 @@ function fdhistogram($freq,$label,$start,$cw,$startlabel=false,$upper=false,$wid
 function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	if (!is_array($bl) || !is_array($freq)) {echo "barlabels and freqarray must be arrays"; return 0;}
 	if (count($bl) != count($freq)) { echo "barlabels and freqarray must have same length"; return 0;}
-	
+
 	if (isset($options['valuelabels'])) {
 		$valuelabels = $options['valuelabels'];
 	} else {
@@ -402,7 +402,7 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	} else {
 		$gap = 0;
 	}
-	
+
 	$alt = "Bar graph for $label <table class=stats><thead><tr><th>Bar Label</th><th>$vertlabel</th></tr></thead>\n<tbody>\n";
 	$start = 0;
 	$x = $start+1;
@@ -434,12 +434,12 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	$leftborder = min(60, 9*strlen($maxfreq)+10) + ($usevertlabel?30:0);
 	//$outst = "setBorder(10);  initPicture(". ($start-.1*($x-$start)) .",$x,". (-.1*$maxfreq) .",$maxfreq);";
 	$outst = "setBorder($leftborder,45,0,$topborder);  initPicture(".($start>0?(max($start-.9*$cw,0)):$start).",$x,0,$maxfreq);";
-	
+
 	$power = floor(log10($maxfreq))-1;
 	$base = $maxfreq/pow(10,$power);
-	
+
 	if ($base>75) {$step = 20*pow(10,$power);} else if ($base>40) { $step = 10*pow(10,$power);} else if ($base>20) {$step = 5*pow(10,$power);} else if ($base>9) {$step = 2*pow(10,$power);} else {$step = pow(10,$power);}
-	
+
 	if (isset($options['showgrid']) && $options['showgrid']==false) {
 		$gdy = 0;
 	} else {
@@ -448,9 +448,9 @@ function fdbargraph($bl,$freq,$label,$width=300,$height=200,$options=array()) {
 	//if ($maxfreq>100) {$step = 20;} else if ($maxfreq > 50) { $step = 10; } else if ($maxfreq > 20) { $step = 5;} else {$step=1;}
 	$outst .= "axes(1000,$step,1,1000,$gdy); fill=\"blue\"; textabs([". ($width/2+15)  .",0],\"$label\",\"above\");";
 	if ($usevertlabel) {
-		$outst .= "textabs([0,". ($height/2+20) . "],\"$vertlabel\",\"right\",90);";	
+		$outst .= "textabs([0,". ($height/2+20) . "],\"$vertlabel\",\"right\",90);";
 	}
-	
+
 	//$outst .= "axes($cw,$step,1,1000,$step); fill=\"blue\"; text([". ($start + .5*($x-$start))  .",". (-.1*$maxfreq) . "],\"$label\");";
 	$outst .= $st;
 	return showasciisvg($outst,$width,$height);
@@ -470,20 +470,27 @@ function piechart($pcts,$labels,$w=350,$h=150) {
 	return $out;
 }
 
-//normrand(mu,sigma,n)
+//normrand(mu,sigma,n, [rnd])
 //returns an array of n random numbers that are normally distributed with given
 //mean mu and standard deviation sigma.  Uses the Box-Muller transform.
-function normrand($mu,$sig,$n) {
+//specify rnd to round to that many digits
+function normrand($mu,$sig,$n,$rnd=null) {
+	global $RND;
 	for ($i=0;$i<ceil($n/2);$i++) {
 		do {
-			$a = rand(-32768,32768)/32768;
-			$b = rand(-32768,32768)/32768;
+			$a = $RND->rand(-32768,32768)/32768;
+			$b = $RND->rand(-32768,32768)/32768;
 			$r = $a*$a+$b*$b;
 			$count++;
 		} while ($r==0||$r>1);
-		$r = sqrt(-2*log($r)/$r); 
-		$z[] = $sig*$a*$r + $mu;
-		$z[] = $sig*$b*$r + $mu;
+		$r = sqrt(-2*log($r)/$r);
+		if ($rnd!==null) {
+			$z[] = round($sig*$a*$r + $mu, $rnd);
+			$z[] = round($sig*$b*$r + $mu, $rnd);
+		} else {
+			$z[] = $sig*$a*$r + $mu;
+			$z[] = $sig*$b*$r + $mu;
+		}
 	}
 	if ($n%2==0) {
 		return $z;
@@ -526,8 +533,8 @@ function boxplot($arr,$label) {
 		} else {
 			$alt .= ($i+1);
 		}
-		$alt .= ": Left whisker at {$a[0]}. Leftside of box at $q1. Line through box at $q2.  Rightside of box at $q3. Right whisker at $max.\n"; 
-		
+		$alt .= ": Left whisker at {$a[0]}. Leftside of box at $q1. Line through box at $q2.  Rightside of box at $q3. Right whisker at $max.\n";
+
 	}
 	if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		return $alt;
@@ -550,12 +557,12 @@ function boxplot($arr,$label) {
 
 //normalcdf(z,[dec])
 //calculates the area under the standard normal distribution to the left of the
-//z-value z, to dec decimals (defaults to 4) 
+//z-value z, to dec decimals (defaults to 4)
 //based on someone else's code - can't remember whose!
 function normalcdf($ztest,$dec=4) {
 	$eps = pow(.1,$dec);
 	$eps2 = pow(.1,$dec+3);
-	
+
 	$ds = 1;
 	$s = 0;
 	$i = 0;
@@ -570,7 +577,7 @@ function normalcdf($ztest,$dec=4) {
 			break;
 		}
 	}
-/* alternate code, less accuracy; around 10^-8 vs 10^-10 w above	
+/* alternate code, less accuracy; around 10^-8 vs 10^-10 w above
 	$b1 =  0.319381530;
  $b2 = -0.356563782;
   $b3 =  1.781477937;
@@ -663,7 +670,7 @@ function Betinc($X,$A,$B, $dec) {
 Older code, couldn't handle fractional degrees of freedom
 function tcdf($ttest,$df,$dec=4) {
 	$eps = pow(.1,$dec);
-	
+
 	$t = abs($ttest);
 	if ($df > 0) {
 	$k3 = 0;
@@ -671,7 +678,7 @@ function tcdf($ttest,$df,$dec=4) {
 	$a3 = $t/sqrt($df);
 	$b3 = 1+pow($a3,2);
 	$y = 0.5;
-	if (abs(floor($df/2)*2 - $df) < $eps) { 
+	if (abs(floor($df/2)*2 - $df) < $eps) {
 		$c3 = $a3/(2*pow($b3,0.5));
 		$k3 = 0;
 	} else {
@@ -711,7 +718,7 @@ function tcdf($ttest,$df,$dec=4) {
 //finds the z-value with a left-tail area of p, to dec decimals (default 5)
 // from Odeh & Evans. 1974. AS 70. Applied Statistics. 23: 96-97
 function invnormalcdf($p,$dec=5) {
-   
+
       $p0 = -0.322232431088;
       $p1 = -1.0;
       $p2 = -0.342242088547;
@@ -722,7 +729,7 @@ function invnormalcdf($p,$dec=5) {
       $q2 =  0.531103462366;
       $q3 =  0.103537752850;
       $q4 =  0.38560700634e-2;
-      
+
    if ($p < 0.5) { $pp = $p; }  else  {$pp = 1 - $p; }
 
 
@@ -735,9 +742,9 @@ function invnormalcdf($p,$dec=5) {
    $xp = round($xp,$dec);
    if ($p < 0.5) { return (-1*$xp); }  else { return  $xp; }
 }
-   
+
 //invtcdf(p,df,[dec])
-//the inverse Student's t-distribution 
+//the inverse Student's t-distribution
 //computes the t-value with a left-tail probability of p, with df degrees of freedom
 //to dec decimal places (default 4)
 // from Algorithm 396: Student's t-quantiles by G.W. Hill  Comm. A.C.M., vol.13(10), 619-620, October 1970
@@ -747,19 +754,19 @@ function invtcdf($p,$ndf,$dec=4) {
 	$origp = $p;
 	if ($p > 0.5)  {$p = 1 - $p; }
 	$p = $p*2;
-	
+
 	if ($ndf < 1 || $p > 1 || $p <= 0) {
 	  echo "error in params";
 	  return false;
 	}
-	
+
 	if ( abs($ndf - 2) < $eps ) {  //special case ndf=2
 	  $fn_val = round(SQRT(2 / ( $p * (2 - $p) ) - 2),$dec);
 	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 	} else if (abs($ndf-4) < $eps) {  //special case ndf=4
 	  $v = 4/sqrt($p*(2-$p))*cos(1/3*acos(sqrt($p*(2-$p))));
-	  $fn_val = round(sqrt($v-4),$dec);	
-	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}	
+	  $fn_val = round(sqrt($v-4),$dec);
+	  if ($origp<.5) {return (-1*$fn_val);} else { return $fn_val;}
 	} else if ($ndf < 1+$eps) { //special case ndf=1
 	  $prob = $p * $half_pi;
 	  $fn_val = round(cos($prob) / sin($prob),$dec);
@@ -771,7 +778,7 @@ function invtcdf($p,$ndf,$dec=4) {
 	  $d = ((94.5 / ($b + $c) - 3) / $b + 1) * sqrt($a * $half_pi)* $ndf;
 	  $x = $d * $p;
 	  $y = pow($x,(2/ $ndf));
-	  
+
 	  if ($y > 0.05 + $a) {
 	    $x = invnormalcdf($origp,$dec+10);
 	    $y = pow($x,2);
@@ -786,7 +793,7 @@ function invtcdf($p,$ndf,$dec=4) {
 	      $y = 0.5 * pow($y,2) + $y;
 	    }
 	  } else {
-	    
+
 	    $y = ((1 / ((($ndf + 6) / ($ndf * $y) - 0.089 * $d - 0.822) * ($ndf + 2) * 3) + 0.5 / ($ndf + 4)) * $y - 1) * ($ndf + 1) / ($ndf + 2) + 1 / $y;
 	  }
 	}
@@ -818,9 +825,9 @@ function invtrefine($t,$p,$ndf,$dec) {
 //regression line, based on array/list of x-values and array/list of y-values
 //Returns as array:  r,slope,intercept
 function linreg($xarr,$yarr) {
-	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
-	if (count($xarr)!=count($yarr)) { 
+	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
 		return false;
 	}
@@ -844,9 +851,9 @@ function linreg($xarr,$yarr) {
 //regression exponential, based on array/list of x-values and array/list of y-values
 //Returns as array:  r,base,intercept
 function expreg($xarr,$yarr) {
-	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
-	if (count($xarr)!=count($yarr)) { 
+	if (count($xarr)!=count($yarr)) {
 		echo "Error: expreg requires xarray length = yarray length";
 		return false;
 	}
@@ -858,7 +865,7 @@ function expreg($xarr,$yarr) {
 	//log(y) = mx+b  y = e^b * (e^m)^x
 	return array($r, exp($m), exp($b));
 }
-	
+
 
 //checklineagainstdata(xarray, yarray, student answer, [variable, alpha])
 //intended for checking a student answer for fitting a line to data.  Determines
@@ -869,9 +876,9 @@ function expreg($xarr,$yarr) {
 //alpha: for confidence bound.  defaults to .05
 //return array(answer, showanswer) to be used to set $answer and $showanswer
 function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
-	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
-	if (count($xarr)!=count($yarr)) { 
+	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
 		return false;
 	}
@@ -891,7 +898,7 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	$r = ($n*$sxy - $sx*$sy)/(sqrt($n*$sxx-$sx*$sx)*sqrt($n*$syy-$sy*$sy));
 	$m = ($n*$sxy - $sx*$sy)/($n*$sxx - $sx*$sx);
 	$b = ($sy - $sx*$m)/$n;
-	
+
 	if ($line=='') {return array('',makepretty("`$m $var + $b`"));}
 
 	foreach ($_POST as $k=>$v) { //try to catch junk answers
@@ -904,7 +911,7 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 	$linec = mathphp(makepretty($line),$var);
 	$linec = str_replace("($var)",'($t)',$linec);
 	$linefunc = create_function('$t','return('.$linec.');');
-			
+
 	$xmin = min($xarr);
 	$xmax = max($xarr);
 	$dx = ($xmax-$xmin)/5;
@@ -930,32 +937,32 @@ function checklineagainstdata($xarr,$yarr,$line,$var="x",$alpha=.05) {
 			break;
 		}
 	}
-	if ($isinbounds) { 
+	if ($isinbounds) {
 		return array($line,makepretty("$m $var + $b"));
 	} else {
 		return array("($line) + 200000",makepretty("`$m $var + $b`"));
 	}
-	
+
 }
 
 //checkdrawnlineagainstdata(xarray, yarray, student answer, [grade dots, alpha, grid])
 //intended for checking a student answer for drawing a line fit to data.  Determines
 //if the student answer is within the confidence bounds for the regression equation.
 //xarray, yarray:  list/array of data values
-//student answer from draw:  the $stuanswers[$thisq] 
+//student answer from draw:  the $stuanswers[$thisq]
 //grade dots: default false.  If true, will grade that dots of xarray,yarray were plotted
 //alpha: for confidence bound.  defaults to .05
 //grid:  If you've modified the grid, include it here
 //return array(answer, showanswer) to be used to set $answer and $showanswer
 function checkdrawnlineagainstdata($xarr,$yarr,$line, $gradedots=false,$alpha=.05, $gridi="-5,5,-5,5,1,1,300,300") {
-	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}	
+	if (!is_array($xarr)) { $xarr = explode(',',$xarr);}
 	if (!is_array($yarr)) { $yarr = explode(',',$yarr);}
 	$gridi = explode(',',$gridi);
 	$grid=array(-5,5,-5,5,1,1,300,300);
 	foreach ($gridi as $i=>$v) {
 		$grid[$i] = $v;
 	}
-	if (count($xarr)!=count($yarr)) { 
+	if (count($xarr)!=count($yarr)) {
 		echo "Error: linreg requires xarray length = yarray length";
 		return false;
 	}
@@ -1016,7 +1023,7 @@ function binomialcdf($N,$p,$x) {
 	return $out;
 }
 
-//chi2teststat(m) 
+//chi2teststat(m)
 //Computes the test stat sum((E-O)^2/E) given a matrix of values
 function chi2teststat($m) {
 	$rows = count($m);
@@ -1038,7 +1045,7 @@ function chi2teststat($m) {
 		}
 	}
 	return $teststat;
-	
+
 }
 
 //chi2cdf(x,df)
@@ -1057,7 +1064,7 @@ function invchicdf($cdf,$a) {
 }
 
 //invchi2cdf(p,df)
-//Compuates the x value with left-tail probability p under the 
+//Compuates the x value with left-tail probability p under the
 //chi-squared distribution with df degrees of freedom
 function invchi2cdf($cdf,$a) {
 	$aa = 0.6931471806;
@@ -1176,7 +1183,7 @@ function gamma_inc($p,$x,$dec=4) {
 	$tol = 1e-7;
 	$xbig = 1e8;
 	$value = 0.0;
-	
+
 	if ($plimit<$p) {
 		$pn1 = 3.0*sqrt($p)*(pow($x/$p,1.0/3.0) + 1.0/(9.0*$p)-1.0);
 		$value = normalcdf($pn1,$dec);
@@ -1217,7 +1224,7 @@ function gamma_inc($p,$x,$dec=4) {
 			$c += 1.0;
 			$pn5 = $b*$pn3 - $a*$c*$pn1;
 			$pn6 = $b*$pn4 - $a*$c*$pn2;
-			
+
 			if (0 < abs($pn6)) {
 				$rn = $pn5/$pn6;
 				if (abs($value-$rn) <= min($tol,$tol*$rn)) {
@@ -1248,75 +1255,75 @@ function gamma_inc($p,$x,$dec=4) {
 
 function gamma_log($x) {
  $c = array(
-    -1.910444077728E-03, 
-     8.4171387781295E-04, 
-    -5.952379913043012E-04, 
-     7.93650793500350248E-04, 
-    -2.777777777777681622553E-03, 
-     8.333333333333333331554247E-02, 
+    -1.910444077728E-03,
+     8.4171387781295E-04,
+    -5.952379913043012E-04,
+     7.93650793500350248E-04,
+    -2.777777777777681622553E-03,
+     8.333333333333333331554247E-02,
      5.7083835261E-03 );
   $d1 = - 5.772156649015328605195174E-01;
   $d2 =   4.227843350984671393993777E-01;
   $d4 =   1.791759469228055000094023;
   $frtbig = 1.42E+09;
   $p1 = array(
-    4.945235359296727046734888, 
-    2.018112620856775083915565E+02, 
-    2.290838373831346393026739E+03, 
-    1.131967205903380828685045E+04, 
-    2.855724635671635335736389E+04, 
-    3.848496228443793359990269E+04, 
-    2.637748787624195437963534E+04, 
+    4.945235359296727046734888,
+    2.018112620856775083915565E+02,
+    2.290838373831346393026739E+03,
+    1.131967205903380828685045E+04,
+    2.855724635671635335736389E+04,
+    3.848496228443793359990269E+04,
+    2.637748787624195437963534E+04,
     7.225813979700288197698961E+03 );
   $p2 = array(
-    4.974607845568932035012064, 
-    5.424138599891070494101986E+02, 
-    1.550693864978364947665077E+04, 
-    1.847932904445632425417223E+05, 
-    1.088204769468828767498470E+06, 
-    3.338152967987029735917223E+06, 
-    5.106661678927352456275255E+06, 
+    4.974607845568932035012064,
+    5.424138599891070494101986E+02,
+    1.550693864978364947665077E+04,
+    1.847932904445632425417223E+05,
+    1.088204769468828767498470E+06,
+    3.338152967987029735917223E+06,
+    5.106661678927352456275255E+06,
     3.074109054850539556250927E+06 );
    $p4 = array(
-    1.474502166059939948905062E+04, 
-    2.426813369486704502836312E+06, 
-    1.214755574045093227939592E+08, 
-    2.663432449630976949898078E+09, 
+    1.474502166059939948905062E+04,
+    2.426813369486704502836312E+06,
+    1.214755574045093227939592E+08,
+    2.663432449630976949898078E+09,
     2.940378956634553899906876E+010,
     1.702665737765398868392998E+011,
-    4.926125793377430887588120E+011, 
+    4.926125793377430887588120E+011,
     5.606251856223951465078242E+011 );
   $pnt68 = 0.6796875;
   $q1 = array(
-    6.748212550303777196073036E+01, 
-    1.113332393857199323513008E+03, 
-    7.738757056935398733233834E+03, 
-    2.763987074403340708898585E+04, 
-    5.499310206226157329794414E+04, 
-    6.161122180066002127833352E+04, 
-    3.635127591501940507276287E+04, 
+    6.748212550303777196073036E+01,
+    1.113332393857199323513008E+03,
+    7.738757056935398733233834E+03,
+    2.763987074403340708898585E+04,
+    5.499310206226157329794414E+04,
+    6.161122180066002127833352E+04,
+    3.635127591501940507276287E+04,
     8.785536302431013170870835E+03 );
   $q2 = array(
-    1.830328399370592604055942E+02, 
-    7.765049321445005871323047E+03, 
-    1.331903827966074194402448E+05, 
-    1.136705821321969608938755E+06, 
-    5.267964117437946917577538E+06, 
-    1.346701454311101692290052E+07, 
-    1.782736530353274213975932E+07, 
+    1.830328399370592604055942E+02,
+    7.765049321445005871323047E+03,
+    1.331903827966074194402448E+05,
+    1.136705821321969608938755E+06,
+    5.267964117437946917577538E+06,
+    1.346701454311101692290052E+07,
+    1.782736530353274213975932E+07,
     9.533095591844353613395747E+06 );
   $q4 = array(
-    2.690530175870899333379843E+03, 
-    6.393885654300092398984238E+05, 
-    4.135599930241388052042842E+07, 
-    1.120872109616147941376570E+09, 
-    1.488613728678813811542398E+010, 
-    1.016803586272438228077304E+011, 
-    3.417476345507377132798597E+011, 
+    2.690530175870899333379843E+03,
+    6.393885654300092398984238E+05,
+    4.135599930241388052042842E+07,
+    1.120872109616147941376570E+09,
+    1.488613728678813811542398E+010,
+    1.016803586272438228077304E+011,
+    3.417476345507377132798597E+011,
     4.463158187419713286462081E+011 );
   $sqrtpi = 0.9189385332046727417803297;
   $xbig = 4.08E+36;
-  
+
   if ($x<=0 || $xbig < $x) {
 	  return 1e10;
   }
@@ -1406,7 +1413,7 @@ function fspin($f,$df1,$df2) {
 	$px2 = 2*M_PI;
 	$exx = 1.10517091807564;
 	$dgr = 180/M_PI;
-	
+
 	$x = $df2/($df1*$f+$df2);
 	if (($df1%2)==0) {
 		return (LJspin(1-$x,$df2,$df1+$df2-4,$df2-2)*pow($x,$df2/2));
@@ -1420,7 +1427,7 @@ function fspin($f,$df1,$df2) {
 	if ($df2>1) {
 		$a = $a+$sat*$cot*LJspin($cot*$cot,2,$df2-3,-1)/$pj2;
 	}
-	if ($df1==1) { 
+	if ($df1==1) {
 		return (1-$a);
 	}
 	$c = 4*LJspin($sat*$sat,$df2+1,$df1+$df2-4,$df2-2)*$sat*pow($cot,$df2)/M_PI;
@@ -1468,7 +1475,7 @@ function invfcdf($p,$df1,$df2) {
 		$cnt++;
 	}
 	return $f;
-	
+
 }
 
 //mosaicplot(rowlabels, columnlabels, count matrix, [width, height])
@@ -1495,7 +1502,7 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 	for ($i=0;$i<$ncol;$i++) {
 		$widths[$i] = round($w*$ccnt[$i]/$ctot);
 	}
-	
+
 	$out .= '<table style="float:left;"><tbody>';
 	$out .= '<tr><td style="height: 3em;">&nbsp;</td></tr>';
 	for ($j=0;$j<$nrow;$j++) {
@@ -1503,7 +1510,7 @@ function mosaicplot($rlbl,$clbl,$m, $w = 300, $h=300) {
 	}
 	$out .= '</tbody></table>';
 	for ($i=0;$i<$ncol;$i++) {
-		$out .= '<table style="table-layout: fixed; float:left;"><tbody>';	
+		$out .= '<table style="table-layout: fixed; float:left;"><tbody>';
 		$out .= '<tr style="line-height: 1px;"><td style="text-align: center; width: '.$widths[$i].'px; height: 3em;">'.$clbl[$i].'</td></tr>';
 		for ($j=0;$j<$nrow;$j++) {
 			$out .= '<tr style="line-height: 1px;"><td style="height: '.round($h*$m[$j][$i]/$ccnt[$i]).'px; background-color: '.$cols[$j].';">&nbsp;</td></tr>';

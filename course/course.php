@@ -1,4 +1,4 @@
-<?php 
+<?php
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
 
@@ -19,23 +19,28 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$body = _("You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n");
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
-	
+
 	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas']) && $sessiondata['courseid']==$cid) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
 		//deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
 		deleteasidfilesbyquery2('id',$sessiondata['sessiontestid'],null,1);
-		$query = "DELETE FROM imas_assessment_sessions WHERE id='{$sessiondata['sessiontestid']}' LIMIT 1";
-		$result = mysql_query($query) or die("Query failed : $query: " . mysql_error());		
+		//DB $query = "DELETE FROM imas_assessment_sessions WHERE id='{$sessiondata['sessiontestid']}' LIMIT 1";
+		//DB $result = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+		$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE id=:id LIMIT 1");
+		$stm->execute(array(':id'=>$sessiondata['sessiontestid']));
 	}
-   
+
 	if (isset($teacherid) && isset($_GET['from']) && isset($_GET['to'])) {
 		$from = $_GET['from'];
 		$to = $_GET['to'];
 		$block = $_GET['block'];
-		$query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		$items = unserialize(mysql_result($result,0,0));
+		//DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $items = unserialize(mysql_result($result,0,0));
+		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+		$stm->execute(array(':id'=>$_GET['cid']));
+		$items = unserialize($stm->fetchColumn(0));
 		$blocktree = explode('-',$block);
 		$sub =& $items;
 		for ($i=1;$i<count($blocktree)-1;$i++) {
@@ -47,10 +52,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		} else {
 			$curblock =& $sub;
 		}
-	   	   
-		$blockloc = $blocktree[count($blocktree)-1]-1; 
+
+		$blockloc = $blocktree[count($blocktree)-1]-1;
 	   	//$sub[$blockloc]['items'] is block with items
-	   
+
 		if (strpos($to,'-')!==false) {  //in or out of block
 			if ($to[0]=='O') {  //out of block
 				$itemtomove = $curblock[$from-1];  //+3 to adjust for other block params
@@ -77,20 +82,26 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				array_splice($curblock,$to-1,0,$itemtomove);
 			}
 		}
-		$itemlist = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
-		mysql_query($query) or die("Query failed : " . mysql_error()); 
+		//DB $itemlist = addslashes(serialize($items));
+		$itemlist = serialize($items);
+		//DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}");
 	}
-		
-	$query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$line = mysql_fetch_array($result, MYSQL_ASSOC);
+
+	//DB $query = "SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,chatset,topbar,cploc,latepasshrs FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
+	$stm = $DBH->prepare("SELECT name,itemorder,hideicons,picicons,allowunenroll,msgset,toolset,topbar,cploc,latepasshrs FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$line = $stm->fetch(PDO::FETCH_ASSOC);
 	if ($line == null) {
 		$overwriteBody = 1;
 		$body = _("Course does not exist.  <a hre=\"../index.php\">Return to main page</a>") . "</body></html>\n";
-	}	
-	
+	}
+
 	$allowunenroll = $line['allowunenroll'];
 	$hideicons = $line['hideicons'];
 	$graphicalicons = ($line['picicons']==1);
@@ -98,7 +109,6 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$items = unserialize($line['itemorder']);
 	$msgset = $line['msgset']%5;
 	$toolset = $line['toolset'];
-	$chatset = $line['chatset'];
 	$latepasshrs = $line['latepasshrs'];
 	$useleftbar = (($line['cploc']&1)==1);
 	$useleftstubar = (($line['cploc']&2)==2);
@@ -109,7 +119,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if (!isset($topbar[2])) {$topbar[2] = 0;}
 	if ($topbar[0][0] == null) {unset($topbar[0][0]);}
 	if ($topbar[1][0] == null) {unset($topbar[1][0]);}
-  
+
 	if (isset($teacherid) && isset($_GET['togglenewflag'])) { //handle toggle of NewFlag
 		$sub =& $items;
 		$blocktree = explode('-',$_GET['togglenewflag']);
@@ -124,18 +134,21 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		} else {
 			$sub['newflag']=0;
 		}
-		$itemlist = addslashes(serialize($items));
-		$query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
-		mysql_query($query) or die("Query failed : " . mysql_error()); 	   
+		//DB $itemlist = addslashes(serialize($items));
+		$itemlist = serialize($items);
+		//DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='$cid'";
+		//DB mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
+		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 	}
-	
+
 	//enable teacher guest access
 	if (isset($guestid)) {
 		$teacherid = $guestid;
 	}
 
 	if ((!isset($_GET['folder']) || $_GET['folder']=='') && !isset($sessiondata['folder'.$cid])) {
-		$_GET['folder'] = '0';  
+		$_GET['folder'] = '0';
 		$sessiondata['folder'.$cid] = '0';
 		writesessiondata();
 	} else if ((isset($_GET['folder']) && $_GET['folder']!='') && (!isset($sessiondata['folder'.$cid]) || $sessiondata['folder'.$cid]!=$_GET['folder'])) {
@@ -168,16 +181,25 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$now = time() + $previewshift;
 	$exceptions = array();
 	if (!isset($teacherid) && !isset($tutorid)) {
+		//DB $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
+		//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
+		//DB $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid='$cid') ";
+		//DB $query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
+		//DB $query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid='$userid' AND ";
+		//DB $query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid='$cid') ";
 		$query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userid' AND ";
-		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid='$cid') ";
+		$query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid=:userid AND ";
+		$query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment' AND items.courseid=:courseid) ";
 		$query .= "UNION SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore,ex.itemtype FROM ";
-		$query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid='$userid' AND ";
-		$query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid='$cid') ";
+		$query .= "imas_exceptions AS ex,imas_items as items,imas_forums as i_f WHERE ex.userid=:userid2 AND ";
+		$query .= "ex.assessmentid=i_f.id AND (items.typeid=i_f.id AND items.itemtype='Forum' AND items.courseid=:courseid2) ";
+		$stm = $DBH->prepare($query);
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid, ':userid2'=>$userid, ':courseid2'=>$cid));
 		// $query .= "AND (($now<i_a.startdate AND ex.startdate<$now) OR ($now>i_a.enddate AND $now<ex.enddate))";
 		//$query .= "AND (ex.startdate<$now AND $now<ex.enddate)";
-		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+		//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 			$exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore'],$line['itemtype']);
 		}
 	}
@@ -185,7 +207,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	if (count($exceptions)>0) {
 		upsendexceptions($items);
 	}
-		
+
 	if ($_GET['folder']!='0') {
 		$now = time() + $previewshift;
 		$blocktree = explode('-',$_GET['folder']);
@@ -204,21 +226,21 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 					echo 'Not authorized';
 					exit;
 				}
-			}  
+			}
 			$items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
 	$jsAddress1 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid={$_GET['cid']}";
 	$jsAddress2 = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-	
+
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
 	if (isset($_COOKIE['openblocks-'.$cid]) && $_COOKIE['openblocks-'.$cid]!='') {$openblocks = explode(',',$_COOKIE['openblocks-'.$cid]); $firstload=false;} else {$firstload=true;}
 	if (isset($_COOKIE['prevloadedblocks-'.$cid]) && $_COOKIE['prevloadedblocks-'.$cid]!='') {$prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$cid]);}
 	$plblist = implode(',',$prevloadedblocks);
 	$oblist = implode(',',$openblocks);
-	
+
 	$curBreadcrumb = $breadcrumbbase;
 	if (isset($backtrack) && count($backtrack)>0) {
 		if (isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
@@ -233,8 +255,10 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 				}
-				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
-				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				//DB $sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".stripslashes($backtrack[$i][0]).'</a>';
+				$sendcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">".$backtrack[$i][0].'</a>';
+				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				$curBreadcrumb .= $backtrack[$i][0];
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
@@ -244,7 +268,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				$backlink = "<span class=right><a href=\"course.php?cid=$cid&folder=".$backtrack[count($backtrack)-2][1]."\">" . _('Back') . "</a></span><br class=\"form\" />";
 			}
 			$_SESSION['backtrack'] = array($sendcrumb,$backtrack[count($backtrack)-1][1]);
-			
+
 		} else {
 			$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder=0\">$coursename</a> ";
 			for ($i=0;$i<count($backtrack);$i++) {
@@ -252,7 +276,8 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "<a href=\"course.php?cid=$cid&folder={$backtrack[$i][1]}\">";
 				}
-				$curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				//DB $curBreadcrumb .= stripslashes($backtrack[$i][0]);
+				$curBreadcrumb .= $backtrack[$i][0];
 				if ($i!=count($backtrack)-1) {
 					$curBreadcrumb .= "</a>";
 				}
@@ -268,14 +293,17 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$curBreadcrumb .= $coursename;
 		$curname = $coursename;
 	}
-	
-	
+
+
 	if ($msgset<4) {
-	   $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
-	   $result = mysql_query($query) or die("Query failed : " . mysql_error());
-	   $msgcnt = mysql_result($result,0,0);
+	   //DB $query = "SELECT COUNT(id) FROM imas_msgs WHERE msgto='$userid' AND courseid='$cid' AND (isread=0 OR isread=4)";
+	   //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	   //DB $msgcnt = mysql_result($result,0,0);
+	   $stm = $DBH->prepare("SELECT COUNT(id) FROM imas_msgs WHERE msgto=:msgto AND courseid=:courseid AND (isread=0 OR isread=4)");
+	   $stm->execute(array(':msgto'=>$userid, ':courseid'=>$cid));
+	   $msgcnt = $stm->fetchColumn(0);
 	   if ($msgcnt>0) {
-		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" style=\"color:red\">" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
+		   $newmsgs = " <a href=\"$imasroot/msgs/newmsglist.php?cid=$cid\" class=noticetext>" . sprintf(_('New (%d)'), $msgcnt) . "</a>";
 	   } else {
 		   $newmsgs = '';
 	   }
@@ -286,7 +314,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$query .= "JOIN imas_forums ON imas_forum_posts.forumid=imas_forums.id LEFT JOIN imas_forum_views AS mfv ";
 	$query .= "ON mfv.threadid=imas_forum_posts.threadid AND mfv.userid='$userid' WHERE imas_forums.courseid='$cid' ";
 	$query .= "GROUP BY imas_forum_posts.threadid HAVING ((max(imas_forum_posts.postdate)>mfv.lastview) OR (mfv.lastview IS NULL))) AS newitems ";
-	*/	
+	*/
 	/*
 	$query = "SELECT count(*) FROM ";
 	$query .= "(SELECT imas_forum_threads.id FROM imas_forum_threads ";
@@ -295,86 +323,83 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 	$query .= "AND (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL))) AS newitems ";
 	*/
 	$now = time();
+	//DB $query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+	//DB $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+	//DB if (!isset($teacherid)) {
+		//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
+	//DB }
+	//DB $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	//DB $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+	//DB if (!isset($teacherid)) {
+		//DB $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+	//DB }
+	//DB $query .= "GROUP BY imas_forum_threads.forumid";
 	$query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
-	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid=:courseid ";
 	if (!isset($teacherid)) {
 		$query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now && imas_forums.enddate>$now)) ";
 	}
-	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
+	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	if (!isset($teacherid)) {
-		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+		$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
 	}
 	$query .= "GROUP BY imas_forum_threads.forumid";
-	
+	$stm = $DBH->prepare($query);
+	if (!isset($teacherid)) {
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid, ':userid2'=>$userid));
+	} else {
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$userid));
+	}
+
+
+
 	/*$query = "SELECT imas_forum_threads.forumid,imas_forum_threads.id FROM imas_forum_threads ";
 	$query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
 	$query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$userid' ";
 	$query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
 	$query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
 	*/
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$newpostcnts = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$newpostcnts[$row[0]] = $row[1];
 	}
 	if (array_sum($newpostcnts)>0) {
-		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" style=\"color:red\">" . sprintf(_('New (%d)'), array_sum($newpostcnts)) . "</a>";
+		$newpostscnt = " <a href=\"$imasroot/forums/newthreads.php?cid=$cid\" class=noticetext>" . sprintf(_('New (%d)'), array_sum($newpostcnts)) . "</a>";
 	} else {
-		$newpostscnt = '';	
+		$newpostscnt = '';
 	}
-	
+
 	//get items with content views, for enabling stats link
 	/*
 	//removed - always showing stats link now.
-	if (isset($teacherid) || isset($tutorid)) { 
+	if (isset($teacherid) || isset($tutorid)) {
 		$hasstats = array();
 		$query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$cid' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
 		//not sure this is useful information, since this is in the list posts by name page, and we don't track forum views in content tracking
 		//$query .= "UNION SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),info)) FROM imas_content_track WHERE courseid='$cid' AND type in ('forumpost','forumreply')";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($result)) {
-			$hasstats[$row[0]] = true;	
+			$hasstats[$row[0]] = true;
 		}
 	}
 	*/
-	
+
 	//get read linked items
 	$readlinkeditems = array();
 	if ($coursetheme=='otbsreader.css' && isset($studentid)) {
-		$query = "SELECT DISTINCT typeid FROM imas_content_track WHERE userid='$userid' AND type='linkedlink' AND courseid='$cid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
-			$readlinkeditems[$row[0]] = true;	
+		//DB $query = "SELECT DISTINCT typeid FROM imas_content_track WHERE userid='$userid' AND type='linkedlink' AND courseid='$cid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT DISTINCT typeid FROM imas_content_track WHERE userid=:userid AND type='linkedlink' AND courseid=:courseid");
+		$stm->execute(array(':userid'=>$userid, ':courseid'=>$cid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+			$readlinkeditems[$row[0]] = true;
 		}
 	}
-	
-	//get active chatters
-	if (isset($mathchaturl) &&  $chatset==1) {
-		if (substr($mathchaturl,0,4)=='http') {
-			//remote mathchat
-			$url = $mathchaturl.'?isactive='.$cid.'&sep='.time();
-			$timeout = 2;
-			$old = ini_set('default_socket_timeout', $timeout);
-			$fp = @fopen($url,'r');
-			if ($fp!==false) {
-				ini_set('default_socket_timeout', $old);
-				stream_set_timeout($fp,2);
-				stream_set_blocking($fp,0);
-				$activechatters = fread($fp,100);
-				fclose($fp);
-			} else {
-				$activechatters = '?';
-			}
-		} else {  
-			//local mathchat
-			$on = time() - 15;
-			$query = "SELECT name FROM mc_sessions WHERE mc_sessions.room='$cid' AND lastping>$on";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$activechatters =  mysql_num_rows($result);
-		}
-	}
-	
+
 	//get latepasses
 	if (!isset($teacherid) && !isset($tutorid) && $previewshift==-1 && isset($studentinfo)) {
 	   //$query = "SELECT latepass FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
@@ -385,12 +410,12 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 		$latepasses = 0;
 	}
 }
-  
-$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=071416\"></script>";
+
+$placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/course.js?v=120516\"></script>";
 if (isset($tutorid) && isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==3) {
 	$placeinhead .= '<script type="text/javascript">$(function(){$(".instrdates").hide();});</script>';
 }
-	
+
 /******* begin html output ********/
 require("../header.php");
 
@@ -404,17 +429,17 @@ if ($overwriteBody==1) {
 } else {
 
 	if (isset($teacherid)) {
- ?>  
+ ?>
 	<script type="text/javascript">
-		function moveitem(from,blk) { 
+		function moveitem(from,blk) {
 			var to = document.getElementById(blk+'-'+from).value;
-			
+
 			if (to != from) {
 				var toopen = '<?php echo $jsAddress1 ?>&block=' + blk + '&from=' + from + '&to=' + to;
 				window.location = toopen;
 			}
 		}
-		
+
 		function additem(blk,tb) {
 			var type = document.getElementById('addtype'+blk+'-'+tb).value;
 			if (tb=='BB' || tb=='LB') { tb = 'b';}
@@ -426,15 +451,15 @@ if ($overwriteBody==1) {
 	</script>
 
 <?php
-	}	
+	}
 ?>
 	<script type="text/javascript">
 		var getbiaddr = 'getblockitems.php?cid=<?php echo $cid ?>&folder=';
 		var oblist = '<?php echo $oblist ?>';
 		var plblist = '<?php echo $plblist ?>';
 		var cid = '<?php echo $cid ?>';
-	</script> 
-	
+	</script>
+
 <?php
 	//check for course layout
 	if (isset($CFG['GEN']['courseinclude'])) {
@@ -448,14 +473,14 @@ if ($overwriteBody==1) {
 	}
 ?>
 	<div class=breadcrumb>
-		<?php 
+		<?php
 		if (isset($CFG['GEN']['logopad'])) {
 			echo '<span class="padright hideinmobile" style="padding-right:'.$CFG['GEN']['logopad'].'">';
 		} else {
 			echo '<span class="padright hideinmobile">';
 		}
 		if (isset($guestid)) {
-			echo '<span class="red">', _('Instructor Preview'), '</span> ';
+			echo '<span class="noticetext">', _('Instructor Preview'), '</span> ';
 		}
 		if (!isset($usernameinheader)) {
 			echo $userfullname;
@@ -465,22 +490,17 @@ if ($overwriteBody==1) {
 		<?php echo $curBreadcrumb ?>
 		<div class=clear></div>
 	</div>
-	
-<?php  
+
+<?php
 	if ($useleftbar && isset($teacherid)) {
-?>	
-	<div id="leftcontent" class="hiddenmobile">
+?>
+	<div id="leftcontent" class="hiddenmobile" role="navigation" aria-label="<?php echo _('Instructor tool navigation');?>">
 		<p>
 		<b><?php echo _('Communication'); ?></b><br/>
 			<a href="<?php echo $imasroot ?>/msgs/msglist.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
 			<?php echo _('Messages'); ?></a> <?php echo $newmsgs ?> <br/>
 			<a href="<?php echo $imasroot ?>/forums/forums.php?cid=<?php echo $cid ?>&folder=<?php echo $_GET['folder'] ?>" class="essen">
 			<?php echo _('Forums'); ?></a> <?php echo $newpostscnt ?>
-<?php 
-		if (isset($mathchaturl) &&  $chatset==1) {
-			echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\" target=\"chat\">", _('Chat'), "</a> ($activechatters)";
-		}
-?>
 		</p>
 	<?php
 	if (isset($CFG['CPS']['leftnavtools']) && $CFG['CPS']['leftnavtools']=='limited') {
@@ -494,7 +514,7 @@ if ($overwriteBody==1) {
 	?>
 		<p><b><?php echo _('Tools'); ?></b><br/>
 			<a href="listusers.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
 	                <a href="coursereports.php?cid=<?php echo $cid ?>">Reports</a><br/>
 			<a href="managestugrps.php?cid=<?php echo $cid ?>"><?php echo _('Groups'); ?></a><br/>
 			<a href="addoutcomes.php?cid=<?php echo $cid ?>"><?php echo _('Outcomes'); ?></a><br/>
@@ -515,7 +535,7 @@ if ($overwriteBody==1) {
 			<a href="manageqset.php?cid=<?php echo $cid ?>"><?php echo _('Manage'); ?></a><br/>
 			<a href="managelibs.php?cid=<?php echo $cid ?>"><?php echo _('Libraries'); ?></a>
 		</p>
-<?php			
+<?php
 		if ($allowcourseimport) {
 ?>
 		<p><b><?php echo _('Export/Import'); ?></b><br/>
@@ -534,7 +554,7 @@ if ($overwriteBody==1) {
 			<br/><a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import'); ?></a>
 		<?php } ?>
 		</p>
-		
+
 		<p><b><?php echo _('Mass Change'); ?></b><br/>
 			<a href="chgassessments.php?cid=<?php echo $cid ?>"><?php echo _('Assessments'); ?></a><br/>
 			<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Forums'); ?></a><br/>
@@ -549,20 +569,20 @@ if ($overwriteBody==1) {
 		</p>
 	</div>
 	<div id="centercontent">
-<?php	
+<?php
 	} else if ($useleftstubar && !isset($teacherid)) {
 		$neededtools = 0;
 		if ($msgset<4) {$neededtools++;}
 		if (($toolset&2)==0) {$neededtools++;}
 		if (($toolset&1)==0) {$neededtools++;}
-		
+
 ?>
-		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>>
-			
+		<div id="leftcontent" <?php if ($essentialsnavcnt<$neededtools+1) {echo 'class="needed"';}?>  role="navigation" aria-label="<?php echo _('Tools navigation');?>">
+
 <?php
 		if ($msgset<4 || ($toolset&2)==0 || ($toolset&1)==0) {
 			echo '<p>';
-			if ($msgset<4) {		
+			if ($msgset<4) {
 				echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen"> ';
 				echo _('Messages').'</a> '.$newmsgs .' <br/>';
 			}
@@ -570,27 +590,24 @@ if ($overwriteBody==1) {
 				echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'" class="essen">';
 				echo _('Forums').'</a> '.$newpostscnt.'<br/>';
 			}
-			if (($toolset&1)==0) {	
+			if (($toolset&1)==0) {
 				echo '<a href="showcalendar.php?cid='.$cid.'" class="essen">'._('Calendar').'</a>';
-			}
-			if (isset($mathchaturl) && $chatset==1) {
-				echo "<br/><a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">", _('Chat'), "</a>  ($activechatters)";
 			}
 			echo '</p>';
 		}
 	?>
-			
+
 			<p>
-			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?>
+			<a href="gradebook.php?cid=<?php echo $cid ?>" class="essen"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?>
 			</p>
 	<?php
 		if (!isset($sessiondata['ltiitemtype'])) { //don't show in LTI embed
 	?>
 			<p>
-			<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>   
+			<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>
 			<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a>
 			</p>
-			<?php		  
+			<?php
 			if ($myrights > 5 && $allowunenroll==1) {
 				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">", _('Unenroll From Course'), "</a></p>\n";
 			}
@@ -600,25 +617,25 @@ if ($overwriteBody==1) {
 		<div id="centercontent">
 <?php
 	}
-   
+
    if ($previewshift>-1) {
 ?>
 	<script type="text/javascript">
 		function changeshift() {
 			var shift = document.getElementById("pshift").value;
 			var toopen = '<?php echo $jsAddress1 ?>&stuview='+shift;
-			window.location = toopen; 
+			window.location = toopen;
 		}
 	</script>
 
-<?php	
+<?php
    }
-   makeTopMenu();	
+   makeTopMenu();
    echo "<div id=\"headercourse\" class=\"pagetitle\"><h2>$curname</h2></div>\n";
-   
+
    if (count($items)>0) {
-	   
-	   	   
+
+
 	   if ($quickview=='on' && isset($teacherid)) {
 		   echo '<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;}</style>';
 		   echo "<script>var AHAHsaveurl = '$imasroot/course/savequickreorder.php?cid=$cid';";
@@ -628,7 +645,7 @@ if ($overwriteBody==1) {
 		   echo "<script src=\"$imasroot/javascript/nested1.js?v=070214\"></script>";
 		   echo '<p><button type="button" onclick="quickviewexpandAll()">'._("Expand All").'</button> ';
 		   echo '<button type="button" onclick="quickviewcollapseAll()">'._("Collapse All").'</button></p>';
-		   
+
 		   echo '<ul id=qviewtree class=qview>';
 		   quickview($items,0);
 		   echo '</ul>';
@@ -650,15 +667,15 @@ if ($overwriteBody==1) {
    if (isset($backlink)) {
 	   echo $backlink;
    }
-   
+
    if (($useleftbar && isset($teacherid)) || ($useleftstubar && !isset($teacherid))) {
 	   echo "</div>";
    } else if (!isset($nocoursenav)) {
-	  
-?>	   
+
+?>
 	<div class=cp>
 		<span class=column>
-<?php		if ($msgset<4) {		
+<?php		if ($msgset<4) {
 			echo '<a href="'.$imasroot.'/msgs/msglist.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
 			echo _('Messages').'</a> '.$newmsgs .' <br/>';
 		}
@@ -666,28 +683,25 @@ if ($overwriteBody==1) {
 			echo '<a href="'.$imasroot.'/forums/forums.php?cid='.$cid.'&amp;folder='.$_GET['folder'].'">';
 			echo _('Forums').'</a> '.$newpostscnt.'<br/>';
 		}
-		if (isset($mathchaturl) && $chatset==1) {
-			echo "<a href=\"$mathchaturl?uname=".urlencode($userfullname)."&amp;room=$cid&amp;roomname=".urlencode($coursename)."\"  target=\"chat\">"._('Chat')."</a>  ($activechatters) <br/>";
-		}
 	?>
 		</span>
 		<div class=clear></div>
 	</div>
 <?php
-	   
-	   
+
+
 	   if (isset($teacherid)) {
 ?>
 	<div class=cp>
 		<span class=column>
 			<?php echo generateadditem($_GET['folder'], 'BB') ?>
 			<a href="listusers.php?cid=<?php echo $cid ?>"><?php echo _('Roster'); ?></a><br/>
-			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Show Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
+			<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Show Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&stuview=0"><?php echo _('Student View'); ?></a><br/>
 			<a href="course.php?cid=<?php echo $cid ?>&quickview=on"><?php echo _('Quick View'); ?></a></span>
 			<span class=column>
 				<a href="manageqset.php?cid=<?php echo $cid ?>"><?php echo _('Manage Question Set'); ?><br></a>
-<?php		
+<?php
 			if ($allowcourseimport) {
 ?>
 				<a href="../admin/export.php?cid=<?php echo $cid ?>"><?php echo _('Export Question Set'); ?><br></a>
@@ -716,21 +730,21 @@ if ($overwriteBody==1) {
 		</span>
 <?php
 			}
-			
+
 			echo "<div class=clear></div></div>\n";
 		}
 		echo "<div class=cp>\n";
-	   
+
 	   if (!isset($teacherid)) {
-	   	if (($toolset&1)==0) {	
+	   	if (($toolset&1)==0) {
 			echo '<a href="showcalendar.php?cid='.$cid.'">Calendar</a><br/>';
 		}
 ?>
-	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/> 
-	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="red">', _('New'), '</span>';}?><br/>
-	<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>   
-	<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a><br/> 
-<?php		  
+	<a href="<?php echo $imasroot ?>/help.php?section=usingimas">Help Using <?php echo $installname;?></a><br/>
+	<a href="gradebook.php?cid=<?php echo $cid ?>"><?php echo _('Gradebook'); ?></a> <?php if (($coursenewflag&1)==1) {echo '<span class="noticetext">', _('New'), '</span>';}?><br/>
+	<a href="../actions.php?action=logout"><?php echo _('Log Out'); ?></a><br/>
+	<a href="<?php echo $imasroot ?>/help.php?section=usingimas"><?php printf(_('Help Using %s'), $installname); ?></a><br/>
+<?php
 			if ($myrights > 5 && $allowunenroll==1) {
 				echo "<p><a href=\"../forms.php?action=unenroll&cid=$cid\">", _('Unenroll From Course'), "</a></p>\n";
 			}
@@ -742,7 +756,7 @@ if ($overwriteBody==1) {
 			if ($allowcourseimport) {
 				echo "<a href=\"copyitems.php?cid=$cid\">", _('Copy Course Items'), "</a><br/>\n";
 			}
-?>			
+?>
 		<a href="../admin/exportitems.php?cid=<?php echo $cid ?>"><?php echo _('Export Course Items'); ?></a><br/>
 		<a href="../admin/importitems.php?cid=<?php echo $cid ?>"><?php echo _('Import Course Items'); ?></a><br/>
 	</span>
@@ -755,7 +769,7 @@ if ($overwriteBody==1) {
 		<a href="chgforums.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Forums'); ?></a>
 		<a href="masschgdates.php?cid=<?php echo $cid ?>"><?php echo _('Mass Change Dates'); ?></a>
 	</span>
-<?php		
+<?php
 		}
 		echo "<div class=clear></div></div>\n";
 	}
@@ -763,7 +777,7 @@ if ($overwriteBody==1) {
 		echo "<script>document.cookie = 'openblocks-$cid=' + oblist;\n";
 		echo "document.cookie = 'loadedblocks-$cid=0';</script>\n";
 	}
-}   
+}
 
 require("../footer.php");
 
@@ -780,11 +794,11 @@ function makeTopMenu() {
 	global $coursenewflag;
 	global $CFG;
 	global $useviewbuttons, $useleftbar;
-	
+
 	if ($useviewbuttons && (isset($teacherid) || $previewshift>-1)) {
 		echo '<div id="viewbuttoncont">';
 		if ($useleftbar && isset($teacherid)) {
-			echo '<span id="leftcontenttoggle"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
+			echo '<span id="leftcontenttoggle" aria-hidden="true"><img alt="menu" style="cursor:pointer" src="'.$imasroot.'/img/menu.png"></span> ';
 		}
 		echo 'View: ';
 		echo "<a href=\"course.php?cid=$cid&quickview=off&teachview=1\" ";
@@ -810,12 +824,12 @@ function makeTopMenu() {
 		echo '>', _('Quick Rearrange'), '</a>';
 		echo '</div>';
 		//echo '<br class="clear"/>';
-			
-		
+
+
 	} else {
 		$useviewbuttons = false;
 	}
-	
+
 	if (isset($teacherid) && $quickview=='on') {
 		if ($useviewbuttons) {
 			echo '<br class="clear"/>';
@@ -823,20 +837,20 @@ function makeTopMenu() {
 		echo '<div class="cpmid">';
 		if (!$useviewbuttons) {
 			echo _('Quick View.'), " <a href=\"course.php?cid=$cid&quickview=off\">", _('Back to regular view'), "</a>. ";
-		} 
+		}
 		if (isset($CFG['CPS']['miniicons'])) {
 			echo _('Use icons to drag-and-drop order.'),' ',_('Click the icon next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
-		
+
 		} else {
 			echo _('Use colored boxes to drag-and-drop order.'),' ',_('Click the B next to a block to expand or collapse it. Click an item title to edit it in place.'), '  <input type="button" id="recchg" disabled="disabled" value="', _('Save Changes'), '" onclick="submitChanges()"/>';
 		}
-		 echo '<span id="submitnotice" style="color:red;"></span>';
+		 echo '<span id="submitnotice" class=noticetext></span>';
 		 echo '<div class="clear"></div>';
 		 echo '</div>';
-		
+
 	}
 	if (($coursenewflag&1)==1) {
-		$gbnewflag = ' <span class="red">' . _('New') . '</span>';
+		$gbnewflag = ' <span class="noticetext">' . _('New') . '</span>';
 	} else {
 		$gbnewflag = '';
 	}
@@ -866,7 +880,7 @@ function makeTopMenu() {
 		if (in_array(5,$topbar[1])) { //Calendar
 			echo "<a href=\"course.php?cid=$cid&quickview=on\">", _('Quick View'), "</a> &nbsp; \n";
 		}
-		
+
 		if (in_array(9,$topbar[1])) { //Log out
 			echo "<a href=\"../actions.php?action=logout\">", _('Log Out'), "</a>";
 		}
@@ -919,4 +933,3 @@ function makeTopMenu() {
 
 
 ?>
-

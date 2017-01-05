@@ -3,38 +3,71 @@
 //Exception Handling functions
 
 //$exception should be from imas_exceptions, and be null, or
-//   array(startdate,enddate,islatepass,waivereqscore,itemtype)
+//   array(startdate,enddate,islatepass)
 //$adata should be associative array from imas_assessments including
-//   startdate, enddate, reviewdate, allowlate
+//   startdate, enddate, allowlate, id
 //returns array(useexception, canundolatepass, canuselatepass)
-function getCanUseAssessException($exception, $adata) {
+function getCanUseAssessException($exception, $adata, $limit=false) {
 	global $latepasshrs, $latepasses, $sessiondata, $viewedassess, $actas;
 	if (!isset($actas)) {$actas = false;}
 	$now = time();
 	$canuselatepass = false;
 	$canundolatepass = false;
 	$useexception = ($exception!==null); //use by default
-	if ($exception[2]>0 && $adata['enddate']>$exception[1]) {
+	if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
 		//if latepass and assessment enddate is later than exception enddate, skip exception
 		$useexception = false;
-	} else if ($exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
+	} else if ($exception!==null && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
 		//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
 		//presumption: exception was made to extend due date, not start assignment early
 		$useexception = false;
 	}
-	if ($useexception && $exception[2]>0 && ($now < $adata['enddate'] || $exception[1] > $now + $latepasshrs*60*60)) {
+	if (!$limit) {
+		if ($useexception && $exception[2]>0 && ($now < $adata['enddate'] || $exception[1] > $now + $latepasshrs*60*60)) {
 			$canundolatepass = true;
-	}
-	if ($exception[2]>0) {
+		}
+		if ($useexception) {
+			//this logic counts "latepasses used" based on date of exception past original enddate
+			//regardless of whether exception is manual or latepass
+			//prevents using latepasses on top of a manual extension
 			$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($latepasshrs*3600)));
+			
+			//use exception due date for determining canuselatepass
+			$adata['enddate'] = $exception[1];
+		} else {
+			//if not using exception, use latepasscnt as actual number of latepasses used, or 0
+			if ($exception!==null) {
+				$latepasscnt = 0;//max(0,$exception[2]);
+			} else {
+				$latepasscnt = 0;
+			}
+		}
+		
+		if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
+			$canuselatepass = true;
+		} else if ($now<$adata['enddate'] && ($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !$actas) {
+			$canuselatepass = true;
+		}
+		return array($useexception, $canundolatepass, $canuselatepass);
+	} else {
+		return $useexception;
 	}
-	if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && isset($viewedassess) && !in_array($typeid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
-		$canuselatepass = true;
-	} else if ($now<$adata['enddate'] && ($line['allowlate']%10==1 || $line['allowlate']%10-1>$latepasscnt) && $latepasses>0 && !$actas) {
-		$canuselatepass = true;
-	}
-	return array($useexception, $canundolatepass, $canuselatepass);
+	
+}
 
+//get if latepass can be used.  Should only be called if exception doesn't already exist
+function getCanUseAssessLatePass($adata) {
+	global $latepasshrs, $latepasses, $sessiondata, $viewedassess, $actas;
+	if (!isset($actas)) {$actas = false;}
+	$now = time();
+	$canuselatepass = false;
+	$latepasscnt = 0; 
+	if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
+		$canuselatepass = true;
+	} else if ($now<$adata['enddate'] && ($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && isset($viewedassess) && !in_array($adata['id'],$viewedassess) && $latepasses>0 && !$actas) {
+		$canuselatepass = true;
+	} 
+	return $canuselatepass;
 }
 
 //$exception should be from imas_exceptions, and be null, or

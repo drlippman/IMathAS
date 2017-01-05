@@ -1222,7 +1222,7 @@ function outputimage() {
 function evalifneeded($str) {
 	if (is_numeric($str)) {
 		return $str;
-	} else if (trim($str)=='' || preg_match('/[^\d+\-\/\*\.]/',$str)) {
+	} else if (trim($str)=='' || preg_match('/[^\(\)\d+\-\/\*\.]/',$str)) {
 		return 0; //return a value to prevent errors
 	} else {
 		eval("\$ret = $str;");

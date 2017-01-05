@@ -5,23 +5,28 @@
 	require("../validate.php");
 	$aid = $_GET['aid'];
 	$cid = $_GET['cid'];
-	
+
 	if (isset($_GET['record'])) {
-	
-		$query = "SELECT id,category FROM imas_questions WHERE assessmentid='$aid'";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
-		while ($row = mysql_fetch_row($result)) {
+
+		$upd_stm = $DBH->prepare("UPDATE imas_questions SET category=:category WHERE id=:id");
+
+		//DB $query = "SELECT id,category FROM imas_questions WHERE assessmentid='$aid'";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB while ($row = mysql_fetch_row($result)) {
+		$stm = $DBH->prepare("SELECT id,category FROM imas_questions WHERE assessmentid=:assessmentid");
+		$stm->execute(array(':assessmentid'=>$aid));
+		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			if ($row[1] != $_POST[$row[0]]) {
-				$query = "UPDATE imas_questions SET category='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
-				
-				mysql_query($query) or die("Query failed : " . mysql_error());
-			} 
+				//DB $query = "UPDATE imas_questions SET category='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
+				//DB mysql_query($query) or die("Query failed : " . mysql_error());
+				$upd_stm->execute(array(':category'=>$_POST[$row[0]], ':id'=>$row[0]));
+			}
 		}
 		header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/addquestions.php?cid=$cid&aid=$aid");
-			
-		exit;	
+
+		exit;
 	}
-	
+
 	$pagetitle = "Categorize Questions";
 	require("../header.php");
 	echo <<<END
@@ -86,16 +91,23 @@ function getnextprev(formn,loc) {
 END;
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
 	echo "&gt; <a href=\"addquestions.php?cid=$cid&aid=$aid\">Add/Remove Questions</a> &gt; Categorize Questions</div>\n";
-	
-	$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $outcomenames = array();
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+	$stm->execute(array(':courseid'=>$cid));
 	$outcomenames = array();
-	while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$outcomenames[$row[0]] = $row[1];
 	}
-	$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
+	//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $row = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+	$stm->execute(array(':id'=>$cid));
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	if ($row[0]=='') {
 		$outcomearr = array();
 	} else {
@@ -104,7 +116,7 @@ END;
 			$outcomearr = array();
 		}
 	}
-	
+
 	$outcomes = array();
 	function flattenarr($ar) {
 		global $outcomes;
@@ -118,30 +130,45 @@ END;
 		}
 	}
 	flattenarr($outcomearr);
-	
+
+	//DB $query = "SELECT imas_questions.id,imas_libraries.id,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
+	//DB $query .= "WHERE imas_questions.assessmentid='$aid' AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
+	//DB $query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT imas_questions.id,imas_libraries.id,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
-	$query .= "WHERE imas_questions.assessmentid='$aid' AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
+	$query .= "WHERE imas_questions.assessmentid=:assessmentid AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
 	$query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid));
 	$libnames = array();
 	$questionlibs = array();
-	while ($row = mysql_fetch_row($result)) {
+	//DB while ($row = mysql_fetch_row($result)) {
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$questionlibs[$row[0]][] = $row[1];
 		$libnames[$row[1]] = $row[2];
 	}
 
 	//add assessment names as options
 	//find the names of assessments these questionsetids appear in
+	//DB $query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
+	//DB $query .= "FROM imas_questions INNER JOIN imas_assessments ";
+	//DB $query .= "ON imas_questions.assessmentid=imas_assessments.id ";
+	//DB $query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid='$aid') ";
+	//DB $query .= "AND imas_assessments.courseid='$cid' ";
+	//DB $query .= "ORDER BY aid";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT DISTINCT imas_questions.questionsetid AS qsetid,imas_assessments.id AS aid,imas_assessments.name ";
 	$query .= "FROM imas_questions INNER JOIN imas_assessments ";
 	$query .= "ON imas_questions.assessmentid=imas_assessments.id ";
-	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid='$aid') ";
-	$query .= "AND imas_assessments.courseid='$cid' ";
+	$query .= "AND imas_questions.questionsetid = ANY (SELECT imas_questions.questionsetid FROM imas_questions WHERE imas_questions.assessmentid=:assessmentid) ";
+	$query .= "AND imas_assessments.courseid=:courseid ";
 	$query .= "ORDER BY aid";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid, ':courseid'=>$cid));
 	$assessmentnames = array();
 	$qsetidassessment = array();
-	while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
+	//DB while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
+	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 		//store the relevent assessment names
 		$assessmentnames[$row['aid']] = $row['name'];
 		if ($row['aid']!=$aid) {
@@ -150,14 +177,19 @@ END;
 		}
 	}
 
+	//DB $query = "SELECT iq.id,iqs.id AS qsetid,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
+	//DB $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$query = "SELECT iq.id,iqs.id AS qsetid,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
-	$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+	$query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid=:assessmentid";
+	$stm = $DBH->prepare($query);
+	$stm->execute(array(':assessmentid'=>$aid));
 	$descriptions = array();
 	$category = array();
 	$extracats = array();
 	$qsetids = array();
-	while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	//DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
+	while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
 		$descriptions[$line['id']] = $line['description'];
 		$category[$line['id']] = $line['category'];
 		//remember which questionsetid corresponds to this question
@@ -166,10 +198,13 @@ END;
 			$extracats[] = $line['category'];
 		}
 	}
-	
-	$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	$row = mysql_fetch_row($result);
+
+	//DB $query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB $row = mysql_fetch_row($result);
+	$stm = $DBH->prepare("SELECT itemorder FROM imas_assessments WHERE id=:id");
+	$stm->execute(array(':id'=>$aid));
+	$row = $stm->fetch(PDO::FETCH_NUM);
 	$itemarr = explode(',',$row[0]);
 	foreach ($itemarr as $k=>$v) {
 		if (($p=strpos($v,'~'))!==false) {
@@ -179,13 +214,13 @@ END;
 	$itemarr = implode(',',$itemarr);
 	$itemarr = str_replace('~',',',$itemarr);
 	$itemarr = explode(',', $itemarr);
-	
+
 	echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
 	echo "<form id=\"selform\" method=post action=\"categorize.php?aid=$aid&cid=$cid&record=true\">";
 	echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
 	echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
 	echo '<table class="gb"><thead><tr><th></th><th>Description</th><th></th><th>Category</th></tr></thead><tbody>';
-	
+
 	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c$qid\" value=\"{$qsetids[$qid]}\"/></td>";
 		echo "<td>{$descriptions[$qid]}</td><td>";
@@ -218,7 +253,7 @@ END;
 			echo ">{$libnames[$qlibid]}</option>\n";
 		}
 		echo '</optgroup>\n';
-		
+
 		if (isset($qsetidassessment[$qsetids[$qid]])) {
 			echo '<optgroup label="Assessments">';
 			//add assessment names as options
@@ -253,21 +288,21 @@ END;
 				echo '<option value="'.$oc[0].'">'.$outcomenames[$oc[0]].'</option>';
 			}
 		}
-		if ($ingrp) { echo '</optgroup>';}	
+		if ($ingrp) { echo '</optgroup>';}
 		echo '</select> <input type="button" value="Assign" onclick="massassign()"/></p>';
-		
+
 	}
 echo "<p>Select first listed <select id=\"label\">\n";
 echo "<option value=\"Libraries\">Libraries</option>";
 echo "<option value=\"Assessments\">Assessments</option>";
 echo "</select>\n";
 echo "for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
-	
+
 	echo "<p>Add new category to lists: <input type=text id=\"newcat\" size=40> ";
 	echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
 	echo '<p><input type=submit value="Record Categorizations"> and return to the Add/Remove Questions page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
 	echo "</form>\n";
-	
-	
-				
+
+
+
 ?>

@@ -6,9 +6,12 @@ require("../validate.php");
 if (!isset($teacherid)) { echo "You are not validated to view this page"; exit;}
 
 //load outcomes
-$query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT outcomes FROM imas_courses WHERE id='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT outcomes FROM imas_courses WHERE id=:id");
+$stm->execute(array(':id'=>$cid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 if ($row[0]=='') {
 	$outcomes = array();
 } else {
@@ -16,9 +19,12 @@ if ($row[0]=='') {
 }
 
 $outcomeinfo = array();
-$query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,name FROM imas_outcomes WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,name FROM imas_outcomes WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$outcomeinfo[$row[0]] = $row[1];
 }
 
@@ -29,12 +35,18 @@ $assessgbcat = array();  //will record gb category for assessment
 $assessnames = array();
 $assessqcnt = array();
 
+//DB $query = "SELECT ia.name,ia.gbcategory,ia.defoutcome,ia.id,iq.category FROM ";
+//DB $query .= "imas_assessments AS ia JOIN imas_questions AS iq ON ia.id=iq.assessmentid ";
+//DB $query .= "WHERE ia.courseid='$cid' AND (ia.defoutcome>0 OR iq.category<>'0')";
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+//DB while ($row = mysql_fetch_assoc($result)) {
 $query = "SELECT ia.name,ia.gbcategory,ia.defoutcome,ia.id,iq.category FROM ";
 $query .= "imas_assessments AS ia JOIN imas_questions AS iq ON ia.id=iq.assessmentid ";
-$query .= "WHERE ia.courseid='$cid' AND (ia.defoutcome>0 OR iq.category<>'0')";
-$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
-	
+$query .= "WHERE ia.courseid=:courseid AND (ia.defoutcome>0 OR iq.category<>'0')";
+$stm = $DBH->prepare($query);
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+
 	if (!is_numeric($row['category'])) {continue;}
 	if ($row['category']==0) {
 		$outc = $row['defoutcome'];
@@ -57,7 +69,7 @@ foreach ($assessqcnt as $id=>$os) {
 	foreach ($os as $o=>$cnt) {
 		if (!isset($outcomeassoc[$o])) {
 			$outcomeassoc[$o] = array();
-		} 
+		}
 		if (!isset($outcomeassoc[$o][$assessgbcat[$id]])) {
 			$outcomeassoc[$o][$assessgbcat[$id]] = array();
 		}
@@ -68,18 +80,21 @@ foreach ($assessqcnt as $id=>$os) {
 //load offline grade usage
 $offgbcat = array();
 $offnames = array();
-$query = "SELECT id,name,gbcategory,outcomes FROM imas_gbitems WHERE courseid='$cid' AND outcomes<>''";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
+//DB $query = "SELECT id,name,gbcategory,outcomes FROM imas_gbitems WHERE courseid='$cid' AND outcomes<>''";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_assoc($result)) {
+$stm = $DBH->prepare("SELECT id,name,gbcategory,outcomes FROM imas_gbitems WHERE courseid=:courseid AND outcomes<>''");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$oc = explode(',',$row['outcomes']);
 	foreach ($oc as $o) {
 		if (!isset($outcomeassoc[$o])) {
 			$outcomeassoc[$o] = array();
-		} 
+		}
 		if (!isset($outcomeassoc[$o][$row['gbcategory']])) {
 			$outcomeassoc[$o][$row['gbcategory']] = array();
 		}
-		
+
 		$outcomeassoc[$o][$row['gbcategory']][] = array('offline',$row['id']);
 		$outcomelinks++;
 	}
@@ -90,9 +105,12 @@ while ($row = mysql_fetch_assoc($result)) {
 //load forum grade usage
 $forumgbcat = array();
 $forumnames = array();
-$query = "SELECT id,cntingb,name,gbcategory,outcomes FROM imas_forums WHERE courseid='$cid' AND outcomes<>''";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
+//DB $query = "SELECT id,cntingb,name,gbcategory,outcomes FROM imas_forums WHERE courseid='$cid' AND outcomes<>''";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_assoc($result)) {
+$stm = $DBH->prepare("SELECT id,cntingb,name,gbcategory,outcomes FROM imas_forums WHERE courseid=:courseid AND outcomes<>''");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$oc = explode(',',$row['outcomes']);
 	if ($row['cntingb']!=0) {
 		$forumgbcat[$row['id']] = $row['gbcategory'];
@@ -102,32 +120,35 @@ while ($row = mysql_fetch_assoc($result)) {
 	foreach ($oc as $o) {
 		if (!isset($outcomeassoc[$o])) {
 			$outcomeassoc[$o] = array();
-		} 
+		}
 		if (!isset($outcomeassoc[$o][$row['gbcategory']])) {
 			$outcomeassoc[$o][$row['gbcategory']] = array();
 		}
-		
+
 		$outcomeassoc[$o][$row['gbcategory']][] = array('forum',$row['id']);
 		$outcomelinks++;
 	}
-	
+
 	$forumnames[$row['id']] = $row['name'];
 }
 
 //load linkedtext items usage
 $linknames = array();
-$query = "SELECT id,title,outcomes FROM imas_linkedtext WHERE courseid='$cid' AND outcomes<>''";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
+//DB $query = "SELECT id,title,outcomes FROM imas_linkedtext WHERE courseid='$cid' AND outcomes<>''";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_assoc($result)) {
+$stm = $DBH->prepare("SELECT id,title,outcomes FROM imas_linkedtext WHERE courseid=:courseid AND outcomes<>''");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$oc = explode(',',$row['outcomes']);
 	foreach ($oc as $o) {
 		if (!isset($outcomeassoc[$o])) {
 			$outcomeassoc[$o] = array();
-		} 
+		}
 		if (!isset($outcomeassoc[$o]['UG'])) {
 			$outcomeassoc[$o]['UG'] = array();
 		}
-		
+
 		$outcomeassoc[$o]['UG'][] = array('link',$row['id']);
 		$outcomelinks++;
 	}
@@ -136,18 +157,21 @@ while ($row = mysql_fetch_assoc($result)) {
 
 //load inlinetext items usage
 $inlinenames = array();
-$query = "SELECT id,title,outcomes FROM imas_inlinetext WHERE courseid='$cid' AND outcomes<>''";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
+//DB $query = "SELECT id,title,outcomes FROM imas_inlinetext WHERE courseid='$cid' AND outcomes<>''";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_assoc($result)) {
+$stm = $DBH->prepare("SELECT id,title,outcomes FROM imas_inlinetext WHERE courseid=:courseid AND outcomes<>''");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	$oc = explode(',',$row['outcomes']);
 	foreach ($oc as $o) {
 		if (!isset($outcomeassoc[$o])) {
 			$outcomeassoc[$o] = array();
-		} 
+		}
 		if (!isset($outcomeassoc[$o]['UG'])) {
 			$outcomeassoc[$o]['UG'] = array();
 		}
-		
+
 		$outcomeassoc[$o]['UG'][] = array('inline',$row['id']);
 		$outcomelinks++;
 	}
@@ -160,10 +184,12 @@ if (in_array(0, $cats)) {
 	$catnames[0] = _('Default');
 }
 if (count($cats)>0) {
-	$catlist = implode(',',$cats);
-	$query = "SELECT id,name FROM imas_gbcats WHERE id IN ($catlist)";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	while ($row = mysql_fetch_row($result)) {
+	$catlist = implode(',', array_map('intval', $cats));
+	//DB $query = "SELECT id,name FROM imas_gbcats WHERE id IN ($catlist)";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB while ($row = mysql_fetch_row($result)) {
+	$stm = $DBH->query("SELECT id,name FROM imas_gbcats WHERE id IN ($catlist)");
+	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$catnames[$row[0]] = $row[1];
 	}
 }
@@ -204,7 +230,7 @@ function printitems($items) {
 			echo '<span class="icon iconforum" >F</span> '.$forumnames[$item[1]];
 		} else if ($item[0]=='offline') {
 			echo '<span class="icon iconoffline" >O</span> '.$offnames[$item[1]];
-		} 
+		}
 	}
 }
 $cnt = 0;
@@ -231,7 +257,7 @@ function printoutcome($arr,$ind) {
 				echo '<td>';
 				if (isset($outcomeassoc[$oi][$id])) {
 					printitems($outcomeassoc[$oi][$id]);
-				}	
+				}
 				echo '</td>';
 			}
 			echo '</tr>';

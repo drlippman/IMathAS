@@ -1,7 +1,7 @@
 <?php
 //(c) 2013 David Lippman, part of IMathAS
 //
-// Assessment "badness" report, based on 
+// Assessment "badness" report, based on
 // Lumen Learning's ImprovOER model
 
 require("../validate.php");
@@ -29,22 +29,31 @@ $assessmetrics = array();
 $maxattemptratio = 0;
 
 //estimate course start/end dates
-$query = "SELECT min(enddate),max(enddate) FROM imas_assessments WHERE courseid='$cid' AND enddate<2000000000";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT min(enddate),max(enddate) FROM imas_assessments WHERE courseid='$cid' AND enddate<2000000000";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT min(enddate),max(enddate) FROM imas_assessments WHERE courseid=:courseid AND enddate<2000000000");
+$stm->execute(array(':courseid'=>$cid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 $mindate = $row[0];
 $maxdate = $row[1];
 
-$query = "SELECT min(showdate),max(showdate) FROM imas_gbitems WHERE courseid='$cid' AND showdate<2000000000";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-$row = mysql_fetch_row($result);
+//DB $query = "SELECT min(showdate),max(showdate) FROM imas_gbitems WHERE courseid='$cid' AND showdate<2000000000";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $row = mysql_fetch_row($result);
+$stm = $DBH->prepare("SELECT min(showdate),max(showdate) FROM imas_gbitems WHERE courseid=:courseid AND showdate<2000000000");
+$stm->execute(array(':courseid'=>$cid));
+$row = $stm->fetch(PDO::FETCH_NUM);
 if ($row[0]<$mindate) { $mindate = $row[0];}
 if ($row[1]>$maxdate) { $maxdate = $row[1];}
 
 $discussdates = array();
-$query = "SELECT id,postby,replyby FROM imas_forums WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,postby,replyby FROM imas_forums WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,postby,replyby FROM imas_forums WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	if ($row[2]<2000000000) {
 		$discussdates[$row[0]] = $row[2];
 	} else if ($row[1]<2000000000) {
@@ -57,9 +66,12 @@ $numsubmissions = array();
 $numattempts = array();
 $timesonfirst = array();
 //pull assessment data to look at number of attempts
-$query = "SELECT ia.defattempts,ias.* FROM imas_assessment_sessions as ias JOIN imas_assessments as ia ON ias.assessmentid=ia.id AND ia.courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_assoc($result)) {
+//DB $query = "SELECT ia.defattempts,ias.* FROM imas_assessment_sessions as ias JOIN imas_assessments as ia ON ias.assessmentid=ia.id AND ia.courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_assoc($result)) {
+$stm = $DBH->prepare("SELECT ia.defattempts,ias.* FROM imas_assessment_sessions as ias JOIN imas_assessments as ia ON ias.assessmentid=ia.id AND ia.courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
 	if (!isset($numsubmissions[$row['assessmentid']])) {
 		$numsubmissions[$row['assessmentid']] = 1;
 		$numattempts[$row['assessmentid']] = 0;
@@ -85,7 +97,7 @@ while ($row = mysql_fetch_assoc($result)) {
 	//this is the attempts per question value
 	$attcnt /= count($qparts);
 	$numattempts[$row['assessmentid']] += $attcnt;
-	
+
 	$timeparts = explode(',',$row['timeontask']);
 	foreach ($timeparts as $timeinf) {
 		$iteminf = explode('~',$timeinf);
@@ -130,7 +142,7 @@ foreach ($gbt[0][1] as $col=>$data) {
 	$numsub = 0;
 	for ($i=1;$i<$lastrow;$i++) {
 		if (isset($gbt[$i][1][$col][0])) {
-			$numsub++;	
+			$numsub++;
 		}
 	}
 	$assessmetrics[$col]['subperc'] = $numsub/$n;

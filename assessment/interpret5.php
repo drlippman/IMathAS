@@ -16,6 +16,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace('"','\"',$str);
 		$str = str_replace("\r\n","\n",$str);
 		$str = str_replace("\n\n","<br/><br/>\n",$str);
+		$str = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$str);  //block function eval or backticks as way of generating variable name
 		return $str;
 	} else {
 		$str = str_replace(array('\\frac','\\tan','\\root','\\vec'),array('\\\\frac','\\\\tan','\\\\root','\\\\vec'),$str);
@@ -24,18 +25,24 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
 		$r =  interpretline($str.';',$anstype,$countcnt).';';
+		$r = preg_replace('/\{\$\{[^}]*[\(|`][^}]*\}\s*\}/','Invalid variable expression',$r);
 		return $r;
 	}
 }
 
 function getquestionqtext($m) {
-	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+	global $DBH;
+	//DB $query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
+	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+	//DB if (mysql_num_rows($result)==0) {
+	$stm = $DBH->prepare("SELECT qtext FROM imas_questionset WHERE id=:id");
+	$stm->execute(array(':id'=>$m[2]));
+	if ($stm->rowCount()==0) {
 		echo _('bad question id in includeqtextfrom');
 		return "";
 	} else {
-		return mysql_result($result,0,0);
+		//DB return mysql_result($result,0,0);
+		return $stm->fetchColumn(0);
 	}
 }
 //interpreter some code text.  Returns a PHP code string.
@@ -57,7 +64,7 @@ function interpretline($str,$anstype,$countcnt) {
 	$syms = tokenize($str,$anstype,$countcnt);
 	$k = 0;
 	$symlen = count($syms);
-	//$lines holds lines of code; $bits holds symbols for the current line. 
+	//$lines holds lines of code; $bits holds symbols for the current line.
 	while ($k<$symlen) {
 		list($sym,$type) = $syms[$k];
 		//first handle stuff that would use last symbol; add it if not needed
@@ -70,7 +77,7 @@ function interpretline($str,$anstype,$countcnt) {
 			$closeparens++;  //triggers to close safepow after next token
 			$lastsym='^';
 			$lasttype = 0;
-		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') { 
+		} else if ($sym=='!' && $lasttype!=0 && $lastsym!='' && $syms[$k+1]{0}!='=') {
 			//convert a! to factorial(a), avoiding if(!a) and a!=b
 			$bits[] = 'factorial(';
 			$bits[] = $lastsym;
@@ -94,11 +101,11 @@ function interpretline($str,$anstype,$countcnt) {
 			}
 			//$closeparens = false;
 		}
-		
-		
+
+
 		if ($sym=='=' && $ifloc==-1 && $whereloc==-1 && $lastsym!='<' && $lastsym!='>' && $lastsym!='!' && $lastsym!='=' && $syms[$k+1]{0}!='=') {
 			//if equality equal (not comparison), and before if/where.
-			//check for commas to the left, convert $a,$b =  to list($a,$b) = 
+			//check for commas to the left, convert $a,$b =  to list($a,$b) =
 			$j = count($bits)-1;
 			$hascomma = false;
 			while ($j>=0) {
@@ -122,7 +129,7 @@ function interpretline($str,$anstype,$countcnt) {
 			//check for for, if, where and rearrange bits if needed
 			if ($forloc>-1) {
 				//convert for($i=a..b) {todo}
-				$j = $forloc; 
+				$j = $forloc;
 				while ($bits[$j]{0}!='{' && $j<count($bits)) {
 					$j++;
 				}
@@ -138,7 +145,7 @@ function interpretline($str,$anstype,$countcnt) {
 				}
 			} else if ($ifloc == 0) {
 				//this is if at beginning of line, form:  if ($a==3) {todo}
-				$j = 0; 
+				$j = 0;
 				while ($bits[$j]{0}!='{' && $j<count($bits)) {
 					$j++;
 				}
@@ -179,7 +186,7 @@ function interpretline($str,$anstype,$countcnt) {
 					}
 				}
 				$bits = array($out);
-					
+
 			} else if (count($elseloc)>0) {
 				echo _('else used without leading if statement');
 				return 'error';
@@ -189,14 +196,14 @@ function interpretline($str,$anstype,$countcnt) {
 				if ($ifloc>-1 && $ifloc<$whereloc) {
 					echo _('line of type $a=b if $c==0 where $d==0 is invalid');
 					return 'error';
-				} 
+				}
 				$wheretodo = implode('',array_slice($bits,0,$whereloc));
-				
+
 				if ($ifloc>-1) {
 					//handle $a = rand() where ($a==b) if ($c==0)
 					$wherecond = implode('',array_slice($bits,$whereloc+1,$ifloc-$whereloc-1));
 					$ifcond = implode('',array_slice($bits,$ifloc+1));
-					if ($countcnt==1) { //if outermost 
+					if ($countcnt==1) { //if outermost
 						$bits = array('if ('.$ifcond.') {$wherecount[0]=0;$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";}; if ($wherecount[0]>=1000 && $wherecount[0]<2000) {echo "nested where not met in 1000 iterations";}}');
 					} else {
 						$bits = array('if ('.$ifcond.') {$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;} }');
@@ -209,16 +216,16 @@ function interpretline($str,$anstype,$countcnt) {
 						$bits = array('$wherecount['.$countcnt.']=0;do{'.$wheretodo.';$wherecount['.$countcnt.']++;$wherecount[0]++;} while (!('.$wherecond.') && $wherecount['.$countcnt.']<200 && $wherecount[0]<1000); if ($wherecount['.$countcnt.']==200) {echo "where not met in 200 iterations";$wherecount[0]=5000;}; ');
 					}
 				}
-				
+
 			} else if ($ifloc > 0) {
 				//handle $a = b if ($c==0)
 				$todo = implode('',array_slice($bits,0,$ifloc));
 				$cond = implode('',array_slice($bits,$ifloc+1));
-				
-				
-				$bits = array("if ($cond) { $todo ; }");	
+
+
+				$bits = array("if ($cond) { $todo ; }");
 			}
-			
+
 			$forloc = -1;
 			$ifloc = -1;
 			$whereloc = -1;
@@ -241,7 +248,7 @@ function interpretline($str,$anstype,$countcnt) {
 			if ($lasttype==3 || $lasttype == 1) {
 				$bits[] = '*';
 			}
-			
+
 		} else if ($type==4) { //is parens
 			//implicit 3(4) (5)(3)  $v(2)
 			if ($lasttype==3 || $lasttype==4 || $lasttype==1) {
@@ -267,8 +274,8 @@ function interpretline($str,$anstype,$countcnt) {
 			$bits[] = '(';
 			$closeparens++;
 		}
-			
-		
+
+
 		$lastsym = $sym;
 		$lasttype = $type;
 		$cnt++;
@@ -287,7 +294,7 @@ function interpretline($str,$anstype,$countcnt) {
 //return array of arrays: array($symbol,$symtype)
 //types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
 function tokenize($str,$anstype,$countcnt) {
-	global $allowedmacros;
+	global $DBH, $allowedmacros;
 	global $mathfuncs;
 	global $disallowedwords,$disallowedvar;
 	$i = 0;
@@ -326,7 +333,7 @@ function tokenize($str,$anstype,$countcnt) {
 				echo sprintf(_('Eeek.. unallowed var %s!'), $out);
 				return array(array('',9));
 			}
-		
+
 		} else if ($c>="a" && $c<="z" || $c>="A" && $c<="Z") { //is str
 			$intype = 2; //string like function name
 			do {
@@ -362,7 +369,7 @@ function tokenize($str,$anstype,$countcnt) {
 				while ($c==' ') {
 					$i++;
 					$c = $str{$i};
-				}    
+				}
 				//could be sin^-1 or sin^(-1) - check for them and rewrite if needed
 				if ($c=='^' && substr($str,$i+1,2)=='-1') {
 					$i += 3;
@@ -388,6 +395,8 @@ function tokenize($str,$anstype,$countcnt) {
 						$out = 'log10';
 					} else if ($out=='ln') {
 						$out = 'log';
+					} else if ($out=='rand') {
+						$out = '$GLOBALS[\'RND\']->rand';
 					} else {
 						//check it's and OK function
 						if (!in_array($out,$allowedmacros)) {
@@ -397,7 +406,7 @@ function tokenize($str,$anstype,$countcnt) {
 					}
 					//rewrite arctrig into atrig for PHP
 					$out = str_replace(array("arcsin","arccos","arctan","arcsinh","arccosh","arctanh"),array("asin","acos","atan","asinh","acosh","atanh"),$out);
-	  
+
 					//connect upcoming parens to function
 					$connecttolast = 2;
 				} else {
@@ -405,7 +414,7 @@ function tokenize($str,$anstype,$countcnt) {
 					if ($out=='true' || $out=='false' || $out=='null') {
 						//we like this - it's an acceptable unquoted string
 					} else {//
-						//an unquoted string!  give a warning to instructor, 
+						//an unquoted string!  give a warning to instructor,
 						//but treat as a quoted string.
 						if (isset($GLOBALS['teacherid'])) {
 							echo sprintf(_('Warning... unquoted string %s.. treating as string'), $out);
@@ -413,7 +422,7 @@ function tokenize($str,$anstype,$countcnt) {
 						$out = "'$out'";
 						$intype = 6;
 					}
-					
+
 				}
 			}
 		} else if (($c>='0' && $c<='9') || ($c=='.'  && ($str{$i+1}>='0' && $str{$i+1}<='9')) ) { //is num
@@ -432,7 +441,7 @@ function tokenize($str,$anstype,$countcnt) {
 				if (($c>='0' && $c<='9') || ($c=='.' && $str{$i+1}!='.' && $lastc!='.')) {
 					//is still num
 				} else if ($c=='e' || $c=='E') {
-					//might be scientific notation:  5e6 or 3e-6 
+					//might be scientific notation:  5e6 or 3e-6
 					$d = $str{$i+1};
 					if ($d>='0' && $d<='9') {
 						$out .= $c;
@@ -446,10 +455,10 @@ function tokenize($str,$anstype,$countcnt) {
 						$c= $str{$i};
 					} else {
 						$cont = false;
-					}	
+					}
 				} else {
 					$cont = false;
-				}	
+				}
 			} while ($cont);
 		} else if ($c=='(' || $c=='{' || $c=='[') { //parens or curlys
 			if ($c=='(') {
@@ -520,17 +529,23 @@ function tokenize($str,$anstype,$countcnt) {
 			} else {
 				$c = $str{$i};
 			}
-		} else if ($c=='"' || $c=="'") { //string
+		} else if ($c=='"' || $c=="'" || $c=='`') { //string, or unquoted math
 			$intype = 6;
 			$qtype = $c;
+			$strtext = '';
 			do {
-				$out .= $c;
+				$strtext .= $c;
 				$i++;
 				if ($i==$len) {break;}
 				$lastc = $c;
 				$c = $str{$i};
-			} while (!($c==$qtype && $lastc!='\\'));	
-			$out .= $c;
+			} while (!($c==$qtype && $lastc!='\\'));
+			$strtext .= $c;
+			if ($c=='`') {
+				$out = _('"invalid - unquoted backticks"');
+			} else {
+				$out .= $strtext;
+			}
 			$i++;
 			$c = $str{$i};
 		} else if ($c=="\n") {
@@ -573,15 +588,21 @@ function tokenize($str,$anstype,$countcnt) {
 				$connecttolast = 0;
 			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0] == 'includecodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
-				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)==0) {
+				//DB $query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB if (mysql_num_rows($result)==0) {
+				$stm = $DBH->prepare("SELECT control,qtype FROM imas_questionset WHERE id=:id");
+				$stm->execute(array(':id'=>$out));
+				if ($stm->rowCount()==0) {
 					//was an error, return error token
 					return array(array('',9));
 				} else {
+					list($thiscontrol, $thisqtype) = $stm->fetch(PDO::FETCH_NUM);
 					//$inside = interpretline(mysql_result($result,0,0),$anstype);
-					$inside = interpret('control',$anstype,mysql_result($result,0,0),$countcnt+1);
-					if (mysql_result($result,0,1)!=$anstype) {
+					//DB $inside = interpret('control',$anstype,mysql_result($result,0,0),$countcnt+1);
+					$inside = interpret('control',$anstype,$thiscontrol,$countcnt+1);
+					//DB if (mysql_result($result,0,1)!=$anstype) {
+					if ($thisqtype!=$anstype) {
 						//echo 'Imported code question type does not match current question answer type';
 					}
 				}
@@ -609,12 +630,12 @@ function tokenize($str,$anstype,$countcnt) {
 				$syms[] =  array($out,$intype);
 			}
 		}
-		
+
 	}
 	return $syms;
 }
 
-//loads a macro library	
+//loads a macro library
 function loadlibrary($str) {
 	$str = str_replace(array("/",".",'"'),"",$str);
 	$libs = explode(",",$str);
@@ -623,26 +644,27 @@ function loadlibrary($str) {
 		if (is_file($libdir . $lib.".php")) {
 			include_once($libdir.$lib.".php");
 		} else {
-			echo sprintf(_("Error loading library %s\n"), $lib);	
+			echo sprintf(_("Error loading library %s\n"), $lib);
 		}
 	}
 }
 
 //sets question seed
 function setseed($ns,$ref=0) {
+	global $RND;
 	if ($ns=="userid") {
 		if (isset($GLOBALS['teacherid']) && isset($GLOBALS['teacherreview'])) { //reviewing in gradebook
-			srand($GLOBALS['teacherreview']);	
+			$RND->srand($GLOBALS['teacherreview']);
 		} else { //in assessment
-			srand($GLOBALS['userid']); 
+			$RND->srand($GLOBALS['userid']);
 		}
 	} else if ($ns=="from") {
 		if (isset($GLOBALS['seeds']) && isset($GLOBALS['seeds'][$ref-1])) {
-			srand($GLOBALS['seeds'][$ref-1]);
+			$RND->srand($GLOBALS['seeds'][$ref-1]);
 		}
 	} else {
-		srand($ns);
-	}	
+		$RND->srand($ns);
+	}
 }
 
 

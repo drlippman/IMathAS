@@ -4,6 +4,17 @@
 var hasTouch;
 var rubricbase, lastrubricpos;
 
+function imasrubric_getpttot(rubricid) {
+	var pttot = 0;
+	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {	
+		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
+			pttot += imasrubrics[rubricid].data[i][2];
+		} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4) {
+			pttot = Math.max(pttot, imasrubrics[rubricid].data[i][2]);
+		}
+	}
+	return pttot;
+}
 function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	hasTouch = 'ontouchstart' in document.documentElement;
 	if (GB_loaded == false) {
@@ -56,13 +67,15 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 	if (imasrubrics[rubricid].type<2) {
 		html += '<tr><td></td><td colspan="3"><a href="#" onclick="imasrubric_fullcredit();return false;">'+_('Full Credit')+'</a></td></tr>';
 	}
+	var pttot = imasrubric_getpttot(rubricid);
+		
 	for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
 		if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown or score and feedback
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/100;
+			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot;
 			html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="'+totpts+'"/> '+totpts+'</td>';
 			//if (totpts==2) {
 			//	html += '</td><td width="10%"><input type="radio" name="rubricgrp'+i+'" value="1"/> 1</td>';
@@ -75,12 +88,12 @@ function imasrubric_show(rubricid,pointsposs,scoreboxid,feedbackid,qn,width) {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
 			html += '</td><td><input type="checkbox" id="rubricchk'+i+'" value="1"/></td></tr>';
-		} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==3) { //score total 
+		} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4) { //score total 
 			html += "<tr><td>"+imasrubrics[rubricid].data[i][0];
 			if (imasrubrics[rubricid].data[i][1]!="") {
 				html += "<br/><i>"+imasrubrics[rubricid].data[i][1]+"</i>";
 			}
-			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/100;
+			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot;
 			html += '</td><td width="10%"><input type="radio" name="rubricgrp" value="'+i+'"/> '+totpts+'</td></tr>';
 		}
 	}
@@ -129,6 +142,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 	if (qn != null && qn != 'null' && qn != '0') {
 		feedback += '#'+qn+': ';
 	}
+	var pttot = imasrubric_getpttot(rubricid);
 	if (imasrubrics[rubricid].type==0 || imasrubrics[rubricid].type==1 ) {  //score breakdown and feedback
 		var score = 0;
 		for (var i=0;i<imasrubrics[rubricid].data.length; i++) {
@@ -139,7 +153,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 				thisscore = 1*val;
 			}
 			score += thisscore;
-			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/100;
+			totpts = Math.round(pointsposs*imasrubrics[rubricid].data[i][2])/pttot;
 			
 			feedback += imasrubrics[rubricid].data[i][0]+': '+thisscore+'/'+totpts+'. ';
 		}
@@ -164,7 +178,7 @@ function imasrubric_record(rubricid,scoreboxid,feedbackid,qn,pointsposs,clearexi
 		}
 	} else if (imasrubrics[rubricid].type==3 || imasrubrics[rubricid].type==4 ) {  //score total and feedback
 		loc = getRadioValue('rubricgrp');
-		totpts = Math.round(pointsposs*imasrubrics[rubricid].data[loc][2])/100;
+		totpts = Math.round(pointsposs*imasrubrics[rubricid].data[loc][2])/pttot;
 		feedback += imasrubrics[rubricid].data[loc][0];//+': '+totpts+'/'+pointsposs+'. ';
 		document.getElementById(scoreboxid).value = totpts;
 		if (imasrubrics[rubricid].type==3) {
@@ -187,13 +201,17 @@ function imasrubric_chgtype() {
 			if (val==2) {
 				els[i].style.display = 'none';
 				document.getElementById("pointsheader").style.display = 'none';
+				$("#breakdowninstr").hide();
+				$("#scoretotalinstr").hide();
 			} else {
 				els[i].style.display = '';
 				document.getElementById("pointsheader").style.display = '';
 				if (val==0 || val==1) {
-					document.getElementById("pointsheader").innerHTML='Percentage of score<br/>Should add to 100';
-				} else if (val==3 || val==4) {
-					document.getElementById("pointsheader").innerHTML='Percentage of score';
+					$("#breakdowninstr").show();
+					$("#scoretotalinstr").hide();
+				} else if (val==3||val==4) {
+					$("#breakdowninstr").hide();
+					$("#scoretotalinstr").show();
 				}
 			}
 		}

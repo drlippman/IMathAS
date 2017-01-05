@@ -15,10 +15,14 @@ $cid = $_GET['cid'];
 if (isset($_POST['checked'])) { //form submitted
 	$checked = $_POST['checked'];
 	require_once("../includes/parsedatetime.php");
-	$checkedlist = "'".implode("','",$checked)."'";
+	//DB $checkedlist = "'".implode("','",$checked)."'";
+	$checkedlist = implode(',', array_map('intval', $checked));
 	$sets = array();
+	$qarr = array();
 	if (isset($_POST['chgavail'])) {
-		$sets[] = 'avail='.intval($_POST['avail']);
+		//DB $sets[] = 'avail='.intval($_POST['avail']);
+		$sets[] = "avail=:avail";
+		$qarr[':avail'] = $_POST['avail'];
 	}
 	if (isset($_POST['chgreplyby'])) {
 		if ($_POST['replyby']=="Always") {
@@ -28,7 +32,9 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$replyby = parsedatetime($_POST['replybydate'],$_POST['replybytime']);
 		}
-		$sets[] = "replyby='$replyby'";
+		//DB $sets[] = "replyby='$replyby'";
+		$sets[] = "replyby=:replyby";
+		$qarr[':replyby'] = $replyby;
 	}
 	if (isset($_POST['chgreplyby'])) {
 		if ($_POST['postby']=="Always") {
@@ -38,7 +44,9 @@ if (isset($_POST['checked'])) { //form submitted
 		} else {
 			$postby = parsedatetime($_POST['postbydate'],$_POST['postbytime']);
 		}
-		$sets[] = "postby='$postby'";
+		//DB $sets[] = "postby='$postby'";
+		$sets[] = "postby=:postby";
+		$qarr[':postby'] = $postby;
 	}
 	if (isset($_POST['chgallowlate'])) {
 		$allowlate = 0;
@@ -48,10 +56,14 @@ if (isset($_POST['checked'])) { //form submitted
 				$allowlate += 100;
 			}
 		}
-		$sets[] = "allowlate=$allowlate";
+		//DB $sets[] = "allowlate=$allowlate";
+		$sets[] = "allowlate=:allowlate";
+		$qarr[':allowlate'] = $allowlate;
 	}
 	if (isset($_POST['chgcaltag'])) {
-		$sets[] = "caltag='".$_POST['caltagpost'].'--'.$_POST['caltagreply']."'";
+		//DB $sets[] = "caltag='".$_POST['caltagpost'].'--'.$_POST['caltagreply']."'";
+		$sets[] = "caltag=:caltag";
+		$qarr[':caltag'] = $_POST['caltagpost'].'--'.$_POST['caltagreply'];
 	}
 	$sops = array();
 	if (isset($_POST['chgallowanon'])) {
@@ -104,13 +116,17 @@ if (isset($_POST['checked'])) { //form submitted
 		foreach ($sops as $op) {
 			$out = "($out $op)";
 		}
-		$sets[] = "settings=$out";
+		$sets[] = "settings=$out";  //safe, calculation
 	}
 	if (isset($_POST['chgdefdisplay'])) {
-		$sets[] = 'defdisplay='.intval($_POST['defdisplay']);
+		//DB $sets[] = 'defdisplay='.intval($_POST['defdisplay']);
+		$sets[] = "defdisplay=:defdisplay";
+		$qarr[':defdisplay'] = $_POST['defdisplay'];
 	}
 	if (isset($_POST['chgsortby'])) {
-		$sets[] = 'sortby='.intval($_POST['sortby']);
+		//DB $sets[] = 'sortby='.intval($_POST['sortby']);
+		$sets[] = "sortby=:sortby";
+		$qarr[':sortby'] = $_POST['sortby'];
 	}
 	if (isset($_POST['chgcntingb'])) {
 		if (is_numeric($_POST['points']) && $_POST['points'] == 0) {
@@ -120,97 +136,123 @@ if (isset($_POST['checked'])) { //form submitted
 		} else if ($_POST['cntingb'] == 4) {
 			$_POST['cntingb'] = 0;
 		}
-		$sets[] = 'cntingb='.intval($_POST['cntingb']);
+		//DB $sets[] = 'cntingb='.intval($_POST['cntingb']);
+		$sets[] = "cntingb=:cntingb";
+		$qarr[':cntingb'] = $_POST['cntingb'];
 		if (is_numeric($_POST['points'])) {
-			$sets[] = 'points='.intval($_POST['points']);
+			//DB $sets[] = 'points='.intval($_POST['points']);
+			$sets[] = "points=:points";
+			$qarr[':points'] = $_POST['points'];
 		}
 	}
 	if (isset($_POST['chggbcat'])) {
-		$sets[] = "gbcategory='{$_POST['gbcat']}'";
+		//DB $sets[] = "gbcategory='{$_POST['gbcat']}'";
+		$sets[] = "gbcategory=:gbcategory";
+		$qarr[':gbcategory'] = $_POST['gbcat'];
 	}
 	if (isset($_POST['chgforumtype'])) {
-		$sets[] = "forumtype='{$_POST['forumtype']}'";
+		//DB $sets[] = "forumtype='{$_POST['forumtype']}'";
+		$sets[] = "forumtype=:forumtype";
+		$qarr[':forumtype'] = $_POST['forumtype'];
 	}
 	if (isset($_POST['chgtaglist'])) {
 		if (isset($_POST['usetags'])) {
 			$taglist = trim($_POST['taglist']);
 		} else {
 			$taglist = '';
-		}	
-		$sets[] = "taglist='$taglist'";
+		}
+		//DB $sets[] = "taglist='$taglist'";
+		$sets[] = "taglist=:taglist";
+		$qarr[':taglist'] = $taglist;
 	}
 	if (count($sets)>0 & count($checked)>0) {
 		$setslist = implode(',',$sets);
-		$query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);";
-		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		//DB $query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);";
+		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$stm = $DBH->prepare("UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist);");
+		$stm->execute($qarr);
 	}
 	if (isset($_POST['chgsubscribe'])) {
-		
+
 		if (isset($_POST['subscribe'])) {
 			//add any subscriptions we don't already have
-			$query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			//DB $query = "SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
+			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("SELECT forumid FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid=:userid");
+			$stm->execute(array(':userid'=>$userid));
 			$hassubscribe = array();
-			if (mysql_num_rows($result)>0) {
-				while ($row = mysql_fetch_row($result)) {
-					$hassubscribe[] = $row[0];
-				}
+			//DB while ($row = mysql_fetch_row($result)) {
+			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+				$hassubscribe[] = $row[0];
 			}
+
 			$toadd = array_diff($_POST['checked'],$hassubscribe);
 			foreach ($toadd as $fid) {
 				$fid = intval($fid);
 				if ($fid>0) {
-					$query = "INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES ('$fid','$userid')";
-					mysql_query($query) or die("Query failed : " . mysql_error());
+					//DB $query = "INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES ('$fid','$userid')";
+					//DB mysql_query($query) or die("Query failed : " . mysql_error());
+					$stm = $DBH->prepare("INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES (:forumid, :userid)");
+					$stm->execute(array(':forumid'=>$fid, ':userid'=>$userid));
 				}
 			}
 		} else {
 			//remove any existing subscriptions
-			$query = "DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
-			mysql_query($query) or die("Query failed : " . mysql_error());
-			
+			//DB $query = "DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid='$userid'";
+			//DB mysql_query($query) or die("Query failed : " . mysql_error());
+			$stm = $DBH->prepare("DELETE FROM imas_forum_subscriptions WHERE forumid IN ($checkedlist) AND userid=:userid");
+			$stm->execute(array(':userid'=>$userid));
+
 		}
-			
+
 	}
 	header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/course.php?cid=$cid");
 	exit;
-} 
+}
 
 //prep for output
 $forumitems = array();
-$query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
-while ($row = mysql_fetch_row($result)) {
+//DB $query = "SELECT id,name FROM imas_forums WHERE courseid='$cid' ORDER BY name";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB while ($row = mysql_fetch_row($result)) {
+$stm = $DBH->prepare("SELECT id,name FROM imas_forums WHERE courseid=:courseid ORDER BY name");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$forumitems[$row[0]] = $row[1];
 }
 
-$query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $query = "SELECT id,name FROM imas_stugroupset WHERE courseid='$cid' ORDER BY name";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+$stm = $DBH->prepare("SELECT id,name FROM imas_stugroupset WHERE courseid=:courseid ORDER BY name");
+$stm->execute(array(':courseid'=>$cid));
 $i=0;
 $page_groupSelect = array();
-while ($row = mysql_fetch_row($result)) {
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 	$page_groupSelect['val'][$i] = $row[0];
 	$page_groupSelect['label'][$i] = "Use group set: {$row[1]}";
 	$i++;
 }
 
-$query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
-$result = mysql_query($query) or die("Query failed : " . mysql_error());
+//DB $query = "SELECT id,name FROM imas_gbcats WHERE courseid='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+$stm = $DBH->prepare("SELECT id,name FROM imas_gbcats WHERE courseid=:courseid");
+$stm->execute(array(':courseid'=>$cid));
 $page_gbcatSelect = array();
 $i=0;
-if (mysql_num_rows($result)>0) {
-	while ($row = mysql_fetch_row($result)) {
-		$page_gbcatSelect['val'][$i] = $row[0];
-		$page_gbcatSelect['label'][$i] = $row[1];
-		$i++;
-	}
+//DB while ($row = mysql_fetch_row($result)) {
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+	$page_gbcatSelect['val'][$i] = $row[0];
+	$page_gbcatSelect['label'][$i] = $row[1];
+	$i++;
 }
+
 
 $hr = floor($coursedeftime/60)%12;
 $min = $coursedeftime%60;
 $am = ($coursedeftime<12*60)?'am':'pm';
 $deftime = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-	
+
 
 $replybydate = tzdate("m/d/Y",time()+7*24*60*60);
 $replybytime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
@@ -241,7 +283,7 @@ $page_allowlateonSelect['label'][2] = "Replies only";
 $placeinhead = "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 $placeinhead .= '<style type="text/css">
 table td {
-	border-bottom: 1px solid #ccf;	
+	border-bottom: 1px solid #ccf;
 }
 </style>
 <script type="text/javascript">
@@ -261,7 +303,7 @@ function valform() {
 $(function() {
 	$(".chgbox").change(function() {
 			$(this).parents("tr").toggleClass("odd");
-	});	
+	});
 })
 </script>';
 
@@ -278,17 +320,17 @@ if (count($forumitems)==0) {
 	echo '<p>No forums to change.</p>';
 	require("../footer.php");
 	exit;
-} 
+}
 
 ?>
 Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('mainform','checked[]',false)">None</a>
-		
+
 <ul class=nomark>
 
 <?php
 
 foreach($forumitems as $id=>$name) {
-	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';		
+	echo '<li><input type="checkbox" name="checked[]" value="'.$id.'" /> '.$name.'</li>';
 }
 ?>
 </ul>
@@ -313,10 +355,10 @@ foreach($forumitems as $id=>$name) {
 <tr class="coptr">
 	<td><input type="checkbox" name="chgpostby" class="chgbox" /></td>
 	<td class="r">Students can create new threads:</td>
-	<td>  
+	<td>
 	<input type=radio name="postby" value="Always" checked="checked"/>Always<br/>
 	<input type=radio name="postby" value="Never" />Never<br/>
-	<input type=radio name="postby" value="Date" />Before: 
+	<input type=radio name="postby" value="Date" />Before:
 	<input type=text size=10 name="postbydate" value="<?php echo $postbydate;?>">
 	<a href="#" onClick="displayDatePicker('postbydate', this); return false">
 	<img src="../img/cal.gif" alt="Calendar"/></A>
@@ -328,21 +370,21 @@ foreach($forumitems as $id=>$name) {
 <tr class="coptr">
 	<td><input type="checkbox" name="chgreplyby" class="chgbox" /></td>
 	<td class="r">Students can reply to posts:</td>
-	<td>  
+	<td>
 	<input type=radio name="replyby" value="Always" checked="checked"/>Always<br/>
 	<input type=radio name="replyby" value="Never" />Never<br/>
-	<input type=radio name="replyby" value="Date" />Before: 
+	<input type=radio name="replyby" value="Date" />Before:
 	<input type=text size=10 name="replybydate" value="<?php echo $replybydate;?>">
 	<a href="#" onClick="displayDatePicker('replybydate', this); return false">
 	<img src="../img/cal.gif" alt="Calendar"/></A>
 	at <input type=text size=10 name=replybytime value="<?php echo $replybytime;?>">
-	
+
 	</td>
 </tr>
 <tr class="coptr">
 	<td><input type="checkbox" name="chgallowlate" class="chgbox" /></td>
 	<td class="r">Allow use of LatePasses?:</td>
-	<td> 
+	<td>
 		<?php
 		writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],0);
 		echo ' on ';
@@ -355,12 +397,12 @@ foreach($forumitems as $id=>$name) {
 <tr class="coptr">
 	<td><input type="checkbox" name="chgcaltag" class="chgbox" /></td>
 	<td class="r">Calendar icon:</td>
-	<td> 
-	New Threads: <input name="caltagpost" type=text size=1 value="FP"/>, 
-	Replies: <input name="caltagreply" type=text size=1 value="FR"/>
+	<td>
+	New Threads: <input name="caltagpost" type=text size=8 value="FP"/>,
+	Replies: <input name="caltagreply" type=text size=8 value="FR"/>
 	</td>
 </tr>
-		
+
 
 <tr class="coptr">
 	<td><input type="checkbox" name="chgallowanon" class="chgbox"/></td>
@@ -422,7 +464,7 @@ foreach($forumitems as $id=>$name) {
 	<td class="r">Sort threads by: </td>
 	<td>
 	<input type="radio" name="sortby" value="0" checked="checked"/> Thread start date<br/>
-	<input type="radio" name="sortby" value="1" /> Most recent reply date	
+	<input type="radio" name="sortby" value="1" /> Most recent reply date
 	</td>
 </tr>
 
@@ -440,7 +482,7 @@ foreach($forumitems as $id=>$name) {
 	<td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
 	<td class="r">Gradebook category: </td>
 	<td>
-<?php 
+<?php
 writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],null,"Default",0," id=gbcat");
 ?>
 	</td>
@@ -457,14 +499,14 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 	<td><input type="checkbox" name="chgtaglist" class="chgbox"/></td>
 	<td class="r">Categorize posts?: </td>
 	<td>
-		<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?> 
+		<input type=checkbox name="usetags" value="1" <?php if ($line['taglist']!='') { echo "checked=1";}?>
 		  onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';" />
 		 <span id="tagholder" style="display:<?php echo ($line['taglist']=='')?"none":"inline"; ?>">
 		   Enter in format CategoryDescription:category,category,category<br/>
 		   <textarea rows="2" cols="60" name="taglist"><?php echo $line['taglist'];?></textarea>
 		 </span>
 	</td>
-</tr>	
+</tr>
 
 </tbody>
 </table>
@@ -474,7 +516,3 @@ writeHtmlSelect ("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],nul
 <?php
 require("../footer.php");
 ?>
-	
-	
-	
-

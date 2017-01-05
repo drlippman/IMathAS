@@ -79,7 +79,7 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
   public function build_signature($request, $consumer, $token) {
     global $OAuth_last_computed_signature;
     $OAuth_last_computed_signature = false;
-    
+
     $base_string = $request->get_signature_base_string();
     $request->base_string = $base_string;
 
@@ -246,10 +246,10 @@ class OAuthRequest {
       }*/
      // Add POST Parameters if they exist
       $parameters = array_merge($parameters, $ourpost);
-      foreach ($parameters as $k=>$v) { //because IMathAS addslashes everything
-      	      $parameters[$k] = stripslashes($v);
-      }
-      
+      //DB foreach ($parameters as $k=>$v) { //because IMathAS addslashes everything
+      //DB 	      $parameters[$k] = stripslashes($v);
+      //DB }
+
       // We have a Authorization-header with OAuth data. Parse the header
       // and add those overriding any duplicates from GET or POST
       if (@substr($request_headers['Authorization'], 0, 6) == "OAuth ") {
@@ -284,7 +284,7 @@ class OAuthRequest {
       $qparms = OAuthUtil::parse_parameters($parts['query']);
       $parameters = array_merge($qparms, $parameters);
     }
-     
+
 
     return new OAuthRequest($http_method, $http_url, $parameters);
   }
@@ -602,7 +602,7 @@ class OAuthServer {
     // this should probably be in a different method
     global $OAuth_last_computed_signature;
     $OAuth_last_computed_signature = false;
-    
+
     $timestamp = @$request->get_parameter('oauth_timestamp');
     $nonce = @$request->get_parameter('oauth_nonce');
 

@@ -6,6 +6,7 @@ var mouseisdown = false;
 var targets = new Array();
 var imgs = new Array();
 var targetOuts = new Array();
+var a11ytargets = new Array();
 var lines = new Array();
 var dots = new Array();
 var odots = new Array();
@@ -69,8 +70,12 @@ var hasTouchTimer = null;
 	5.3:  line segment
 	5.4:  vector
 	6: parabola
+	6.1: horiz parabola
 	6.5: square root
 	7: circle (only works on square grids)
+	7.2: ellipse
+	7.4: vertical hyperbola
+	7.5: horizontal hyperbola
 	8: abs value
 	8.2: linear/linear rational
 	8.3: exponential (unshifted)
@@ -95,6 +100,232 @@ function clearcanvas(tarnum) {
 	curTarget = null;
 	curLine = null;
 	dragObj = null;
+}
+
+function addA11yTarget(canvdata, thisdrawla) {
+	var tarnum = canvdata[0];
+	a11ytargets.push(tarnum);
+	var ansformats = canvdata[1].substr(9).split(',');
+	var xmin = canvdata[2];
+	var xmax = canvdata[3];
+	var ymin = canvdata[4];
+	var ymax = canvdata[5];
+	if (ymin==ymax) { //numberlines
+		ymin = -1; ymax = 1;
+	}
+	var imgborder = canvdata[6];
+	var imgwidth = canvdata[7];
+	var imgheight = canvdata[8];
+	var tarel = document.getElementById("a11ydraw"+tarnum);
+	targetOuts[tarnum] = document.getElementById('qn'+tarnum);
+	targets[tarnum] = {el: tarel, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, imgborder: imgborder, imgwidth: imgwidth, imgheight: imgheight};
+	targets[tarnum].pixperx = (imgwidth - 2*imgborder)/(xmax-xmin);
+	targets[tarnum].pixpery = (ymin==ymax)?1:((imgheight - 2*imgborder)/(ymax-ymin));
+	var afgroup;
+	//massae ansformats array to account for default behaviors
+	if (ansformats[0]=="inequality") {
+		afgroup = ansformats.shift();
+		if (ansformats.length==0) {
+			ansformats = ["line"];
+		} else if (ansformats[0]=="both") {
+			ansformats = ["line","parab"];
+		}
+	} else if (ansformats[0]=="twopoint") {
+		afgroup = ansformats.shift();
+		if (ansformats.length==0) {
+			ansformats = ["line","parab","abs","circle","dot"];
+		}
+	} else if (ansformats[0]=="numberline") {
+		afgroup = "basic";
+		ansformats.shift();
+	} else {
+		afgroup = "basic";
+	}
+	targets[tarnum].afgroup = afgroup;
+	var types = {
+		"inequality": {
+			"line": [
+				{"mode":10, "descr":_("Linear inequality with solid line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")},
+				{"mode":10.2, "descr":_("Linear inequality with dashed line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")}
+			],
+			"parab": [
+				{"mode":10.3, "descr":_("Parabolic inequality with solid line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")},
+				{"mode":10.4, "descr":_("Parabolic inequality with dashed line"), inN: 3, "input":_("Enter 2 points on the line, then a third point in the shaded region")}
+			]
+		},
+		"twopoint": {
+			"line": [{"mode":5, "descr":_("Line"), inN: 2, "input":_("Enter two points on the line")}],
+			"lineseg": [{"mode":5.3, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
+			"ray": [{"mode":5.2, "descr":_("Ray"), inN: 2, "input":_("Enter the starting point of the ray and another point on the ray")}],
+			"parab": [{"mode":6, "descr":_("Parabola"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
+			"horizparab": [{"mode":6.1, "descr":_("Parabola opening right or left"), inN: 2, "input":_("Enter the vertex, then another point on the parabola")}],
+			"sqrt": [{"mode":6.5, "descr":_("Square root"), inN: 2, "input":_("Enter the starting point of the square root, then another point on the graph")}],
+			"abs": [{"mode":8, "descr":_("Absolute value"), inN: 2, "input":_("Enter the corner point of the absolute value, then another point on the graph")}],
+			"rational": [{"mode":8.2, "descr":_("Rational"), inN: 2, "input":_("Enter the point where the vertical and horizontal asymptote cross, then a point on the graph")}],
+			"exp": [{"mode":8.3, "descr":_("Exponential"), inN: 2, "input":_("Enter two points on the graph")}],
+			"circle": [{"mode":7, "descr":_("Circle"), inN: 2, "input":_("Enter the center point of the circle, then a point on the graph")}],
+			"ellipse": [{"mode":7.2, "descr":_("Ellipse"), inN: 2, "input":_("Enter the center point of the ellipse, then a point offset from the center by the horizontal radius and vertical radius")}],
+			"hyperbola": [
+				{"mode":7.4, "descr":_("Vertical hyperbola"), inN: 2, "input":_("Enter the center point of the hyperbola, then a point (x,y) where x is the x-coordinate of the co-vertex and y is the y-coordinate of the vertex")},
+				{"mode":7.5, "descr":_("Horizontal hyperbola"), inN: 2, "input":_("Enter the center point of the hyperbola, then a point (x,y) where x is the x-coordinate of the vertex and y is the y-coordinate of the co-vertex")},
+			],
+			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
+			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
+			"trig": [
+				{"mode":9, "descr":_("Cosine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point half a phase further")},
+				{"mode":9.2, "descr":_("Sine"), inN: 2, "input":_("Enter a point at the start of a phase, then a point a quarter phase further")}
+			],
+			"vector": [{"mode":5.4, "descr":_("Vector"), inN: 2, "input":_("Enter the starting and ending point of the vector")}],
+		},
+		"basic": {
+			"line": [{"mode":0, "descr":_("Lines"), inN: "list", "input":_("Enter list of points to connect with lines")}],
+			"lineseg": [{"mode":0.5, "descr":_("Line segment"), inN: 2, "input":_("Enter the starting and ending point of the line segment")}],
+			"freehand": [{"mode":0.7, "descr":_("Freehand"), inN: "list", "input":_("Enter list of points to connect with lines")}],
+			"dot": [{"mode":1, "descr":_("Solid dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
+			"opendot": [{"mode":2, "descr":_("Open dot"), inN: 1, "input":_("Enter the coordinates of the dot")}],
+			"polygon": [{"mode":1, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":1}],
+			"closedpolygon": [{"mode":1, "descr":_("Polygon"), inN: "list", "input":_("Enter list of points to place dots connected with lines"), "dotline":2}],
+		}
+	};
+
+	var defmode, inputmodes = [], selects = [], input, moderef=[],op;
+	for (var i=0;i<ansformats.length;i++) {
+		if (types[afgroup].hasOwnProperty(ansformats[i])) {
+			if (i==0) {
+				defmode = types[afgroup][ansformats[i]][0].mode;
+			}
+			for (var j=0;j<types[afgroup][ansformats[i]].length;j++) {
+				moderef[types[afgroup][ansformats[i]][j].mode] = types[afgroup][ansformats[i]][j];
+				inputmodes.push(types[afgroup][ansformats[i]][j].mode);
+				op = '<option value="'+types[afgroup][ansformats[i]][j].mode+'"';
+				op += ' data-af="'+ansformats[i]+'">'+types[afgroup][ansformats[i]][j].descr+'</option>';
+				selects.push(op);
+			}
+		}
+	}
+	targets[tarnum].defmode = defmode;
+	targets[tarnum].inputmodes = inputmodes;
+	targets[tarnum].selects = selects;
+	targets[tarnum].moderef = moderef;
+
+	//how can we restore what the student entered, if we're allowing
+	//things like (2/3, 0)?  Either we convert that to a decimal, or
+	// we have to store original typed answer.
+	//maybe new drawla[5] for that purpose?
+	//need to be able to get acccess to drawla from here
+	//TODO:  Check if thisdrawla was defined
+	if (thisdrawla == null && lines.hasOwnProperty(tarnum)) {
+		for (var i=0;i<lines[tarnum].length;i++) {
+			adda11ydraw(tarnum, 0, pixcoordstopointlist(lines[tarnum][i], tarnum));
+		}
+		for (var i=0;i<dots[tarnum].length;i++) {
+			adda11ydraw(tarnum, 1, pixcoordstopointlist(dots[tarnum][i], tarnum));
+		}
+		for (var i=0;i<odots[tarnum].length;i++) {
+			adda11ydraw(tarnum, 2, pixcoordstopointlist(odots[tarnum][i], tarnum));
+		}
+		for (var i=0;i<tplines[tarnum].length;i++) {
+			adda11ydraw(tarnum, tptypes[tarnum][i], pixcoordstopointlist(tplines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(tplines[tarnum][i][1], tarnum));
+		}
+		for (var i=0;i<ineqlines[tarnum].length;i++) {
+			adda11ydraw(tarnum, ineqtypes[tarnum][i], pixcoordstopointlist(ineqlines[tarnum][i][0], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][1], tarnum)+","+pixcoordstopointlist(ineqlines[tarnum][i][2], tarnum));
+		}
+	} else if (thisdrawla != null) {
+		for (var i=0;i<thisdrawla.length;i++) {
+			//format:  mode, "entered answer"
+			//but somehow have to preserve parens in the entered answer??
+			adda11ydraw(tarnum, thisdrawla[i][0], thisdrawla[i][1].replace(/\[/g,"(").replace(/\]/g,")"));
+		}
+	}
+
+}
+
+function adda11ydraw(tarnum,initmode,defval) {
+	var thistarg = targets[tarnum];
+	var mode = initmode || thistarg.defmode;
+	var val = defval || "";
+	var afgroup = thistarg.afgroup;
+	html = '<select aria-label="'+_("Drawing element type")+'" onchange="imathasDraw.changea11ydraw(this,\''+tarnum+'\')">';
+	for (j in thistarg.selects) {
+		html += thistarg.selects[j];
+	}
+	html += '</select><br/>';
+	html += '<span class="a11ydrawinstr"></span><br/>';
+	html += '<input type="text" aria-label="'+_("Point list")+'" value="'+val+'"/>';
+	html += '<button type="button" class="imgbutton" onclick="imathasDraw.removea11ydraw(this)">';
+	html += _("Remove")+'</button>';
+	var li = $("<li>", {class:"a11ydrawrow"}).html(html);
+	$(thistarg.el).append(li);
+	li.find("select").val(mode);
+	li.find(".a11ydrawinstr").text(thistarg.moderef[mode].input);
+	if (!defval) {
+		li.find("select").focus();
+	}
+}
+
+function removea11ydraw(el) {
+	$(el).parent().remove();
+}
+function changea11ydraw(tarel, tarnum) {
+	var curmode = $(tarel).val();
+	var modedata = targets[tarnum].moderef[curmode];
+	$(tarel).parent().find(".a11ydrawinstr").text(modedata.input);
+}
+function pixcoordstopointlist(vals,tarnum) {
+	var thistarg = targets[tarnum];
+	var x,y;
+	x = (vals[0] - thistarg.imgborder)/thistarg.pixperx + thistarg.xmin;
+	y = (thistarg.imgheight - vals[1] - thistarg.imgborder)/thistarg.pixpery + thistarg.ymin;
+	x = Math.round(x*100)/100;
+	y = Math.round(y*100)/100;
+	return "("+x+","+y+")";
+}
+function encodea11ydraw() {
+	for (var i=0;i<a11ytargets.length;i++) {
+		var tarnum = a11ytargets[i];
+		var thistarg = targets[tarnum];
+		var lines = [];
+		var dots = [];
+		var odots = [];
+		var tplines = [];
+		var tpineq = [];
+		var saveinput = [];
+		var afgroup = targets[tarnum].afgroup;
+		$("#a11ydraw"+tarnum).find(".a11ydrawrow").each(function(i,el) {
+			var mode = $(el).find("select").val();
+			var input = $(el).find("input").val();
+			saveinput.push("["+mode+',"'+input+'"]');
+			input = input.replace(/[\(\)]/g,'').split(/\s*,\s*/);
+			var outpts = [];
+			for (var i=1;i<input.length;i+=2) {
+				try {
+					with (Math) input[i-1] = eval(mathjs(input[i-1]));
+				} catch(e) {
+					input[i-1] = NaN;
+				}
+				try {
+					with (Math) input[i] = eval(mathjs(input[i]));
+				} catch(e) {
+					input[i] = NaN;
+				}
+				input[i-1] = (input[i-1] - thistarg.xmin)*thistarg.pixperx + thistarg.imgborder;
+				input[i] = thistarg.imgheight - (input[i] - thistarg.ymin)*thistarg.pixpery - thistarg.imgborder;
+				outpts.push(Math.round(input[i-1])+','+Math.round(input[i]));
+			}
+			if (mode==1) {
+				dots.push('('+outpts.join('),(')+')');
+			} else if (mode==2) {
+				odots.push('('+outpts.join('),(')+')');
+			} else if (mode<1) {
+				lines.push('('+outpts.join('),(')+')');
+			} else if (mode>=5 && mode<10 && outpts.length==2) {
+				tplines.push('('+mode+','+outpts.join(',')+')');
+			} else if (mode>10 && outpts.length==3) {
+				tpineq.push('('+mode+','+outpts.join(',')+')');
+			}
+		});
+		targetOuts[tarnum].value = lines.join(';')+';;'+dots.join(',')+';;'+odots.join(',')+';;'+tplines.join(',')+';;'+tpineq.join(',')+';;'+saveinput.join(',');
+	}
 }
 
 function addTarget(tarnum,target,imgpath,formel,xmin,xmax,ymin,ymax,imgborder,imgwidth,imgheight,defmode,dotline,locky,snaptogrid) {
@@ -415,7 +646,7 @@ function drawTarget(x,y) {
 					}
 				}
 			}
-		} else if (tptypes[curTarget][i]==6) {//if a tp parabola
+		} else if (tptypes[curTarget][i]==6 || tptypes[curTarget][i]==6.1) {//if a tp parabola
 			var y2 = null;
 			var x2 = null;
 			if (tplines[curTarget][i].length==2) {
@@ -425,30 +656,71 @@ function drawTarget(x,y) {
 				x2 = x;
 				y2 = y;
 			}
-			if (x2 != null && x2!=tplines[curTarget][i][0][0]) {
-				if (y2==tplines[curTarget][i][0][1]) {
-					ctx.moveTo(0,y2);
-					ctx.lineTo(targets[curTarget].imgwidth,y2);
-				} else {
-					var stretch = (y2 - tplines[curTarget][i][0][1])/((x2 - tplines[curTarget][i][0][0])*(x2 - tplines[curTarget][i][0][0]));
-					if (y2>tplines[curTarget][i][0][1]) {
-						//crosses at y=imgheight
-						var inta = Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var intb = -1*Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var cnty = tplines[curTarget][i][0][1] - (targets[curTarget].imgheight - tplines[curTarget][i][0][1]);
-						var qy = targets[curTarget].imgheight;
+			if (x2 != null) {
+				if (tptypes[curTarget][i]==6) {
+					if (y2==tplines[curTarget][i][0][1]) {
+						ctx.moveTo(0,y2);
+						ctx.lineTo(targets[curTarget].imgwidth,y2);
+					} else if (x2 == tplines[curTarget][i][0][0]) {
+						ctx.moveTo(x2,tplines[curTarget][i][0][1]);
+						if (y2>tplines[curTarget][i][0][1]) {
+							ctx.lineTo(x2,targets[curTarget].imgheight);
+						} else {
+							ctx.lineTo(x2,0);
+						}
 					} else {
-						var inta = Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var intb = -1*Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
-						var cnty = 2*tplines[curTarget][i][0][1];
-						var qy = 0;
+						var stretch = (y2 - tplines[curTarget][i][0][1])/((x2 - tplines[curTarget][i][0][0])*(x2 - tplines[curTarget][i][0][0]));
+						if (y2>tplines[curTarget][i][0][1]) {
+							//crosses at y=imgheight
+							var inta = Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var intb = -1*Math.sqrt((targets[curTarget].imgheight - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var cnty = tplines[curTarget][i][0][1] - (targets[curTarget].imgheight - tplines[curTarget][i][0][1]);
+							var qy = targets[curTarget].imgheight;
+						} else {
+							var inta = Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var intb = -1*Math.sqrt((0 - tplines[curTarget][i][0][1])/stretch)+tplines[curTarget][i][0][0];
+							var cnty = 2*tplines[curTarget][i][0][1];
+							var qy = 0;
+						}
+						var cp1x = inta + 2.0/3.0*(tplines[curTarget][i][0][0] - inta);
+						var cp1y = qy + 2.0/3.0*(cnty - qy);
+						var cp2x = cp1x + (intb - inta)/3.0;
+						var cp2y = cp1y;
+						ctx.moveTo(inta,qy);
+						ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,intb,qy);
 					}
-					var cp1x = inta + 2.0/3.0*(tplines[curTarget][i][0][0] - inta);
-					var cp1y = qy + 2.0/3.0*(cnty - qy);
-					var cp2x = cp1x + (intb - inta)/3.0;
-					var cp2y = cp1y;
-					ctx.moveTo(inta,qy);
-					ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,intb,qy);
+				} else if (tptypes[curTarget][i]==6.1) {
+					if (x2==tplines[curTarget][i][0][0]) {
+						ctx.moveTo(x2,0);
+						ctx.lineTo(x2,targets[curTarget].imgheight);
+					} else if (y2 == tplines[curTarget][i][0][1]) {
+						ctx.moveTo(tplines[curTarget][i][0][0],y2);
+						if (x2>tplines[curTarget][i][0][0]) {
+							ctx.lineTo(targets[curTarget].imgwidth,y2);
+						} else {
+							ctx.lineTo(0,y2);
+						}
+					} else {
+						var stretch = (x2 - tplines[curTarget][i][0][0])/((y2 - tplines[curTarget][i][0][1])*(y2 - tplines[curTarget][i][0][1]));
+						if (x2>tplines[curTarget][i][0][0]) {
+							//crosses at x=imgwidth
+							var inta = Math.sqrt((targets[curTarget].imgwidth - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var intb = -1*Math.sqrt((targets[curTarget].imgwidth - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var cntx = tplines[curTarget][i][0][0] - (targets[curTarget].imgwidth - tplines[curTarget][i][0][0]);
+							var qx = targets[curTarget].imgwidth;
+						} else {
+							var inta = Math.sqrt((0 - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var intb = -1*Math.sqrt((0 - tplines[curTarget][i][0][0])/stretch)+tplines[curTarget][i][0][1];
+							var cntx = 2*tplines[curTarget][i][0][0];
+							var qx = 0;
+						}
+						var cp1y = inta + 2.0/3.0*(tplines[curTarget][i][0][1] - inta);
+						var cp1x = qx + 2.0/3.0*(cntx - qx);
+						var cp2y = cp1y + (intb - inta)/3.0;
+						var cp2x = cp1x;
+						ctx.moveTo(qx,inta);
+						ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,qx,intb);
+					}
 				}
 
 			}
@@ -482,7 +754,9 @@ function drawTarget(x,y) {
 					} while (curx > 0 && curx < targets[curTarget].imgwidth && cury > 0 && cury < targets[curTarget].imgheight);
 				}
 			}
-		} else if (tptypes[curTarget][i]==7) {//if a tp circle
+		} else if (tptypes[curTarget][i]>=7 && tptypes[curTarget][i]<8) {//if a tp circle
+			var y2 = null;
+			var x2 = null;
 			if (tplines[curTarget][i].length==2) {
 				x2 = tplines[curTarget][i][1][0];
 				y2 = tplines[curTarget][i][1][1];
@@ -491,8 +765,113 @@ function drawTarget(x,y) {
 				y2 = y;
 			}
 			if (x2 != null && (x2!=tplines[curTarget][i][0][0] || y2!=tplines[curTarget][i][0][1])) {
-				var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
-				ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
+				if (tptypes[curTarget][i]==7) { //is a tp circle
+					var rad = Math.sqrt((x2-tplines[curTarget][i][0][0])*(x2-tplines[curTarget][i][0][0]) + (y2-tplines[curTarget][i][0][1])*(y2-tplines[curTarget][i][0][1]));
+					ctx.arc(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],rad,0,2*Math.PI,true);
+				} else if (tptypes[curTarget][i]==7.2) { //if a tp ellipse
+					var rx = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var ry = Math.abs(y2-tplines[curTarget][i][0][1]);
+					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
+						ctx.strokeStyle = "rgb(0,255,255)";
+						ctx.lineWidth = 1;
+						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
+						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2,y2-2*(y2-tplines[curTarget][i][0][1]),x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2-2*(x2-tplines[curTarget][i][0][0]),y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.lineWidth = 2;
+					}
+					ctx.strokeStyle = "rgb(0,0,255)";
+					ctx.save(); // save state
+					ctx.beginPath();
+					ctx.translate(tplines[curTarget][i][0][0]-rx, tplines[curTarget][i][0][1]-ry);
+					ctx.scale(rx, ry);
+					ctx.arc(1, 1, 1, 0, 2 * Math.PI, false);
+					ctx.restore(); // restore to original state
+				} else if (tptypes[curTarget][i]==7.4) { //if a tp vert hyperbola
+					var b = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var a = Math.abs(y2-tplines[curTarget][i][0][1]);
+					var m = Math.abs(a/b);
+					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]+m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]-m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
+					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
+						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.lineWidth = 1;
+						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
+						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2,y2-2*(y2-tplines[curTarget][i][0][1]),x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2-2*(x2-tplines[curTarget][i][0][0]),y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.lineWidth = 2;
+					}
+					ctx.beginPath();
+					ctx.strokeStyle = "rgb(0,0,255)";
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+						cury = tplines[curTarget][i][0][1] + Math.sqrt((Math.pow(curx-tplines[curTarget][i][0][0], 2)/(b*b) + 1)*a*a);
+						if (cury<-100) { cury = -100;}
+						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+						if (curx==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+					ctx.stroke();
+					ctx.beginPath();
+					for (var curx=0;curx < targets[curTarget].imgwidth+4;curx += 3) {
+						cury = tplines[curTarget][i][0][1] - Math.sqrt((Math.pow(curx-tplines[curTarget][i][0][0], 2)/(b*b) + 1)*a*a);
+						if (cury<-100) { cury = -100;}
+						if (cury>targets[curTarget].imgheight+100) { cury=targets[curTarget].imgheight+100;}
+						if (curx==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				} else if (tptypes[curTarget][i]==7.5) { //if a tp horiz hyperbola
+					var a = Math.abs(x2-tplines[curTarget][i][0][0]);
+					var b = Math.abs(y2-tplines[curTarget][i][0][1]);
+					var m = Math.abs(b/a);
+					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]+m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],targets[curTarget].imgwidth,tplines[curTarget][i][0][1]-m*(targets[curTarget].imgwidth-tplines[curTarget][i][0][0]));
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]-m*tplines[curTarget][i][0][0]);
+					ctx.dashedLine(tplines[curTarget][i][0][0],tplines[curTarget][i][0][1],0,tplines[curTarget][i][0][1]+m*tplines[curTarget][i][0][0]);
+					if (curTPcurve==i || (dragObj != null && dragObj.num==i)) {
+						ctx.strokeStyle = "rgb(0,255,255)";	
+						ctx.lineWidth = 1;
+						ctx.dashedLine(x2,y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2,5);
+						ctx.dashedLine(x2,y2,x2,y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2,y2-2*(y2-tplines[curTarget][i][0][1]),x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.dashedLine(x2-2*(x2-tplines[curTarget][i][0][0]),y2,x2-2*(x2-tplines[curTarget][i][0][0]),y2-2*(y2-tplines[curTarget][i][0][1]),5);
+						ctx.lineWidth = 2;
+					}
+					ctx.beginPath();
+					ctx.strokeStyle = "rgb(0,0,255)";
+					for (var cury=0;cury < targets[curTarget].imgwidth+4;cury += 3) {
+						curx = tplines[curTarget][i][0][0] + Math.sqrt((Math.pow(cury-tplines[curTarget][i][0][1], 2)/(b*b) + 1)*a*a);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+					ctx.stroke();
+					ctx.beginPath();
+					for (var cury=0;cury < targets[curTarget].imgwidth+4;cury += 3) {
+						curx = tplines[curTarget][i][0][0] - Math.sqrt((Math.pow(cury-tplines[curTarget][i][0][1], 2)/(b*b) + 1)*a*a);
+						if (curx<-100) { curx = -100;}
+						if (curx>targets[curTarget].imgwidth+100) { curx=targets[curTarget].imgwidth+100;}
+						if (cury==0) {
+							ctx.moveTo(curx,cury);
+						} else {
+							ctx.lineTo(curx,cury);
+						}
+					}
+				}
 			}
 		} else if (tptypes[curTarget][i]==8) {//if a tp absolute value
 			var slope = null;
@@ -1474,7 +1853,7 @@ function initCanvases(k) {
 		    var dashes = Math.sqrt(dX * dX + dY * dY) / dashLen;
 		    var dashX = dX / dashes;
 		    var dashY = dY / dashes;
-		    dashes = Math.round(dashes);
+		    dashes = Math.floor(dashes);
 
 		    var q = 0;
 		    while (q++ < dashes && y1>-1 && y1<targets[curTarget].imgheight+1 && x1>-1 && x1<targets[curTarget].imgwidth+1) {
@@ -1490,6 +1869,7 @@ function initCanvases(k) {
 	} catch(e) { }
 	for (var i in canvases) {
 		if (typeof(k)=='undefined' || k==i) {
+			var thisdrawla = null;
 			if (drawla[i]!=null && drawla[i].length>2) {
 				lines[canvases[i][0]] = drawla[i][0];
 				dots[canvases[i][0]] = drawla[i][1];
@@ -1511,8 +1891,15 @@ function initCanvases(k) {
 						ineqlines[canvases[i][0]][j] = [drawla[i][4][j].slice(1,3),drawla[i][4][j].slice(3,5),drawla[i][4][j].slice(5)];
 					}
 				}
+				if (drawla[i].length>5) {
+					thisdrawla = drawla[i][5];
+				}
 			}
-			addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+			if (canvases[i][1].substr(0,8)=="a11ydraw") {
+				addA11yTarget(canvases[i], thisdrawla);
+			} else {
+				addTarget(canvases[i][0],'canvas'+canvases[i][0],imasroot+'/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+			}
 		}
 	}
 }
@@ -1885,7 +2272,11 @@ var drawexport = {
 	clearcanvas:clearcanvas,
 	settool:settool,
 	addnormslider:addnormslider,
-	chgnormtype:chgnormtype
+	chgnormtype:chgnormtype,
+	adda11ydraw:adda11ydraw,
+	changea11ydraw:changea11ydraw,
+	encodea11ydraw:encodea11ydraw,
+	removea11ydraw:removea11ydraw
 };
 return drawexport;
 }(jQuery));

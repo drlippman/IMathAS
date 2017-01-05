@@ -5,7 +5,7 @@ if (file_exists("config.php")) {
 	exit;
 }
 if (isset($_POST['dbserver'])) {
-	
+
 	$contents = "<?php
 //IMathAS Math Config File.  Adjust settings here!
 
@@ -14,6 +14,9 @@ if (isset($_POST['dbserver'])) {
 \$dbname = \"{$_POST['dbname']}\";
 \$dbusername = \"{$_POST['dbusername']}\";
 \$dbpassword = \"{$_POST['dbpassword']}\";
+
+//error reporting level.  Set to 0 for production servers.
+error_reporting(E_ALL & ~E_NOTICE);
 
 //install name
 \$installname = \"{$_POST['installname']}\";
@@ -73,14 +76,6 @@ if ($pass) {
 
 ";
 }
-	
-if ($_POST['mathchaturl']==0) {
-	$contents .= "//Math chat disabled \n//\$mathchaturl = \"\$imasroot/mathchat/index.php\";\n\n";	
-} else if ($_POST['mathchaturl']==1) {
-	$contents .= "//Math chat enabled \n\$mathchaturl = \"\$imasroot/mathchat/index.php\";\n\n";	
-} else if ($_POST['mathchaturl']==2) {
-	$contents .= "//Math chat enabled \n\$mathchaturl = \"{$_POST['mathchaturlurl']}\";\n\n";	
-}
 
 if (!empty($_POST['sessionpath'])) {
 	$contents .= "//session path \n\$sessionpath = \"{$_POST['sessionpath']}\";\n\n";
@@ -99,7 +94,7 @@ if (!empty($_POST['AWSkey']) && !empty($_POST['AWSsecret']) && !empty($_POST['AW
 //\$AWSsecret = \"{$_POST['AWSsecret']}\";\n
 //\$AWSbucket = \"{$_POST['AWSbucket']}\";\n\n";
 }
-	
+
 $contents .= '
 //Uncomment to change the default course theme, also used on the home & admin page:
 //$defaultcoursetheme = "default.css"
@@ -108,28 +103,20 @@ $contents .= '
 
 //no need to change anything from here on
   /* Connecting, selecting database */
-  if (!isset($dbsetup)) {
-	 $link = mysql_connect($dbserver,$dbusername, $dbpassword) 
-	  or die("<p>Could not connect : " . mysql_error() . "</p></div></body></html>");
-	 mysql_select_db($dbname) 
-	  or die("<p>Could not select database</p></div></body></html>");
-	  
+	try {
+	 $DBH = new PDO("mysql:host=$dbserver;dbname=$dbname", $dbusername, $dbpassword);
+	 $DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+	 $GLOBALS["DBH"] = $DBH;
+	} catch(PDOException $e) {
+	 die("<p>Could not connect to database: <b>" . $e->getMessage() . "</b></p></div></body></html>");
+	}
+	$DBH->query("set session sql_mode=\'\'");
+
 	  unset($dbserver);
 	  unset($dbusername);
 	  unset($dbpassword);
-     $query = "set session sql_mode=\'\'";
-     $result = mysql_query($query);
 
-  }
-  //clean up post and get if magic quotes aren\'t on
-  function addslashes_deep($value) {
-	return (is_array($value) ? array_map(\'addslashes_deep\', $value) : addslashes($value));
-  }
-  if (!get_magic_quotes_gpc()) {
-   $_GET    = array_map(\'addslashes_deep\', $_GET);
-   $_POST  = array_map(\'addslashes_deep\', $_POST);
-   $_COOKIE = array_map(\'addslashes_deep\', $_COOKIE);
-  } 
+
 ?>';
 $file = fopen('config.php','w');
 $f =  fwrite($file,$contents);
@@ -175,7 +162,7 @@ if ($c6 && $c7 && $c8) {
 </body>
 </html>
 <?php
-	
+
 } else {
 ?>
 <html>
@@ -188,7 +175,7 @@ p {
 	margin: 5px;
 }
 p.imp {
-	background: #fcc;	
+	background: #fcc;
 }
 </style>
 <title>IMathAS Install</title>
@@ -261,7 +248,7 @@ Login format.<br/>
 </p>
 
 <p>
-Require new users to respond to an email to verify their account before allowing 
+Require new users to respond to an email to verify their account before allowing
 them to log in?<br/>
 <input type="radio" name="emailconfirmation" value="true"/>Yes<br/>
 <input type="radio" name="emailconfirmation" value="false" checked="checked" />No
@@ -288,18 +275,9 @@ subdirectory.<br/>
 </p>
 
 <p>
-Absolute path or full url to Mimetex CGI, for math image fallback.  If you cannot install it 
+Absolute path or full url to Mimetex CGI, for math image fallback.  If you cannot install it
 on your local installation, you can use the default public server.<br/>
 <input type="text" name="mathimgurl" size="80" value="http://www.imathas.com/cgi-bin/mimetex.cgi" />
-</p>
-
-<p>
-Enable live chat?  If lots of people use this, it could overburden the server.  You can
-use a live chat from another server to distribute load if you want.<br/>
-<input type="radio" name="mathchaturl" value="0" checked="checked" /> Disable<br/>
-<input type="radio" name="mathchaturl" value="1" /> Enable using this server<br/>
-<input type="radio" name="mathchaturl" value="2" /> Enable, using this url:
-<input type="text" name="mathchaturlurl" size="80" value="http://otherserver.edu/imathasroot/mathchat/index.php"/>
 </p>
 
 <p>
@@ -309,15 +287,15 @@ Enable use of IMathAS as a BasicLTI producer?<br/>
 </p>
 
 <p>
-Should non-admins be allowed to create open-to-all libraries? On a single-school 
-install, set to yes; for larger installs that plan to use the Instructor Groups features, 
+Should non-admins be allowed to create open-to-all libraries? On a single-school
+install, set to yes; for larger installs that plan to use the Instructor Groups features,
 set to no<br/>
 <input type="radio" name="allownongrouplibs" value="true"  /> Yes<br/>
 <input type="radio" name="allownongrouplibs" value="false" checked="checked" /> No
 </p>
 
 <p>
-Should anyone be allowed to import/export questions and libraries from the 
+Should anyone be allowed to import/export questions and libraries from the
 course page?  Intended for easy sharing between systems, but the course page
 is cleaner if turned off.<br/>
 <input type="radio" name="allowcourseimport" value="true"  /> Yes<br/>
@@ -339,7 +317,7 @@ change it when you need to install a macro file.<br/>
 
 <p>
 Set PHP session path away from default.  Leave blank to use default, or provide
-an absolute file system path. 
+an absolute file system path.
 Changing is usually not necessary unless your site is on a server farm, or
 you're on a shared server and want more security of session data.
 Make sure this directory has write access by the server process.
@@ -362,6 +340,6 @@ Amazon S3 Bucket:<input type="text" name="AWSbucket" value=""/><br/>
 <input type="reset" value="Reset Defaults"/>
 </form>
 
-<?php	
+<?php
 }
 ?>

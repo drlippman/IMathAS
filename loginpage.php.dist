@@ -56,8 +56,8 @@ if (!isset($imasroot)) { //don't allow direct access to loginpage.php
 ?>
 <b>Login</b>
 <table>
-<tr><td><?php echo $loginprompt;?>:</td><td><input type="text" size="15" id="username" name="username" /></td></tr>
-<tr><td>Password:</td><td><input type="password" size="15" name="password" /></td></tr>
+<tr><td><label for="username"><?php echo $loginprompt;?></label>:</td><td><input type="text" size="15" id="username" name="username" /></td></tr>
+<tr><td><label for="password">Password</label>:</td><td><input type="password" size="15" id="password" name="password" /></td></tr>
 </table>
 <div id="settings">JavaScript is not enabled.  JavaScript is required for <?php echo $installname; ?>.  Please enable JavaScript and reload this page</div>
 <div class="textright"><a href="<?php echo $imasroot; ?>/forms.php?action=newuser">Register as a new student</a></div>
