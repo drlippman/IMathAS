@@ -532,6 +532,9 @@ if (isset($_GET['delete'])) {
 			<lticm:property name="selection_height">300</lticm:property>
 		      </lticm:options>');
 		fwrite($fp,'</blti:extensions>');
+		fwrite($fp,'<blti:custom>');
+		fwrite($fp,'  <lticm:property name="canvas_assignment_due_at">$Canvas.assignment.dueAt.iso8601</lticm:property>');
+		fwrite($fp,'</blti:custom>');
 		fwrite($fp,'</cartridge_basiclti_link>');
 		fclose($fp);
 		$resitem =  '<resource identifier="RESbltiimathas" type="imsbasiclti_xmlv1p0">'."\n";
