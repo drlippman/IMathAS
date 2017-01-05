@@ -432,7 +432,7 @@ $placeinhead .= '</script>';
 		</tbody>
 		</table>
 		<script type="text/javascript">
-		initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
+		initSortTable('myTable',Array('S','S','S','S','D',false,false),true);
 		</script>
 
 		<input type=button value="Add New User" onclick="window.location='forms.php?action=newadmin'">
